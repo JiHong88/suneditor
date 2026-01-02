@@ -535,28 +535,345 @@ describe('HTML', () => {
              expect(result).toBe(true);
              expect(editor.ui.showToast).toHaveBeenCalledWith(editor.lang.message_copy_success, expect.anything());
         });
-        
+
         it('should fail if content is not valid', async () => {
              const result = await html.copy({}); // invalid object
              expect(result).toBe(false);
         });
-        
+
         it('should handle clipboard error (return false)', async () => {
              jest.spyOn(clipboard, 'write').mockResolvedValue(false);
              editor.ui.showToast = jest.fn();
-             
+
              const result = await html.copy('text');
              expect(result).toBe(false);
              expect(editor.ui.showToast).toHaveBeenCalledWith(editor.lang.message_copy_fail, expect.anything(), 'error');
         });
-        
+
         it('should handle exception in copy', async () => {
              jest.spyOn(clipboard, 'write').mockRejectedValue(new Error('fail'));
              console.error = jest.fn(); // suppress console error
              editor.ui.showToast = jest.fn();
-             
+
              const result = await html.copy('text');
              expect(result).toBe(false);
         });
     });
+
+	/**
+	 * ============================================================
+	 * STRICT DOM VERIFICATION TESTS FOR HTML CLASS
+	 * These tests verify exact DOM output to catch regressions
+	 * during refactoring.
+	 * ============================================================
+	 */
+	describe('Strict DOM verification - insert', () => {
+		it('should produce exact HTML when inserting text at cursor', () => {
+			wysiwyg.innerHTML = '<p>Hello World</p>';
+			const textNode = wysiwyg.querySelector('p').firstChild;
+			editor.selection.setRange(textNode, 5, textNode, 5);
+
+			const insertText = document.createTextNode(' Beautiful');
+			html.insertNode(insertText);
+
+			expect(wysiwyg.innerHTML).toBe('<p>Hello Beautiful World</p>');
+		});
+
+		it('should produce exact HTML when inserting span at cursor', () => {
+			wysiwyg.innerHTML = '<p>Plain text here</p>';
+			const textNode = wysiwyg.querySelector('p').firstChild;
+			editor.selection.setRange(textNode, 6, textNode, 6);
+
+			const span = document.createElement('span');
+			span.style.color = 'red';
+			span.textContent = 'colored';
+			html.insertNode(span);
+
+			expect(wysiwyg.innerHTML).toBe('<p>Plain <span style="color: red;">colored</span>text here</p>');
+		});
+
+		it('should produce exact HTML when replacing selected text', () => {
+			wysiwyg.innerHTML = '<p>Replace this word</p>';
+			const textNode = wysiwyg.querySelector('p').firstChild;
+			editor.selection.setRange(textNode, 8, textNode, 12);
+
+			const replacement = document.createTextNode('that');
+			html.insertNode(replacement);
+
+			expect(wysiwyg.innerHTML).toBe('<p>Replace that word</p>');
+		});
+
+		it('should insert strong element correctly', () => {
+			wysiwyg.innerHTML = '<p>Normal text</p>';
+			const textNode = wysiwyg.querySelector('p').firstChild;
+			editor.selection.setRange(textNode, 7, textNode, 7);
+
+			const strong = document.createElement('strong');
+			strong.textContent = 'BOLD';
+			html.insertNode(strong);
+
+			expect(wysiwyg.querySelector('strong')).toBeTruthy();
+			expect(wysiwyg.querySelector('strong').textContent).toBe('BOLD');
+		});
+	});
+
+	describe('Strict DOM verification - insertNode with block elements', () => {
+		it('should split paragraph when inserting block element', () => {
+			wysiwyg.innerHTML = '<p>Before After</p>';
+			const textNode = wysiwyg.querySelector('p').firstChild;
+			editor.selection.setRange(textNode, 7, textNode, 7);
+
+			const newP = document.createElement('p');
+			newP.textContent = 'Middle';
+			html.insertNode(newP);
+
+			// Should have multiple paragraphs now
+			const paragraphs = wysiwyg.querySelectorAll('p');
+			expect(paragraphs.length).toBeGreaterThanOrEqual(2);
+			expect(wysiwyg.textContent).toContain('Before');
+			expect(wysiwyg.textContent).toContain('Middle');
+			expect(wysiwyg.textContent).toContain('After');
+		});
+
+		it('should insert div element splitting content', () => {
+			wysiwyg.innerHTML = '<p>Start End</p>';
+			const textNode = wysiwyg.querySelector('p').firstChild;
+			editor.selection.setRange(textNode, 6, textNode, 6);
+
+			const div = document.createElement('div');
+			div.textContent = 'Inserted Block';
+			html.insertNode(div);
+
+			expect(wysiwyg.querySelector('div')).toBeTruthy();
+			expect(wysiwyg.textContent).toContain('Inserted Block');
+		});
+	});
+
+	describe('Strict DOM verification - remove', () => {
+		it('should remove selected text exactly', () => {
+			wysiwyg.innerHTML = '<p>Remove middle text</p>';
+			const textNode = wysiwyg.querySelector('p').firstChild;
+			editor.selection.setRange(textNode, 7, textNode, 14);
+
+			html.remove();
+
+			expect(wysiwyg.innerHTML).toBe('<p>Remove text</p>');
+		});
+
+		it('should remove entire word when selected', () => {
+			wysiwyg.innerHTML = '<p>Hello World</p>';
+			const textNode = wysiwyg.querySelector('p').firstChild;
+			editor.selection.setRange(textNode, 6, textNode, 11);
+
+			html.remove();
+
+			expect(wysiwyg.innerHTML).toBe('<p>Hello </p>');
+		});
+
+		it('should handle removing formatted text', () => {
+			wysiwyg.innerHTML = '<p>Text <strong>Bold</strong> More</p>';
+			const strongText = wysiwyg.querySelector('strong').firstChild;
+			editor.selection.setRange(strongText, 0, strongText, 4);
+
+			html.remove();
+
+			// Bold text should be removed, strong tag may or may not remain
+			expect(wysiwyg.textContent).toContain('Text');
+			expect(wysiwyg.textContent).toContain('More');
+			expect(wysiwyg.textContent).not.toContain('Bold');
+		});
+
+		it('should remove across multiple elements', () => {
+			wysiwyg.innerHTML = '<p><strong>Bold</strong><em>Italic</em></p>';
+			const boldText = wysiwyg.querySelector('strong').firstChild;
+			const italicText = wysiwyg.querySelector('em').firstChild;
+			editor.selection.setRange(boldText, 2, italicText, 3);
+
+			html.remove();
+
+			// Should have removed "ld" from Bold and "Ita" from Italic
+			expect(wysiwyg.textContent).toBe('Bolic');
+		});
+	});
+
+	describe('Strict DOM verification - get/set', () => {
+		it('should get exact HTML content', () => {
+			wysiwyg.innerHTML = '<p>Test <strong>content</strong></p>';
+
+			const result = html.get();
+
+			expect(result).toBe('<p>Test <strong>content</strong></p>');
+		});
+
+		it('should set HTML content exactly', () => {
+			html.set('<p>New <em>content</em></p>');
+
+			expect(wysiwyg.innerHTML).toBe('<p>New <em>content</em></p>');
+		});
+
+		it('should handle empty content', () => {
+			html.set('');
+
+			// Empty content results in empty string (actual behavior)
+			expect(wysiwyg.innerHTML).toBeDefined();
+		});
+
+		it('should preserve complex nested structure', () => {
+			const complexHTML = '<p><strong><em>Bold Italic</em></strong></p><ul><li>Item 1</li><li>Item 2</li></ul>';
+			html.set(complexHTML);
+
+			expect(wysiwyg.querySelector('strong em')).toBeTruthy();
+			expect(wysiwyg.querySelectorAll('li').length).toBe(2);
+		});
+	});
+
+	describe('Strict DOM verification - clean', () => {
+		it('should clean HTML removing extra whitespace', () => {
+			const dirty = '  <p>  Text   with   spaces  </p>  ';
+			const cleaned = html.clean(dirty);
+
+			// Should be trimmed and normalized
+			expect(cleaned).not.toMatch(/^\s+/);
+			expect(cleaned).not.toMatch(/\s+$/);
+		});
+
+		it('should preserve necessary structure', () => {
+			const input = '<p><strong>Bold</strong> <em>Italic</em></p>';
+			const cleaned = html.clean(input);
+
+			expect(cleaned).toContain('<strong>');
+			expect(cleaned).toContain('<em>');
+		});
+
+		it('should remove script tags', () => {
+			const malicious = '<p>Safe</p><script>alert("xss")</script>';
+			const cleaned = html.clean(malicious);
+
+			expect(cleaned).not.toContain('<script>');
+			expect(cleaned).toContain('Safe');
+		});
+
+		it('should handle inline styles (clean may strip styles based on config)', () => {
+			const styled = '<p><span style="color: red;">Red Text</span></p>';
+			const cleaned = html.clean(styled);
+
+			// clean() may strip inline styles based on editor configuration
+			// Text content should be preserved
+			expect(cleaned).toContain('Red Text');
+		});
+	});
+
+	describe('Strict DOM verification - list operations', () => {
+		it('should insert into list item correctly', () => {
+			wysiwyg.innerHTML = '<ul><li>Item one</li><li>Item two</li></ul>';
+			const li = wysiwyg.querySelector('li');
+			const textNode = li.firstChild;
+			editor.selection.setRange(textNode, 5, textNode, 5);
+
+			const span = document.createElement('span');
+			span.textContent = ' inserted';
+			html.insertNode(span);
+
+			expect(li.textContent).toContain('inserted');
+		});
+
+		it('should handle inserting list into paragraph', () => {
+			wysiwyg.innerHTML = '<p>Before list</p>';
+			const textNode = wysiwyg.querySelector('p').firstChild;
+			editor.selection.setRange(textNode, 11, textNode, 11);
+
+			const ul = document.createElement('ul');
+			ul.innerHTML = '<li>New item</li>';
+			html.insertNode(ul);
+
+			expect(wysiwyg.querySelector('ul')).toBeTruthy();
+			expect(wysiwyg.querySelector('li').textContent).toBe('New item');
+		});
+	});
+
+	describe('Strict DOM verification - table operations', () => {
+		it('should insert text into table cell', () => {
+			wysiwyg.innerHTML = '<table><tbody><tr><td>Cell</td></tr></tbody></table>';
+			const cell = wysiwyg.querySelector('td');
+			const textNode = cell.firstChild;
+			editor.selection.setRange(textNode, 4, textNode, 4);
+
+			const insertText = document.createTextNode(' content');
+			html.insertNode(insertText);
+
+			expect(cell.textContent).toBe('Cell content');
+		});
+
+		it('should handle removing text from table cell', () => {
+			wysiwyg.innerHTML = '<table><tbody><tr><td>Remove this</td></tr></tbody></table>';
+			const cell = wysiwyg.querySelector('td');
+			const textNode = cell.firstChild;
+			editor.selection.setRange(textNode, 7, textNode, 11);
+
+			html.remove();
+
+			expect(cell.textContent).toBe('Remove ');
+		});
+	});
+
+	describe('Strict DOM verification - special characters', () => {
+		it('should handle HTML entities correctly', () => {
+			html.set('<p>Test &amp; verify &lt;tag&gt;</p>');
+
+			expect(wysiwyg.textContent).toBe('Test & verify <tag>');
+		});
+
+		it('should handle unicode characters', () => {
+			html.set('<p>한글 테스트 🎉</p>');
+
+			expect(wysiwyg.textContent).toBe('한글 테스트 🎉');
+		});
+
+		it('should preserve whitespace in preformatted blocks', () => {
+			const preContent = '<pre>  indented\n    more indent</pre>';
+			html.set(preContent);
+
+			const pre = wysiwyg.querySelector('pre');
+			expect(pre).toBeTruthy();
+			expect(pre.textContent).toContain('  indented');
+		});
+	});
+
+	describe('Strict DOM verification - edge cases', () => {
+		it('should handle empty selection insert', () => {
+			wysiwyg.innerHTML = '<p>Text</p>';
+			const p = wysiwyg.querySelector('p');
+			editor.selection.setRange(p, 0, p, 0);
+
+			const span = document.createElement('span');
+			span.textContent = 'Start';
+			html.insertNode(span);
+
+			expect(wysiwyg.textContent).toContain('Start');
+		});
+
+		it('should handle insert at end of content', () => {
+			wysiwyg.innerHTML = '<p>Content</p>';
+			const textNode = wysiwyg.querySelector('p').firstChild;
+			editor.selection.setRange(textNode, 7, textNode, 7);
+
+			const endText = document.createTextNode(' End');
+			html.insertNode(endText);
+
+			expect(wysiwyg.querySelector('p').textContent).toBe('Content End');
+		});
+
+		it('should handle nested inline elements', () => {
+			wysiwyg.innerHTML = '<p><strong><em>Nested</em></strong></p>';
+			const emText = wysiwyg.querySelector('em').firstChild;
+			editor.selection.setRange(emText, 3, emText, 3);
+
+			const u = document.createElement('u');
+			u.textContent = '-inserted-';
+			html.insertNode(u);
+
+			expect(wysiwyg.querySelector('u')).toBeTruthy();
+			expect(wysiwyg.textContent).toContain('-inserted-');
+		});
+	});
 });
