@@ -1424,39 +1424,36 @@ class Editor {
 		this._componentsInfoReset = false;
 		this._checkComponents(true);
 
-		this._w.setTimeout(
-			function () {
-				// Check if instance was destroyed (e.g., in SSR with dynamic imports mistake)
-				if (!this.context) {
-					console.warn('[SUNEDITOR:E_INIT_FAIL] Editor instance was destroyed before initialization completed. Check if destroy() was called.');
-					return;
-				}
+		this._w.setTimeout(() => {
+			// Check if instance was destroyed (e.g., in SSR with dynamic imports mistake)
+			if (!this.__context?.size) {
+				console.warn('[SUNEDITOR:E_INIT_FAIL] Editor instance was destroyed before initialization completed. Check if destroy() was called.');
+				return;
+			}
 
-				// toolbar visibility
-				this.context.get('toolbar_main').style.visibility = '';
-				// roots
-				this.applyFrameRoots((e) => {
-					// observer
-					if (this.eventManager._wwFrameObserver) this.eventManager._wwFrameObserver.observe(e.get('wysiwygFrame'));
-					if (this.eventManager._toolbarObserver) this.eventManager._toolbarObserver.observe(e.get('_toolbarShadow'));
-					// resource state
-					this._resourcesStateChange(e);
-				});
+			// toolbar visibility
+			this.context.get('toolbar_main').style.visibility = '';
+			// roots
+			this.applyFrameRoots((e) => {
+				// observer
+				if (this.eventManager._wwFrameObserver) this.eventManager._wwFrameObserver.observe(e.get('wysiwygFrame'));
+				if (this.eventManager._toolbarObserver) this.eventManager._toolbarObserver.observe(e.get('_toolbarShadow'));
+				// resource state
+				this._resourcesStateChange(e);
+			});
 
-				// history reset
-				this.history.reset();
-				// plugin hook
-				for (const plugin of Object.values(this.plugins)) {
-					plugin.init?.();
-				}
-				// class init
-				this.selection.__init();
+			// history reset
+			this.history.reset();
+			// plugin hook
+			for (const plugin of Object.values(this.plugins)) {
+				plugin.init?.();
+			}
+			// class init
+			this.selection.__init();
 
-				// user event
-				this.triggerEvent('onload', {});
-			}.bind(this),
-			0,
-		);
+			// user event
+			this.triggerEvent('onload', {});
+		}, 0);
 	}
 
 	/**
