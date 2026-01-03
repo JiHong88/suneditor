@@ -131,7 +131,7 @@ class Viewer extends CoreInjector {
 				}
 			}
 
-			this.editor._nativeFocus();
+			this.focusManager.nativeFocus();
 			dom.utils.removeClass(this.editor.commandTargets.get('codeView'), 'active');
 
 			if (!dom.check.isNonEditable(wysiwygFrame)) {

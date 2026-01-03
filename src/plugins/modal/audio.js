@@ -151,7 +151,7 @@ class Audio_ extends PluginModal {
 		if (!/^audio/.test(file.type)) return;
 
 		this.submitFile([file]);
-		this.editor.focus();
+		this.focusManager.focus();
 	}
 
 	/**
@@ -255,7 +255,7 @@ class Audio_ extends PluginModal {
 		}
 
 		// focus
-		this.editor.focusEdge(focusEl);
+		this.focusManager.focusEdge(focusEl);
 		this.history.push(false);
 	}
 
@@ -380,7 +380,7 @@ class Audio_ extends PluginModal {
 			element.src = src;
 			const figure = Figure.CreateContainer(element, 'se-flex-component');
 			if (!this.component.insert(figure.container, { scrollTo: isLast ? true : false, insertBehavior: isLast ? this.pluginOptions.insertBehavior : 'line' })) {
-				if (isLast) this.editor.focus();
+				if (isLast) this.focusManager.focus();
 				return;
 			}
 			if (!this.options.get('componentInsertBehavior')) {

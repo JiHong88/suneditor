@@ -11,7 +11,7 @@ declare const _default: {
 	/** @action cacheFormatAttrsTemp */
 	'cache.formatAttrsTemp': ({ ports }: EffectContext, { attrs }: any) => void;
 	/** @action editorNativeFocus */
-	'editor._nativeFocus': ({ ports }: EffectContext) => void;
+	'focusManager.nativeFocus': ({ ports }: EffectContext) => void;
 	/** @action historyPush */
 	'history.push': ({ ports }: EffectContext, hard: any) => void;
 	/** @action documentTypeRefreshHeader */

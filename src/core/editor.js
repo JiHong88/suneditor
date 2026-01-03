@@ -3,13 +3,17 @@ import Constructor, { InitOptions, UpdateButton, CreateShortcuts, CreateStatusba
 import { OPTION_FRAME_FIXED_FLAG, OPTION_FIXED_FLAG, BaseOptionsMap, FrameOptionsMap } from './config/options';
 import { ContextUtil } from './config/context';
 import { UpdateStatusbarContext, FrameContextUtil } from './config/frameContext';
-import { BASIC_COMMANDS, ACTIVE_EVENT_COMMANDS, SELECT_ALL, DIR_BTN_ACTIVE, SAVE, COPY_FORMAT, FONT_STYLE, PAGE_BREAK } from './base/actives';
-import History from './base/history';
-import EventManager from './event/eventManager';
+
+// type
 import DocumentType from './section/documentType';
 
-// util
-import InstanceCheck from './util/instanceCheck';
+// base
+import { BASIC_COMMANDS, ACTIVE_EVENT_COMMANDS, DIR_BTN_ACTIVE } from './support/actives';
+import History from './support/history';
+import CommandExecutor from './support/commandExecutor';
+import FocusManager from './support/focusManager';
+import InstanceCheck from './support/instanceCheck';
+import EventManager from './event/eventManager';
 
 // class injector
 import { _getClassInjectorKeys } from '../editorInjector/_classes';
@@ -334,13 +338,13 @@ class Editor {
 		this.selectMenuOn = false;
 
 		// ------ base ------
-		/** @description History class instance @type {ReturnType<typeof import('./base/history').default>} */
+		/** @description History class instance @type {ReturnType<typeof import('./support/history').default>} */
 		this.history = null;
 		/** @description EventManager class instance @type {import('./event/eventManager').default} */
 		this.eventManager = null;
 
 		//  ----- util -----
-		/** @description iframe-safe instanceof check utility class @type {import('./util/instanceCheck').default} */
+		/** @description iframe-safe instanceof check utility class @type {import('./support/instanceCheck').default} */
 		this.instanceCheck = null;
 
 		// ------ class ------
@@ -627,7 +631,7 @@ class Editor {
 				this.plugins[command].show();
 			}
 		} else if (command) {
-			this.commandHandler(command, button);
+			this.commandExecutor.execute(command, button);
 		}
 
 		if (/dropdown/.test(type)) {
@@ -635,98 +639,6 @@ class Editor {
 		} else if (!/command/.test(type)) {
 			this.menu.dropdownOff();
 			this.menu.containerOff();
-		}
-	}
-
-	/**
-	 * @description Execute default command of command button
-	 * - (selectAll, codeView, fullScreen, indent, outdent, undo, redo, removeFormat, print, preview, showBlocks, save, bold, underline, italic, strike, subscript, superscript, copy, cut, paste)
-	 * @param {string} command Property of command button (data-value)
-	 * @param {?Node} [button] Command button
-	 * @returns {Promise<void>}
-	 */
-	async commandHandler(command, button) {
-		if (this.frameContext.get('isReadOnly') && !/copy|cut|selectAll|codeView|fullScreen|print|preview|showBlocks/.test(command)) return;
-
-		switch (command) {
-			case 'selectAll':
-				SELECT_ALL(this);
-				break;
-			case 'copy': {
-				const range = this.selection.getRange();
-				if (range.collapsed) break;
-
-				const container = dom.utils.createElement('div', null, range.cloneContents());
-				await this.html.copy(container.innerHTML);
-
-				break;
-			}
-			case 'newDocument':
-				this.html.set(`<${this.options.get('defaultLine')}><br></${this.options.get('defaultLine')}>`);
-				this.focus();
-				this.history.push(false);
-				// document type
-				if (this.frameContext.has('documentType_use_header')) {
-					this.frameContext.get('documentType').reHeader();
-				}
-				break;
-			case 'codeView':
-				this.viewer.codeView(!this.frameContext.get('isCodeView'));
-				break;
-			case 'fullScreen':
-				this.viewer.fullScreen(!this.frameContext.get('isFullScreen'));
-				break;
-			case 'indent':
-				this.format.indent();
-				break;
-			case 'outdent':
-				this.format.outdent();
-				break;
-			case 'undo':
-				this.history.undo();
-				break;
-			case 'redo':
-				this.history.redo();
-				break;
-			case 'removeFormat':
-				this.inline.remove();
-				this.focus();
-				break;
-			case 'print':
-				this.viewer.print();
-				break;
-			case 'preview':
-				this.viewer.preview();
-				break;
-			case 'showBlocks':
-				this.viewer.showBlocks(!this.frameContext.get('isShowBlocks'));
-				break;
-			case 'dir':
-				this.setDir(this.options.get('_rtl') ? 'ltr' : 'rtl');
-				break;
-			case 'dir_ltr':
-				this.setDir('ltr');
-				break;
-			case 'dir_rtl':
-				this.setDir('rtl');
-				break;
-			case 'save':
-				await SAVE(this);
-				break;
-			case 'copyFormat':
-				COPY_FORMAT(this, button);
-				break;
-			case 'pageBreak':
-				PAGE_BREAK(this);
-				break;
-			case 'pageUp':
-				this.frameContext.get('documentType').pageUp();
-				break;
-			case 'pageDown':
-				this.frameContext.get('documentType').pageDown();
-				break;
-			default:
-				FONT_STYLE(this, command);
 		}
 	}
 
@@ -1068,80 +980,6 @@ class Editor {
 	}
 
 	/**
-	 * @description Focus to wysiwyg area
-	 * @param {*} [rootKey] Root frame key.
-	 */
-	focus(rootKey) {
-		if (rootKey) this.changeFrameContext(rootKey);
-		if (this.frameContext.get('wysiwygFrame').style.display === 'none') return;
-		this._preventBlur = false;
-
-		if (this.frameOptions.get('iframe') || !this.frameContext.get('wysiwyg').contains(this.selection.getNode())) {
-			this._nativeFocus();
-		} else {
-			try {
-				const range = this.selection.getRange();
-				if (range.startContainer === range.endContainer && dom.check.isWysiwygFrame(range.startContainer)) {
-					const currentNode = /** @type {HTMLElement} */ (range.commonAncestorContainer).children[range.startOffset];
-					if (!this.format.isLine(currentNode) && !this.component.is(currentNode)) {
-						const br = dom.utils.createElement('BR');
-						const format = dom.utils.createElement(this.options.get('defaultLine'), null, br);
-						this.frameContext.get('wysiwyg').insertBefore(format, currentNode);
-						this.selection.setRange(br, 0, br, 0);
-						return;
-					}
-				}
-				this.selection.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
-			} catch (e) {
-				console.warn('[SUNEDITOR.focus.warn] ', e);
-				this._nativeFocus();
-			}
-		}
-
-		if (this.isBalloon) this.eventManager._toggleToolbarBalloon();
-	}
-
-	/**
-	 * @description If "focusEl" is a component, then that component is selected; if it is a format element, the last text is selected
-	 * - If "focusEdge" is null, then selected last element
-	 * @param {?Node} [focusEl] Focus element
-	 */
-	focusEdge(focusEl) {
-		this._preventBlur = false;
-		focusEl ||= this.frameContext.get('wysiwyg').lastElementChild;
-
-		const fileComponentInfo = this.component.get(focusEl);
-		if (fileComponentInfo) {
-			this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName);
-		} else if (focusEl) {
-			if (focusEl.nodeType !== 3) {
-				focusEl = dom.query.getEdgeChild(
-					focusEl,
-					function (current) {
-						return current.childNodes.length === 0 || current.nodeType === 3;
-					},
-					true,
-				);
-			}
-			if (!focusEl) this._nativeFocus();
-			else this.selection.setRange(focusEl, focusEl.textContent.length, focusEl, focusEl.textContent.length);
-		} else {
-			this.focus();
-		}
-	}
-
-	/**
-	 * @description Focusout to wysiwyg area (.blur())
-	 */
-	blur() {
-		if (this.frameOptions.get('iframe')) {
-			this.frameContext.get('wysiwygFrame').blur();
-		} else {
-			this.frameContext.get('wysiwyg').blur();
-		}
-	}
-
-	/**
 	 * @description Destroy the suneditor
 	 */
 	destroy() {
@@ -1256,15 +1094,6 @@ class Editor {
 	}
 
 	/** ----- private methods ----------------------------------------------------------------------------------------------------------------------------- */
-
-	/**
-	 * @internal
-	 * @description Focus to wysiwyg area using "native focus function"
-	 */
-	_nativeFocus() {
-		this.selection.__focus();
-		this.selection.init();
-	}
 
 	/**
 	 * @internal
@@ -1589,7 +1418,7 @@ class Editor {
 							const focusEl = target.previousElementSibling || target.nextElementSibling;
 							dom.utils.removeItem(target);
 							// focus
-							this.focusEdge(focusEl);
+							this.focusManager.focusEdge(focusEl);
 							this.history.push(false);
 						},
 					},
@@ -1774,7 +1603,10 @@ class Editor {
 
 		// eventManager
 		this.eventManager = new EventManager(this);
-
+		// commandExecutor
+		this.commandExecutor = new CommandExecutor(this);
+		// focusManager
+		this.focusManager = new FocusManager(this);
 		// util
 		this.instanceCheck = new InstanceCheck(this);
 

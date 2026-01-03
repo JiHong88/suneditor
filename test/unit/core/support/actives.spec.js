@@ -1,5 +1,5 @@
 import { createTestEditor, destroyTestEditor, waitForEditorReady } from '../../../__mocks__/editorIntegration';
-import * as actives from '../../../../src/core/base/actives';
+import * as actives from '../../../../src/core/support/actives';
 import { dom, env } from '../../../../src/helper';
 
 describe('actives', () => {

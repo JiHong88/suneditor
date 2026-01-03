@@ -188,7 +188,7 @@ class Modal extends CoreInjector {
 		this.inst.modalInit?.();
 		this.inst.modalOff?.(this.isUpdate);
 
-		if (!this.isUpdate) this.editor.focus();
+		if (!this.isUpdate) this.focusManager.focus();
 	}
 
 	/**

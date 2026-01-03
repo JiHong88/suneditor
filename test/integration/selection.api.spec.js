@@ -111,7 +111,7 @@ describe('Selection API integration tests', () => {
 		});
 
 		it('should return valid range even without explicit selection', () => {
-			editor.focus();
+			editor.focusManager.focus();
 
 			const range = editor.selection.getRange();
 
@@ -189,7 +189,7 @@ describe('Selection API integration tests', () => {
 			editor.selection.setRange(textNode, 7, textNode, 11);
 
 			// Apply formatting
-			await editor.commandHandler('bold');
+			await editor.commandExecutor.execute('bold');
 
 			// Selection should still be active
 			const range = editor.selection.getRange();
@@ -203,7 +203,7 @@ describe('Selection API integration tests', () => {
 			// Select and format "First"
 			let textNode = wysiwyg.querySelector('p').firstChild;
 			editor.selection.setRange(textNode, 0, textNode, 5);
-			await editor.commandHandler('bold');
+			await editor.commandExecutor.execute('bold');
 
 			// Select and format "Second"
 			textNode = wysiwyg.querySelector('p').firstChild || wysiwyg.querySelector('p').childNodes[0];
@@ -211,7 +211,7 @@ describe('Selection API integration tests', () => {
 				const fullText = wysiwyg.textContent;
 				const secondStart = fullText.indexOf('Second');
 				editor.selection.setRange(textNode, secondStart, textNode, secondStart + 6);
-				await editor.commandHandler('italic');
+				await editor.commandExecutor.execute('italic');
 			}
 
 			// Both words should have formatting
@@ -227,7 +227,7 @@ describe('Selection API integration tests', () => {
 			wysiwyg.innerHTML = '<p>All of this content</p>';
 
 			// Use selectAll command
-			await editor.commandHandler('selectAll');
+			await editor.commandExecutor.execute('selectAll');
 
 			// Get selection
 			const range = editor.selection.getRange();

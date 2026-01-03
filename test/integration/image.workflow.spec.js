@@ -449,7 +449,7 @@ describe('Image Workflow Integration Tests', () => {
 			expect(wysiwyg.querySelectorAll('img').length).toBe(1);
 
 			// Undo
-			await editor.commandHandler('undo');
+			await editor.commandExecutor.execute('undo');
 
 			// Image should be removed (in real implementation)
 			// For this test, we just verify undo was called
@@ -467,8 +467,8 @@ describe('Image Workflow Integration Tests', () => {
 			editor.history.push(false);
 
 			// Undo then Redo
-			await editor.commandHandler('undo');
-			await editor.commandHandler('redo');
+			await editor.commandExecutor.execute('undo');
+			await editor.commandExecutor.execute('redo');
 
 			// Verify redo executed
 			expect(true).toBe(true);
@@ -491,7 +491,7 @@ describe('Image Workflow Integration Tests', () => {
 			expect(image.style.width).toBe('200px');
 
 			// Undo resize
-			await editor.commandHandler('undo');
+			await editor.commandExecutor.execute('undo');
 
 			// In real implementation, width would be restored
 			expect(true).toBe(true);
@@ -602,10 +602,10 @@ describe('Image Workflow Integration Tests', () => {
 			expect(paragraphs[0].querySelector('strong')).toBeTruthy();
 
 			// Undo text change
-			await editor.commandHandler('undo');
+			await editor.commandExecutor.execute('undo');
 
 			// Undo image change
-			await editor.commandHandler('undo');
+			await editor.commandExecutor.execute('undo');
 
 			expect(true).toBe(true);
 		});

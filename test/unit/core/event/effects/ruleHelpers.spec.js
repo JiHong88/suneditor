@@ -20,8 +20,8 @@ describe('Rule Helpers', () => {
 			component: {
 				is: jest.fn()
 			},
-			editor: {
-				_nativeFocus: jest.fn()
+			focusManager: {
+				nativeFocus: jest.fn()
 			},
 			nodeTransform: {
 				removeAllParents: jest.fn()
@@ -69,8 +69,8 @@ describe('Rule Helpers', () => {
 
 			const result = hardDelete(mockPorts);
 
-			// Should have called _nativeFocus
-			expect(mockPorts.editor._nativeFocus).toHaveBeenCalled();
+			// Should have called nativeFocus
+			expect(mockPorts.focusManager.nativeFocus).toHaveBeenCalled();
 			expect(result).toBe(true);
 
 			// Cleanup

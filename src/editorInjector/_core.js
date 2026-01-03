@@ -16,7 +16,12 @@ export default function CoreInjector(editor) {
 	 */
 	this.eventManager = editor.eventManager;
 	/**
-	 * @description The util/instanceCheck instance.
+	 * @description The focus manager instance
+	 * @type {SunEditor.Core['focusManager']}
+	 */
+	this.focusManager = editor.focusManager;
+	/**
+	 * @description The instanceCheck instance.
 	 * @type {SunEditor.Core['instanceCheck']}
 	 */
 	this.instanceCheck = editor.instanceCheck;

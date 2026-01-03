@@ -39,6 +39,12 @@ jest.mock('../../../../src/editorInjector', () => {
 			this.inline = editor.inline || {
 				apply: jest.fn()
 			};
+			this.focusManager = editor.focusManager || {
+				focus: jest.fn(),
+				blur: jest.fn(),
+				focusEdge: jest.fn(),
+				nativeFocus: jest.fn()
+			};
 		}
 	};
 });
@@ -157,7 +163,7 @@ describe('Link Plugin', () => {
 			inline: {
 				apply: jest.fn()
 			},
-			focus: jest.fn()
+			focusManager: { focus: jest.fn(), blur: jest.fn(), focusEdge: jest.fn(), nativeFocus: jest.fn() }
 		};
 
 		link = new Link(mockEditor, {});
@@ -426,7 +432,7 @@ describe('Link Plugin', () => {
 
 			expect(dom.utils.removeItem).toHaveBeenCalledWith(targetBeforeDeletion);
 			expect(link.controller.currentTarget).toBeNull();
-			expect(mockEditor.focus).toHaveBeenCalled();
+			expect(mockEditor.focusManager.focus).toHaveBeenCalled();
 			expect(mockEditor.history.push).toHaveBeenCalledWith(false);
 		});
 	});

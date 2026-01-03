@@ -85,10 +85,10 @@ export function makePorts(inst, { _styleNodes }) {
 	const { selection, format, listFormat, component, html, nodeTransform, history, char, menu } = inst;
 
 	return {
-		// editor
-		editor: {
-			_nativeFocus: () => inst.editor._nativeFocus(),
-			blur: () => inst.editor.blur(),
+		// focusManager
+		focusManager: {
+			nativeFocus: () => inst.focusManager.nativeFocus(),
+			blur: () => inst.focusManager.blur(),
 		},
 
 		// === class ===
@@ -185,9 +185,9 @@ export function makePorts(inst, { _styleNodes }) {
 /**
  * @typedef {Object} EventReducerPorts
  *
- * @property {Object} editor
- * @property {() => void} editor._nativeFocus
- * @property {() => void} editor.blur
+ * @property {Object} focusManager
+ * @property {() => void} focusManager.nativeFocus
+ * @property {() => void} focusManager.blur
  * @property {SelectionPorts} selection
  * @property {FormatPorts} format
  * @property {ListFormatPorts} listFormat

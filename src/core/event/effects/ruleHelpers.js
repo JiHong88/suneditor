@@ -43,7 +43,7 @@ function hardDelete(ports) {
 			dom.utils.removeItem(dom.query.getParentElement(sCell, (current) => ancestor === current.parentNode));
 		} else {
 			dom.utils.removeItem(dom.query.getParentElement(sCell, (current) => ancestor === current.parentNode));
-			ports.editor._nativeFocus();
+			ports.focusManager.nativeFocus();
 			return true;
 		}
 	}

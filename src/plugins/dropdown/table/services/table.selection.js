@@ -348,7 +348,7 @@ export class TableSelectionService {
 	 * @param {HTMLElement} cell Target node
 	 */
 	focusCellEdge(cell) {
-		if (!env.isMobile) this.#main.editor.focusEdge(cell);
+		if (!env.isMobile) this.#main.focusManager.focusEdge(cell);
 	}
 
 	/**

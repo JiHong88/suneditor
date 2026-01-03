@@ -9,10 +9,12 @@ jest.mock('../../../../src/editorInjector', () => {
 			this.eventManager = { addEvent: jest.fn() };
 			this.events = { onAudioLoad: jest.fn(), onAudioAction: jest.fn() };
 			this.options = { get: jest.fn().mockReturnValue('auto') };
-			// Editor methods for comprehensive coverage
-			this.editor = {
+			// focusManager for comprehensive coverage
+			this.focusManager = {
 				focus: jest.fn(),
-				focusEdge: jest.fn()
+				blur: jest.fn(),
+				focusEdge: jest.fn(),
+				nativeFocus: jest.fn()
 			};
 			this.format = {
 				getLine: jest.fn().mockReturnValue(null),
@@ -636,7 +638,7 @@ describe('Audio Plugin', () => {
 
 			audio.create(mockElement, 'https://example.com/audio.mp3', file, false, true);
 
-			expect(audio.editor.focus).toHaveBeenCalled();
+			expect(audio.focusManager.focus).toHaveBeenCalled();
 		});
 
 		it('should not re-select if src is same on update', () => {

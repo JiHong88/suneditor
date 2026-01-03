@@ -56,9 +56,9 @@ describe('Event Actions', () => {
 	});
 
 	describe('Editor commands', () => {
-		it('should create editorNativeFocus action', () => {
+		it('should create focusManagerNativeFocus action', () => {
 			const action = A.editorNativeFocus();
-			expect(action).toEqual({ t: 'editor._nativeFocus' });
+			expect(action).toEqual({ t: 'focusManager.nativeFocus' });
 		});
 
 		it('should create historyPush action with hard parameter', () => {

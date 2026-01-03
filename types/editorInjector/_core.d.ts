@@ -21,7 +21,12 @@ export default class CoreInjector {
 	 */
 	eventManager: SunEditor.Core['eventManager'];
 	/**
-	 * @description The util/instanceCheck instance.
+	 * @description The focus manager instance
+	 * @type {SunEditor.Core['focusManager']}
+	 */
+	focusManager: SunEditor.Core['focusManager'];
+	/**
+	 * @description The instanceCheck instance.
 	 * @type {SunEditor.Core['instanceCheck']}
 	 */
 	instanceCheck: SunEditor.Core['instanceCheck'];

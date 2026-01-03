@@ -218,7 +218,7 @@ class Table extends PluginDropdownFree {
 				},
 				null,
 			);
-		this.editor.focus();
+		this.focusManager.focus();
 		this.history.push(false);
 	}
 

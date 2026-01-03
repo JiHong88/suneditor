@@ -110,7 +110,12 @@ describe('Table Plugin Main Class', () => {
             menu: {
                 initDropdownTarget: jest.fn()
             },
-            focus: jest.fn(),
+            focusManager: {
+                focus: jest.fn(),
+                blur: jest.fn(),
+                focusEdge: jest.fn(),
+                nativeFocus: jest.fn(),
+            },
             history: {
                 push: jest.fn()
             },
@@ -1054,7 +1059,7 @@ describe('Table Plugin Main Class', () => {
              tablePlugin.frameContext = { get: jest.fn().mockReturnValue('wysiwyg') };
              tablePlugin.nodeTransform = { removeAllParents: jest.fn() };
              tablePlugin._closeTableSelectInfo = jest.fn();
-             tablePlugin.editor = { focus: jest.fn() };
+             tablePlugin.focusManager = { focus: jest.fn(), blur: jest.fn(), focusEdge: jest.fn(), nativeFocus: jest.fn() };
              tablePlugin.history = { push: jest.fn() };
              
              const { dom } = require('../../../../../src/helper');

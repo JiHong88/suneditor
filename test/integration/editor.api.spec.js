@@ -42,7 +42,7 @@ describe('Editor API integration tests', () => {
             editor.selection.setRange(textNode, 0, textNode, 4);
 
             // Apply bold
-            await editor.commandHandler('bold');
+            await editor.commandExecutor.execute('bold');
 
             // Check if bold was applied
             const bold = wysiwyg.querySelector('strong') || wysiwyg.querySelector('b');
@@ -56,7 +56,7 @@ describe('Editor API integration tests', () => {
             const textNode = wysiwyg.querySelector('p').firstChild;
             editor.selection.setRange(textNode, 0, textNode, 4);
 
-            await editor.commandHandler('italic');
+            await editor.commandExecutor.execute('italic');
 
             const italic = wysiwyg.querySelector('em') || wysiwyg.querySelector('i');
             expect(italic).not.toBeNull();
@@ -69,7 +69,7 @@ describe('Editor API integration tests', () => {
             const textNode = wysiwyg.querySelector('p').firstChild;
             editor.selection.setRange(textNode, 0, textNode, 4);
 
-            await editor.commandHandler('underline');
+            await editor.commandExecutor.execute('underline');
 
             const underline = wysiwyg.querySelector('u');
             expect(underline).not.toBeNull();
@@ -82,7 +82,7 @@ describe('Editor API integration tests', () => {
             const textNode = wysiwyg.querySelector('em').firstChild;
             editor.selection.setRange(textNode, 0, textNode, 9);
 
-            await editor.commandHandler('removeFormat');
+            await editor.commandExecutor.execute('removeFormat');
 
             // After removeFormat, should have no formatting tags
             expect(wysiwyg.textContent).toContain('Formatted');
@@ -102,7 +102,7 @@ describe('Editor API integration tests', () => {
             editor.history.push(false);
 
             // Undo
-            await editor.commandHandler('undo');
+            await editor.commandExecutor.execute('undo');
 
             expect(wysiwyg.innerHTML).toContain('Initial');
         });
@@ -116,8 +116,8 @@ describe('Editor API integration tests', () => {
             editor.history.push(false);
 
             // Undo then redo
-            await editor.commandHandler('undo');
-            await editor.commandHandler('redo');
+            await editor.commandExecutor.execute('undo');
+            await editor.commandExecutor.execute('redo');
 
             expect(wysiwyg.innerHTML).toContain('Changed');
         });
@@ -133,7 +133,7 @@ describe('Editor API integration tests', () => {
 
             // In jsdom, execCommand for lists doesn't create actual list DOM
             // Just verify the command executes without error
-            await editor.commandHandler('insertOrderedList');
+            await editor.commandExecutor.execute('insertOrderedList');
 
             // Command should execute successfully
             expect(true).toBe(true);
@@ -148,7 +148,7 @@ describe('Editor API integration tests', () => {
 
             // In jsdom, execCommand for lists doesn't create actual list DOM
             // Just verify the command executes without error
-            await editor.commandHandler('insertUnorderedList');
+            await editor.commandExecutor.execute('insertUnorderedList');
 
             // Command should execute successfully
             expect(true).toBe(true);
@@ -157,7 +157,7 @@ describe('Editor API integration tests', () => {
 
     describe('focus and blur', () => {
         it('should focus on editor', () => {
-            editor.focus();
+            editor.focusManager.focus();
 
             const wysiwyg = editor.frameContext.get('wysiwyg');
             // In jsdom, focus doesn't work perfectly, but method shouldn't throw
@@ -165,8 +165,8 @@ describe('Editor API integration tests', () => {
         });
 
         it('should blur from editor', () => {
-            editor.focus();
-            editor.blur();
+            editor.focusManager.focus();
+            editor.focusManager.blur();
 
             // Should not throw
             expect(true).toBe(true);
@@ -176,9 +176,9 @@ describe('Editor API integration tests', () => {
             const wysiwyg = editor.frameContext.get('wysiwyg');
             wysiwyg.innerHTML = '<p>Test content</p>';
 
-            editor.focus();
-            editor.blur();
-            editor.focus();
+            editor.focusManager.focus();
+            editor.focusManager.blur();
+            editor.focusManager.focus();
 
             expect(wysiwyg.innerHTML).toContain('Test content');
         });
@@ -246,7 +246,7 @@ describe('Editor API integration tests', () => {
         it('should call indent method', async () => {
             jest.spyOn(editor.format, 'indent');
 
-            await editor.commandHandler('indent');
+            await editor.commandExecutor.execute('indent');
 
             expect(editor.format.indent).toHaveBeenCalled();
         });
@@ -254,7 +254,7 @@ describe('Editor API integration tests', () => {
         it('should call outdent method', async () => {
             jest.spyOn(editor.format, 'outdent');
 
-            await editor.commandHandler('outdent');
+            await editor.commandExecutor.execute('outdent');
 
             expect(editor.format.outdent).toHaveBeenCalled();
         });
@@ -265,7 +265,7 @@ describe('Editor API integration tests', () => {
             const wysiwyg = editor.frameContext.get('wysiwyg');
             wysiwyg.innerHTML = '<p>All text to select</p>';
 
-            await editor.commandHandler('selectAll');
+            await editor.commandExecutor.execute('selectAll');
 
             // After selectAll, range should exist
             const range = editor.selection.getRange();
@@ -286,7 +286,7 @@ describe('Editor API integration tests', () => {
             editor.selection.setRange(textNode, 0, textNode, 5);
 
             // 3. Make it bold
-            await editor.commandHandler('bold');
+            await editor.commandExecutor.execute('bold');
             editor.history.push(false);
 
             // 4. Verify bold was applied
@@ -294,7 +294,7 @@ describe('Editor API integration tests', () => {
             expect(bold).not.toBeNull();
 
             // 5. Undo
-            await editor.commandHandler('undo');
+            await editor.commandExecutor.execute('undo');
 
             // 6. Bold should be removed
             expect(wysiwyg.innerHTML).toContain('Hello');
@@ -310,7 +310,7 @@ describe('Editor API integration tests', () => {
             editor.selection.setRange(textNode, 0, textNode, 9);
 
             // Apply bold
-            await editor.commandHandler('bold');
+            await editor.commandExecutor.execute('bold');
 
             // Re-select (formatting might change selection)
             const boldNode = (wysiwyg.querySelector('strong') || wysiwyg.querySelector('b'));
@@ -318,7 +318,7 @@ describe('Editor API integration tests', () => {
                 editor.selection.setRange(boldNode.firstChild, 0, boldNode.firstChild, 9);
 
                 // Apply italic
-                await editor.commandHandler('italic');
+                await editor.commandExecutor.execute('italic');
 
                 // Should have both bold and italic
                 const italic = wysiwyg.querySelector('em') || wysiwyg.querySelector('i');
@@ -335,7 +335,7 @@ describe('Editor API integration tests', () => {
             const wysiwyg = editor.frameContext.get('wysiwyg');
             wysiwyg.innerHTML = '<p>Old content</p><p>More content</p>';
 
-            await editor.commandHandler('newDocument');
+            await editor.commandExecutor.execute('newDocument');
 
             // Should have default empty line
             expect(wysiwyg.innerHTML).toContain('<br>');
@@ -351,14 +351,14 @@ describe('Editor API integration tests', () => {
             editor.selection.setRange(textNode, 0, textNode, 4);
 
             // Apply formatting
-            await editor.commandHandler('bold');
-            await editor.commandHandler('italic');
+            await editor.commandExecutor.execute('bold');
+            await editor.commandExecutor.execute('italic');
 
             // Now remove all formatting
             const formattedText = wysiwyg.querySelector('strong, b, em, i');
             if (formattedText && formattedText.firstChild) {
                 editor.selection.setRange(formattedText.firstChild, 0, formattedText.firstChild, 4);
-                await editor.commandHandler('removeFormat');
+                await editor.commandExecutor.execute('removeFormat');
             }
 
             // Text should still be there
@@ -392,7 +392,7 @@ describe('Editor API integration tests', () => {
             const wysiwyg = editor.frameContext.get('wysiwyg');
             wysiwyg.innerHTML = '<p>First</p><p>Last</p>';
 
-            editor.focusEdge();
+            editor.focusManager.focusEdge();
 
             // Should not throw
             expect(true).toBe(true);
@@ -403,7 +403,7 @@ describe('Editor API integration tests', () => {
             wysiwyg.innerHTML = '<p>Paragraph</p>';
 
             const p = wysiwyg.querySelector('p');
-            editor.focusEdge(p);
+            editor.focusManager.focusEdge(p);
 
             // Should not throw
             expect(true).toBe(true);

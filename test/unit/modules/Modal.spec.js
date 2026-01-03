@@ -22,6 +22,12 @@ jest.mock('../../../src/editorInjector/_core.js', () => {
 			addGlobalEvent: jest.fn(() => 'mock-event-id'),
 			removeGlobalEvent: jest.fn()
 		};
+		this.focusManager = editor.focusManager || {
+			focus: jest.fn(),
+			blur: jest.fn(),
+			focusEdge: jest.fn(),
+			nativeFocus: jest.fn()
+		};
 	});
 });
 
@@ -97,7 +103,7 @@ describe('Modules - Modal', () => {
 			frameContext: new Map(),
 			options: new Map([['_rtl', false]]),
 			triggerEvent: jest.fn(),
-			focus: jest.fn(),
+			focusManager: { focus: jest.fn(), blur: jest.fn(), focusEdge: jest.fn(), nativeFocus: jest.fn() },
 			currentControllerName: null,
 			opendModal: null,
 			opendControllers: [],
@@ -111,6 +117,7 @@ describe('Modules - Modal', () => {
 
 		mockInst = {
 			editor: mockEditor,
+			focusManager: mockEditor.focusManager,
 			constructor: {
 				key: 'testModal',
 				name: 'TestModal'
@@ -360,7 +367,7 @@ describe('Modules - Modal', () => {
 			expect(mockEditor.eventManager.removeGlobalEvent).toHaveBeenCalled();
 			expect(mockInst.modalInit).toHaveBeenCalled();
 			expect(mockInst.modalOff).toHaveBeenCalledWith(false);
-			expect(mockEditor.focus).toHaveBeenCalled();
+			expect(mockEditor.focusManager.focus).toHaveBeenCalled();
 		});
 
 		it('should not call init if not provided', () => {
@@ -379,9 +386,9 @@ describe('Modules - Modal', () => {
 
 		it('should not focus editor when updating', () => {
 			modal.isUpdate = true;
-			mockEditor.focus.mockClear();
+			mockEditor.focusManager.focus.mockClear();
 			modal.close();
-			expect(mockEditor.focus).not.toHaveBeenCalled();
+			expect(mockEditor.focusManager.focus).not.toHaveBeenCalled();
 		});
 
 		it('should call off with true when updating', () => {

@@ -139,7 +139,7 @@ class FileUpload extends PluginCommand {
 		}
 
 		this.submitFile([file]);
-		this.editor.focus();
+		this.focusManager.focus();
 	}
 
 	/**
@@ -210,7 +210,7 @@ class FileUpload extends PluginCommand {
 		dom.utils.removeItem(containerTarget);
 		this.ui.offCurrentController();
 
-		this.editor.focusEdge(focusEl);
+		this.focusManager.focusEdge(focusEl);
 		this.history.push(false);
 	}
 
@@ -361,7 +361,7 @@ class FileUpload extends PluginCommand {
 		dom.utils.addClass(figure.container, 'se-file-figure|se-flex-component');
 
 		if (!this.component.insert(figure.container, { scrollTo: isLast ? true : false, insertBehavior: isLast ? this.insertBehavior : null })) {
-			this.editor.focus();
+			this.focusManager.focus();
 			return;
 		}
 

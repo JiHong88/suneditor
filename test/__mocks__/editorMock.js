@@ -588,12 +588,17 @@ export function createMockEditor(customOptions = {}) {
 			offCurrentModal: jest.fn()
 		},
 
+		// Focus manager
+		focusManager: {
+			focus: jest.fn(),
+			blur: jest.fn(),
+			nativeFocus: jest.fn(),
+			focusEdge: jest.fn(),
+			_preventBlur: false
+		},
+
 		// Editor actions
-		focus: jest.fn(),
-		blur: jest.fn(),
-		_nativeFocus: jest.fn(),
 		changeFrameContext: jest.fn(),
-		focusEdge: jest.fn(),
 		_checkComponents: jest.fn(),
 		_resourcesStateChange: jest.fn(),
 		applyCommandTargets: jest.fn((command, callback) => {
@@ -728,6 +733,7 @@ export function createMockThis(editor = null, customProps = {}) {
 		context: mockEditor.context,
 		status: mockEditor.status,
 		plugins: mockEditor.plugins,
+		focusManager: mockEditor.focusManager,
 
 		// Event manager specific properties
 		isComposing: false,

@@ -219,12 +219,12 @@ declare class Editor {
 	 * @type {boolean}
 	 */
 	selectMenuOn: boolean;
-	/** @description History class instance @type {ReturnType<typeof import('./base/history').default>} */
-	history: ReturnType<typeof import('./base/history').default>;
+	/** @description History class instance @type {ReturnType<typeof import('./support/history').default>} */
+	history: ReturnType<typeof import('./support/history').default>;
 	/** @description EventManager class instance @type {import('./event/eventManager').default} */
 	eventManager: import('./event/eventManager').default;
-	/** @description iframe-safe instanceof check utility class @type {import('./util/instanceCheck').default} */
-	instanceCheck: import('./util/instanceCheck').default;
+	/** @description iframe-safe instanceof check utility class @type {import('./support/instanceCheck').default} */
+	instanceCheck: import('./support/instanceCheck').default;
 	/** @description Toolbar class instance @type {import('./class/toolbar').default} */
 	toolbar: import('./class/toolbar').default;
 	/** @description Sub-Toolbar class instance @type {?import('./class/toolbar').default} */
@@ -416,14 +416,6 @@ declare class Editor {
 	 */
 	run(command: string, type: string, button?: Node | null): void;
 	/**
-	 * @description Execute default command of command button
-	 * - (selectAll, codeView, fullScreen, indent, outdent, undo, redo, removeFormat, print, preview, showBlocks, save, bold, underline, italic, strike, subscript, superscript, copy, cut, paste)
-	 * @param {string} command Property of command button (data-value)
-	 * @param {?Node} [button] Command button
-	 * @returns {Promise<void>}
-	 */
-	commandHandler(command: string, button?: Node | null): Promise<void>;
-	/**
 	 * @description Execute "editor.run" with command button.
 	 * @param {Node} target Command target
 	 */
@@ -470,30 +462,10 @@ declare class Editor {
 	 */
 	execCommand(command: string, showDefaultUI?: boolean, value?: string): void;
 	/**
-	 * @description Focus to wysiwyg area
-	 * @param {*} [rootKey] Root frame key.
-	 */
-	focus(rootKey?: any): void;
-	/**
-	 * @description If "focusEl" is a component, then that component is selected; if it is a format element, the last text is selected
-	 * - If "focusEdge" is null, then selected last element
-	 * @param {?Node} [focusEl] Focus element
-	 */
-	focusEdge(focusEl?: Node | null): void;
-	/**
-	 * @description Focusout to wysiwyg area (.blur())
-	 */
-	blur(): void;
-	/**
 	 * @description Destroy the suneditor
 	 */
 	destroy(): any;
 	/** ----- private methods ----------------------------------------------------------------------------------------------------------------------------- */
-	/**
-	 * @internal
-	 * @description Focus to wysiwyg area using "native focus function"
-	 */
-	_nativeFocus(): void;
 	/**
 	 * @internal
 	 * @description Check the components such as image and video and modify them according to the format.
@@ -541,9 +513,13 @@ declare class Editor {
 	 * @description Caches custom(starts with "_") shortcut keys for commands.
 	 */
 	__cachingShortcuts(): void;
+	commandExecutor: CommandExecutor;
+	focusManager: FocusManager;
 	#private;
 }
 import { ContextUtil } from './config/context';
 import { FrameContextUtil } from './config/frameContext';
 import { FrameOptionsMap } from './config/options';
 import { BaseOptionsMap } from './config/options';
+import CommandExecutor from './support/commandExecutor';
+import FocusManager from './support/focusManager';

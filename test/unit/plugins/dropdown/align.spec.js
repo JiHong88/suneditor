@@ -77,7 +77,8 @@ jest.mock('../../../../src/editorInjector/_core.js', () => {
         this.options = editor.options;
         this.history = editor.history;
         this.frameContext = editor.frameContext;
-        this.triggerEvent = editor.triggerEvent || jest.fn();
+        this.focusManager = editor.focusManager;
+		this.triggerEvent = editor.triggerEvent || jest.fn();
     });
 });
 
@@ -127,7 +128,12 @@ describe('Plugins - Dropdown - Align', () => {
                 push: jest.fn()
             },
             effectNode: null,
-            focus: jest.fn(),
+            focusManager: {
+                focus: jest.fn(),
+                blur: jest.fn(),
+                focusEdge: jest.fn(),
+                nativeFocus: jest.fn(),
+            },
             frameContext: new Map([
                 ['wwComputedStyle', {
                     getPropertyValue: jest.fn().mockReturnValue('left')
@@ -485,7 +491,7 @@ describe('Plugins - Dropdown - Align', () => {
             expect(dom.utils.setStyle).toHaveBeenCalledWith(mockFormats[1], 'textAlign', 'center');
             expect(mockEditor.effectNode).toBeNull();
             expect(mockEditor.menu.dropdownOff).toHaveBeenCalled();
-            expect(mockEditor.focus).toHaveBeenCalled();
+            expect(mockEditor.focusManager.focus).toHaveBeenCalled();
             expect(mockEditor.history.push).toHaveBeenCalledWith(false);
         });
 

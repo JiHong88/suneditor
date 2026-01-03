@@ -266,7 +266,7 @@ class FontSize extends PluginInput {
 		} finally {
 			this.isInputActive = false;
 			event.preventDefault();
-			this.editor.focus();
+			this.focusManager.focus();
 		}
 	}
 

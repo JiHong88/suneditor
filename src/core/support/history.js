@@ -72,7 +72,7 @@ export default function History(editor) {
 
 		editor.changeFrameContext(focusKey);
 		editor.selection.setRange(getNodeFromPath(focusItem.s.path, focusItem.frame), focusItem.s.offset, getNodeFromPath(focusItem.e.path, focusItem.frame), focusItem.e.offset);
-		editor.focus();
+		editor.focusManager.focus();
 
 		if (stackIndex < 0) stackIndex = 0;
 		else if (stackIndex >= stack.length) stackIndex = stack.length - 1;

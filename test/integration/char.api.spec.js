@@ -267,7 +267,7 @@ describe('Char API integration tests', () => {
 			// Apply bold
 			const textNode = wysiwyg.querySelector('p').firstChild;
 			editor.selection.setRange(textNode, 0, textNode, 6);
-			await editor.commandHandler('bold');
+			await editor.commandExecutor.execute('bold');
 
 			const lengthAfter = editor.char.getLength();
 

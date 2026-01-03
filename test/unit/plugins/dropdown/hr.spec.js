@@ -61,6 +61,7 @@ jest.mock('../../../../src/editorInjector/_core.js', () => {
 		this.history = editor.history;
 		this.nodeTransform = editor.nodeTransform;
 		this.frameContext = editor.frameContext;
+		this.focusManager = editor.focusManager;
 		this.triggerEvent = editor.triggerEvent || jest.fn();
 	});
 });
@@ -99,8 +100,12 @@ describe('Plugins - Dropdown - HR', () => {
 			nodeTransform: {
 				split: jest.fn().mockReturnValue(document.createElement('p')),
 			},
-			focus: jest.fn(),
-			focusEdge: jest.fn(),
+			focusManager: {
+				focus: jest.fn(),
+				blur: jest.fn(),
+				focusEdge: jest.fn(),
+				nativeFocus: jest.fn(),
+			},
 			frameContext: new Map(),
 			triggerEvent: jest.fn(),
 		};
@@ -231,7 +236,7 @@ describe('Plugins - Dropdown - HR', () => {
 			hr.componentDestroy(mockTarget);
 
 			expect(dom.utils.removeItem).toHaveBeenCalledWith(mockTarget);
-			expect(mockEditor.focusEdge).toHaveBeenCalledWith(mockTarget.previousElementSibling);
+			expect(mockEditor.focusManager.focusEdge).toHaveBeenCalledWith(mockTarget.previousElementSibling);
 			expect(mockEditor.history.push).toHaveBeenCalledWith(false);
 		});
 
@@ -240,7 +245,7 @@ describe('Plugins - Dropdown - HR', () => {
 
 			hr.componentDestroy(mockTarget);
 
-			expect(mockEditor.focusEdge).toHaveBeenCalledWith(mockTarget.nextElementSibling);
+			expect(mockEditor.focusManager.focusEdge).toHaveBeenCalledWith(mockTarget.nextElementSibling);
 		});
 
 		it('should handle null target gracefully', () => {
@@ -250,7 +255,7 @@ describe('Plugins - Dropdown - HR', () => {
 
 			const { dom } = require('../../../../src/helper');
 			expect(dom.utils.removeItem).not.toHaveBeenCalled();
-			expect(mockEditor.focusEdge).not.toHaveBeenCalled();
+			expect(mockEditor.focusManager.focusEdge).not.toHaveBeenCalled();
 			expect(mockEditor.history.push).not.toHaveBeenCalled();
 		});
 
@@ -260,7 +265,7 @@ describe('Plugins - Dropdown - HR', () => {
 
 			hr.componentDestroy(mockTarget);
 
-			expect(mockEditor.focusEdge).toHaveBeenCalledWith(null);
+			expect(mockEditor.focusManager.focusEdge).toHaveBeenCalledWith(null);
 		});
 
 		it('should always push history when target exists', () => {
@@ -367,7 +372,7 @@ describe('Plugins - Dropdown - HR', () => {
 			const result = hr.submit(className);
 
 			expect(dom.utils.createElement).toHaveBeenCalledWith('hr', { class: className });
-			expect(mockEditor.focus).toHaveBeenCalled();
+			expect(mockEditor.focusManager.focus).toHaveBeenCalled();
 			expect(mockEditor.component.insert).toHaveBeenCalledWith(expect.any(Object), { insertBehavior: 'line' });
 			expect(result).toBeDefined();
 		});
@@ -388,7 +393,7 @@ describe('Plugins - Dropdown - HR', () => {
 		it('should always focus editor before inserting', () => {
 			hr.submit('__se__solid');
 
-			expect(mockEditor.focus).toHaveBeenCalled();
+			expect(mockEditor.focusManager.focus).toHaveBeenCalled();
 		});
 
 		it('should use line insertion behavior', () => {

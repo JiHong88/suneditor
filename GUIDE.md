@@ -1576,13 +1576,13 @@ Editor initialization completes **asynchronously**. Always use `onload` for post
 ```javascript
 // ❌ WRONG - may fail
 const editor = SUNEDITOR.create('editor');
-editor.focus();
+editor.focusManager.focus();
 
 // ✅ CORRECT
 SUNEDITOR.create('editor', {
 	events: {
 		onload: ({ editor }) => {
-			editor.focus();
+			editor.focusManager.focus();
 			editor.html.set('<p>Initial content</p>');
 		},
 	},

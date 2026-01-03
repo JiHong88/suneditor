@@ -48,8 +48,11 @@ describe('Delete Rule', () => {
 			selection: {
 				getRange: jest.fn().mockReturnValue(range)
 			},
-			editor: {
-				_nativeFocus: jest.fn()
+			focusManager: {
+				focus: jest.fn(),
+				blur: jest.fn(),
+				focusEdge: jest.fn(),
+				nativeFocus: jest.fn()
 			}
 		};
 

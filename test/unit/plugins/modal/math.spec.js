@@ -53,8 +53,8 @@ jest.mock('../../../../src/editorInjector', () => {
 			this.html = editor.html || {
 				copy: jest.fn().mockResolvedValue(true)
 			};
-			this.editor = editor.editor || {
-				focus: jest.fn()
+			this.focusManager = editor.focusManager || {
+				focus: jest.fn(), blur: jest.fn(), focusEdge: jest.fn(), nativeFocus: jest.fn()
 			};
 		}
 	};
@@ -235,8 +235,8 @@ describe('Math Plugin', () => {
 			html: {
 				copy: jest.fn().mockResolvedValue(true)
 			},
-			editor: {
-				focus: jest.fn()
+			focusManager: {
+				focus: jest.fn(), blur: jest.fn(), focusEdge: jest.fn(), nativeFocus: jest.fn()
 			}
 		};
 	});
@@ -683,7 +683,7 @@ describe('Math Plugin', () => {
 
 			expect(dom.utils.removeItem).toHaveBeenCalledWith(mockTarget);
 			expect(math.controller.close).toHaveBeenCalled();
-			expect(mockEditor.editor.focus).toHaveBeenCalled();
+			expect(mockEditor.focusManager.focus).toHaveBeenCalled();
 			expect(mockEditor.history.push).toHaveBeenCalledWith(false);
 		});
 	});

@@ -30,7 +30,7 @@ export default {
 
 	// commands
 	/** @action editorNativeFocus */
-	'editor._nativeFocus': ({ ports }) => ports.editor._nativeFocus(),
+	'focusManager.nativeFocus': ({ ports }) => ports.focusManager.nativeFocus(),
 	/** @action historyPush */
 	'history.push': ({ ports }, hard) => ports.history.push(hard),
 	/** @action documentTypeRefreshHeader */
@@ -55,6 +55,6 @@ export default {
 	// utils
 	/** @action selectComponentFallback */
 	'select.component.fallback': ({ ports }, { cmponentInfo }) => {
-		if (ports.component.select(cmponentInfo.target, cmponentInfo.pluginName) === false) ports.editor.blur();
+		if (ports.component.select(cmponentInfo.target, cmponentInfo.pluginName) === false) ports.focusManager.blur();
 	},
 };

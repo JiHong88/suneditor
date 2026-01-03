@@ -23,7 +23,7 @@ export function ButtonsHandler(e) {
 	if (isInput) {
 		this.editor._preventBlur = false;
 	} else if (!this.frameContext.get('wysiwyg').contains(this.selection.getNode())) {
-		this.editor.focus();
+		this.focusManager.focus();
 	}
 
 	if (dom.query.getParentElement(target, '.se-dropdown')) {

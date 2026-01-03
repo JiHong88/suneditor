@@ -322,7 +322,7 @@ class Component extends CoreInjector {
 			if (this.isInline(info.container)) {
 				this.#selection.setRange(info.container, 0, info.container, 0);
 			}
-			this.editor.blur();
+			this.focusManager.blur();
 			_w.setTimeout(() => {
 				this.__selectionSelected = false;
 			});
@@ -857,7 +857,7 @@ class Component extends CoreInjector {
 					const offset = focusNode.nodeType === 3 ? focusNode.textContent.length : 1;
 					this.#selection.setRange(focusNode, offset, focusNode, offset);
 				} else {
-					this.editor.focus();
+					this.focusManager.focus();
 				}
 				return;
 			}
@@ -879,7 +879,7 @@ class Component extends CoreInjector {
 			const pluginName = this.currentPluginName;
 			this.deselect();
 			container.parentNode.insertBefore(newEl, container);
-			if (this.select(compContext.target, pluginName) === false) this.editor.blur();
+			if (this.select(compContext.target, pluginName) === false) this.focusManager.blur();
 			this.history.push(false);
 
 			return;

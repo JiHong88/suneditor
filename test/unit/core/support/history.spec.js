@@ -1,4 +1,4 @@
-import History from '../../../../src/core/base/history';
+import History from '../../../../src/core/support/history';
 import { createMockEditor } from '../../../__mocks__/editorMock';
 
 describe('History', () => {

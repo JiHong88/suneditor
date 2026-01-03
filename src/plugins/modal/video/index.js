@@ -272,7 +272,7 @@ class Video extends PluginModal {
 		if (!/^video/.test(file.type)) return;
 
 		this.submitFile([file]);
-		this.editor.focus();
+		this.focusManager.focus();
 	}
 
 	/**
@@ -371,7 +371,7 @@ class Video extends PluginModal {
 		}
 
 		// focus
-		this.editor.focusEdge(focusEl);
+		this.focusManager.focusEdge(focusEl);
 		this.history.push(false);
 	}
 

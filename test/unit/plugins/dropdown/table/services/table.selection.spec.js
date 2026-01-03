@@ -46,8 +46,13 @@ describe('TableSelectionService', () => {
                 setMergeSplitButton: jest.fn()
             },
             editor: {
-                focusEdge: jest.fn(),
                 _preventBlur: false
+            },
+            focusManager: {
+                focus: jest.fn(),
+                blur: jest.fn(),
+                focusEdge: jest.fn(),
+                nativeFocus: jest.fn(),
             },
             eventManager: {
                 addGlobalEvent: jest.fn(),
@@ -341,10 +346,10 @@ describe('TableSelectionService', () => {
 
             selectionService.focusCellEdge(cell);
 
-            expect(main.editor.focusEdge).toHaveBeenCalledWith(cell);
+            expect(main.focusManager.focusEdge).toHaveBeenCalledWith(cell);
         });
 
-        it('should not call editor.focusEdge on mobile', () => {
+        it('should not call focusManager.focusEdge on mobile', () => {
             const { env } = require('../../../../../../src/helper');
             const originalIsMobile = env.isMobile;
             env.isMobile = true;
@@ -353,7 +358,7 @@ describe('TableSelectionService', () => {
 
             selectionService.focusCellEdge(cell);
 
-            expect(main.editor.focusEdge).not.toHaveBeenCalled();
+            expect(main.focusManager.focusEdge).not.toHaveBeenCalled();
 
             env.isMobile = originalIsMobile;
         });

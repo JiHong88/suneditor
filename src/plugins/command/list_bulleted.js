@@ -109,7 +109,7 @@ class List_bulleted extends PluginCommand {
 	submit(type) {
 		const range = this.listFormat.apply(`ul:${type || ''}`, null, false);
 		if (range) this.selection.setRange(range.sc, range.so, range.ec, range.eo);
-		this.editor.focus();
+		this.focusManager.focus();
 		this.history.push(false);
 	}
 }

@@ -22,7 +22,8 @@ jest.mock('../../../../src/editorInjector/_core.js', () => {
         this.plugins = editor.plugins;
         this.icons = editor.icons;
         this.frameContext = editor.frameContext;
-        this.triggerEvent = editor.triggerEvent || jest.fn();
+        this.focusManager = editor.focusManager;
+		this.triggerEvent = editor.triggerEvent || jest.fn();
     });
 });
 

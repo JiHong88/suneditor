@@ -113,7 +113,7 @@ export async function OnClick_wysiwyg(fc, e) {
 				const prevLi = selectionNode.nextElementSibling;
 				const oLi = dom.utils.createElement('LI', null, selectionNode);
 				rangeEl.insertBefore(oLi, prevLi);
-				this.editor.focus();
+				this.focusManager.focus();
 			} else if (
 				!dom.check.isWysiwygFrame(selectionNode) &&
 				!this.component.is(selectionNode) &&
@@ -121,7 +121,7 @@ export async function OnClick_wysiwyg(fc, e) {
 				this._setDefaultLine(this.format.isBlock(rangeEl) ? 'DIV' : this.options.get('defaultLine')) !== null
 			) {
 				e.preventDefault();
-				this.editor.focus();
+				this.focusManager.focus();
 			}
 		}
 	}

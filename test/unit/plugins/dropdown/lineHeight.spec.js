@@ -68,7 +68,8 @@ jest.mock('../../../../src/editorInjector/_core.js', () => {
         this.history = editor.history;
         this.menu = editor.menu;
         this.frameContext = editor.frameContext;
-        this.triggerEvent = editor.triggerEvent || jest.fn();
+        this.focusManager = editor.focusManager;
+		this.triggerEvent = editor.triggerEvent || jest.fn();
     });
 });
 

@@ -230,7 +230,7 @@ class Image_ extends PluginModal {
 		if (!/^image/.test(file.type)) return;
 
 		this.submitFile([file]);
-		this.editor.focus();
+		this.focusManager.focus();
 	}
 
 	/**
@@ -340,7 +340,7 @@ class Image_ extends PluginModal {
 		}
 
 		// focus
-		this.editor.focusEdge(focusEl);
+		this.focusManager.focusEdge(focusEl);
 		this.history.push(false);
 	}
 

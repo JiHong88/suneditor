@@ -442,7 +442,7 @@ declare function onKeyDown(params: BaseEvent): void;
 declare function onKeyUp(params: BaseEvent): void;
 /**
  * @callback
- * @description Fired when the editor gains focus (managed focus via editor.focus()).
+ * @description Fired when the editor gains focus (managed focus via editor.focusManager.focus()).
  * Triggered after toolbar display updates and status flags are set.
  * This is different from onNativeFocus which fires on native DOM focus events.
  * @param {BaseEvent} params

@@ -98,7 +98,7 @@ class Align extends PluginDropdown {
 
 		this.editor.effectNode = null;
 		this.menu.dropdownOff();
-		this.editor.focus();
+		this.focusManager.focus();
 		this.history.push(false);
 	}
 

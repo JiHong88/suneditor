@@ -22,7 +22,7 @@ jest.mock('../../../../src/editorInjector', () => {
 			};
 			this.icons = { cancel: '<svg>cancel</svg>', revert: '<svg>revert</svg>', embed: '<svg>embed</svg>' };
 			this.eventManager = { addEvent: jest.fn() };
-			this.editor = { focusEdge: jest.fn() };
+			this.focusManager = { focus: jest.fn(), focusEdge: jest.fn(), blur: jest.fn(), nativeFocus: jest.fn() };
 			this.format = {
 				getLine: jest.fn().mockReturnValue(null),
 				addLine: jest.fn().mockReturnValue({ nodeType: 1 }),
@@ -203,7 +203,7 @@ describe('Embed Plugin', () => {
 			// Restore missing mocks
 			component: { select: jest.fn(), insert: jest.fn() },
 			history: { push: jest.fn(), pause: jest.fn(), resume: jest.fn() },
-			focusEdge: jest.fn(),
+			focusManager: { focus: jest.fn(), blur: jest.fn(), focusEdge: jest.fn(), nativeFocus: jest.fn() },
 			format: {
 				getLine: jest.fn().mockReturnValue(null),
 				addLine: jest.fn().mockReturnValue({ nodeType: 1 }),

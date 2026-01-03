@@ -618,7 +618,7 @@ describe('EventManager', () => {
 			mockEditor.commandTargets = commandTargets;
 			mockEditor.activeCommands = ['bold'];
 			
-			eventManager._setKeyEffect([]);
+			eventManager.selectionState.reset();
 			
 			expect(button.classList.contains('active')).toBe(false);
 		});
@@ -1067,7 +1067,7 @@ describe('EventManager', () => {
 				container.appendChild(nonFocusNode);
 				mockEditor.frameContext.get('wysiwyg').appendChild(container);
 
-				mockEditor.blur = jest.fn();
+				mockEditor.focusManager.blur = jest.fn();
 				mockEditor.frameContext.set('isReadOnly', false);
 
 				// Mock dom checks
@@ -1076,7 +1076,7 @@ describe('EventManager', () => {
 
 				eventManager.applyTagEffect(nonFocusNode);
 
-				expect(mockEditor.blur).toHaveBeenCalled();
+				expect(mockEditor.focusManager.blur).toHaveBeenCalled();
 			});
 		});
 

@@ -680,7 +680,7 @@ class Format extends CoreInjector {
 			lastNode ||= firstNode;
 			const childEdge = dom.query.getEdgeChildNodes(firstNode, lastNode?.parentNode ? firstNode : lastNode);
 			if (!childEdge) {
-				this.editor.focus();
+				this.focusManager.focus();
 			} else {
 				edge = {
 					cc: (childEdge.sc || childEdge.ec).parentNode,

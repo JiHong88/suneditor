@@ -180,7 +180,7 @@ class Link extends PluginModal {
 			/** delete */
 			dom.utils.removeItem(this.controller.currentTarget);
 			this.controller.currentTarget = null;
-			this.editor.focus();
+			this.focusManager.focus();
 			this.history.push(false);
 		}
 	}

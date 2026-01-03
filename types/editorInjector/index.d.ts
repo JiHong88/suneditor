@@ -19,6 +19,8 @@ declare class EditorInjector {
 	instanceCheck: import('./_core').default['instanceCheck'];
 	/** @type {import('./_core').default['history']} */
 	history: import('./_core').default['history'];
+	/** @type {import('./_core').default['focusManager']} */
+	focusManager: import('./_core').default['focusManager'];
 	/** @type {import('./_core').default['events']} */
 	events: import('./_core').default['events'];
 	/** @type {import('./_core').default['triggerEvent']} */

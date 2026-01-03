@@ -350,12 +350,12 @@ describe('EventManager Complex Logic', () => {
 			pElement.appendChild(nonFocusElement);
 			mockEditor.frameContext.get('wysiwyg').appendChild(pElement);
 
-			mockEditor.blur = jest.fn();
+			mockEditor.focusManager.blur = jest.fn();
 			mockEditor.frameContext.set('isReadOnly', false);
 
 			eventManager.applyTagEffect(nonFocusElement);
 
-			expect(mockEditor.blur).toHaveBeenCalled();
+			expect(mockEditor.focusManager.blur).toHaveBeenCalled();
 		});
 	});
 

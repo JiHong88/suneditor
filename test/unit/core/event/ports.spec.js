@@ -13,9 +13,11 @@ describe('Event Ports', () => {
 		mockStyleNodes = { value: null };
 
 		mockInst = {
+			focusManager: {
+				nativeFocus: jest.fn(),
+				blur: jest.fn()
+			},
 			editor: {
-				_nativeFocus: jest.fn(),
-				blur: jest.fn(),
 				_iframeAutoHeight: jest.fn()
 			},
 			selection: {
@@ -85,7 +87,7 @@ describe('Event Ports', () => {
 
 	describe('Port structure', () => {
 		it('should return ports object with all required properties', () => {
-			expect(ports).toHaveProperty('editor');
+			expect(ports).toHaveProperty('focusManager');
 			expect(ports).toHaveProperty('selection');
 			expect(ports).toHaveProperty('format');
 			expect(ports).toHaveProperty('listFormat');
@@ -105,9 +107,9 @@ describe('Event Ports', () => {
 			expect(ports).toHaveProperty('enterScrollTo');
 		});
 
-		it('should have editor ports', () => {
-			expect(typeof ports.editor._nativeFocus).toBe('function');
-			expect(typeof ports.editor.blur).toBe('function');
+		it('should have focusManager ports', () => {
+			expect(typeof ports.focusManager.nativeFocus).toBe('function');
+			expect(typeof ports.focusManager.blur).toBe('function');
 		});
 
 		it('should have selection ports', () => {
@@ -133,15 +135,15 @@ describe('Event Ports', () => {
 		});
 	});
 
-	describe('Editor ports', () => {
-		it('should call editor._nativeFocus', () => {
-			ports.editor._nativeFocus();
-			expect(mockInst.editor._nativeFocus).toHaveBeenCalled();
+	describe('FocusManager ports', () => {
+		it('should call focusManager.nativeFocus', () => {
+			ports.focusManager.nativeFocus();
+			expect(mockInst.focusManager.nativeFocus).toHaveBeenCalled();
 		});
 
-		it('should call editor.blur', () => {
-			ports.editor.blur();
-			expect(mockInst.editor.blur).toHaveBeenCalled();
+		it('should call focusManager.blur', () => {
+			ports.focusManager.blur();
+			expect(mockInst.focusManager.blur).toHaveBeenCalled();
 		});
 	});
 

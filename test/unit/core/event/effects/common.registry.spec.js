@@ -12,7 +12,10 @@ describe('Common Effects Registry', () => {
 	beforeEach(() => {
 		mockPorts = {
 			editor: {
-				_nativeFocus: jest.fn(),
+				_nativeFocus: jest.fn()
+			},
+			focusManager: {
+				nativeFocus: jest.fn(),
 				blur: jest.fn()
 			},
 			styleNodeCache: jest.fn(),
@@ -61,7 +64,7 @@ describe('Common Effects Registry', () => {
 			expect(keys).toContain('event.prevent.stop');
 			expect(keys).toContain('cache.styleNode');
 			expect(keys).toContain('cache.formatAttrsTemp');
-			expect(keys).toContain('editor._nativeFocus');
+			expect(keys).toContain('focusManager.nativeFocus');
 			expect(keys).toContain('history.push');
 			expect(keys).toContain('documentType.refreshHeader');
 			expect(keys).toContain('component.deselect');
@@ -110,9 +113,9 @@ describe('Common Effects Registry', () => {
 	});
 
 	describe('Command effects', () => {
-		it('should call editor native focus', () => {
-			commonEffects['editor._nativeFocus'](effContext);
-			expect(mockPorts.editor._nativeFocus).toHaveBeenCalled();
+		it('should call focusManager native focus', () => {
+			commonEffects['focusManager.nativeFocus'](effContext);
+			expect(mockPorts.focusManager.nativeFocus).toHaveBeenCalled();
 		});
 
 		it('should push history', () => {
@@ -204,7 +207,7 @@ describe('Common Effects Registry', () => {
 			commonEffects['select.component.fallback'](effContext, { cmponentInfo });
 
 			expect(mockPorts.component.select).toHaveBeenCalledWith(target, 'image');
-			expect(mockPorts.editor.blur).not.toHaveBeenCalled();
+			expect(mockPorts.focusManager.blur).not.toHaveBeenCalled();
 		});
 
 		it('should blur editor when component selection fails', () => {
@@ -219,7 +222,7 @@ describe('Common Effects Registry', () => {
 			commonEffects['select.component.fallback'](effContext, { cmponentInfo });
 
 			expect(mockPorts.component.select).toHaveBeenCalledWith(target, 'image');
-			expect(mockPorts.editor.blur).toHaveBeenCalled();
+			expect(mockPorts.focusManager.blur).toHaveBeenCalled();
 		});
 	});
 
@@ -238,7 +241,7 @@ describe('Common Effects Registry', () => {
 			expect(() => {
 				commonEffects['event.prevent'](effContext);
 				commonEffects['component.deselect'](effContext);
-				commonEffects['editor._nativeFocus'](effContext);
+				commonEffects['focusManager.nativeFocus'](effContext);
 			}).not.toThrow();
 		});
 

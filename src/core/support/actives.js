@@ -256,7 +256,7 @@ export function FONT_STYLE(editor, command) {
 	}
 
 	editor.inline.apply(el, { stylesToModify: StyleMap[command] || null, nodesToRemove: [nodeName], strictRemove: false });
-	editor.focus();
+	editor.focusManager.focus();
 }
 
 /**

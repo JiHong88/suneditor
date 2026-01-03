@@ -14,6 +14,9 @@ declare class EventManager extends CoreInjector {
 	 * @type {Array<Element>}
 	 */
 	scrollparents: Array<Element>;
+	/** @type {DefaultLineManager} */
+	defaultLineManager: DefaultLineManager;
+	selectionState: SelectionState;
 	/** @internal @type {boolean} */
 	_onShortcutKey: boolean;
 	/** @internal @type {boolean} */
@@ -129,12 +132,6 @@ declare class EventManager extends CoreInjector {
 	_injectActiveEvent(target: Node): void;
 	/**
 	 * @internal
-	 * @description remove class, display text.
-	 * @param {Array<string>} ignoredList Igonred button list
-	 */
-	_setKeyEffect(ignoredList: Array<string>): void;
-	/**
-	 * @internal
 	 * @description Show toolbar-balloon with delay.
 	 */
 	_showToolbarBalloonDelay(): void;
@@ -158,7 +155,7 @@ declare class EventManager extends CoreInjector {
 	 * @description If there is no default format, add a line and move 'selection'.
 	 * @param {?string} formatName Format tag name (default: 'P')
 	 */
-	_setDefaultLine(formatName: string | null): any;
+	_setDefaultLine(formatName: string | null): void;
 	/**
 	 * @internal
 	 * @description Handles data transfer actions for paste and drop events.
@@ -288,3 +285,5 @@ declare class EventManager extends CoreInjector {
 	#private;
 }
 import CoreInjector from '../../editorInjector/_core';
+import DefaultLineManager from './support/defaultLineManager';
+import SelectionState from './support/selectionState';

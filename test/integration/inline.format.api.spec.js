@@ -64,7 +64,7 @@ describe('Inline Format API integration tests', () => {
 			const textNode = strong.firstChild;
 			editor.selection.setRange(textNode, 0, textNode, textNode.textContent.length);
 
-			await editor.commandHandler('removeFormat');
+			await editor.commandExecutor.execute('removeFormat');
 
 			// Text preserved
 			expect(wysiwyg.textContent).toContain('Bold text');
@@ -93,7 +93,7 @@ describe('Inline Format API integration tests', () => {
 			const textNode = wysiwyg.querySelector('p').firstChild;
 			editor.selection.setRange(textNode, 10, textNode, 14);
 
-			await editor.commandHandler('bold');
+			await editor.commandExecutor.execute('bold');
 
 			const content = wysiwyg.innerHTML.toLowerCase();
 			expect(content).toMatch(/<(strong|b)>/);
@@ -106,7 +106,7 @@ describe('Inline Format API integration tests', () => {
 			const textNode = wysiwyg.querySelector('p').firstChild;
 			editor.selection.setRange(textNode, 10, textNode, 16);
 
-			await editor.commandHandler('italic');
+			await editor.commandExecutor.execute('italic');
 
 			const content = wysiwyg.innerHTML.toLowerCase();
 			expect(content).toMatch(/<(em|i)>/);
@@ -119,7 +119,7 @@ describe('Inline Format API integration tests', () => {
 			const textNode = wysiwyg.querySelector('p').firstChild;
 			editor.selection.setRange(textNode, 0, textNode, 9);
 
-			await editor.commandHandler('underline');
+			await editor.commandExecutor.execute('underline');
 
 			const content = wysiwyg.innerHTML.toLowerCase();
 			expect(content).toContain('<u>');
@@ -132,7 +132,7 @@ describe('Inline Format API integration tests', () => {
 			const textNode = wysiwyg.querySelector('p').firstChild;
 			editor.selection.setRange(textNode, 0, textNode, 6);
 
-			await editor.commandHandler('strike');
+			await editor.commandExecutor.execute('strike');
 
 			const content = wysiwyg.innerHTML.toLowerCase();
 			expect(content).toMatch(/<(del|s|strike)>/);
@@ -146,7 +146,7 @@ describe('Inline Format API integration tests', () => {
 			const textNode = wysiwyg.querySelector('p').firstChild;
 			editor.selection.setRange(textNode, 1, textNode, 2);
 
-			await editor.commandHandler('subscript');
+			await editor.commandExecutor.execute('subscript');
 
 			const content = wysiwyg.innerHTML.toLowerCase();
 			expect(content).toContain('<sub>');
@@ -160,7 +160,7 @@ describe('Inline Format API integration tests', () => {
 			const textNode = wysiwyg.querySelector('p').firstChild;
 			editor.selection.setRange(textNode, 4, textNode, 5);
 
-			await editor.commandHandler('superscript');
+			await editor.commandExecutor.execute('superscript');
 
 			const content = wysiwyg.innerHTML.toLowerCase();
 			expect(content).toContain('<sup>');
@@ -176,13 +176,13 @@ describe('Inline Format API integration tests', () => {
 			editor.selection.setRange(textNode, 0, textNode, textNode.textContent.length);
 
 			// Apply bold
-			await editor.commandHandler('bold');
+			await editor.commandExecutor.execute('bold');
 
 			// Reselect and apply italic
 			const formatted = wysiwyg.querySelector('strong, b');
 			if (formatted && formatted.firstChild) {
 				editor.selection.setRange(formatted.firstChild, 0, formatted.firstChild, 9);
-				await editor.commandHandler('italic');
+				await editor.commandExecutor.execute('italic');
 			}
 
 			// Should have both formats
@@ -201,7 +201,7 @@ describe('Inline Format API integration tests', () => {
 			editor.selection.setRange(textNode, 0, textNode, 6);
 
 			// Apply bold
-			await editor.commandHandler('bold');
+			await editor.commandExecutor.execute('bold');
 			let content = wysiwyg.innerHTML.toLowerCase();
 			let hasBold = content.includes('<strong>') || content.includes('<b>');
 			expect(hasBold).toBe(true);
@@ -210,7 +210,7 @@ describe('Inline Format API integration tests', () => {
 			const boldNode = wysiwyg.querySelector('strong, b');
 			if (boldNode && boldNode.firstChild) {
 				editor.selection.setRange(boldNode.firstChild, 0, boldNode.firstChild, 6);
-				await editor.commandHandler('bold');
+				await editor.commandExecutor.execute('bold');
 			}
 
 			// Should remove or reduce bold formatting
@@ -227,14 +227,14 @@ describe('Inline Format API integration tests', () => {
 			// Make "important" bold
 			let textNode = wysiwyg.querySelector('p').firstChild;
 			editor.selection.setRange(textNode, 8, textNode, 17);
-			await editor.commandHandler('bold');
+			await editor.commandExecutor.execute('bold');
 
 			// Make "important" also italic
 			const boldNode = wysiwyg.querySelector('strong, b');
 			if (boldNode && boldNode.firstChild) {
 				textNode = boldNode.firstChild;
 				editor.selection.setRange(textNode, 0, textNode, 9);
-				await editor.commandHandler('italic');
+				await editor.commandExecutor.execute('italic');
 			}
 
 			// Verify text is preserved
@@ -248,9 +248,9 @@ describe('Inline Format API integration tests', () => {
 			// Select and format
 			let textNode = wysiwyg.querySelector('p').firstChild;
 			editor.selection.setRange(textNode, 0, textNode, 6);
-			await editor.commandHandler('bold');
-			await editor.commandHandler('italic');
-			await editor.commandHandler('underline');
+			await editor.commandExecutor.execute('bold');
+			await editor.commandExecutor.execute('italic');
+			await editor.commandExecutor.execute('underline');
 
 			// Now remove all formatting
 			const formatted = wysiwyg.querySelector('strong, b, em, i, u');
@@ -258,7 +258,7 @@ describe('Inline Format API integration tests', () => {
 				textNode = formatted.nodeType === 3 ? formatted : formatted.firstChild;
 				if (textNode) {
 					editor.selection.setRange(textNode, 0, textNode, 6);
-					await editor.commandHandler('removeFormat');
+					await editor.commandExecutor.execute('removeFormat');
 				}
 			}
 
@@ -273,7 +273,7 @@ describe('Inline Format API integration tests', () => {
 			// Format "2" in H2O as subscript
 			let textNode = wysiwyg.querySelector('p').firstChild;
 			editor.selection.setRange(textNode, 1, textNode, 2);
-			await editor.commandHandler('subscript');
+			await editor.commandExecutor.execute('subscript');
 
 			// Format "2" in mc2 as superscript
 			textNode = wysiwyg.querySelector('p').firstChild || wysiwyg.querySelector('p').childNodes[0];
@@ -281,7 +281,7 @@ describe('Inline Format API integration tests', () => {
 				const fullText = wysiwyg.textContent;
 				const mc2Index = fullText.indexOf('mc2') + 2;
 				editor.selection.setRange(textNode, mc2Index, textNode, mc2Index + 1);
-				await editor.commandHandler('superscript');
+				await editor.commandExecutor.execute('superscript');
 			}
 
 			// Verify structure
@@ -297,7 +297,7 @@ describe('Inline Format API integration tests', () => {
 			// Format only "middle"
 			const textNode = wysiwyg.querySelector('p').firstChild;
 			editor.selection.setRange(textNode, 6, textNode, 12);
-			await editor.commandHandler('bold');
+			await editor.commandExecutor.execute('bold');
 
 			// All text should be preserved
 			const fullText = wysiwyg.textContent;
@@ -315,7 +315,7 @@ describe('Inline Format API integration tests', () => {
 
 			// Bold "quick"
 			editor.selection.setRange(textNode, 4, textNode, 9);
-			await editor.commandHandler('bold');
+			await editor.commandExecutor.execute('bold');
 
 			// Find "jumps" and bold it
 			const allText = wysiwyg.textContent;
@@ -324,7 +324,7 @@ describe('Inline Format API integration tests', () => {
 				textNode = wysiwyg.querySelector('p').firstChild || wysiwyg.querySelector('p').childNodes[0];
 				if (textNode) {
 					editor.selection.setRange(textNode, jumpsStart, textNode, jumpsStart + 5);
-					await editor.commandHandler('bold');
+					await editor.commandExecutor.execute('bold');
 				}
 			}
 
@@ -346,7 +346,7 @@ describe('Inline Format API integration tests', () => {
 
 			// Should not throw
 			await expect(async () => {
-				await editor.commandHandler('bold');
+				await editor.commandExecutor.execute('bold');
 			}).not.toThrow();
 		});
 
@@ -372,13 +372,13 @@ describe('Inline Format API integration tests', () => {
 			const textNode = wysiwyg.querySelector('p').firstChild;
 			editor.selection.setRange(textNode, 0, textNode, 6);
 
-			await editor.commandHandler('bold');
+			await editor.commandExecutor.execute('bold');
 
 			// Apply bold again
 			const boldNode = wysiwyg.querySelector('strong, b');
 			if (boldNode && boldNode.firstChild) {
 				editor.selection.setRange(boldNode.firstChild, 0, boldNode.firstChild, 6);
-				await editor.commandHandler('bold');
+				await editor.commandExecutor.execute('bold');
 			}
 
 			// Text should be preserved

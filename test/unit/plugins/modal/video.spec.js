@@ -55,7 +55,7 @@ jest.mock('../../../../src/editorInjector', () => {
 			this.eventManager = { addEvent: jest.fn(), removeEvent: jest.fn() };
 			this.events = { onVideoLoad: jest.fn(), onVideoAction: jest.fn() };
 			this.options = { get: jest.fn().mockReturnValue('auto') };
-			this.editor = { focus: jest.fn(), focusEdge: jest.fn() };
+			this.focusManager = { focus: jest.fn(), focusEdge: jest.fn(), blur: jest.fn(), nativeFocus: jest.fn() };
 			this.format = { getLine: jest.fn().mockReturnValue(null) };
 			this.history = { push: jest.fn() };
 			this.frameContext = new Map([['wysiwyg', { nodeType: 1 }]]);
@@ -630,8 +630,8 @@ describe('Video Plugin', () => {
              video.triggerEvent = jest.fn().mockResolvedValue(undefined);
              // Mock frameContext - set wysiwyg to same object as parentNode
              video.frameContext = new Map([['wysiwyg', mockWysiwyg]]);
-             // Mock editor.focusEdge
-             video.editor = { focus: jest.fn(), focusEdge: jest.fn() };
+             // Mock focusManager
+             video.focusManager = { focus: jest.fn(), blur: jest.fn(), focusEdge: jest.fn(), nativeFocus: jest.fn() };
 
              jest.clearAllMocks();
              await video.componentDestroy(oFrame);
@@ -641,7 +641,7 @@ describe('Video Plugin', () => {
                  expect.objectContaining({ element: oFrame })
              );
              expect(dom.utils.removeItem).toHaveBeenCalled();
-             expect(video.editor.focusEdge).toHaveBeenCalled();
+             expect(video.focusManager.focusEdge).toHaveBeenCalled();
              expect(video.history.push).toHaveBeenCalled();
         });
 
@@ -678,7 +678,7 @@ describe('Video Plugin', () => {
              video.triggerEvent = jest.fn().mockResolvedValue(undefined);
              video.frameContext = new Map([['wysiwyg', mockWysiwyg]]);
              video.nodeTransform = { removeAllParents: jest.fn() };
-             video.editor = { focus: jest.fn(), focusEdge: jest.fn() };
+             video.focusManager = { focus: jest.fn(), blur: jest.fn(), focusEdge: jest.fn(), nativeFocus: jest.fn() };
 
              jest.clearAllMocks();
              await video.componentDestroy(oFrame);
@@ -774,14 +774,14 @@ describe('Video Plugin', () => {
 
         it('onFilePasteAndDrop should handle video files', () => {
             const submitFileSpy = jest.spyOn(video, 'submitFile');
-            // Ensure editor.focus is a function
-            video.editor = { focus: jest.fn(), focusEdge: jest.fn() };
+            // Ensure focusManager.focus is a function
+            video.focusManager = { focus: jest.fn(), blur: jest.fn(), focusEdge: jest.fn(), nativeFocus: jest.fn() };
 
             const videoFile = { type: 'video/mp4', name: 'test.mp4' };
             video.onFilePasteAndDrop({ file: videoFile });
 
             expect(submitFileSpy).toHaveBeenCalledWith([videoFile]);
-            expect(video.editor.focus).toHaveBeenCalled();
+            expect(video.focusManager.focus).toHaveBeenCalled();
 
             submitFileSpy.mockRestore();
         });

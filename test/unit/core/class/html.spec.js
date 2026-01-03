@@ -238,7 +238,7 @@ describe('HTML', () => {
 			const text = wysiwyg.firstChild.firstChild;
 			editor.selection.setRange(text, 4, text, 4);
 
-			const focusSpy = jest.spyOn(editor, 'focus');
+			const focusSpy = jest.spyOn(editor.focusManager, 'focus');
 
 			html.insert('<span>new</span>');
 

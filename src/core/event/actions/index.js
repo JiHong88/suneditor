@@ -30,7 +30,7 @@ export const A = {
 	/** @returns {Action} */
 	componentDeselect: () => ({ t: 'component.deselect' }),
 	/** @returns {Action} */
-	editorNativeFocus: () => ({ t: 'editor._nativeFocus' }),
+	editorNativeFocus: () => ({ t: 'focusManager.nativeFocus' }),
 	/**
 	 * @param {boolean} hard
 	 * @returns {Action}

@@ -78,8 +78,8 @@ export function makePorts(
 		_styleNodes: any;
 	},
 ): {
-	editor: {
-		_nativeFocus: () => void;
+	focusManager: {
+		nativeFocus: () => void;
 		blur: () => void;
 	};
 	selection: {
@@ -159,7 +159,7 @@ export function makePorts(
 	menu: {
 		dropdownOff: () => void;
 	};
-	setDefaultLine: (tag: any) => any;
+	setDefaultLine: (tag: any) => void;
 	hideToolbar: () => void;
 	hideToolbar_sub: () => void;
 	styleNodeCache: () => Node[];
@@ -230,8 +230,8 @@ export type MenuPorts = {
 	dropdownOff: (...args: Parameters<Menu['dropdownOff']>) => ReturnType<Menu['dropdownOff']>;
 };
 export type EventReducerPorts = {
-	editor: {
-		_nativeFocus: () => void;
+	focusManager: {
+		nativeFocus: () => void;
 		blur: () => void;
 	};
 	selection: SelectionPorts;

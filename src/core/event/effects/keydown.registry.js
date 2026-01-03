@@ -46,13 +46,13 @@ export default {
 		if (dom.check.isBreak(selectionNode)) dom.utils.removeItem(selectionNode);
 		else if (dom.check.isBreak((currentZWS = range.startContainer.childNodes?.[range.startOffset]))) dom.utils.removeItem(currentZWS);
 
-		if (ports.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) ports.editor.blur();
+		if (ports.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) ports.focusManager.blur();
 	},
 	/** @action backspaceComponentRemove */
 	'backspace.component.remove': ({ ports }, { isList, sel, formatEl, fileComponentInfo }) => {
 		if (isList) dom.utils.removeItem(sel);
 		if (formatEl.textContent.length === 0) dom.utils.removeItem(formatEl);
-		if (ports.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) ports.editor.blur();
+		if (ports.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) ports.focusManager.blur();
 	},
 	/** @action backspaceListMergePrev */
 	'backspace.list.mergePrev': ({ ports }, { prev, formatEl, rangeEl }) => {
@@ -93,7 +93,7 @@ export default {
 			dom.utils.removeItem(formatEl);
 		}
 
-		if (ports.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) ports.editor.blur();
+		if (ports.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) ports.focusManager.blur();
 	},
 	/** @action deleteComponentSelectNext */
 	'delete.component.selectNext': ({ ports, ctx }, { formatEl, nextEl }) => {
@@ -113,7 +113,7 @@ export default {
 		const fileComponentInfo = ports.component.get(nextEl);
 		if (fileComponentInfo) {
 			ctx.e.stopPropagation();
-			if (ports.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) ports.editor.blur();
+			if (ports.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) ports.focusManager.blur();
 		} else if (ports.component.is(nextEl)) {
 			ctx.e.stopPropagation();
 			dom.utils.removeItem(nextEl);

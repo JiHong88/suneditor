@@ -399,10 +399,10 @@ class HTML extends CoreInjector {
 	 * editor.html.insert('<div class="custom">Content</div>', { skipCleaning: true });
 	 */
 	insert(html, { selectInserted, skipCharCount, skipCleaning } = {}) {
-		if (!this.frameContext.get('wysiwyg').contains(this.#selection.get().focusNode)) this.editor.focus();
+		if (!this.frameContext.get('wysiwyg').contains(this.#selection.get().focusNode)) this.focusManager.focus();
 
 		this.remove();
-		this.editor.focus();
+		this.focusManager.focus();
 
 		let focusNode = null;
 		if (typeof html === 'string') {
@@ -474,10 +474,10 @@ class HTML extends CoreInjector {
 				const offset = focusNode?.nodeType === 3 ? focusNode.textContent.length : 1;
 				this.#selection.setRange(focusNode, offset, focusNode, offset);
 			} else {
-				this.editor.focus();
+				this.focusManager.focus();
 			}
 		} else {
-			this.editor.focus();
+			this.focusManager.focus();
 		}
 
 		this.history.push(false);

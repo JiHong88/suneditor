@@ -9,10 +9,14 @@ jest.mock('../../../../src/editorInjector', () => {
 			this.eventManager = { addEvent: jest.fn() };
 			this.events = { onImageLoad: jest.fn(), onImageAction: jest.fn() };
 			this.options = { get: jest.fn().mockReturnValue('auto') };
-			// Editor methods for comprehensive coverage
-			this.editor = {
+			// focusManager for comprehensive coverage
+			this.focusManager = {
 				focus: jest.fn(),
+				blur: jest.fn(),
 				focusEdge: jest.fn(),
+				nativeFocus: jest.fn()
+			};
+			this.editor = {
 				_iframeAutoHeight: jest.fn()
 			};
 			this.format = {

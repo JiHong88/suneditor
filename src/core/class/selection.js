@@ -179,7 +179,7 @@ class Selection_ extends CoreInjector {
 			this.status.hasFocus = true;
 		} catch (error) {
 			console.warn('[SUNEDITOR.selection.focus.warn]', error.message);
-			this.editor._nativeFocus();
+			this.focusManager.nativeFocus();
 			return;
 		}
 
@@ -206,7 +206,7 @@ class Selection_ extends CoreInjector {
 		this.selectionNode = null;
 		this.editor.effectNode = null;
 		if (this.status.hasFocus) this.get().removeAllRanges();
-		this.eventManager._setKeyEffect([]);
+		this.eventManager.selectionState.reset();
 	}
 
 	/**

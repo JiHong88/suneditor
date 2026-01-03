@@ -152,7 +152,8 @@ jest.mock('../../../../src/editorInjector/_core.js', () => {
         this.eventManager = editor.eventManager;
         this.events = editor.events;
         this.frameContext = editor.frameContext;
-        this.triggerEvent = editor.triggerEvent || jest.fn();
+        this.focusManager = editor.focusManager;
+		this.triggerEvent = editor.triggerEvent || jest.fn();
     });
 });
 
@@ -227,8 +228,12 @@ describe('Plugins - Command - FileUpload', () => {
             },
             frameContext: new Map(),
             triggerEvent: jest.fn().mockResolvedValue(undefined),
-            focus: jest.fn(),
-            focusEdge: jest.fn(),
+            focusManager: {
+                focus: jest.fn(),
+                blur: jest.fn(),
+                focusEdge: jest.fn(),
+                nativeFocus: jest.fn(),
+            },
             _preventBlur: false
         };
     });
@@ -406,7 +411,7 @@ describe('Plugins - Command - FileUpload', () => {
             const result = fileUpload.onFilePasteAndDrop({ file: mockFile });
 
             expect(fileUpload.submitFile).toHaveBeenCalledWith([mockFile]);
-            expect(mockEditor.focus).toHaveBeenCalled();
+            expect(mockEditor.focusManager.focus).toHaveBeenCalled();
             expect(result).toBe(undefined);
         });
 
@@ -773,7 +778,7 @@ describe('Plugins - Command - FileUpload', () => {
 
             fileUpload.create('/path/to/test.pdf', { name: 'test.pdf' }, true);
 
-            expect(mockEditor.focus).toHaveBeenCalled();
+            expect(mockEditor.focusManager.focus).toHaveBeenCalled();
         });
     });
 

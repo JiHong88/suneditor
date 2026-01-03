@@ -491,4 +491,171 @@ describe('Menu', () => {
 			expect(menu.currentDropdown.style.left).toBe('100px');
 		});
 	});
+
+	describe('dropdownShow', () => {
+		it('should re-open dropdown when currentButton exists', () => {
+			const mockButton = document.createElement('button');
+			mockButton.setAttribute('data-command', 'testCommand');
+			mockButton.setAttribute('data-type', 'dropdown');
+			const parent = document.createElement('div');
+			const toolbar = document.createElement('div');
+			toolbar.classList.add('se-toolbar');
+			parent.appendChild(mockButton);
+			toolbar.appendChild(parent);
+			dom.query.getParentElement.mockReturnValue(toolbar);
+
+			const mockDropdown = document.createElement('div');
+			menu.targetMap.testCommand = mockDropdown;
+
+			// First open dropdown
+			menu.dropdownOn(mockButton);
+			expect(menu.currentButton).toBe(mockButton);
+
+			// Hide it
+			mockDropdown.style.display = 'none';
+
+			// Show again via dropdownShow
+			menu.dropdownShow();
+
+			expect(mockDropdown.style.display).toBe('block');
+		});
+
+		it('should do nothing when currentButton is null', () => {
+			menu.currentButton = null;
+
+			expect(() => {
+				menu.dropdownShow();
+			}).not.toThrow();
+		});
+	});
+
+	describe('dropdownHide', () => {
+		it('should hide current dropdown without closing', () => {
+			const mockDropdown = document.createElement('div');
+			mockDropdown.style.display = 'block';
+			menu.currentDropdown = mockDropdown;
+			menu.currentDropdownName = 'testCommand';
+
+			menu.dropdownHide();
+
+			expect(mockDropdown.style.display).toBe('none');
+			// State should be preserved (not cleared like dropdownOff)
+			expect(menu.currentDropdownName).toBe('testCommand');
+		});
+
+		it('should do nothing when no dropdown is open', () => {
+			menu.currentDropdown = null;
+
+			expect(() => {
+				menu.dropdownHide();
+			}).not.toThrow();
+		});
+	});
+
+	describe('__resetMenuPosition', () => {
+		it('should call offset.setRelPosition with correct arguments', () => {
+			const mockButton = document.createElement('button');
+			const parent = document.createElement('div');
+			parent.appendChild(mockButton);
+			const toolbar = document.createElement('div');
+			toolbar.classList.add('se-toolbar');
+			toolbar.appendChild(parent);
+			dom.query.getParentElement.mockReturnValue(toolbar);
+
+			const mockDropdown = document.createElement('div');
+
+			menu.__resetMenuPosition(mockButton, mockDropdown);
+
+			expect(mockOffset.setRelPosition).toHaveBeenCalledWith(
+				mockDropdown,
+				mockEditor.carrierWrapper,
+				parent,
+				toolbar
+			);
+		});
+	});
+
+	describe('__restoreMenuPosition', () => {
+		it('should restore menu position when menuBtn and menuContainer exist', () => {
+			const mockButton = document.createElement('button');
+			mockButton.setAttribute('data-command', 'testCommand');
+			mockButton.setAttribute('data-type', 'dropdown');
+			const parent = document.createElement('div');
+			const toolbar = document.createElement('div');
+			toolbar.classList.add('se-toolbar');
+			parent.appendChild(mockButton);
+			toolbar.appendChild(parent);
+			dom.query.getParentElement.mockReturnValue(toolbar);
+
+			const mockDropdown = document.createElement('div');
+			menu.targetMap.testCommand = mockDropdown;
+
+			// Open dropdown to set internal state
+			menu.dropdownOn(mockButton);
+			mockOffset.setRelPosition.mockClear();
+
+			// Restore position
+			menu.__restoreMenuPosition();
+
+			expect(mockOffset.setRelPosition).toHaveBeenCalled();
+		});
+
+		it('should do nothing when menuBtn or menuContainer is null', () => {
+			// Initial state - no menu opened yet
+			menu.__restoreMenuPosition();
+
+			expect(mockOffset.setRelPosition).not.toHaveBeenCalled();
+		});
+	});
+
+	describe('dropdownOff with free type plugin', () => {
+		it('should call plugin off method for free type dropdown', () => {
+			const mockDropdown = document.createElement('div');
+			const mockButton = document.createElement('button');
+			const mockParent = document.createElement('div');
+			mockParent.appendChild(mockButton);
+			const mockPlugin = { off: jest.fn() };
+
+			menu.currentDropdown = mockDropdown;
+			menu.currentDropdownActiveButton = mockButton;
+			menu.currentDropdownName = 'testCommand';
+			menu.currentDropdownType = 'dropdownfree';
+			menu.currentDropdownPlugin = mockPlugin;
+
+			menu.dropdownOff();
+
+			expect(mockPlugin.off).toHaveBeenCalled();
+		});
+
+		it('should not call plugin off for non-free type dropdown', () => {
+			const mockDropdown = document.createElement('div');
+			const mockButton = document.createElement('button');
+			const mockParent = document.createElement('div');
+			mockParent.appendChild(mockButton);
+			const mockPlugin = { off: jest.fn() };
+
+			menu.currentDropdown = mockDropdown;
+			menu.currentDropdownActiveButton = mockButton;
+			menu.currentDropdownName = 'testCommand';
+			menu.currentDropdownType = 'dropdown';
+			menu.currentDropdownPlugin = mockPlugin;
+
+			menu.dropdownOff();
+
+			expect(mockPlugin.off).not.toHaveBeenCalled();
+		});
+	});
+
+	describe('initDropdownTarget type variations', () => {
+		it('should handle containerfree type', () => {
+			const mockMenu = document.createElement('div');
+			const classObj = { key: 'testKey', type: 'containerfree' };
+
+			menu.initDropdownTarget(classObj, mockMenu);
+
+			expect(menu.targetMap.testKey).toBe(mockMenu);
+			// Free type should not set data-key attribute
+			expect(mockMenu.getAttribute('data-key')).toBeNull();
+		});
+	});
 });

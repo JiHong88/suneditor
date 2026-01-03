@@ -11,7 +11,7 @@ describe('Action Executor', () => {
 	beforeEach(() => {
 		mockEffContext = {
 			ports: {
-				editor: { _nativeFocus: jest.fn() },
+				focusManager: { nativeFocus: jest.fn(), blur: jest.fn() },
 				selection: { setRange: jest.fn() },
 				component: { deselect: jest.fn() }
 			},
@@ -129,11 +129,11 @@ describe('Action Executor', () => {
 			expect(mockEffContext.ports.component.deselect).toHaveBeenCalled();
 		});
 
-		it('should execute editor._nativeFocus action', async () => {
-			const actions = [{ t: 'editor._nativeFocus' }];
+		it('should execute focusManager.nativeFocus action', async () => {
+			const actions = [{ t: 'focusManager.nativeFocus' }];
 
 			await actionExecutor(actions, mockEffContext);
-			expect(mockEffContext.ports.editor._nativeFocus).toHaveBeenCalled();
+			expect(mockEffContext.ports.focusManager.nativeFocus).toHaveBeenCalled();
 		});
 
 		it('should execute selection.setRange action with payload', async () => {

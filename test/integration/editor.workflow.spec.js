@@ -60,7 +60,7 @@ describe('Core - Editor workflow Tests', () => {
 			editor.selection.setRange(textNode, 0, textNode, 6);
 
 			// Apply bold
-			await editor.commandHandler('bold');
+			await editor.commandExecutor.execute('bold');
 
 			// Should have formatting applied
 			expect(true).toBe(true);
@@ -76,7 +76,7 @@ describe('Core - Editor workflow Tests', () => {
 			editor.history.push(false);
 
 			// Undo should restore
-			await editor.commandHandler('undo');
+			await editor.commandExecutor.execute('undo');
 
 			expect(wysiwyg.textContent).toContain('Delete me');
 		});
@@ -92,7 +92,7 @@ describe('Core - Editor workflow Tests', () => {
 			editor.selection.setRange(textNode, 0, textNode, 9);
 
 			// Execute copy
-			await editor.commandHandler('copy');
+			await editor.commandExecutor.execute('copy');
 
 			// Should not throw
 			expect(true).toBe(true);
@@ -103,10 +103,10 @@ describe('Core - Editor workflow Tests', () => {
 			wysiwyg.innerHTML = '<p>First paragraph</p><p>Second paragraph</p>';
 
 			// Select all
-			await editor.commandHandler('selectAll');
+			await editor.commandExecutor.execute('selectAll');
 
 			// Copy
-			await editor.commandHandler('copy');
+			await editor.commandExecutor.execute('copy');
 
 			// Should not throw
 			expect(true).toBe(true);
@@ -122,9 +122,9 @@ describe('Core - Editor workflow Tests', () => {
 			editor.selection.setRange(textNode, 0, textNode, 9);
 
 			// Apply multiple formats
-			await editor.commandHandler('bold');
-			await editor.commandHandler('italic');
-			await editor.commandHandler('underline');
+			await editor.commandExecutor.execute('bold');
+			await editor.commandExecutor.execute('italic');
+			await editor.commandExecutor.execute('underline');
 
 			// Should not throw
 			expect(true).toBe(true);
@@ -135,10 +135,10 @@ describe('Core - Editor workflow Tests', () => {
 			wysiwyg.innerHTML = '<p><strong><em>Formatted</em></strong></p>';
 
 			// Select all
-			await editor.commandHandler('selectAll');
+			await editor.commandExecutor.execute('selectAll');
 
 			// Remove format
-			await editor.commandHandler('removeFormat');
+			await editor.commandExecutor.execute('removeFormat');
 
 			// Should not throw
 			expect(true).toBe(true);
@@ -149,14 +149,14 @@ describe('Core - Editor workflow Tests', () => {
 			wysiwyg.innerHTML = '<p>Indent me</p>';
 
 			// Focus
-			editor.focus();
+			editor.focusManager.focus();
 
 			// Indent
-			await editor.commandHandler('indent');
-			await editor.commandHandler('indent');
+			await editor.commandExecutor.execute('indent');
+			await editor.commandExecutor.execute('indent');
 
 			// Outdent
-			await editor.commandHandler('outdent');
+			await editor.commandExecutor.execute('outdent');
 
 			// Should not throw
 			expect(true).toBe(true);
@@ -169,13 +169,13 @@ describe('Core - Editor workflow Tests', () => {
 			wysiwyg.innerHTML = '<p>مرحبا بالعالم</p>';
 
 			// Change to RTL
-			await editor.commandHandler('dir_rtl');
+			await editor.commandExecutor.execute('dir_rtl');
 
 			expect(editor.options.get('_rtl')).toBe(true);
 			expect(wysiwyg.classList.contains('se-rtl')).toBe(true);
 
 			// Change back to LTR
-			await editor.commandHandler('dir_ltr');
+			await editor.commandExecutor.execute('dir_ltr');
 
 			expect(editor.options.get('_rtl')).toBe(false);
 			expect(wysiwyg.classList.contains('se-rtl')).toBe(false);
@@ -200,31 +200,31 @@ describe('Core - Editor workflow Tests', () => {
 			wysiwyg.innerHTML = '<p>Code view test</p>';
 
 			// Enter code view
-			await editor.commandHandler('codeView');
+			await editor.commandExecutor.execute('codeView');
 			expect(editor.frameContext.get('isCodeView')).toBe(true);
 
 			// Exit code view
-			await editor.commandHandler('codeView');
+			await editor.commandExecutor.execute('codeView');
 			expect(editor.frameContext.get('isCodeView')).toBe(false);
 		});
 
 		it('should toggle full screen', async () => {
 			// Enter full screen
-			await editor.commandHandler('fullScreen');
+			await editor.commandExecutor.execute('fullScreen');
 			expect(editor.frameContext.get('isFullScreen')).toBe(true);
 
 			// Exit full screen
-			await editor.commandHandler('fullScreen');
+			await editor.commandExecutor.execute('fullScreen');
 			expect(editor.frameContext.get('isFullScreen')).toBe(false);
 		});
 
 		it('should toggle show blocks', async () => {
 			// Show blocks
-			await editor.commandHandler('showBlocks');
+			await editor.commandExecutor.execute('showBlocks');
 			expect(editor.frameContext.get('isShowBlocks')).toBe(true);
 
 			// Hide blocks
-			await editor.commandHandler('showBlocks');
+			await editor.commandExecutor.execute('showBlocks');
 			expect(editor.frameContext.get('isShowBlocks')).toBe(false);
 		});
 	});
@@ -246,11 +246,11 @@ describe('Core - Editor workflow Tests', () => {
 			editor.history.push(false);
 
 			// Undo twice
-			await editor.commandHandler('undo');
-			await editor.commandHandler('undo');
+			await editor.commandExecutor.execute('undo');
+			await editor.commandExecutor.execute('undo');
 
 			// Redo once
-			await editor.commandHandler('redo');
+			await editor.commandExecutor.execute('redo');
 
 			// Should not throw
 			expect(true).toBe(true);
@@ -260,7 +260,7 @@ describe('Core - Editor workflow Tests', () => {
 			const wysiwyg = editor.frameContext.get('wysiwyg');
 			wysiwyg.innerHTML = '<p>Content to clear</p>';
 
-			await editor.commandHandler('newDocument');
+			await editor.commandExecutor.execute('newDocument');
 
 			// Should have empty default line
 			const defaultLine = editor.options.get('defaultLine');
@@ -270,13 +270,13 @@ describe('Core - Editor workflow Tests', () => {
 
 	describe('Focus management workflow', () => {
 		it('should handle focus and blur cycles', () => {
-			editor.focus();
-			expect(editor._preventBlur).toBe(false);
+			editor.focusManager.focus();
+			expect(editor.focusManager._preventBlur).toBe(false);
 
-			editor.blur();
+			editor.focusManager.blur();
 
-			editor.focus();
-			expect(editor._preventBlur).toBe(false);
+			editor.focusManager.focus();
+			expect(editor.focusManager._preventBlur).toBe(false);
 		});
 
 		it('should handle focusEdge with different content', () => {
@@ -284,11 +284,11 @@ describe('Core - Editor workflow Tests', () => {
 
 			// With text content
 			wysiwyg.innerHTML = '<p>Test</p>';
-			editor.focusEdge();
+			editor.focusManager.focusEdge();
 
 			// With nested content
 			wysiwyg.innerHTML = '<p><strong>Nested</strong> content</p>';
-			editor.focusEdge();
+			editor.focusManager.focusEdge();
 
 			// Should not throw
 			expect(true).toBe(true);
@@ -359,7 +359,7 @@ describe('Core - Editor workflow Tests', () => {
 
 			// Should fall back gracefully
 			expect(() => {
-				editor.focus();
+				editor.focusManager.focus();
 			}).not.toThrow();
 		});
 
@@ -372,7 +372,7 @@ describe('Core - Editor workflow Tests', () => {
 
 			// Should not crash the editor
 			try {
-				await editor.commandHandler('indent');
+				await editor.commandExecutor.execute('indent');
 			} catch (e) {
 				// Error is expected
 			}
@@ -422,17 +422,17 @@ describe('Core - Editor workflow Tests', () => {
 			editor.history.push(false);
 
 			// Format
-			await editor.commandHandler('bold');
+			await editor.commandExecutor.execute('bold');
 
 			// More typing
 			wysiwyg.innerHTML = '<p><strong>Start typing</strong></p>';
 			editor.history.push(false);
 
 			// Indent
-			await editor.commandHandler('indent');
+			await editor.commandExecutor.execute('indent');
 
 			// Undo
-			await editor.commandHandler('undo');
+			await editor.commandExecutor.execute('undo');
 
 			// Should not throw
 			expect(true).toBe(true);
@@ -443,7 +443,7 @@ describe('Core - Editor workflow Tests', () => {
 			wysiwyg.innerHTML = '<p>Test</p>';
 
 			// Rapid commands
-			await Promise.all([editor.commandHandler('bold'), editor.commandHandler('italic'), editor.commandHandler('underline')]);
+			await Promise.all([editor.commandExecutor.execute('bold'), editor.commandExecutor.execute('italic'), editor.commandExecutor.execute('underline')]);
 
 			// Should complete without errors
 			expect(true).toBe(true);

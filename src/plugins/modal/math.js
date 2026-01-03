@@ -304,7 +304,7 @@ class Math_ extends PluginModal {
 	async componentDestroy(target) {
 		dom.utils.removeItem(target);
 		this.controller.close();
-		this.editor.focus();
+		this.focusManager.focus();
 		this.history.push(false);
 	}
 

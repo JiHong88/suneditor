@@ -14,15 +14,16 @@ import { OnKeyDown_wysiwyg, OnKeyUp_wysiwyg } from './handlers/handler_ww_key';
 import { OnPaste_wysiwyg, OnCopy_wysiwyg, OnCut_wysiwyg } from './handlers/handler_ww_clipboard';
 import { OnDragOver_wysiwyg, OnDragEnd_wysiwyg, OnDrop_wysiwyg } from './handlers/handler_ww_dragDrop';
 
+// logic
+import DefaultLineManager from './support/defaultLineManager';
+import SelectionState from './support/selectionState';
+
 const { _w, _d, isMobile, isTouchDevice } = env;
 
 /**
  * @description Event manager, editor's all event management class
  */
 class EventManager extends CoreInjector {
-	/** @type {RegExp} */
-	#onButtonsCheck;
-
 	/** @type {Array<*>} */
 	#events = [];
 	/** @type {number} */
@@ -55,6 +56,12 @@ class EventManager extends CoreInjector {
 		 */
 		this.scrollparents = [];
 
+		// logic services
+		/** @type {DefaultLineManager} */
+		this.defaultLineManager = new DefaultLineManager(editor);
+		this.selectionState = new SelectionState(editor);
+
+		// internal members
 		/** @internal @type {boolean} */
 		this._onShortcutKey = false;
 		/** @internal @type {boolean} */
@@ -91,8 +98,6 @@ class EventManager extends CoreInjector {
 		this.__eventDoc = null;
 		/** @type {string} */
 		this.__secopy = null;
-
-		this.#onButtonsCheck = new RegExp(`^(${Object.keys(editor.options.get('_defaultStyleTagMap')).join('|')})$`, 'i');
 	}
 
 	/** @internal @type {SunEditor.Core['char']} */
@@ -264,127 +269,7 @@ class EventManager extends CoreInjector {
 	 * @returns {Node|undefined} selectionNode
 	 */
 	applyTagEffect(selectionNode) {
-		selectionNode ||= this.selection.getNode();
-		if (selectionNode === this.editor.effectNode) return;
-		this.editor.effectNode = selectionNode;
-
-		const marginDir = this.options.get('_rtl') ? 'marginRight' : 'marginLeft';
-		const plugins = this.plugins;
-		const commandTargets = this.editor.commandTargets;
-		const classOnCheck = this.#onButtonsCheck;
-		const styleCommand = this.options.get('_styleCommandMap');
-		const commandMapNodes = [];
-		const currentNodes = [];
-
-		const styleTags = this.options.get('_textStyleTags');
-		const styleNodes = [];
-
-		const ignoreCommands = [];
-		const activeCommands = this.editor.activeCommands;
-		const cLen = activeCommands.length;
-		let nodeName = '';
-
-		if (this.component.is(selectionNode) && !this.component.__selectionSelected) {
-			const component = this.component.get(selectionNode);
-			if (!component) return;
-			this.editor.effectNode = null;
-			this.component.select(component.target, component.pluginName);
-			return;
-		}
-
-		while (selectionNode.firstChild) {
-			selectionNode = selectionNode.firstChild;
-		}
-
-		const fc = this.frameContext;
-		const notReadonly = !fc.get('isReadOnly');
-		for (let element = selectionNode; !dom.check.isWysiwygFrame(element); element = element.parentElement) {
-			if (!element) break;
-			if (element.nodeType !== 1 || dom.check.isBreak(element)) continue;
-			if (this.#isNonFocusNode(element)) {
-				this.editor.blur();
-				return;
-			}
-
-			nodeName = element.nodeName.toLowerCase();
-			currentNodes.push(nodeName);
-			if (styleTags.includes(nodeName) && !this.format.isLine(nodeName)) styleNodes.push(element);
-
-			/* Active plugins */
-			if (notReadonly) {
-				for (let c = 0, name; c < cLen; c++) {
-					name = activeCommands[c];
-					if (
-						!commandMapNodes.includes(name) &&
-						!ignoreCommands.includes(name) &&
-						commandTargets.get(name) &&
-						commandTargets.get(name).filter((e) => {
-							const r = plugins[name]?.active(element, e);
-							if (r === undefined) {
-								ignoreCommands.push(name);
-							}
-							return r;
-						}).length > 0
-					) {
-						commandMapNodes.push(name);
-					}
-				}
-			}
-
-			/** indent, outdent */
-			if (this.format.isLine(element)) {
-				/* Outdent */
-				if (!commandMapNodes.includes('outdent') && commandTargets.has('outdent') && (dom.check.isListCell(element) || (element.style[marginDir] && numbers.get(element.style[marginDir], 0) > 0))) {
-					if (
-						commandTargets.get('outdent').filter((e) => {
-							if (dom.check.isImportantDisabled(e)) return false;
-							e.disabled = false;
-							return true;
-						}).length > 0
-					) {
-						commandMapNodes.push('outdent');
-					}
-				}
-				/* Indent */
-				if (!commandMapNodes.includes('indent') && commandTargets.has('indent')) {
-					const indentDisable = dom.check.isListCell(element) && !element.previousElementSibling;
-					if (
-						commandTargets.get('indent').filter((e) => {
-							if (dom.check.isImportantDisabled(e)) return false;
-							e.disabled = indentDisable;
-							return true;
-						}).length > 0
-					) {
-						commandMapNodes.push('indent');
-					}
-				}
-
-				continue;
-			}
-
-			/** default active buttons [strong, ins, em, del, sub, sup] */
-			if (classOnCheck.test(nodeName)) {
-				nodeName = styleCommand[nodeName] || nodeName;
-				commandMapNodes.push(nodeName);
-				dom.utils.addClass(commandTargets.get(nodeName), 'active');
-			}
-		}
-
-		this._setKeyEffect(commandMapNodes);
-
-		// cache style nodes
-		this.__cacheStyleNodes = styleNodes.reverse();
-
-		/** save current nodes */
-		this.status.currentNodes = currentNodes.reverse();
-		this.status.currentNodesMap = commandMapNodes;
-
-		/**  Displays the current node structure to statusbar */
-		if (this.frameOptions.get('statusbar_showPathLabel') && fc.get('navigation')) {
-			fc.get('navigation').textContent = this.options.get('_rtl') ? this.status.currentNodes.reverse().join(' < ') : this.status.currentNodes.join(' > ');
-		}
-
-		return selectionNode;
+		return this.selectionState.update(selectionNode);
 	}
 
 	/**
@@ -398,36 +283,6 @@ class EventManager extends CoreInjector {
 			dom.utils.removeClass(target, '__se__active');
 			this.#geckoActiveEvent = this.removeGlobalEvent(this.#geckoActiveEvent);
 		});
-	}
-
-	/**
-	 * @internal
-	 * @description remove class, display text.
-	 * @param {Array<string>} ignoredList Igonred button list
-	 */
-	_setKeyEffect(ignoredList) {
-		const activeCommands = this.editor.activeCommands;
-		const commandTargets = this.editor.commandTargets;
-		const plugins = this.plugins;
-		for (let i = 0, len = activeCommands.length, k, c, p; i < len; i++) {
-			k = activeCommands[i];
-			if (ignoredList.includes(k) || !(c = commandTargets.get(k))) continue;
-
-			p = plugins[k];
-			for (let j = 0, jLen = c.length, e; j < jLen; j++) {
-				e = c[j];
-				if (!e) continue;
-				if (p) {
-					p.active(null, e);
-				} else if (/^outdent$/i.test(k)) {
-					if (!dom.check.isImportantDisabled(e)) e.disabled = true;
-				} else if (/^indent$/i.test(k)) {
-					if (!dom.check.isImportantDisabled(e)) e.disabled = false;
-				} else {
-					dom.utils.removeClass(e, 'active');
-				}
-			}
-		}
 	}
 
 	/**
@@ -491,114 +346,7 @@ class EventManager extends CoreInjector {
 	 * @param {?string} formatName Format tag name (default: 'P')
 	 */
 	_setDefaultLine(formatName) {
-		if (!this.options.get('__lineFormatFilter')) return null;
-		if (this.editor._fileManager.pluginRegExp.test(this.editor.currentControllerName)) return;
-
-		const range = this.selection.getRange();
-		const commonCon = /** @type {HTMLElement} */ (range.commonAncestorContainer);
-		const startCon = range.startContainer;
-		const endOffset = range.endOffset;
-		const rangeEl = this.format.getBlock(commonCon, null);
-
-		/** @type {Node} */
-		let focusNode;
-		let offset, format;
-
-		if (rangeEl) {
-			format = dom.utils.createElement(formatName || this.options.get('defaultLine'));
-			format.innerHTML = rangeEl.innerHTML;
-			if (format.childNodes.length === 0) format.innerHTML = unicode.zeroWidthSpace;
-
-			rangeEl.innerHTML = format.outerHTML;
-			format = rangeEl.firstChild;
-			focusNode = format.childNodes[endOffset] || dom.query.getEdgeChildNodes(format, null).sc;
-
-			if (!focusNode) {
-				focusNode = dom.utils.createTextNode(unicode.zeroWidthSpace);
-				format.insertBefore(focusNode, format.firstChild);
-			}
-
-			offset = focusNode.textContent.length;
-			this.selection.setRange(focusNode, offset, focusNode, offset);
-			return;
-		}
-
-		if (commonCon.nodeType === 3 && this.component.is(commonCon.parentElement)) {
-			const compInfo = this.component.get(commonCon.parentElement);
-			if (!compInfo) return;
-
-			const container = compInfo.container;
-
-			if (commonCon.parentElement === container) {
-				const siblingEl = commonCon.nextElementSibling ? container : container.nextElementSibling;
-				const el = dom.utils.createElement(this.options.get('defaultLine'), null, commonCon);
-				container.parentElement.insertBefore(el, siblingEl);
-				this.editor.focusEdge(el);
-				return;
-			}
-
-			this.component.select(compInfo.target, compInfo.pluginName);
-			return null;
-		} else if (commonCon.nodeType === 1 && commonCon.getAttribute('data-se-embed') === 'true') {
-			let el = commonCon.nextElementSibling;
-			if (!this.format.isLine(el)) el = this.format.addLine(commonCon, this.options.get('defaultLine'));
-			this.selection.setRange(el.firstChild, 0, el.firstChild, 0);
-			return;
-		}
-
-		if ((this.format.isBlock(startCon) || dom.check.isWysiwygFrame(startCon)) && (this.component.is(startCon.children[range.startOffset]) || this.component.is(startCon.children[range.startOffset - 1]))) return;
-		if (dom.query.getParentElement(commonCon, dom.check.isExcludeFormat)) return null;
-
-		if (this.format.isBlock(commonCon) && commonCon.childNodes.length <= 1) {
-			let br = null;
-			if (commonCon.childNodes.length === 1 && dom.check.isBreak(commonCon.firstChild)) {
-				br = commonCon.firstChild;
-			} else {
-				br = dom.utils.createTextNode(unicode.zeroWidthSpace);
-				commonCon.appendChild(br);
-			}
-
-			this.selection.setRange(br, 1, br, 1);
-			return;
-		}
-
-		try {
-			if (commonCon.nodeType === 3) {
-				format = dom.utils.createElement(formatName || this.options.get('defaultLine'));
-				commonCon.parentNode.insertBefore(format, commonCon);
-				format.appendChild(commonCon);
-			}
-
-			if (dom.check.isBreak(format.nextSibling)) dom.utils.removeItem(format.nextSibling);
-			if (dom.check.isBreak(format.previousSibling)) dom.utils.removeItem(format.previousSibling);
-			if (dom.check.isBreak(focusNode)) {
-				const zeroWidth = dom.utils.createTextNode(unicode.zeroWidthSpace);
-				focusNode.parentNode.insertBefore(zeroWidth, focusNode);
-				focusNode = zeroWidth;
-			}
-		} catch {
-			this.editor.execCommand('formatBlock', false, formatName || this.options.get('defaultLine'));
-			this.editor.effectNode = null;
-			this.selection.init();
-			return;
-		}
-
-		if (format) {
-			if (dom.check.isBreak(format.nextSibling)) dom.utils.removeItem(format.nextSibling);
-			if (dom.check.isBreak(format.previousSibling)) dom.utils.removeItem(format.previousSibling);
-			if (dom.check.isBreak(focusNode)) {
-				const zeroWidth = dom.utils.createTextNode(unicode.zeroWidthSpace);
-				focusNode.parentNode.insertBefore(zeroWidth, focusNode);
-				focusNode = zeroWidth;
-			}
-		}
-
-		this.editor.effectNode = null;
-		if (startCon) {
-			this.selection.setRange(startCon, 1, startCon, 1);
-		} else {
-			this.editor._nativeFocus();
-		}
+		return this.defaultLineManager.execute(formatName);
 	}
 
 	/**
@@ -1089,15 +837,6 @@ class EventManager extends CoreInjector {
 	}
 
 	/**
-	 * @description Checks if a node is a non-focusable element(.data-se-non-focus). (e.g. fileUpload.component > span)
-	 * @param {Node} node Node to check
-	 * @returns {boolean} True if the node is non-focusable, otherwise false
-	 */
-	#isNonFocusNode(node) {
-		return dom.check.isElement(node) && node.getAttribute('data-se-non-focus') === 'true';
-	}
-
-	/**
 	 * @description Adjusts the position of the editor's toolbar, controllers, and other floating elements based on scroll position.
 	 * - Ensures UI elements maintain their intended relative positions when scrolling.
 	 * @param {*} eventWysiwyg The wysiwyg event object containing scroll data (Window or element)
@@ -1287,7 +1026,7 @@ class EventManager extends CoreInjector {
 		if (this._inputFocus || this.editor._preventBlur) return;
 		this.editor._preventFocus = false;
 
-		this._setKeyEffect([]);
+		this.selectionState.reset();
 
 		this.status.currentNodes = [];
 		this.status.currentNodesMap = [];

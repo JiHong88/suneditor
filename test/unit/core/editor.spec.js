@@ -204,15 +204,15 @@ describe('Core - Editor', () => {
 		});
 
 		describe('focus', () => {
-			it('should call _nativeFocus for iframe', () => {
+			it('should call nativeFocus for iframe', () => {
 				// given
-				jest.spyOn(editor, '_nativeFocus');
+				jest.spyOn(editor.focusManager, 'nativeFocus');
 				if (editor.frameOptions.get('iframe')) {
 					// when
-					editor.focus();
+					editor.focusManager.focus();
 
 					// then
-					expect(editor._nativeFocus).toHaveBeenCalled();
+					expect(editor.focusManager.nativeFocus).toHaveBeenCalled();
 				} else {
 					// Skip test if not iframe mode
 				}
@@ -220,13 +220,13 @@ describe('Core - Editor', () => {
 
 			it('should set _preventBlur to false', () => {
 				// given
-				editor._preventBlur = true;
+				editor.focusManager._preventBlur = true;
 
 				// when
-				editor.focus();
+				editor.focusManager.focus();
 
 				// then
-				expect(editor._preventBlur).toBe(false);
+				expect(editor.focusManager._preventBlur).toBe(false);
 			});
 		});
 
@@ -236,7 +236,7 @@ describe('Core - Editor', () => {
 				if (editor.frameOptions.get('iframe')) {
 					const iframe = editor.frameContext.get('wysiwygFrame');
 					jest.spyOn(iframe, 'blur');
-					editor.blur();
+					editor.focusManager.blur();
 					expect(iframe.blur).toHaveBeenCalled();
 				} else {
 					// Skip test if not iframe mode
@@ -248,7 +248,7 @@ describe('Core - Editor', () => {
 				if (!editor.frameOptions.get('iframe')) {
 					const wysiwyg = editor.frameContext.get('wysiwyg');
 					jest.spyOn(wysiwyg, 'blur');
-					editor.blur();
+					editor.focusManager.blur();
 					expect(wysiwyg.blur).toHaveBeenCalled();
 				} else {
 					// Skip test if iframe mode
@@ -333,7 +333,7 @@ describe('Core - Editor', () => {
 				wysiwyg.innerHTML = '<p>Test content</p>';
 
 				// when
-				await editor.commandHandler('selectAll');
+				await editor.commandExecutor.execute('selectAll');
 
 				// then - selection should be made
 				expect(editor.selection.getRange()).toBeTruthy();
@@ -346,7 +346,7 @@ describe('Core - Editor', () => {
 				editor.selection.setRange(wysiwyg.firstChild.firstChild, 0, wysiwyg.firstChild.firstChild, 4);
 
 				// when
-				await editor.commandHandler('copy');
+				await editor.commandExecutor.execute('copy');
 
 				// then - should not throw
 			});
@@ -356,7 +356,7 @@ describe('Core - Editor', () => {
 				jest.spyOn(editor.history, 'push');
 
 				// when
-				await editor.commandHandler('newDocument');
+				await editor.commandExecutor.execute('newDocument');
 
 				// then
 				const wysiwyg = editor.frameContext.get('wysiwyg');
@@ -369,7 +369,7 @@ describe('Core - Editor', () => {
 				jest.spyOn(editor.format, 'indent');
 
 				// when
-				await editor.commandHandler('indent');
+				await editor.commandExecutor.execute('indent');
 
 				// then
 				expect(editor.format.indent).toHaveBeenCalled();
@@ -380,7 +380,7 @@ describe('Core - Editor', () => {
 				jest.spyOn(editor.format, 'outdent');
 
 				// when
-				await editor.commandHandler('outdent');
+				await editor.commandExecutor.execute('outdent');
 
 				// then
 				expect(editor.format.outdent).toHaveBeenCalled();
@@ -391,7 +391,7 @@ describe('Core - Editor', () => {
 				jest.spyOn(editor.history, 'undo');
 
 				// when
-				await editor.commandHandler('undo');
+				await editor.commandExecutor.execute('undo');
 
 				// then
 				expect(editor.history.undo).toHaveBeenCalled();
@@ -402,7 +402,7 @@ describe('Core - Editor', () => {
 				jest.spyOn(editor.history, 'redo');
 
 				// when
-				await editor.commandHandler('redo');
+				await editor.commandExecutor.execute('redo');
 
 				// then
 				expect(editor.history.redo).toHaveBeenCalled();
@@ -413,7 +413,7 @@ describe('Core - Editor', () => {
 				jest.spyOn(editor.inline, 'remove');
 
 				// when
-				await editor.commandHandler('removeFormat');
+				await editor.commandExecutor.execute('removeFormat');
 
 				// then
 				expect(editor.inline.remove).toHaveBeenCalled();
@@ -424,7 +424,7 @@ describe('Core - Editor', () => {
 				jest.spyOn(editor.viewer, 'print');
 
 				// when
-				await editor.commandHandler('print');
+				await editor.commandExecutor.execute('print');
 
 				// then
 				expect(editor.viewer.print).toHaveBeenCalled();
@@ -435,7 +435,7 @@ describe('Core - Editor', () => {
 				editor.viewer.preview = jest.fn();
 
 				// when
-				await editor.commandHandler('preview');
+				await editor.commandExecutor.execute('preview');
 
 				// then
 				expect(editor.viewer.preview).toHaveBeenCalled();
@@ -446,7 +446,7 @@ describe('Core - Editor', () => {
 				jest.spyOn(editor.viewer, 'codeView');
 
 				// when
-				await editor.commandHandler('codeView');
+				await editor.commandExecutor.execute('codeView');
 
 				// then
 				expect(editor.viewer.codeView).toHaveBeenCalled();
@@ -457,7 +457,7 @@ describe('Core - Editor', () => {
 				jest.spyOn(editor.viewer, 'fullScreen');
 
 				// when
-				await editor.commandHandler('fullScreen');
+				await editor.commandExecutor.execute('fullScreen');
 
 				// then
 				expect(editor.viewer.fullScreen).toHaveBeenCalled();
@@ -468,7 +468,7 @@ describe('Core - Editor', () => {
 				jest.spyOn(editor.viewer, 'showBlocks');
 
 				// when
-				await editor.commandHandler('showBlocks');
+				await editor.commandExecutor.execute('showBlocks');
 
 				// then
 				expect(editor.viewer.showBlocks).toHaveBeenCalled();
@@ -479,7 +479,7 @@ describe('Core - Editor', () => {
 				jest.spyOn(editor, 'setDir');
 
 				// when
-				await editor.commandHandler('dir_ltr');
+				await editor.commandExecutor.execute('dir_ltr');
 
 				// then
 				expect(editor.setDir).toHaveBeenCalledWith('ltr');
@@ -490,7 +490,7 @@ describe('Core - Editor', () => {
 				jest.spyOn(editor, 'setDir');
 
 				// when
-				await editor.commandHandler('dir_rtl');
+				await editor.commandExecutor.execute('dir_rtl');
 
 				// then
 				expect(editor.setDir).toHaveBeenCalledWith('rtl');
@@ -502,7 +502,7 @@ describe('Core - Editor', () => {
 				jest.spyOn(editor.format, 'indent');
 
 				// when
-				await editor.commandHandler('indent');
+				await editor.commandExecutor.execute('indent');
 
 				// then
 				expect(editor.format.indent).not.toHaveBeenCalled();
@@ -555,16 +555,16 @@ describe('Core - Editor', () => {
 		});
 
 		describe('run', () => {
-			it('should call commandHandler when no type specified', () => {
+			it('should call commandExecutor.execute when no type specified', () => {
 				// given
-				jest.spyOn(editor, 'commandHandler');
+				jest.spyOn(editor.commandExecutor, 'execute');
 				const mockButton = document.createElement('button');
 
 				// when
 				editor.run('bold', null, mockButton);
 
 				// then
-				expect(editor.commandHandler).toHaveBeenCalledWith('bold', mockButton);
+				expect(editor.commandExecutor.execute).toHaveBeenCalledWith('bold', mockButton);
 			});
 		});
 
@@ -603,7 +603,7 @@ describe('Core - Editor', () => {
 				wysiwyg.innerHTML = '<p>First</p><p>Last</p>';
 
 				// when
-				editor.focusEdge();
+				editor.focusManager.focusEdge();
 
 				// then - should not throw
 			});
@@ -622,7 +622,7 @@ describe('Core - Editor', () => {
 				jest.spyOn(editor.component, 'select');
 
 				// when
-				editor.focusEdge(component);
+				editor.focusManager.focusEdge(component);
 
 				// then
 				if (editor.component.select.mock.calls.length > 0) {
@@ -637,7 +637,7 @@ describe('Core - Editor', () => {
 				wysiwyg.innerHTML = '<p>Test content</p>';
 
 				// when
-				editor.focusEdge(wysiwyg.firstChild);
+				editor.focusManager.focusEdge(wysiwyg.firstChild);
 
 				// then - should not throw
 			});
@@ -792,11 +792,11 @@ describe('Core - Editor', () => {
 			});
 
 			it('should handle command without type', async () => {
-				jest.spyOn(editor, 'commandHandler');
+				jest.spyOn(editor.commandExecutor, 'execute');
 
 				await editor.run('undo', null, null);
 
-				expect(editor.commandHandler).toHaveBeenCalledWith('undo', null);
+				expect(editor.commandExecutor.execute).toHaveBeenCalledWith('undo', null);
 			});
 		});
 
@@ -810,11 +810,11 @@ describe('Core - Editor', () => {
 				range.selectNode(wysiwyg);
 
 				jest.spyOn(editor.selection, 'getRange').mockReturnValue(range);
-				jest.spyOn(editor, '_nativeFocus');
+				jest.spyOn(editor.focusManager, 'nativeFocus');
 
 				// Should handle gracefully
 				expect(() => {
-					editor.focus();
+					editor.focusManager.focus();
 				}).not.toThrow();
 			});
 
@@ -836,7 +836,7 @@ describe('Core - Editor', () => {
 				jest.spyOn(editor.selection, 'setRange');
 
 				// Should create default line
-				editor.focus();
+				editor.focusManager.focus();
 
 				// Should not throw
 			});
@@ -848,7 +848,7 @@ describe('Core - Editor', () => {
 				const commands = ['bold', 'italic', 'underline', 'strike', 'subscript', 'superscript'];
 
 				for (const cmd of commands) {
-					await editor.commandHandler(cmd);
+					await editor.commandExecutor.execute(cmd);
 				}
 			});
 
@@ -856,7 +856,7 @@ describe('Core - Editor', () => {
 				const wysiwyg = editor.frameContext.get('wysiwyg');
 				wysiwyg.innerHTML = '<p>Test</p>';
 
-				await editor.commandHandler('horizontalRule');
+				await editor.commandExecutor.execute('horizontalRule');
 
 				// Should not throw
 			});
@@ -865,8 +865,8 @@ describe('Core - Editor', () => {
 				const wysiwyg = editor.frameContext.get('wysiwyg');
 				wysiwyg.innerHTML = '<p>List item</p>';
 
-				await editor.commandHandler('insertOrderedList');
-				await editor.commandHandler('insertUnorderedList');
+				await editor.commandExecutor.execute('insertOrderedList');
+				await editor.commandExecutor.execute('insertUnorderedList');
 
 				// Should not throw
 			});
@@ -875,7 +875,7 @@ describe('Core - Editor', () => {
 				const wysiwyg = editor.frameContext.get('wysiwyg');
 				wysiwyg.innerHTML = '<p>Format this</p>';
 
-				await editor.commandHandler('formatBlock', 'h1');
+				await editor.commandExecutor.execute('formatBlock', 'h1');
 
 				// Should not throw
 			});
@@ -1131,7 +1131,7 @@ describe('Core - Editor', () => {
 			jest.spyOn(editor, 'setDir');
 
 			// when
-			await editor.commandHandler('dir');
+			await editor.commandExecutor.execute('dir');
 
 			// then
 			expect(editor.setDir).toHaveBeenCalled();
@@ -1142,7 +1142,7 @@ describe('Core - Editor', () => {
 			editor.events.save = jest.fn();
 
 			// when
-			await editor.commandHandler('save');
+			await editor.commandExecutor.execute('save');
 
 			// then - should call save event
 		});
@@ -1152,14 +1152,14 @@ describe('Core - Editor', () => {
 			const button = document.createElement('button');
 
 			// when
-			await editor.commandHandler('copyFormat', button);
+			await editor.commandExecutor.execute('copyFormat', button);
 
 			// then - should not throw
 		});
 
 		it('should handle pageBreak command', async () => {
 			// when
-			await editor.commandHandler('pageBreak');
+			await editor.commandExecutor.execute('pageBreak');
 
 			// then - should not throw
 		});
@@ -1175,7 +1175,7 @@ describe('Core - Editor', () => {
 			jest.spyOn(editor.selection, 'getRange').mockReturnValue(range);
 
 			// when
-			await editor.commandHandler('copy');
+			await editor.commandExecutor.execute('copy');
 
 			// then - should not call copy when collapsed
 		});
@@ -1505,13 +1505,13 @@ describe('Core - Editor', () => {
 			wysiwyg.innerHTML = '<div></div>';
 			const emptyDiv = wysiwyg.querySelector('div');
 
-			jest.spyOn(editor, 'focus');
-			jest.spyOn(editor, '_nativeFocus');
+			jest.spyOn(editor.focusManager, 'focus');
+			jest.spyOn(editor.focusManager, 'nativeFocus');
 
 			// when
-			editor.focusEdge(emptyDiv);
+			editor.focusManager.focusEdge(emptyDiv);
 
-			// then - should call _nativeFocus when no valid focus target found
+			// then - should call nativeFocus when no valid focus target found
 		});
 
 		it('should call focus when no focusEl and wysiwyg is empty', () => {
@@ -1523,13 +1523,13 @@ describe('Core - Editor', () => {
 				configurable: true
 			});
 
-			jest.spyOn(editor, 'focus');
+			jest.spyOn(editor.focusManager, 'focus');
 
 			// when
-			editor.focusEdge(null);
+			editor.focusManager.focusEdge(null);
 
 			// then
-			expect(editor.focus).toHaveBeenCalled();
+			expect(editor.focusManager.focus).toHaveBeenCalled();
 		});
 
 		it('should use text node directly when focusEl is text node', () => {
@@ -1541,14 +1541,14 @@ describe('Core - Editor', () => {
 			jest.spyOn(editor.selection, 'setRange');
 
 			// when
-			editor.focusEdge(textNode);
+			editor.focusManager.focusEdge(textNode);
 
 			// then
 			expect(editor.selection.setRange).toHaveBeenCalled();
 		});
 	});
 
-	describe('_nativeFocus', () => {
+	describe('nativeFocus', () => {
 		let editor;
 
 		beforeEach(async () => {
@@ -1566,7 +1566,7 @@ describe('Core - Editor', () => {
 			jest.spyOn(editor.selection, 'init');
 
 			// when
-			editor._nativeFocus();
+			editor.focusManager.nativeFocus();
 
 			// then
 			expect(editor.selection.__focus).toHaveBeenCalled();
@@ -1799,7 +1799,7 @@ describe('Core - Editor', () => {
 
 		it('html.insertNode should insert a node', () => {
 			// given
-			editor.focus();
+			editor.focusManager.focus();
 			const node = document.createElement('span');
 			node.textContent = 'Inserted';
 
@@ -1888,7 +1888,7 @@ describe('Core - Editor', () => {
 		it('getSelection should return current selection', () => {
 			// given
 			editor.setContents('<p>Test</p>');
-			editor.focus();
+			editor.focusManager.focus();
 
 			// when
 			const selection = editor.selection.get();
@@ -1900,7 +1900,7 @@ describe('Core - Editor', () => {
 		it('removeRange should remove selection range', () => {
 			// given
 			editor.setContents('<p>Test</p>');
-			editor.focus();
+			editor.focusManager.focus();
 
 			// when
 			editor.selection.removeRange();

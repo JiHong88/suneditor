@@ -53,7 +53,8 @@ jest.mock('../../../../src/editorInjector/_core.js', () => {
         this.history = editor.history;
         this.menu = editor.menu;
         this.frameContext = editor.frameContext;
-        this.triggerEvent = editor.triggerEvent || jest.fn();
+        this.focusManager = editor.focusManager;
+		this.triggerEvent = editor.triggerEvent || jest.fn();
     });
 });
 
@@ -88,7 +89,7 @@ describe('Plugins - Command - List_bulleted', () => {
                 initDropdownTarget: jest.fn(),
                 dropdownOff: jest.fn()
             },
-            focus: jest.fn(),
+            focusManager: { focus: jest.fn(), blur: jest.fn(), focusEdge: jest.fn(), nativeFocus: jest.fn() },
             frameContext: new Map(),
             triggerEvent: jest.fn()
         };
@@ -340,7 +341,7 @@ describe('Plugins - Command - List_bulleted', () => {
 
             expect(mockEditor.listFormat.apply).toHaveBeenCalledWith('ul:circle', null, false);
             expect(mockEditor.selection.setRange).toHaveBeenCalledWith('start', 0, 'end', 1);
-            expect(mockEditor.focus).toHaveBeenCalled();
+            expect(mockEditor.focusManager.focus).toHaveBeenCalled();
             expect(mockEditor.history.push).toHaveBeenCalledWith(false);
         });
 
@@ -359,7 +360,7 @@ describe('Plugins - Command - List_bulleted', () => {
             listBulleted.submit('disc');
 
             expect(mockEditor.selection.setRange).not.toHaveBeenCalled();
-            expect(mockEditor.focus).toHaveBeenCalled();
+            expect(mockEditor.focusManager.focus).toHaveBeenCalled();
             expect(mockEditor.history.push).toHaveBeenCalledWith(false);
         });
     });

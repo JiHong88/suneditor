@@ -70,7 +70,7 @@ class HR extends PluginDropdown {
 		dom.utils.removeItem(target);
 
 		// focus
-		this.editor.focusEdge(focusEl);
+		this.focusManager.focusEdge(focusEl);
 		this.history.push(false);
 	}
 
@@ -102,7 +102,7 @@ class HR extends PluginDropdown {
 	 */
 	submit(className) {
 		const hr = dom.utils.createElement('hr', { class: className });
-		this.editor.focus();
+		this.focusManager.focus();
 		this.component.insert(hr, { insertBehavior: 'line' });
 		return hr;
 	}

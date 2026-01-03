@@ -390,7 +390,7 @@ class Embed extends PluginModal {
 		}
 
 		// focus
-		this.editor.focusEdge(focusEl);
+		this.focusManager.focusEdge(focusEl);
 		this.history.push(false);
 	}
 

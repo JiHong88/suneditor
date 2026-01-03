@@ -28,6 +28,12 @@ jest.mock('../../../../src/editorInjector', () => {
 			};
 			this.format = { isLine: jest.fn().mockReturnValue(false) };
 			this.inline = { apply: jest.fn() };
+			this.focusManager = editor.focusManager || {
+				focus: jest.fn(),
+				blur: jest.fn(),
+				focusEdge: jest.fn(),
+				nativeFocus: jest.fn()
+			};
 		}
 	};
 });
@@ -102,7 +108,12 @@ describe('FontSize Plugin', () => {
 			frameContext: {
 				get: jest.fn().mockReturnValue({ fontSize: '13px' }),
 			},
-			focus: jest.fn(),
+			focusManager: {
+				focus: jest.fn(),
+				blur: jest.fn(),
+				focusEdge: jest.fn(),
+				nativeFocus: jest.fn(),
+			},
 		};
 
 		fontSize = new FontSize(mockEditor, {

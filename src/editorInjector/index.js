@@ -15,6 +15,8 @@ function EditorInjector(editor) {
 	this.instanceCheck;
 	/** @type {import('./_core').default['history']} */
 	this.history;
+	/** @type {import('./_core').default['focusManager']} */
+	this.focusManager;
 	/** @type {import('./_core').default['events']} */
 	this.events;
 	/** @type {import('./_core').default['triggerEvent']} */

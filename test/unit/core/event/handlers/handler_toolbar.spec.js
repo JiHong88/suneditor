@@ -40,7 +40,7 @@ describe('handler_toolbar', () => {
 			ButtonsHandler.call(mockThis, mockEvent);
 
 			expect(dom.query.getEventTarget).toHaveBeenCalledWith(mockEvent);
-			expect(mockThis.editor.focus).toHaveBeenCalled();
+			expect(mockThis.focusManager.focus).toHaveBeenCalled();
 		});
 
 		it('should handle sub-balloon toolbar hiding', () => {
@@ -65,7 +65,7 @@ describe('handler_toolbar', () => {
 
 			ButtonsHandler.call(mockThis, mockEvent);
 
-			expect(mockThis.editor.focus).toHaveBeenCalled();
+			expect(mockThis.focusManager.focus).toHaveBeenCalled();
 		});
 
 		it('should handle dropdown clicks', () => {
@@ -95,7 +95,7 @@ describe('handler_toolbar', () => {
 
 			ButtonsHandler.call(mockThis, mockEvent);
 
-			expect(mockThis.editor.focus).toHaveBeenCalled();
+			expect(mockThis.focusManager.focus).toHaveBeenCalled();
 		});
 
 		it('should handle input plugin activation', () => {
