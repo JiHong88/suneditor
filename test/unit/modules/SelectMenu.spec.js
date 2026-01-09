@@ -15,6 +15,7 @@ jest.mock('../../../src/editorInjector/_core.js', () => {
 			removeGlobalEvent: jest.fn()
 		};
 		this.triggerEvent = editor.triggerEvent || jest.fn();
+		this.uiManager = editor.uiManager || { selectMenuOn: false };
 	});
 });
 
@@ -60,14 +61,13 @@ describe('Modules - SelectMenu', () => {
 		jest.clearAllMocks();
 
 		mockEditor = {
-			ui: { showSelectMenu: jest.fn(), hideSelectMenu: jest.fn() },
+			uiManager: { showSelectMenu: jest.fn(), hideSelectMenu: jest.fn(), selectMenuOn: false },
 			selection: { getRangeElement: jest.fn() },
 			triggerEvent: jest.fn(),
 			offset: {
 				get: jest.fn(() => ({ left: 100, top: 50 })),
 				getGlobal: jest.fn(() => ({ left: 100, top: 50 }))
 			},
-			selectMenuOn: false,
 			frameContext: new Map([['_ww', document.createElement('div')]]),
 			options: new Map([['_rtl', false]]),
 			eventManager: {
@@ -295,7 +295,7 @@ describe('Modules - SelectMenu', () => {
 		it('should open select menu', () => {
 			selectMenu.open();
 
-			expect(mockEditor.selectMenuOn).toBe(true);
+			expect(mockEditor.uiManager.selectMenuOn).toBe(true);
 			expect(selectMenu.isOpen).toBe(true);
 			expect(mockEditor.eventManager.addGlobalEvent).toHaveBeenCalled();
 		});
@@ -347,7 +347,7 @@ describe('Modules - SelectMenu', () => {
 			expect(selectMenu.isOpen).toBe(true);
 
 			selectMenu.close();
-			expect(mockEditor.selectMenuOn).toBe(false);
+			expect(mockEditor.uiManager.selectMenuOn).toBe(false);
 			expect(selectMenu.isOpen).toBe(false);
 			expect(selectMenu.index).toBe(-1);
 			expect(selectMenu.item).toBeNull();

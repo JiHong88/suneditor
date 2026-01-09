@@ -35,10 +35,6 @@ class Modal extends CoreInjector {
 	constructor(inst, element) {
 		super(inst.editor);
 
-		// editor class
-		this.ui = this.editor.ui;
-		this.offset = this.editor.offset;
-
 		// members
 		this.inst = inst;
 		this.kind = inst.constructor.key || inst.constructor.name;
@@ -72,6 +68,14 @@ class Modal extends CoreInjector {
 				};
 			}
 		}
+	}
+
+	get #offset() {
+		return this.editor.offset;
+	}
+
+	get #uiManager() {
+		return this.editor.uiManager;
 	}
 
 	/**
@@ -139,14 +143,14 @@ class Modal extends CoreInjector {
 	 * - The plugin's "init" method is called.
 	 */
 	open() {
-		this.ui.offCurrentModal();
+		this.#uiManager.offCurrentModal();
 		this.#fixCurrentController(true);
 
 		if (this.#closeSignal) this.#modalInner.addEventListener('click', this.#closeListener[1]);
 		this.#bindClose &&= this.eventManager.removeGlobalEvent(this.#bindClose);
 		this.#bindClose = this.eventManager.addGlobalEvent('keydown', this.#closeListener[0]);
-		this.isUpdate = this.kind === this.editor.currentControllerName;
-		this.editor.opendModal = this;
+		this.isUpdate = this.kind === this.#uiManager.currentControllerName;
+		this.#uiManager.opendModal = this;
 
 		if (!this.isUpdate) this.inst.modalInit?.();
 		this.inst.modalOn?.(this.isUpdate);
@@ -175,7 +179,7 @@ class Modal extends CoreInjector {
 		this.#removeGlobalEvent();
 		this.#fixCurrentController(false);
 		_w.setTimeout(() => {
-			this.editor.opendModal = null;
+			this.#uiManager.opendModal = null;
 		}, 0);
 
 		if (this.#closeSignal) this.#modalInner.removeEventListener('click', this.#closeListener[1]);
@@ -196,7 +200,7 @@ class Modal extends CoreInjector {
 	 * @param {boolean} fixed - Whether to fix or unfix the controller.
 	 */
 	#fixCurrentController(fixed) {
-		const cont = this.editor.opendControllers;
+		const cont = this.#uiManager.opendControllers;
 		for (let i = 0; i < cont.length; i++) {
 			cont[i].fixed = fixed;
 			cont[i].form.style.display = fixed ? 'none' : 'block';
@@ -208,7 +212,7 @@ class Modal extends CoreInjector {
 	 * @returns {import('../../core/class/offset').OffsetGlobalInfo} The offset position of the modal.
 	 */
 	#saveOffset() {
-		const offset = this.offset.getGlobal(this.#resizeBody);
+		const offset = this.#offset.getGlobal(this.#resizeBody);
 		this.#offetTop = offset.top;
 		this.#offetLeft = offset.left;
 		return offset;
@@ -220,7 +224,7 @@ class Modal extends CoreInjector {
 	 */
 	#addGlobalEvent(dir) {
 		this.#removeGlobalEvent();
-		this.ui.enableBackWrapper(DIRECTION_CURSOR_MAP[dir]);
+		this.#uiManager.enableBackWrapper(DIRECTION_CURSOR_MAP[dir]);
 		this.#bindClose_mousemove = this.eventManager.addGlobalEvent('mousemove', this.#globalEventHandlers.mousemove, true);
 		this.#bindClose_mouseup = this.eventManager.addGlobalEvent('mouseup', this.#globalEventHandlers.mouseup, true);
 	}
@@ -229,7 +233,7 @@ class Modal extends CoreInjector {
 	 * @description Removes global event listeners related to modal resizing.
 	 */
 	#removeGlobalEvent() {
-		this.ui.disableBackWrapper();
+		this.#uiManager.disableBackWrapper();
 		this.#bindClose_mousemove &&= this.eventManager.removeGlobalEvent(this.#bindClose_mousemove);
 		this.#bindClose_mouseup &&= this.eventManager.removeGlobalEvent(this.#bindClose_mouseup);
 	}
@@ -248,21 +252,21 @@ class Modal extends CoreInjector {
 		e.preventDefault();
 		e.stopPropagation();
 
-		this.ui.showLoading();
+		this.#uiManager.showLoading();
 
 		try {
 			const result = await this.inst.modalAction();
 			if (result === false) {
-				this.ui.hideLoading();
+				this.#uiManager.hideLoading();
 			} else if (result === undefined) {
 				this.close();
 			} else {
 				this.close();
-				this.ui.hideLoading();
+				this.#uiManager.hideLoading();
 			}
 		} catch (error) {
 			this.close();
-			this.ui.hideLoading();
+			this.#uiManager.hideLoading();
 			throw Error(`[SUNEDITOR.Modal[${this.kind}].warn] ${error.message}`);
 		}
 	}

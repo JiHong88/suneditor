@@ -82,7 +82,7 @@ class Component extends CoreInjector {
 		/** @internal */
 		this.__prevent = false;
 
-		this.editor.applyFrameRoots((e) => {
+		this.contextManager.applyToRoots((e) => {
 			// drag
 			const dragHandle = dom.utils.createElement('DIV', { class: 'se-drag-handle', draggable: 'true' }, this.icons.selection);
 			e.get('wrapper').appendChild(dragHandle);
@@ -94,33 +94,32 @@ class Component extends CoreInjector {
 		});
 	}
 
-	/** @type {SunEditor.Core['char']} */
 	get #char() {
 		return this.editor.char;
 	}
-	/** @type {SunEditor.Core['html']} */
+
 	get #html() {
 		return this.editor.html;
 	}
-	/** @type {SunEditor.Core['selection']} */
+
 	get #selection() {
 		return this.editor.selection;
 	}
-	/** @type {SunEditor.Core['format']} */
+
 	get #format() {
 		return this.editor.format;
 	}
-	/** @type {SunEditor.Core['offset']} */
+
 	get #offset() {
 		return this.editor.offset;
 	}
-	/** @type {SunEditor.Core['ui']} */
-	get #ui() {
-		return this.editor.ui;
-	}
-	/** @type {SunEditor.Core['nodeTransform']} */
+
 	get #nodeTransform() {
 		return this.editor.nodeTransform;
+	}
+
+	get #shortcuts() {
+		return this.editor.shortcuts;
 	}
 
 	/**
@@ -259,7 +258,7 @@ class Component extends CoreInjector {
 			if (/^FIGURE$/i.test(element.nodeName)) element = /** @type {HTMLElement} */ (element).firstElementChild;
 			if (!element) return null;
 
-			const comp = this.editor._componentManager.map((f) => f(element)).find((e) => e);
+			const comp = this.pluginManager.findComponentInfo(element);
 			if (!comp) return null;
 			target = comp.target;
 			pluginName = comp.pluginName;
@@ -271,7 +270,7 @@ class Component extends CoreInjector {
 			if (this.#isFiles(element)) {
 				isFile = true;
 			}
-			const comp = this.editor._componentManager.map((f) => f(element)).find((e) => e);
+			const comp = this.pluginManager.findComponentInfo(element);
 			if (!comp) return null;
 			target = comp.target;
 			pluginName = comp.pluginName;
@@ -380,7 +379,7 @@ class Component extends CoreInjector {
 		} else if (isBreakComponent || !dom.utils.hasClass(info.container, 'se-input-component')) {
 			const dragHandle = /** @type {HTMLElement} */ (this.frameContext.get('wrapper').querySelector('.se-drag-handle'));
 			dom.utils.addClass(dragHandle, 'se-drag-handle-full');
-			this.#ui._visibleControllers(false, false);
+			this.uiManager._visibleControllers(false, false);
 
 			const sizeTarget = info.caption ? info.target : info.cover || info.container || info.target;
 			const w = sizeTarget.offsetWidth;
@@ -409,7 +408,7 @@ class Component extends CoreInjector {
 			this.status.onSelected = false;
 		}, 0);
 		this.__deselect();
-		this.#ui.setControllerOnDisabledButtons(false);
+		this.uiManager.setControllerOnDisabledButtons(false);
 
 		if (this.editor._preventFocus && !this.status.hasFocus && !this.__prevent) {
 			this.eventManager.__postBlurEvent(this.frameContext, null);
@@ -428,7 +427,7 @@ class Component extends CoreInjector {
 		if (!element) return false;
 
 		if (/^FIGURE$/i.test(element.nodeName) || dom.check.isComponentContainer(element)) return true;
-		if (this.editor._componentManager.find((f) => f(element))) return true;
+		if (this.pluginManager.findComponentInfo(element)) return true;
 
 		return false;
 	}
@@ -446,7 +445,7 @@ class Component extends CoreInjector {
 		if (/^FIGURE$/i.test(element.nodeName)) element = element.parentElement;
 		if (dom.utils.hasClass(element, 'se-inline-component')) return true;
 
-		const comp = this.editor._componentManager.find((f) => f(element));
+		const comp = this.pluginManager.findComponentInfo(element);
 		if (comp && (dom.utils.hasClass(element, 'se-inline-component') || dom.utils.hasClass(element.parentElement, 'se-inline-component'))) return true;
 
 		return false;
@@ -471,11 +470,7 @@ class Component extends CoreInjector {
 	async copy(container) {
 		const cloneContainer = /** @type {HTMLElement} */ (dom.utils.clone(container, true));
 
-		// remove selected class
-		dom.utils.removeClass(cloneContainer, 'se-component-selected');
-		dom.utils.removeClass(cloneContainer.querySelectorAll('.se-figure-selected'), 'se-figure-selected');
-		dom.utils.removeClass(cloneContainer.querySelectorAll('.se-selected-table-cell'), 'se-selected-table-cell');
-		dom.utils.removeClass(cloneContainer.querySelector('.se-selected-cell-focus'), 'se-selected-cell-focus');
+		RemoveSelectedClass(cloneContainer);
 
 		// copy to clipboard
 		if ((await this.#html.copy(cloneContainer)) === false) return;
@@ -503,7 +498,7 @@ class Component extends CoreInjector {
 		if (info || figure) {
 			info ||= this.get(figure);
 			if (info && !dom.utils.hasClass(info.container, 'se-component-selected')) {
-				this.#ui.offCurrentController();
+				this.uiManager.offCurrentController();
 				_DragHandle.set('__overInfo', ON_OVER_COMPONENT);
 				this.select(info.target, info.pluginName);
 			}
@@ -521,14 +516,13 @@ class Component extends CoreInjector {
 	__deselect() {
 		this.editor._preventBlur = false;
 		_DragHandle.set('__overInfo', null);
-		dom.utils.removeClass(this.currentInfo?.cover, 'se-figure-selected');
 		this.__removeDragEvent();
 
 		if (this.currentInfo) {
 			const infoContainer = this.currentInfo.container;
 			const infoCover = this.currentInfo.cover;
 			converter.debounce(() => {
-				dom.utils.removeClass(infoContainer, 'se-component-selected');
+				RemoveSelectedClass(infoContainer);
 				dom.utils.removeClass(infoCover, 'se-figure-over-selected');
 			}, 0)();
 		}
@@ -548,7 +542,7 @@ class Component extends CoreInjector {
 		this.currentPluginName = '';
 		this.currentInfo = null;
 		this.__removeGlobalEvent();
-		this.#ui.__offControllers();
+		this.uiManager._offControllers();
 	}
 
 	/**
@@ -570,7 +564,7 @@ class Component extends CoreInjector {
 		const t_style = lb_t.style;
 		const b_style = lb_b.style;
 		const offsetTarget = container.offsetWidth < element.offsetWidth ? container : element;
-		const target = this.editor._figureContainer?.style.display === 'block' ? this.editor._figureContainer : offsetTarget;
+		const target = this.uiManager.getVisibleFigure() || offsetTarget;
 		const isList = dom.check.isListCell(container.parentNode);
 
 		// top
@@ -718,18 +712,18 @@ class Component extends CoreInjector {
 	 */
 	#isFiles(element) {
 		const nodeName = element.nodeName.toLowerCase();
-		return this.editor._fileManager.regExp.test(nodeName) && (!this.editor._fileManager.tagAttrs[nodeName] || this.editor._fileManager.tagAttrs[nodeName]?.every((v) => /** @type {HTMLElement} */ (element).hasAttribute(v)));
+		return this.pluginManager.fileInfo.regExp.test(nodeName) && (!this.pluginManager.fileInfo.tagAttrs[nodeName] || this.pluginManager.fileInfo.tagAttrs[nodeName]?.every((v) => /** @type {HTMLElement} */ (element).hasAttribute(v)));
 	}
 
 	#OnDragEnter() {
 		this.editor._preventBlur = true;
-		this.#ui._visibleControllers(false, dom.utils.hasClass(_DragHandle.get('__dragHandler'), 'se-drag-handle-full'));
+		this.uiManager._visibleControllers(false, dom.utils.hasClass(_DragHandle.get('__dragHandler'), 'se-drag-handle-full'));
 		dom.utils.addClass(_DragHandle.get('__dragCover') || _DragHandle.get('__dragContainer'), 'se-drag-over');
 	}
 
 	#OnDragLeave() {
 		this.editor._preventBlur = false;
-		if (!dom.utils.hasClass(_DragHandle.get('__dragHandler'), 'se-drag-handle-full')) this.#ui._visibleControllers(true, true);
+		if (!dom.utils.hasClass(_DragHandle.get('__dragHandler'), 'se-drag-handle-full')) this.uiManager._visibleControllers(true, true);
 		dom.utils.removeClass([_DragHandle.get('__dragCover'), _DragHandle.get('__dragContainer')], 'se-drag-over');
 	}
 
@@ -779,7 +773,7 @@ class Component extends CoreInjector {
 			this.currentTarget?.contains(target) ||
 			dom.query.getParentElement(target, '.se-controller') ||
 			dom.utils.hasClass(target, 'se-drag-handle') ||
-			(this.currentPluginName === this.editor.currentControllerName && this.editor.opendControllers.some(({ form }) => form.contains(target)))
+			(this.currentPluginName === this.uiManager.currentControllerName && this.uiManager.opendControllers.some(({ form }) => form.contains(target)))
 		) {
 			return;
 		}
@@ -797,8 +791,6 @@ class Component extends CoreInjector {
 		if (!info) return;
 
 		const cloneContainer = info.container.cloneNode(true);
-		dom.utils.removeClass(cloneContainer, 'se-component-selected');
-
 		if (typeof this.plugins[info.pluginName]?.componentCopy !== 'function' || this.plugins[info.pluginName].componentCopy({ event: e, cloneContainer, info }) === false) {
 			SetClipboardComponent(e, cloneContainer, e.clipboardData);
 		}
@@ -826,7 +818,7 @@ class Component extends CoreInjector {
 	 * @param {KeyboardEvent} e - Event object
 	 */
 	async #OnKeyDown_component(e) {
-		if (this.editor.selectMenuOn) return;
+		if (this.uiManager.selectMenuOn) return;
 
 		const keyCode = e.code;
 		const ctrl = keyCodeMap.isCtrl(e);
@@ -834,11 +826,11 @@ class Component extends CoreInjector {
 		// redo, undo
 		if (ctrl) {
 			if (keyCode !== 'ControlRight' && keyCode !== 'ControlLeft') {
-				const info = this.editor.shortcutsKeyMap.get(keyCode + (e.shiftKey ? '1000' : ''));
+				const info = this.#shortcuts.keyMap.get(keyCode + (e.shiftKey ? '1000' : ''));
 				if (/^(redo|undo)$/.test(info?.command)) {
 					e.preventDefault();
 					e.stopPropagation();
-					this.editor.run(info.command, info.type, info.button);
+					this.commandDispatcher.run(info.command, info.type, info.button);
 				}
 			}
 			return;
@@ -970,8 +962,15 @@ class Component extends CoreInjector {
 function SetClipboardComponent(e, container, clipboardData) {
 	e.preventDefault();
 	e.stopPropagation();
-	container.querySelectorAll('.se-figure-selected').forEach((el) => dom.utils.removeClass(el, 'se-figure-selected'));
+	RemoveSelectedClass(container);
 	clipboardData.setData('text/html', container.outerHTML);
+}
+
+function RemoveSelectedClass(container) {
+	dom.utils.removeClass(container, 'se-component-selected');
+	dom.utils.removeClass(container.querySelectorAll('.se-figure-selected'), 'se-figure-selected');
+	dom.utils.removeClass(container.querySelectorAll('.se-selected-table-cell'), 'se-selected-table-cell');
+	dom.utils.removeClass(container.querySelector('.se-selected-cell-focus'), 'se-selected-cell-focus');
 }
 
 export default Component;

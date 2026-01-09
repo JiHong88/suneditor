@@ -2,7 +2,9 @@
  * @fileoverview Shortcuts class
  */
 
+import CoreInjector from '../../editorInjector/_core';
 import { keyCodeMap } from '../../helper';
+import { CreateShortcuts } from '../section/constructor';
 
 /**
  * @typedef {Omit<Shortcuts & Partial<SunEditor.Injector_Core>, 'shortcuts'>} ShortcutsThis
@@ -29,14 +31,28 @@ import { keyCodeMap } from '../../helper';
 /**
  * @description Shortcuts class
  */
-class Shortcuts {
+class Shortcuts extends CoreInjector {
+	#isDisabled = false;
+
 	/**
 	 * @constructor
 	 * @param {SunEditor.Core} editor - The root editor instance
 	 */
 	constructor(editor) {
-		this.editor = editor;
-		this.isDisabled = false;
+		super(editor);
+
+		/**
+		 * @description Shoutcuts key map
+		 * @type {Map<string, *>}
+		 */
+		this.keyMap = new Map();
+
+		/**
+		 * @description Shoutcuts reverse key array
+		 * - An array of key codes generated with the reverseButtons option, used to reverse the action for a specific key combination.
+		 * @type {Set<string>}
+		 */
+		this.reverseKeys = new Set();
 	}
 
 	/**
@@ -52,15 +68,15 @@ class Shortcuts {
 	 * @returns {boolean} Whether to execute shortcuts
 	 */
 	command(event, ctrl, shift, keyCode, text, edge, line, range) {
-		if (this.isDisabled) return false;
+		if (this.#isDisabled) return false;
 
 		/** @type {ShortcutInfo} */
 		let info = null;
 
 		if (ctrl) {
-			info = this.editor.shortcutsKeyMap.get(keyCode + (shift ? '1000' : ''));
+			info = this.keyMap.get(keyCode + (shift ? '1000' : ''));
 		} else {
-			info = this.editor.shortcutsKeyMap.get(text) || this.editor.shortcutsKeyMap.get(text + event.key);
+			info = this.keyMap.get(text) || this.keyMap.get(text + event.key);
 		}
 
 		if (!info || (!shift && info.s) || (info.space && !keyCodeMap.isSpace(keyCode)) || (info.enter && !keyCodeMap.isEnter(keyCode)) || (info.textTrigger && !event.key.trim()) || (info.edge && !edge)) return false;
@@ -70,7 +86,7 @@ class Shortcuts {
 		} else if (typeof info.method === 'function') {
 			info.method({ range, line, info, event, keyCode, editor: this.editor });
 		} else {
-			this.editor.run(info.command, info.type, info.button);
+			this.editor.commandDispatcher.run(info.command, info.type, info.button);
 		}
 
 		return true;
@@ -80,14 +96,30 @@ class Shortcuts {
 	 * @description Disable the shortcut activation.
 	 */
 	disable() {
-		this.isDisabled = true;
+		this.#isDisabled = true;
 	}
 
 	/**
 	 * @description Enable the shortcut activation.
 	 */
 	enable() {
-		this.isDisabled = false;
+		this.#isDisabled = false;
+	}
+
+	/**
+	 * @internal
+	 * @description Registers custom shortcut keys (keys starting with "_") into the shortcut map.
+	 * Called during initialization and when toolbar is reset.
+	 */
+	_registerCustomShortcuts() {
+		const shortcuts = this.editor.options.get('shortcuts');
+		const reverseCommandArray = this.editor.options.get('_reverseCommandArray');
+		const keyMap = (this.keyMap = new Map());
+		const reverseKeys = this.reverseKeys;
+		for (const key of Object.keys(shortcuts)) {
+			if (!key.startsWith('_')) continue;
+			CreateShortcuts('', null, shortcuts[key], keyMap, reverseCommandArray, reverseKeys);
+		}
 	}
 
 	/**
@@ -95,7 +127,8 @@ class Shortcuts {
 	 * @description Destroy the Shortcuts instance and release memory
 	 */
 	_destroy() {
-		// No internal state to clean up
+		this.keyMap.clear();
+		this.reverseKeys.clear();
 	}
 }
 

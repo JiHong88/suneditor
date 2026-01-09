@@ -100,63 +100,58 @@ class EventManager extends CoreInjector {
 		this.__secopy = null;
 	}
 
-	/** @internal @type {SunEditor.Core['char']} */
 	get char() {
 		return this.editor.char;
 	}
-	/** @internal @type {SunEditor.Core['component']} */
+
 	get component() {
 		return this.editor.component;
 	}
-	/** @internal @type {SunEditor.Core['format']} */
+
 	get format() {
 		return this.editor.format;
 	}
-	/** @internal @type {SunEditor.Core['listFormat']} */
+
 	get listFormat() {
 		return this.editor.listFormat;
 	}
-	/** @internal @type {SunEditor.Core['html']} */
+
 	get html() {
 		return this.editor.html;
 	}
-	/** @internal @type {SunEditor.Core['inline']} */
+
 	get inline() {
 		return this.editor.inline;
 	}
-	/** @internal @type {SunEditor.Core['menu']} */
+
 	get menu() {
 		return this.editor.menu;
 	}
-	/** @internal @type {SunEditor.Core['nodeTransform']} */
+
 	get nodeTransform() {
 		return this.editor.nodeTransform;
 	}
-	/** @internal @type {SunEditor.Core['offset']} */
+
 	get offset() {
 		return this.editor.offset;
 	}
-	/** @internal @type {SunEditor.Core['selection']} */
+
 	get selection() {
 		return this.editor.selection;
 	}
-	/** @internal @type {SunEditor.Core['shortcuts']} */
+
 	get shortcuts() {
 		return this.editor.shortcuts;
 	}
-	/** @internal @type {SunEditor.Core['subToolbar']} */
+
 	get subToolbar() {
 		return this.editor.subToolbar;
 	}
-	/** @internal @type {SunEditor.Core['toolbar']} */
+
 	get toolbar() {
 		return this.editor.toolbar;
 	}
-	/** @internal @type {SunEditor.Core['ui']} */
-	get ui() {
-		return this.editor.ui;
-	}
-	/** @internal @type {SunEditor.Core['viewer']} */
+
 	get viewer() {
 		return this.editor.viewer;
 	}
@@ -325,7 +320,7 @@ class EventManager extends CoreInjector {
 	 * @description Hide the toolbar.
 	 */
 	_hideToolbar() {
-		if (!this.editor._notHideToolbar && !this.frameContext.get('isFullScreen')) {
+		if (!this.uiManager.isPreventToolbarHide && !this.frameContext.get('isFullScreen')) {
 			this.toolbar.hide();
 		}
 	}
@@ -335,7 +330,7 @@ class EventManager extends CoreInjector {
 	 * @description Hide the Sub-Toolbar.
 	 */
 	_hideToolbar_sub() {
-		if (this.subToolbar && !this.editor._notHideToolbar) {
+		if (this.subToolbar && !this.uiManager.isPreventToolbarHide) {
 			this.subToolbar.hide();
 		}
 	}
@@ -361,7 +356,7 @@ class EventManager extends CoreInjector {
 	 */
 	async _dataTransferAction(type, e, clipboardData, frameContext) {
 		try {
-			this.ui.showLoading();
+			this.uiManager.showLoading();
 			await this.#setClipboardData(type, e, clipboardData, frameContext);
 			e.preventDefault();
 			e.stopPropagation();
@@ -369,7 +364,7 @@ class EventManager extends CoreInjector {
 		} catch (err) {
 			console.warn('[SUNEDITOR.paste.error]', err);
 		} finally {
-			this.ui.hideLoading();
+			this.uiManager.hideLoading();
 		}
 	}
 
@@ -506,7 +501,7 @@ class EventManager extends CoreInjector {
 			this._wwFrameObserver = new ResizeObserver((entries) => {
 				_w.setTimeout(() => {
 					entries.forEach((e) => {
-						this.editor.__callResizeFunction(this.frameRoots.get(e.target.getAttribute('data-root-key')), -1, e);
+						this.uiManager._emitResizeEvent(this.frameRoots.get(e.target.getAttribute('data-root-key')), -1, e);
 					});
 				}, 0);
 			});
@@ -519,7 +514,7 @@ class EventManager extends CoreInjector {
 				'click',
 				(e) => {
 					if (e.target === this.carrierWrapper.querySelector('.se-modal .se-modal-inner')) {
-						this.ui.offCurrentModal();
+						this.uiManager.offCurrentModal();
 					}
 				},
 				false,
@@ -751,37 +746,24 @@ class EventManager extends CoreInjector {
 
 	/**
 	 * @internal
-	 * @description Calls a registered plugin event and executes associated handlers synchronously (fire-and-forget).
-	 * - Use this for performance-critical events like onMouseMove, onScroll
-	 * - If any handler returns `false`, the event propagation stops.
+	 * @description Calls a registered plugin event synchronously.
 	 * @param {string} name The name of the plugin event
-	 * @param {{ frameContext: SunEditor.FrameContext, event: Event, data?: string, line?: Node, range?: Range, file?: File, doc?: Document }} e The event object passed to the plugin event handler
-	 * @returns {boolean|undefined} Returns `false` if any handler stops the event, otherwise `undefined`
+	 * @param {SunEditor.EventParams.PluginEvent} e The event payload
+	 * @returns {boolean|undefined} Returns `false` if any handler stops the event
 	 */
 	_callPluginEvent(name, e) {
-		const eventPlugins = this.editor._onPluginEvents.get(name);
-		for (let i = 0, r; i < eventPlugins.length; i++) {
-			r = eventPlugins[i](e);
-			if (typeof r === 'boolean') return r;
-		}
+		return this.pluginManager.emitEvent(name, e);
 	}
 
 	/**
 	 * @internal
-	 * @description Calls a registered plugin event and executes associated handlers asynchronously.
-	 * - Use this for events that need to check return values or ensure completion
-	 * - Waits for each handler to complete (including async handlers)
-	 * - If any handler returns `false`, the event propagation stops.
+	 * @description Calls a registered plugin event asynchronously.
 	 * @param {string} name The name of the plugin event
-	 * @param {{ frameContext: SunEditor.FrameContext, event: Event, data?: string, line?: Node, range?: Range, file?: File, doc?: Document }} e The event object passed to the plugin event handler
-	 * @returns {Promise<boolean|undefined>} Returns `false` if any handler stops the event, otherwise `undefined`
+	 * @param {SunEditor.EventParams.PluginEvent} e The event payload
+	 * @returns {Promise<boolean|undefined>} Returns `false` if any handler stops the event
 	 */
 	async _callPluginEventAsync(name, e) {
-		const eventPlugins = this.editor._onPluginEvents.get(name);
-		for (let i = 0, r; i < eventPlugins.length; i++) {
-			r = await eventPlugins[i](e);
-			if (typeof r === 'boolean') return r;
-		}
+		return await this.pluginManager.emitEventAsync(name, e);
 	}
 
 	/**
@@ -837,55 +819,6 @@ class EventManager extends CoreInjector {
 	}
 
 	/**
-	 * @description Adjusts the position of the editor's toolbar, controllers, and other floating elements based on scroll position.
-	 * - Ensures UI elements maintain their intended relative positions when scrolling.
-	 * @param {*} eventWysiwyg The wysiwyg event object containing scroll data (Window or element)
-	 */
-	#moveContainer(eventWysiwyg) {
-		const y = eventWysiwyg.scrollTop || eventWysiwyg.scrollY || 0;
-		const x = eventWysiwyg.scrollLeft || eventWysiwyg.scrollX || 0;
-
-		if (this.editor.isBalloon) {
-			this.context.get('toolbar_main').style.top = this.toolbar.balloonOffset.top - y + 'px';
-			this.context.get('toolbar_main').style.left = this.toolbar.balloonOffset.left - x + 'px';
-		} else if (this.editor.isSubBalloon) {
-			this.context.get('toolbar_sub_main').style.top = this.subToolbar.balloonOffset.top - y + 'px';
-			this.context.get('toolbar_sub_main').style.left = this.subToolbar.balloonOffset.left - x + 'px';
-		}
-
-		if (this.editor._controllerTargetContext !== this.frameContext.get('topArea')) {
-			this.ui.offCurrentController();
-		}
-
-		if (this.editor._lineBreaker_t) {
-			const t_style = this.editor._lineBreaker_t.style;
-			if (t_style.display !== 'none') {
-				const t_offset = (this.editor._lineBreaker_t.getAttribute('data-offset') || ',').split(',');
-				t_style.top = numbers.get(t_style.top, 0) - (y - numbers.get(t_offset[0], 0)) + 'px';
-				t_style.left = numbers.get(t_style.left, 0) - (x - numbers.get(t_offset[1], 0)) + 'px';
-				this.editor._lineBreaker_t.setAttribute('data-offset', y + ',' + x);
-			}
-		}
-
-		if (this.editor._lineBreaker_b) {
-			const b_style = this.editor._lineBreaker_b.style;
-			if (b_style.display !== 'none') {
-				const b_offset = (this.editor._lineBreaker_b.getAttribute('data-offset') || ',').split(',');
-				b_style.top = numbers.get(b_style.top, 0) - (y - numbers.get(b_offset[0], 0)) + 'px';
-				b_style[b_offset[1]] = numbers.get(b_style[b_offset[1]], 0) - (x - numbers.get(b_offset[2], 0)) + 'px';
-				this.editor._lineBreaker_b.setAttribute('data-offset', y + ',' + b_offset[1] + ',' + x);
-			}
-		}
-
-		const openCont = this.editor.opendControllers;
-		for (let i = 0; i < openCont.length; i++) {
-			if (!openCont[i].notInCarrier) continue;
-			openCont[i].form.style.top = openCont[i].inst.__offset.top - y + 'px';
-			openCont[i].form.style.left = openCont[i].inst.__offset.left - x + 'px';
-		}
-	}
-
-	/**
 	 * @description Handles the scrolling of the editor container.
 	 * - Repositions open controllers if necessary.
 	 */
@@ -894,23 +827,7 @@ class EventManager extends CoreInjector {
 			this.menu.__resetMenuPosition(this.menu.currentDropdownActiveButton, this.menu.currentDropdown);
 		}
 
-		const openCont = this.editor.opendControllers;
-		if (openCont.length === 0) return;
-
-		this.#rePositionController(openCont);
-	}
-
-	/**
-	 * @description Repositions the currently open controllers within the editor.
-	 * - Ensures elements are displayed in their correct positions after scrolling.
-	 * @param {Array<object>} cont List of controllers to reposition
-	 */
-	#rePositionController(cont) {
-		if (_DragHandle.get('__dragMove')) _DragHandle.get('__dragMove')();
-		for (let i = 0; i < cont.length; i++) {
-			if (cont[i].notInCarrier) continue;
-			cont[i].inst?._scrollReposition();
-		}
+		this.uiManager._repositionControllers();
 	}
 
 	/**
@@ -927,7 +844,7 @@ class EventManager extends CoreInjector {
 		const isToolbarHidden = toolbar.style.display === 'none' || (this.editor.isInline && !this.toolbar.inlineToolbarAttr.isShow);
 		if (toolbar.offsetWidth === 0 && !isToolbarHidden) return;
 
-		const opendBrowser = this.editor.opendBrowser;
+		const opendBrowser = this.uiManager.opendBrowser;
 		if (opendBrowser && opendBrowser.area.style.display === 'block') {
 			opendBrowser.body.style.maxHeight = dom.utils.getClientSize().h - opendBrowser.header.offsetHeight - 50 + 'px';
 		}
@@ -944,7 +861,7 @@ class EventManager extends CoreInjector {
 			return;
 		}
 
-		this.editor._iframeAutoHeight(fc);
+		this.uiManager._iframeAutoHeight(fc);
 
 		if (this.toolbar.isSticky) {
 			this.context.get('toolbar_main').style.width = fc.get('topArea').offsetWidth - 2 + 'px';
@@ -958,7 +875,7 @@ class EventManager extends CoreInjector {
 	 * @param {Event} e - Event object
 	 */
 	#OnScroll_wysiwyg(frameContext, eventWysiwyg, e) {
-		this.#moveContainer(eventWysiwyg);
+		this.uiManager._syncScrollPosition(eventWysiwyg);
 		this.#scrollContainer();
 
 		// plugin event
@@ -1001,8 +918,8 @@ class EventManager extends CoreInjector {
 		if ((this.status.rootKey === rootKey && this.editor._preventBlur) || this.editor._preventFocus) return;
 		this.editor._preventFocus = true;
 
-		dom.utils.removeClass(this.editor.commandTargets.get('codeView'), 'active');
-		dom.utils.setDisabled(this.editor._codeViewDisabledButtons, false);
+		dom.utils.removeClass(this.commandDispatcher.targets.get('codeView'), 'active');
+		this.uiManager._toggleCodeViewButtons(false);
 
 		this.editor.changeFrameContext(rootKey);
 		this.history.resetButtons(rootKey, null);
@@ -1031,9 +948,9 @@ class EventManager extends CoreInjector {
 		this.status.currentNodes = [];
 		this.status.currentNodesMap = [];
 
-		this.ui.offCurrentController();
+		this.uiManager.offCurrentController();
 
-		this.editor.applyFrameRoots((root) => {
+		this.contextManager.applyToRoots((root) => {
 			if (root.get('navigation')) root.get('navigation').textContent = '';
 		});
 
@@ -1048,7 +965,7 @@ class EventManager extends CoreInjector {
 	#OnMouseDown_statusbar(e) {
 		e.stopPropagation();
 		this._resizeClientY = e.clientY;
-		this.ui.enableBackWrapper('ns-resize');
+		this.uiManager.enableBackWrapper('ns-resize');
 		this.#resize_editor = this.addGlobalEvent('mousemove', this.#__resizeEditor.bind(this));
 		this.#close_move = this.addGlobalEvent('mouseup', this.#__closeMove.bind(this));
 	}
@@ -1062,11 +979,11 @@ class EventManager extends CoreInjector {
 		const h = resizeInterval < fc.get('_minHeight') ? fc.get('_minHeight') : resizeInterval;
 		fc.get('wysiwygFrame').style.height = fc.get('code').style.height = h + 'px';
 		this._resizeClientY = e.clientY;
-		if (!env.isResizeObserverSupported) this.editor.__callResizeFunction(fc, h, null);
+		if (!env.isResizeObserverSupported) this.uiManager._emitResizeEvent(fc, h, null);
 	}
 
 	#__closeMove() {
-		this.ui.disableBackWrapper();
+		this.uiManager.disableBackWrapper();
 		this.#resize_editor &&= this.removeGlobalEvent(this.#resize_editor);
 		this.#close_move &&= this.removeGlobalEvent(this.#close_move);
 	}
@@ -1103,7 +1020,7 @@ class EventManager extends CoreInjector {
 		this.status.initViewportHeight = _w.visualViewport.height;
 
 		if (!isMobile) {
-			this.ui.offCurrentController();
+			this.uiManager.offCurrentController();
 		}
 
 		if (this.editor.isBalloon) this.toolbar.hide();
@@ -1157,7 +1074,7 @@ class EventManager extends CoreInjector {
 		const selection = _wd.getSelection();
 		let anchorNode = selection.anchorNode;
 
-		this.editor.applyFrameRoots((root) => {
+		this.contextManager.applyToRoots((root) => {
 			if (anchorNode && root.get('wysiwyg').contains(anchorNode)) {
 				if (root.get('isReadOnly') || root.get('isDisabled')) return;
 
@@ -1184,8 +1101,8 @@ class EventManager extends CoreInjector {
 	 */
 	#OnFocus_code(frameContext) {
 		this.editor.changeFrameContext(frameContext.get('key'));
-		dom.utils.addClass(this.editor.commandTargets.get('codeView'), 'active');
-		dom.utils.setDisabled(this.editor._codeViewDisabledButtons, true);
+		dom.utils.addClass(this.commandDispatcher.targets.get('codeView'), 'active');
+		this.uiManager._toggleCodeViewButtons(true);
 	}
 }
 

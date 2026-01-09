@@ -26,22 +26,14 @@
 
 // --------------------------------------------------------- [Context & Options] ---------------------------------------------------------------------------------------------------
 /**
- * @typedef {Map<keyof import('./core/config/context').ContextUtil, *>} SunEditor.Context
- */
-
-/**
- * @typedef {import('./core/config/options').BaseOptionsMap} SunEditor.Options
- *
+ * @typedef {import('./core/services/contextManager').ContextMap} SunEditor.Context
+ * @typedef {import('./core/services/optionManager').BaseOptionsMap} SunEditor.Options
  */
 
 // --------------------------------------------------------- [{Frame} Context & Options] ---------------------------------------------------------------------------------------------------
 /**
- * @typedef {import('./core/config/frameContext').FrameContextUtil} SunEditor.FrameContext
- */
-
-/**
- * @typedef {import('./core/config/options').FrameOptionsMap} SunEditor.FrameOptions
- *
+ * @typedef {import('./core/services/contextManager').FrameContextMap} SunEditor.FrameContext
+ * @typedef {import('./core/services/optionManager').FrameOptionsMap} SunEditor.FrameOptions
  */
 
 /**
@@ -269,6 +261,11 @@
  * @typedef {import('./events').AudioInfo} SunEditor.EventParams.AudioInfo
  * @typedef {import('./events').FileInfo} SunEditor.EventParams.FileInfo
  * @typedef {import('./events').EmbedInfo} SunEditor.EventParams.EmbedInfo
+ */
+
+/**
+ * The event object passed to the plugin event handler
+ * @typedef {import('./core/services/pluginManager').PluginEventParam} SunEditor.EventParams.PluginEvent
  */
 
 // --------------------------------------------------------- [UI Types] ---------------------------------------------------------------------------------------------------

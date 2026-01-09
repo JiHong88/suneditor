@@ -17,7 +17,7 @@ describe('Event Ports', () => {
 				nativeFocus: jest.fn(),
 				blur: jest.fn()
 			},
-			editor: {
+			uiManager: {
 				_iframeAutoHeight: jest.fn()
 			},
 			selection: {
@@ -397,7 +397,7 @@ describe('Event Ports', () => {
 			const range = document.createRange();
 			ports.enterScrollTo(range);
 
-			expect(mockInst.editor._iframeAutoHeight).toHaveBeenCalledWith(mockInst.frameContext);
+			expect(mockInst.uiManager._iframeAutoHeight).toHaveBeenCalledWith(mockInst.frameContext);
 			expect(mockInst.selection.scrollTo).toHaveBeenCalledWith(range, {
 				behavior: 'auto',
 				block: 'nearest',
@@ -418,7 +418,7 @@ describe('Event Ports', () => {
 			const range = document.createRange();
 			ports.enterScrollTo(range);
 
-			expect(mockInst.editor._iframeAutoHeight).toHaveBeenCalled();
+			expect(mockInst.uiManager._iframeAutoHeight).toHaveBeenCalled();
 			// scrollTo should not be called on mobile with scrollparents
 			// Note: This behavior depends on isMobile implementation
 

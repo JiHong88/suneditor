@@ -576,7 +576,7 @@ class Video extends PluginModal {
 					file: f,
 				});
 
-				this.ui.alertOpen(message === NO_EVENT ? err : message || err, 'error');
+				this.uiManager.alertOpen(message === NO_EVENT ? err : message || err, 'error');
 
 				return false;
 			}
@@ -591,7 +591,7 @@ class Video extends PluginModal {
 			const err = '[SUNEDITOR.videoUpload.fail] Size of uploadable total videos: ' + limitSize / 1000 + 'KB';
 			const message = await this.triggerEvent('onVideoUploadError', { error: err, limitSize, currentSize, uploadSize: fileSize });
 
-			this.ui.alertOpen(message === NO_EVENT ? err : message || err, 'error');
+			this.uiManager.alertOpen(message === NO_EVENT ? err : message || err, 'error');
 
 			return false;
 		}

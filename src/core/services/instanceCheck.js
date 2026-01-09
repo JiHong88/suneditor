@@ -2,12 +2,14 @@
  * @description iframe-safe instanceof check utility class
  */
 class InstanceCheck {
+	#frameContext;
+
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.FrameContext} frameContext - Frame context
 	 */
-	constructor(editor) {
-		this.editor = editor;
+	constructor(frameContext) {
+		this.#frameContext = frameContext;
 	}
 
 	/**
@@ -50,7 +52,7 @@ class InstanceCheck {
 	 * @returns {SunEditor.GlobalWindow}
 	 */
 	#getFrameWindow() {
-		return /** @type {SunEditor.GlobalWindow} */ (this.editor.frameContext.get('_ww'));
+		return /** @type {SunEditor.GlobalWindow} */ (this.#frameContext.get('_ww'));
 	}
 }
 

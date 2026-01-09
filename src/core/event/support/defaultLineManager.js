@@ -6,25 +6,32 @@ import { dom, unicode } from '../../../helper';
  * - Manages the initial line creation when the editor is empty.
  */
 export default class DefaultLineManager {
+	#editor;
+	#options;
+	#frameContext;
+	#uiManager;
+
 	/**
 	 * @constructor
 	 * @param {SunEditor.Instance} editor
 	 */
 	constructor(editor) {
-		this.editor = editor;
-		this.options = editor.options;
+		this.#editor = editor;
+		this.#options = editor.options;
+		this.#frameContext = editor.frameContext;
+		this.#uiManager = editor.uiManager;
 	}
 
 	get #selection() {
-		return this.editor.selection;
+		return this.#editor.selection;
 	}
 
 	get #format() {
-		return this.editor.format;
+		return this.#editor.format;
 	}
 
 	get #component() {
-		return this.editor.component;
+		return this.#editor.component;
 	}
 
 	/**
@@ -35,8 +42,8 @@ export default class DefaultLineManager {
 	 * @returns {?void}
 	 */
 	execute(formatName) {
-		if (!this.options.get('__lineFormatFilter')) return null;
-		if (this.editor._fileManager.pluginRegExp.test(this.editor.currentControllerName)) return;
+		if (!this.#options.get('__lineFormatFilter')) return null;
+		if (this.#editor.pluginManager.fileInfo.pluginRegExp.test(this.#uiManager.currentControllerName)) return;
 
 		const range = this.#selection.getRange();
 		const commonCon = /** @type {HTMLElement} */ (range.commonAncestorContainer);
@@ -49,7 +56,7 @@ export default class DefaultLineManager {
 		let offset, format;
 
 		if (rangeEl) {
-			format = dom.utils.createElement(formatName || this.options.get('defaultLine'));
+			format = dom.utils.createElement(formatName || this.#options.get('defaultLine'));
 			format.innerHTML = rangeEl.innerHTML;
 			if (format.childNodes.length === 0) format.innerHTML = unicode.zeroWidthSpace;
 
@@ -75,9 +82,9 @@ export default class DefaultLineManager {
 
 			if (commonCon.parentElement === container) {
 				const siblingEl = commonCon.nextElementSibling ? container : container.nextElementSibling;
-				const el = dom.utils.createElement(this.options.get('defaultLine'), null, commonCon);
+				const el = dom.utils.createElement(this.#options.get('defaultLine'), null, commonCon);
 				container.parentElement.insertBefore(el, siblingEl);
-				this.editor.focusManager.focusEdge(el);
+				this.#editor.focusManager.focusEdge(el);
 				return;
 			}
 
@@ -85,7 +92,7 @@ export default class DefaultLineManager {
 			return null;
 		} else if (commonCon.nodeType === 1 && commonCon.getAttribute('data-se-embed') === 'true') {
 			let el = commonCon.nextElementSibling;
-			if (!this.#format.isLine(el)) el = this.#format.addLine(commonCon, this.options.get('defaultLine'));
+			if (!this.#format.isLine(el)) el = this.#format.addLine(commonCon, this.#options.get('defaultLine'));
 			this.#selection.setRange(el.firstChild, 0, el.firstChild, 0);
 			return;
 		}
@@ -108,7 +115,7 @@ export default class DefaultLineManager {
 
 		try {
 			if (commonCon.nodeType === 3) {
-				format = dom.utils.createElement(formatName || this.options.get('defaultLine'));
+				format = dom.utils.createElement(formatName || this.#options.get('defaultLine'));
 				commonCon.parentNode.insertBefore(format, commonCon);
 				format.appendChild(commonCon);
 			}
@@ -121,8 +128,8 @@ export default class DefaultLineManager {
 				focusNode = zeroWidth;
 			}
 		} catch {
-			this.editor.execCommand('formatBlock', false, formatName || this.options.get('defaultLine'));
-			this.editor.effectNode = null;
+			this.#frameContext.get('_wd').execCommand('formatBlock', false, `<${formatName || this.#options.get('defaultLine')}>`);
+			this.#editor.effectNode = null;
 			this.#selection.init();
 			return;
 		}
@@ -137,11 +144,11 @@ export default class DefaultLineManager {
 			}
 		}
 
-		this.editor.effectNode = null;
+		this.#editor.effectNode = null;
 		if (startCon) {
 			this.#selection.setRange(startCon, 1, startCon, 1);
 		} else {
-			this.editor.focusManager.nativeFocus();
+			this.#editor.focusManager.nativeFocus();
 		}
 	}
 }

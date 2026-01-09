@@ -15,10 +15,10 @@ describe('HTML', () => {
 		await waitForEditorReady(editor);
 		html = editor.html;
 
-		editor.ui.showLoading = jest.fn();
-		editor.ui.hideLoading = jest.fn();
-		editor.ui.offCurrentController = jest.fn();
-		editor.ui.showToast = jest.fn();
+		editor.uiManager.showLoading = jest.fn();
+		editor.uiManager.hideLoading = jest.fn();
+		editor.uiManager.offCurrentController = jest.fn();
+		editor.uiManager.showToast = jest.fn();
 
 		wysiwyg = editor.frameContext.get('wysiwyg');
 	});
@@ -528,12 +528,12 @@ describe('HTML', () => {
         it('should copy content to clipboard', async () => {
              jest.spyOn(clipboard, 'write').mockResolvedValue(true);
              // mock toast
-             editor.ui.showToast = jest.fn();
+             editor.uiManager.showToast = jest.fn();
 
              const result = await html.copy('text');
 
              expect(result).toBe(true);
-             expect(editor.ui.showToast).toHaveBeenCalledWith(editor.lang.message_copy_success, expect.anything());
+             expect(editor.uiManager.showToast).toHaveBeenCalledWith(editor.lang.message_copy_success, expect.anything());
         });
 
         it('should fail if content is not valid', async () => {
@@ -543,17 +543,17 @@ describe('HTML', () => {
 
         it('should handle clipboard error (return false)', async () => {
              jest.spyOn(clipboard, 'write').mockResolvedValue(false);
-             editor.ui.showToast = jest.fn();
+             editor.uiManager.showToast = jest.fn();
 
              const result = await html.copy('text');
              expect(result).toBe(false);
-             expect(editor.ui.showToast).toHaveBeenCalledWith(editor.lang.message_copy_fail, expect.anything(), 'error');
+             expect(editor.uiManager.showToast).toHaveBeenCalledWith(editor.lang.message_copy_fail, expect.anything(), 'error');
         });
 
         it('should handle exception in copy', async () => {
              jest.spyOn(clipboard, 'write').mockRejectedValue(new Error('fail'));
              console.error = jest.fn(); // suppress console error
-             editor.ui.showToast = jest.fn();
+             editor.uiManager.showToast = jest.fn();
 
              const result = await html.copy('text');
              expect(result).toBe(false);

@@ -82,8 +82,6 @@ declare class ModalAnchorEditor extends CoreInjector {
 	 * @param {SunEditor.Instance} editor The instance object that called the constructor.
 	 */
 	constructor(editor: SunEditor.Instance, modalForm: any, params: any);
-	selection: import('../../core/class/selection').default;
-	ui: import('../../core/class/ui').default;
 	openNewWindow: boolean;
 	relList: any;
 	defaultRel: any;

@@ -17,15 +17,14 @@ class NodeTransform extends CoreInjector {
 		super(editor);
 	}
 
-	/** @type {SunEditor.Core['component']} */
 	get #component() {
 		return this.editor.component;
 	}
-	/** @type {SunEditor.Core['format']} */
+
 	get #format() {
 		return this.editor.format;
 	}
-	/** @type {SunEditor.Core['inline']} */
+
 	get #inline() {
 		return this.editor.inline;
 	}

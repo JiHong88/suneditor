@@ -21,8 +21,8 @@ describe('EventManager - workflow Tests', () => {
 			await waitForEditorReady(editor);
 
 			if (editor.ui) {
-				editor.ui.showLoading = jest.fn();
-				editor.ui.hideLoading = jest.fn();
+				editor.uiManager.showLoading = jest.fn();
+				editor.uiManager.hideLoading = jest.fn();
 			}
 			if (editor.viewer) {
 				editor.viewer.print = jest.fn();
@@ -93,8 +93,8 @@ describe('EventManager - workflow Tests', () => {
 			await waitForEditorReady(editor);
 
 			if (editor.ui) {
-				editor.ui.showLoading = jest.fn();
-				editor.ui.hideLoading = jest.fn();
+				editor.uiManager.showLoading = jest.fn();
+				editor.uiManager.hideLoading = jest.fn();
 			}
 			if (editor.viewer) {
 				editor.viewer.print = jest.fn();
@@ -147,8 +147,8 @@ describe('EventManager - workflow Tests', () => {
 			await waitForEditorReady(editor);
 
 			if (editor.ui) {
-				editor.ui.showLoading = jest.fn();
-				editor.ui.hideLoading = jest.fn();
+				editor.uiManager.showLoading = jest.fn();
+				editor.uiManager.hideLoading = jest.fn();
 			}
 			if (editor.viewer) {
 				editor.viewer.print = jest.fn();
@@ -191,8 +191,8 @@ describe('EventManager - workflow Tests', () => {
 			await waitForEditorReady(editor);
 
 			if (editor.ui) {
-				editor.ui.showLoading = jest.fn();
-				editor.ui.hideLoading = jest.fn();
+				editor.uiManager.showLoading = jest.fn();
+				editor.uiManager.hideLoading = jest.fn();
 			}
 			if (editor.viewer) {
 				editor.viewer.print = jest.fn();
@@ -234,8 +234,8 @@ describe('EventManager - workflow Tests', () => {
 			await waitForEditorReady(editor);
 
 			if (editor.ui) {
-				editor.ui.showLoading = jest.fn();
-				editor.ui.hideLoading = jest.fn();
+				editor.uiManager.showLoading = jest.fn();
+				editor.uiManager.hideLoading = jest.fn();
 			}
 			if (editor.viewer) {
 				editor.viewer.print = jest.fn();
@@ -291,8 +291,8 @@ describe('EventManager - workflow Tests', () => {
 			await waitForEditorReady(editor);
 
 			if (editor.ui) {
-				editor.ui.showLoading = jest.fn();
-				editor.ui.hideLoading = jest.fn();
+				editor.uiManager.showLoading = jest.fn();
+				editor.uiManager.hideLoading = jest.fn();
 			}
 			if (editor.viewer) {
 				editor.viewer.print = jest.fn();

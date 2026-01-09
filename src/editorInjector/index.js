@@ -9,14 +9,26 @@ function EditorInjector(editor) {
 	// CoreInjector props
 	/** @type {SunEditor.Core} */
 	this.editor;
-	/** @type {import('./_core').default['eventManager']} */
-	this.eventManager;
+
+	// services
+	/** @type {SunEditor.Core['contextManager']} */
+	this.contextManager = editor.contextManager;
 	/** @type {import('./_core').default['instanceCheck']} */
 	this.instanceCheck;
-	/** @type {import('./_core').default['history']} */
-	this.history;
+	/** @type {import('./_core').default['pluginManager']} */
+	this.pluginManager;
 	/** @type {import('./_core').default['focusManager']} */
 	this.focusManager;
+	/** @type {import('./_core').default['commandDispatcher']} */
+	this.commandDispatcher;
+	/** @type {import('./_core').default['history']} */
+	this.history;
+	/** @type {import('./_core').default['eventManager']} */
+	this.eventManager;
+	/** @type {import('./_core').default['uiManager']} */
+	this.uiManager = editor.uiManager;
+
+	// etc
 	/** @type {import('./_core').default['events']} */
 	this.events;
 	/** @type {import('./_core').default['triggerEvent']} */
@@ -73,8 +85,6 @@ function EditorInjector(editor) {
 	this.selection;
 	/** @type {import('./_classes').default['shortcuts']} */
 	this.shortcuts;
-	/** @type {import('./_classes').default['ui']} */
-	this.ui;
 	/** @type {import('./_classes').default['viewer']} */
 	this.viewer;
 

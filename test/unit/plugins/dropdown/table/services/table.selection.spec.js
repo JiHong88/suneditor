@@ -58,7 +58,7 @@ describe('TableSelectionService', () => {
                 addGlobalEvent: jest.fn(),
                 removeGlobalEvent: jest.fn()
             },
-            ui: {
+            uiManager: {
                 disableBackWrapper: jest.fn()
             },
             setState: jest.fn((key, val) => { mainState[key] = val; }),
@@ -117,7 +117,7 @@ describe('TableSelectionService', () => {
          
          it('should remove global events on init', () => {
              selectionService.init();
-             expect(main.ui.disableBackWrapper).toHaveBeenCalled();
+             expect(main.uiManager.disableBackWrapper).toHaveBeenCalled();
          });
     });
 
@@ -310,7 +310,7 @@ describe('TableSelectionService', () => {
 
             selectionService.startCellSelection(cell, false);
 
-            expect(main.ui.disableBackWrapper).toHaveBeenCalled();
+            expect(main.uiManager.disableBackWrapper).toHaveBeenCalled();
         });
     });
 

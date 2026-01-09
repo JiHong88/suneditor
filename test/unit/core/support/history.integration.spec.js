@@ -76,8 +76,8 @@ describe('History - Integration Tests', () => {
 		});
 
 		it('should update undo/redo buttons', () => {
-			const undoButton = editor.commandTargets.get('undo')?.[0];
-			const redoButton = editor.commandTargets.get('redo')?.[0];
+			const undoButton = editor.commandDispatcher.targets.get('undo')?.[0];
+			const redoButton = editor.commandDispatcher.targets.get('redo')?.[0];
 
 			if (undoButton && redoButton) {
 				// Initially should be disabled
@@ -138,8 +138,8 @@ describe('History - Integration Tests', () => {
 			expect(wysiwyg.innerHTML).toBe(initialContent);
 
 			// Buttons should be disabled
-			const undoButton = editor.commandTargets.get('undo')?.[0];
-			const redoButton = editor.commandTargets.get('redo')?.[0];
+			const undoButton = editor.commandDispatcher.targets.get('undo')?.[0];
+			const redoButton = editor.commandDispatcher.targets.get('redo')?.[0];
 
 			if (undoButton && redoButton) {
 				expect(undoButton.disabled).toBe(true);

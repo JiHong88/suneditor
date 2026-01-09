@@ -24,11 +24,6 @@ declare class Editor {
 	 */
 	rootKeys: Array<any>;
 	/**
-	 * @description Frame root map
-	 * @type {Map<*, SunEditor.FrameContext>}
-	 */
-	frameRoots: Map<any, SunEditor.FrameContext>;
-	/**
 	 * @description Document object
 	 * @type {Document}
 	 */
@@ -43,61 +38,6 @@ declare class Editor {
 	 * @type {HTMLElement}
 	 */
 	carrierWrapper: HTMLElement;
-	/**
-	 * @internal
-	 * @description Editor context object
-	 * @type {SunEditor.Context}
-	 */
-	__context: SunEditor.Context;
-	/**
-	 * @description Utility object that manages the editor's runtime context.
-	 * Provides methods to get, set, and inspect internal context.
-	 * @type {ContextUtil}
-	 */
-	context: ContextUtil;
-	/**
-	 * @internal
-	 * @description Current focusing [frame] context
-	 * @type {import('./config/frameContext').FrameContextMap}
-	 */
-	__frameContext: import('./config/frameContext').FrameContextMap;
-	/**
-	 * @description Utility object that manages the editor's runtime [frame] context.
-	 * Provides methods to get, set, and inspect internal context.
-	 * @type {FrameContextUtil}
-	 */
-	frameContext: FrameContextUtil;
-	/**
-	 * @internal
-	 * @description Current focusing [frame] context options
-	 * @type {SunEditor.FrameOptions}
-	 */
-	__frameOptions: SunEditor.FrameOptions;
-	/**
-	 * @description Utility object that manages the editor's runtime [frame] options.
-	 * Provides methods to get, set, and inspect internal [frame] options.
-	 * @type {FrameOptionsMap}
-	 */
-	frameOptions: FrameOptionsMap;
-	/**
-	 * @internal
-	 * @description Editor row options
-	 * @type {Map<string, *>}
-	 */
-	__options: Map<string, any>;
-	/**
-	 * @description Utility object that manages the editor's runtime options.
-	 * Provides methods to get, set, and inspect internal editor options.
-	 * @type {BaseOptionsMap}
-	 */
-	options: BaseOptionsMap;
-	/**
-	 * @description Plugins
-	 * @type {Object<string, *>}
-	 */
-	plugins: {
-		[x: string]: any;
-	};
 	/**
 	 * @description Events object, call by triggerEvent function
 	 * @type {SunEditor.Event.Handlers}
@@ -158,73 +98,28 @@ declare class Editor {
 	 */
 	isSubBalloonAlways: boolean;
 	/**
-	 * @description All command buttons map
-	 * @type {Map<string, HTMLElement>}
-	 */
-	allCommandButtons: Map<string, HTMLElement>;
-	/**
-	 * @description All command buttons map
-	 * @type {Map<string, HTMLElement>}
-	 */
-	subAllCommandButtons: Map<string, HTMLElement>;
-	/**
-	 * @description Shoutcuts key map
-	 * @type {Map<string, *>}
-	 */
-	shortcutsKeyMap: Map<string, any>;
-	/**
-	 * @description Shoutcuts reverse key array
-	 * - An array of key codes generated with the reverseButtons option, used to reverse the action for a specific key combination.
-	 * @type {Set<string>}
-	 */
-	reverseKeys: Set<string>;
-	/**
-	 * @description A map with the plugin's buttons having an "active" method and the default command buttons with an "active" action.
-	 * - Each button is contained in an array.
-	 * @type {Map<string, Array<HTMLButtonElement>>}
-	 */
-	commandTargets: Map<string, Array<HTMLButtonElement>>;
-	/**
-	 * @description Plugins array with "active" method.
-	 * - "activeCommands" runs the "add" method when creating the editor.
-	 * @type {Array<string>}
-	 */
-	activeCommands: Array<string>;
-	/**
 	 * @description The selection node (selection.getNode()) to which the effect was last applied
 	 * @type {?Node}
 	 */
 	effectNode: Node | null;
-	/**
-	 * @description Currently open "Modal" instance
-	 * @type {*}
-	 */
-	opendModal: any;
-	/**
-	 * @description Currently open "Controller" info array
-	 * @type {Array<SunEditor.Module.Controller.Info>}
-	 */
-	opendControllers: Array<SunEditor.Module.Controller.Info>;
-	/**
-	 * @description Currently open "Controller" caller plugin name
-	 */
-	currentControllerName: string;
-	/**
-	 * @description Currently open "Browser" instance
-	 * @type {*}
-	 */
-	opendBrowser: any;
-	/**
-	 * @description Whether "SelectMenu" is open
-	 * @type {boolean}
-	 */
-	selectMenuOn: boolean;
-	/** @description History class instance @type {ReturnType<typeof import('./support/history').default>} */
-	history: ReturnType<typeof import('./support/history').default>;
+	/** @description Context manager class @type {import('./services/contextManager').default} */
+	contextManager: import('./services/contextManager').default;
+	/** @description Context option manager class @type {import('./services/optionManager').default} */
+	optionManager: import('./services/optionManager').default;
+	/** @description iframe-safe instanceof check utility class @type {import('./services/instanceCheck').default} */
+	instanceCheck: import('./services/instanceCheck').default;
+	/** @description Plugin Manager */
+	pluginManager: PluginManager;
+	/** @description Focus Manager */
+	focusManager: FocusManager;
+	/** @description UI manager class instance @type {import('./services/uiManager').default} */
+	uiManager: import('./services/uiManager').default;
+	/** @description Command Dispatcher */
+	commandDispatcher: CommandDispatcher;
+	/** @description History class instance @type {ReturnType<typeof import('./services/history').default>} */
+	history: ReturnType<typeof import('./services/history').default>;
 	/** @description EventManager class instance @type {import('./event/eventManager').default} */
 	eventManager: import('./event/eventManager').default;
-	/** @description iframe-safe instanceof check utility class @type {import('./support/instanceCheck').default} */
-	instanceCheck: import('./support/instanceCheck').default;
 	/** @description Toolbar class instance @type {import('./class/toolbar').default} */
 	toolbar: import('./class/toolbar').default;
 	/** @description Sub-Toolbar class instance @type {?import('./class/toolbar').default} */
@@ -251,8 +146,6 @@ declare class Editor {
 	selection: import('./class/selection').default;
 	/** @description Shortcuts class instance @type {import('./class/shortcuts').default} */
 	shortcuts: import('./class/shortcuts').default;
-	/** @description UI class instance @type {import('./class/ui').default} */
-	ui: import('./class/ui').default;
 	/** @description Viewer class instance @type {import('./class/viewer').default} */
 	viewer: import('./class/viewer').default;
 	/**
@@ -278,31 +171,6 @@ declare class Editor {
 	_preventSelection: boolean;
 	/**
 	 * @internal
-	 * @description Line breaker (top)
-	 * @type {HTMLElement}
-	 */
-	_lineBreaker_t: HTMLElement;
-	/**
-	 * @internal
-	 * @description Line breaker (bottom)
-	 * @type {HTMLElement}
-	 */
-	_lineBreaker_b: HTMLElement;
-	/**
-	 * @internal
-	 * @description Plugin call event map
-	 * @type {Map<string, Array<((...args: *) => *) & { index: number }>>}
-	 */
-	_onPluginEvents: Map<
-		string,
-		Array<
-			((...args: any) => any) & {
-				index: number;
-			}
-		>
-	>;
-	/**
-	 * @internal
 	 * @description Copy format info
 	 * - eventManager.__cacheStyleNodes copied
 	 * @type {?Array<Node>}
@@ -316,42 +184,6 @@ declare class Editor {
 	_onCopyFormatInitMethod: ((...args: any) => any) | null;
 	/**
 	 * @internal
-	 * @description Controller target's frame div (editor.frameContext.get('topArea'))
-	 * @type {?HTMLElement}
-	 */
-	_controllerTargetContext: HTMLElement | null;
-	/**
-	 * @internal
-	 * @description List of buttons that are disabled when "controller" is opened
-	 * @type {Array<HTMLButtonElement|HTMLInputElement>}
-	 */
-	_controllerOnDisabledButtons: Array<HTMLButtonElement | HTMLInputElement>;
-	/**
-	 * @internal
-	 * @description List of buttons that are disabled when "codeView" mode opened
-	 * @type {Array<HTMLButtonElement|HTMLInputElement>}
-	 */
-	_codeViewDisabledButtons: Array<HTMLButtonElement | HTMLInputElement>;
-	/**
-	 * @internal
-	 * @description Responsive Toolbar Button Structure array
-	 * @type {Array<*>}
-	 */
-	_responsiveButtons: Array<any>;
-	/**
-	 * @internal
-	 * @description Responsive Sub-Toolbar Button Structure array
-	 * @type {Array<*>}
-	 */
-	_responsiveButtons_sub: Array<any>;
-	/**
-	 * @internal
-	 * @description Variable that controls the "blur" event in the editor of inline or balloon mode when the focus is moved to dropdown
-	 * @type {boolean}
-	 */
-	_notHideToolbar: boolean;
-	/**
-	 * @internal
 	 * @description If true, initialize all indexes of image, video information
 	 * @type {boolean}
 	 */
@@ -363,75 +195,43 @@ declare class Editor {
 	 */
 	_componentsInfoReset: boolean;
 	/**
-	 * @internal
-	 * @description plugin retainFormat info Map()
-	 * @type {Map<string, { key: string, method: (...args: *) => * }>}
+	 * @description Context
+	 * @type {Map<*, SunEditor.FrameContext>}
 	 */
-	_MELInfo: Map<
-		string,
-		{
-			key: string;
-			method: (...args: any) => any;
-		}
-	>;
+	get frameRoots(): Map<any, SunEditor.FrameContext>;
 	/**
-	 * @internal
-	 * @description Variables for file component management
+	 * @description Context
+	 * @type {SunEditor.Context}
+	 */
+	get context(): SunEditor.Context;
+	/**
+	 * @description Options
+	 * @type {SunEditor.Options}
+	 */
+	get options(): SunEditor.Options;
+	/**
+	 * @description Frame context
+	 * @type {SunEditor.FrameContext}
+	 */
+	get frameContext(): SunEditor.FrameContext;
+	/**
+	 * @description Frame options
+	 * @type {SunEditor.FrameOptions}
+	 */
+	get frameOptions(): SunEditor.FrameOptions;
+	/**
+	 * @description Plugins
 	 * @type {Object<string, *>}
 	 */
-	_fileManager: {
+	get plugins(): {
 		[x: string]: any;
 	};
 	/**
-	 * @internal
-	 * @description Variables for managing the components
-	 * @type {Array<*>}
+	 * @description Plugins array with "active" method.
+	 * - "activeCommands" runs the "add" method when creating the editor.
+	 * @type {Array<string>}
 	 */
-	_componentManager: Array<any>;
-	/**
-	 * @internal
-	 * @description Current Figure container.
-	 * @type {?HTMLElement}
-	 */
-	_figureContainer: HTMLElement | null;
-	/**
-	 * @description If the plugin is not added, add the plugin and call the 'add' function.
-	 * - If the plugin is added call callBack function.
-	 * @param {string} pluginName The name of the plugin to call
-	 * @param {?Array<HTMLElement>} targets Plugin target button (This is not necessary if you have a button list when creating the editor)
-	 * @param {?Object<string, *>} pluginOptions Plugin's options
-	 */
-	registerPlugin(
-		pluginName: string,
-		targets: Array<HTMLElement> | null,
-		pluginOptions: {
-			[x: string]: any;
-		} | null,
-	): void;
-	/**
-	 * @description Run plugin calls and basic commands.
-	 * @param {string} command Command string
-	 * @param {string} type Display type string ('command', 'dropdown', 'modal', 'container')
-	 * @param {?Node} [button] The element of command button
-	 */
-	run(command: string, type: string, button?: Node | null): void;
-	/**
-	 * @description Execute "editor.run" with command button.
-	 * @param {Node} target Command target
-	 */
-	runFromTarget(target: Node): void;
-	/**
-	 * @description It is executed by inserting the button of commandTargets as the argument value of the "f" function.
-	 * - "func" is called as long as the button array's length.
-	 * @param {string} cmd data-command
-	 * @param {(...args: *) => *} func Function.
-	 */
-	applyCommandTargets(cmd: string, func: (...args: any) => any): void;
-	/**
-	 * @description Execute a function by traversing all root targets.
-	 * @param {(...args: *) => *} f Function
-	 */
-	applyFrameRoots(f: (...args: any) => any): void;
+	get activeCommands(): Array<string>;
 	/**
 	 * @description Checks if the content of the editor is empty.
 	 * - Display criteria for "placeholder".
@@ -439,11 +239,6 @@ declare class Editor {
 	 * @returns {boolean}
 	 */
 	isEmpty(fc?: SunEditor.FrameContext | null): boolean;
-	/**
-	 * @description Set direction to "rtl" or "ltr".
-	 * @param {string} dir "rtl" or "ltr"
-	 */
-	setDir(dir: string): void;
 	/**
 	 * @description Add or reset option property (Editor is reloaded)
 	 * @param {SunEditor.InitOptions} newOptions Options
@@ -455,71 +250,11 @@ declare class Editor {
 	 */
 	changeFrameContext(rootKey: any): void;
 	/**
-	 * @description javascript execCommand
-	 * @param {string} command javascript execCommand function property
-	 * @param {boolean} [showDefaultUI] javascript execCommand function property
-	 * @param {string} [value] javascript execCommand function property
-	 */
-	execCommand(command: string, showDefaultUI?: boolean, value?: string): void;
-	/**
 	 * @description Destroy the suneditor
 	 */
 	destroy(): any;
-	/** ----- private methods ----------------------------------------------------------------------------------------------------------------------------- */
-	/**
-	 * @internal
-	 * @description Check the components such as image and video and modify them according to the format.
-	 * @param {boolean} loaded If true, the component is loaded.
-	 */
-	_checkComponents(loaded: boolean): void;
-	/**
-	 * @internal
-	 * @description Initialize the information of the components.
-	 */
-	_resetComponents(): void;
-	/**
-	 * @internal
-	 * @description Set display property when there is placeholder.
-	 * @param {?SunEditor.FrameContext} [fc] - Frame context object, If null fc is this.frameContext
-	 */
-	_checkPlaceholder(fc?: SunEditor.FrameContext | null): void;
-	/**
-	 * @internal
-	 * @description Called when there are changes to tags in the wysiwyg region.
-	 * @param {SunEditor.FrameContext} fc - Frame context object
-	 */
-	_resourcesStateChange(fc: SunEditor.FrameContext): void;
-	/**
-	 * @internal
-	 * @description Modify the height value of the iframe when the height of the iframe is automatic.
-	 * @param {SunEditor.FrameContext|FrameContextUtil} fc - Frame context object
-	 */
-	_iframeAutoHeight(fc: SunEditor.FrameContext | FrameContextUtil): void;
-	/**
-	 * @internal
-	 * @description Call the "onResizeEditor" event
-	 * @param {SunEditor.FrameContext|FrameContextUtil} fc - Frame context object
-	 * @param {number} h - Height value
-	 * @param {ResizeObserverEntry} resizeObserverEntry - ResizeObserverEntry object
-	 */
-	__callResizeFunction(fc: SunEditor.FrameContext | FrameContextUtil, h: number, resizeObserverEntry: ResizeObserverEntry): void;
-	/**
-	 * @internal
-	 * @description Caching basic buttons to use
-	 */
-	__cachingButtons(): void;
-	/**
-	 * @internal
-	 * @description Caches custom(starts with "_") shortcut keys for commands.
-	 */
-	__cachingShortcuts(): void;
-	commandExecutor: CommandExecutor;
-	focusManager: FocusManager;
 	#private;
 }
-import { ContextUtil } from './config/context';
-import { FrameContextUtil } from './config/frameContext';
-import { FrameOptionsMap } from './config/options';
-import { BaseOptionsMap } from './config/options';
-import CommandExecutor from './support/commandExecutor';
-import FocusManager from './support/focusManager';
+import CommandDispatcher from './services/commandDispatcher';
+import FocusManager from './services/focusManager';
+import PluginManager from './services/pluginManager';

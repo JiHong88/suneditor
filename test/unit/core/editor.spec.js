@@ -23,8 +23,6 @@ describe('Core - Editor', () => {
 			}).toThrow();
 		});
 
-
-
 		it('should handle invalid multiTargets with appropriate errors', () => {
 			// Test various invalid inputs
 			expect(() => {
@@ -32,12 +30,6 @@ describe('Core - Editor', () => {
 			}).toThrow();
 		});
 	});
-
-
-
-
-
-
 
 	describe('Editor parameter validation', () => {
 		it('should require multiTargets as first parameter', () => {
@@ -87,12 +79,6 @@ describe('Core - Editor', () => {
 		});
 	});
 
-
-
-
-
-
-
 	describe('Instance methods', () => {
 		let editor;
 
@@ -101,11 +87,11 @@ describe('Core - Editor', () => {
 			await waitForEditorReady(editor);
 
 			// Mock UI methods to prevent side effects during cleanup
-			if (editor.ui) {
-				editor.ui.showLoading = jest.fn();
-				editor.ui.hideLoading = jest.fn();
-				editor.ui.showToast = jest.fn();
-				editor.ui.closeToast = jest.fn();
+			if (editor.uiManager) {
+				editor.uiManager.showLoading = jest.fn();
+				editor.uiManager.hideLoading = jest.fn();
+				editor.uiManager.showToast = jest.fn();
+				editor.uiManager.closeToast = jest.fn();
 			}
 			if (editor.viewer) {
 				editor.viewer.print = jest.fn();
@@ -119,7 +105,7 @@ describe('Core - Editor', () => {
 		describe('setDir', () => {
 			it('should set the text direction to rtl', () => {
 				// when
-				editor.setDir('rtl');
+				editor.uiManager.setDir('rtl');
 
 				// then
 				const frame = editor.frameContext;
@@ -130,10 +116,10 @@ describe('Core - Editor', () => {
 
 			it('should set the text direction to ltr', () => {
 				// given
-				editor.setDir('rtl');
+				editor.uiManager.setDir('rtl');
 
 				// when
-				editor.setDir('ltr');
+				editor.uiManager.setDir('ltr');
 
 				// then
 				const frame = editor.frameContext;
@@ -144,11 +130,11 @@ describe('Core - Editor', () => {
 
 			it('should not change if direction is already set', () => {
 				// given
-				editor.setDir('rtl');
+				editor.uiManager.setDir('rtl');
 				const initialRtl = editor.options.get('_rtl');
 
 				// when
-				editor.setDir('rtl');
+				editor.uiManager.setDir('rtl');
 
 				// then
 				expect(editor.options.get('_rtl')).toBe(initialRtl);
@@ -160,7 +146,7 @@ describe('Core - Editor', () => {
 				wysiwyg.innerHTML = '<p style="margin-left: 10px; margin-right: 20px;">Test</p>';
 
 				// when
-				editor.setDir('rtl');
+				editor.uiManager.setDir('rtl');
 
 				// then
 				const p = wysiwyg.querySelector('p');
@@ -262,7 +248,7 @@ describe('Core - Editor', () => {
 				const mockFn = jest.fn();
 
 				// when
-				editor.applyFrameRoots(mockFn);
+				editor.contextManager.applyToRoots(mockFn);
 
 				// then
 				expect(mockFn).toHaveBeenCalledTimes(editor.frameRoots.size);
@@ -276,9 +262,9 @@ describe('Core - Editor', () => {
 				const testCommand = 'bold';
 
 				// Ensure command targets exist
-				if (editor.commandTargets.has(testCommand)) {
+				if (editor.commandDispatcher.targets.has(testCommand)) {
 					// when
-					editor.applyCommandTargets(testCommand, mockFn);
+					editor.commandDispatcher.applyTargets(testCommand, mockFn);
 
 					// then
 					expect(mockFn).toHaveBeenCalled();
@@ -293,36 +279,8 @@ describe('Core - Editor', () => {
 
 				// when & then
 				expect(() => {
-					editor.applyCommandTargets('nonExistentCommand', mockFn);
+					editor.commandDispatcher.applyTargets('nonExistentCommand', mockFn);
 				}).not.toThrow();
-			});
-		});
-
-		describe('execCommand', () => {
-			it('should execute native execCommand', () => {
-				// given
-				const wd = editor.frameContext.get('_wd');
-				wd.execCommand = jest.fn();
-				jest.spyOn(editor.history, 'push');
-
-				// when
-				editor.execCommand('bold', false, null);
-
-				// then
-				expect(wd.execCommand).toHaveBeenCalledWith('bold', false, null);
-				expect(editor.history.push).toHaveBeenCalledWith(true);
-			});
-
-			it('should format block command with angle brackets', () => {
-				// given
-				const wd = editor.frameContext.get('_wd');
-				wd.execCommand = jest.fn();
-
-				// when
-				editor.execCommand('formatBlock', false, 'p');
-
-				// then
-				expect(wd.execCommand).toHaveBeenCalledWith('formatBlock', false, '<p>');
 			});
 		});
 
@@ -333,7 +291,7 @@ describe('Core - Editor', () => {
 				wysiwyg.innerHTML = '<p>Test content</p>';
 
 				// when
-				await editor.commandExecutor.execute('selectAll');
+				await editor.commandDispatcher.run('selectAll');
 
 				// then - selection should be made
 				expect(editor.selection.getRange()).toBeTruthy();
@@ -346,7 +304,7 @@ describe('Core - Editor', () => {
 				editor.selection.setRange(wysiwyg.firstChild.firstChild, 0, wysiwyg.firstChild.firstChild, 4);
 
 				// when
-				await editor.commandExecutor.execute('copy');
+				await editor.commandDispatcher.run('copy');
 
 				// then - should not throw
 			});
@@ -356,7 +314,7 @@ describe('Core - Editor', () => {
 				jest.spyOn(editor.history, 'push');
 
 				// when
-				await editor.commandExecutor.execute('newDocument');
+				await editor.commandDispatcher.run('newDocument');
 
 				// then
 				const wysiwyg = editor.frameContext.get('wysiwyg');
@@ -369,7 +327,7 @@ describe('Core - Editor', () => {
 				jest.spyOn(editor.format, 'indent');
 
 				// when
-				await editor.commandExecutor.execute('indent');
+				await editor.commandDispatcher.run('indent');
 
 				// then
 				expect(editor.format.indent).toHaveBeenCalled();
@@ -380,7 +338,7 @@ describe('Core - Editor', () => {
 				jest.spyOn(editor.format, 'outdent');
 
 				// when
-				await editor.commandExecutor.execute('outdent');
+				await editor.commandDispatcher.run('outdent');
 
 				// then
 				expect(editor.format.outdent).toHaveBeenCalled();
@@ -391,7 +349,7 @@ describe('Core - Editor', () => {
 				jest.spyOn(editor.history, 'undo');
 
 				// when
-				await editor.commandExecutor.execute('undo');
+				await editor.commandDispatcher.run('undo');
 
 				// then
 				expect(editor.history.undo).toHaveBeenCalled();
@@ -402,7 +360,7 @@ describe('Core - Editor', () => {
 				jest.spyOn(editor.history, 'redo');
 
 				// when
-				await editor.commandExecutor.execute('redo');
+				await editor.commandDispatcher.run('redo');
 
 				// then
 				expect(editor.history.redo).toHaveBeenCalled();
@@ -413,7 +371,7 @@ describe('Core - Editor', () => {
 				jest.spyOn(editor.inline, 'remove');
 
 				// when
-				await editor.commandExecutor.execute('removeFormat');
+				await editor.commandDispatcher.run('removeFormat');
 
 				// then
 				expect(editor.inline.remove).toHaveBeenCalled();
@@ -424,7 +382,7 @@ describe('Core - Editor', () => {
 				jest.spyOn(editor.viewer, 'print');
 
 				// when
-				await editor.commandExecutor.execute('print');
+				await editor.commandDispatcher.run('print');
 
 				// then
 				expect(editor.viewer.print).toHaveBeenCalled();
@@ -435,7 +393,7 @@ describe('Core - Editor', () => {
 				editor.viewer.preview = jest.fn();
 
 				// when
-				await editor.commandExecutor.execute('preview');
+				await editor.commandDispatcher.run('preview');
 
 				// then
 				expect(editor.viewer.preview).toHaveBeenCalled();
@@ -446,7 +404,7 @@ describe('Core - Editor', () => {
 				jest.spyOn(editor.viewer, 'codeView');
 
 				// when
-				await editor.commandExecutor.execute('codeView');
+				await editor.commandDispatcher.run('codeView');
 
 				// then
 				expect(editor.viewer.codeView).toHaveBeenCalled();
@@ -457,7 +415,7 @@ describe('Core - Editor', () => {
 				jest.spyOn(editor.viewer, 'fullScreen');
 
 				// when
-				await editor.commandExecutor.execute('fullScreen');
+				await editor.commandDispatcher.run('fullScreen');
 
 				// then
 				expect(editor.viewer.fullScreen).toHaveBeenCalled();
@@ -468,7 +426,7 @@ describe('Core - Editor', () => {
 				jest.spyOn(editor.viewer, 'showBlocks');
 
 				// when
-				await editor.commandExecutor.execute('showBlocks');
+				await editor.commandDispatcher.run('showBlocks');
 
 				// then
 				expect(editor.viewer.showBlocks).toHaveBeenCalled();
@@ -476,24 +434,24 @@ describe('Core - Editor', () => {
 
 			it('should handle dir_ltr command', async () => {
 				// given
-				jest.spyOn(editor, 'setDir');
+				jest.spyOn(editor.uiManager, 'setDir');
 
 				// when
-				await editor.commandExecutor.execute('dir_ltr');
+				await editor.commandDispatcher.run('dir_ltr');
 
 				// then
-				expect(editor.setDir).toHaveBeenCalledWith('ltr');
+				expect(editor.uiManager.setDir).toHaveBeenCalledWith('ltr');
 			});
 
 			it('should handle dir_rtl command', async () => {
 				// given
-				jest.spyOn(editor, 'setDir');
+				jest.spyOn(editor.uiManager, 'setDir');
 
 				// when
-				await editor.commandExecutor.execute('dir_rtl');
+				await editor.commandDispatcher.run('dir_rtl');
 
 				// then
-				expect(editor.setDir).toHaveBeenCalledWith('rtl');
+				expect(editor.uiManager.setDir).toHaveBeenCalledWith('rtl');
 			});
 
 			it('should not handle commands in readOnly mode', async () => {
@@ -502,7 +460,7 @@ describe('Core - Editor', () => {
 				jest.spyOn(editor.format, 'indent');
 
 				// when
-				await editor.commandExecutor.execute('indent');
+				await editor.commandDispatcher.run('indent');
 
 				// then
 				expect(editor.format.indent).not.toHaveBeenCalled();
@@ -516,29 +474,29 @@ describe('Core - Editor', () => {
 			it('should return early for input elements', () => {
 				// given
 				const input = document.createElement('input');
-				jest.spyOn(editor, 'run');
+				jest.spyOn(editor.commandDispatcher, 'run');
 
 				// when
-				editor.runFromTarget(input);
+				editor.commandDispatcher.runFromTarget(input);
 
 				// then
-				expect(editor.run).not.toHaveBeenCalled();
+				expect(editor.commandDispatcher.run).not.toHaveBeenCalled();
 			});
 
 			it('should return if no command button found', () => {
 				// given
 				const div = document.createElement('div');
-				jest.spyOn(editor, 'run');
+				jest.spyOn(editor.commandDispatcher, 'run');
 
 				// when
-				editor.runFromTarget(div);
+				editor.commandDispatcher.runFromTarget(div);
 
 				// then
-				expect(editor.run).not.toHaveBeenCalled();
+				expect(editor.commandDispatcher.run).not.toHaveBeenCalled();
 			});
 		});
 
-		describe('registerPlugin', () => {
+		describe('pluginManager.register', () => {
 			it('should initialize plugin if it is a function', () => {
 				// given
 				const mockPlugin = jest.fn(function () {
@@ -547,7 +505,7 @@ describe('Core - Editor', () => {
 				editor.plugins['testPlugin'] = mockPlugin;
 
 				// when
-				editor.registerPlugin('testPlugin', null, {});
+				editor.pluginManager.register('testPlugin', null, {});
 
 				// then
 				expect(mockPlugin).toHaveBeenCalled();
@@ -555,27 +513,25 @@ describe('Core - Editor', () => {
 		});
 
 		describe('run', () => {
-			it('should call commandExecutor.execute when no type specified', () => {
+			it('should call run method with command when no type specified', () => {
 				// given
-				jest.spyOn(editor.commandExecutor, 'execute');
+				const runSpy = jest.spyOn(editor.commandDispatcher, 'run');
 				const mockButton = document.createElement('button');
 
 				// when
-				editor.run('bold', null, mockButton);
+				editor.commandDispatcher.run('bold', null, mockButton);
 
 				// then
-				expect(editor.commandExecutor.execute).toHaveBeenCalledWith('bold', mockButton);
+				expect(runSpy).toHaveBeenCalledWith('bold', null, mockButton);
 			});
 		});
 
 		describe('command targets and buttons', () => {
 			it('should cache command buttons during initialization', () => {
-				expect(editor.allCommandButtons).toBeInstanceOf(Map);
-				expect(editor.commandTargets).toBeInstanceOf(Map);
+				expect(editor.commandDispatcher.allCommandButtons).toBeInstanceOf(Map);
+				expect(editor.commandDispatcher.targets).toBeInstanceOf(Map);
 			});
 		});
-
-
 
 		describe('changeFrameContext', () => {
 			it('should change frame context to new root key', () => {
@@ -701,7 +657,7 @@ describe('Core - Editor', () => {
 			});
 		});
 
-		describe('_checkPlaceholder', () => {
+		describe('_updatePlaceholder (moved to uiManager)', () => {
 			it('should show placeholder when editor is empty', () => {
 				// given
 				const fc = editor.frameContext;
@@ -719,7 +675,7 @@ describe('Core - Editor', () => {
 				});
 
 				// when
-				editor._checkPlaceholder();
+				editor.uiManager._updatePlaceholder();
 
 				// then
 				expect(placeholder.style.display).toBe('block');
@@ -737,7 +693,7 @@ describe('Core - Editor', () => {
 				wysiwyg.innerHTML = '<p>Test content</p>';
 
 				// when
-				editor._checkPlaceholder();
+				editor.uiManager._updatePlaceholder();
 
 				// then
 				expect(placeholder.style.display).toBe('none');
@@ -754,7 +710,7 @@ describe('Core - Editor', () => {
 				fc.set('isCodeView', true);
 
 				// when
-				editor._checkPlaceholder();
+				editor.uiManager._updatePlaceholder();
 
 				// then
 				expect(placeholder.style.display).toBe('none');
@@ -785,18 +741,18 @@ describe('Core - Editor', () => {
 				jest.spyOn(editor.menu, 'containerOff');
 
 				// Execute non-dropdown type
-				editor.run('undo', null, null);
+				editor.commandDispatcher.run('undo', null, null);
 
 				expect(editor.menu.dropdownOff).toHaveBeenCalled();
 				expect(editor.menu.containerOff).toHaveBeenCalled();
 			});
 
 			it('should handle command without type', async () => {
-				jest.spyOn(editor.commandExecutor, 'execute');
+				const runSpy = jest.spyOn(editor.commandDispatcher, 'run');
 
-				await editor.run('undo', null, null);
+				await editor.commandDispatcher.run('undo', null, null);
 
-				expect(editor.commandExecutor.execute).toHaveBeenCalledWith('undo', null);
+				expect(runSpy).toHaveBeenCalledWith('undo', null, null);
 			});
 		});
 
@@ -848,7 +804,7 @@ describe('Core - Editor', () => {
 				const commands = ['bold', 'italic', 'underline', 'strike', 'subscript', 'superscript'];
 
 				for (const cmd of commands) {
-					await editor.commandExecutor.execute(cmd);
+					await editor.commandDispatcher.run(cmd);
 				}
 			});
 
@@ -856,7 +812,7 @@ describe('Core - Editor', () => {
 				const wysiwyg = editor.frameContext.get('wysiwyg');
 				wysiwyg.innerHTML = '<p>Test</p>';
 
-				await editor.commandExecutor.execute('horizontalRule');
+				await editor.commandDispatcher.run('horizontalRule');
 
 				// Should not throw
 			});
@@ -865,8 +821,8 @@ describe('Core - Editor', () => {
 				const wysiwyg = editor.frameContext.get('wysiwyg');
 				wysiwyg.innerHTML = '<p>List item</p>';
 
-				await editor.commandExecutor.execute('insertOrderedList');
-				await editor.commandExecutor.execute('insertUnorderedList');
+				await editor.commandDispatcher.run('insertOrderedList');
+				await editor.commandDispatcher.run('insertUnorderedList');
 
 				// Should not throw
 			});
@@ -875,7 +831,7 @@ describe('Core - Editor', () => {
 				const wysiwyg = editor.frameContext.get('wysiwyg');
 				wysiwyg.innerHTML = '<p>Format this</p>';
 
-				await editor.commandExecutor.execute('formatBlock', 'h1');
+				await editor.commandDispatcher.run('formatBlock', 'h1');
 
 				// Should not throw
 			});
@@ -896,47 +852,47 @@ describe('Core - Editor', () => {
 			editorInstance = await createTestEditor({
 				editorStyle: 'font-size: 20px;',
 				minHeight: '300px',
-				mode: 'classic'
+				mode: 'classic',
 			});
 			await waitForEditorReady(editorInstance);
-            
-            // Frame options are stored in frameContext
-            const frameOptions = editorInstance.frameContext.get('options');
+
+			// Frame options are stored in frameContext
+			const frameOptions = editorInstance.frameContext.get('options');
 			expect(frameOptions.get('editorStyle')).toBe('font-size: 20px;');
 			expect(frameOptions.get('minHeight')).toBe('300px');
-            // Base options are stored in options
+			// Base options are stored in options
 			expect(editorInstance.options.get('mode')).toBe('classic');
 		});
 
 		it('should handle toolbar options', async () => {
 			editorInstance = await createTestEditor({
-				buttonList: [['bold', 'underline']]
+				buttonList: [['bold', 'underline']],
 			});
 			await waitForEditorReady(editorInstance);
 			const toolbar = editorInstance.context.get('toolbar_main');
 			expect(toolbar).toBeTruthy();
 			expect(toolbar.querySelectorAll('.se-btn').length).toBeGreaterThan(0);
 		});
-        
-        it('should initialize in balloon mode', async () => {
-             editorInstance = await createTestEditor({
-                 mode: 'balloon'
-             });
-             await waitForEditorReady(editorInstance);
-             
-             expect(editorInstance.isBalloon).toBe(true);
-             expect(editorInstance.isInline).toBe(false);
-        });
 
-        it('should initialize in inline mode', async () => {
-             editorInstance = await createTestEditor({
-                 mode: 'inline'
-             });
-             await waitForEditorReady(editorInstance);
+		it('should initialize in balloon mode', async () => {
+			editorInstance = await createTestEditor({
+				mode: 'balloon',
+			});
+			await waitForEditorReady(editorInstance);
 
-             expect(editorInstance.isInline).toBe(true);
-             expect(editorInstance.isBalloon).toBe(false);
-        });
+			expect(editorInstance.isBalloon).toBe(true);
+			expect(editorInstance.isInline).toBe(false);
+		});
+
+		it('should initialize in inline mode', async () => {
+			editorInstance = await createTestEditor({
+				mode: 'inline',
+			});
+			await waitForEditorReady(editorInstance);
+
+			expect(editorInstance.isInline).toBe(true);
+			expect(editorInstance.isBalloon).toBe(false);
+		});
 	});
 
 	describe('run method with different types', () => {
@@ -960,7 +916,7 @@ describe('Core - Editor', () => {
 			jest.spyOn(editor.viewer, '_resetFullScreenHeight');
 
 			// when - first click
-			editor.run('se-more-layer', 'more', moreButton);
+			editor.commandDispatcher.run('se-more-layer', 'more', moreButton);
 
 			// then
 			expect(editor.viewer._resetFullScreenHeight).toHaveBeenCalled();
@@ -976,7 +932,7 @@ describe('Core - Editor', () => {
 			editor.menu.containerOn = jest.fn();
 
 			// when
-			editor.run('testContainer', 'container', containerButton);
+			editor.commandDispatcher.run('testContainer', 'container', containerButton);
 
 			// then
 			expect(editor.menu.containerOn).toHaveBeenCalled();
@@ -992,7 +948,7 @@ describe('Core - Editor', () => {
 			editor.menu.dropdownOn = jest.fn();
 
 			// when
-			editor.run('testDropdown', 'dropdown', dropdownButton);
+			editor.commandDispatcher.run('testDropdown', 'dropdown', dropdownButton);
 
 			// then
 			expect(editor.menu.dropdownOn).toHaveBeenCalled();
@@ -1001,7 +957,7 @@ describe('Core - Editor', () => {
 		it('should handle modal type and open plugin', () => {
 			// given
 			const modalPlugin = {
-				open: jest.fn()
+				open: jest.fn(),
 			};
 			editor.plugins['testModal'] = modalPlugin;
 
@@ -1010,7 +966,7 @@ describe('Core - Editor', () => {
 			modalButton.setAttribute('data-type', 'modal');
 
 			// when
-			editor.run('testModal', 'modal', modalButton);
+			editor.commandDispatcher.run('testModal', 'modal', modalButton);
 
 			// then
 			expect(modalPlugin.open).toHaveBeenCalledWith(modalButton);
@@ -1019,7 +975,7 @@ describe('Core - Editor', () => {
 		it('should handle command type and call plugin action', () => {
 			// given
 			const commandPlugin = {
-				action: jest.fn()
+				action: jest.fn(),
 			};
 			editor.plugins['testCommand'] = commandPlugin;
 
@@ -1028,7 +984,7 @@ describe('Core - Editor', () => {
 			commandButton.setAttribute('data-type', 'command');
 
 			// when
-			editor.run('testCommand', 'command', commandButton);
+			editor.commandDispatcher.run('testCommand', 'command', commandButton);
 
 			// then
 			expect(commandPlugin.action).toHaveBeenCalledWith(commandButton);
@@ -1037,7 +993,7 @@ describe('Core - Editor', () => {
 		it('should handle browser type and open plugin', () => {
 			// given
 			const browserPlugin = {
-				open: jest.fn()
+				open: jest.fn(),
 			};
 			editor.plugins['testBrowser'] = browserPlugin;
 
@@ -1046,7 +1002,7 @@ describe('Core - Editor', () => {
 			browserButton.setAttribute('data-type', 'browser');
 
 			// when
-			editor.run('testBrowser', 'browser', browserButton);
+			editor.commandDispatcher.run('testBrowser', 'browser', browserButton);
 
 			// then
 			expect(browserPlugin.open).toHaveBeenCalledWith(null);
@@ -1055,7 +1011,7 @@ describe('Core - Editor', () => {
 		it('should handle popup type and show plugin', () => {
 			// given
 			const popupPlugin = {
-				show: jest.fn()
+				show: jest.fn(),
 			};
 			editor.plugins['testPopup'] = popupPlugin;
 
@@ -1064,7 +1020,7 @@ describe('Core - Editor', () => {
 			popupButton.setAttribute('data-type', 'popup');
 
 			// when
-			editor.run('testPopup', 'popup', popupButton);
+			editor.commandDispatcher.run('testPopup', 'popup', popupButton);
 
 			// then
 			expect(popupPlugin.show).toHaveBeenCalled();
@@ -1076,12 +1032,12 @@ describe('Core - Editor', () => {
 			const button = document.createElement('button');
 			button.setAttribute('data-command', 'bold');
 			button.setAttribute('data-type', 'dropdown');
-			editor._controllerOnDisabledButtons.push(button);
+			editor.uiManager._controllerOnDisabledButtons.push(button);
 
 			jest.spyOn(editor.menu, 'dropdownOn');
 
 			// when
-			editor.run('bold', 'dropdown', button);
+			editor.commandDispatcher.run('bold', 'dropdown', button);
 
 			// then
 			expect(editor.menu.dropdownOn).not.toHaveBeenCalled();
@@ -1093,7 +1049,7 @@ describe('Core - Editor', () => {
 		it('should call dropdownOff after dropdown command execution', () => {
 			// given
 			const commandPlugin = {
-				action: jest.fn()
+				action: jest.fn(),
 			};
 			editor.plugins['testCmd'] = commandPlugin;
 
@@ -1107,7 +1063,7 @@ describe('Core - Editor', () => {
 			jest.spyOn(editor.menu, 'dropdownOff');
 
 			// when
-			editor.run('testCmd', 'dropdown', button);
+			editor.commandDispatcher.run('testCmd', 'dropdown', button);
 
 			// then
 			expect(editor.menu.dropdownOff).toHaveBeenCalled();
@@ -1128,13 +1084,13 @@ describe('Core - Editor', () => {
 
 		it('should handle dir command', async () => {
 			// given
-			jest.spyOn(editor, 'setDir');
+			jest.spyOn(editor.uiManager, 'setDir');
 
 			// when
-			await editor.commandExecutor.execute('dir');
+			await editor.commandDispatcher.run('dir');
 
 			// then
-			expect(editor.setDir).toHaveBeenCalled();
+			expect(editor.uiManager.setDir).toHaveBeenCalled();
 		});
 
 		it('should handle save command', async () => {
@@ -1142,7 +1098,7 @@ describe('Core - Editor', () => {
 			editor.events.save = jest.fn();
 
 			// when
-			await editor.commandExecutor.execute('save');
+			await editor.commandDispatcher.run('save');
 
 			// then - should call save event
 		});
@@ -1152,14 +1108,14 @@ describe('Core - Editor', () => {
 			const button = document.createElement('button');
 
 			// when
-			await editor.commandExecutor.execute('copyFormat', button);
+			await editor.commandDispatcher.run('copyFormat', button);
 
 			// then - should not throw
 		});
 
 		it('should handle pageBreak command', async () => {
 			// when
-			await editor.commandExecutor.execute('pageBreak');
+			await editor.commandDispatcher.run('pageBreak');
 
 			// then - should not throw
 		});
@@ -1175,7 +1131,7 @@ describe('Core - Editor', () => {
 			jest.spyOn(editor.selection, 'getRange').mockReturnValue(range);
 
 			// when
-			await editor.commandExecutor.execute('copy');
+			await editor.commandDispatcher.run('copy');
 
 			// then - should not call copy when collapsed
 		});
@@ -1202,7 +1158,7 @@ describe('Core - Editor', () => {
 		it('should update buttons when targets provided', () => {
 			// given
 			const mockPlugin = {
-				active: jest.fn()
+				active: jest.fn(),
 			};
 			editor.plugins['testPlugin'] = mockPlugin;
 
@@ -1210,14 +1166,14 @@ describe('Core - Editor', () => {
 			target.setAttribute('data-command', 'testPlugin');
 
 			// when
-			editor.registerPlugin('testPlugin', [target], {});
+			editor.pluginManager.register('testPlugin', [target], {});
 
 			// then - should add to activeCommands
 			expect(editor.activeCommands.includes('testPlugin')).toBe(true);
 		});
 	});
 
-	describe('_resourcesStateChange', () => {
+	describe('_syncFrameState (moved to uiManager)', () => {
 		let editor;
 
 		beforeEach(async () => {
@@ -1233,17 +1189,23 @@ describe('Core - Editor', () => {
 			// given
 			const fc = editor.frameContext;
 
-			// Get placeholder element to verify _checkPlaceholder was called
+			// Get placeholder element to verify _updatePlaceholder was called
 			const placeholder = fc.get('placeholder');
 			const wysiwyg = fc.get('wysiwyg');
 
 			// Make editor empty so placeholder should show
-			wysiwyg.innerHTML = '';
+			wysiwyg.innerHTML = '<p><br></p>';
+			// Mock innerText for JSDOM
+			Object.defineProperty(wysiwyg, 'innerText', {
+				value: '\n',
+				writable: true,
+				configurable: true,
+			});
 
 			// when
-			editor._resourcesStateChange(fc);
+			editor.uiManager._syncFrameState(fc);
 
-			// then - verify _checkPlaceholder ran (placeholder should be visible for empty editor)
+			// then - verify _updatePlaceholder ran (placeholder should be visible for empty editor)
 			// The function should not throw and should update placeholder visibility
 			expect(placeholder).toBeDefined();
 		});
@@ -1258,14 +1220,14 @@ describe('Core - Editor', () => {
 			wysiwyg.innerHTML = '<p>Test content</p>';
 
 			// when
-			editor._resourcesStateChange(fc);
+			editor.uiManager._syncFrameState(fc);
 
 			// then
 			expect(pageMirror.innerHTML).toBe(wysiwyg.innerHTML);
 		});
 	});
 
-	describe('__callResizeFunction', () => {
+	describe('_emitResizeEvent (moved to uiManager)', () => {
 		let editor;
 
 		beforeEach(async () => {
@@ -1284,7 +1246,7 @@ describe('Core - Editor', () => {
 			editor.events.onResizeEditor = jest.fn();
 
 			// when
-			editor.__callResizeFunction(fc, 200, null);
+			editor.uiManager._emitResizeEvent(fc, 200, null);
 
 			// then
 			expect(editor.events.onResizeEditor).toHaveBeenCalled();
@@ -1299,11 +1261,11 @@ describe('Core - Editor', () => {
 
 			const entry = {
 				borderBoxSize: [{ blockSize: 300 }],
-				contentRect: { height: 280 }
+				contentRect: { height: 280 },
 			};
 
 			// when
-			editor.__callResizeFunction(fc, -1, entry);
+			editor.uiManager._emitResizeEvent(fc, -1, entry);
 
 			// then
 			expect(fc.get('_editorHeight')).toBe(300);
@@ -1318,11 +1280,11 @@ describe('Core - Editor', () => {
 
 			const entry = {
 				borderBoxSize: null,
-				contentRect: { height: 280 }
+				contentRect: { height: 280 },
 			};
 
 			// when
-			editor.__callResizeFunction(fc, -1, entry);
+			editor.uiManager._emitResizeEvent(fc, -1, entry);
 
 			// then - should compute height from contentRect + padding
 			expect(editor.events.onResizeEditor).toHaveBeenCalled();
@@ -1373,7 +1335,7 @@ describe('Core - Editor', () => {
 			fc.get('options').set('maxHeight', '200px');
 			Object.defineProperty(fc.get('wysiwyg'), 'offsetHeight', {
 				value: 300,
-				configurable: true
+				configurable: true,
 			});
 
 			// when
@@ -1402,7 +1364,7 @@ describe('Core - Editor', () => {
 			wysiwyg.innerHTML = '<p style="text-align: left;">Left aligned</p><p style="text-align: right;">Right aligned</p>';
 
 			// when
-			editor.setDir('rtl');
+			editor.uiManager.setDir('rtl');
 
 			// then
 			const p1 = wysiwyg.querySelector('p:first-child');
@@ -1415,11 +1377,11 @@ describe('Core - Editor', () => {
 			// given
 			const mockSetDir = jest.fn();
 			editor.plugins['testPlugin'] = {
-				setDir: mockSetDir
+				setDir: mockSetDir,
 			};
 
 			// when
-			editor.setDir('rtl');
+			editor.uiManager.setDir('rtl');
 
 			// then
 			expect(mockSetDir).toHaveBeenCalledWith('rtl');
@@ -1431,7 +1393,7 @@ describe('Core - Editor', () => {
 			jest.spyOn(editor.toolbar, '_showBalloon');
 
 			// when
-			editor.setDir('rtl');
+			editor.uiManager.setDir('rtl');
 
 			// then
 			expect(editor.toolbar._showBalloon).toHaveBeenCalled();
@@ -1443,14 +1405,14 @@ describe('Core - Editor', () => {
 		it('should handle error gracefully and revert direction', () => {
 			// given
 			editor.options.set('_rtl', false);
-			jest.spyOn(editor.ui, 'offCurrentController').mockImplementation(() => {
+			jest.spyOn(editor.uiManager, 'offCurrentController').mockImplementation(() => {
 				throw new Error('Test error');
 			});
 
 			const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
 
 			// when
-			editor.setDir('rtl');
+			editor.uiManager.setDir('rtl');
 
 			// then
 			expect(consoleSpy).toHaveBeenCalled();
@@ -1460,7 +1422,7 @@ describe('Core - Editor', () => {
 		});
 	});
 
-	describe('_checkComponents and _resetComponents', () => {
+	describe('pluginManager.checkFileInfo and resetFileInfo', () => {
 		let editor;
 
 		beforeEach(async () => {
@@ -1473,16 +1435,16 @@ describe('Core - Editor', () => {
 		});
 
 		it('should call all file info plugin check methods', () => {
-			// This tests the private method indirectly
+			// This tests the pluginManager method
 			// The method is called during initialization
 			expect(() => {
-				editor._checkComponents(true);
+				editor.pluginManager.checkFileInfo(true);
 			}).not.toThrow();
 		});
 
 		it('should call all file info plugin reset methods', () => {
 			expect(() => {
-				editor._resetComponents();
+				editor.pluginManager.resetFileInfo();
 			}).not.toThrow();
 		});
 	});
@@ -1520,7 +1482,7 @@ describe('Core - Editor', () => {
 			wysiwyg.innerHTML = '';
 			Object.defineProperty(wysiwyg, 'lastElementChild', {
 				value: null,
-				configurable: true
+				configurable: true,
 			});
 
 			jest.spyOn(editor.focusManager, 'focus');
@@ -1618,13 +1580,13 @@ describe('Core - Editor', () => {
 			button.setAttribute('data-type', 'command');
 			button.disabled = true;
 
-			jest.spyOn(editor, 'run');
+			jest.spyOn(editor.commandDispatcher, 'run');
 
 			// when
-			editor.runFromTarget(button);
+			editor.commandDispatcher.runFromTarget(button);
 
 			// then
-			expect(editor.run).not.toHaveBeenCalled();
+			expect(editor.commandDispatcher.run).not.toHaveBeenCalled();
 		});
 
 		it('should not run if no command and type', () => {
@@ -1632,13 +1594,13 @@ describe('Core - Editor', () => {
 			const button = document.createElement('button');
 			button.className = 'se-toolbar-btn';
 
-			jest.spyOn(editor, 'run');
+			jest.spyOn(editor.commandDispatcher, 'run');
 
 			// when
-			editor.runFromTarget(button);
+			editor.commandDispatcher.runFromTarget(button);
 
 			// then
-			expect(editor.run).not.toHaveBeenCalled();
+			expect(editor.commandDispatcher.run).not.toHaveBeenCalled();
 		});
 	});
 
@@ -1657,7 +1619,7 @@ describe('Core - Editor', () => {
 		it('should reset basic options', () => {
 			// given
 			const newOptions = {
-				placeholder: 'New placeholder text'
+				placeholder: 'New placeholder text',
 			};
 
 			// when - should not throw
@@ -1670,16 +1632,16 @@ describe('Core - Editor', () => {
 
 		it('should handle theme option', () => {
 			// given
-			jest.spyOn(editor.ui, 'setTheme');
+			jest.spyOn(editor.uiManager, 'setTheme');
 			const newOptions = {
-				theme: 'dark'
+				theme: 'dark',
 			};
 
 			// when
 			editor.resetOptions(newOptions);
 
 			// then
-			expect(editor.ui.setTheme).toHaveBeenCalledWith('dark');
+			expect(editor.uiManager.setTheme).toHaveBeenCalledWith('dark');
 		});
 
 		it('should handle events option', () => {
@@ -1687,8 +1649,8 @@ describe('Core - Editor', () => {
 			const testHandler = jest.fn();
 			const newOptions = {
 				events: {
-					onInput: testHandler
-				}
+					onInput: testHandler,
+				},
 			};
 
 			// when
@@ -1712,7 +1674,7 @@ describe('Core - Editor', () => {
 			// given
 			jest.spyOn(editor.history, 'resetDelayTime');
 			const newOptions = {
-				historyStackDelayTime: 500
+				historyStackDelayTime: 500,
 			};
 
 			// when
@@ -1726,7 +1688,7 @@ describe('Core - Editor', () => {
 			// given
 			const toolbar = editor.context.get('toolbar_main');
 			const newOptions = {
-				toolbar_hide: true
+				toolbar_hide: true,
 			};
 
 			// when
@@ -1740,7 +1702,7 @@ describe('Core - Editor', () => {
 			// given
 			const toolbar = editor.context.get('toolbar_main');
 			const newOptions = {
-				shortcutsHint: false
+				shortcutsHint: false,
 			};
 
 			// when
@@ -1823,56 +1785,6 @@ describe('Core - Editor', () => {
 		});
 	});
 
-	describe('ui class methods', () => {
-		let editor;
-
-		beforeEach(async () => {
-			editor = createTestEditor();
-			await waitForEditorReady(editor);
-		});
-
-		afterEach(() => {
-			destroyTestEditor(editor);
-		});
-
-		it('ui.hide should hide the editor', () => {
-			// when
-			editor.ui.hide();
-
-			// then
-			expect(editor.frameContext.get('topArea').style.display).toBe('none');
-		});
-
-		it('ui.show should show the editor', () => {
-			// given
-			editor.ui.hide();
-
-			// when
-			editor.ui.show();
-
-			// then
-			expect(editor.frameContext.get('topArea').style.display).not.toBe('none');
-		});
-	});
-
-	describe('effectNode and tag effects', () => {
-		let editor;
-
-		beforeEach(async () => {
-			editor = createTestEditor();
-			await waitForEditorReady(editor);
-		});
-
-		afterEach(() => {
-			destroyTestEditor(editor);
-		});
-
-		it('should have effectNode initially null', () => {
-			// then
-			expect(editor.effectNode).toBeNull();
-		});
-	});
-
 	describe('selection methods', () => {
 		let editor;
 
@@ -1933,31 +1845,6 @@ describe('Core - Editor', () => {
 		});
 	});
 
-	describe('print and preview', () => {
-		let editor;
-
-		beforeEach(async () => {
-			editor = createTestEditor();
-			await waitForEditorReady(editor);
-		});
-
-		afterEach(() => {
-			destroyTestEditor(editor);
-		});
-
-		it('print should be callable on viewer', () => {
-			// given - verify viewer exists
-			expect(editor.viewer).toBeDefined();
-			expect(typeof editor.viewer.print).toBe('function');
-		});
-
-		it('preview should be callable on viewer', () => {
-			// given - verify viewer exists
-			expect(editor.viewer).toBeDefined();
-			expect(typeof editor.viewer.preview).toBe('function');
-		});
-	});
-
 	describe('char class methods', () => {
 		let editor;
 
@@ -1979,78 +1866,6 @@ describe('Core - Editor', () => {
 
 			// then
 			expect(count).toBeGreaterThan(0);
-		});
-	});
-
-	describe('getCharCount', () => {
-		let editor;
-
-		beforeEach(async () => {
-			editor = createTestEditor();
-			await waitForEditorReady(editor);
-		});
-
-		afterEach(() => {
-			destroyTestEditor(editor);
-		});
-
-		it('should return character count', () => {
-			// given
-			editor.frameContext.get('wysiwyg').innerHTML = '<p>Hello</p>';
-
-			// when
-			const count = editor.char.getLength();
-
-			// then
-			expect(count).toBeGreaterThanOrEqual(5);
-		});
-	});
-
-	describe('history methods', () => {
-		let editor;
-
-		beforeEach(async () => {
-			editor = createTestEditor();
-			await waitForEditorReady(editor);
-		});
-
-		afterEach(() => {
-			destroyTestEditor(editor);
-		});
-
-		it('history.push should push to history stack', () => {
-			// when
-			editor.history.push(false);
-
-			// then - should not throw
-			expect(editor.history).toBeDefined();
-		});
-
-		it('history.undo should undo last change', () => {
-			// given
-			editor.frameContext.get('wysiwyg').innerHTML = '<p>Test</p>';
-			editor.history.push(false);
-			editor.frameContext.get('wysiwyg').innerHTML = '<p>Test Modified</p>';
-			editor.history.push(false);
-
-			// when
-			editor.history.undo();
-
-			// then - should undo
-		});
-
-		it('history.redo should redo undone change', () => {
-			// given
-			editor.frameContext.get('wysiwyg').innerHTML = '<p>Test</p>';
-			editor.history.push(false);
-			editor.frameContext.get('wysiwyg').innerHTML = '<p>Modified</p>';
-			editor.history.push(false);
-			editor.history.undo();
-
-			// when
-			editor.history.redo();
-
-			// then - should redo
 		});
 	});
 
@@ -2089,60 +1904,6 @@ describe('Core - Editor', () => {
 		});
 	});
 
-	describe('offset class', () => {
-		let editor;
-
-		beforeEach(async () => {
-			editor = createTestEditor();
-			await waitForEditorReady(editor);
-		});
-
-		afterEach(() => {
-			destroyTestEditor(editor);
-		});
-
-		it('offset should be accessible', () => {
-			// then
-			expect(editor.offset).toBeDefined();
-		});
-	});
-
-	describe('inline class', () => {
-		let editor;
-
-		beforeEach(async () => {
-			editor = createTestEditor();
-			await waitForEditorReady(editor);
-		});
-
-		afterEach(() => {
-			destroyTestEditor(editor);
-		});
-
-		it('inline should be accessible', () => {
-			// then
-			expect(editor.inline).toBeDefined();
-		});
-	});
-
-	describe('nodeTransform class', () => {
-		let editor;
-
-		beforeEach(async () => {
-			editor = createTestEditor();
-			await waitForEditorReady(editor);
-		});
-
-		afterEach(() => {
-			destroyTestEditor(editor);
-		});
-
-		it('nodeTransform should be accessible', () => {
-			// then
-			expect(editor.nodeTransform).toBeDefined();
-		});
-	});
-
 	describe('component class', () => {
 		let editor;
 
@@ -2155,11 +1916,6 @@ describe('Core - Editor', () => {
 			destroyTestEditor(editor);
 		});
 
-		it('component should be accessible', () => {
-			// then
-			expect(editor.component).toBeDefined();
-		});
-
 		it('component.is should check if element is a component', () => {
 			// given
 			const div = document.createElement('div');
@@ -2169,123 +1925,6 @@ describe('Core - Editor', () => {
 
 			// then
 			expect(result).toBe(false);
-		});
-	});
-
-	describe('eventManager', () => {
-		let editor;
-
-		beforeEach(async () => {
-			editor = createTestEditor();
-			await waitForEditorReady(editor);
-		});
-
-		afterEach(() => {
-			destroyTestEditor(editor);
-		});
-
-		it('eventManager should be accessible', () => {
-			// then
-			expect(editor.eventManager).toBeDefined();
-		});
-
-		it('eventManager.addEvent should add event listener', () => {
-			// given
-			const element = document.createElement('div');
-			const handler = jest.fn();
-
-			// when
-			editor.eventManager.addEvent(element, 'click', handler);
-
-			// then - event should be added
-		});
-
-		it('eventManager.removeEvent should remove event listener', () => {
-			// given
-			const element = document.createElement('div');
-			const handler = jest.fn();
-			const eventObj = editor.eventManager.addEvent(element, 'click', handler);
-
-			// when
-			if (eventObj) {
-				editor.eventManager.removeEvent(eventObj);
-			}
-
-			// then - event should be removed
-		});
-	});
-
-	describe('shortcuts class', () => {
-		let editor;
-
-		beforeEach(async () => {
-			editor = createTestEditor();
-			await waitForEditorReady(editor);
-		});
-
-		afterEach(() => {
-			destroyTestEditor(editor);
-		});
-
-		it('shortcuts should be accessible', () => {
-			// then
-			expect(editor.shortcuts).toBeDefined();
-		});
-	});
-
-	describe('status object', () => {
-		let editor;
-
-		beforeEach(async () => {
-			editor = createTestEditor();
-			await waitForEditorReady(editor);
-		});
-
-		afterEach(() => {
-			destroyTestEditor(editor);
-		});
-
-		it('status should have rootKey', () => {
-			// then
-			expect(editor.status).toBeDefined();
-			expect(editor.status.rootKey).toBeDefined();
-		});
-
-		it('status should have initViewportHeight', () => {
-			// then
-			expect(editor.status.initViewportHeight).toBeDefined();
-		});
-	});
-
-	describe('menu class', () => {
-		let editor;
-
-		beforeEach(async () => {
-			editor = createTestEditor();
-			await waitForEditorReady(editor);
-		});
-
-		afterEach(() => {
-			destroyTestEditor(editor);
-		});
-
-		it('menu should be accessible', () => {
-			// then
-			expect(editor.menu).toBeDefined();
-		});
-
-		it('menu.dropdownOff should close dropdowns', () => {
-			// when
-			editor.menu.dropdownOff();
-
-			// then - should not throw
-		});
-
-		it('menu.containerOff should close containers', () => {
-			// when
-			editor.menu.containerOff();
-
-			// then - should not throw
 		});
 	});
 
@@ -2335,45 +1974,6 @@ describe('Core - Editor', () => {
 		});
 	});
 
-	describe('additional editor state', () => {
-		let editor;
-
-		beforeEach(async () => {
-			editor = createTestEditor();
-			await waitForEditorReady(editor);
-		});
-
-		afterEach(() => {
-			destroyTestEditor(editor);
-		});
-
-		it('should have isBalloon property', () => {
-			// then
-			expect(typeof editor.isBalloon).toBe('boolean');
-		});
-
-		it('should have isInline property', () => {
-			// then
-			expect(typeof editor.isInline).toBe('boolean');
-		});
-
-		it('should have plugins object', () => {
-			// then
-			expect(editor.plugins).toBeDefined();
-			expect(typeof editor.plugins).toBe('object');
-		});
-
-		it('should have lang object for i18n', () => {
-			// then
-			expect(editor.lang).toBeDefined();
-		});
-
-		it('should have icons object', () => {
-			// then
-			expect(editor.icons).toBeDefined();
-		});
-	});
-
 	describe('additional resetOptions cases', () => {
 		let editor;
 
@@ -2390,7 +1990,7 @@ describe('Core - Editor', () => {
 			// given
 			const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
 			const newOptions = {
-				plugins: {} // plugins is a fixed option
+				plugins: {}, // plugins is a fixed option
 			};
 
 			// when

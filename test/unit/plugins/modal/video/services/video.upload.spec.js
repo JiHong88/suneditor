@@ -33,7 +33,7 @@ describe('VideoUploadService', () => {
                 uploadHeaders: { 'Authorization': 'token' }
             },
             fileManager: mockFileManager,
-            ui: mockUi,
+            uiManager: mockUi,
             triggerEvent: jest.fn().mockResolvedValue('NO_EVENT'), // Simulate env.NO_EVENT value
             createVideoTag: jest.fn().mockReturnValue({ cloneNode: jest.fn().mockReturnValue({}) }),
             create: jest.fn()

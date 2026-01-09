@@ -70,7 +70,7 @@ describe('TableResizeService', () => {
                     querySelector: jest.fn().mockReturnValue(document.createElement('div'))
                 })
             },
-            ui: {
+            uiManager: {
                 enableBackWrapper: jest.fn(),
                 disableBackWrapper: jest.fn()
             },
@@ -149,7 +149,7 @@ describe('TableResizeService', () => {
 
               resizeService.readyResizeFromEdge({}, document.createElement('td'));
 
-              expect(main.ui.enableBackWrapper).toHaveBeenCalled();
+              expect(main.uiManager.enableBackWrapper).toHaveBeenCalled();
               expect(main.eventManager.addGlobalEvent).toHaveBeenCalled();
           });
     });
@@ -184,7 +184,7 @@ describe('TableResizeService', () => {
             resizeService.init();
 
             expect(resizeService.isResizing()).toBe(false);
-            expect(main.ui.disableBackWrapper).toHaveBeenCalled();
+            expect(main.uiManager.disableBackWrapper).toHaveBeenCalled();
         });
     });
 
@@ -377,7 +377,7 @@ describe('TableResizeService', () => {
 
             resizeService.readyResizeFromEdge({}, document.createElement('td'));
 
-            expect(main.ui.enableBackWrapper).toHaveBeenCalledWith('ew-resize');
+            expect(main.uiManager.enableBackWrapper).toHaveBeenCalledWith('ew-resize');
             expect(capturedHandlers['mousemove']).toBeDefined();
         });
 
@@ -413,7 +413,7 @@ describe('TableResizeService', () => {
 
             resizeService.readyResizeFromEdge({}, document.createElement('td'));
 
-            expect(main.ui.enableBackWrapper).toHaveBeenCalledWith('ew-resize');
+            expect(main.uiManager.enableBackWrapper).toHaveBeenCalledWith('ew-resize');
         });
 
         it('should resize figure on mousemove', () => {
@@ -557,7 +557,7 @@ describe('TableResizeService', () => {
 
             resizeService.readyResizeFromEdge({}, td);
 
-            expect(main.ui.enableBackWrapper).toHaveBeenCalledWith('ns-resize');
+            expect(main.uiManager.enableBackWrapper).toHaveBeenCalledWith('ns-resize');
         });
 
         it('should stop row resize on Esc key', () => {

@@ -30,23 +30,22 @@ class Selection_ extends CoreInjector {
 		this.__iframeFocus = false;
 	}
 
-	/** @type {SunEditor.Core['component']} */
 	get #component() {
 		return this.editor.component;
 	}
-	/** @type {SunEditor.Core['format']} */
+
 	get #format() {
 		return this.editor.format;
 	}
-	/** @type {SunEditor.Core['html']} */
+
 	get #html() {
 		return this.editor.html;
 	}
-	/** @type {SunEditor.Core['offset']} */
+
 	get #offset() {
 		return this.editor.offset;
 	}
-	/** @type {SunEditor.Core['toolbar']} */
+
 	get #toolbar() {
 		return this.editor.toolbar;
 	}
@@ -691,7 +690,7 @@ class Selection_ extends CoreInjector {
 		return (
 			(dom.check.isWysiwygFrame(range.startContainer) && dom.check.isWysiwygFrame(range.endContainer)) ||
 			/FIGURE/i.test(comm.nodeName) ||
-			(this.editor._fileManager.regExp.test(comm.nodeName) && (!this.editor._fileManager.tagAttrs[comm.nodeName] || this.editor._fileManager.tagAttrs[comm.nodeName]?.every((v) => comm.hasAttribute(v)))) ||
+			(this.pluginManager.fileInfo.regExp.test(comm.nodeName) && (!this.pluginManager.fileInfo.tagAttrs[comm.nodeName] || this.pluginManager.fileInfo.tagAttrs[comm.nodeName]?.every((v) => comm.hasAttribute(v)))) ||
 			this.#component.is(comm)
 		);
 	}

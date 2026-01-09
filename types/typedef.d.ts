@@ -6,10 +6,10 @@ declare global {
 		type Instance = import('./core/editor').default;
 		type InitOptions = import('./core/config/options').EditorInitOptions;
 		type InitFrameOptions = import('./core/config/options').EditorFrameOptions;
-		type Context = Map<keyof import('./core/config/context').ContextUtil, any>;
-		type Options = import('./core/config/options').BaseOptionsMap;
-		type FrameContext = import('./core/config/frameContext').FrameContextUtil;
-		type FrameOptions = import('./core/config/options').FrameOptionsMap;
+		type Context = import('./core/services/contextManager').ContextMap;
+		type Options = import('./core/services/optionManager').BaseOptionsMap;
+		type FrameContext = import('./core/services/contextManager').FrameContextMap;
+		type FrameOptions = import('./core/services/optionManager').FrameOptionsMap;
 		type EventWysiwyg = HTMLElement & Window;
 		type WysiwygFrame = HTMLElement & HTMLIFrameElement;
 		type GlobalWindow = Window & typeof globalThis;
@@ -307,6 +307,10 @@ declare global {
 			 * EventParams - Event callback parameters
 			 */
 			type EmbedInfo = import('./events').EmbedInfo;
+			/**
+			 * The event object passed to the plugin event handler
+			 */
+			type PluginEvent = import('./core/services/pluginManager').PluginEventParam;
 		}
 		export namespace UI {
 			/**

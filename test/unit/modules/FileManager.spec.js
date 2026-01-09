@@ -10,7 +10,7 @@ jest.mock('../../../src/editorInjector/_core.js', () => {
         this.editor = editor;
         this.frameContext = editor.frameContext;
         this.triggerEvent = editor.triggerEvent || jest.fn();
-        this.ui = editor.ui;
+        this.uiManager = editor.uiManager;
         this.component = editor.component;
     });
 });
@@ -47,7 +47,7 @@ describe('Modules - FileManager', () => {
         };
 
         mockEditor = {
-            ui: mockUI,
+            uiManager: mockUI,
             frameContext: mockFrameContext,
             component: {
                 resetFileIndex: jest.fn()
@@ -76,7 +76,7 @@ describe('Modules - FileManager', () => {
 
             const fileManager = new FileManager(mockInst, params);
 
-            expect(fileManager.ui).toBe(mockUI);
+            expect(fileManager.uiManager).toBe(mockUI);
             expect(fileManager.kind).toBe('testPlugin');
             expect(fileManager.inst).toBe(mockInst);
             expect(fileManager.query).toBe('img[data-se-file]');

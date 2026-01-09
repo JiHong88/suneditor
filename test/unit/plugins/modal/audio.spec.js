@@ -36,7 +36,7 @@ jest.mock('../../../../src/editorInjector', () => {
 				insert: jest.fn().mockReturnValue(true)
 			};
 			this.triggerEvent = jest.fn().mockResolvedValue(true);
-			this.ui = {
+			this.uiManager = {
 				alertOpen: jest.fn()
 			};
 			this.plugins = {};
@@ -459,7 +459,7 @@ describe('Audio Plugin', () => {
 				upload: jest.fn()
 			};
 			audio.modal = { isUpdate: false };
-			audio.ui = {
+			audio.uiManager = {
 				alertOpen: jest.fn()
 			};
 		});

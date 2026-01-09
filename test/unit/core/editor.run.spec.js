@@ -13,9 +13,9 @@ describe('Editor Run & Plugin Logic', () => {
         await waitForEditorReady(editor);
         
         // Mock UI methods to avoid rendering issues
-        editor.ui.showLoading = jest.fn();
-        editor.ui.hideLoading = jest.fn();
-        editor.ui.showToast = jest.fn();
+        editor.uiManager.showLoading = jest.fn();
+        editor.uiManager.hideLoading = jest.fn();
+        editor.uiManager.showToast = jest.fn();
         
         // Mock menu methods for run dispatching
         editor.menu.dropdownOn = jest.fn();
@@ -61,28 +61,28 @@ describe('Editor Run & Plugin Logic', () => {
             editor.plugins[pluginName] = mockPluginClass;
 
             const buttons = [document.createElement('button')];
-            editor.registerPlugin(pluginName, buttons, { option: true });
+            editor.pluginManager.register(pluginName, buttons, { option: true });
 
             expect(mockPluginClass).toHaveBeenCalled();
             // Should be added to activecommands
             expect(editor.activeCommands).toContain(pluginName);
         });
-        
+
         it('should not add to activeCommands if active method is missing', () => {
              const pluginName = 'noActivePlugin';
              const mockPluginClass = jest.fn(function(e) {
                  this._destroy = jest.fn();
              });
              editor.plugins[pluginName] = mockPluginClass;
-             
+
              // Reset activeCommands to verify push
              // Note: activeCommands might be null or array.
              if(!editor.activeCommands) editor.activeCommands = [];
              const initialLength = editor.activeCommands.length;
-             
+
              const buttons = [document.createElement('button')];
-             editor.registerPlugin(pluginName, buttons, {});
-             
+             editor.pluginManager.register(pluginName, buttons, {});
+
              expect(editor.activeCommands.length).toBe(initialLength);
         });
     });
@@ -111,7 +111,7 @@ describe('Editor Run & Plugin Logic', () => {
             const getParentSpy = jest.spyOn(dom.query, 'getParentElement').mockReturnValue(toolbar);
             const hasClassSpy = jest.spyOn(dom.utils, 'hasClass').mockReturnValue(true); // Is sub toolbar
             
-            editor.run('moreCommand', 'more', button);
+            editor.commandDispatcher.run('moreCommand', 'more', button);
             
             expect(editor.subToolbar._moreLayerOn).toHaveBeenCalled();
             expect(editor.viewer._resetFullScreenHeight).toHaveBeenCalled();
@@ -136,7 +136,7 @@ describe('Editor Run & Plugin Logic', () => {
              const getParentSpy = jest.spyOn(dom.query, 'getParentElement').mockReturnValue(toolbar);
              const hasClassSpy = jest.spyOn(dom.utils, 'hasClass').mockReturnValue(false); // Not sub toolbar
              
-             editor.run('moreCommand', 'more', button);
+             editor.commandDispatcher.run('moreCommand', 'more', button);
              
              expect(editor.toolbar._moreLayerOff).toHaveBeenCalled();
              
@@ -152,7 +152,7 @@ describe('Editor Run & Plugin Logic', () => {
              editor.menu.currentDropdownActiveButton = button;
              editor.menu.targetMap = { testDropdown: {} };
              
-             editor.run('testDropdown', 'dropdown', button);
+             editor.commandDispatcher.run('testDropdown', 'dropdown', button);
              
              // It skips the main block `if (/dropdown/ ... && button !== current)`
              // And falls through to cleanup
@@ -165,40 +165,38 @@ describe('Editor Run & Plugin Logic', () => {
             const button = document.createElement('button');
             button.setAttribute('data-command', 'bold');
             button.setAttribute('data-type', 'command');
-            
+
             // Mock run to verify propagation without execution
-            const runSpy = jest.spyOn(editor, 'run').mockImplementation(() => {});
+            const runSpy = jest.spyOn(editor.commandDispatcher, 'run').mockImplementation(() => {});
             jest.spyOn(dom.query, 'getCommandTarget').mockReturnValue(button);
-            
-            editor.runFromTarget(button);
-            
+
+            editor.commandDispatcher.runFromTarget(button);
+
             expect(runSpy).toHaveBeenCalledWith('bold', 'command', button);
             runSpy.mockRestore();
         });
 
-// ... rest of file (input, disabled tests)
-
         it('should return if target is input', () => {
              const input = document.createElement('input');
              jest.spyOn(dom.check, 'isInputElement').mockReturnValue(true);
-             jest.spyOn(editor, 'run');
-             
-             editor.runFromTarget(input);
-             
-             expect(editor.run).not.toHaveBeenCalled();
+             jest.spyOn(editor.commandDispatcher, 'run');
+
+             editor.commandDispatcher.runFromTarget(input);
+
+             expect(editor.commandDispatcher.run).not.toHaveBeenCalled();
         });
-        
+
         it('should return if button is disabled', () => {
              const button = document.createElement('button');
              button.disabled = true;
              button.setAttribute('data-command', 'bold');
-             
+
              jest.spyOn(dom.query, 'getCommandTarget').mockReturnValue(button);
-             jest.spyOn(editor, 'run');
-             
-             editor.runFromTarget(button);
-             
-             expect(editor.run).not.toHaveBeenCalled();
+             jest.spyOn(editor.commandDispatcher, 'run');
+
+             editor.commandDispatcher.runFromTarget(button);
+
+             expect(editor.commandDispatcher.run).not.toHaveBeenCalled();
         });
     });
     
@@ -208,7 +206,7 @@ describe('Editor Run & Plugin Logic', () => {
              editor.plugins['test'] = mockPlugin;
              
              // options._rtl starts false
-             editor.setDir('rtl');
+             editor.uiManager.setDir('rtl');
              
              expect(mockPlugin.setDir).toHaveBeenCalledWith('rtl');
          });

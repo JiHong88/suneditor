@@ -9,27 +9,49 @@ export default function CoreInjector(editor) {
 	 */
 	this.editor = editor;
 
-	// base
+	// services
 	/**
-	 * @description The event manager instance.
-	 * @type {SunEditor.Core['eventManager']}
+	 * @description The context manager instance.
+	 * @type {SunEditor.Core['contextManager']}
 	 */
-	this.eventManager = editor.eventManager;
-	/**
-	 * @description The focus manager instance
-	 * @type {SunEditor.Core['focusManager']}
-	 */
-	this.focusManager = editor.focusManager;
+	this.contextManager = editor.contextManager;
 	/**
 	 * @description The instanceCheck instance.
 	 * @type {SunEditor.Core['instanceCheck']}
 	 */
 	this.instanceCheck = editor.instanceCheck;
 	/**
+	 * @description The plugin manager instance
+	 * @type {SunEditor.Core['pluginManager']}
+	 */
+	this.pluginManager = editor.pluginManager;
+	/**
+	 * @description The focus manager instance
+	 * @type {SunEditor.Core['focusManager']}
+	 */
+	this.focusManager = editor.focusManager;
+	/**
+	 * @description The command dispatcher instance
+	 * @type {SunEditor.Core['commandDispatcher']}
+	 */
+	this.commandDispatcher = editor.commandDispatcher;
+	/**
 	 * @description The history manager instance.
 	 * @type {SunEditor.Core['history']}
 	 */
 	this.history = editor.history;
+	/**
+	 * @description The event manager instance.
+	 * @type {SunEditor.Core['eventManager']}
+	 */
+	this.eventManager = editor.eventManager;
+	/**
+	 * @description The ui manager instance.
+	 * @type {SunEditor.Core['uiManager']}
+	 */
+	this.uiManager = editor.uiManager;
+
+	// base
 	/**
 	 * @description The events instance.
 	 * @type {SunEditor.Core['events']}

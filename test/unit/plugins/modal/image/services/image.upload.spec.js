@@ -38,7 +38,7 @@ describe('ImageUploadService', () => {
                 canResize: true
             },
             fileManager: mockFileManager,
-            ui: mockUi,
+            uiManager: mockUi,
             state: {},
             modal: {
                 isUpdate: false

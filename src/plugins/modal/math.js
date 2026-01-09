@@ -315,6 +315,7 @@ class Math_ extends PluginModal {
 	 */
 	#renderer(exp) {
 		let result = '';
+
 		try {
 			dom.utils.removeClass(this.textArea, 'se-error');
 			if (this.katex) {
@@ -327,12 +328,22 @@ class Math_ extends PluginModal {
 				} else {
 					result = `<span class="se-math">${result}</span>`;
 				}
+			} else {
+				/** @type {Error & { code?: string }} */
+				const err = new Error('404 Not found. "KaTeX" or "MathJax" library');
+				err.code = 'MATH_LIB_NOT_FOUND';
+				throw err;
 			}
 		} catch (error) {
 			dom.utils.addClass(this.textArea, 'se-error');
-			result = `<span class="se-math-error">Math syntax error. (Refer ${this.katex ? `<a href="${env.KATEX_WEBSITE}" target="_blank">KaTeX</a>` : `<a href="${env.MATHJAX_WEBSITE}" target="_blank">MathJax</a>`})</span>`;
+			if (error.code === 'MATH_LIB_NOT_FOUND') {
+				result = `<span class="se-math-error">${error.message}</span>`;
+			} else {
+				result = `<span class="se-math-error">Math syntax error. (Refer ${this.katex ? `<a href="${env.KATEX_WEBSITE}" target="_blank">KaTeX</a>` : `<a href="${env.MATHJAX_WEBSITE}" target="_blank">MathJax</a>`})</span>`;
+			}
 			console.warn('[SUNEDITOR.math.error] ', error.message);
 		}
+
 		return result;
 	}
 

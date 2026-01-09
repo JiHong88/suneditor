@@ -36,23 +36,18 @@ class Inline extends CoreInjector {
 		this.#listKebab = converter.camelToKebabCase(this.options.get('__listCommonStyle'));
 	}
 
-	/** @type {SunEditor.Core['selection']} */
 	get #selection() {
 		return this.editor.selection;
 	}
-	/** @type {SunEditor.Core['format']} */
+
 	get #format() {
 		return this.editor.format;
 	}
-	/** @type {SunEditor.Core['component']} */
+
 	get #component() {
 		return this.editor.component;
 	}
-	/** @type {SunEditor.Core['ui']} */
-	get #ui() {
-		return this.editor.ui;
-	}
-	/** @type {SunEditor.Core['nodeTransform']} */
+
 	get #nodeTransform() {
 		return this.editor.nodeTransform;
 	}
@@ -421,7 +416,7 @@ class Inline extends CoreInjector {
 		}
 
 		// set range
-		this.#ui.offCurrentController();
+		this.uiManager.offCurrentController();
 		this.#selection.setRange(start.container, start.offset, end.container, end.offset);
 		this.history.push(false);
 

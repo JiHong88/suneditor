@@ -66,7 +66,7 @@ export class VideoUploadService {
 	async #error(response) {
 		const message = await this.#main.triggerEvent('onVideoUploadError', { error: response });
 		const err = message === NO_EVENT ? response.errorMessage : message || response.errorMessage;
-		this.#main.ui.alertOpen(err, 'error');
+		this.#main.uiManager.alertOpen(err, 'error');
 		console.error('[SUNEDITOR.plugin.video.error]', message);
 	}
 

@@ -72,25 +72,24 @@ class Toolbar extends CoreInjector {
 		this._setResponsive();
 	}
 
-	/** @type {SunEditor.Core['menu']} */
 	get #menu() {
 		return this.editor.menu;
 	}
-	/** @type {SunEditor.Core['viewer']} */
+
 	get #viewer() {
 		return this.editor.viewer;
 	}
-	/** @type {SunEditor.Core['ui']} */
-	get #ui() {
-		return this.editor.ui;
-	}
-	/** @type {SunEditor.Core['offset']} */
+
 	get #offset() {
 		return this.editor.offset;
 	}
-	/** @type {SunEditor.Core['selection']} */
+
 	get #selection() {
 		return this.editor.selection;
+	}
+
+	get #shortcuts() {
+		return this.editor.shortcuts;
 	}
 
 	/**
@@ -188,7 +187,7 @@ class Toolbar extends CoreInjector {
 		this.#menu.containerOff();
 
 		const { icons, lang } = this;
-		const newToolbar = CreateToolBar(buttonList, this.plugins, this.editor.__options, icons, lang, true);
+		const newToolbar = CreateToolBar(buttonList, this.plugins, this.editor.options, icons, lang, true);
 
 		newToolbar.updateButtons.forEach((v) => UpdateButton(v.button, v.plugin, this.icons, this.lang));
 
@@ -236,13 +235,10 @@ class Toolbar extends CoreInjector {
 	 * @description Reset the common buttons info.
 	 */
 	#resetButtonInfo() {
-		this.editor.allCommandButtons = new Map();
-		this.editor.subAllCommandButtons = new Map();
-		this.editor.commandTargets = new Map();
-		this.editor.shortcutsKeyMap = new Map();
+		this.commandDispatcher.resetTargets();
+		this.uiManager._initToggleButtons();
 
-		this.editor.__cachingButtons();
-		this.editor.__cachingShortcuts();
+		this.#shortcuts._registerCustomShortcuts();
 
 		this.history.resetButtons(this.frameContext.get('key'), null);
 		this._resetSticky();
@@ -250,7 +246,7 @@ class Toolbar extends CoreInjector {
 		this.editor.effectNode = null;
 		this.#viewer._setButtonsActive();
 		if (this.status.hasFocus) this.eventManager.applyTagEffect();
-		if (this.frameContext.get('isReadOnly')) this.#ui.setControllerOnDisabledButtons(true);
+		if (this.frameContext.get('isReadOnly')) this.uiManager.setControllerOnDisabledButtons(true);
 	}
 
 	/**

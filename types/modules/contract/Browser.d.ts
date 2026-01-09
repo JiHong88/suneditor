@@ -155,7 +155,6 @@ declare class Browser extends CoreInjector {
 	 * @param {BrowserParams} params Browser options
 	 */
 	constructor(inst: any, params: BrowserParams);
-	offset: import('../../core/class/offset').default;
 	useSearch: boolean;
 	kind: any;
 	inst: any;

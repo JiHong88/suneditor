@@ -40,9 +40,6 @@ class SelectMenu extends CoreInjector {
 	constructor(editor, params) {
 		super(editor);
 
-		// editor class
-		this.offset = this.editor.offset;
-
 		// members
 		const positionItems = params.position.split('-');
 		this.form = null;
@@ -72,6 +69,10 @@ class SelectMenu extends CoreInjector {
 			keydown: this.#OnKeyDown_refer.bind(this),
 		};
 		this.#globalEventHandlers = { keydown: this.#CloseListener_key.bind(this), mousedown: this.#CloseListener_mousedown.bind(this), click: this.#CloseListener_click.bind(this) };
+	}
+
+	get #offset() {
+		return this.editor.offset;
 	}
 
 	/**
@@ -124,7 +125,7 @@ class SelectMenu extends CoreInjector {
 	 * @param {?string} [onItemQuerySelector] The querySelector string of the menu to be activated
 	 */
 	open(position, onItemQuerySelector) {
-		this.editor.selectMenuOn = true;
+		this.uiManager.selectMenuOn = true;
 
 		this.openMethod?.();
 
@@ -141,7 +142,7 @@ class SelectMenu extends CoreInjector {
 	 * @description Select menu close
 	 */
 	close() {
-		this.editor.selectMenuOn = false;
+		this.uiManager.selectMenuOn = false;
 		dom.utils.removeClass(this.#refer, 'on');
 		this.#init();
 		this.form?.removeAttribute('style');
@@ -255,7 +256,7 @@ class SelectMenu extends CoreInjector {
 		}
 
 		// set top position
-		const globalTarget = this.offset.get(target);
+		const globalTarget = this.#offset.get(target);
 		const targetOffsetTop = target.offsetTop;
 		const targetGlobalTop = globalTarget.top;
 		const targetHeight = target.offsetHeight;
@@ -273,14 +274,14 @@ class SelectMenu extends CoreInjector {
 					form.style.top = t + 'px';
 				}
 				// over bottom
-				let formT = this.offset.getGlobal(form).top;
+				let formT = this.#offset.getGlobal(form).top;
 				const modH = h - (targetGlobalTop - formT) - wbottom - targetHeight;
 				if (modH > 0) {
 					t -= modH + 4;
 					form.style.top = t + 'px';
 				}
 				// over height
-				formT = this.offset.getGlobal(form).top;
+				formT = this.#offset.getGlobal(form).top;
 				if (formT < 0) {
 					h += formT - 4;
 					t -= formT - 4;
@@ -332,7 +333,7 @@ class SelectMenu extends CoreInjector {
 		}
 
 		form.style.left = l + 'px';
-		const fl = this.offset.getGlobal(form).left;
+		const fl = this.#offset.getGlobal(form).left;
 		let overW = 0;
 		switch (side + '-' + (side ? originP : subPosition)) {
 			case 'true-left':
@@ -347,7 +348,7 @@ class SelectMenu extends CoreInjector {
 				overW = _w.innerWidth - (fl + formW);
 				if (overW < 0) l += overW - 4;
 				form.style.left = l + 'px';
-				const centerfl = this.offset.getGlobal(form).left;
+				const centerfl = this.#offset.getGlobal(form).left;
 				if (centerfl < 0) l -= centerfl - 4;
 				break;
 			}

@@ -18,9 +18,14 @@ describe('Controller', () => {
                 __removeGlobalEvent: jest.fn(),
                 isInline: jest.fn().mockReturnValue(false)
             },
-            ui: { 
-                setControllerOnDisabledButtons: jest.fn(), 
-                _visibleControllers: jest.fn()  
+            uiManager: {
+                setControllerOnDisabledButtons: jest.fn(),
+                _visibleControllers: jest.fn(),
+                onControllerContext: jest.fn(),
+                offControllerContext: jest.fn(),
+                opendControllers: [],
+                currentControllerName: '',
+                selectMenuOn: false
             },
             selection: { 
                 isRange: jest.fn().mockReturnValue(false) 
@@ -124,7 +129,7 @@ describe('Controller', () => {
             expect(spyTrigger).toHaveBeenCalledWith('onBeforeShowController', expect.any(Object));
             expect(form.style.display).toBe('block');
             expect(controller.isOpen).toBe(true);
-            expect(editor.opendControllers).toContainEqual(expect.objectContaining({ form }));
+            expect(editor.uiManager.opendControllers).toContainEqual(expect.objectContaining({ form }));
         });
 
         it('should hide toolbar if balloon mode is enabled', async () => {
@@ -136,7 +141,7 @@ describe('Controller', () => {
         it('should set disabled buttons state if not focused', async () => {
              editor.status.hasFocus = false;
              await controller.open(target, null, { disabled: true });
-             expect(editor.ui.setControllerOnDisabledButtons).toHaveBeenCalledWith(true);
+             expect(editor.uiManager.setControllerOnDisabledButtons).toHaveBeenCalledWith(true);
         });
 
          it('should set position using offset.setAbsPosition for elements', async () => {
@@ -162,7 +167,7 @@ describe('Controller', () => {
             controller.close();
             expect(controller.isOpen).toBe(false);
             expect(form.style.display).toBe('none');
-            expect(editor.opendControllers.length).toBe(0);
+            expect(editor.uiManager.opendControllers.length).toBe(0);
         });
 
         it('should remove global events', () => {
@@ -315,8 +320,8 @@ describe('Controller', () => {
              // controller.inst is set in constructor.
              // Controller checks: if (cont[i].inst === this && cont[i].fixed)
              
-             // Setup editor.opendControllers
-             editor.opendControllers = [{ inst: controller, fixed: true }];
+             // Setup editor.uiManager.opendControllers
+             editor.uiManager.opendControllers = [{ inst: controller, fixed: true }];
              
              const keydownCall = editor.eventManager.addGlobalEvent.mock.calls.find(c => c[0] === 'keydown');
              const keydownHandler = keydownCall[1];
@@ -387,7 +392,7 @@ describe('Controller', () => {
         it('should set disabled buttons to false when not focused and disabled is false', async () => {
             editor.status.hasFocus = false;
             await controller.open(target, null, { disabled: false });
-            expect(editor.ui.setControllerOnDisabledButtons).toHaveBeenCalledWith(false);
+            expect(editor.uiManager.setControllerOnDisabledButtons).toHaveBeenCalledWith(false);
         });
 
         it('should hide subToolbar when isSubBalloon mode is enabled', async () => {
@@ -480,8 +485,8 @@ describe('Controller', () => {
         });
 
         it('should call hide when setRangePosition returns false for Range target', async () => {
-            // Mock the selection.isRange to return true for the range
-            controller.selection.isRange = jest.fn().mockReturnValue(true);
+            // Mock selection.isRange to return true for the range
+            editor.selection.isRange = jest.fn().mockReturnValue(true);
             editor.offset.setRangePosition.mockReturnValue(false);
 
             const hideSpy = jest.spyOn(controller, 'hide');
@@ -541,7 +546,7 @@ describe('Controller', () => {
             mouseEnterHandler(mockEvent);
 
             // zIndex should be updated
-            expect(editor.currentControllerName).toBe('testPlugin');
+            expect(editor.uiManager.currentControllerName).toBe('testPlugin');
         });
 
         it('should not update zIndex when isInsideForm and has parents', () => {
@@ -619,7 +624,7 @@ describe('Controller', () => {
         });
 
         it('should not close when selectMenuOn is true', () => {
-            editor.selectMenuOn = true;
+            editor.uiManager.selectMenuOn = true;
 
             const keydownCall = editor.eventManager.addGlobalEvent.mock.calls.find(c => c[0] === 'keydown');
             const keydownHandler = keydownCall[1];
@@ -632,7 +637,7 @@ describe('Controller', () => {
 
             expect(spyClose).not.toHaveBeenCalled();
 
-            editor.selectMenuOn = false;
+            editor.uiManager.selectMenuOn = false;
         });
 
         it('should not close on non-ESC key when target is inside form', () => {
@@ -845,7 +850,7 @@ describe('Controller', () => {
     describe('#controllerOn event cancellation', () => {
         it('should not add to opendControllers when onBeforeShowController returns false', async () => {
             // Reset the opendControllers array
-            editor.opendControllers = [];
+            editor.uiManager.opendControllers = [];
 
             jest.spyOn(controller, 'triggerEvent').mockResolvedValue(false);
 
@@ -854,7 +859,7 @@ describe('Controller', () => {
             // When event is cancelled, controller should not be added to opendControllers
             // Note: the controller does set form.style.display = 'block' before event check in #controllerOn
             // but it should NOT push to opendControllers if cancelled
-            expect(editor.opendControllers.length).toBe(0);
+            expect(editor.uiManager.opendControllers.length).toBe(0);
         });
     });
 

@@ -141,7 +141,7 @@ jest.mock('../../../../src/editorInjector/_core.js', () => {
         this.editor = editor;
         this.lang = editor.lang;
         this.icons = editor.icons;
-        this.ui = editor.ui;
+        this.uiManager = editor.uiManager;
         this.options = editor.options;
         this.selection = editor.selection;
         this.format = editor.format;
@@ -185,7 +185,7 @@ describe('Plugins - Command - FileUpload', () => {
                 checked: '✓',
                 cancel: '✗'
             },
-            ui: {
+            uiManager: {
                 alertOpen: jest.fn(),
                 offCurrentController: jest.fn()
             },
@@ -556,7 +556,7 @@ describe('Plugins - Command - FileUpload', () => {
                 url: '/test.pdf'
             });
             expect(dom.utils.removeItem).toHaveBeenCalledWith(mockContainer);
-            expect(mockEditor.ui.offCurrentController).toHaveBeenCalled();
+            expect(mockEditor.uiManager.offCurrentController).toHaveBeenCalled();
             expect(mockEditor.history.push).toHaveBeenCalledWith(false);
         });
 
@@ -609,7 +609,7 @@ describe('Plugins - Command - FileUpload', () => {
                 limitSize: 1000,
                 uploadSize: 1500
             }));
-            expect(mockEditor.ui.alertOpen).toHaveBeenCalled();
+            expect(mockEditor.uiManager.alertOpen).toHaveBeenCalled();
             expect(result).toBe(false);
         });
 
@@ -821,7 +821,7 @@ describe('Plugins - Command - FileUpload', () => {
             // Trigger upload which will call the callback
             await fileUpload.submitFile(mockFiles);
 
-            expect(mockEditor.ui.alertOpen).toHaveBeenCalledWith('Upload failed', 'error');
+            expect(mockEditor.uiManager.alertOpen).toHaveBeenCalledWith('Upload failed', 'error');
             expect(consoleSpy).toHaveBeenCalledWith('[SUNEDITOR.plugin.fileUpload.error]', 'Upload failed');
 
             consoleSpy.mockRestore();

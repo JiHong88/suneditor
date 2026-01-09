@@ -85,11 +85,10 @@ class Offset extends CoreInjector {
 		super(editor);
 	}
 
-	/** @type {SunEditor.Core['selection']} */
 	get #selection() {
 		return this.editor.selection;
 	}
-	/** @type {SunEditor.Core['toolbar']} */
+
 	get #toolbar() {
 		return this.editor.toolbar;
 	}

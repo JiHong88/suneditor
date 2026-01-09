@@ -63,7 +63,6 @@ class Menu extends CoreInjector {
 		this.#menuContainer = null;
 	}
 
-	/** @type {SunEditor.Core['offset']} */
 	get #offset() {
 		return this.editor.offset;
 	}
@@ -97,7 +96,7 @@ class Menu extends CoreInjector {
 		if (moreBtn) {
 			const target = dom.query.getParentElement(moreBtn, '.se-btn-tray').querySelector('[data-command="' + moreBtn.getAttribute('data-ref') + '"]');
 			if (target) {
-				this.editor.runFromTarget(target);
+				this.commandDispatcher.runFromTarget(target);
 				this.dropdownOn(button);
 				return;
 			}
@@ -148,7 +147,7 @@ class Menu extends CoreInjector {
 				dom.utils.removeClass(this.currentDropdownActiveButton.parentElement.children, 'on');
 			}
 			this.currentDropdownActiveButton = null;
-			this.editor._notHideToolbar = false;
+			this.uiManager.preventToolbarHide(false);
 		}
 
 		this.editor._preventBlur = false;
@@ -208,7 +207,7 @@ class Menu extends CoreInjector {
 			this.currentContainer = null;
 			dom.utils.removeClass(this.currentContainerActiveButton, 'on');
 			this.currentContainerActiveButton = null;
-			this.editor._notHideToolbar = false;
+			this.uiManager.preventToolbarHide(false);
 		}
 
 		this.editor._preventBlur = false;

@@ -42,7 +42,7 @@ jest.mock('../../../../src/editorInjector', () => {
 				isInline: jest.fn().mockReturnValue(false)
 			};
 			this.triggerEvent = jest.fn().mockResolvedValue(true);
-			this.ui = {
+			this.uiManager = {
 				alertOpen: jest.fn(),
 				hideLoading: jest.fn()
 			};
@@ -463,7 +463,7 @@ describe('Image Plugin', () => {
 				upload: jest.fn()
 			};
 			image.modal = { isUpdate: false };
-			image.ui = {
+			image.uiManager = {
 				alertOpen: jest.fn(),
 				hideLoading: jest.fn()
 			};
@@ -886,7 +886,7 @@ describe('Image Plugin', () => {
 				upload: jest.fn()
 			};
 			image.modal = { isUpdate: false };
-			image.ui = {
+			image.uiManager = {
 				alertOpen: jest.fn(),
 				hideLoading: jest.fn()
 			};
@@ -1273,7 +1273,7 @@ describe('Image Plugin', () => {
 	describe('Error upload handling with NO_EVENT', () => {
 		beforeEach(() => {
 			image.pluginOptions.uploadSingleSizeLimit = 5000;
-			image.ui = { alertOpen: jest.fn() };
+			image.uiManager = { alertOpen: jest.fn() };
 		});
 
 		it('should show default error when triggerEvent returns NO_EVENT', async () => {
@@ -1283,7 +1283,7 @@ describe('Image Plugin', () => {
 			const files = [{ type: 'image/jpeg', name: 'test.jpg', size: 10000 }];
 			const result = await image.submitFile(files);
 
-			expect(image.ui.alertOpen).toHaveBeenCalledWith(
+			expect(image.uiManager.alertOpen).toHaveBeenCalledWith(
 				expect.stringContaining('SUNEDITOR.imageUpload.fail'),
 				'error'
 			);
@@ -1296,7 +1296,7 @@ describe('Image Plugin', () => {
 			const files = [{ type: 'image/jpeg', name: 'test.jpg', size: 10000 }];
 			const result = await image.submitFile(files);
 
-			expect(image.ui.alertOpen).toHaveBeenCalledWith('Custom error message', 'error');
+			expect(image.uiManager.alertOpen).toHaveBeenCalledWith('Custom error message', 'error');
 			expect(result).toBe(false);
 		});
 
@@ -1306,7 +1306,7 @@ describe('Image Plugin', () => {
 			const files = [{ type: 'image/jpeg', name: 'test.jpg', size: 10000 }];
 			const result = await image.submitFile(files);
 
-			expect(image.ui.alertOpen).toHaveBeenCalledWith(
+			expect(image.uiManager.alertOpen).toHaveBeenCalledWith(
 				expect.stringContaining('SUNEDITOR.imageUpload.fail'),
 				'error'
 			);
@@ -1319,7 +1319,7 @@ describe('Image Plugin', () => {
 			image.pluginOptions.uploadSizeLimit = 5000;
 			image.pluginOptions.uploadSingleSizeLimit = 0;
 			image.fileManager = { getSize: jest.fn().mockReturnValue(3000) };
-			image.ui = { alertOpen: jest.fn() };
+			image.uiManager = { alertOpen: jest.fn() };
 		});
 
 		it('should show default error when NO_EVENT for total size limit', async () => {
@@ -1329,7 +1329,7 @@ describe('Image Plugin', () => {
 			const files = [{ type: 'image/jpeg', name: 'test.jpg', size: 3000 }];
 			const result = await image.submitFile(files);
 
-			expect(image.ui.alertOpen).toHaveBeenCalledWith(
+			expect(image.uiManager.alertOpen).toHaveBeenCalledWith(
 				expect.stringContaining('SUNEDITOR.imageUpload.fail'),
 				'error'
 			);
@@ -1342,7 +1342,7 @@ describe('Image Plugin', () => {
 			const files = [{ type: 'image/jpeg', name: 'test.jpg', size: 3000 }];
 			const result = await image.submitFile(files);
 
-			expect(image.ui.alertOpen).toHaveBeenCalledWith('Total size exceeded', 'error');
+			expect(image.uiManager.alertOpen).toHaveBeenCalledWith('Total size exceeded', 'error');
 		});
 	});
 

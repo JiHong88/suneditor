@@ -96,7 +96,7 @@ export class TableResizeService {
 				const colIndex = this.#state.logical_cellIndex + this.#state.current_colSpan - (cellEdge.isLeft ? 1 : 0);
 
 				// ready
-				this.#main.ui.enableBackWrapper('ew-resize');
+				this.#main.uiManager.enableBackWrapper('ew-resize');
 				this.#resizeLine ||= this.#main.frameContext.get('wrapper').querySelector(Constants.RESIZE_CELL_CLASS);
 				this.#resizeLinePrev = this.#main.frameContext.get('wrapper').querySelector(Constants.RESIZE_CELL_PREV_CLASS);
 
@@ -141,7 +141,7 @@ export class TableResizeService {
 				this.#main.setRowInfo(row);
 
 				// ready
-				this.#main.ui.enableBackWrapper('ns-resize');
+				this.#main.uiManager.enableBackWrapper('ns-resize');
 				this.#resizeLine ||= this.#main.frameContext.get('wrapper').querySelector(Constants.RESIZE_ROW_CLASS);
 				this.#resizeLinePrev = this.#main.frameContext.get('wrapper').querySelector(Constants.RESIZE_ROW_PREV_CLASS);
 
@@ -419,7 +419,7 @@ export class TableResizeService {
 	 */
 	#removeGlobalEvents() {
 		this.#resizing = false;
-		this.#main.ui.disableBackWrapper();
+		this.#main.uiManager.disableBackWrapper();
 		this.#hideResizeLine();
 		if (this.#resizeLinePrev) {
 			this.#resizeLinePrev.style.display = 'none';

@@ -15,11 +15,13 @@ describe('Key Handler', () => {
 		mockThis = {
 			isComposing: false,
 			editor: {
-				selectMenuOn: false,
 				isBalloon: false,
 				isSubBalloon: false,
 				isBalloonAlways: false,
 				isSubBalloonAlways: false
+			},
+			uiManager: {
+				selectMenuOn: false
 			},
 			selection: {
 				getNode: jest.fn(() => document.createTextNode('text')),
@@ -118,7 +120,7 @@ describe('Key Handler', () => {
 
 			it('should return early if selectMenuOn', async () => {
 				jest.spyOn(keyCodeMap, 'isComposing').mockReturnValue(false);
-				mockThis.editor.selectMenuOn = true;
+				mockThis.uiManager.selectMenuOn = true;
 
 				await OnKeyDown_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 

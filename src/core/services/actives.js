@@ -77,7 +77,7 @@ export const BASIC_COMMANDS = ACTIVE_EVENT_COMMANDS.concat(['undo', 'redo', 'sav
  * @param {SunEditor.Core} editor - The root editor instance
  */
 export function SELECT_ALL(editor) {
-	editor.ui.offCurrentController();
+	editor.uiManager.offCurrentController();
 	editor.menu.containerOff();
 
 	// check all tags
@@ -149,38 +149,6 @@ export function SELECT_ALL(editor) {
 }
 
 /**
- * @description Toggles direction button active state.
- * @param {SunEditor.Core} editor - The root editor instance
- * @param {boolean} rtl - Whether the text direction is right-to-left.
- */
-export function DIR_BTN_ACTIVE(editor, rtl) {
-	const icons = editor.icons;
-	const commandTargets = editor.commandTargets;
-	const shortcutsKeyMap = editor.shortcutsKeyMap;
-
-	// change reverse shortcuts key
-	editor.reverseKeys.forEach((e) => {
-		const info = shortcutsKeyMap.get(e);
-		if (!info) return;
-		[info.command, info.r] = [info.r, info.command];
-	});
-
-	// change dir buttons
-	editor.applyCommandTargets('dir', (e) => {
-		dom.utils.changeTxt(e.querySelector('.se-tooltip-text'), editor.lang[rtl ? 'dir_ltr' : 'dir_rtl']);
-		dom.utils.changeElement(e.firstElementChild, icons[rtl ? 'dir_ltr' : 'dir_rtl']);
-	});
-
-	if (rtl) {
-		dom.utils.addClass(commandTargets.get('dir_rtl'), 'active');
-		dom.utils.removeClass(commandTargets.get('dir_ltr'), 'active');
-	} else {
-		dom.utils.addClass(commandTargets.get('dir_ltr'), 'active');
-		dom.utils.removeClass(commandTargets.get('dir_rtl'), 'active');
-	}
-}
-
-/**
  * @description Saves the editor content.
  * @param {SunEditor.Core} editor - The root editor instance
  * @returns {Promise<void>}
@@ -206,7 +174,7 @@ export async function SAVE(editor) {
 	fc.set('savedIndex', editor.history.getRootStack()[editor.status.rootKey].index);
 
 	// set save button disable
-	editor.applyCommandTargets('save', (e) => {
+	editor.commandDispatcher.applyTargets('save', (e) => {
 		e.disabled = true;
 	});
 }

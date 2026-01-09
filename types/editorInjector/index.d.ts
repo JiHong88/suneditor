@@ -13,14 +13,22 @@ declare class EditorInjector {
 	constructor(editor: SunEditor.Core);
 	/** @type {SunEditor.Core} */
 	editor: SunEditor.Core;
-	/** @type {import('./_core').default['eventManager']} */
-	eventManager: import('./_core').default['eventManager'];
+	/** @type {SunEditor.Core['contextManager']} */
+	contextManager: SunEditor.Core['contextManager'];
 	/** @type {import('./_core').default['instanceCheck']} */
 	instanceCheck: import('./_core').default['instanceCheck'];
-	/** @type {import('./_core').default['history']} */
-	history: import('./_core').default['history'];
+	/** @type {import('./_core').default['pluginManager']} */
+	pluginManager: import('./_core').default['pluginManager'];
 	/** @type {import('./_core').default['focusManager']} */
 	focusManager: import('./_core').default['focusManager'];
+	/** @type {import('./_core').default['commandDispatcher']} */
+	commandDispatcher: import('./_core').default['commandDispatcher'];
+	/** @type {import('./_core').default['history']} */
+	history: import('./_core').default['history'];
+	/** @type {import('./_core').default['eventManager']} */
+	eventManager: import('./_core').default['eventManager'];
+	/** @type {import('./_core').default['uiManager']} */
+	uiManager: import('./_core').default['uiManager'];
 	/** @type {import('./_core').default['events']} */
 	events: import('./_core').default['events'];
 	/** @type {import('./_core').default['triggerEvent']} */
@@ -75,8 +83,6 @@ declare class EditorInjector {
 	selection: import('./_classes').default['selection'];
 	/** @type {import('./_classes').default['shortcuts']} */
 	shortcuts: import('./_classes').default['shortcuts'];
-	/** @type {import('./_classes').default['ui']} */
-	ui: import('./_classes').default['ui'];
 	/** @type {import('./_classes').default['viewer']} */
 	viewer: import('./_classes').default['viewer'];
 }

@@ -47,14 +47,24 @@ describe('Menu', () => {
 			setRelPosition: jest.fn(),
 		};
 
+		const mockUiManager = {
+			preventToolbarHide: jest.fn(),
+			_notHideToolbar: false
+		};
+
 		mockEditor = {
-			runFromTarget: jest.fn(),
+			commandDispatcher: {
+				run: jest.fn(),
+				runFromTarget: jest.fn(),
+				targets: new Map(),
+				applyTargets: jest.fn()
+			},
 			_preventBlur: false,
-			_notHideToolbar: false,
 			// Include all properties that getters will access via this.editor.xxx
 			context: mockContext,
 			eventManager: mockEventManager,
 			offset: mockOffset,
+			uiManager: mockUiManager,
 			carrierWrapper: document.createElement('div'),
 			plugins: {},
 		};
@@ -67,6 +77,8 @@ describe('Menu', () => {
 			this.eventManager = editor.eventManager;
 			this.carrierWrapper = editor.carrierWrapper;
 			this.plugins = editor.plugins;
+			this.commandDispatcher = editor.commandDispatcher;
+			this.uiManager = editor.uiManager;
 		});
 
 		menu = new Menu(mockEditor);
@@ -232,7 +244,7 @@ describe('Menu', () => {
 
 			menu.dropdownOn(mockButton);
 
-			expect(mockEditor.runFromTarget).toHaveBeenCalledWith(mockTarget);
+			expect(mockEditor.commandDispatcher.runFromTarget).toHaveBeenCalledWith(mockTarget);
 		});
 	});
 
@@ -261,7 +273,7 @@ describe('Menu', () => {
 			expect(menu.currentDropdownActiveButton).toBeNull();
 			expect(mockDropdown.style.display).toBe('none');
 			expect(dom.utils.removeClass).toHaveBeenCalledWith(mockParent.children, 'on');
-			expect(mockEditor._notHideToolbar).toBe(false);
+			expect(mockEditor.uiManager._notHideToolbar).toBe(false);
 			expect(mockEditor._preventBlur).toBe(false);
 			expect(menu.currentDropdownPlugin).toBeNull();
 		});
@@ -318,7 +330,7 @@ describe('Menu', () => {
 			expect(menu.currentContainerActiveButton).toBeNull();
 			expect(mockContainer.style.display).toBe('none');
 			expect(dom.utils.removeClass).toHaveBeenCalledWith(mockButton, 'on');
-			expect(mockEditor._notHideToolbar).toBe(false);
+			expect(mockEditor.uiManager._notHideToolbar).toBe(false);
 			expect(mockEditor._preventBlur).toBe(false);
 		});
 

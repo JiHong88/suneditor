@@ -369,7 +369,7 @@ class Image_ extends PluginModal {
 					file: f,
 				});
 
-				this.ui.alertOpen(message === NO_EVENT ? err : message || err, 'error');
+				this.uiManager.alertOpen(message === NO_EVENT ? err : message || err, 'error');
 
 				return false;
 			}
@@ -389,7 +389,7 @@ class Image_ extends PluginModal {
 				uploadSize: fileSize,
 			});
 
-			this.ui.alertOpen(message === NO_EVENT ? err : message || err, 'error');
+			this.uiManager.alertOpen(message === NO_EVENT ? err : message || err, 'error');
 
 			return false;
 		}
@@ -933,7 +933,7 @@ class Image_ extends PluginModal {
 		if (this.state.produceIndex === 0) {
 			this.component.applyInsertBehavior(container, null, this.pluginOptions.insertBehavior || this.options.get('componentInsertBehavior'));
 
-			this.editor._iframeAutoHeight(this.frameContext);
+			this.uiManager._iframeAutoHeight(this.frameContext);
 			this.history.push(false);
 		}
 	}

@@ -12,6 +12,8 @@ import { numbers } from '../../helper';
  */
 export default function History(editor) {
 	const frameRoots = editor.frameRoots;
+	const commandDispatcher = editor.commandDispatcher;
+	const contextManager = editor.contextManager;
 	let delayTime = editor.options.get('historyStackDelayTime');
 	let pushDelay = null;
 	let stackIndex, stack, rootStack, rootInitContents;
@@ -77,10 +79,10 @@ export default function History(editor) {
 		if (stackIndex < 0) stackIndex = 0;
 		else if (stackIndex >= stack.length) stackIndex = stack.length - 1;
 
-		editor.ui.offCurrentController();
-		editor._checkComponents(false);
+		editor.uiManager.offCurrentController();
+		editor.pluginManager.checkFileInfo(false);
 		editor.char.display();
-		editor._resourcesStateChange(fc);
+		editor.uiManager._syncFrameState(fc);
 
 		// document type
 		if (fc.has('documentType_use_header')) {
@@ -166,7 +168,7 @@ export default function History(editor) {
 
 		stack = stack.slice(0, stackIndex + 1);
 		root.value.splice(stackIndex + 1);
-		editor.applyCommandTargets('redo', (e) => {
+		commandDispatcher.applyTargets('redo', (e) => {
 			e.disabled = true;
 		});
 
@@ -181,7 +183,7 @@ export default function History(editor) {
 	 * @param {Range} range Selection range.
 	 */
 	function pushStack(rootKey, range) {
-		editor._checkComponents(false);
+		editor.pluginManager.checkFileInfo(false);
 
 		const fc = frameRoots.get(rootKey);
 		const current = fc.get('wysiwyg').innerHTML;
@@ -193,7 +195,7 @@ export default function History(editor) {
 		setStack(current, range, rootKey, 1);
 
 		if (stackIndex === 1) {
-			editor.applyCommandTargets('undo', (e) => {
+			commandDispatcher.applyTargets('undo', (e) => {
 				e.disabled = false;
 			});
 		}
@@ -217,7 +219,7 @@ export default function History(editor) {
 			rootKey = rootKey || rootKey === null ? rootKey : editor.status.rootKey;
 			const range = editor.status._range;
 
-			_w.setTimeout(editor._resourcesStateChange.bind(editor, frameRoots.get(rootKey)), 0);
+			_w.setTimeout(editor.uiManager._syncFrameState.bind(editor.uiManager, frameRoots.get(rootKey)), 0);
 			const time = typeof delay === 'number' ? (delay > 0 ? delay : 0) : !delay ? 0 : delayTime;
 
 			if (!time || pushDelay) {
@@ -304,12 +306,12 @@ export default function History(editor) {
 		 * @description Resets the history stack and disables related UI buttons.
 		 */
 		reset() {
-			editor.applyCommandTargets('undo', (e) => (e.disabled = true));
-			editor.applyCommandTargets('redo', (e) => (e.disabled = true));
-			editor.applyCommandTargets('save', (e) => (e.disabled = true));
+			commandDispatcher.applyTargets('undo', (e) => (e.disabled = true));
+			commandDispatcher.applyTargets('redo', (e) => (e.disabled = true));
+			commandDispatcher.applyTargets('save', (e) => (e.disabled = true));
 
-			editor.applyFrameRoots((e) => e.set('historyIndex', -1));
-			editor.applyFrameRoots((e) => e.set('isChanged', false));
+			contextManager.applyToRoots((e) => e.set('historyIndex', -1));
+			contextManager.applyToRoots((e) => e.set('isChanged', false));
 
 			stackIndex = -1;
 			stack = [];
@@ -335,11 +337,11 @@ export default function History(editor) {
 			const target = editor.frameRoots.get(rootKey);
 			const rootLen = root.value.length - 1;
 
-			editor.applyCommandTargets('undo', (e) => {
+			commandDispatcher.applyTargets('undo', (e) => {
 				if (index > 0 && index <= rootLen) e.disabled = false;
 				else e.disabled = true;
 			});
-			editor.applyCommandTargets('redo', (e) => {
+			commandDispatcher.applyTargets('redo', (e) => {
 				if (index > -1 && index < rootLen) e.disabled = false;
 				else e.disabled = true;
 			});
@@ -350,7 +352,7 @@ export default function History(editor) {
 
 			target.set('historyIndex', index);
 			target.set('isChanged', isChanged);
-			editor.applyCommandTargets('save', (e) => {
+			commandDispatcher.applyTargets('save', (e) => {
 				if (isChanged) e.disabled = false;
 				else e.disabled = true;
 			});

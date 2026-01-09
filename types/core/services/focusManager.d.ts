@@ -5,10 +5,6 @@ export default class FocusManager {
 	 * @param {SunEditor.Instance} editor
 	 */
 	constructor(editor: SunEditor.Instance);
-	editor: import('../editor').default;
-	options: any;
-	frameContext: import('../config/frameContext').FrameContextUtil;
-	frameOptions: any;
 	/**
 	 * @description Focus to wysiwyg area
 	 * @param {*} [rootKey] Root frame key.

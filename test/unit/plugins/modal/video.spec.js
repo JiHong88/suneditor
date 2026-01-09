@@ -62,7 +62,7 @@ jest.mock('../../../../src/editorInjector', () => {
 			this.nodeTransform = { removeAllParents: jest.fn() };
 			this.component = { select: jest.fn(), insert: jest.fn() };
 			this.triggerEvent = jest.fn().mockResolvedValue(true);
-			this.ui = { alertOpen: jest.fn() };
+			this.uiManager = { alertOpen: jest.fn() };
 			this.functions = { createHTML: jest.fn() };
             this.plugins = {};
 		}
@@ -422,13 +422,13 @@ describe('Video Plugin', () => {
                 const NO_EVENT = require('../../../../src/helper').env.NO_EVENT;
                 const videoWithLimit = new Video(mockEditor, { uploadSingleSizeLimit: 1000 });
                 videoWithLimit.triggerEvent = jest.fn().mockResolvedValue(NO_EVENT);
-                videoWithLimit.ui = { alertOpen: jest.fn() };
+                videoWithLimit.uiManager = { alertOpen: jest.fn() };
 
                 const files = [{ name: 'big.mp4', type: 'video/mp4', size: 2000 }];
                 const result = await videoWithLimit.submitFile(files);
 
                 expect(result).toBe(false);
-                expect(videoWithLimit.ui.alertOpen).toHaveBeenCalledWith(
+                expect(videoWithLimit.uiManager.alertOpen).toHaveBeenCalledWith(
                     expect.stringContaining('Size of uploadable single file'),
                     'error'
                 );
@@ -440,13 +440,13 @@ describe('Video Plugin', () => {
                 // fileManager.getSize returns current total size
                 videoWithLimit.fileManager.getSize = jest.fn().mockReturnValue(4000);
                 videoWithLimit.triggerEvent = jest.fn().mockResolvedValue(NO_EVENT);
-                videoWithLimit.ui = { alertOpen: jest.fn() };
+                videoWithLimit.uiManager = { alertOpen: jest.fn() };
 
                 const files = [{ name: 'video.mp4', type: 'video/mp4', size: 2000 }];
                 const result = await videoWithLimit.submitFile(files);
 
                 expect(result).toBe(false);
-                expect(videoWithLimit.ui.alertOpen).toHaveBeenCalledWith(
+                expect(videoWithLimit.uiManager.alertOpen).toHaveBeenCalledWith(
                     expect.stringContaining('Size of uploadable total videos'),
                     'error'
                 );

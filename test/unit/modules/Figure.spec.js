@@ -41,6 +41,7 @@ jest.mock('../../../src/modules/ui/_DragHandle.js', () => ({
 jest.mock('../../../src/editorInjector/_core.js', () => {
     return jest.fn().mockImplementation(function(editor) {
         this.editor = editor;
+        this.contextManager = editor.contextManager;
         this.frameContext = editor.frameContext;
         this.triggerEvent = editor.triggerEvent || jest.fn();
         this.icons = editor.icons;
@@ -58,7 +59,7 @@ jest.mock('../../../src/editorInjector/_core.js', () => {
             isRange: jest.fn().mockReturnValue(false)
         };
         this.status = editor.status;
-        this.ui = editor.ui;
+        this.uiManager = editor.uiManager;
         this.selection = editor.selection;
         this.offset = editor.offset;
         this.component = editor.component;
@@ -158,7 +159,7 @@ describe('Modules - Figure', () => {
         jest.clearAllMocks();
 
         mockEditor = {
-            ui: {
+            uiManager: {
                 showFigure: jest.fn(),
                 hideFigure: jest.fn(),
                 _visibleControllers: jest.fn(),
@@ -186,20 +187,22 @@ describe('Modules - Figure', () => {
                 removeGlobalEvent: jest.fn()
             },
             triggerEvent: jest.fn(),
-            applyFrameRoots: jest.fn((callback) => {
-                const mockContext = new Map();
-                mockContext.set('wrapper', {
-                    querySelector: jest.fn().mockReturnValue(null),
-                    appendChild: jest.fn()
-                });
-                mockContext.set('_figure', {
-                    main: { style: {}, appendChild: jest.fn() },
-                    border: { style: {} },
-                    display: { style: {} },
-                    handles: [{ style: {} }, { style: {} }]
-                });
-                callback(mockContext);
-            }),
+            contextManager: {
+                applyToRoots: jest.fn((callback) => {
+                    const mockContext = new Map();
+                    mockContext.set('wrapper', {
+                        querySelector: jest.fn().mockReturnValue(null),
+                        appendChild: jest.fn()
+                    });
+                    mockContext.set('_figure', {
+                        main: { style: {}, appendChild: jest.fn() },
+                        border: { style: {} },
+                        display: { style: {} },
+                        handles: [{ style: {} }, { style: {} }]
+                    });
+                    callback(mockContext);
+                })
+            },
             frameContext: new Map([
                 ['_ww', { focus: jest.fn() }],
                 ['wrapper', {

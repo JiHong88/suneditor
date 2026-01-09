@@ -28,7 +28,7 @@ export function ButtonsHandler(e) {
 
 	if (dom.query.getParentElement(target, '.se-dropdown')) {
 		e.stopPropagation();
-		this.editor._notHideToolbar = true;
+		this.uiManager.preventToolbarHide(true);
 	} else {
 		let command = target.getAttribute('data-command');
 		let className = target.className;
@@ -128,5 +128,5 @@ export function OnClick_menuTray(e) {
  */
 export function OnClick_toolbar(e) {
 	const eventTarget = dom.query.getEventTarget(e);
-	this.editor.runFromTarget(eventTarget);
+	this.commandDispatcher.runFromTarget(eventTarget);
 }

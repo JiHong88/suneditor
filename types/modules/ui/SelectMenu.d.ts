@@ -45,7 +45,6 @@ declare class SelectMenu extends CoreInjector {
 	 * @param {SunEditor.Instance} editor The instance object that called the constructor.
 	 */
 	constructor(editor: SunEditor.Instance, params: any);
-	offset: import('../../core/class/offset').default;
 	form: HTMLElement;
 	items: any[];
 	/** @type {HTMLLIElement[]} */

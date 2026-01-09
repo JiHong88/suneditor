@@ -43,7 +43,7 @@ describe('EditorInjector - index.js', () => {
             offset: { mock: 'offset' },
             selection: { mock: 'selection' },
             shortcuts: { mock: 'shortcuts' },
-            ui: { mock: 'ui' },
+            uiManager: { mock: 'ui' },
             viewer: { mock: 'viewer' }
         };
     });

@@ -157,35 +157,30 @@ class HTML extends CoreInjector {
 		this.__resetAutoStyleify(options.get('autoStyleify'));
 	}
 
-	/** @type {SunEditor.Core['selection']} */
 	get #selection() {
 		return this.editor.selection;
 	}
-	/** @type {SunEditor.Core['format']} */
+
 	get #format() {
 		return this.editor.format;
 	}
-	/** @type {SunEditor.Core['component']} */
+
 	get #component() {
 		return this.editor.component;
 	}
-	/** @type {SunEditor.Core['char']} */
+
 	get #char() {
 		return this.editor.char;
 	}
-	/** @type {SunEditor.Core['ui']} */
-	get #ui() {
-		return this.editor.ui;
-	}
-	/** @type {SunEditor.Core['viewer']} */
+
 	get #viewer() {
 		return this.editor.viewer;
 	}
-	/** @type {SunEditor.Core['nodeTransform']} */
+
 	get #nodeTransform() {
 		return this.editor.nodeTransform;
 	}
-	/** @type {SunEditor.Core['inline']} */
+
 	get #inline() {
 		return this.editor.inline;
 	}
@@ -338,15 +333,7 @@ class HTML extends CoreInjector {
 			iframePlaceholders[i].replaceWith(iframe);
 		}
 
-		let retainFilter;
-		if ((retainFilter = this.options.get('__pluginRetainFilter'))) {
-			this.editor._MELInfo.forEach((plugin, query) => {
-				const infoLst = domParser.querySelectorAll(query);
-				for (let i = 0, len = infoLst.length; i < len; i++) {
-					if (retainFilter === true || retainFilter[plugin.key] !== false) plugin.method(infoLst[i]);
-				}
-			});
-		}
+		this.pluginManager.applyRetainFormat(domParser);
 
 		if (formatFilter) {
 			let domTree = domParser.childNodes;
@@ -1219,7 +1206,7 @@ class HTML extends CoreInjector {
 	 * @param {number|Array<number>} [options.rootKey=null] Root index
 	 */
 	set(html, { rootKey } = {}) {
-		this.#ui.offCurrentController();
+		this.uiManager.offCurrentController();
 		this.#selection.removeRange();
 		const convertValue = html === null || html === undefined ? '' : this.clean(html, { forceFormat: true, whitelist: null, blacklist: null });
 
@@ -1231,7 +1218,7 @@ class HTML extends CoreInjector {
 
 			if (!this.frameContext.get('isCodeView')) {
 				this.frameContext.get('wysiwyg').innerHTML = convertValue;
-				this.editor._resetComponents();
+				this.pluginManager.resetFileInfo();
 				this.history.push(false, rootKey[i]);
 			} else {
 				const value = this._convertToCode(convertValue, false);
@@ -1247,7 +1234,7 @@ class HTML extends CoreInjector {
 	 * @param {number|Array<number>} [options.rootKey=null] Root index
 	 */
 	add(html, { rootKey } = {}) {
-		this.#ui.offCurrentController();
+		this.uiManager.offCurrentController();
 
 		if (!rootKey) rootKey = [this.status.rootKey];
 		else if (!Array.isArray(rootKey)) rootKey = [rootKey];
@@ -1303,14 +1290,14 @@ class HTML extends CoreInjector {
 			if (typeof content !== 'string' && !dom.check.isElement(content) && !dom.check.isText(content)) return false;
 
 			if ((await clipboard.write(content)) === false) {
-				this.#ui.showToast(this.lang.message_copy_fail, this.options.get('toastMessageTime').copy, 'error');
+				this.uiManager.showToast(this.lang.message_copy_fail, this.options.get('toastMessageTime').copy, 'error');
 				return false;
 			}
-			this.#ui.showToast(this.lang.message_copy_success, this.options.get('toastMessageTime').copy);
+			this.uiManager.showToast(this.lang.message_copy_success, this.options.get('toastMessageTime').copy);
 			return true;
 		} catch (err) {
 			console.error('[SUNEDITOR.html.copy.fail] :', err);
-			this.#ui.showToast(this.lang.message_copy_fail, this.options.get('toastMessageTime').copy, 'error');
+			this.uiManager.showToast(this.lang.message_copy_fail, this.options.get('toastMessageTime').copy, 'error');
 			return false;
 		}
 	}
@@ -1331,7 +1318,7 @@ class HTML extends CoreInjector {
 			this.editor.changeFrameContext(rootKey[i]);
 			if (ctx.head) this.frameContext.get('_wd').head.innerHTML = ctx.head.replace(this.#disallowedTagsRegExp, '');
 			if (ctx.body) this.frameContext.get('_wd').body.innerHTML = this.clean(ctx.body, { forceFormat: true, whitelist: null, blacklist: null });
-			this.editor._resetComponents();
+			this.pluginManager.resetFileInfo();
 		}
 	}
 

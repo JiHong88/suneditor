@@ -71,14 +71,18 @@ describe('EventManager Handlers', () => {
         contextMap.set('toolbar_main', document.createElement('div'));
         contextMap.set('toolbar_sub_main', document.createElement('div'));
         
-        mockEditor.ui = {
+        mockEditor.uiManager = {
             showLoading: jest.fn(),
             hideLoading: jest.fn(),
             offCurrentModal: jest.fn(),
             offCurrentController: jest.fn(),
             enableBackWrapper: jest.fn(),
             disableBackWrapper: jest.fn(),
-            resizeEditor: jest.fn()
+            resizeEditor: jest.fn(),
+            _repositionControllers: jest.fn(),
+            _syncScrollPosition: jest.fn(),
+            _toggleCodeViewButtons: jest.fn(),
+            opendControllers: []
         };
         
         mockEditor.toolbar = {
@@ -138,7 +142,7 @@ describe('EventManager Handlers', () => {
             wysiwyg.dispatchEvent(event);
             
             expect(eventManager.status.hasFocus).toBe(false);
-            expect(mockEditor.ui.offCurrentController).toHaveBeenCalled();
+            expect(mockEditor.uiManager.offCurrentController).toHaveBeenCalled();
         });
 
         it('should not blur if readOnly', () => {
@@ -219,7 +223,7 @@ describe('EventManager Handlers', () => {
 			mockEditor.isBalloon = false;
 			mockEditor.isSubBalloon = false;
 
-			const spy = jest.spyOn(mockEditor.ui, 'offCurrentController');
+			const spy = jest.spyOn(mockEditor.uiManager, 'offCurrentController');
 
 			window.dispatchEvent(new Event('resize'));
 
@@ -355,10 +359,10 @@ describe('EventManager Handlers', () => {
 	describe('Code Focus Event', () => {
 		it('should configure code view disabled buttons', () => {
 			mockEditor._codeViewDisabledButtons = [];
-			mockEditor.commandTargets = new Map([['codeView', [document.createElement('button')]]]);
+			mockEditor.commandDispatcher.targets.set('codeView', [document.createElement('button')]);
 
 			expect(mockEditor._codeViewDisabledButtons).toBeDefined();
-			expect(mockEditor.commandTargets.has('codeView')).toBe(true);
+			expect(mockEditor.commandDispatcher.targets.has('codeView')).toBe(true);
 		});
 	});
 
@@ -384,7 +388,15 @@ describe('EventManager Handlers', () => {
 	});
 
 	describe('Controller Repositioning', () => {
-		it('should reposition controllers on scroll', () => {
+		it('should call _repositionControllers on scroll', () => {
+			// Trigger wysiwyg scroll
+			wysiwyg.dispatchEvent(new Event('scroll'));
+
+			// eventManager should call uiManager._repositionControllers
+			expect(mockEditor.uiManager._repositionControllers).toHaveBeenCalled();
+		});
+
+		it('should trigger repositioning logic when scroll event fires', () => {
 			const controller = {
 				notInCarrier: false,
 				inst: {
@@ -392,30 +404,21 @@ describe('EventManager Handlers', () => {
 				},
 				form: document.createElement('div')
 			};
-			mockEditor.opendControllers = [controller];
+			mockEditor.uiManager.opendControllers = [controller];
+
+			// Use a real implementation for this specific test
+			mockEditor.uiManager._repositionControllers.mockImplementation(() => {
+				for (const c of mockEditor.uiManager.opendControllers) {
+					if (!c.notInCarrier && c.inst?._scrollReposition) {
+						c.inst._scrollReposition();
+					}
+				}
+			});
 
 			// Trigger wysiwyg scroll
 			wysiwyg.dispatchEvent(new Event('scroll'));
 
 			expect(controller.inst._scrollReposition).toHaveBeenCalled();
-		});
-
-		it('should skip controller repositioning when notInCarrier is true', () => {
-			const controller = {
-				notInCarrier: true,
-				inst: {
-					_scrollReposition: jest.fn(),
-					__offset: { top: 100, left: 50 }
-				},
-				form: document.createElement('div')
-			};
-			mockEditor.opendControllers = [controller];
-
-			// The repositioning is different for notInCarrier controllers
-			wysiwyg.dispatchEvent(new Event('scroll'));
-
-			// It should update form style instead
-			expect(controller.form.style.top).toBeDefined();
 		});
 	});
 

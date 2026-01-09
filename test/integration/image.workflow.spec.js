@@ -25,9 +25,9 @@ describe('Image Workflow Integration Tests', () => {
 
 		// Mock UI methods
 		if (editor.ui) {
-			editor.ui.showLoading = jest.fn();
-			editor.ui.hideLoading = jest.fn();
-			editor.ui.alertOpen = jest.fn();
+			editor.uiManager.showLoading = jest.fn();
+			editor.uiManager.hideLoading = jest.fn();
+			editor.uiManager.alertOpen = jest.fn();
 		}
 	});
 
@@ -449,7 +449,7 @@ describe('Image Workflow Integration Tests', () => {
 			expect(wysiwyg.querySelectorAll('img').length).toBe(1);
 
 			// Undo
-			await editor.commandExecutor.execute('undo');
+			await editor.commandDispatcher.run('undo');
 
 			// Image should be removed (in real implementation)
 			// For this test, we just verify undo was called
@@ -467,8 +467,8 @@ describe('Image Workflow Integration Tests', () => {
 			editor.history.push(false);
 
 			// Undo then Redo
-			await editor.commandExecutor.execute('undo');
-			await editor.commandExecutor.execute('redo');
+			await editor.commandDispatcher.run('undo');
+			await editor.commandDispatcher.run('redo');
 
 			// Verify redo executed
 			expect(true).toBe(true);
@@ -491,7 +491,7 @@ describe('Image Workflow Integration Tests', () => {
 			expect(image.style.width).toBe('200px');
 
 			// Undo resize
-			await editor.commandExecutor.execute('undo');
+			await editor.commandDispatcher.run('undo');
 
 			// In real implementation, width would be restored
 			expect(true).toBe(true);
@@ -602,10 +602,10 @@ describe('Image Workflow Integration Tests', () => {
 			expect(paragraphs[0].querySelector('strong')).toBeTruthy();
 
 			// Undo text change
-			await editor.commandExecutor.execute('undo');
+			await editor.commandDispatcher.run('undo');
 
 			// Undo image change
-			await editor.commandExecutor.execute('undo');
+			await editor.commandDispatcher.run('undo');
 
 			expect(true).toBe(true);
 		});

@@ -10,14 +10,6 @@ export default class SelectionState {
 	 * @param {SunEditor.Instance} editor
 	 */
 	constructor(editor: SunEditor.Instance);
-	editor: import('../../editor').default;
-	options: any;
-	status: SunEditor.Status;
-	frameContext: import('../../config/frameContext').FrameContextUtil;
-	frameOptions: any;
-	plugins: {
-		[x: string]: any;
-	};
 	/**
 	 * @description Updates the toolbar state based on the current selection.
 	 * - Traverses the DOM from the selection to the root.

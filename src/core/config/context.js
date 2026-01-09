@@ -1,11 +1,4 @@
 /**
- * ================================================================================================================================
- * === CONTEXT TYPES : Store
- * =================================================================================================================================
- */
-
-/**
- * ================================================================================================================================
  * @typedef {Object} ContextStore
  *
  * This object stores **global editor-level UI references** for a SunEditor instance.
@@ -34,14 +27,6 @@
  * === Sticky Mode Helpers ===
  * @property {HTMLElement} [_stickyDummy] - A **dummy placeholder** used when the toolbar is in sticky mode (to prevent layout shift).
  * ================================================================================================================================
- */
-
-/** --+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+-- */
-
-/**
- * ================================================================================================================================
- * === UTILITIES : Manage Context Map
- * =================================================================================================================================
  */
 
 /**
@@ -77,46 +62,5 @@ export function CreateContext(toolbar, toolbarContainer, menuTray, subbar, statu
 		m.set('statusbar_wrapper', statusbarContainer.querySelector('.sun-editor'));
 	}
 
-	return /** @type {SunEditor.Context} */ (m);
-}
-
-/**
- * @typedef {Object} ContextUtil
- * @property {(k: keyof ContextStore) => HTMLElement|null} get - Get a DOM element from the context by key.
- * @property {(k: keyof ContextStore, v: HTMLElement) => void} set - Set a DOM element in the context by key.
- * @property {(k: keyof ContextStore) => boolean} has - Check if a key exists in the context.
- * @property {(k: keyof ContextStore) => boolean} delete - Delete a key from the context.
- * @property {() => Object<keyof ContextStore, HTMLElement|null>} [getAll] - Get all DOM elements in the context as an object.
- * @property {() => void} clear - Clear all elements in the context.
- */
-
-/**
- * @description Creates a utility wrapper for editor base options.
- * - Provides get, set, has, getAll, and setMany methods with internal Map support.
- * @param {*} editor - The editor instance
- * @returns {ContextUtil}
- */
-export function ContextUtil(editor) {
-	const store = editor.__context;
-
-	return {
-		get(k) {
-			return store.get(k);
-		},
-		set(k, v) {
-			return store.set(k, v);
-		},
-		has(k) {
-			return store.has(k);
-		},
-		delete(k) {
-			return store.delete(k);
-		},
-		getAll() {
-			return Object.fromEntries(store.entries());
-		},
-		clear() {
-			store.clear();
-		},
-	};
+	return /** @type {SunEditor.Context} */ (/** @type {unknown} */ (m));
 }

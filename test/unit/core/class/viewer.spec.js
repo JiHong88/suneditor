@@ -202,7 +202,7 @@ describe('Viewer', () => {
 
               viewer._setButtonsActive();
 
-              const codeViewBtn = editor.commandTargets?.get('codeView');
+              const codeViewBtn = editor.commandDispatcher.targets?.get('codeView');
               if (codeViewBtn) {
                    expect(codeViewBtn.classList.contains('active')).toBe(true);
               }

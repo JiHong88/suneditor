@@ -117,12 +117,6 @@ declare class Controller extends CoreInjector {
 	 * @param {?string} [_name] An optional name for the controller key.
 	 */
 	constructor(inst: any, element: Node, params: ControllerParams, _name?: string | null);
-	toolbar: import('../../core/class/toolbar').default;
-	subToolbar: import('../../core/class/toolbar').default;
-	component: import('../../core/class/component').default;
-	ui: import('../../core/class/ui').default;
-	selection: import('../../core/class/selection').default;
-	offset: import('../../core/class/offset').default;
 	kind: any;
 	inst: any;
 	form: HTMLFormElement;

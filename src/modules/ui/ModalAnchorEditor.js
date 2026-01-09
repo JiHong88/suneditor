@@ -38,10 +38,6 @@ class ModalAnchorEditor extends CoreInjector {
 	constructor(editor, modalForm, params) {
 		super(editor);
 
-		// editor class
-		this.selection = this.editor.selection;
-		this.ui = this.editor.ui;
-
 		// params
 		this.openNewWindow = !!params.openNewWindow;
 		this.relList = Array.isArray(params.relList) ? params.relList : [];
@@ -137,6 +133,11 @@ class ModalAnchorEditor extends CoreInjector {
 		this.eventManager.addEvent(this.bookmarkButton, 'click', this.#OnClick_bookmarkButton.bind(this));
 		this.eventManager.addEvent(forms.querySelector('._se_upload_button'), 'click', () => this.input.click());
 	}
+
+	get #selection() {
+		return this.editor.selection;
+	}
+
 	/**
 	 * @description Initialize.
 	 * - Sets the current anchor element to be edited.
@@ -153,7 +154,7 @@ class ModalAnchorEditor extends CoreInjector {
 	on(isUpdate) {
 		if (!isUpdate) {
 			this.init();
-			this.displayInput.value = this.selection.get().toString().trim();
+			this.displayInput.value = this.#selection.get().toString().trim();
 			this.newWindowCheck.checked = this.openNewWindow;
 			this.titleInput.value = '';
 		} else if (this.currentTarget) {
@@ -387,7 +388,7 @@ class ModalAnchorEditor extends CoreInjector {
 		const message = await this.triggerEvent('onFileUploadError', { error: response });
 		if (message === false) return;
 		const err = message === NO_EVENT ? response.errorMessage : message || response.errorMessage;
-		this.ui.alertOpen(err, 'error');
+		this.uiManager.alertOpen(err, 'error');
 		console.error('[SUNEDITOR.plugin.fileUpload.error]', err);
 	}
 

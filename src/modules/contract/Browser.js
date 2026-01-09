@@ -55,9 +55,6 @@ class Browser extends CoreInjector {
 	constructor(inst, params) {
 		super(inst.editor);
 
-		// editor class
-		this.offset = this.editor.offset;
-
 		// create HTML
 		this.useSearch = params.useSearch ?? true;
 		const browserFrame = dom.utils.createElement('DIV', { class: 'se-browser sun-editor-common' + (params.className ? ` ${params.className}` : '') });
@@ -129,6 +126,10 @@ class Browser extends CoreInjector {
 		this.eventManager.addEvent([this.header, browserFrame.querySelector('.se-browser-main')], 'mousedown', this.#SideClose.bind(this));
 	}
 
+	get #offset() {
+		return this.editor.offset;
+	}
+
 	/**
 	 * @description Open a file browser plugin
 	 * @param {Object} [params={}]
@@ -147,7 +148,7 @@ class Browser extends CoreInjector {
 
 		this.titleArea.textContent = params.title || this.title;
 		this.area.style.display = 'block';
-		this.editor.opendBrowser = this;
+		this.uiManager.opendBrowser = this;
 		this.closeArrow = this.options.get('_rtl') ? this.icons.menu_arrow_left : this.icons.menu_arrow_right;
 
 		if (this.directData) {
@@ -156,7 +157,7 @@ class Browser extends CoreInjector {
 			this.#drawFileList(params.url || this.url, params.urlHeader || this.urlHeader, false);
 		}
 
-		this.body.style.maxHeight = dom.utils.getClientSize().h - (this.offset.getGlobal(this.body).top - _w.scrollY) - 20 + 'px';
+		this.body.style.maxHeight = dom.utils.getClientSize().h - (this.#offset.getGlobal(this.body).top - _w.scrollY) - 20 + 'px';
 	}
 
 	/**
@@ -175,7 +176,7 @@ class Browser extends CoreInjector {
 		this.data = {};
 		this.keyword = '';
 		this.list.innerHTML = this.tagArea.innerHTML = this.titleArea.textContent = '';
-		this.editor.opendBrowser = null;
+		this.uiManager.opendBrowser = null;
 		this.sideInner = null;
 
 		this.inst.browserInit?.();

@@ -1,288 +1,263 @@
 import { createTestEditor, destroyTestEditor, waitForEditorReady } from '../../../__mocks__/editorIntegration';
 
 describe('Core - Shortcuts', () => {
-    let editor;
-    let shortcuts;
+	let editor;
+	let shortcuts;
 
-    beforeEach(async () => {
-        editor = createTestEditor();
-        await waitForEditorReady(editor);
-        shortcuts = editor.shortcuts;
-    });
+	beforeEach(async () => {
+		editor = createTestEditor();
+		await waitForEditorReady(editor);
+		shortcuts = editor.shortcuts;
+	});
 
-    afterEach(() => {
-        destroyTestEditor(editor);
-    });
+	afterEach(() => {
+		destroyTestEditor(editor);
+	});
 
-    describe('Constructor', () => {
-        it('should initialize with editor reference', () => {
-            expect(shortcuts.editor).toBe(editor);
-        });
+	describe('command method', () => {
+		let mockEvent;
+		let mockRange;
+		let mockLine;
 
-        it('should initialize with isDisabled as false', () => {
-            expect(shortcuts.isDisabled).toBe(false);
-        });
-    });
+		beforeEach(() => {
+			mockEvent = {
+				key: 'b',
+				code: 'KeyB',
+				preventDefault: jest.fn(),
+				stopPropagation: jest.fn(),
+			};
+			mockRange = document.createRange();
+			mockLine = document.createElement('p');
+		});
 
-    describe('disable method', () => {
-        it('should set isDisabled to true', () => {
-            shortcuts.disable();
-            expect(shortcuts.isDisabled).toBe(true);
-        });
-    });
+		it('should return false when shortcuts are disabled', () => {
+			shortcuts.disable();
+			const result = shortcuts.command(mockEvent, false, false, 'KeyB', 'b', false, mockLine, mockRange);
+			expect(result).toBe(false);
+		});
 
-    describe('enable method', () => {
-        it('should set isDisabled to false', () => {
-            shortcuts.isDisabled = true;
-            shortcuts.enable();
-            expect(shortcuts.isDisabled).toBe(false);
-        });
-    });
+		it('should return false when no matching shortcut is found', () => {
+			const result = shortcuts.command(mockEvent, false, false, 'KeyX', 'x', false, mockLine, mockRange);
+			expect(result).toBe(false);
+		});
 
-    describe('command method', () => {
-        let mockEvent;
-        let mockRange;
-        let mockLine;
+		it('should handle ctrl+key shortcuts', () => {
+			// Setup a test shortcut and mock plugin
+			editor.plugins['bold'] = { action: jest.fn() };
+			const mockInfo = {
+				command: 'bold',
+				type: 'command',
+				button: null,
+				c: true,
+				s: false,
+				space: false,
+				enter: false,
+			};
+			shortcuts.keyMap.set('KeyB', mockInfo);
 
-        beforeEach(() => {
-            mockEvent = {
-                key: 'b',
-                code: 'KeyB',
-                preventDefault: jest.fn(),
-                stopPropagation: jest.fn()
-            };
-            mockRange = document.createRange();
-            mockLine = document.createElement('p');
-        });
+			const result = shortcuts.command(mockEvent, true, false, 'KeyB', 'b', false, mockLine, mockRange);
 
-        it('should return false when shortcuts are disabled', () => {
-            shortcuts.disable();
-            const result = shortcuts.command(mockEvent, false, false, 'KeyB', 'b', false, mockLine, mockRange);
-            expect(result).toBe(false);
-        });
+			expect(result).toBe(true);
+			expect(editor.plugins['bold'].action).toHaveBeenCalled();
+		});
 
-        it('should return false when no matching shortcut is found', () => {
-            const result = shortcuts.command(mockEvent, false, false, 'KeyX', 'x', false, mockLine, mockRange);
-            expect(result).toBe(false);
-        });
+		it('should handle ctrl+shift+key shortcuts', () => {
+			editor.plugins['testCommand'] = { action: jest.fn() };
+			const mockInfo = {
+				command: 'testCommand',
+				type: 'command',
+				button: null,
+				c: true,
+				s: true,
+				space: false,
+				enter: false,
+			};
+			shortcuts.keyMap.set('KeyB1000', mockInfo);
 
-        it('should handle ctrl+key shortcuts', () => {
-            // Setup a test shortcut and mock plugin
-            editor.plugins['bold'] = { action: jest.fn() };
-            const mockInfo = {
-                command: 'bold',
-                type: 'command',
-                button: null,
-                c: true,
-                s: false,
-                space: false,
-                enter: false
-            };
-            editor.shortcutsKeyMap.set('KeyB', mockInfo);
+			const result = shortcuts.command(mockEvent, true, true, 'KeyB', 'b', false, mockLine, mockRange);
 
-            const result = shortcuts.command(mockEvent, true, false, 'KeyB', 'b', false, mockLine, mockRange);
+			expect(result).toBe(true);
+			expect(editor.plugins['testCommand'].action).toHaveBeenCalled();
+		});
 
-            expect(result).toBe(true);
-            expect(editor.plugins['bold'].action).toHaveBeenCalled();
-        });
+		it('should handle text-based shortcuts', () => {
+			editor.plugins['testText'] = { action: jest.fn() };
+			const mockInfo = {
+				command: 'testText',
+				type: 'command',
+				button: null,
+				c: false,
+				s: false,
+				space: false,
+				enter: false,
+			};
+			shortcuts.keyMap.set('##', mockInfo);
+			mockEvent.key = '#';
 
-        it('should handle ctrl+shift+key shortcuts', () => {
-            editor.plugins['testCommand'] = { action: jest.fn() };
-            const mockInfo = {
-                command: 'testCommand',
-                type: 'command',
-                button: null,
-                c: true,
-                s: true,
-                space: false,
-                enter: false
-            };
-            editor.shortcutsKeyMap.set('KeyB1000', mockInfo);
+			const result = shortcuts.command(mockEvent, false, false, 'Digit3', '##', false, mockLine, mockRange);
 
-            const result = shortcuts.command(mockEvent, true, true, 'KeyB', 'b', false, mockLine, mockRange);
+			expect(result).toBe(true);
+			expect(editor.plugins['testText'].action).toHaveBeenCalled();
+		});
 
-            expect(result).toBe(true);
-            expect(editor.plugins['testCommand'].action).toHaveBeenCalled();
-        });
+		it('should return false if shift is required but not pressed', () => {
+			const mockInfo = {
+				command: 'testShift',
+				type: 'command',
+				button: null,
+				c: false,
+				s: true,
+				space: false,
+				enter: false,
+			};
+			shortcuts.keyMap.set('KeyA', mockInfo);
 
-        it('should handle text-based shortcuts', () => {
-            editor.plugins['testText'] = { action: jest.fn() };
-            const mockInfo = {
-                command: 'testText',
-                type: 'command',
-                button: null,
-                c: false,
-                s: false,
-                space: false,
-                enter: false
-            };
-            editor.shortcutsKeyMap.set('##', mockInfo);
-            mockEvent.key = '#';
+			const result = shortcuts.command(mockEvent, false, false, 'KeyA', 'a', false, mockLine, mockRange);
 
-            const result = shortcuts.command(mockEvent, false, false, 'Digit3', '##', false, mockLine, mockRange);
+			expect(result).toBe(false);
+		});
 
-            expect(result).toBe(true);
-            expect(editor.plugins['testText'].action).toHaveBeenCalled();
-        });
+		it('should return false if space is required but not pressed', () => {
+			const mockInfo = {
+				command: 'testSpace',
+				type: 'command',
+				button: null,
+				c: false,
+				s: false,
+				space: true,
+				enter: false,
+			};
+			shortcuts.keyMap.set('test', mockInfo);
 
-        it('should return false if shift is required but not pressed', () => {
-            const mockInfo = {
-                command: 'testShift',
-                type: 'command',
-                button: null,
-                c: false,
-                s: true,
-                space: false,
-                enter: false
-            };
-            editor.shortcutsKeyMap.set('KeyA', mockInfo);
+			const result = shortcuts.command(mockEvent, false, false, 'KeyA', 'test', false, mockLine, mockRange);
 
-            const result = shortcuts.command(mockEvent, false, false, 'KeyA', 'a', false, mockLine, mockRange);
+			expect(result).toBe(false);
+		});
 
-            expect(result).toBe(false);
-        });
+		it('should return false if enter is required but not pressed', () => {
+			const mockInfo = {
+				command: 'testEnter',
+				type: 'command',
+				button: null,
+				c: false,
+				s: false,
+				space: false,
+				enter: true,
+			};
+			shortcuts.keyMap.set('test', mockInfo);
 
-        it('should return false if space is required but not pressed', () => {
-            const mockInfo = {
-                command: 'testSpace',
-                type: 'command',
-                button: null,
-                c: false,
-                s: false,
-                space: true,
-                enter: false
-            };
-            editor.shortcutsKeyMap.set('test', mockInfo);
+			const result = shortcuts.command(mockEvent, false, false, 'KeyA', 'test', false, mockLine, mockRange);
 
-            const result = shortcuts.command(mockEvent, false, false, 'KeyA', 'test', false, mockLine, mockRange);
+			expect(result).toBe(false);
+		});
 
-            expect(result).toBe(false);
-        });
+		it('should return false if edge is required but not at edge', () => {
+			const mockInfo = {
+				command: 'testEdge',
+				type: 'command',
+				button: null,
+				c: false,
+				s: false,
+				space: false,
+				enter: false,
+				edge: true,
+			};
+			shortcuts.keyMap.set('test', mockInfo);
 
-        it('should return false if enter is required but not pressed', () => {
-            const mockInfo = {
-                command: 'testEnter',
-                type: 'command',
-                button: null,
-                c: false,
-                s: false,
-                space: false,
-                enter: true
-            };
-            editor.shortcutsKeyMap.set('test', mockInfo);
+			const result = shortcuts.command(mockEvent, false, false, 'KeyA', 'test', false, mockLine, mockRange);
 
-            const result = shortcuts.command(mockEvent, false, false, 'KeyA', 'test', false, mockLine, mockRange);
+			expect(result).toBe(false);
+		});
 
-            expect(result).toBe(false);
-        });
+		it('should return false if textTrigger is required but key has no text', () => {
+			const mockInfo = {
+				command: 'testText',
+				type: 'command',
+				button: null,
+				c: false,
+				s: false,
+				space: false,
+				enter: false,
+				textTrigger: true,
+			};
+			shortcuts.keyMap.set('test', mockInfo);
+			mockEvent.key = ' ';
 
-        it('should return false if edge is required but not at edge', () => {
-            const mockInfo = {
-                command: 'testEdge',
-                type: 'command',
-                button: null,
-                c: false,
-                s: false,
-                space: false,
-                enter: false,
-                edge: true
-            };
-            editor.shortcutsKeyMap.set('test', mockInfo);
+			const result = shortcuts.command(mockEvent, false, false, 'Space', 'test', false, mockLine, mockRange);
 
-            const result = shortcuts.command(mockEvent, false, false, 'KeyA', 'test', false, mockLine, mockRange);
+			expect(result).toBe(false);
+		});
 
-            expect(result).toBe(false);
-        });
+		it('should call plugin method when method is a string', () => {
+			const mockPluginMethod = jest.fn();
+			editor.plugins['testPlugin'] = {
+				testMethod: mockPluginMethod,
+			};
 
-        it('should return false if textTrigger is required but key has no text', () => {
-            const mockInfo = {
-                command: 'testText',
-                type: 'command',
-                button: null,
-                c: false,
-                s: false,
-                space: false,
-                enter: false,
-                textTrigger: true
-            };
-            editor.shortcutsKeyMap.set('test', mockInfo);
-            mockEvent.key = ' ';
+			const mockInfo = {
+				plugin: 'testPlugin',
+				method: 'testMethod',
+				c: false,
+				s: false,
+				space: false,
+				enter: false,
+			};
+			shortcuts.keyMap.set('test', mockInfo);
 
-            const result = shortcuts.command(mockEvent, false, false, 'Space', 'test', false, mockLine, mockRange);
+			const result = shortcuts.command(mockEvent, false, false, 'KeyA', 'test', false, mockLine, mockRange);
 
-            expect(result).toBe(false);
-        });
+			expect(result).toBe(true);
+			expect(mockPluginMethod).toHaveBeenCalledWith({
+				range: mockRange,
+				line: mockLine,
+				info: mockInfo,
+				event: mockEvent,
+				keyCode: 'KeyA',
+			});
+		});
 
-        it('should call plugin method when method is a string', () => {
-            const mockPluginMethod = jest.fn();
-            editor.plugins['testPlugin'] = {
-                testMethod: mockPluginMethod
-            };
+		it('should call method function when method is a function', () => {
+			const mockMethod = jest.fn();
+			const mockInfo = {
+				method: mockMethod,
+				c: false,
+				s: false,
+				space: false,
+				enter: false,
+			};
+			shortcuts.keyMap.set('test', mockInfo);
 
-            const mockInfo = {
-                plugin: 'testPlugin',
-                method: 'testMethod',
-                c: false,
-                s: false,
-                space: false,
-                enter: false
-            };
-            editor.shortcutsKeyMap.set('test', mockInfo);
+			const result = shortcuts.command(mockEvent, false, false, 'KeyA', 'test', false, mockLine, mockRange);
 
-            const result = shortcuts.command(mockEvent, false, false, 'KeyA', 'test', false, mockLine, mockRange);
+			expect(result).toBe(true);
+			expect(mockMethod).toHaveBeenCalledWith({
+				range: mockRange,
+				line: mockLine,
+				info: mockInfo,
+				event: mockEvent,
+				keyCode: 'KeyA',
+				editor: editor,
+			});
+		});
 
-            expect(result).toBe(true);
-            expect(mockPluginMethod).toHaveBeenCalledWith({
-                range: mockRange,
-                line: mockLine,
-                info: mockInfo,
-                event: mockEvent,
-                keyCode: 'KeyA'
-            });
-        });
+		it('should handle text + event.key combination shortcuts', () => {
+			editor.plugins['testCombo'] = { action: jest.fn() };
+			const mockInfo = {
+				command: 'testCombo',
+				type: 'command',
+				button: null,
+				c: false,
+				s: false,
+				space: false,
+				enter: false,
+			};
+			shortcuts.keyMap.set('ab', mockInfo);
+			mockEvent.key = 'b';
 
-        it('should call method function when method is a function', () => {
-            const mockMethod = jest.fn();
-            const mockInfo = {
-                method: mockMethod,
-                c: false,
-                s: false,
-                space: false,
-                enter: false
-            };
-            editor.shortcutsKeyMap.set('test', mockInfo);
+			const result = shortcuts.command(mockEvent, false, false, 'KeyB', 'a', false, mockLine, mockRange);
 
-            const result = shortcuts.command(mockEvent, false, false, 'KeyA', 'test', false, mockLine, mockRange);
-
-            expect(result).toBe(true);
-            expect(mockMethod).toHaveBeenCalledWith({
-                range: mockRange,
-                line: mockLine,
-                info: mockInfo,
-                event: mockEvent,
-                keyCode: 'KeyA',
-                editor: editor
-            });
-        });
-
-        it('should handle text + event.key combination shortcuts', () => {
-            editor.plugins['testCombo'] = { action: jest.fn() };
-            const mockInfo = {
-                command: 'testCombo',
-                type: 'command',
-                button: null,
-                c: false,
-                s: false,
-                space: false,
-                enter: false
-            };
-            editor.shortcutsKeyMap.set('ab', mockInfo);
-            mockEvent.key = 'b';
-
-            const result = shortcuts.command(mockEvent, false, false, 'KeyB', 'a', false, mockLine, mockRange);
-
-            expect(result).toBe(true);
-            expect(editor.plugins['testCombo'].action).toHaveBeenCalled();
-        });
-    });
+			expect(result).toBe(true);
+			expect(editor.plugins['testCombo'].action).toHaveBeenCalled();
+		});
+	});
 });

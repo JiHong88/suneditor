@@ -55,12 +55,16 @@ describe('Figure', () => {
                 select: jest.fn(),
                 copy: jest.fn()
             },
-            ui: {
+            uiManager: {
                 _visibleControllers: jest.fn(),
                 setControllerOnDisabledButtons: jest.fn(),
                 offCurrentController: jest.fn(),
                 disableBackWrapper: jest.fn(),
-                enableBackWrapper: jest.fn()
+                enableBackWrapper: jest.fn(),
+                setFigureContainer: jest.fn(),
+                onControllerContext: jest.fn(),
+                offControllerContext: jest.fn(),
+                opendControllers: []
             },
             offset: {
                 getLocal: jest.fn().mockReturnValue({ top: 0, left: 0, scrollX: 0, scrollY: 0 }),
@@ -123,9 +127,11 @@ describe('Figure', () => {
                 ['wysiwygFrame', { clientWidth: 800 }],
                 ['wwComputedStyle', { getPropertyValue: jest.fn().mockReturnValue('0px') }]
             ]),
-            applyFrameRoots: jest.fn((cb) => {
-                 cb(editor.frameContext);
-            }),
+            contextManager: {
+                applyToRoots: jest.fn((cb) => {
+                    cb(editor.frameContext);
+                })
+            },
             iframe: window,
             _w: window,
             _d: document
@@ -206,7 +212,7 @@ describe('Figure', () => {
 
             figure.open(targetElement, {});
 
-            expect(editor.opendControllers.length).toBeGreaterThan(0);
+            expect(editor.uiManager.opendControllers.length).toBeGreaterThan(0);
         });
 
         it('should return undefined and warn when targetNode is null', () => {
@@ -1219,7 +1225,7 @@ describe('Figure', () => {
 
              onResizeHandler(mousedownEvent);
 
-             expect(figure.ui.enableBackWrapper).toHaveBeenCalled();
+             expect(figure.uiManager.enableBackWrapper).toHaveBeenCalled();
          });
     });
 

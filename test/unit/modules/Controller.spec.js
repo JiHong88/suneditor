@@ -27,7 +27,7 @@ jest.mock('../../../src/editorInjector/_core.js', () => {
             __removeGlobalEvent: jest.fn(),
             deselect: jest.fn()
         };
-        this.ui = editor.ui;
+        this.uiManager = editor.uiManager;
         this.selection = editor.selection;
         this.offset = editor.offset;
         this.status = editor.status;
@@ -133,10 +133,15 @@ describe('Modules - Controller', () => {
         jest.clearAllMocks();
 
         mockEditor = {
-            ui: {
+            uiManager: {
                 showController: jest.fn(),
                 hideController: jest.fn(),
-                setControllerOnDisabledButtons: jest.fn()
+                setControllerOnDisabledButtons: jest.fn(),
+                onControllerContext: jest.fn(),
+                offControllerContext: jest.fn(),
+                _visibleControllers: jest.fn(),
+                opendControllers: [],
+                currentControllerName: ''
             },
             selection: {
                 getRangeElement: jest.fn(),

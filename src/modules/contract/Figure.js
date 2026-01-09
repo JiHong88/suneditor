@@ -143,15 +143,6 @@ class Figure extends CoreInjector {
 			center: this.icons.format_float_center,
 		};
 
-		// editor class
-		this.component = this.editor.component;
-		this.ui = this.editor.ui;
-		this.offset = this.editor.offset;
-		this.selection = this.editor.selection;
-		this.html = this.editor.html;
-		this.format = this.editor.format;
-		this.nodeTransform = this.editor.nodeTransform;
-
 		// modules
 		/** @type {Object<string, *>} */
 		this._action = {};
@@ -217,7 +208,7 @@ class Figure extends CoreInjector {
 		this.eventManager.addEvent(this.alignButton, 'click', this.#OnClick_alignButton.bind(this));
 		this.eventManager.addEvent(this.asButton, 'click', this.#OnClick_asButton.bind(this));
 		this.eventManager.addEvent(this.resizeButton, 'click', this.#OnClick_resizeButton.bind(this));
-		this.editor.applyFrameRoots((e) => {
+		this.contextManager.applyToRoots((e) => {
 			if (!e.get('wrapper').querySelector('.se-controller.se-resizing-container')) {
 				// resizing
 				const main = CreateHTML_resizeDot();
@@ -351,13 +342,37 @@ class Figure extends CoreInjector {
 		return dom.check.isComponentContainer(element) || /^(HR)$/.test(element?.nodeName);
 	}
 
+	get #component() {
+		return this.editor.component;
+	}
+
+	get #offset() {
+		return this.editor.offset;
+	}
+
+	get #selection() {
+		return this.editor.selection;
+	}
+
+	get #html() {
+		return this.editor.html;
+	}
+
+	get #format() {
+		return this.editor.format;
+	}
+
+	get #nodeTransform() {
+		return this.editor.nodeTransform;
+	}
+
 	/**
 	 * @description Close the figure's controller
 	 */
 	close() {
 		this.editor._preventBlur = false;
 		dom.utils.removeClass(this._cover, 'se-figure-selected');
-		this.component.__removeDragEvent();
+		this.#component.__removeDragEvent();
 		this.#removeGlobalEvents();
 		this.controller?.close();
 	}
@@ -409,7 +424,7 @@ class Figure extends CoreInjector {
 		const sizeTarget = /** @type {HTMLElement} */ (figureTarget ? this._cover || this._container || target : target);
 		const w = sizeTarget.offsetWidth || null;
 		const h = sizeTarget.offsetHeight || null;
-		const { top, left, scrollX, scrollY } = this.offset.getLocal(sizeTarget);
+		const { top, left, scrollX, scrollY } = this.#offset.getLocal(sizeTarget);
 
 		const dataSize = (target.getAttribute('data-se-size') || '').split(',');
 
@@ -440,8 +455,8 @@ class Figure extends CoreInjector {
 		if (infoOnly) return targetInfo;
 
 		const _figure = this.frameContext.get('_figure');
-		this.editor._figureContainer = _figure.main;
-		this.editor.opendControllers = this.editor.opendControllers.filter((c) => c.form !== _figure.main);
+		this.uiManager.setFigureContainer(_figure.main);
+		this.uiManager.opendControllers = this.uiManager.opendControllers.filter((c) => c.form !== _figure.main);
 
 		_figure.main.style.top = top + 'px';
 		_figure.main.style.left = left + 'px';
@@ -454,7 +469,7 @@ class Figure extends CoreInjector {
 
 		this.__offset = { left: left + scrollX, top: top + scrollY };
 
-		this.editor.opendControllers.push({
+		this.uiManager.opendControllers.push({
 			position: 'none',
 			form: _figure.main,
 			target: sizeTarget,
@@ -502,7 +517,7 @@ class Figure extends CoreInjector {
 				this.#setAlignIcon();
 				// as button
 				this.#setAsIcon();
-				this.ui._visibleControllers(true, true);
+				this.uiManager._visibleControllers(true, true);
 
 				// rotate, aption, align, onresize - display;
 				const transformButtons = this.controller.form.querySelectorAll(
@@ -663,7 +678,7 @@ class Figure extends CoreInjector {
 		const target = figure.target;
 		const container = figure.container;
 		const cover = figure.cover;
-		if (/%$/.test(target.style.width) && align === 'center' && !this.component.isInline(container)) {
+		if (/%$/.test(target.style.width) && align === 'center' && !this.#component.isInline(container)) {
 			container.style.minWidth = '100%';
 			cover.style.width = container.style.width;
 		} else {
@@ -705,7 +720,7 @@ class Figure extends CoreInjector {
 		switch (formatStyle) {
 			case 'inline': {
 				if (inlineCover) break;
-				this.component.deselect();
+				this.#component.deselect();
 
 				const next = container.nextElementSibling;
 				const parent = container.parentElement;
@@ -729,11 +744,11 @@ class Figure extends CoreInjector {
 			}
 			case 'block': {
 				if (!inlineCover) break;
-				this.component.deselect();
+				this.#component.deselect();
 
-				this.selection.setRange(container, 0, container, 1);
-				const r = this.html.remove();
-				const s = this.nodeTransform.split(r.container, r.offset, 0);
+				this.#selection.setRange(container, 0, container, 1);
+				const r = this.#html.remove();
+				const s = this.#nodeTransform.split(r.container, r.offset, 0);
 
 				if (s?.previousElementSibling && dom.check.isZeroWidth(s.previousElementSibling)) {
 					dom.utils.removeItem(s.previousElementSibling);
@@ -797,14 +812,14 @@ class Figure extends CoreInjector {
 					if (!captionText) {
 						caption.focus();
 					} else {
-						this.selection.setRange(captionText, 0, captionText, captionText.textContent.length);
+						this.#selection.setRange(captionText, 0, captionText, captionText.textContent.length);
 					}
 
 					this._caption = caption;
 					this.controller.close();
 				} else {
 					dom.utils.removeItem(this._caption);
-					_w.setTimeout(this.component.select.bind(this.component, element, this.kind), 0);
+					_w.setTimeout(this.#component.select.bind(this.#component, element, this.kind), 0);
 					this._caption = null;
 				}
 
@@ -826,7 +841,7 @@ class Figure extends CoreInjector {
 				break;
 			}
 			case 'copy': {
-				this.component.copy(this._container);
+				this.#component.copy(this._container);
 				break;
 			}
 			case 'remove': {
@@ -845,7 +860,7 @@ class Figure extends CoreInjector {
 
 		this.history.push(false);
 		if (!/^remove|caption$/.test(command)) {
-			this.component.select(element, this.kind);
+			this.#component.select(element, this.kind);
 		}
 	}
 
@@ -857,29 +872,29 @@ class Figure extends CoreInjector {
 	 * @param {import('../manager/FileManager').default} [fileManagerInst=null] - FileManager module instance, if used.
 	 */
 	retainFigureFormat(container, originEl, anchorCover, fileManagerInst) {
-		const isInline = this.component.isInline(container);
+		const isInline = this.#component.isInline(container);
 		const originParent = originEl.parentNode;
-		let existElement = this.format.isBlock(originParent) || dom.check.isWysiwygFrame(originParent) ? originEl : Figure.GetContainer(originEl)?.container || originParent || originEl;
+		let existElement = this.#format.isBlock(originParent) || dom.check.isWysiwygFrame(originParent) ? originEl : Figure.GetContainer(originEl)?.container || originParent || originEl;
 
 		if (dom.query.getParentElement(originEl, dom.check.isExcludeFormat)) {
 			existElement = anchorCover && anchorCover !== originEl ? anchorCover : originEl;
 			existElement.parentNode.replaceChild(container, existElement);
-		} else if (isInline && this.format.isLine(existElement)) {
+		} else if (isInline && this.#format.isLine(existElement)) {
 			const refer = isInline && /^SPAN$/i.test(originEl.parentElement.nodeName) ? originEl.parentElement : originEl;
 			refer.parentElement.replaceChild(container, refer);
 		} else if (dom.check.isListCell(existElement)) {
 			const refer = dom.query.getParentElement(originEl, (current) => current.parentNode === existElement);
 			existElement.insertBefore(container, refer);
 			dom.utils.removeItem(originEl);
-			this.nodeTransform.removeEmptyNode(refer, null, true);
-		} else if (this.format.isLine(existElement)) {
+			this.#nodeTransform.removeEmptyNode(refer, null, true);
+		} else if (this.#format.isLine(existElement)) {
 			const refer = dom.query.getParentElement(originEl, (current) => current.parentNode === existElement);
-			existElement = this.nodeTransform.split(existElement, refer);
+			existElement = this.#nodeTransform.split(existElement, refer);
 			existElement.parentNode.insertBefore(container, existElement);
 			dom.utils.removeItem(originEl);
-			this.nodeTransform.removeEmptyNode(existElement, null, true);
+			this.#nodeTransform.removeEmptyNode(existElement, null, true);
 		} else {
-			if (this.format.isLine(existElement.parentNode)) {
+			if (this.#format.isLine(existElement.parentNode)) {
 				const formats = existElement.parentNode;
 				formats.parentNode.insertBefore(container, existElement.previousSibling ? formats.nextElementSibling : formats);
 				if (fileManagerInst?.__updateTags.map((current) => existElement.contains(current)).length === 0) dom.utils.removeItem(existElement);
@@ -1005,7 +1020,7 @@ class Figure extends CoreInjector {
 	 */
 	#asFormatChange(figureinfo, w, h) {
 		const kind = this.kind;
-		figureinfo.target.onload = () => this.component.select(figureinfo.target, kind);
+		figureinfo.target.onload = () => this.#component.select(figureinfo.target, kind);
 
 		this.#setFigureInfo(figureinfo);
 
@@ -1291,12 +1306,12 @@ class Figure extends CoreInjector {
 	 * @description Removes the resize event listeners.
 	 */
 	#offResizeEvent() {
-		this.component.__removeDragEvent();
+		this.#component.__removeDragEvent();
 		this.#removeGlobalEvents();
 
 		this._displayResizeHandles(true);
-		this.ui.offCurrentController();
-		this.ui.disableBackWrapper();
+		this.uiManager.offCurrentController();
+		this.uiManager.disableBackWrapper();
 	}
 
 	/**
@@ -1355,7 +1370,7 @@ class Figure extends CoreInjector {
 		inst._resizeClientX = e.clientX;
 		inst._resizeClientY = e.clientY;
 		inst.frameContext.get('_figure').main.style.float = /l/.test(direction) ? 'right' : /r/.test(direction) ? 'left' : 'none';
-		this.ui.enableBackWrapper(DIRECTION_CURSOR_MAP[direction]);
+		this.uiManager.enableBackWrapper(DIRECTION_CURSOR_MAP[direction]);
 
 		const { w, h, dw, dh } = this.getSize(inst._element);
 		__resizing_p_wh = __resizing_p_ow = false;
@@ -1463,7 +1478,7 @@ class Figure extends CoreInjector {
 		}
 
 		this.history.push(false);
-		this.component.select(this._element, this.kind);
+		this.#component.select(this._element, this.kind);
 	}
 
 	/**
@@ -1473,7 +1488,7 @@ class Figure extends CoreInjector {
 	#ContainerResizingESC(e) {
 		if (!keyCodeMap.isEsc(e.code)) return;
 		this.#offResizeEvent();
-		this.component.select(this._element, this.kind);
+		this.#component.select(this._element, this.kind);
 	}
 
 	/**
@@ -1482,7 +1497,7 @@ class Figure extends CoreInjector {
 	#SetMenuAlign(value) {
 		this.setAlign(this._element, value);
 		this.selectMenu_align.close();
-		this.component.select(this._element, this.kind);
+		this.#component.select(this._element, this.kind);
 	}
 
 	/**
@@ -1512,14 +1527,14 @@ class Figure extends CoreInjector {
 		}
 
 		this.selectMenu_resize.close();
-		this.component.select(this._element, this.kind);
+		this.#component.select(this._element, this.kind);
 	}
 
 	#OffFigureContainer() {
 		const _figure = this.frameContext.get('_figure');
 		_figure.main.style.display = 'none';
-		this.editor._figureContainer = null;
-		this.editor.opendControllers = this.editor.opendControllers.filter((c) => c.form !== _figure.main);
+		this.uiManager.setFigureContainer(null);
+		this.uiManager.opendControllers = this.uiManager.opendControllers.filter((c) => c.form !== _figure.main);
 	}
 
 	#OnClick_alignButton() {

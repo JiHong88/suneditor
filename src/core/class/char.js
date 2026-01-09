@@ -18,7 +18,6 @@ class Char extends CoreInjector {
 		super(editor);
 	}
 
-	/** @type {SunEditor.Core['selection']} */
 	get #selection() {
 		return this.editor.selection;
 	}

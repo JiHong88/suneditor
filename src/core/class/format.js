@@ -36,19 +36,18 @@ class Format extends CoreInjector {
 		this.__resetBrLineBreak(this.options.get('defaultLineBreakFormat'));
 	}
 
-	/** @type {SunEditor.Core['component']} */
 	get #component() {
 		return this.editor.component;
 	}
-	/** @type {SunEditor.Core['selection']} */
+
 	get #selection() {
 		return this.editor.selection;
 	}
-	/** @type {SunEditor.Core['nodeTransform']} */
+
 	get #nodeTransform() {
 		return this.editor.nodeTransform;
 	}
-	/** @type {SunEditor.Core['listFormat']} */
+
 	get #listFormat() {
 		return this.editor.listFormat;
 	}

@@ -85,7 +85,7 @@ class Table extends PluginDropdownFree {
 		const controller_table = CreateHTML_controller_table(editor);
 		const controller_cell = CreateHTML_controller_cell(editor, this.cellControllerTop);
 
-		editor.applyFrameRoots((e) => {
+		this.contextManager.applyToRoots((e) => {
 			e.get('wrapper').appendChild(dom.utils.createElement('DIV', { class: Constants.RESIZE_CELL_CLASS.replace(/^\./, '') }));
 			e.get('wrapper').appendChild(dom.utils.createElement('DIV', { class: Constants.RESIZE_CELL_PREV_CLASS.replace(/^\./, '') }));
 			e.get('wrapper').appendChild(dom.utils.createElement('DIV', { class: Constants.RESIZE_ROW_CLASS.replace(/^\./, '') }));
@@ -233,7 +233,7 @@ class Table extends PluginDropdownFree {
 
 		if (selectedCells.length > 0) {
 			this.clipboardService.copySelectedTableCells(event, cloneContainer, selectedCells);
-			this.editor.ui.showToast(this.lang.message_copy_success, 550);
+			this.uiManager.showToast(this.lang.message_copy_success, 550);
 		}
 	}
 
@@ -460,7 +460,7 @@ class Table extends PluginDropdownFree {
 
 		const keyCode = event.code;
 		const isTab = keyCodeMap.isTab(keyCode);
-		if (this.editor.selectMenuOn || this.resizeService.isResizing() || (!isTab && this.#_s) || keyCodeMap.isCtrl(event)) return;
+		if (this.uiManager.selectMenuOn || this.resizeService.isResizing() || (!isTab && this.#_s) || keyCodeMap.isCtrl(event)) return;
 
 		if (!this.cellControllerTop) {
 			this.controller_cell.hide();

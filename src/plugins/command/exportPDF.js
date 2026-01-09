@@ -58,7 +58,7 @@ class ExportPDF extends PluginCommand {
 			return;
 		}
 
-		this.ui.showLoading();
+		this.uiManager.showLoading();
 		let ww = null;
 
 		try {
@@ -90,7 +90,7 @@ class ExportPDF extends PluginCommand {
 			console.error('[SUNEDITOR.plugins.exportPDF.error]', error.message);
 		} finally {
 			dom.utils.removeItem(ww);
-			this.ui.hideLoading();
+			this.uiManager.hideLoading();
 		}
 	}
 

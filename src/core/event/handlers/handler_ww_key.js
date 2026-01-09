@@ -23,7 +23,7 @@ const _styleNodes = Object.preventExtensions({ value: [] });
  */
 export async function OnKeyDown_wysiwyg(fc, e) {
 	if ((this.isComposing = keyCodeMap.isComposing(e))) return true;
-	if (this.editor.selectMenuOn || !e.isTrusted) return;
+	if (this.uiManager.selectMenuOn || !e.isTrusted) return;
 
 	let selectionNode = this.selection.getNode();
 	if (dom.check.isInputElement(selectionNode)) return;

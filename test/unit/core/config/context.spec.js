@@ -2,7 +2,8 @@
  * @fileoverview Unit tests for core/config/context.js
  */
 
-import { CreateContext, ContextUtil } from '../../../../src/core/config/context';
+import { CreateContext } from '../../../../src/core/config/context';
+// ContextUtil moved to contextManager service
 
 describe('Core Config - Context', () => {
     let mockDOM;
@@ -163,142 +164,6 @@ describe('Core Config - Context', () => {
         });
     });
 
-    describe('ContextUtil function', () => {
-        let mockEditor;
-        let contextUtil;
-
-        beforeEach(() => {
-            const contextMap = CreateContext(
-                mockDOM.toolbar,
-                mockDOM.toolbarContainer,
-                mockDOM.menuTray,
-                mockDOM.subbar,
-                mockDOM.statusbarContainer
-            );
-
-            mockEditor = {
-                __context: contextMap
-            };
-
-            contextUtil = ContextUtil(mockEditor);
-        });
-
-
-        it('should get DOM elements correctly', () => {
-            expect(contextUtil.get('menuTray')).toBe(mockDOM.menuTray);
-            expect(contextUtil.get('toolbar_main')).toBe(mockDOM.toolbar);
-            expect(contextUtil.get('toolbar_sub_main')).toBe(mockDOM.subbar);
-            expect(contextUtil.get('nonexistent')).toBeUndefined();
-        });
-
-        it('should set DOM elements correctly', () => {
-            const newElement = document.createElement('div');
-            contextUtil.set('customElement', newElement);
-            expect(contextUtil.get('customElement')).toBe(newElement);
-        });
-
-        it('should check existence correctly', () => {
-            expect(contextUtil.has('menuTray')).toBe(true);
-            expect(contextUtil.has('toolbar_main')).toBe(true);
-            expect(contextUtil.has('nonexistent')).toBe(false);
-        });
-
-        it('should delete elements correctly', () => {
-            expect(contextUtil.has('menuTray')).toBe(true);
-            contextUtil.delete('menuTray');
-            expect(contextUtil.has('menuTray')).toBe(false);
-            expect(contextUtil.get('menuTray')).toBeUndefined();
-        });
-
-        it('should get all elements as object', () => {
-            const all = contextUtil.getAll();
-            expect(typeof all).toBe('object');
-            expect(all.menuTray).toBe(mockDOM.menuTray);
-            expect(all.toolbar_main).toBe(mockDOM.toolbar);
-            expect(all.toolbar_sub_main).toBe(mockDOM.subbar);
-        });
-
-        it('should clear all elements', () => {
-            expect(contextUtil.has('menuTray')).toBe(true);
-            contextUtil.clear();
-            expect(contextUtil.getAll()).toEqual({});
-            expect(contextUtil.has('menuTray')).toBe(false);
-        });
-
-        it('should handle DOM element replacement', () => {
-            const originalToolbar = contextUtil.get('toolbar_main');
-            const newToolbar = document.createElement('div');
-
-            contextUtil.set('toolbar_main', newToolbar);
-            expect(contextUtil.get('toolbar_main')).toBe(newToolbar);
-            expect(contextUtil.get('toolbar_main')).not.toBe(originalToolbar);
-        });
-
-        it('should maintain reference integrity', () => {
-            const menuTray = contextUtil.get('menuTray');
-            const menuTray2 = contextUtil.get('menuTray');
-            expect(menuTray).toBe(menuTray2);
-            expect(menuTray).toBe(mockDOM.menuTray);
-        });
-    });
-
-    describe('Integration tests', () => {
-        it('should work end-to-end from CreateContext to ContextUtil', () => {
-            // Create context
-            const context = CreateContext(
-                mockDOM.toolbar,
-                mockDOM.toolbarContainer,
-                mockDOM.menuTray,
-                mockDOM.subbar,
-                mockDOM.statusbarContainer
-            );
-
-            // Create editor with context
-            const mockEditor = { __context: context };
-            const util = ContextUtil(mockEditor);
-
-            // Test full workflow
-            expect(util.get('menuTray')).toBe(mockDOM.menuTray);
-
-            // Add new element
-            const newElement = document.createElement('div');
-            util.set('testElement', newElement);
-            expect(util.get('testElement')).toBe(newElement);
-
-            // Verify original elements still exist
-            expect(util.has('toolbar_main')).toBe(true);
-            expect(util.has('toolbar_sub_main')).toBe(true);
-
-            // Test deletion
-            util.delete('testElement');
-            expect(util.has('testElement')).toBe(false);
-        });
-
-        it('should handle dynamic context updates', () => {
-            const context = CreateContext(
-                mockDOM.toolbar,
-                null, // No container initially
-                mockDOM.menuTray,
-                null, // No subbar initially
-                null  // No statusbar initially
-            );
-
-            const mockEditor = { __context: context };
-            const util = ContextUtil(mockEditor);
-
-            // Initially should not have container elements
-            expect(util.has('toolbar_wrapper')).toBe(false);
-            expect(util.has('toolbar_sub_main')).toBe(false);
-
-            // Add elements dynamically
-            const toolbarWrapper = document.createElement('div');
-            const subToolbar = document.createElement('div');
-
-            util.set('toolbar_wrapper', toolbarWrapper);
-            util.set('toolbar_sub_main', subToolbar);
-
-            expect(util.get('toolbar_wrapper')).toBe(toolbarWrapper);
-            expect(util.get('toolbar_sub_main')).toBe(subToolbar);
-        });
-    });
+    // Note: ContextUtil and Integration tests have been moved to
+    // test/unit/core/services/contextManager.spec.js
 });

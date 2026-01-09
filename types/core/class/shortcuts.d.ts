@@ -82,14 +82,18 @@ export type ShortcutInfo = {
 /**
  * @description Shortcuts class
  */
-declare class Shortcuts {
+declare class Shortcuts extends CoreInjector {
 	/**
-	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @description Shoutcuts key map
+	 * @type {Map<string, *>}
 	 */
-	constructor(editor: SunEditor.Core);
-	editor: import('../editor').default;
-	isDisabled: boolean;
+	keyMap: Map<string, any>;
+	/**
+	 * @description Shoutcuts reverse key array
+	 * - An array of key codes generated with the reverseButtons option, used to reverse the action for a specific key combination.
+	 * @type {Set<string>}
+	 */
+	reverseKeys: Set<string>;
 	/**
 	 * @description If there is a shortcut function, run it.
 	 * @param {KeyboardEvent} event Keyboard event object
@@ -113,7 +117,15 @@ declare class Shortcuts {
 	enable(): void;
 	/**
 	 * @internal
+	 * @description Registers custom shortcut keys (keys starting with "_") into the shortcut map.
+	 * Called during initialization and when toolbar is reset.
+	 */
+	_registerCustomShortcuts(): void;
+	/**
+	 * @internal
 	 * @description Destroy the Shortcuts instance and release memory
 	 */
 	_destroy(): void;
+	#private;
 }
+import CoreInjector from '../../editorInjector/_core';

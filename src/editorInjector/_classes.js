@@ -30,8 +30,6 @@ function ClassInjector(editor) {
 	this.selection = editor.selection;
 	/** @description Shortcuts class instance @type {SunEditor.Core['shortcuts']} */
 	this.shortcuts = editor.shortcuts;
-	/** @description UI class instance @type {SunEditor.Core['ui']} */
-	this.ui = editor.ui;
 	/** @description Viewer class instance @type {SunEditor.Core['viewer']} */
 	this.viewer = editor.viewer;
 }

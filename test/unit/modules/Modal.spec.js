@@ -28,6 +28,22 @@ jest.mock('../../../src/editorInjector/_core.js', () => {
 			focusEdge: jest.fn(),
 			nativeFocus: jest.fn()
 		};
+		this.uiManager = editor.uiManager || {
+			showModal: jest.fn(),
+			hideModal: jest.fn(),
+			offCurrentModal: jest.fn(),
+			showLoading: jest.fn(),
+			hideLoading: jest.fn(),
+			enableBackWrapper: jest.fn(),
+			disableBackWrapper: jest.fn(),
+			opendControllers: [],
+			currentControllerName: '',
+			opendModal: null
+		};
+		this.offset = editor.offset || {
+			getOffset: jest.fn().mockReturnValue({ left: 0, top: 0 }),
+			getGlobal: jest.fn().mockReturnValue({ left: 100, top: 50, width: 200, height: 150 })
+		};
 	});
 });
 
@@ -86,14 +102,17 @@ describe('Modules - Modal', () => {
 		};
 
 		mockEditor = {
-			ui: {
+			uiManager: {
 				showModal: jest.fn(),
 				hideModal: jest.fn(),
 				offCurrentModal: jest.fn(),
 				showLoading: jest.fn(),
 				hideLoading: jest.fn(),
 				enableBackWrapper: jest.fn(),
-				disableBackWrapper: jest.fn()
+				disableBackWrapper: jest.fn(),
+				opendControllers: [],
+				currentControllerName: '',
+				opendModal: null
 			},
 			offset: {
 				getOffset: jest.fn().mockReturnValue({ left: 0, top: 0 }),
@@ -308,7 +327,7 @@ describe('Modules - Modal', () => {
 		it('should open modal and call init', () => {
 			modal.open();
 
-			expect(mockEditor.ui.offCurrentModal).toHaveBeenCalled();
+			expect(mockEditor.uiManager.offCurrentModal).toHaveBeenCalled();
 			expect(mockEditor.eventManager.addGlobalEvent).toHaveBeenCalled();
 			expect(mockInst.modalInit).toHaveBeenCalled();
 			expect(mockInst.modalOn).toHaveBeenCalledWith(false);
@@ -334,20 +353,20 @@ describe('Modules - Modal', () => {
 		});
 
 		it('should set isUpdate to true when updating same controller', () => {
-			mockEditor.currentControllerName = 'testModal';
+			mockEditor.uiManager.currentControllerName = 'testModal';
 			modal.open();
 			expect(modal.isUpdate).toBe(true);
 		});
 
 		it('should not call init when updating', () => {
-			mockEditor.currentControllerName = 'testModal';
+			mockEditor.uiManager.currentControllerName = 'testModal';
 			mockInst.modalInit.mockClear();
 			modal.open();
 			expect(mockInst.modalInit).not.toHaveBeenCalled();
 		});
 
 		it('should call on with true when updating', () => {
-			mockEditor.currentControllerName = 'testModal';
+			mockEditor.uiManager.currentControllerName = 'testModal';
 			modal.open();
 			expect(mockInst.modalOn).toHaveBeenCalledWith(true);
 		});
@@ -419,7 +438,7 @@ describe('Modules - Modal', () => {
 				await submitHandler[2](submitEvent);
 			}
 
-			expect(mockEditor.ui.showLoading).toHaveBeenCalled();
+			expect(mockEditor.uiManager.showLoading).toHaveBeenCalled();
 		});
 
 		it('should close modal and hide loading when action returns true', async () => {
@@ -435,7 +454,7 @@ describe('Modules - Modal', () => {
 				await submitHandler[2](submitEvent);
 			}
 
-			expect(mockEditor.ui.hideLoading).toHaveBeenCalled();
+			expect(mockEditor.uiManager.hideLoading).toHaveBeenCalled();
 		});
 
 		it('should only hide loading when action returns false', async () => {
@@ -451,7 +470,7 @@ describe('Modules - Modal', () => {
 				await submitHandler[2](submitEvent);
 			}
 
-			expect(mockEditor.ui.hideLoading).toHaveBeenCalled();
+			expect(mockEditor.uiManager.hideLoading).toHaveBeenCalled();
 		});
 
 		it('should only close modal when action returns undefined', async () => {
@@ -484,7 +503,7 @@ describe('Modules - Modal', () => {
 				await expect(submitHandler[2](submitEvent)).rejects.toThrow();
 			}
 
-			expect(mockEditor.ui.hideLoading).toHaveBeenCalled();
+			expect(mockEditor.uiManager.hideLoading).toHaveBeenCalled();
 		});
 	});
 
@@ -627,7 +646,7 @@ describe('Modules - Modal', () => {
 				fixed: false,
 				form: { style: { display: 'block' } }
 			};
-			mockEditor.opendControllers = [mockController];
+			mockEditor.uiManager.opendControllers = [mockController];
 
 			modal.open();
 
@@ -640,7 +659,7 @@ describe('Modules - Modal', () => {
 				fixed: true,
 				form: { style: { display: 'none' } }
 			};
-			mockEditor.opendControllers = [mockController];
+			mockEditor.uiManager.opendControllers = [mockController];
 
 			modal.close();
 
@@ -649,7 +668,7 @@ describe('Modules - Modal', () => {
 		});
 
 		it('should handle empty controller list', () => {
-			mockEditor.opendControllers = [];
+			mockEditor.uiManager.opendControllers = [];
 
 			expect(() => {
 				modal.open();
@@ -769,7 +788,7 @@ describe('Modules - Modal', () => {
 
 			if (mousedownHandler) {
 				mousedownHandler[2](mousedownEvent);
-				expect(mockEditor.ui.enableBackWrapper).toHaveBeenCalled();
+				expect(mockEditor.uiManager.enableBackWrapper).toHaveBeenCalled();
 			}
 		});
 
@@ -786,7 +805,7 @@ describe('Modules - Modal', () => {
 
 			if (mousedownHandler) {
 				mousedownHandler[2](mousedownEvent);
-				expect(mockEditor.ui.enableBackWrapper).toHaveBeenCalled();
+				expect(mockEditor.uiManager.enableBackWrapper).toHaveBeenCalled();
 			}
 		});
 
@@ -800,7 +819,7 @@ describe('Modules - Modal', () => {
 
 			if (mousedownHandler) {
 				mousedownHandler[2](mousedownEvent);
-				expect(mockEditor.ui.enableBackWrapper).toHaveBeenCalled();
+				expect(mockEditor.uiManager.enableBackWrapper).toHaveBeenCalled();
 			}
 		});
 
@@ -889,7 +908,7 @@ describe('Modules - Modal', () => {
 
 			capturedHandlers.mousedownW(mockEvent);
 
-			expect(mockEditor.ui.enableBackWrapper).toHaveBeenCalledWith('ns-resize');
+			expect(mockEditor.uiManager.enableBackWrapper).toHaveBeenCalledWith('ns-resize');
 			expect(capturedHandlers.mousemove).toBeDefined();
 			expect(capturedHandlers.mouseup).toBeDefined();
 		});
@@ -983,7 +1002,7 @@ describe('Modules - Modal', () => {
 			capturedHandlers.mouseup();
 
 			expect(dom.utils.removeClass).toHaveBeenCalled();
-			expect(mockEditor.ui.disableBackWrapper).toHaveBeenCalled();
+			expect(mockEditor.uiManager.disableBackWrapper).toHaveBeenCalled();
 		});
 
 		it('should add active class to handle on mousedown', () => {
@@ -999,19 +1018,19 @@ describe('Modules - Modal', () => {
 			// Test w direction cursor
 			const handleW = mockResizeElement.querySelector('.se-modal-resize-handle-w');
 			capturedHandlers.mousedownW({ target: handleW });
-			expect(mockEditor.ui.enableBackWrapper).toHaveBeenCalledWith('ns-resize');
+			expect(mockEditor.uiManager.enableBackWrapper).toHaveBeenCalledWith('ns-resize');
 
 			// Reset and test h direction
-			mockEditor.ui.enableBackWrapper.mockClear();
+			mockEditor.uiManager.enableBackWrapper.mockClear();
 			const handleH = mockResizeElement.querySelector('.se-modal-resize-handle-h');
 			capturedHandlers.mousedownH({ target: handleH });
-			expect(mockEditor.ui.enableBackWrapper).toHaveBeenCalledWith('ew-resize');
+			expect(mockEditor.uiManager.enableBackWrapper).toHaveBeenCalledWith('ew-resize');
 
 			// Reset and test c direction
-			mockEditor.ui.enableBackWrapper.mockClear();
+			mockEditor.uiManager.enableBackWrapper.mockClear();
 			const handleC = mockResizeElement.querySelector('.se-modal-resize-handle-c');
 			capturedHandlers.mousedownC({ target: handleC });
-			expect(mockEditor.ui.enableBackWrapper).toHaveBeenCalledWith('nwse-resize');
+			expect(mockEditor.uiManager.enableBackWrapper).toHaveBeenCalledWith('nwse-resize');
 		});
 
 		it('should use RTL-specific cursors when RTL is enabled', () => {
@@ -1021,7 +1040,7 @@ describe('Modules - Modal', () => {
 			const handleC = mockResizeElement.querySelector('.se-modal-resize-handle-c');
 			capturedHandlers.mousedownC({ target: handleC });
 
-			expect(mockEditor.ui.enableBackWrapper).toHaveBeenCalledWith('nesw-resize');
+			expect(mockEditor.uiManager.enableBackWrapper).toHaveBeenCalledWith('nesw-resize');
 		});
 
 		it('should not call modalResize if not provided', () => {
@@ -1228,7 +1247,7 @@ describe('Modules - Modal', () => {
 				// Expected to throw
 			}
 
-			expect(mockEditor.ui.hideLoading).toHaveBeenCalled();
+			expect(mockEditor.uiManager.hideLoading).toHaveBeenCalled();
 			expect(dom.utils.removeClass).toHaveBeenCalled();
 		});
 	});
@@ -1275,13 +1294,13 @@ describe('Modules - Modal', () => {
 
 			// First mousedown
 			capturedHandlers.mousedownW({ target: handleW });
-			expect(mockEditor.ui.disableBackWrapper).toHaveBeenCalled();
+			expect(mockEditor.uiManager.disableBackWrapper).toHaveBeenCalled();
 
-			mockEditor.ui.disableBackWrapper.mockClear();
+			mockEditor.uiManager.disableBackWrapper.mockClear();
 
 			// Second mousedown should cleanup previous events first
 			capturedHandlers.mousedownW({ target: handleW });
-			expect(mockEditor.ui.disableBackWrapper).toHaveBeenCalled();
+			expect(mockEditor.uiManager.disableBackWrapper).toHaveBeenCalled();
 		});
 	});
 

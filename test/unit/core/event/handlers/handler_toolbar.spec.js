@@ -74,7 +74,7 @@ describe('handler_toolbar', () => {
 			ButtonsHandler.call(mockThis, mockEvent);
 
 			expect(mockEvent.stopPropagation).toHaveBeenCalled();
-			expect(mockThis.editor._notHideToolbar).toBe(true);
+			expect(mockThis.uiManager.preventToolbarHide).toHaveBeenCalledWith(true);
 		});
 
 		it('should find command in parent elements', () => {
@@ -255,13 +255,13 @@ describe('handler_toolbar', () => {
 			OnClick_toolbar.call(mockThis, mockEvent);
 
 			expect(dom.query.getEventTarget).toHaveBeenCalledWith(mockEvent);
-			expect(mockThis.editor.runFromTarget).toHaveBeenCalledWith(mockTarget);
+			expect(mockThis.editor.commandDispatcher.runFromTarget).toHaveBeenCalledWith(mockTarget);
 		});
 
 		it('should execute plugin action', () => {
 			OnClick_toolbar.call(mockThis, mockEvent);
 
-			expect(mockThis.editor.runFromTarget).toHaveBeenCalledWith(mockTarget);
+			expect(mockThis.editor.commandDispatcher.runFromTarget).toHaveBeenCalledWith(mockTarget);
 		});
 
 		it('should handle missing plugin gracefully', () => {
@@ -285,7 +285,7 @@ describe('handler_toolbar', () => {
 
 			OnClick_toolbar.call(mockThis, mockEvent);
 
-			expect(mockThis.editor.runFromTarget).toHaveBeenCalledWith(mockTarget);
+			expect(mockThis.editor.commandDispatcher.runFromTarget).toHaveBeenCalledWith(mockTarget);
 		});
 
 		it('should handle nested element structures', () => {
@@ -299,7 +299,7 @@ describe('handler_toolbar', () => {
 
 			OnClick_toolbar.call(mockThis, mockEvent);
 
-			expect(mockThis.editor.runFromTarget).toHaveBeenCalledWith(icon);
+			expect(mockThis.editor.commandDispatcher.runFromTarget).toHaveBeenCalledWith(icon);
 		});
 
 		it('should stop at toolbar container', () => {
@@ -315,7 +315,7 @@ describe('handler_toolbar', () => {
 
 			OnClick_toolbar.call(mockThis, mockEvent);
 
-			expect(mockThis.editor.runFromTarget).toHaveBeenCalledWith(nestedButton);
+			expect(mockThis.editor.commandDispatcher.runFromTarget).toHaveBeenCalledWith(nestedButton);
 		});
 
 		it('should handle active plugin with custom action', () => {
@@ -323,7 +323,7 @@ describe('handler_toolbar', () => {
 
 			OnClick_toolbar.call(mockThis, mockEvent);
 
-			expect(mockThis.editor.runFromTarget).toHaveBeenCalledWith(mockTarget);
+			expect(mockThis.editor.commandDispatcher.runFromTarget).toHaveBeenCalledWith(mockTarget);
 		});
 	});
 
@@ -505,7 +505,7 @@ describe('handler_toolbar', () => {
 
 			OnClick_toolbar.call(mockThis, mockEvent);
 
-			expect(mockThis.editor.runFromTarget).toHaveBeenCalledWith(mockTarget);
+			expect(mockThis.editor.commandDispatcher.runFromTarget).toHaveBeenCalledWith(mockTarget);
 		});
 
 		it('should handle container button type', () => {
@@ -514,7 +514,7 @@ describe('handler_toolbar', () => {
 
 			OnClick_toolbar.call(mockThis, mockEvent);
 
-			expect(mockThis.editor.runFromTarget).toHaveBeenCalledWith(mockTarget);
+			expect(mockThis.editor.commandDispatcher.runFromTarget).toHaveBeenCalledWith(mockTarget);
 		});
 
 		it('should handle modal button type', () => {
@@ -523,7 +523,7 @@ describe('handler_toolbar', () => {
 
 			OnClick_toolbar.call(mockThis, mockEvent);
 
-			expect(mockThis.editor.runFromTarget).toHaveBeenCalledWith(mockTarget);
+			expect(mockThis.editor.commandDispatcher.runFromTarget).toHaveBeenCalledWith(mockTarget);
 		});
 	});
 

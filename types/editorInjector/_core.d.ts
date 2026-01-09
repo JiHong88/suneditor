@@ -16,25 +16,45 @@ export default class CoreInjector {
 	 */
 	editor: SunEditor.Core;
 	/**
-	 * @description The event manager instance.
-	 * @type {SunEditor.Core['eventManager']}
+	 * @description The context manager instance.
+	 * @type {SunEditor.Core['contextManager']}
 	 */
-	eventManager: SunEditor.Core['eventManager'];
-	/**
-	 * @description The focus manager instance
-	 * @type {SunEditor.Core['focusManager']}
-	 */
-	focusManager: SunEditor.Core['focusManager'];
+	contextManager: SunEditor.Core['contextManager'];
 	/**
 	 * @description The instanceCheck instance.
 	 * @type {SunEditor.Core['instanceCheck']}
 	 */
 	instanceCheck: SunEditor.Core['instanceCheck'];
 	/**
+	 * @description The plugin manager instance
+	 * @type {SunEditor.Core['pluginManager']}
+	 */
+	pluginManager: SunEditor.Core['pluginManager'];
+	/**
+	 * @description The focus manager instance
+	 * @type {SunEditor.Core['focusManager']}
+	 */
+	focusManager: SunEditor.Core['focusManager'];
+	/**
+	 * @description The command dispatcher instance
+	 * @type {SunEditor.Core['commandDispatcher']}
+	 */
+	commandDispatcher: SunEditor.Core['commandDispatcher'];
+	/**
 	 * @description The history manager instance.
 	 * @type {SunEditor.Core['history']}
 	 */
 	history: SunEditor.Core['history'];
+	/**
+	 * @description The event manager instance.
+	 * @type {SunEditor.Core['eventManager']}
+	 */
+	eventManager: SunEditor.Core['eventManager'];
+	/**
+	 * @description The ui manager instance.
+	 * @type {SunEditor.Core['uiManager']}
+	 */
+	uiManager: SunEditor.Core['uiManager'];
 	/**
 	 * @description The events instance.
 	 * @type {SunEditor.Core['events']}

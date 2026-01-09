@@ -2,52 +2,60 @@ import { dom } from '../../helper';
 import { COPY_FORMAT, FONT_STYLE, PAGE_BREAK, SAVE, SELECT_ALL } from './actives';
 
 /**
- * @description 명령어 실행 담당 서비스 (기존 commandHandler 대체)
+ * @description Command executor
  */
 export default class CommandExecutor {
+	#editor;
+	#frameContext;
+	#options;
+
 	/**
 	 * @constructor
 	 * @param {SunEditor.Instance} editor
 	 */
 	constructor(editor) {
-		this.editor = editor;
-		this.frameContext = editor.frameContext;
-		this.options = editor.options;
+		this.#editor = editor;
+		this.#frameContext = editor.frameContext;
+		this.#options = editor.options;
 	}
 
 	get #selection() {
-		return this.editor.selection;
+		return this.#editor.selection;
 	}
 
 	get #format() {
-		return this.editor.format;
+		return this.#editor.format;
 	}
 
 	get #inline() {
-		return this.editor.inline;
+		return this.#editor.inline;
 	}
 
 	get #html() {
-		return this.editor.html;
+		return this.#editor.html;
 	}
 
 	get #viewer() {
-		return this.editor.viewer;
+		return this.#editor.viewer;
+	}
+
+	get #uiManager() {
+		return this.#editor.uiManager;
 	}
 
 	get #history() {
-		return this.editor.history;
+		return this.#editor.history;
 	}
 
 	/**
 	 * @description Execute default command of command button
 	 */
 	async execute(command, button) {
-		if (this.frameContext.get('isReadOnly') && !/copy|cut|selectAll|codeView|fullScreen|print|preview|showBlocks/.test(command)) return;
+		if (this.#frameContext.get('isReadOnly') && !/copy|cut|selectAll|codeView|fullScreen|print|preview|showBlocks/.test(command)) return;
 
 		switch (command) {
 			case 'selectAll':
-				SELECT_ALL(this.editor);
+				SELECT_ALL(this.#editor);
 				break;
 			case 'copy': {
 				const range = this.#selection.getRange();
@@ -59,19 +67,19 @@ export default class CommandExecutor {
 				break;
 			}
 			case 'newDocument':
-				this.#html.set(`<${this.options.get('defaultLine')}><br></${this.options.get('defaultLine')}>`);
-				this.editor.focusManager.focus();
+				this.#html.set(`<${this.#options.get('defaultLine')}><br></${this.#options.get('defaultLine')}>`);
+				this.#editor.focusManager.focus();
 				this.#history.push(false);
 				// document type
-				if (this.frameContext.has('documentType_use_header')) {
-					this.frameContext.get('documentType').reHeader();
+				if (this.#frameContext.has('documentType_use_header')) {
+					this.#frameContext.get('documentType').reHeader();
 				}
 				break;
 			case 'codeView':
-				this.#viewer.codeView(!this.frameContext.get('isCodeView'));
+				this.#viewer.codeView(!this.#frameContext.get('isCodeView'));
 				break;
 			case 'fullScreen':
-				this.#viewer.fullScreen(!this.frameContext.get('isFullScreen'));
+				this.#viewer.fullScreen(!this.#frameContext.get('isFullScreen'));
 				break;
 			case 'indent':
 				this.#format.indent();
@@ -87,7 +95,7 @@ export default class CommandExecutor {
 				break;
 			case 'removeFormat':
 				this.#inline.remove();
-				this.editor.focusManager.focus();
+				this.#editor.focusManager.focus();
 				break;
 			case 'print':
 				this.#viewer.print();
@@ -96,34 +104,34 @@ export default class CommandExecutor {
 				this.#viewer.preview();
 				break;
 			case 'showBlocks':
-				this.#viewer.showBlocks(!this.frameContext.get('isShowBlocks'));
+				this.#viewer.showBlocks(!this.#frameContext.get('isShowBlocks'));
 				break;
 			case 'dir':
-				this.editor.setDir(this.options.get('_rtl') ? 'ltr' : 'rtl');
+				this.#uiManager.setDir(this.#options.get('_rtl') ? 'ltr' : 'rtl');
 				break;
 			case 'dir_ltr':
-				this.editor.setDir('ltr');
+				this.#uiManager.setDir('ltr');
 				break;
 			case 'dir_rtl':
-				this.editor.setDir('rtl');
+				this.#uiManager.setDir('rtl');
 				break;
 			case 'save':
-				await SAVE(this.editor);
+				await SAVE(this.#editor);
 				break;
 			case 'copyFormat':
-				COPY_FORMAT(this.editor, button);
+				COPY_FORMAT(this.#editor, button);
 				break;
 			case 'pageBreak':
-				PAGE_BREAK(this.editor);
+				PAGE_BREAK(this.#editor);
 				break;
 			case 'pageUp':
-				this.frameContext.get('documentType').pageUp();
+				this.#frameContext.get('documentType').pageUp();
 				break;
 			case 'pageDown':
-				this.frameContext.get('documentType').pageDown();
+				this.#frameContext.get('documentType').pageDown();
 				break;
 			default:
-				FONT_STYLE(this.editor, command);
+				FONT_STYLE(this.#editor, command);
 		}
 	}
 }

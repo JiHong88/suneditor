@@ -121,7 +121,7 @@ export class ImageUploadService {
 			const filesLen = this.#main.modal.isUpdate ? 1 : files.length;
 
 			if (filesLen === 0) {
-				this.#main.ui.hideLoading();
+				this.#main.uiManager.hideLoading();
 				console.warn('[SUNEDITOR.image.base64.fail] cause : No applicable files');
 				return;
 			}
@@ -152,7 +152,7 @@ export class ImageUploadService {
 				reader.readAsDataURL(file);
 			}
 		} catch (error) {
-			this.#main.ui.hideLoading();
+			this.#main.uiManager.hideLoading();
 			throw Error(`[SUNEDITOR.plugins.image._setBase64.fail] ${error.message}`);
 		}
 	}
@@ -190,7 +190,7 @@ export class ImageUploadService {
 	async #error(response) {
 		const message = await this.#main.triggerEvent('onImageUploadError', { error: response });
 		const err = message === NO_EVENT ? response.errorMessage : message || response.errorMessage;
-		this.#main.ui.alertOpen(err, 'error');
+		this.#main.uiManager.alertOpen(err, 'error');
 		console.error('[SUNEDITOR.plugin.image.error]', err);
 	}
 

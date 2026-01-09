@@ -103,7 +103,7 @@ describe('Table Plugin Main Class', () => {
         // Setup Editor mock
         editor = {
             lang: { table: 'Table' },
-            applyFrameRoots: jest.fn(),
+            contextManager: { applyToRoots: jest.fn() },
             eventManager: {
                 addEvent: jest.fn()
             },
@@ -122,7 +122,7 @@ describe('Table Plugin Main Class', () => {
             component: {
                 select: jest.fn()
             },
-            ui: {
+            uiManager: {
                 showToast: jest.fn()
             },
             frameContext: {
@@ -1038,7 +1038,7 @@ describe('Table Plugin Main Class', () => {
               const mockEditor = {
                   ...editor, // editor is available in local scope? from beforeEach? No, let editor;
                   // I should redeclare or use what's available.
-                  applyFrameRoots: jest.fn(),
+                  contextManager: { applyToRoots: jest.fn() },
                   get: jest.fn(),
               };
               
@@ -1074,11 +1074,13 @@ describe('Table Plugin Main Class', () => {
              const TableClass = tablePlugin.constructor;
              const mockEditor = {
                  ...editor,
-                 applyFrameRoots: jest.fn((cb) => cb({ get: jest.fn().mockReturnValue({ appendChild: jest.fn() }) })),
+                 contextManager: {
+                     applyToRoots: jest.fn((cb) => cb({ get: jest.fn().mockReturnValue({ appendChild: jest.fn() }) }))
+                 },
                  get: jest.fn(),
              };
              new TableClass(mockEditor, {});
-             expect(mockEditor.applyFrameRoots).toHaveBeenCalled();
+             expect(mockEditor.contextManager.applyToRoots).toHaveBeenCalled();
          });
 
          it('should handle complex retainFormat', () => {

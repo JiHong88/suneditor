@@ -16,8 +16,8 @@ describe('HTML Complex Logic', () => {
         wysiwyg = editor.frameContext.get('wysiwyg');
         
         // Mock UI methods
-        editor.ui.showLoading = jest.fn();
-        editor.ui.hideLoading = jest.fn();
+        editor.uiManager.showLoading = jest.fn();
+        editor.uiManager.hideLoading = jest.fn();
     });
 
     afterEach(() => {

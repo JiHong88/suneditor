@@ -28,9 +28,6 @@ class ApiManager extends CoreInjector {
 	constructor(inst, params) {
 		super(inst.editor);
 
-		// editor class
-		this.ui = this.editor.ui;
-
 		/**
 		 * @description Caller instance key name
 		 * @type {string}
@@ -116,20 +113,20 @@ class ApiManager extends CoreInjector {
 					try {
 						resolve(xhr);
 					} finally {
-						this.ui.hideLoading();
+						this.uiManager.hideLoading();
 					}
 				} else {
 					try {
 						const res = !xhr.responseText ? xhr : JSON.parse(xhr.responseText);
 						reject(res);
 					} finally {
-						this.ui.hideLoading();
+						this.uiManager.hideLoading();
 					}
 				}
 			};
 
 			xhr.onerror = () => {
-				this.ui.hideLoading();
+				this.uiManager.hideLoading();
 				reject(new Error('Network error'));
 			};
 
@@ -168,7 +165,7 @@ async function CallBackApi(xmlHttp, callBack, errorCallBack) {
 			} catch (error) {
 				throw Error(`[SUNEDITOR.ApiManager[${this.kind}].upload.callBack.fail] ${error.message}`);
 			} finally {
-				this.ui.hideLoading();
+				this.uiManager.hideLoading();
 			}
 		} else {
 			// exception
@@ -180,11 +177,11 @@ async function CallBackApi(xmlHttp, callBack, errorCallBack) {
 					message = await errorCallBack(res, xmlHttp);
 				}
 				const err = `[SUNEDITOR.ApiManager[${this.kind}].upload.serverException] status: ${xmlHttp.status}, response: ${message || res.errorMessage || xmlHttp.responseText}`;
-				this.ui.alertOpen(err, 'error');
+				this.uiManager.alertOpen(err, 'error');
 			} catch (error) {
 				throw Error(`[SUNEDITOR.ApiManager[${this.kind}].upload.errorCallBack.fail] ${error.message}`);
 			} finally {
-				this.ui.hideLoading();
+				this.uiManager.hideLoading();
 			}
 		}
 	}

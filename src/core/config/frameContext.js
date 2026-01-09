@@ -1,13 +1,6 @@
 import { get as getNumber } from '../../helper/numbers';
 
 /**
- * ================================================================================================================================
- * === FRAME CONTEXT TYPES : Store
- * =================================================================================================================================
- */
-
-/**
- * ================================================================================================================================
  * @typedef {Object} FrameContextStore
  *
  * This object stores **all frame-specific states and DOM references** for a SunEditor instance.
@@ -83,26 +76,7 @@ import { get as getNumber } from '../../helper/numbers';
  * ================================================================================================================================
  */
 
-/** @typedef {Map<keyof FrameContextStore|null, *>} FrameContextMap */
-
-/** --+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+-- */
-
-/**
- * ================================================================================================================================
- * === UTILITIES : Manage Frame Context Map
- * =================================================================================================================================
- */
-
-/**
- * @typedef {Object} FrameContextUtil
- * @property {<K extends keyof FrameContextStore>(k: K) => FrameContextStore[K]} get - Get a DOM element from the context by key.
- * @property {<K extends keyof FrameContextStore>(k: K, v: FrameContextStore[K]) => void} set - Set a DOM element in the context by key.
- * @property {<K extends keyof FrameContextStore>(k: K) => boolean} has - Check if a key exists in the context.
- * @property {<K extends keyof FrameContextStore>(k: K) => boolean} delete - Delete a key from the context.
- * @property {() => Object<keyof FrameContextStore, *>} [getAll] - Get all DOM elements in the context as an object.
- * @property {(newMap: *) => void} [reset] - Reset the context with a new Map.
- * @property {() => void} clear - Clear all elements in the context.
- */
+/** @typedef {Map<keyof FrameContextStore|null, *>} FrameContexType */
 
 /**
  * @description Elements and variables you should have
@@ -114,10 +88,10 @@ import { get as getNumber } from '../../helper/numbers';
  * @param {{inner: HTMLElement, page: HTMLElement, pageMirror: HTMLElement}} documentTypeInner Document type elements
  * @param {?HTMLElement} statusbar Editor statusbar
  * @param {*} key root key
- * @returns {FrameContextMap}
+ * @returns {FrameContexType}
  */
 export function CreateFrameContext(editorTarget, top, wwFrame, codeWrapper, codeFrame, statusbar, documentTypeInner, key) {
-	const m = /** @type {FrameContextMap} */ (
+	const m = /** @type {FrameContexType} */ (
 		new Map([
 			['key', key],
 			['options', editorTarget.options],
@@ -173,7 +147,7 @@ export function CreateFrameContext(editorTarget, top, wwFrame, codeWrapper, code
 /**
  * @description Update statusbar context
  * @param {HTMLElement} statusbar Statusbar element
- * @param {FrameContextMap|FrameContextUtil} mapper FrameContext map
+ * @param {FrameContexType|import('../services/contextManager').FrameContextMap} mapper FrameContext map
  */
 export function UpdateStatusbarContext(statusbar, mapper) {
 	statusbar ? mapper.set('statusbar', statusbar) : mapper.delete('statusbar');
@@ -183,59 +157,4 @@ export function UpdateStatusbarContext(statusbar, mapper) {
 	navigation ? mapper.set('navigation', navigation) : mapper.delete('navigation');
 	charWrapper ? mapper.set('charWrapper', charWrapper) : mapper.delete('charWrapper');
 	charCounter ? mapper.set('charCounter', charCounter) : mapper.delete('charCounter');
-}
-
-/**
- * @description Creates a utility wrapper for editor base options.
- * - Provides get, set, has, getAll, and setMany methods with internal Map support.
- * @param {*} editor - The editor instance
- * @returns {FrameContextUtil}
- */
-export function FrameContextUtil(editor) {
-	let store = editor.__frameContext;
-
-	return {
-		/**
-		 * @template {keyof FrameContextStore} K
-		 * @param {K} k
-		 * @returns {FrameContextStore[K]}
-		 */
-		get(k) {
-			return store.get(k);
-		},
-		/**
-		 * @template {keyof FrameContextStore} K
-		 * @param {K} k
-		 * @param {FrameContextStore[K]} v
-		 */
-		set(k, v) {
-			return store.set(k, v);
-		},
-		/**
-		 * @template {keyof FrameContextStore} K
-		 * @param {K} k
-		 * @returns {boolean}
-		 */
-		has(k) {
-			return store.has(k);
-		},
-		/**
-		 * @template {keyof FrameContextStore} K
-		 * @param {K} k
-		 * @returns {boolean}
-		 */
-		delete(k) {
-			return store.delete(k);
-		},
-		getAll() {
-			return Object.fromEntries(store.entries());
-		},
-		/** @param {*} newMap */
-		reset(newMap) {
-			store = editor.__options = newMap;
-		},
-		clear() {
-			store.clear();
-		},
-	};
 }

@@ -137,12 +137,25 @@ describe('Toolbar', () => {
 			__options: {},
 			allCommandButtons: new Map(),
 			subAllCommandButtons: new Map(),
-			commandTargets: new Map(),
+			commandDispatcher: {
+				targets: new Map(),
+				resetTargets: jest.fn(),
+				applyTargets: jest.fn(),
+				run: jest.fn(),
+				runFromTarget: jest.fn(),
+			},
+			shortcuts: {
+				command: jest.fn().mockReturnValue(false),
+				enable: jest.fn(),
+				disable: jest.fn(),
+				_registerCustomShortcuts: jest.fn(),
+				keyMap: new Map(),
+				reverseKeys: []
+			},
 			shortcutsKeyMap: new Map(),
 			effectNode: null,
 			isSubBalloon: false,
 			__cachingButtons: jest.fn(),
-			__cachingShortcuts: jest.fn(),
 			// Include all properties that getters will access via this.editor.xxx
 			context: mockContext,
 			frameContext: mockFrameContext,
@@ -167,8 +180,9 @@ describe('Toolbar', () => {
 			viewer: {
 				_setButtonsActive: jest.fn(),
 			},
-			ui: {
+			uiManager: {
 				setControllerOnDisabledButtons: jest.fn(),
+				_initToggleButtons: jest.fn(),
 			},
 			eventManager: {
 				applyTagEffect: jest.fn(),
@@ -193,6 +207,8 @@ describe('Toolbar', () => {
 			this.history = editor.history;
 			this.status = editor.status;
 			this.triggerEvent = editor.triggerEvent;
+			this.commandDispatcher = editor.commandDispatcher;
+			this.uiManager = editor.uiManager;
 		});
 
 		const options = {
@@ -235,7 +251,6 @@ describe('Toolbar', () => {
 		it('should call CoreInjector constructor', () => {
 			expect(CoreInjector).toHaveBeenCalledWith(mockEditor);
 		});
-
 	});
 
 	describe('disable', () => {
@@ -427,12 +442,12 @@ describe('Toolbar', () => {
 			expect(toolbar._moreLayerOff).toHaveBeenCalled();
 			expect(mockMenu.dropdownOff).toHaveBeenCalled();
 			expect(mockMenu.containerOff).toHaveBeenCalled();
-			expect(CreateToolBar).toHaveBeenCalledWith(buttonList, {}, {}, {}, {}, true);
+			expect(CreateToolBar).toHaveBeenCalledWith(buttonList, {}, mockOptions, {}, {}, true);
 			expect(UpdateButton).toHaveBeenCalled();
 			expect(mockMain.replaceChild).toHaveBeenCalledWith(mockButtonTray, mockContext.get('toolbar_buttonTray'));
 			expect(mockContext.set).toHaveBeenCalledWith('toolbar_buttonTray', mockButtonTray);
-			// Verify button info was reset (internal behavior)
-			expect(mockEditor.__cachingButtons).toHaveBeenCalled();
+			// Verify button info was reset (refactored from __cachingButtons)
+			expect(mockEditor.commandDispatcher.resetTargets).toHaveBeenCalled();
 			expect(toolbar.triggerEvent).toHaveBeenCalledWith('onSetToolbarButtons', {
 				buttonTray: mockButtonTray,
 				frameContext: mockFrameContext,
@@ -456,12 +471,8 @@ describe('Toolbar', () => {
 
 			toolbar.setButtons(buttonList);
 
-			expect(mockEditor.allCommandButtons).toBeInstanceOf(Map);
-			expect(mockEditor.subAllCommandButtons).toBeInstanceOf(Map);
-			expect(mockEditor.commandTargets).toBeInstanceOf(Map);
-			expect(mockEditor.shortcutsKeyMap).toBeInstanceOf(Map);
-			expect(mockEditor.__cachingButtons).toHaveBeenCalled();
-			expect(mockEditor.__cachingShortcuts).toHaveBeenCalled();
+			// Verify commandDispatcher.resetTargets was called (refactored from __cachingButtons)
+			expect(mockEditor.commandDispatcher.resetTargets).toHaveBeenCalled();
 			expect(toolbar.history.resetButtons).toHaveBeenCalled();
 			expect(mockEditor.effectNode).toBeNull();
 			expect(mockEditor.viewer._setButtonsActive).toHaveBeenCalled();
@@ -500,7 +511,7 @@ describe('Toolbar', () => {
 
 			toolbar.setButtons(buttonList);
 
-			expect(mockEditor.ui.setControllerOnDisabledButtons).toHaveBeenCalledWith(true);
+			expect(mockEditor.uiManager.setControllerOnDisabledButtons).toHaveBeenCalledWith(true);
 		});
 	});
 

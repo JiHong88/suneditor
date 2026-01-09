@@ -87,15 +87,14 @@ class DocumentType extends CoreInjector {
 		}
 	}
 
-	/** @type {SunEditor.Core['offset']} */
 	get #offset() {
 		return this.editor.offset;
 	}
-	/** @type {SunEditor.Core['selection']} */
+
 	get #selection() {
 		return this.editor.selection;
 	}
-	/** @type {SunEditor.Core['toolbar']} */
+
 	get #toolbar() {
 		return this.editor.toolbar;
 	}

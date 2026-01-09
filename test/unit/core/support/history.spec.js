@@ -1,4 +1,4 @@
-import History from '../../../../src/core/support/history';
+import History from '../../../../src/core/services/history';
 import { createMockEditor } from '../../../__mocks__/editorMock';
 
 describe('History', () => {
@@ -218,10 +218,10 @@ describe('History', () => {
 			history.push(false, 'test-frame');
 			history.reset();
 
-			expect(mockEditor.applyCommandTargets).toHaveBeenCalledWith('undo', expect.any(Function));
-			expect(mockEditor.applyCommandTargets).toHaveBeenCalledWith('redo', expect.any(Function));
-			expect(mockEditor.applyCommandTargets).toHaveBeenCalledWith('save', expect.any(Function));
-			expect(mockEditor.applyFrameRoots).toHaveBeenCalled();
+			expect(mockEditor.commandDispatcher.applyTargets).toHaveBeenCalledWith('undo', expect.any(Function));
+			expect(mockEditor.commandDispatcher.applyTargets).toHaveBeenCalledWith('redo', expect.any(Function));
+			expect(mockEditor.commandDispatcher.applyTargets).toHaveBeenCalledWith('save', expect.any(Function));
+			expect(mockEditor.contextManager.applyToRoots).toHaveBeenCalled();
 
 			const rootStack = history.getRootStack();
 			expect(rootStack['test-frame']).toEqual({ value: [], index: -1 });
@@ -239,9 +239,9 @@ describe('History', () => {
 			history.push(false, 'test-frame');
 			history.resetButtons('test-frame', 0);
 
-			expect(mockEditor.applyCommandTargets).toHaveBeenCalledWith('undo', expect.any(Function));
-			expect(mockEditor.applyCommandTargets).toHaveBeenCalledWith('redo', expect.any(Function));
-			expect(mockEditor.applyCommandTargets).toHaveBeenCalledWith('save', expect.any(Function));
+			expect(mockEditor.commandDispatcher.applyTargets).toHaveBeenCalledWith('undo', expect.any(Function));
+			expect(mockEditor.commandDispatcher.applyTargets).toHaveBeenCalledWith('redo', expect.any(Function));
+			expect(mockEditor.commandDispatcher.applyTargets).toHaveBeenCalledWith('save', expect.any(Function));
 		});
 
 		it('should trigger onResetButtons event', () => {

@@ -24,8 +24,8 @@ describe('Core - Editor Advanced Features', () => {
 
 			// Mock UI
 			if (editor.ui) {
-				editor.ui.showLoading = jest.fn();
-				editor.ui.hideLoading = jest.fn();
+				editor.uiManager.showLoading = jest.fn();
+				editor.uiManager.hideLoading = jest.fn();
 			}
 			if (editor.viewer) {
 				editor.viewer.print = jest.fn();
@@ -47,8 +47,8 @@ describe('Core - Editor Advanced Features', () => {
 
 			// Mock UI
 			if (editor.ui) {
-				editor.ui.showLoading = jest.fn();
-				editor.ui.hideLoading = jest.fn();
+				editor.uiManager.showLoading = jest.fn();
+				editor.uiManager.hideLoading = jest.fn();
 			}
 			if (editor.viewer) {
 				editor.viewer.print = jest.fn();
@@ -68,8 +68,8 @@ describe('Core - Editor Advanced Features', () => {
 
 			// Mock UI
 			if (editor.ui) {
-				editor.ui.showLoading = jest.fn();
-				editor.ui.hideLoading = jest.fn();
+				editor.uiManager.showLoading = jest.fn();
+				editor.uiManager.hideLoading = jest.fn();
 			}
 			if (editor.viewer) {
 				editor.viewer.print = jest.fn();
@@ -87,8 +87,8 @@ describe('Core - Editor Advanced Features', () => {
 
 			// Mock UI
 			if (editor.ui) {
-				editor.ui.showLoading = jest.fn();
-				editor.ui.hideLoading = jest.fn();
+				editor.uiManager.showLoading = jest.fn();
+				editor.uiManager.hideLoading = jest.fn();
 			}
 			if (editor.viewer) {
 				editor.viewer.print = jest.fn();
@@ -109,8 +109,8 @@ describe('Core - Editor Advanced Features', () => {
 
 			// Mock UI
 			if (editor.ui) {
-				editor.ui.showLoading = jest.fn();
-				editor.ui.hideLoading = jest.fn();
+				editor.uiManager.showLoading = jest.fn();
+				editor.uiManager.hideLoading = jest.fn();
 			}
 			if (editor.viewer) {
 				editor.viewer.print = jest.fn();
@@ -130,8 +130,8 @@ describe('Core - Editor Advanced Features', () => {
 
 			// Mock UI
 			if (editor.ui) {
-				editor.ui.showLoading = jest.fn();
-				editor.ui.hideLoading = jest.fn();
+				editor.uiManager.showLoading = jest.fn();
+				editor.uiManager.hideLoading = jest.fn();
 			}
 			if (editor.viewer) {
 				editor.viewer.print = jest.fn();
@@ -149,8 +149,8 @@ describe('Core - Editor Advanced Features', () => {
 
 			// Mock UI
 			if (editor.ui) {
-				editor.ui.showLoading = jest.fn();
-				editor.ui.hideLoading = jest.fn();
+				editor.uiManager.showLoading = jest.fn();
+				editor.uiManager.hideLoading = jest.fn();
 			}
 			if (editor.viewer) {
 				editor.viewer.print = jest.fn();
@@ -169,8 +169,8 @@ describe('Core - Editor Advanced Features', () => {
 
 			// Mock UI
 			if (editor.ui) {
-				editor.ui.showLoading = jest.fn();
-				editor.ui.hideLoading = jest.fn();
+				editor.uiManager.showLoading = jest.fn();
+				editor.uiManager.hideLoading = jest.fn();
 			}
 			if (editor.viewer) {
 				editor.viewer.print = jest.fn();
@@ -188,8 +188,8 @@ describe('Core - Editor Advanced Features', () => {
 
 			// Mock UI
 			if (editor.ui) {
-				editor.ui.showLoading = jest.fn();
-				editor.ui.hideLoading = jest.fn();
+				editor.uiManager.showLoading = jest.fn();
+				editor.uiManager.hideLoading = jest.fn();
 			}
 			if (editor.viewer) {
 				editor.viewer.print = jest.fn();
@@ -215,8 +215,8 @@ describe('Core - Editor Advanced Features', () => {
 
 			// Mock UI
 			if (editor.ui) {
-				editor.ui.showLoading = jest.fn();
-				editor.ui.hideLoading = jest.fn();
+				editor.uiManager.showLoading = jest.fn();
+				editor.uiManager.hideLoading = jest.fn();
 			}
 			if (editor.viewer) {
 				editor.viewer.print = jest.fn();

@@ -53,7 +53,6 @@ declare class ApiManager extends CoreInjector {
 	 * @param {ApiManagerParams} [params] API options
 	 */
 	constructor(inst: any, params?: ApiManagerParams);
-	ui: import('../../core/class/ui').default;
 	/**
 	 * @description Caller instance key name
 	 * @type {string}

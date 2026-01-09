@@ -678,7 +678,7 @@ describe('Component', () => {
 			jest.spyOn(component.editor.eventManager, '__postFocusEvent');
 
 			// Mock ui controllers
-			component.editor.ui._visibleControllers = jest.fn();
+			component.editor.uiManager._visibleControllers = jest.fn();
 			
 			component.select(element, 'test');
 
@@ -885,13 +885,13 @@ describe('Component', () => {
             });
             
             const selectSpy = jest.spyOn(component, 'select').mockImplementation(() => {});
-            // Mock editor.ui for #ui.offCurrentController
-            editor.ui = { offCurrentController: jest.fn() };
+            // Mock uiManager.offCurrentController
+            const offControllerSpy = jest.spyOn(editor.uiManager, 'offCurrentController').mockImplementation(() => {});
 
             component.hoverSelect(element);
-            
+
             expect(selectSpy).toHaveBeenCalledWith(element, 'test');
-            expect(editor.ui.offCurrentController).toHaveBeenCalled();
+            expect(offControllerSpy).toHaveBeenCalled();
         });
     });
 

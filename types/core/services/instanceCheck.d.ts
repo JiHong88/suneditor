@@ -6,10 +6,9 @@ export default InstanceCheck;
 declare class InstanceCheck {
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.FrameContext} frameContext - Frame context
 	 */
-	constructor(editor: SunEditor.Core);
-	editor: import('../editor').default;
+	constructor(frameContext: SunEditor.FrameContext);
 	/**
 	 * @param {*} obj
 	 * @returns {obj is Node}

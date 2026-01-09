@@ -16,11 +16,13 @@ describe('Handler WYSIWYG Key (Extra Coverage)', () => {
         mockThis = {
             isComposing: false,
             editor: {
-                selectMenuOn: false,
                 isBalloon: false,
                 isSubBalloon: false,
                 isBalloonAlways: false,
                 isSubBalloonAlways: false
+            },
+            uiManager: {
+                selectMenuOn: false
             },
             selection: {
                 getNode: jest.fn(() => document.createTextNode('text')),

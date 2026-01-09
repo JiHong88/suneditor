@@ -101,7 +101,7 @@ describe('Complex workflow integration tests', () => {
 			const p = wysiwyg.querySelector('p');
 			const textNode = p.firstChild;
 			editor.selection.setRange(textNode, 0, textNode, 6);
-			await editor.commandExecutor.execute('bold');
+			await editor.commandDispatcher.run('bold');
 
 			// Check bold was applied
 			let content = wysiwyg.innerHTML.toLowerCase();
@@ -127,13 +127,13 @@ describe('Complex workflow integration tests', () => {
 			editor.selection.setRange(textNode, 0, textNode, 6);
 
 			// Apply bold
-			await editor.commandExecutor.execute('bold');
+			await editor.commandDispatcher.run('bold');
 
 			// Re-select for italic
 			const strong = wysiwyg.querySelector('strong, b');
 			if (strong && strong.firstChild) {
 				editor.selection.setRange(strong.firstChild, 0, strong.firstChild, 6);
-				await editor.commandExecutor.execute('italic');
+				await editor.commandDispatcher.run('italic');
 			}
 
 			// Should have both formats
@@ -156,7 +156,7 @@ describe('Complex workflow integration tests', () => {
 			editor.selection.setRange(textNode, 0, textNode, 5);
 
 			// Make bold
-			await editor.commandExecutor.execute('bold');
+			await editor.commandDispatcher.run('bold');
 
 			// Move selection to "Second"
 			const text = wysiwyg.textContent;
@@ -166,7 +166,7 @@ describe('Complex workflow integration tests', () => {
 				editor.selection.setRange(currentTextNode, secondIndex, currentTextNode, secondIndex + 6);
 
 				// Make italic
-				await editor.commandExecutor.execute('italic');
+				await editor.commandDispatcher.run('italic');
 			}
 
 			// Both formats should exist
@@ -274,7 +274,7 @@ describe('Complex workflow integration tests', () => {
 			const p = wysiwyg.querySelector('p');
 			const textNode = p.firstChild;
 			editor.selection.setRange(textNode, 0, textNode, 7);
-			await editor.commandExecutor.execute('bold');
+			await editor.commandDispatcher.run('bold');
 
 			// Check bold exists
 			let hasBold = wysiwyg.querySelector('strong, b');
@@ -300,7 +300,7 @@ describe('Complex workflow integration tests', () => {
 			let p = wysiwyg.querySelector('p');
 			let textNode = p.firstChild;
 			editor.selection.setRange(textNode, 0, textNode, 5);
-			await editor.commandExecutor.execute('bold');
+			await editor.commandDispatcher.run('bold');
 
 			// Verify bold was applied
 			let hasBold = wysiwyg.querySelector('strong, b');
@@ -356,7 +356,7 @@ describe('Complex workflow integration tests', () => {
 			const p = wysiwyg.querySelector('p');
 			const textNode = p.firstChild;
 			editor.selection.setRange(textNode, 0, textNode, 10);
-			await editor.commandExecutor.execute('bold');
+			await editor.commandDispatcher.run('bold');
 
 			// Exit fullscreen
 			editor.viewer.fullScreen(false);
@@ -378,7 +378,7 @@ describe('Complex workflow integration tests', () => {
 			const p = wysiwyg.querySelector('p');
 			const textNode = p.firstChild;
 			editor.selection.setRange(textNode, 0, textNode, 7);
-			await editor.commandExecutor.execute('bold');
+			await editor.commandDispatcher.run('bold');
 
 			let charCount2 = editor.char.getLength();
 			expect(charCount2).toBe(charCount1);
@@ -464,9 +464,9 @@ describe('Complex workflow integration tests', () => {
 
 			// Rapid operations
 			editor.selection.setRange(textNode, 0, textNode, 5);
-			await editor.commandExecutor.execute('bold');
-			await editor.commandExecutor.execute('italic');
-			await editor.commandExecutor.execute('underline');
+			await editor.commandDispatcher.run('bold');
+			await editor.commandDispatcher.run('italic');
+			await editor.commandDispatcher.run('underline');
 
 			editor.format.indent();
 			editor.format.indent();
@@ -523,7 +523,7 @@ describe('Complex workflow integration tests', () => {
 
 			// 1. Bold first word
 			editor.selection.setRange(textNode, 0, textNode, 7);
-			await editor.commandExecutor.execute('bold');
+			await editor.commandDispatcher.run('bold');
 
 			// 2. Re-query and change to H2
 			p = wysiwyg.querySelector('p');

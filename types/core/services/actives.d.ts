@@ -5,12 +5,6 @@ import type {} from '../../typedef';
  */
 export function SELECT_ALL(editor: SunEditor.Core): void;
 /**
- * @description Toggles direction button active state.
- * @param {SunEditor.Core} editor - The root editor instance
- * @param {boolean} rtl - Whether the text direction is right-to-left.
- */
-export function DIR_BTN_ACTIVE(editor: SunEditor.Core, rtl: boolean): void;
-/**
  * @description Saves the editor content.
  * @param {SunEditor.Core} editor - The root editor instance
  * @returns {Promise<void>}

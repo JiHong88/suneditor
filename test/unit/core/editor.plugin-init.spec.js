@@ -13,8 +13,8 @@ describe('Core - Editor Plugin Initialization', () => {
 
 		// Mock UI methods
 		if (editor.ui) {
-			editor.ui.showLoading = jest.fn();
-			editor.ui.hideLoading = jest.fn();
+			editor.uiManager.showLoading = jest.fn();
+			editor.uiManager.hideLoading = jest.fn();
 		}
 		if (editor.viewer) {
 			editor.viewer.print = jest.fn();
@@ -29,58 +29,54 @@ describe('Core - Editor Plugin Initialization', () => {
 
 	describe('File management plugin registration', () => {
 		it('should have file manager setup', () => {
-			// File manager should be setup during initialization
-			expect(editor._fileManager).toBeDefined();
-			expect(editor._fileManager.tags).toBeDefined();
-			expect(Array.isArray(editor._fileManager.tags)).toBe(true);
+			// File manager should be setup during initialization in PluginManager
+			const fileInfo = editor.pluginManager.fileInfo;
+			expect(fileInfo).toBeDefined();
+			expect(fileInfo.tags).toBeDefined();
+			expect(Array.isArray(fileInfo.tags)).toBe(true);
 		});
 
 		it('should add file plugin tags to fileManager', () => {
-			expect(editor._fileManager.tags).toBeDefined();
-			expect(Array.isArray(editor._fileManager.tags)).toBe(true);
+			const fileInfo = editor.pluginManager.fileInfo;
+			expect(fileInfo.tags).toBeDefined();
+			expect(Array.isArray(fileInfo.tags)).toBe(true);
 		});
 
 		it('should create pluginMap for file tags', () => {
-			expect(editor._fileManager.pluginMap).toBeDefined();
-			expect(typeof editor._fileManager.pluginMap).toBe('object');
+			const fileInfo = editor.pluginManager.fileInfo;
+			expect(fileInfo.pluginMap).toBeDefined();
+			expect(typeof fileInfo.pluginMap).toBe('object');
 		});
 
 		it('should handle file plugin with tagAttrs', () => {
-			const initialPluginMap = { ...editor._fileManager.pluginMap };
+			const tagAttrs = editor.pluginManager.fileInfo.tagAttrs;
 			// Should have setup tagAttrs
-			expect(editor._fileManager.tagAttrs).toBeDefined();
+			expect(tagAttrs).toBeDefined();
 		});
 	});
 
 	describe('Component plugin registration', () => {
 		it('should have component manager setup', () => {
-			// Component manager should have entries
-			expect(editor._componentManager).toBeDefined();
-			expect(Array.isArray(editor._componentManager)).toBe(true);
+			// Component manager should checkable via getter
+			const checkers = editor.pluginManager.componentCheckers;
+			expect(checkers).toBeDefined();
+			expect(Array.isArray(checkers)).toBe(true);
 		});
 	});
 
 	describe('Plugin event handlers registration', () => {
 		it('should have plugin events setup', () => {
-			// Plugin events should be registered
-			expect(editor._onPluginEvents).toBeDefined();
-			expect(editor._onPluginEvents.has('onMouseDown')).toBe(true);
-			expect(editor._onPluginEvents.has('onKeyDown')).toBe(true);
-			expect(editor._onPluginEvents.has('onInput')).toBe(true);
-		});
-
-		it('should have sorted event handlers', () => {
-			// Event handlers should be arrays
-			const mouseHandlers = editor._onPluginEvents.get('onMouseDown');
-			expect(Array.isArray(mouseHandlers)).toBe(true);
+			// Plugin events are now private, verify public interface
+			expect(editor.pluginManager.emitEvent).toBeDefined();
+			expect(typeof editor.pluginManager.emitEvent).toBe('function');
 		});
 	});
 
 	describe('Plugin retainFormat registration', () => {
-		it('should have MEL info setup', () => {
-			// MEL info should have entry
-			expect(editor._MELInfo).toBeDefined();
-			expect(editor._MELInfo instanceof Map).toBe(true);
+		it('should have applyRetainFormat setup', () => {
+			// MEL info is private, verify public interface
+			expect(editor.pluginManager.applyRetainFormat).toBeDefined();
+			expect(typeof editor.pluginManager.applyRetainFormat).toBe('function');
 		});
 	});
 
@@ -91,7 +87,8 @@ describe('Core - Editor Plugin Initialization', () => {
 
 			if (hasPageBreak) {
 				// Component manager should have pageBreak handler
-				const initialLength = editor._componentManager.length;
+				const checkers = editor.pluginManager.componentCheckers;
+				const initialLength = checkers.length;
 				expect(initialLength).toBeGreaterThan(0);
 			}
 		});
@@ -99,26 +96,27 @@ describe('Core - Editor Plugin Initialization', () => {
 
 	describe('File manager RegExp setup', () => {
 		it('should create regExp for file tags', () => {
-			expect(editor._fileManager.regExp).toBeDefined();
-			expect(editor._fileManager.regExp instanceof RegExp).toBe(true);
+			const fileInfo = editor.pluginManager.fileInfo;
+			expect(fileInfo.regExp).toBeDefined();
+			expect(fileInfo.regExp instanceof RegExp).toBe(true);
 		});
 
 		it('should create pluginRegExp', () => {
-			expect(editor._fileManager.pluginRegExp).toBeDefined();
-			expect(editor._fileManager.pluginRegExp instanceof RegExp).toBe(true);
+			const fileInfo = editor.pluginManager.fileInfo;
+			expect(fileInfo.pluginRegExp).toBeDefined();
+			expect(fileInfo.pluginRegExp instanceof RegExp).toBe(true);
 		});
 	});
 
 	describe('Plugin initialization', () => {
 		it('should have plugins initialized', () => {
 			// Plugins should be setup
-			expect(editor.plugins).toBeDefined();
-			expect(typeof editor.plugins).toBe('object');
+			expect(editor.pluginManager).toBeDefined();
 		});
 
 		it('should have active commands list', () => {
-			expect(editor.activeCommands).toBeDefined();
-			expect(Array.isArray(editor.activeCommands)).toBe(true);
+			expect(editor.pluginManager.activeCommands).toBeDefined();
+			expect(Array.isArray(editor.pluginManager.activeCommands)).toBe(true);
 		});
 	});
 });

@@ -41,7 +41,7 @@ jest.mock('../../../src/editorInjector/_core.js', () => {
 			onFileLoad: jest.fn(),
 			onFileAction: jest.fn(),
 		};
-		this.ui = (editor && editor.ui) || { alertOpen: jest.fn() };
+		this.uiManager = (editor && editor.uiManager) || { alertOpen: jest.fn() };
 		this.selection = (editor && editor.selection) || { get: jest.fn().mockReturnValue({ toString: () => 'selected text' }) };
 		this.options = (editor && editor.options) || { get: jest.fn().mockReturnValue('https://') };
 	});
@@ -103,7 +103,7 @@ describe('Modules - ModalAnchorEditor', () => {
 		jest.clearAllMocks();
 
 		mockEditor = {
-			ui: {
+			uiManager: {
 				showModalAnchor: jest.fn(),
 				hideModalAnchor: jest.fn(),
 				alertOpen: jest.fn(),

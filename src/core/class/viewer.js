@@ -38,23 +38,18 @@ class Viewer extends CoreInjector {
 		this.#disallowedTagNameRegExp = new RegExp(`^(${this.options.get('_disallowedExtraTag')})$`, 'i');
 	}
 
-	/** @type {SunEditor.Core['ui']} */
-	get #ui() {
-		return this.editor.ui;
-	}
-	/** @type {SunEditor.Core['toolbar']} */
 	get #toolbar() {
 		return this.editor.toolbar;
 	}
-	/** @type {SunEditor.Core['subToolbar']} */
+
 	get #subToolbar() {
 		return this.editor.subToolbar;
 	}
-	/** @type {SunEditor.Core['html']} */
+
 	get #html() {
 		return this.editor.html;
 	}
-	/** @type {SunEditor.Core['menu']} */
+
 	get #menu() {
 		return this.editor.menu;
 	}
@@ -69,8 +64,8 @@ class Viewer extends CoreInjector {
 		if (value === fc.get('isCodeView')) return;
 
 		fc.set('isCodeView', value);
-		this.#ui.offCurrentController();
-		this.#ui.offCurrentModal();
+		this.uiManager.offCurrentController();
+		this.uiManager.offCurrentModal();
 
 		const codeWrapper = fc.get('codeWrapper');
 		const codeFrame = fc.get('code');
@@ -93,7 +88,7 @@ class Viewer extends CoreInjector {
 			}
 
 			if (!fc.get('isFullScreen')) {
-				this.editor._notHideToolbar = true;
+				this.uiManager.preventToolbarHide(true);
 				if (this.editor.isBalloon) {
 					this.context.get('toolbar_arrow').style.display = 'none';
 					this.context.get('toolbar_main').style.left = '';
@@ -111,7 +106,7 @@ class Viewer extends CoreInjector {
 
 			this.status._range = null;
 			codeFrame.focus();
-			dom.utils.addClass(this.editor.commandTargets.get('codeView'), 'active');
+			dom.utils.addClass(this.commandDispatcher.targets.get('codeView'), 'active');
 			dom.utils.addClass(wrapper, 'se-code-view-status');
 		} else {
 			if (!dom.check.isNonEditable(wysiwygFrame)) this.#setCodeDataToEditor();
@@ -122,7 +117,7 @@ class Viewer extends CoreInjector {
 			if (this.frameOptions.get('height') === 'auto' && !this.options.get('hasCodeMirror')) fc.get('code').style.height = '0px';
 
 			if (!fc.get('isFullScreen')) {
-				this.editor._notHideToolbar = false;
+				this.uiManager.preventToolbarHide(false);
 				if (/balloon/.test(this.options.get('mode'))) {
 					this.context.get('toolbar_arrow').style.display = '';
 					this.editor.isInline = this.#toolbar.isInlineMode = false;
@@ -132,7 +127,7 @@ class Viewer extends CoreInjector {
 			}
 
 			this.focusManager.nativeFocus();
-			dom.utils.removeClass(this.editor.commandTargets.get('codeView'), 'active');
+			dom.utils.removeClass(this.commandDispatcher.targets.get('codeView'), 'active');
 
 			if (!dom.check.isNonEditable(wysiwygFrame)) {
 				this.history.push(false);
@@ -141,8 +136,8 @@ class Viewer extends CoreInjector {
 			dom.utils.removeClass(wrapper, 'se-code-view-status');
 		}
 
-		this.editor._checkPlaceholder(fc);
-		dom.utils.setDisabled(this.editor._codeViewDisabledButtons, value);
+		this.uiManager._updatePlaceholder(fc);
+		this.uiManager._toggleCodeViewButtons(value);
 
 		// document type
 		if (fc.has('documentType_use_header')) {
@@ -178,7 +173,7 @@ class Viewer extends CoreInjector {
 		const isCodeView = this.frameContext.get('isCodeView');
 		const arrow = this.context.get('toolbar_arrow');
 
-		this.#ui.offCurrentController();
+		this.uiManager.offCurrentController();
 		const wasToolbarHidden = toolbar.style.display === 'none' || (this.editor.isInline && !this.#toolbar.inlineToolbarAttr.isShow);
 
 		if (value) {
@@ -243,13 +238,13 @@ class Viewer extends CoreInjector {
 
 			if (this.frameOptions.get('iframe') && this.frameOptions.get('height') === 'auto') {
 				editorArea.style.overflow = 'auto';
-				this.editor._iframeAutoHeight(fc);
+				this.uiManager._iframeAutoHeight(fc);
 			}
 
 			fc.get('topArea').style.marginTop = this.options.get('fullScreenOffset') + 'px';
 
 			const reductionIcon = this.icons.reduction;
-			this.editor.applyCommandTargets('fullScreen', (e) => {
+			this.commandDispatcher.applyTargets('fullScreen', (e) => {
 				dom.utils.changeElement(e.firstElementChild, reductionIcon);
 				dom.utils.addClass(e, 'active');
 			});
@@ -299,7 +294,7 @@ class Viewer extends CoreInjector {
 			fc.get('topArea').style.marginTop = '';
 
 			const expansionIcon = this.icons.expansion;
-			this.editor.applyCommandTargets('fullScreen', (e) => {
+			this.commandDispatcher.applyTargets('fullScreen', (e) => {
 				dom.utils.changeElement(e.firstElementChild, expansionIcon);
 				dom.utils.removeClass(e, 'active');
 			});
@@ -322,13 +317,13 @@ class Viewer extends CoreInjector {
 
 		if (value) {
 			dom.utils.addClass(fc.get('wysiwyg'), 'se-show-block');
-			dom.utils.addClass(this.editor.commandTargets.get('showBlocks'), 'active');
+			dom.utils.addClass(this.commandDispatcher.targets.get('showBlocks'), 'active');
 		} else {
 			dom.utils.removeClass(fc.get('wysiwyg'), 'se-show-block');
-			dom.utils.removeClass(this.editor.commandTargets.get('showBlocks'), 'active');
+			dom.utils.removeClass(this.commandDispatcher.targets.get('showBlocks'), 'active');
 		}
 
-		this.editor._resourcesStateChange(fc);
+		this.uiManager._syncFrameState(fc);
 	}
 
 	/**
@@ -340,21 +335,21 @@ class Viewer extends CoreInjector {
 
 		// codeView
 		if (fc.get('isCodeView')) {
-			dom.utils.addClass(this.editor.commandTargets.get('codeView'), 'active');
+			dom.utils.addClass(this.commandDispatcher.targets.get('codeView'), 'active');
 		} else {
-			dom.utils.removeClass(this.editor.commandTargets.get('codeView'), 'active');
+			dom.utils.removeClass(this.commandDispatcher.targets.get('codeView'), 'active');
 		}
 
 		// fullScreen
 		if (fc.get('isFullScreen')) {
 			const reductionIcon = this.icons.reduction;
-			this.editor.applyCommandTargets('fullScreen', (e) => {
+			this.commandDispatcher.applyTargets('fullScreen', (e) => {
 				dom.utils.changeElement(e.firstElementChild, reductionIcon);
 				dom.utils.addClass(e, 'active');
 			});
 		} else {
 			const expansionIcon = this.icons.expansion;
-			this.editor.applyCommandTargets('fullScreen', (e) => {
+			this.commandDispatcher.applyTargets('fullScreen', (e) => {
 				dom.utils.changeElement(e.firstElementChild, expansionIcon);
 				dom.utils.removeClass(e, 'active');
 			});
@@ -362,9 +357,9 @@ class Viewer extends CoreInjector {
 
 		// showBlocks
 		if (fc.get('isShowBlocks')) {
-			dom.utils.addClass(this.editor.commandTargets.get('showBlocks'), 'active');
+			dom.utils.addClass(this.commandDispatcher.targets.get('showBlocks'), 'active');
 		} else {
-			dom.utils.removeClass(this.editor.commandTargets.get('showBlocks'), 'active');
+			dom.utils.removeClass(this.commandDispatcher.targets.get('showBlocks'), 'active');
 		}
 	}
 
@@ -432,7 +427,7 @@ class Viewer extends CoreInjector {
 				</html>`);
 		}
 
-		this.#ui.showLoading();
+		this.uiManager.showLoading();
 		_w.setTimeout(() => {
 			try {
 				iframe.focus();
@@ -451,7 +446,7 @@ class Viewer extends CoreInjector {
 			} catch (error) {
 				throw Error(`[SUNEDITOR.print.fail] error: ${error.message}`);
 			} finally {
-				this.#ui.hideLoading();
+				this.uiManager.hideLoading();
 				dom.utils.removeItem(iframe);
 			}
 		}, 1000);
@@ -463,8 +458,8 @@ class Viewer extends CoreInjector {
 	preview() {
 		this.#menu.dropdownOff();
 		this.#menu.containerOff();
-		this.#ui.offCurrentController();
-		this.#ui.offCurrentModal();
+		this.uiManager.offCurrentController();
+		this.uiManager.offCurrentModal();
 
 		const contentHTML = this.options.get('previewTemplate') ? this.options.get('previewTemplate').replace(/\{\{\s*contents\s*\}\}/i, this.#html.get({ withFrame: true })) : this.#html.get({ withFrame: true });
 		const windowObject = _w.open('', '_blank');

@@ -6,6 +6,14 @@ import { dom, numbers } from '../../../helper';
  * - Manages the 'active' state of plugins and commands.
  */
 export default class SelectionState {
+	#editor;
+	#options;
+	#status;
+	#frameContext;
+	#frameOptions;
+	#plugins;
+	#commandTargets;
+
 	/** @type {RegExp} */
 	#onButtonsCheck;
 
@@ -14,26 +22,27 @@ export default class SelectionState {
 	 * @param {SunEditor.Instance} editor
 	 */
 	constructor(editor) {
-		this.editor = editor;
-		this.options = editor.options;
-		this.status = editor.status;
-		this.frameContext = editor.frameContext;
-		this.frameOptions = editor.frameOptions;
-		this.plugins = editor.plugins;
+		this.#editor = editor;
+		this.#options = editor.options;
+		this.#status = editor.status;
+		this.#frameContext = editor.frameContext;
+		this.#frameOptions = editor.frameOptions;
+		this.#plugins = editor.plugins;
+		this.#commandTargets = editor.commandDispatcher.targets;
 
 		this.#onButtonsCheck = new RegExp(`^(${Object.keys(editor.options.get('_defaultStyleTagMap')).join('|')})$`, 'i');
 	}
 
 	get #selection() {
-		return this.editor.selection;
+		return this.#editor.selection;
 	}
 
 	get #format() {
-		return this.editor.format;
+		return this.#editor.format;
 	}
 
 	get #component() {
-		return this.editor.component;
+		return this.#editor.component;
 	}
 
 	/**
@@ -46,29 +55,29 @@ export default class SelectionState {
 	 */
 	update(selectionNode) {
 		selectionNode ||= this.#selection.getNode();
-		if (selectionNode === this.editor.effectNode) return;
-		this.editor.effectNode = selectionNode;
+		if (selectionNode === this.#editor.effectNode) return;
+		this.#editor.effectNode = selectionNode;
 
-		const marginDir = this.options.get('_rtl') ? 'marginRight' : 'marginLeft';
-		const plugins = this.plugins;
-		const commandTargets = this.editor.commandTargets;
+		const marginDir = this.#options.get('_rtl') ? 'marginRight' : 'marginLeft';
+		const plugins = this.#plugins;
+		const commandTargets = this.#commandTargets;
 		const classOnCheck = this.#onButtonsCheck;
-		const styleCommand = this.options.get('_styleCommandMap');
+		const styleCommand = this.#options.get('_styleCommandMap');
 		const commandMapNodes = [];
 		const currentNodes = [];
 
-		const styleTags = this.options.get('_textStyleTags');
+		const styleTags = this.#options.get('_textStyleTags');
 		const styleNodes = [];
 
 		const ignoreCommands = [];
-		const activeCommands = this.editor.activeCommands;
+		const activeCommands = this.#editor.activeCommands;
 		const cLen = activeCommands.length;
 		let nodeName = '';
 
 		if (this.#component.is(selectionNode) && !this.#component.__selectionSelected) {
 			const component = this.#component.get(selectionNode);
 			if (!component) return;
-			this.editor.effectNode = null;
+			this.#editor.effectNode = null;
 			this.#component.select(component.target, component.pluginName);
 			return;
 		}
@@ -77,13 +86,13 @@ export default class SelectionState {
 			selectionNode = selectionNode.firstChild;
 		}
 
-		const fc = this.frameContext;
+		const fc = this.#frameContext;
 		const notReadonly = !fc.get('isReadOnly');
 		for (let element = selectionNode; !dom.check.isWysiwygFrame(element); element = element.parentElement) {
 			if (!element) break;
 			if (element.nodeType !== 1 || dom.check.isBreak(element)) continue;
 			if (this.#isNonFocusNode(element)) {
-				this.editor.focusManager.blur();
+				this.#editor.focusManager.blur();
 				return;
 			}
 
@@ -157,12 +166,12 @@ export default class SelectionState {
 		this.__cacheStyleNodes = styleNodes.reverse();
 
 		/** save current nodes */
-		this.status.currentNodes = currentNodes.reverse();
-		this.status.currentNodesMap = commandMapNodes;
+		this.#status.currentNodes = currentNodes.reverse();
+		this.#status.currentNodesMap = commandMapNodes;
 
 		/**  Displays the current node structure to statusbar */
-		if (this.frameOptions.get('statusbar_showPathLabel') && fc.get('navigation')) {
-			fc.get('navigation').textContent = this.options.get('_rtl') ? this.status.currentNodes.reverse().join(' < ') : this.status.currentNodes.join(' > ');
+		if (this.#frameOptions.get('statusbar_showPathLabel') && fc.get('navigation')) {
+			fc.get('navigation').textContent = this.#options.get('_rtl') ? this.#status.currentNodes.reverse().join(' < ') : this.#status.currentNodes.join(' > ');
 		}
 
 		return selectionNode;
@@ -183,9 +192,9 @@ export default class SelectionState {
 	 * @param {Array<string>} ignoredList List of formatting commands to keep active (others will be deactivated).
 	 */
 	#setKeyEffect(ignoredList) {
-		const activeCommands = this.editor.activeCommands;
-		const commandTargets = this.editor.commandTargets;
-		const plugins = this.plugins;
+		const activeCommands = this.#editor.activeCommands;
+		const commandTargets = this.#commandTargets;
+		const plugins = this.#plugins;
 		for (let i = 0, len = activeCommands.length, k, c, p; i < len; i++) {
 			k = activeCommands[i];
 			if (ignoredList.includes(k) || !(c = commandTargets.get(k))) continue;

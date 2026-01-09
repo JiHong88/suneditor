@@ -1,19 +1,19 @@
 import { env, converter, dom, numbers } from '../helper';
-import Constructor, { InitOptions, UpdateButton, CreateShortcuts, CreateStatusbar } from './section/constructor';
-import { OPTION_FRAME_FIXED_FLAG, OPTION_FIXED_FLAG, BaseOptionsMap, FrameOptionsMap } from './config/options';
-import { ContextUtil } from './config/context';
-import { UpdateStatusbarContext, FrameContextUtil } from './config/frameContext';
+import Constructor from './section/constructor';
 
 // type
 import DocumentType from './section/documentType';
 
-// base
-import { BASIC_COMMANDS, ACTIVE_EVENT_COMMANDS, DIR_BTN_ACTIVE } from './support/actives';
-import History from './support/history';
-import CommandExecutor from './support/commandExecutor';
-import FocusManager from './support/focusManager';
-import InstanceCheck from './support/instanceCheck';
+// services
 import EventManager from './event/eventManager';
+import History from './services/history';
+import InstanceCheck from './services/instanceCheck';
+import PluginManager from './services/pluginManager';
+import FocusManager from './services/focusManager';
+import CommandDispatcher from './services/commandDispatcher';
+import ContextManager from './services/contextManager';
+import OptionManager from './services/optionManager';
+import UIManager from './services/uiManager';
 
 // class injector
 import { _getClassInjectorKeys } from '../editorInjector/_classes';
@@ -31,39 +31,18 @@ import Offset from './class/offset';
 import Selection_ from './class/selection';
 import Shortcuts from './class/shortcuts';
 import Toolbar from './class/toolbar';
-import UI from './class/ui';
 import Viewer from './class/viewer';
-
-const COMMAND_BUTTONS = '.se-menu-list .se-toolbar-btn[data-command]';
-const DISABLE_BUTTONS_CODEVIEW = `${COMMAND_BUTTONS}:not([class~="se-code-view-enabled"]):not([data-type="MORE"])`;
-const DISABLE_BUTTONS_CONTROLLER = `${COMMAND_BUTTONS}:not([class~="se-component-enabled"]):not([data-type="MORE"])`;
 
 /**
  * @description Class instance keys that need circular reference cleanup in destroy().
  * @type {readonly string[]}
  */
-const EDITOR_CLASS_KEYS = Object.freeze(['eventManager', 'instanceCheck', ..._getClassInjectorKeys()]);
+const EDITOR_CLASS_KEYS = Object.freeze([..._getClassInjectorKeys()]);
 
 /**
  * @description SunEditor class.
  */
 class Editor {
-	#pluginCallButtons;
-	#pluginCallButtons_sub;
-	#originOptions;
-
-	/**
-	 * @description Properties for managing files in the "FileManager" module
-	 * @type {Array<*>}
-	 */
-	#fileInfoPluginsCheck = null;
-
-	/**
-	 * @description Properties for managing files in the "FileManager" module
-	 * @type {Array<*>}
-	 */
-	#fileInfoPluginsReset = null;
-
 	/**
 	 * @constructor
 	 * @description SunEditor constructor function.
@@ -82,12 +61,6 @@ class Editor {
 		this.rootKeys = product.rootKeys;
 
 		/**
-		 * @description Frame root map
-		 * @type {Map<*, SunEditor.FrameContext>}
-		 */
-		this.frameRoots = product.frameRoots;
-
-		/**
 		 * @description Document object
 		 * @type {Document}
 		 */
@@ -104,68 +77,6 @@ class Editor {
 		 * @type {HTMLElement}
 		 */
 		this.carrierWrapper = product.carrierWrapper;
-
-		/**
-		 * @internal
-		 * @description Editor context object
-		 * @type {SunEditor.Context}
-		 */
-		this.__context = product.context;
-
-		/**
-		 * @description Utility object that manages the editor's runtime context.
-		 * Provides methods to get, set, and inspect internal context.
-		 * @type {ContextUtil}
-		 */
-		this.context = ContextUtil(this);
-
-		/**
-		 * @internal
-		 * @description Current focusing [frame] context
-		 * @type {import('./config/frameContext').FrameContextMap}
-		 */
-		this.__frameContext = new Map();
-
-		/**
-		 * @description Utility object that manages the editor's runtime [frame] context.
-		 * Provides methods to get, set, and inspect internal context.
-		 * @type {FrameContextUtil}
-		 */
-		this.frameContext = FrameContextUtil(this);
-
-		/**
-		 * @internal
-		 * @description Current focusing [frame] context options
-		 * @type {SunEditor.FrameOptions}
-		 */
-		this.__frameOptions = new Map();
-
-		/**
-		 * @description Utility object that manages the editor's runtime [frame] options.
-		 * Provides methods to get, set, and inspect internal [frame] options.
-		 * @type {FrameOptionsMap}
-		 */
-		this.frameOptions = FrameOptionsMap(this);
-
-		/**
-		 * @internal
-		 * @description Editor row options
-		 * @type {Map<string, *>}
-		 */
-		this.__options = product.options;
-
-		/**
-		 * @description Utility object that manages the editor's runtime options.
-		 * Provides methods to get, set, and inspect internal editor options.
-		 * @type {BaseOptionsMap}
-		 */
-		this.options = BaseOptionsMap(this);
-
-		/**
-		 * @description Plugins
-		 * @type {Object<string, *>}
-		 */
-		this.plugins = product.plugins || {};
 
 		/**
 		 * @description Events object, call by triggerEvent function
@@ -264,88 +175,30 @@ class Editor {
 		this.isSubBalloonAlways = false;
 
 		/**
-		 * @description All command buttons map
-		 * @type {Map<string, HTMLElement>}
-		 */
-		this.allCommandButtons = new Map();
-
-		/**
-		 * @description All command buttons map
-		 * @type {Map<string, HTMLElement>}
-		 */
-		this.subAllCommandButtons = new Map();
-
-		/**
-		 * @description Shoutcuts key map
-		 * @type {Map<string, *>}
-		 */
-		this.shortcutsKeyMap = new Map();
-
-		/**
-		 * @description Shoutcuts reverse key array
-		 * - An array of key codes generated with the reverseButtons option, used to reverse the action for a specific key combination.
-		 * @type {Set<string>}
-		 */
-		this.reverseKeys = new Set();
-
-		/**
-		 * @description A map with the plugin's buttons having an "active" method and the default command buttons with an "active" action.
-		 * - Each button is contained in an array.
-		 * @type {Map<string, Array<HTMLButtonElement>>}
-		 */
-		this.commandTargets = new Map();
-
-		/**
-		 * @description Plugins array with "active" method.
-		 * - "activeCommands" runs the "add" method when creating the editor.
-		 * @type {Array<string>}
-		 */
-		this.activeCommands = null;
-
-		/**
 		 * @description The selection node (selection.getNode()) to which the effect was last applied
 		 * @type {?Node}
 		 */
 		this.effectNode = null;
 
-		/**
-		 * @description Currently open "Modal" instance
-		 * @type {*}
-		 */
-		this.opendModal = null;
-
-		/**
-		 * @description Currently open "Controller" info array
-		 * @type {Array<SunEditor.Module.Controller.Info>}
-		 */
-		this.opendControllers = [];
-
-		/**
-		 * @description Currently open "Controller" caller plugin name
-		 */
-		this.currentControllerName = '';
-
-		/**
-		 * @description Currently open "Browser" instance
-		 * @type {*}
-		 */
-		this.opendBrowser = null;
-
-		/**
-		 * @description Whether "SelectMenu" is open
-		 * @type {boolean}
-		 */
-		this.selectMenuOn = false;
-
-		// ------ base ------
-		/** @description History class instance @type {ReturnType<typeof import('./support/history').default>} */
-		this.history = null;
+		// ------ services ------
+		/** @description Context manager class @type {import('./services/contextManager').default} */
+		this.contextManager = new ContextManager(this, product);
+		/** @description Context option manager class @type {import('./services/optionManager').default} */
+		this.optionManager = new OptionManager(this, product, options);
+		/** @description iframe-safe instanceof check utility class @type {import('./services/instanceCheck').default} */
+		this.instanceCheck = new InstanceCheck(this.frameContext);
+		/** @description Plugin Manager */
+		this.pluginManager = new PluginManager(this, product);
+		/** @description Focus Manager */
+		this.focusManager = new FocusManager(this);
+		/** @description UI manager class instance @type {import('./services/uiManager').default} */
+		this.uiManager = new UIManager(this);
+		/** @description Command Dispatcher */
+		this.commandDispatcher = new CommandDispatcher(this);
+		/** @description History class instance @type {ReturnType<typeof import('./services/history').default>} */
+		this.history = History(this);
 		/** @description EventManager class instance @type {import('./event/eventManager').default} */
 		this.eventManager = null;
-
-		//  ----- util -----
-		/** @description iframe-safe instanceof check utility class @type {import('./support/instanceCheck').default} */
-		this.instanceCheck = null;
 
 		// ------ class ------
 		/** @description Toolbar class instance @type {import('./class/toolbar').default} */
@@ -374,8 +227,6 @@ class Editor {
 		this.selection = null;
 		/** @description Shortcuts class instance @type {import('./class/shortcuts').default} */
 		this.shortcuts = null;
-		/** @description UI class instance @type {import('./class/ui').default} */
-		this.ui = null;
 		/** @description Viewer class instance @type {import('./class/viewer').default} */
 		this.viewer = null;
 
@@ -403,26 +254,6 @@ class Editor {
 		this._preventSelection = false;
 
 		// ------------------------------------------------------- internal properties -------------------------------------------------------
-		/**
-		 * @internal
-		 * @description Line breaker (top)
-		 * @type {HTMLElement}
-		 */
-		this._lineBreaker_t = null;
-
-		/**
-		 * @internal
-		 * @description Line breaker (bottom)
-		 * @type {HTMLElement}
-		 */
-		this._lineBreaker_b = null;
-
-		/**
-		 * @internal
-		 * @description Plugin call event map
-		 * @type {Map<string, Array<((...args: *) => *) & { index: number }>>}
-		 */
-		this._onPluginEvents = null;
 
 		/**
 		 * @internal
@@ -441,48 +272,6 @@ class Editor {
 
 		/**
 		 * @internal
-		 * @description Controller target's frame div (editor.frameContext.get('topArea'))
-		 * @type {?HTMLElement}
-		 */
-		this._controllerTargetContext = null;
-
-		/**
-		 * @internal
-		 * @description List of buttons that are disabled when "controller" is opened
-		 * @type {Array<HTMLButtonElement|HTMLInputElement>}
-		 */
-		this._controllerOnDisabledButtons = [];
-
-		/**
-		 * @internal
-		 * @description List of buttons that are disabled when "codeView" mode opened
-		 * @type {Array<HTMLButtonElement|HTMLInputElement>}
-		 */
-		this._codeViewDisabledButtons = [];
-
-		/**
-		 * @internal
-		 * @description Responsive Toolbar Button Structure array
-		 * @type {Array<*>}
-		 */
-		this._responsiveButtons = product.responsiveButtons;
-
-		/**
-		 * @internal
-		 * @description Responsive Sub-Toolbar Button Structure array
-		 * @type {Array<*>}
-		 */
-		this._responsiveButtons_sub = product.responsiveButtons_sub;
-
-		/**
-		 * @internal
-		 * @description Variable that controls the "blur" event in the editor of inline or balloon mode when the focus is moved to dropdown
-		 * @type {boolean}
-		 */
-		this._notHideToolbar = false;
-
-		/**
-		 * @internal
 		 * @description If true, initialize all indexes of image, video information
 		 * @type {boolean}
 		 */
@@ -495,60 +284,9 @@ class Editor {
 		 */
 		this._componentsInfoReset = false;
 
-		/**
-		 * @internal
-		 * @description plugin retainFormat info Map()
-		 * @type {Map<string, { key: string, method: (...args: *) => * }>}
-		 */
-		this._MELInfo = null;
-
-		/**
-		 * @internal
-		 * @description Variables for file component management
-		 * @type {Object<string, *>}
-		 */
-		this._fileManager = {
-			tags: null,
-			regExp: null,
-			pluginRegExp: null,
-			pluginMap: null,
-		};
-
-		/**
-		 * @internal
-		 * @description Variables for managing the components
-		 * @type {Array<*>}
-		 */
-		this._componentManager = [];
-
-		/**
-		 * @internal
-		 * @description Current Figure container.
-		 * @type {?HTMLElement}
-		 */
-		this._figureContainer = null;
-
-		/**
-		 * @description List of buttons to run plugins in the toolbar
-		 * @type {Object<string, Array<HTMLElement>>}
-		 */
-		this.#pluginCallButtons = product.pluginCallButtons;
-
-		/**
-		 * @description List of buttons to run plugins in the Sub-Toolbar
-		 * @type {Object<string, Array<HTMLElement>>|[]}
-		 */
-		this.#pluginCallButtons_sub = product.pluginCallButtons_sub;
-
-		/**
-		 * @description Origin options
-		 * @type {SunEditor.InitOptions}
-		 */
-		this.#originOptions = options;
-
 		/** ----- Create editor ------------------------------------------------------------ */
 		try {
-			this.#Create(options);
+			this.#Create(options, product);
 		} catch (e) {
 			console.error('[SUNEDITOR:E_CREATE_FAIL] Failed to create editor instance.', e);
 			throw e;
@@ -556,129 +294,60 @@ class Editor {
 	}
 
 	/**
-	 * @description If the plugin is not added, add the plugin and call the 'add' function.
-	 * - If the plugin is added call callBack function.
-	 * @param {string} pluginName The name of the plugin to call
-	 * @param {?Array<HTMLElement>} targets Plugin target button (This is not necessary if you have a button list when creating the editor)
-	 * @param {?Object<string, *>} pluginOptions Plugin's options
+	 * @description Context
+	 * @type {Map<*, SunEditor.FrameContext>}
 	 */
-	registerPlugin(pluginName, targets, pluginOptions) {
-		let plugin = this.plugins[pluginName];
-		if (!plugin) {
-			throw Error(`[SUNEDITOR.registerPlugin.fail] The called plugin does not exist or is in an invalid format. (pluginName: "${pluginName}")`);
-		} else if (typeof this.plugins[pluginName] === 'function') {
-			plugin = this.plugins[pluginName] = new this.plugins[pluginName](this, pluginOptions || {});
-		}
-
-		if (targets) {
-			for (let i = 0, len = targets.length; i < len; i++) {
-				UpdateButton(targets[i], plugin, this.icons, this.lang);
-			}
-
-			if (!this.activeCommands.includes(pluginName) && typeof this.plugins[pluginName].active === 'function') {
-				this.activeCommands.push(pluginName);
-			}
-		}
+	get frameRoots() {
+		return this.contextManager.frameRoots;
 	}
 
 	/**
-	 * @description Run plugin calls and basic commands.
-	 * @param {string} command Command string
-	 * @param {string} type Display type string ('command', 'dropdown', 'modal', 'container')
-	 * @param {?Node} [button] The element of command button
+	 * @description Context
+	 * @type {SunEditor.Context}
 	 */
-	run(command, type, button) {
-		if (type) {
-			if (/more/i.test(type)) {
-				const toolbar = dom.query.getParentElement(button, '.se-toolbar');
-				const toolInst = dom.utils.hasClass(toolbar, 'se-toolbar-sub') ? this.subToolbar : this.toolbar;
-				if (button !== toolInst.currentMoreLayerActiveButton) {
-					const layer = toolbar.querySelector('.' + command);
-					if (layer) {
-						toolInst._moreLayerOn(button, layer);
-						toolInst._showBalloon();
-						toolInst._showInline();
-					}
-					dom.utils.addClass(button, 'on');
-				} else if (toolInst.currentMoreLayerActiveButton) {
-					toolInst._moreLayerOff();
-					toolInst._showBalloon();
-					toolInst._showInline();
-				}
-
-				this.viewer._resetFullScreenHeight();
-				return;
-			}
-
-			if (/container/.test(type) && (this.menu.targetMap[command] === null || button !== this.menu.currentContainerActiveButton)) {
-				this.menu.containerOn(button);
-				return;
-			}
-
-			if (this.frameContext.get('isReadOnly') && dom.utils.arrayIncludes(this._controllerOnDisabledButtons, button)) return;
-
-			if (/dropdown/.test(type) && (this.menu.targetMap[command] === null || button !== this.menu.currentDropdownActiveButton)) {
-				this.menu.dropdownOn(button);
-				return;
-			} else if (/modal/.test(type)) {
-				this.plugins[command].open(button);
-				return;
-			} else if (/command/.test(type)) {
-				this.plugins[command].action(button);
-			} else if (/browser/.test(type)) {
-				this.plugins[command].open(null);
-			} else if (/popup/.test(type)) {
-				this.plugins[command].show();
-			}
-		} else if (command) {
-			this.commandExecutor.execute(command, button);
-		}
-
-		if (/dropdown/.test(type)) {
-			this.menu.dropdownOff();
-		} else if (!/command/.test(type)) {
-			this.menu.dropdownOff();
-			this.menu.containerOff();
-		}
+	get context() {
+		return this.contextManager.context;
 	}
 
 	/**
-	 * @description Execute "editor.run" with command button.
-	 * @param {Node} target Command target
+	 * @description Options
+	 * @type {SunEditor.Options}
 	 */
-	runFromTarget(target) {
-		if (dom.check.isInputElement(target)) return;
-
-		const targetBtn = /** @type {HTMLButtonElement} */ (dom.query.getCommandTarget(target));
-		if (!targetBtn) return;
-
-		const command = targetBtn.getAttribute('data-command');
-		const type = targetBtn.getAttribute('data-type');
-
-		if (!command && !type) return;
-		if (targetBtn.disabled) return;
-
-		this.run(command, type, target);
+	get options() {
+		return this.optionManager.options;
 	}
 
 	/**
-	 * @description It is executed by inserting the button of commandTargets as the argument value of the "f" function.
-	 * - "func" is called as long as the button array's length.
-	 * @param {string} cmd data-command
-	 * @param {(...args: *) => *} func Function.
+	 * @description Frame context
+	 * @type {SunEditor.FrameContext}
 	 */
-	applyCommandTargets(cmd, func) {
-		if (this.commandTargets.has(cmd)) {
-			this.commandTargets.get(cmd).forEach(func);
-		}
+	get frameContext() {
+		return this.contextManager.frameContext;
 	}
 
 	/**
-	 * @description Execute a function by traversing all root targets.
-	 * @param {(...args: *) => *} f Function
+	 * @description Frame options
+	 * @type {SunEditor.FrameOptions}
 	 */
-	applyFrameRoots(f) {
-		this.frameRoots.forEach(f);
+	get frameOptions() {
+		return this.optionManager.frameOptions;
+	}
+
+	/**
+	 * @description Plugins
+	 * @type {Object<string, *>}
+	 */
+	get plugins() {
+		return this.pluginManager.plugins;
+	}
+
+	/**
+	 * @description Plugins array with "active" method.
+	 * - "activeCommands" runs the "add" method when creating the editor.
+	 * @type {Array<string>}
+	 */
+	get activeCommands() {
+		return this.pluginManager.activeCommands;
 	}
 
 	/**
@@ -693,259 +362,11 @@ class Editor {
 	}
 
 	/**
-	 * @description Set direction to "rtl" or "ltr".
-	 * @param {string} dir "rtl" or "ltr"
-	 */
-	setDir(dir) {
-		const rtl = dir === 'rtl';
-		if (this.options.get('_rtl') === rtl) return;
-
-		try {
-			this.options.set('_rtl', rtl);
-			this.ui.offCurrentController();
-
-			const fc = this.frameContext;
-			const plugins = this.plugins;
-			for (const k in plugins) {
-				plugins[k].setDir?.(dir);
-			}
-
-			const toolbarWrapper = this.context.get('toolbar_wrapper');
-			const statusbarWrapper = this.context.get('statusbar_wrapper');
-			if (rtl) {
-				this.applyFrameRoots((e) => {
-					dom.utils.addClass([e.get('topArea'), e.get('wysiwyg'), e.get('documentTypePageMirror')], 'se-rtl');
-				});
-				dom.utils.addClass([this.carrierWrapper, toolbarWrapper, statusbarWrapper], 'se-rtl');
-			} else {
-				this.applyFrameRoots((e) => {
-					dom.utils.removeClass([e.get('topArea'), e.get('wysiwyg'), e.get('documentTypePageMirror')], 'se-rtl');
-				});
-				dom.utils.removeClass([this.carrierWrapper, toolbarWrapper, statusbarWrapper], 'se-rtl');
-			}
-
-			const lineNodes = dom.query.getListChildren(
-				fc.get('wysiwyg'),
-				(current) => {
-					return this.format.isLine(current) && !!(current.style.marginRight || current.style.marginLeft || current.style.textAlign);
-				},
-				null,
-			);
-
-			for (let i = 0, n, l, r; (n = lineNodes[i]); i++) {
-				n = lineNodes[i];
-				// indent margin
-				r = n.style.marginRight;
-				l = n.style.marginLeft;
-				if (r || l) {
-					n.style.marginRight = l;
-					n.style.marginLeft = r;
-				}
-				// text align
-				r = n.style.textAlign;
-				if (r === 'left') n.style.textAlign = 'right';
-				else if (r === 'right') n.style.textAlign = 'left';
-			}
-
-			DIR_BTN_ACTIVE(this, rtl);
-
-			// document type
-			if (fc.has('documentType_use_header')) {
-				if (rtl) fc.get('wrapper').appendChild(fc.get('documentTypeInner'));
-				else fc.get('wrapper').insertBefore(fc.get('documentTypeInner'), fc.get('wysiwygFrame'));
-			}
-			if (fc.has('documentType_use_page')) {
-				if (rtl) fc.get('wrapper').insertBefore(fc.get('documentTypePage'), fc.get('wysiwygFrame'));
-				else fc.get('wrapper').appendChild(fc.get('documentTypePage'));
-			}
-
-			if (this.isBalloon) this.toolbar._showBalloon();
-			else if (this.isSubBalloon) this.subToolbar._showBalloon();
-		} catch (e) {
-			this.options.set('_rtl', !rtl);
-			console.warn(`[SUNEDITOR.setDir.fail] ${e.toString()}`);
-		}
-
-		this.effectNode = null;
-		this.eventManager.applyTagEffect();
-	}
-
-	/**
 	 * @description Add or reset option property (Editor is reloaded)
 	 * @param {SunEditor.InitOptions} newOptions Options
 	 */
 	resetOptions(newOptions) {
-		this.viewer.codeView(false);
-		this.viewer.showBlocks(false);
-
-		const rootDiff = new Map();
-		const frameRoots = this.frameRoots;
-		const newRoots = [];
-		const newRootKeys = new Map();
-
-		// frame roots
-		const nRoot = {};
-		for (const k in newOptions) {
-			if (OPTION_FRAME_FIXED_FLAG[k] === undefined) continue;
-			nRoot[k] = newOptions[k];
-			delete newOptions[k];
-		}
-		for (const rootKey of frameRoots.keys()) {
-			newOptions[rootKey || ''] = { ...nRoot, ...newOptions[rootKey || ''] };
-		}
-
-		// check reoption validation
-		const newOptionKeys = Object.keys(newOptions);
-		this.#CheckResetKeys(newOptionKeys, this.plugins, '');
-		if (newOptionKeys.length === 0) return;
-
-		if (frameRoots.size === 1) {
-			newOptionKeys.unshift(null);
-		}
-
-		// option merge
-		const _originOptions = [this.#originOptions, newOptions].reduce((init, option) => {
-			for (const key in option) {
-				if (frameRoots.has(key || null)) {
-					this.#RestoreFrameOptions(key, option, frameRoots, rootDiff, newRootKeys, newRoots);
-				} else {
-					init[key] = option[key];
-				}
-			}
-			return init;
-		}, {});
-
-		// init options
-		const options = this.options;
-		const newO = InitOptions(_originOptions, newRoots, this.plugins);
-		const newOptionMap = newO.o;
-		const newFrameMap = newO.frameMap;
-		/** --------- [root start] --------- */
-		for (let i = 0, len = newOptionKeys.length, k; i < len; i++) {
-			k = /** @type {keyof import('./config/options').AllBaseOptions} */ (newOptionKeys[i] || null);
-
-			if (newRootKeys.has(k)) {
-				const diff = rootDiff.get(k);
-				const fc = frameRoots.get(k);
-				const originOptions = fc.get('options');
-				const newRootOptions = newFrameMap.get(k);
-
-				// --- set options : fc ---
-				fc.set('options', newRootOptions);
-
-				// statusbar-changed
-				if (diff.has('statusbar-changed')) {
-					// statusbar
-					dom.utils.removeItem(fc.get('statusbar'));
-					if (newRootOptions.get('statusbar')) {
-						const statusbar = CreateStatusbar(newRootOptions, null).statusbar;
-						fc.get('container').appendChild(statusbar);
-						UpdateStatusbarContext(statusbar, fc);
-						this.eventManager.__addStatusbarEvent(fc, newRootOptions);
-					} else {
-						this.eventManager.removeEvent(originOptions.get('__statusbarEvent'));
-						newRootOptions.set('__statusbarEvent', null);
-						UpdateStatusbarContext(null, fc);
-					}
-					// charCounter
-					if (fc.get('statusbar')) {
-						this.char.display(fc);
-					}
-				}
-
-				// iframe's options
-				if (diff.has('iframe_attributes')) {
-					const frame = fc.get('wysiwygFrame');
-					const originAttr = originOptions.get('iframe_attributes');
-					const newAttr = newRootOptions.get('iframe_attributes');
-					for (const origin_k in originAttr) frame.removeAttribute(origin_k);
-					for (const new_k in newAttr) frame.setAttribute(new_k, newAttr[new_k]);
-				}
-
-				if (diff.has('iframe_cssFileName')) {
-					const docHead = fc.get('_wd').head;
-					const links = docHead.getElementsByTagName('link');
-					while (links[0]) docHead.removeChild(links[0]);
-					const parseDocument = new DOMParser().parseFromString(converter._setIframeStyleLinks(newRootOptions.get('iframe_cssFileName')), 'text/html');
-					const newLinks = parseDocument.head.children;
-					const sTag = docHead.querySelector('style');
-					while (newLinks[0]) docHead.insertBefore(newLinks[0], sTag);
-				}
-
-				if (diff.has('placeholder')) {
-					fc.get('placeholder').textContent = newRootOptions.get('placeholder');
-				}
-
-				// frame styles
-				this.ui.setEditorStyle(newRootOptions.get('editorStyle'), fc);
-
-				// frame attributes
-				const frame = fc.get('wysiwyg');
-				const originAttr = originOptions.get('editableFrameAttributes');
-				const newAttr = newRootOptions.get('editableFrameAttributes');
-				for (const origin_k in originAttr) frame.removeAttribute(origin_k);
-				for (const new_k in newAttr) frame.setAttribute(new_k, newAttr[new_k]);
-
-				continue;
-			}
-			/** --------- [root end] --------- */
-
-			//  --- set options ---
-			options.set(k, newOptionMap.get(k));
-
-			/** Options that require a function call */
-			switch (k) {
-				case 'theme': {
-					this.ui.setTheme(options.get('theme'));
-					break;
-				}
-				case 'events': {
-					const events = options.get('events');
-					for (const name in events) {
-						this.events[name] = events[name];
-					}
-					break;
-				}
-				case 'autoStyleify': {
-					this.html.__resetAutoStyleify(options.get('autoStyleify'));
-					break;
-				}
-				case 'textDirection': {
-					this.setDir(options.get('_rtl') ? 'ltr' : 'rtl');
-					break;
-				}
-				case 'historyStackDelayTime': {
-					this.history.resetDelayTime(options.get('historyStackDelayTime'));
-					break;
-				}
-				case 'defaultLineBreakFormat': {
-					this.format.__resetBrLineBreak(options.get('defaultLineBreakFormat'));
-				}
-			}
-		}
-
-		/** apply options */
-		// _origin
-		this.#originOptions = _originOptions;
-
-		// --- [toolbar] ---
-		const toolbar = this.context.get('toolbar_main');
-		// width
-		if (/inline|balloon/i.test(options.get('mode')) && newOptionKeys.includes('toolbar_width')) {
-			toolbar.style.width = options.get('toolbar_width');
-		}
-		// hide
-		if (options.get('toolbar_hide')) {
-			toolbar.style.display = 'none';
-		} else {
-			toolbar.style.display = '';
-		}
-		// shortcuts hint
-		if (options.get('shortcutsHint')) {
-			dom.utils.removeClass(toolbar, 'se-shortcut-hide');
-		} else {
-			dom.utils.addClass(toolbar, 'se-shortcut-hide');
-		}
+		this.optionManager.reset(newOptions);
 
 		this.effectNode = null;
 		this.#setFrameInfo(this.frameRoots.get(this.status.rootKey));
@@ -969,31 +390,12 @@ class Editor {
 	}
 
 	/**
-	 * @description javascript execCommand
-	 * @param {string} command javascript execCommand function property
-	 * @param {boolean} [showDefaultUI] javascript execCommand function property
-	 * @param {string} [value] javascript execCommand function property
-	 */
-	execCommand(command, showDefaultUI, value) {
-		this.frameContext.get('_wd').execCommand(command, showDefaultUI, command === 'formatBlock' ? '<' + value + '>' : value);
-		this.history.push(true);
-	}
-
-	/**
 	 * @description Destroy the suneditor
 	 */
 	destroy() {
-		/** destroy plugins first (they may use editor references) */
-		const plugins = this.plugins;
-		for (const k in plugins) {
-			const p = plugins[k];
-			p._destroy?.();
-			// break circular reference: plugin.editor
-			p.editor = null;
-		}
-		this.plugins = null;
-
-		/** remove history */
+		this.uiManager.destroy();
+		this.commandDispatcher.destroy();
+		this.pluginManager.destroy();
 		this.history.destroy();
 
 		/** remove event listeners */
@@ -1010,48 +412,17 @@ class Editor {
 		dom.utils.removeItem(this.context.get('toolbar_sub_wrapper'));
 		dom.utils.removeItem(this.context.get('statusbar_wrapper'));
 
-		/** clear frame roots */
-		this.applyFrameRoots((e) => {
-			// destroy documentType instance
-			const docType = e.get('documentType');
-			if (docType) {
-				docType._destroy();
-				docType.editor = null;
-			}
-			dom.utils.removeItem(e.get('topArea'));
-			e.get('options').clear();
-			e.clear();
-		});
-
-		/** clear Map/Set objects */
-		this.allCommandButtons.clear();
-		this.subAllCommandButtons.clear();
-		this.shortcutsKeyMap.clear();
-		this.reverseKeys.clear();
-		this.commandTargets.clear();
-		this.__frameContext.clear();
-		this.__frameOptions.clear();
-		if (this._MELInfo) this._MELInfo.clear();
-		if (this._onPluginEvents) this._onPluginEvents.clear();
-
-		/** clear other object references */
-		this.options.clear();
-		this.context.clear();
-		this.frameRoots.clear();
-
 		/** clear events */
 		for (const k in this.events) {
 			this.events[k] = null;
 		}
 		this.events = null;
 
-		/** break circular references in class instances (instance.editor = this) */
 		for (let i = 0; i < EDITOR_CLASS_KEYS.length; i++) {
 			const key = EDITOR_CLASS_KEYS[i];
 			const instance = this[key];
 			if (instance) {
 				instance._destroy?.();
-				instance.editor = null;
 				this[key] = null;
 			}
 		}
@@ -1064,149 +435,20 @@ class Editor {
 			this.status = null;
 		}
 
+		this.optionManager.destroy();
+		this.contextManager.destroy();
+
 		/** clear remaining references */
 		this.carrierWrapper = null;
 		this.history = null;
+		this.focusManager = null;
 		this.rootKeys = null;
 		this.effectNode = null;
-		this.opendModal = null;
-		this.opendBrowser = null;
-		this.opendControllers = null;
-		this.activeCommands = null;
 		this.shadowRoot = null;
-		this._responsiveButtons = null;
-		this._responsiveButtons_sub = null;
-		this._fileManager = null;
-		this._componentManager = null;
-		this._controllerOnDisabledButtons = null;
-		this._codeViewDisabledButtons = null;
-		this._lineBreaker_t = null;
-		this._lineBreaker_b = null;
 		this._onCopyFormatInfo = null;
 		this._onCopyFormatInitMethod = null;
-		this.#originOptions = null;
-		this.#pluginCallButtons = null;
-		this.#pluginCallButtons_sub = null;
-		this.#fileInfoPluginsCheck = null;
-		this.#fileInfoPluginsReset = null;
 
 		return null;
-	}
-
-	/** ----- private methods ----------------------------------------------------------------------------------------------------------------------------- */
-
-	/**
-	 * @internal
-	 * @description Check the components such as image and video and modify them according to the format.
-	 * @param {boolean} loaded If true, the component is loaded.
-	 */
-	_checkComponents(loaded) {
-		for (let i = 0, len = this.#fileInfoPluginsCheck.length; i < len; i++) {
-			this.#fileInfoPluginsCheck[i](loaded);
-		}
-	}
-
-	/**
-	 * @internal
-	 * @description Initialize the information of the components.
-	 */
-	_resetComponents() {
-		for (let i = 0, len = this.#fileInfoPluginsReset.length; i < len; i++) {
-			this.#fileInfoPluginsReset[i]();
-		}
-	}
-
-	/**
-	 * @internal
-	 * @description Set display property when there is placeholder.
-	 * @param {?SunEditor.FrameContext} [fc] - Frame context object, If null fc is this.frameContext
-	 */
-	_checkPlaceholder(fc) {
-		fc ||= /** @type {SunEditor.FrameContext} */ (this.frameContext);
-		const placeholder = fc.get('placeholder');
-
-		if (placeholder) {
-			if (fc.get('isCodeView')) {
-				placeholder.style.display = 'none';
-				return;
-			}
-
-			if (this.isEmpty(fc)) {
-				placeholder.style.display = 'block';
-			} else {
-				placeholder.style.display = 'none';
-			}
-		}
-	}
-
-	/**
-	 * @internal
-	 * @description Called when there are changes to tags in the wysiwyg region.
-	 * @param {SunEditor.FrameContext} fc - Frame context object
-	 */
-	_resourcesStateChange(fc) {
-		this._iframeAutoHeight(fc);
-		this._checkPlaceholder(fc);
-		// document type page
-		if (fc.has('documentType_use_page')) {
-			fc.get('documentTypePageMirror').innerHTML = fc.get('wysiwyg').innerHTML;
-			fc.get('documentType').rePage(true);
-		}
-	}
-
-	/**
-	 * @internal
-	 * @description Modify the height value of the iframe when the height of the iframe is automatic.
-	 * @param {SunEditor.FrameContext|FrameContextUtil} fc - Frame context object
-	 */
-	_iframeAutoHeight(fc) {
-		const autoFrame = fc.get('_iframeAuto');
-
-		if (autoFrame) {
-			this._w.setTimeout(() => {
-				const h = autoFrame.offsetHeight;
-				const wysiwygFrame = fc.get('wysiwygFrame');
-				wysiwygFrame.style.height = h + 'px';
-
-				// maxHeight
-				const fo = fc.get('options');
-				if (fo.get('iframe')) {
-					const maxHeight = fo.get('maxHeight');
-					if (maxHeight) {
-						wysiwygFrame.setAttribute('scrolling', h > numbers.get(maxHeight) ? 'auto' : 'no');
-					}
-				}
-
-				if (!env.isResizeObserverSupported) this.__callResizeFunction(fc, h, null);
-			}, 0);
-		} else if (!env.isResizeObserverSupported) {
-			this.__callResizeFunction(fc, fc.get('wysiwygFrame').offsetHeight, null);
-		}
-	}
-
-	/**
-	 * @internal
-	 * @description Call the "onResizeEditor" event
-	 * @param {SunEditor.FrameContext|FrameContextUtil} fc - Frame context object
-	 * @param {number} h - Height value
-	 * @param {ResizeObserverEntry} resizeObserverEntry - ResizeObserverEntry object
-	 */
-	__callResizeFunction(fc, h, resizeObserverEntry) {
-		h =
-			h === -1
-				? resizeObserverEntry?.borderBoxSize && resizeObserverEntry.borderBoxSize[0]
-					? resizeObserverEntry.borderBoxSize[0].blockSize
-					: resizeObserverEntry.contentRect.height + numbers.get(fc.get('wwComputedStyle').getPropertyValue('padding-left')) + numbers.get(fc.get('wwComputedStyle').getPropertyValue('padding-right'))
-				: h;
-		if (fc.get('_editorHeight') !== h) {
-			this.triggerEvent('onResizeEditor', { height: h, prevHeight: fc.get('_editorHeight'), frameContext: fc, observerEntry: resizeObserverEntry });
-			fc.set('_editorHeight', h);
-		}
-
-		// document type page
-		if (fc.has('documentType_use_page')) {
-			fc.get('documentType').resizePage();
-		}
 	}
 
 	/**
@@ -1214,11 +456,9 @@ class Editor {
 	 * @param {SunEditor.FrameContext} rt Root target[key] FrameContext
 	 */
 	#setFrameInfo(rt) {
-		this.frameContext.reset(rt);
-		this.frameOptions.reset(rt.get('options'));
-		rt.set('_editorHeight', rt.get('wysiwygFrame').offsetHeight);
-		this._lineBreaker_t = rt.get('lineBreaker_t');
-		this._lineBreaker_b = rt.get('lineBreaker_b');
+		this.contextManager.reset(rt);
+		this.optionManager.resetFrame(rt.get('options'));
+		this.uiManager.reset(rt);
 	}
 
 	/**
@@ -1229,33 +469,28 @@ class Editor {
 		this.status.initViewportHeight = this._w.visualViewport.height;
 		this.eventManager.__setViewportSize();
 
-		this.applyFrameRoots((e) => {
-			this.#setEditorParams(e);
-		});
+		this.contextManager.init();
 
 		// initialize core and add event listeners
 		this.#setFrameInfo(this.frameRoots.get(this.status.rootKey));
 		this.#init(options);
-		for (const v of this._onPluginEvents.values()) {
-			v.sort((a, b) => a.index - b.index);
-		}
 
-		this.applyFrameRoots((e) => {
+		this.contextManager.applyToRoots((e) => {
 			this.eventManager._addFrameEvents(e);
 			this.#initWysiwygArea(e, e.get('options').get('value'));
 			if (e.get('options').get('iframe') && e.get('options').get('height') === 'auto') {
-				this.__callResizeFunction(e, e.get('wysiwygFrame').offsetHeight, null);
+				this.uiManager._emitResizeEvent(e, e.get('wysiwygFrame').offsetHeight, null);
 			}
 		});
 
 		this.eventManager.__eventDoc = null;
 		this._componentsInfoInit = false;
 		this._componentsInfoReset = false;
-		this._checkComponents(true);
+		this.pluginManager.checkFileInfo(true);
 
 		this._w.setTimeout(() => {
 			// Check if instance was destroyed (e.g., in SSR with dynamic imports mistake)
-			if (!this.__context?.size) {
+			if (!this.context?.size()) {
 				console.warn('[SUNEDITOR:E_INIT_FAIL] Editor instance was destroyed before initialization completed. Check if destroy() was called.');
 				return;
 			}
@@ -1263,12 +498,12 @@ class Editor {
 			// toolbar visibility
 			this.context.get('toolbar_main').style.visibility = '';
 			// roots
-			this.applyFrameRoots((e) => {
+			this.contextManager.applyToRoots((e) => {
 				// observer
 				if (this.eventManager._wwFrameObserver) this.eventManager._wwFrameObserver.observe(e.get('wysiwygFrame'));
 				if (this.eventManager._toolbarObserver) this.eventManager._toolbarObserver.observe(e.get('_toolbarShadow'));
 				// resource state
-				this._resourcesStateChange(e);
+				this.uiManager._syncFrameState(e);
 			});
 
 			// history reset
@@ -1321,205 +556,10 @@ class Editor {
 	 * @param {SunEditor.InitOptions} options Options
 	 */
 	#init(options) {
-		// file components
-		this.#fileInfoPluginsCheck = [];
-		this.#fileInfoPluginsReset = [];
-
-		// text components
-		this._MELInfo = new Map();
-
-		// Command and file plugins registration
-		this.activeCommands = ACTIVE_EVENT_COMMANDS;
-		this._onPluginEvents = new Map([
-			['onMouseMove', []],
-			['onMouseLeave', []],
-			['onMouseDown', []],
-			['onMouseUp', []],
-			['onScroll', []],
-			['onClick', []],
-			['onBeforeInput', []],
-			['onInput', []],
-			['onKeyDown', []],
-			['onKeyUp', []],
-			['onFocus', []],
-			['onBlur', []],
-			['onPaste', []],
-			['onFilePasteAndDrop', []],
-		]);
-		this._fileManager.tags = [];
-		this._fileManager.pluginMap = {};
-		this._fileManager.tagAttrs = {};
-
-		const plugins = this.plugins;
-		const filePluginRegExp = [];
-		let plugin;
-		for (const key in plugins) {
-			this.registerPlugin(key, this.#pluginCallButtons[key], options[key]);
-			this.registerPlugin(key, this.#pluginCallButtons_sub[key], options[key]);
-			plugin = this.plugins[key];
-
-			// Filemanager
-			if (typeof plugin.__fileManagement === 'object') {
-				const fm = plugin.__fileManagement;
-				this.#fileInfoPluginsCheck.push(fm._checkInfo.bind(fm));
-				this.#fileInfoPluginsReset.push(fm._resetInfo.bind(fm));
-				if (Array.isArray(fm.tagNames)) {
-					const tagNames = fm.tagNames;
-					this._fileManager.tags = this._fileManager.tags.concat(tagNames);
-					filePluginRegExp.push(key);
-					for (let tag = 0, tLen = tagNames.length, t; tag < tLen; tag++) {
-						t = tagNames[tag].toLowerCase();
-						this._fileManager.pluginMap[t] = key;
-						if (fm.tagAttrs) {
-							this._fileManager.tagAttrs[t] = fm.tagAttrs;
-						}
-					}
-				}
-			}
-
-			// Not file component
-			if (typeof plugin.constructor.component === 'function') {
-				this._componentManager.push(
-					function (launcher, element) {
-						if (!element || !(element = launcher.component?.(element))) return null;
-						return {
-							target: element,
-							pluginName: launcher.key,
-							options: launcher.options,
-						};
-					}.bind(null, plugin.constructor),
-				);
-			}
-
-			// plugin event
-			const pluginOptions = plugin.constructor.options || {};
-			this._onPluginEvents.forEach((v, k) => {
-				if (typeof plugin[k] === 'function') {
-					const f = plugin[k].bind(plugin);
-					f.index = pluginOptions[`eventIndex_${k}`] || pluginOptions.eventIndex || 0;
-					v.push(f);
-				}
-			});
-
-			// plugin maintain
-			if (plugin.retainFormat) {
-				const info = plugin.retainFormat();
-				this._MELInfo.set(info.query, { key: plugin.constructor.key, method: info.method });
-			}
-		}
-
-		if (this.options.get('buttons').has('pageBreak') || this.options.get('buttons_sub')?.has('pageBreak')) {
-			this._componentManager.push((element) => {
-				if (!element || !dom.utils.hasClass(element, 'se-page-break')) return null;
-				return {
-					target: element,
-					launcher: {
-						destroy: (target) => {
-							const focusEl = target.previousElementSibling || target.nextElementSibling;
-							dom.utils.removeItem(target);
-							// focus
-							this.focusManager.focusEdge(focusEl);
-							this.history.push(false);
-						},
-					},
-				};
-			});
-		}
-
-		this._fileManager.regExp = new RegExp(`^(${this._fileManager.tags.join('|') || '\\^'})$`, 'i');
-		this._fileManager.pluginRegExp = new RegExp(`^(${filePluginRegExp.length === 0 ? '\\^' : filePluginRegExp.join('|')})$`, 'i');
-
-		this.#pluginCallButtons = null;
-		this.#pluginCallButtons_sub = null;
-
-		this.__cachingButtons();
-		this.__cachingShortcuts();
-	}
-
-	/**
-	 * @internal
-	 * @description Caching basic buttons to use
-	 */
-	__cachingButtons() {
-		const ctx = this.context;
-		this.#setDisabledButtons();
-
-		this.#saveCommandButtons(this.allCommandButtons, ctx.get('toolbar_buttonTray'));
-		this.#saveCommandButtons(this.subAllCommandButtons, ctx.get('toolbar_sub_buttonTray'));
-	}
-
-	/**
-	 * @internal
-	 * @description Caches custom(starts with "_") shortcut keys for commands.
-	 */
-	__cachingShortcuts() {
-		const shortcuts = this.options.get('shortcuts');
-		const reverseCommandArray = this.options.get('_reverseCommandArray');
-		const keyMap = this.shortcutsKeyMap;
-		const reverseKeys = this.reverseKeys;
-		for (const key of Object.keys(shortcuts)) {
-			if (!key.startsWith('_')) continue;
-			CreateShortcuts('', null, shortcuts[key], keyMap, reverseCommandArray, reverseKeys);
-		}
-	}
-
-	/**
-	 * @description Set the disabled button list
-	 * - this._codeViewDisabledButtons, this._controllerOnDisabledButtons
-	 */
-	#setDisabledButtons() {
-		const ctx = this.context;
-
-		this._codeViewDisabledButtons = converter.nodeListToArray(ctx.get('toolbar_buttonTray').querySelectorAll(DISABLE_BUTTONS_CODEVIEW));
-		this._controllerOnDisabledButtons = converter.nodeListToArray(ctx.get('toolbar_buttonTray').querySelectorAll(DISABLE_BUTTONS_CONTROLLER));
-
-		if (this.options.has('_subMode')) {
-			this._codeViewDisabledButtons = this._codeViewDisabledButtons.concat(converter.nodeListToArray(ctx.get('toolbar_sub_buttonTray').querySelectorAll(DISABLE_BUTTONS_CODEVIEW)));
-			this._controllerOnDisabledButtons = this._controllerOnDisabledButtons.concat(converter.nodeListToArray(ctx.get('toolbar_sub_buttonTray').querySelectorAll(DISABLE_BUTTONS_CONTROLLER)));
-		}
-	}
-
-	/**
-	 * @description Save the current buttons
-	 * @param {Map<string, Element>} cmdButtons Command button map
-	 * @param {?Element} tray Button tray
-	 */
-	#saveCommandButtons(cmdButtons, tray) {
-		if (!tray) return;
-
-		const currentButtons = tray.querySelectorAll(COMMAND_BUTTONS);
-		const shortcuts = this.options.get('shortcuts');
-		const reverseCommandArray = this.options.get('_reverseCommandArray');
-		const keyMap = this.shortcutsKeyMap;
-		const reverseKeys = this.reverseKeys;
-
-		for (let i = 0, len = currentButtons.length, e, c; i < len; i++) {
-			e = /** @type {HTMLButtonElement} */ (currentButtons[i]);
-			c = e.getAttribute('data-command');
-			// command set
-			cmdButtons.set(c, e);
-			this.#setCommandTargets(c, e);
-			// shortcuts
-			CreateShortcuts(c, e, shortcuts[c], keyMap, reverseCommandArray, reverseKeys);
-		}
-	}
-
-	/**
-	 * @description Sets command target elements.
-	 * @param {string} cmd - The command identifier.
-	 * @param {HTMLButtonElement} target - The associated command button.
-	 */
-	#setCommandTargets(cmd, target) {
-		if (!cmd || !target) return;
-
-		const isBasicCmd = BASIC_COMMANDS.includes(cmd);
-		if (!isBasicCmd && !this.plugins[cmd]) return;
-
-		if (!this.commandTargets.get(cmd)) {
-			this.commandTargets.set(cmd, [target]);
-		} else if (!this.commandTargets.get(cmd).includes(target)) {
-			this.commandTargets.get(cmd).push(target);
-		}
+		this.pluginManager.init(options);
+		this.commandDispatcher._initCommandButtons();
+		this.shortcuts._registerCustomShortcuts();
+		this.uiManager.init();
 	}
 
 	/**
@@ -1539,53 +579,10 @@ class Editor {
 	}
 
 	/**
-	 * @description Set the FrameContext parameters and options
-	 * @param {SunEditor.FrameContext} e - Frame context object
-	 */
-	#setEditorParams(e) {
-		const frameOptions = e.get('options');
-		const _w = this._w;
-
-		e.set('wwComputedStyle', _w.getComputedStyle(e.get('wysiwyg')));
-
-		if (!frameOptions.get('iframe') && typeof ShadowRoot === 'function') {
-			let child = e.get('wysiwygFrame');
-			while (child) {
-				if (child.shadowRoot) {
-					this.shadowRoot = child.shadowRoot;
-					break;
-				} else if (child instanceof ShadowRoot) {
-					this.shadowRoot = child;
-					break;
-				}
-				child = /** @type {SunEditor.WysiwygFrame} */ (child.parentNode);
-			}
-		}
-
-		// init, validate
-		if (frameOptions.get('iframe')) {
-			e.set('_ww', e.get('wysiwygFrame').contentWindow);
-			e.set('_wd', e.get('wysiwygFrame').contentDocument);
-			e.set('wysiwyg', e.get('_wd').body);
-			// e.get('wysiwyg').className += ' ' + options.get('_editableClass');
-			if (frameOptions.get('_defaultStyles').editor) e.get('wysiwyg').style.cssText = frameOptions.get('_defaultStyles').editor;
-			if (frameOptions.get('height') === 'auto') e.set('_iframeAuto', e.get('_wd').body);
-		} else {
-			e.set('_ww', _w);
-			e.set('_wd', this._d);
-		}
-
-		// wisywig attributes
-		const attr = frameOptions.get('editableFrameAttributes');
-		for (const k in attr) {
-			e.get('wysiwyg').setAttribute(k, attr[k]);
-		}
-	}
-
-	/**
 	 * @description Registers and initializes editor classes.
+	 * @param {import('./section/constructor').ConstructorReturnType} product - The initial product object.
 	 */
-	#registerClass() {
+	#registerClass(product) {
 		// use events
 		this.events = this.options.get('events') || {};
 		this.triggerEvent = async (eventName, eventData) => {
@@ -1598,29 +595,20 @@ class Editor {
 			return env.NO_EVENT;
 		};
 
-		// history function
-		this.history = History(this);
-
 		// eventManager
 		this.eventManager = new EventManager(this);
-		// commandExecutor
-		this.commandExecutor = new CommandExecutor(this);
-		// focusManager
-		this.focusManager = new FocusManager(this);
-		// util
-		this.instanceCheck = new InstanceCheck(this);
 
 		// ----- [core classes : editorInector/_classes] -------------------------------------
 		this.offset = new Offset(this);
 		this.shortcuts = new Shortcuts(this);
-		this.toolbar = new Toolbar(this, { keyName: 'toolbar', balloon: this.isBalloon, balloonAlways: this.isBalloonAlways, inline: this.isInline, res: this._responsiveButtons });
+		this.toolbar = new Toolbar(this, { keyName: 'toolbar', balloon: this.isBalloon, balloonAlways: this.isBalloonAlways, inline: this.isInline, res: product.responsiveButtons });
 		if (this.options.has('_subMode')) {
 			this.subToolbar = new Toolbar(this, {
 				keyName: 'toolbar_sub',
 				balloon: this.isSubBalloon,
 				balloonAlways: this.isSubBalloonAlways,
 				inline: false,
-				res: this._responsiveButtons_sub,
+				res: product.responsiveButtons_sub,
 			});
 		}
 		this.selection = new Selection_(this);
@@ -1632,18 +620,16 @@ class Editor {
 		this.listFormat = new ListFormat(this);
 		this.menu = new Menu(this);
 		this.char = new Char(this);
-		this.ui = new UI(this);
 		this.viewer = new Viewer(this);
-
-		this._responsiveButtons = this._responsiveButtons_sub = null;
 	}
 
 	/**
 	 * @description Creates the editor instance and initializes components.
 	 * @param {SunEditor.InitOptions} originOptions - The initial editor options.
+	 * @param {import('./section/constructor').ConstructorReturnType} product - The initial product object.
 	 * @returns {Promise<void>}
 	 */
-	async #Create(originOptions) {
+	async #Create(originOptions, product) {
 		// set modes
 		this.isInline = /inline/i.test(this.options.get('mode'));
 		this.isBalloon = /balloon/i.test(this.options.get('mode'));
@@ -1654,14 +640,14 @@ class Editor {
 		this.isSubBalloonAlways = /balloon-always/i.test(this.options.get('_subMode'));
 
 		// register class
-		this.#registerClass();
+		this.#registerClass(product);
 
 		// common events
 		this.eventManager._addCommonEvents();
 
 		// init
 		const iframePromises = [];
-		this.applyFrameRoots((e) => {
+		this.contextManager.applyToRoots((e) => {
 			const o = e.get('originElement');
 			const t = e.get('topArea');
 			o.style.display = 'none';
@@ -1671,7 +657,7 @@ class Editor {
 			if (e.get('options').get('iframe')) {
 				const iframeLoaded = new Promise((resolve) => {
 					this.eventManager.addEvent(e.get('wysiwygFrame'), 'load', ({ target }) => {
-						this.#setIframeDocument(target, this.__options, e.get('options'));
+						this.#setIframeDocument(target, this.options, e.get('options'));
 						resolve();
 					});
 				});
@@ -1679,7 +665,7 @@ class Editor {
 			}
 		});
 
-		this.applyFrameRoots((e) => {
+		this.contextManager.applyToRoots((e) => {
 			e.get('wrapper').appendChild(e.get('wysiwygFrame'));
 
 			// document type
@@ -1700,47 +686,6 @@ class Editor {
 		}
 
 		this.#editorInit(originOptions);
-	}
-
-	#RestoreFrameOptions(key, option, frameRoots, rootDiff, newRootKeys, newRoots) {
-		const nro = option[key];
-		const newKeys = Object.keys(nro);
-		this.#CheckResetKeys(newKeys, null, key + '.');
-		if (newKeys.length === 0) return false;
-
-		const rootKey = key || null;
-		rootDiff.set(rootKey, new Map());
-
-		const o = frameRoots.get(rootKey).get('options').get('_origin');
-		const no = {};
-		const hasOwn = Object.prototype.hasOwnProperty;
-		for (const rk in nro) {
-			if (!hasOwn.call(OPTION_FRAME_FIXED_FLAG, rk)) continue;
-			const roV = nro[rk];
-			if (!newKeys.includes(rk) || o[rk] === roV) continue;
-			rootDiff.get(rootKey).set(this.#GetResetDiffKey(rk), true);
-			no[rk] = roV;
-		}
-
-		const newO = { ...o, ...no };
-		newRootKeys.set(rootKey, new Map(Object.entries(newO)));
-		newRoots.push({ key: rootKey, options: newO });
-	}
-
-	#GetResetDiffKey(key) {
-		if (/^statusbar|^charCounter/.test(key)) return 'statusbar-changed';
-		return key;
-	}
-
-	#CheckResetKeys(keys, plugins, root) {
-		for (let i = 0, len = keys.length, k; i < len; i++) {
-			k = keys[i];
-			if (OPTION_FIXED_FLAG[k] === 'fixed' || OPTION_FRAME_FIXED_FLAG[k] === 'fixed' || (plugins && plugins[k])) {
-				console.warn(`[SUNEDITOR.warn.resetOptions] The "[${root + k}]" option cannot be changed after the editor is created.`);
-				keys.splice(i--, 1);
-				len--;
-			}
-		}
 	}
 }
 

@@ -43,8 +43,6 @@ declare class ClassInjector {
 	selection: SunEditor.Core['selection'];
 	/** @description Shortcuts class instance @type {SunEditor.Core['shortcuts']} */
 	shortcuts: SunEditor.Core['shortcuts'];
-	/** @description UI class instance @type {SunEditor.Core['ui']} */
-	ui: SunEditor.Core['ui'];
 	/** @description Viewer class instance @type {SunEditor.Core['viewer']} */
 	viewer: SunEditor.Core['viewer'];
 }

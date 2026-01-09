@@ -53,36 +53,20 @@ declare class EventManager extends CoreInjector {
 	__eventDoc: Document;
 	/** @type {string} */
 	__secopy: string;
-	/** @internal @type {SunEditor.Core['char']} */
-	get char(): SunEditor.Core['char'];
-	/** @internal @type {SunEditor.Core['component']} */
-	get component(): SunEditor.Core['component'];
-	/** @internal @type {SunEditor.Core['format']} */
-	get format(): SunEditor.Core['format'];
-	/** @internal @type {SunEditor.Core['listFormat']} */
-	get listFormat(): SunEditor.Core['listFormat'];
-	/** @internal @type {SunEditor.Core['html']} */
-	get html(): SunEditor.Core['html'];
-	/** @internal @type {SunEditor.Core['inline']} */
-	get inline(): SunEditor.Core['inline'];
-	/** @internal @type {SunEditor.Core['menu']} */
-	get menu(): SunEditor.Core['menu'];
-	/** @internal @type {SunEditor.Core['nodeTransform']} */
-	get nodeTransform(): SunEditor.Core['nodeTransform'];
-	/** @internal @type {SunEditor.Core['offset']} */
-	get offset(): SunEditor.Core['offset'];
-	/** @internal @type {SunEditor.Core['selection']} */
-	get selection(): SunEditor.Core['selection'];
-	/** @internal @type {SunEditor.Core['shortcuts']} */
-	get shortcuts(): SunEditor.Core['shortcuts'];
-	/** @internal @type {SunEditor.Core['subToolbar']} */
-	get subToolbar(): SunEditor.Core['subToolbar'];
-	/** @internal @type {SunEditor.Core['toolbar']} */
-	get toolbar(): SunEditor.Core['toolbar'];
-	/** @internal @type {SunEditor.Core['ui']} */
-	get ui(): SunEditor.Core['ui'];
-	/** @internal @type {SunEditor.Core['viewer']} */
-	get viewer(): SunEditor.Core['viewer'];
+	get char(): import('../class/char').default;
+	get component(): import('../class/component').default;
+	get format(): import('../class/format').default;
+	get listFormat(): import('../class/listFormat').default;
+	get html(): import('../class/html').default;
+	get inline(): import('../class/inline').default;
+	get menu(): import('../class/menu').default;
+	get nodeTransform(): import('../class/nodeTransform').default;
+	get offset(): import('../class/offset').default;
+	get selection(): import('../class/selection').default;
+	get shortcuts(): import('../class/shortcuts').default;
+	get subToolbar(): import('../class/toolbar').default;
+	get toolbar(): import('../class/toolbar').default;
+	get viewer(): import('../class/viewer').default;
 	/**
 	 * @description Register for an event.
 	 * - Only events registered with this method are unregistered or re-registered when methods such as 'setOptions', 'destroy' are called.
@@ -217,47 +201,20 @@ declare class EventManager extends CoreInjector {
 	_clearRetainStyleNodes(formatEl: HTMLElement): void;
 	/**
 	 * @internal
-	 * @description Calls a registered plugin event and executes associated handlers synchronously (fire-and-forget).
-	 * - Use this for performance-critical events like onMouseMove, onScroll
-	 * - If any handler returns `false`, the event propagation stops.
+	 * @description Calls a registered plugin event synchronously.
 	 * @param {string} name The name of the plugin event
-	 * @param {{ frameContext: SunEditor.FrameContext, event: Event, data?: string, line?: Node, range?: Range, file?: File, doc?: Document }} e The event object passed to the plugin event handler
-	 * @returns {boolean|undefined} Returns `false` if any handler stops the event, otherwise `undefined`
+	 * @param {SunEditor.EventParams.PluginEvent} e The event payload
+	 * @returns {boolean|undefined} Returns `false` if any handler stops the event
 	 */
-	_callPluginEvent(
-		name: string,
-		e: {
-			frameContext: SunEditor.FrameContext;
-			event: Event;
-			data?: string;
-			line?: Node;
-			range?: Range;
-			file?: File;
-			doc?: Document;
-		},
-	): boolean | undefined;
+	_callPluginEvent(name: string, e: SunEditor.EventParams.PluginEvent): boolean | undefined;
 	/**
 	 * @internal
-	 * @description Calls a registered plugin event and executes associated handlers asynchronously.
-	 * - Use this for events that need to check return values or ensure completion
-	 * - Waits for each handler to complete (including async handlers)
-	 * - If any handler returns `false`, the event propagation stops.
+	 * @description Calls a registered plugin event asynchronously.
 	 * @param {string} name The name of the plugin event
-	 * @param {{ frameContext: SunEditor.FrameContext, event: Event, data?: string, line?: Node, range?: Range, file?: File, doc?: Document }} e The event object passed to the plugin event handler
-	 * @returns {Promise<boolean|undefined>} Returns `false` if any handler stops the event, otherwise `undefined`
+	 * @param {SunEditor.EventParams.PluginEvent} e The event payload
+	 * @returns {Promise<boolean|undefined>} Returns `false` if any handler stops the event
 	 */
-	_callPluginEventAsync(
-		name: string,
-		e: {
-			frameContext: SunEditor.FrameContext;
-			event: Event;
-			data?: string;
-			line?: Node;
-			range?: Range;
-			file?: File;
-			doc?: Document;
-		},
-	): Promise<boolean | undefined>;
+	_callPluginEventAsync(name: string, e: SunEditor.EventParams.PluginEvent): Promise<boolean | undefined>;
 	/**
 	 * @internal
 	 * @description Removes input event listeners and resets input-related properties.

@@ -225,7 +225,7 @@ export namespace Core {
 	 */
 	function Shortcut(params: SunEditor.HookParams.Shortcut): void;
 	/**
-	 * Executes the method called when the rtl, ltr mode changes. ("editor.setDir")
+	 * Executes the method called when the rtl, ltr mode changes. ("editor.ui.setDir")
 	 * @param {string} dir - Direction ("rtl" or "ltr")
 	 * @returns {void}
 	 */

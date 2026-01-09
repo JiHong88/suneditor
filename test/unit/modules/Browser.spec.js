@@ -20,7 +20,7 @@ jest.mock('../../../src/editorInjector/_core.js', () => {
         this.triggerEvent = editor.triggerEvent || jest.fn();
         this.lang = editor.lang;
         this.icons = editor.icons;
-        this.ui = editor.ui;
+        this.uiManager = editor.uiManager;
         this.offset = editor.offset || {
             getGlobal: jest.fn().mockReturnValue({ top: 100 })
         };
@@ -134,7 +134,7 @@ describe('Modules - Browser', () => {
         jest.clearAllMocks();
 
         mockEditor = {
-            ui: { showBrowser: jest.fn(), hideBrowser: jest.fn() },
+            uiManager: { showBrowser: jest.fn(), hideBrowser: jest.fn() },
             triggerEvent: jest.fn(),
             offset: {
                 getGlobal: jest.fn().mockReturnValue({ top: 100 })
@@ -331,7 +331,7 @@ describe('Modules - Browser', () => {
 
         it('should set editor opendBrowser', () => {
             browser.open();
-            expect(browser.editor.opendBrowser).toBe(browser);
+            expect(browser.uiManager.opendBrowser).toBe(browser);
         });
 
         it('should use title from params if provided', () => {
@@ -426,9 +426,9 @@ describe('Modules - Browser', () => {
         });
 
         it('should set editor opendBrowser to null', () => {
-            browser.editor.opendBrowser = browser;
+            browser.uiManager.opendBrowser = browser;
             browser.close();
-            expect(browser.editor.opendBrowser).toBeNull();
+            expect(browser.uiManager.opendBrowser).toBeNull();
         });
 
         it('should call apiManager.cancel', () => {

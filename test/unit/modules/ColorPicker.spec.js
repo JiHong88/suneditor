@@ -35,7 +35,7 @@ jest.mock('../../../src/editorInjector/_core.js', () => {
         this.triggerEvent = (editor && editor.triggerEvent) || jest.fn();
         this.icons = (editor && editor.icons) || {};
         this.lang = (editor && editor.lang) || {};
-        this.ui = (editor && editor.ui) || {};
+        this.uiManager = (editor && editor.ui) || {};
         this.carrierWrapper = {
             appendChild: jest.fn(),
             contains: jest.fn().mockReturnValue(true)
@@ -207,7 +207,7 @@ describe('Modules - ColorPicker', () => {
         };
 
         mockEditor = {
-            ui: {
+            uiManager: {
                 showColorPicker: jest.fn(),
                 hideColorPicker: jest.fn()
             },

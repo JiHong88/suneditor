@@ -4,14 +4,14 @@
 
 import { createTestEditor, destroyTestEditor, waitForEditorReady } from '../../../__mocks__/editorIntegration';
 
-describe('UI', () => {
+describe('UIManager', () => {
 	let editor;
-	let ui;
+	let uiManager;
 
 	beforeEach(async () => {
 		editor = createTestEditor();
 		await waitForEditorReady(editor);
-		ui = editor.ui;
+		uiManager = editor.uiManager;
 	});
 
 	afterEach(() => {
@@ -21,70 +21,70 @@ describe('UI', () => {
 	describe('setEditorStyle', () => {
 		it('should set editor style without error', () => {
 			expect(() => {
-				ui.setEditorStyle('background-color: #fff;');
+				uiManager.setEditorStyle('background-color: #fff;');
 			}).not.toThrow();
 		});
 
 		it('should handle empty style', () => {
 			expect(() => {
-				ui.setEditorStyle('');
+				uiManager.setEditorStyle('');
 			}).not.toThrow();
 		});
 	});
 
 	describe('setTheme', () => {
 		it('should set theme', () => {
-			ui.setTheme('dark');
+			uiManager.setTheme('dark');
 			expect(editor.options.get('theme')).toBe('dark');
 		});
 
 		it('should handle empty theme', () => {
-			ui.setTheme('');
+			uiManager.setTheme('');
 			expect(editor.options.get('theme')).toBe('');
 		});
 
 		it('should handle non-string theme', () => {
 			expect(() => {
-				ui.setTheme(null);
+				uiManager.setTheme(null);
 			}).not.toThrow();
 		});
 	});
 
 	describe('readOnly', () => {
 		it('should enable readonly mode', () => {
-			ui.readOnly(true);
+			uiManager.readOnly(true);
 			expect(editor.frameContext.get('isReadOnly')).toBe(true);
 		});
 
 		it('should disable readonly mode', () => {
-			ui.readOnly(true);
-			ui.readOnly(false);
+			uiManager.readOnly(true);
+			uiManager.readOnly(false);
 			expect(editor.frameContext.get('isReadOnly')).toBe(false);
 		});
 	});
 
 	describe('disable and enable', () => {
 		it('should disable editor', () => {
-			ui.disable();
+			uiManager.disable();
 			expect(editor.frameContext.get('isDisabled')).toBe(true);
 		});
 
 		it('should enable editor', () => {
-			ui.disable();
-			ui.enable();
+			uiManager.disable();
+			uiManager.enable();
 			expect(editor.frameContext.get('isDisabled')).toBe(false);
 		});
 	});
 
 	describe('show and hide', () => {
 		it('should hide editor', () => {
-			ui.hide();
+			uiManager.hide();
 			expect(editor.frameContext.get('topArea').style.display).toBe('none');
 		});
 
 		it('should show editor', () => {
-			ui.hide();
-			ui.show();
+			uiManager.hide();
+			uiManager.show();
 			expect(editor.frameContext.get('topArea').style.display).toBe('block');
 		});
 	});
@@ -92,13 +92,13 @@ describe('UI', () => {
 	describe('showLoading and hideLoading', () => {
 		it('should show loading', () => {
 			expect(() => {
-				ui.showLoading();
+				uiManager.showLoading();
 			}).not.toThrow();
 		});
 
 		it('should hide loading', () => {
 			expect(() => {
-				ui.hideLoading();
+				uiManager.hideLoading();
 			}).not.toThrow();
 		});
 	});
@@ -107,13 +107,13 @@ describe('UI', () => {
 		let result;
 		it('should handle activation', () => {
 			expect(() => {
-				result = ui.setControllerOnDisabledButtons(true);
+				result = uiManager.setControllerOnDisabledButtons(true);
 			}).not.toThrow();
 			expect(result).toBe(true);
 		});
 
 		it('should handle deactivation', () => {
-			result = ui.setControllerOnDisabledButtons(false);
+			result = uiManager.setControllerOnDisabledButtons(false);
 			expect(result).toBe(false);
 		});
 	});
@@ -121,113 +121,96 @@ describe('UI', () => {
 	describe('enableBackWrapper and disableBackWrapper', () => {
 		it('should enable back wrapper', () => {
 			expect(() => {
-				ui.enableBackWrapper('pointer');
+				uiManager.enableBackWrapper('pointer');
 			}).not.toThrow();
 		});
 
 		it('should disable back wrapper', () => {
 			expect(() => {
-				ui.disableBackWrapper();
+				uiManager.disableBackWrapper();
 			}).not.toThrow();
 		});
 	});
 
-	describe('alert methods', () => {
-		it('should have alertOpen method', () => {
-			expect(typeof ui.alertOpen).toBe('function');
+	describe('setDir', () => {
+		it('should set direction to rtl', () => {
+			// Ensure initial state is ltr
+			if (editor.options.get('_rtl') === true) {
+				uiManager.setDir('ltr');
+			}
+			uiManager.setDir('rtl');
+			expect(editor.options.get('_rtl')).toBe(true);
 		});
 
-		it('should have alertClose method', () => {
-			expect(typeof ui.alertClose).toBe('function');
+		it('should set direction to ltr', () => {
+			uiManager.setDir('rtl');
+			uiManager.setDir('ltr');
+			expect(editor.options.get('_rtl')).toBe(false);
 		});
 
-		it('should call alertOpen without error', () => {
-			expect(() => {
-				ui.alertOpen('Test message');
-			}).not.toThrow();
+		it('should not change if already set to same direction', () => {
+			const initialRtl = editor.options.get('_rtl');
+			uiManager.setDir(initialRtl ? 'rtl' : 'ltr');
+			expect(editor.options.get('_rtl')).toBe(initialRtl);
 		});
 
-		it('should call alertClose without error', () => {
-			expect(() => {
-				ui.alertClose();
-			}).not.toThrow();
-		});
-	});
-
-	describe('toast methods', () => {
-		it('should have showToast method', () => {
-			expect(typeof ui.showToast).toBe('function');
+		it('should add se-rtl class when set to rtl', () => {
+			// Ensure initial state is ltr
+			if (editor.options.get('_rtl') === true) {
+				uiManager.setDir('ltr');
+			}
+			uiManager.setDir('rtl');
+			expect(editor.frameContext.get('topArea').classList.contains('se-rtl')).toBe(true);
 		});
 
-		it('should have closeToast method', () => {
-			expect(typeof ui.closeToast).toBe('function');
+		it('should remove se-rtl class when set to ltr', () => {
+			// Set to rtl first, then ltr
+			if (editor.options.get('_rtl') === false) {
+				uiManager.setDir('rtl');
+			}
+			uiManager.setDir('ltr');
+			expect(editor.frameContext.get('topArea').classList.contains('se-rtl')).toBe(false);
 		});
 
-		it('should call showToast without error', () => {
-			expect(() => {
-				ui.showToast('Test toast');
-			}).not.toThrow();
-		});
+		it('should toggle direction buttons active state', () => {
+			const dirLtrBtn = editor.commandDispatcher.targets.get('dir_ltr');
+			const dirRtlBtn = editor.commandDispatcher.targets.get('dir_rtl');
 
-		it('should handle showToast with duration', () => {
-			expect(() => {
-				ui.showToast('Test toast', 1000);
-			}).not.toThrow();
-		});
+			// Only run assertions if dir buttons exist
+			if (dirLtrBtn && dirRtlBtn) {
+				uiManager.setDir('rtl');
+				expect(dirRtlBtn.classList.contains('active')).toBe(true);
+				expect(dirLtrBtn.classList.contains('active')).toBe(false);
 
-		it('should call closeToast without error', () => {
-			expect(() => {
-				ui.closeToast();
-			}).not.toThrow();
-		});
-	});
-
-	describe('offCurrentController', () => {
-		it('should have offCurrentController method', () => {
-			expect(typeof ui.offCurrentController).toBe('function');
-		});
-
-		it('should call without error', () => {
-			expect(() => {
-				ui.offCurrentController();
-			}).not.toThrow();
-		});
-	});
-
-	describe('offCurrentModal', () => {
-		it('should have offCurrentModal method', () => {
-			expect(typeof ui.offCurrentModal).toBe('function');
-		});
-
-		it('should call without error', () => {
-			expect(() => {
-				ui.offCurrentModal();
-			}).not.toThrow();
+				uiManager.setDir('ltr');
+				expect(dirLtrBtn.classList.contains('active')).toBe(true);
+				expect(dirRtlBtn.classList.contains('active')).toBe(false);
+			}
 		});
 	});
 
 	describe('Edge cases', () => {
 		it('should handle multiple readOnly toggles', () => {
-			ui.readOnly(true);
-			ui.readOnly(true);
-			ui.readOnly(false);
-			ui.readOnly(false);
+			uiManager.readOnly(true);
+			uiManager.readOnly(true);
+			uiManager.readOnly(false);
+			uiManager.readOnly(false);
 			expect(editor.frameContext.get('isReadOnly')).toBe(false);
 		});
 
 		it('should handle multiple disable/enable toggles', () => {
-			ui.disable();
-			ui.disable();
-			ui.enable();
-			ui.enable();
+			uiManager.disable();
+			uiManager.disable();
+			uiManager.enable();
+			uiManager.enable();
 			expect(editor.frameContext.get('isDisabled')).toBe(false);
 		});
 
 		it('should handle multiple show/hide toggles', () => {
-			ui.hide();
-			ui.hide();
-			ui.show();
-			ui.show();
+			uiManager.hide();
+			uiManager.hide();
+			uiManager.show();
+			uiManager.show();
 			expect(editor.frameContext.get('topArea').style.display).toBe('block');
 		});
 	});

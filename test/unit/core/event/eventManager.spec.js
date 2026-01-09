@@ -12,10 +12,10 @@ describe('EventManager', () => {
 
 		// Initialize observers for tests
 		eventManager._wwFrameObserver = {
-			disconnect: jest.fn()
+			disconnect: jest.fn(),
 		};
 		eventManager._toolbarObserver = {
-			disconnect: jest.fn()
+			disconnect: jest.fn(),
 		};
 	});
 
@@ -47,7 +47,7 @@ describe('EventManager', () => {
 				target,
 				type: 'click',
 				listener,
-				useCapture: undefined
+				useCapture: undefined,
 			});
 			expect(target.addEventListener).toHaveBeenCalledWith('click', listener, undefined);
 		});
@@ -106,7 +106,7 @@ describe('EventManager', () => {
 			expect(eventInfo).toEqual({
 				type: 'resize',
 				listener,
-				useCapture: undefined
+				useCapture: undefined,
 			});
 		});
 
@@ -187,7 +187,7 @@ describe('EventManager', () => {
 			mockEditor.component.is.mockReturnValue(true);
 			mockEditor.component.get.mockReturnValue({
 				target: componentElement,
-				pluginName: 'test'
+				pluginName: 'test',
 			});
 
 			eventManager.applyTagEffect(componentElement);
@@ -211,15 +211,13 @@ describe('EventManager', () => {
 
 		it('should check active plugins for commandTargets', () => {
 			const button = document.createElement('button');
-			const commandTargets = new Map();
-			commandTargets.set('testPlugin', [button]);
-			mockEditor.commandTargets = commandTargets;
+			mockEditor.commandDispatcher.targets.set('testPlugin', [button]);
 			mockEditor.activeCommands = ['testPlugin'];
 			mockEditor.frameContext.set('isReadOnly', false);
 
 			// Mock plugin active method
 			mockEditor.plugins.testPlugin = {
-				active: jest.fn().mockReturnValue(true)
+				active: jest.fn().mockReturnValue(true),
 			};
 
 			const textNode = document.createTextNode('text');
@@ -237,14 +235,12 @@ describe('EventManager', () => {
 		it('should handle indent/outdent enabling logic', () => {
 			const buttonIndent = document.createElement('button');
 			const buttonOutdent = document.createElement('button');
-			const commandTargets = new Map();
-			commandTargets.set('indent', [buttonIndent]);
-			commandTargets.set('outdent', [buttonOutdent]);
-			mockEditor.commandTargets = commandTargets;
+			mockEditor.commandDispatcher.targets.set('indent', [buttonIndent]);
+			mockEditor.commandDispatcher.targets.set('outdent', [buttonOutdent]);
 
 			// Mock format.isLine
 			mockEditor.format.isLine.mockReturnValue(true);
-			
+
 			// Case: List cell (enables indent/outdent)
 			const listCell = document.createElement('li');
 			const textNode = document.createTextNode('item');
@@ -261,16 +257,14 @@ describe('EventManager', () => {
 			// Ref: eventManager.js:355 const indentDisable = dom.check.isListCell(element) && !element.previousElementSibling;
 			// If isListCell is true and no prev sibling, indentDisable is true (disabled).
 			// We want to verify logic.
-			
+
 			// Let's rely on commandMapNodes. If button logic runs, it might add to map.
 		});
 
 		it('should enable outdent for elements with margin', () => {
 			const buttonOutdent = document.createElement('button');
-			const commandTargets = new Map();
-			commandTargets.set('outdent', [buttonOutdent]);
-			mockEditor.commandTargets = commandTargets;
-			
+			mockEditor.commandDispatcher.targets.set('outdent', [buttonOutdent]);
+
 			const pElement = document.createElement('p');
 			pElement.style.marginLeft = '20px';
 			const textNode = document.createTextNode('text');
@@ -279,13 +273,13 @@ describe('EventManager', () => {
 
 			mockEditor.format.isLine.mockReturnValue(true);
 			dom.check.isListCell.mockReturnValue(false);
-			
+
 			// Mock loop checks
 			// eventManager logic: if (element.style[marginDir] ...)
 			mockEditor.options.set('_rtl', false);
 
 			eventManager.applyTagEffect(textNode);
-			
+
 			expect(mockEditor.status.currentNodesMap).toContain('outdent');
 		});
 	});
@@ -294,17 +288,17 @@ describe('EventManager', () => {
 		it('should handle paste action successfully', async () => {
 			const mockClipboardData = {
 				getData: jest.fn().mockReturnValue('<p>test</p>'),
-				files: []
+				files: [],
 			};
 			const mockEvent = {
 				preventDefault: jest.fn(),
-				stopPropagation: jest.fn()
+				stopPropagation: jest.fn(),
 			};
 
 			const result = await eventManager._dataTransferAction('paste', mockEvent, mockClipboardData, mockEditor.frameContext);
 
-			expect(mockEditor.ui.showLoading).toHaveBeenCalled();
-			expect(mockEditor.ui.hideLoading).toHaveBeenCalled();
+			expect(mockEditor.uiManager.showLoading).toHaveBeenCalled();
+			expect(mockEditor.uiManager.hideLoading).toHaveBeenCalled();
 			expect(result).toBe(false);
 		});
 
@@ -312,11 +306,11 @@ describe('EventManager', () => {
 			const mockClipboardData = {
 				getData: jest.fn().mockImplementation(() => {
 					throw new Error('Test error');
-				})
+				}),
 			};
 			const mockEvent = {
 				preventDefault: jest.fn(),
-				stopPropagation: jest.fn()
+				stopPropagation: jest.fn(),
 			};
 
 			const consoleWarn = jest.spyOn(console, 'warn').mockImplementation();
@@ -324,7 +318,7 @@ describe('EventManager', () => {
 			await eventManager._dataTransferAction('paste', mockEvent, mockClipboardData, mockEditor.frameContext);
 
 			expect(consoleWarn).toHaveBeenCalledWith('[SUNEDITOR.paste.error]', expect.any(Error));
-			expect(mockEditor.ui.hideLoading).toHaveBeenCalled();
+			expect(mockEditor.uiManager.hideLoading).toHaveBeenCalled();
 
 			consoleWarn.mockRestore();
 		});
@@ -346,10 +340,10 @@ describe('EventManager', () => {
 
 		it('should disconnect observers', () => {
 			const mockWwFrameObserver = {
-				disconnect: jest.fn()
+				disconnect: jest.fn(),
 			};
 			const mockToolbarObserver = {
-				disconnect: jest.fn()
+				disconnect: jest.fn(),
 			};
 
 			eventManager._wwFrameObserver = mockWwFrameObserver;
@@ -388,7 +382,7 @@ describe('EventManager', () => {
 				getBlock: jest.fn(),
 				isBlock: jest.fn(),
 				isLine: jest.fn(),
-				addLine: jest.fn()
+				addLine: jest.fn(),
 			};
 		});
 
@@ -401,9 +395,9 @@ describe('EventManager', () => {
 		it('should set default line when inside block', () => {
 			const div = document.createElement('div');
 			mockEditor.format.getBlock.mockReturnValue(div);
-			
+
 			eventManager._setDefaultLine('div');
-			
+
 			expect(mockEditor.selection.setRange).toHaveBeenCalled();
 		});
 
@@ -413,20 +407,20 @@ describe('EventManager', () => {
 			const component = document.createElement('div');
 			wrapper.appendChild(component);
 			component.appendChild(commonCon);
-			
+
 			mockEditor.selection.getRange.mockReturnValue({
 				commonAncestorContainer: commonCon,
 				startContainer: commonCon,
-				startOffset: 0
+				startOffset: 0,
 			});
-			
+
 			// Mock component checks
 			// component.is(component) -> true
 			mockEditor.component.is.mockImplementation((node) => node === component);
 			mockEditor.component.get.mockReturnValue({
 				container: wrapper,
 				target: component,
-				pluginName: 'testComp'
+				pluginName: 'testComp',
 			});
 
 			eventManager._setDefaultLine('div');
@@ -437,10 +431,10 @@ describe('EventManager', () => {
 		it('should handle data-se-embed attribute', () => {
 			const commonCon = document.createElement('div');
 			commonCon.setAttribute('data-se-embed', 'true');
-			
+
 			// Mock check for format.isLine
 			mockEditor.format.isLine.mockReturnValue(false);
-			
+
 			const newLine = document.createElement('p');
 			newLine.innerHTML = '<br>';
 			mockEditor.format.addLine.mockReturnValue(newLine);
@@ -448,7 +442,7 @@ describe('EventManager', () => {
 			mockEditor.selection.getRange.mockReturnValue({
 				commonAncestorContainer: commonCon,
 				startContainer: commonCon,
-				startOffset: 0
+				startOffset: 0,
 			});
 
 			eventManager._setDefaultLine('P');
@@ -456,39 +450,8 @@ describe('EventManager', () => {
 			expect(mockEditor.format.addLine).toHaveBeenCalled();
 			expect(mockEditor.selection.setRange).toHaveBeenCalled();
 		});
-
-		it('should fallback to execCommand on error', () => {
-			// Simulate try/catch block by ensuring getBlock returns null and manual insertion throws
-			mockEditor.format.getBlock.mockReturnValue(null);
-			// Mock nodeType to 3 to enter the block
-			const commonCon = document.createTextNode('text');
-			// Mock parent element to define where to insert
-			const parent = document.createElement('div');
-			parent.appendChild(commonCon);
-			
-			mockEditor.selection.getRange.mockReturnValue({
-				commonAncestorContainer: commonCon,
-				startContainer: commonCon,
-				startOffset: 0
-			});
-
-			mockEditor.component.is.mockReturnValue(false);
-
-			// Mock createElement to throw error
-			dom.utils.createElement = jest.fn().mockImplementation(() => {
-				throw new Error('Test Error');
-			});
-
-			// Ensure execCommand is mocked
-			mockEditor.execCommand = jest.fn();
-			mockEditor.selection.init = jest.fn();
-
-			eventManager._setDefaultLine('div');
-
-			expect(mockEditor.execCommand).toHaveBeenCalledWith('formatBlock', false, 'div');
-		});
 	});
-	
+
 	describe('_dataTransferAction extensions', () => {
 		it('should clean MS Word content', async () => {
 			const mockClipboardData = {
@@ -496,35 +459,38 @@ describe('EventManager', () => {
 					if (type === 'text/html') return '<html xmlns:o="urn:schemas-microsoft-com:office:office"><body><!--StartFragment--><p class="MsoNormal">Word Content</p><!--EndFragment--></body></html>';
 					return 'Word Content';
 				}),
-				files: []
+				files: [],
 			};
 			const mockEvent = {
 				preventDefault: jest.fn(),
-				stopPropagation: jest.fn()
+				stopPropagation: jest.fn(),
 			};
 
 			mockEditor.char = { test: jest.fn().mockReturnValue(true) };
 			mockEditor.options.set('autoLinkify', false);
 			// Pass-through html clean
-			mockEditor.html.clean = jest.fn(html => html);
+			mockEditor.html.clean = jest.fn((html) => html);
 
 			await eventManager._dataTransferAction('paste', mockEvent, mockClipboardData, mockEditor.frameContext);
 
-			expect(mockEditor.triggerEvent).toHaveBeenCalledWith('onPaste', expect.objectContaining({
-				data: expect.stringContaining('Word Content'),
-				from: 'MS'
-			}));
+			expect(mockEditor.triggerEvent).toHaveBeenCalledWith(
+				'onPaste',
+				expect.objectContaining({
+					data: expect.stringContaining('Word Content'),
+					from: 'MS',
+				}),
+			);
 		});
 
 		it('should handle file drop events', async () => {
 			const mockFile = new File(['content'], 'test.txt', { type: 'text/plain' });
 			const mockClipboardData = {
 				getData: jest.fn().mockReturnValue(''),
-				files: [mockFile]
+				files: [mockFile],
 			};
 			const mockEvent = {
 				preventDefault: jest.fn(),
-				stopPropagation: jest.fn()
+				stopPropagation: jest.fn(),
 			};
 
 			await eventManager._dataTransferAction('drop', mockEvent, mockClipboardData, mockEditor.frameContext);
@@ -537,9 +503,9 @@ describe('EventManager', () => {
 			// let's verify if 'onFilePasteAndDrop' is checked.
 			// Actually, eventManager._callPluginEventAsync is called. We can spy it!
 			jest.spyOn(eventManager, '_callPluginEventAsync');
-			
+
 			mockEditor.frameContext.set('isReadOnly', false);
-			
+
 			await eventManager._dataTransferAction('drop', mockEvent, mockClipboardData, mockEditor.frameContext);
 
 			// Check that callPluginEventAsync was called for onFilePasteAndDrop
@@ -549,7 +515,7 @@ describe('EventManager', () => {
 		it('should check max char count', async () => {
 			const mockClipboardData = {
 				getData: jest.fn().mockReturnValue('content'),
-				files: []
+				files: [],
 			};
 			mockEditor.char = { test: jest.fn().mockReturnValue(false) }; // Max limit reached
 
@@ -567,11 +533,11 @@ describe('EventManager', () => {
 			mockEditor.selection.init = jest.fn(); // Mock init method
 			mockEditor.subToolbar = {
 				_showBalloon: jest.fn(),
-				hide: jest.fn()
+				hide: jest.fn(),
 			};
 			mockEditor.toolbar = {
 				_showBalloon: jest.fn(),
-				hide: jest.fn()
+				hide: jest.fn(),
 			};
 		});
 
@@ -581,9 +547,9 @@ describe('EventManager', () => {
 
 		it('_showToolbarBalloonDelay should call showBalloon after delay', () => {
 			eventManager._showToolbarBalloonDelay();
-			
+
 			jest.advanceTimersByTime(250);
-			
+
 			expect(mockEditor.toolbar._showBalloon).toHaveBeenCalled();
 		});
 
@@ -593,40 +559,38 @@ describe('EventManager', () => {
 			mockEditor.isBalloonAlways = true;
 			// Mock options.has to return false for _subMode
 			mockEditor.options.has = jest.fn().mockReturnValue(false);
-			
+
 			eventManager._toggleToolbarBalloon();
-			
+
 			expect(mockEditor.toolbar._showBalloon).toHaveBeenCalled();
 		});
 
 		it('_hideToolbar should hide toolbar when not active', () => {
-			mockEditor._notHideToolbar = false;
+			mockEditor.uiManager.isPreventToolbarHide = false;
 			// frameContext is a Map, so we set the value
 			mockEditor.frameContext.set('isFullScreen', false);
-			
+
 			eventManager._hideToolbar();
-			
+
 			expect(mockEditor.toolbar.hide).toHaveBeenCalled();
 		});
 	});
 
 	describe('_setKeyEffect', () => {
 		it('should update button states', () => {
-			const commandTargets = new Map();
 			const button = document.createElement('button');
-			commandTargets.set('bold', [button]);
-			mockEditor.commandTargets = commandTargets;
+			mockEditor.commandDispatcher.targets.set('bold', [button]);
 			mockEditor.activeCommands = ['bold'];
-			
+
 			eventManager.selectionState.reset();
-			
+
 			expect(button.classList.contains('active')).toBe(false);
 		});
 	});
 	describe('Setup and Teardown', () => {
 		it('_addCommonEvents should attach listeners', () => {
 			mockEditor.context = {
-				get: jest.fn((key) => document.createElement('div'))
+				get: jest.fn((key) => document.createElement('div')),
 			};
 			mockEditor.toolbar = { _setResponsive: jest.fn() };
 
@@ -683,7 +647,7 @@ describe('EventManager', () => {
 	describe('removeGlobalEvent with iframe', () => {
 		it('should remove event from iframe window when iframe option is true', () => {
 			const mockWw = {
-				removeEventListener: jest.fn()
+				removeEventListener: jest.fn(),
 			};
 			mockEditor.frameOptions.set('iframe', true);
 			mockEditor.frameContext.set('_ww', mockWw);
@@ -758,7 +722,7 @@ describe('EventManager', () => {
 	describe('_hideToolbar_sub', () => {
 		it('should hide sub toolbar when it exists and not prevented', () => {
 			mockEditor.subToolbar = { hide: jest.fn() };
-			mockEditor._notHideToolbar = false;
+			mockEditor.uiManager.isPreventToolbarHide = false;
 
 			eventManager._hideToolbar_sub();
 
@@ -767,7 +731,7 @@ describe('EventManager', () => {
 
 		it('should not hide sub toolbar when _notHideToolbar is true', () => {
 			mockEditor.subToolbar = { hide: jest.fn() };
-			mockEditor._notHideToolbar = true;
+			mockEditor.uiManager.isPreventToolbarHide = true;
 
 			eventManager._hideToolbar_sub();
 
@@ -776,7 +740,7 @@ describe('EventManager', () => {
 
 		it('should handle when subToolbar is null', () => {
 			mockEditor.subToolbar = null;
-			mockEditor._notHideToolbar = false;
+			mockEditor.uiManager.isPreventToolbarHide = false;
 
 			expect(() => eventManager._hideToolbar_sub()).not.toThrow();
 		});
@@ -887,7 +851,13 @@ describe('EventManager', () => {
 			const handler1 = jest.fn().mockReturnValue(undefined);
 			const handler2 = jest.fn().mockReturnValue(true);
 
-			mockEditor._onPluginEvents.set('onTest', [handler1, handler2]);
+			// Mock pluginManager.emitEvent to simulate handler execution
+			mockEditor.pluginManager.emitEvent.mockImplementation((name, e) => {
+				if (name === 'onTest') {
+					handler1(e);
+					return handler2(e);
+				}
+			});
 
 			const result = eventManager._callPluginEvent('onTest', { event: {} });
 
@@ -900,7 +870,14 @@ describe('EventManager', () => {
 			const handler1 = jest.fn().mockReturnValue(false);
 			const handler2 = jest.fn();
 
-			mockEditor._onPluginEvents.set('onTest', [handler1, handler2]);
+			// Mock pluginManager.emitEvent to stop on false
+			mockEditor.pluginManager.emitEvent.mockImplementation((name, e) => {
+				if (name === 'onTest') {
+					const r = handler1(e);
+					if (r === false) return false;
+					return handler2(e);
+				}
+			});
 
 			const result = eventManager._callPluginEvent('onTest', { event: {} });
 
@@ -912,7 +889,11 @@ describe('EventManager', () => {
 		it('should return undefined when no handler returns boolean', () => {
 			const handler = jest.fn().mockReturnValue(undefined);
 
-			mockEditor._onPluginEvents.set('onTest', [handler]);
+			mockEditor.pluginManager.emitEvent.mockImplementation((name, e) => {
+				if (name === 'onTest') {
+					return handler(e);
+				}
+			});
 
 			const result = eventManager._callPluginEvent('onTest', { event: {} });
 
@@ -925,7 +906,13 @@ describe('EventManager', () => {
 			const handler1 = jest.fn().mockResolvedValue(undefined);
 			const handler2 = jest.fn().mockResolvedValue(true);
 
-			mockEditor._onPluginEvents.set('onTest', [handler1, handler2]);
+			// Mock pluginManager.emitEventAsync to simulate async handler execution
+			mockEditor.pluginManager.emitEventAsync.mockImplementation(async (name, e) => {
+				if (name === 'onTest') {
+					await handler1(e);
+					return await handler2(e);
+				}
+			});
 
 			const result = await eventManager._callPluginEventAsync('onTest', { event: {} });
 
@@ -938,7 +925,14 @@ describe('EventManager', () => {
 			const handler1 = jest.fn().mockResolvedValue(false);
 			const handler2 = jest.fn();
 
-			mockEditor._onPluginEvents.set('onTest', [handler1, handler2]);
+			// Mock pluginManager.emitEventAsync to stop on false
+			mockEditor.pluginManager.emitEventAsync.mockImplementation(async (name, e) => {
+				if (name === 'onTest') {
+					const r = await handler1(e);
+					if (r === false) return false;
+					return await handler2(e);
+				}
+			});
 
 			const result = await eventManager._callPluginEventAsync('onTest', { event: {} });
 
@@ -993,7 +987,7 @@ describe('EventManager', () => {
 
 			mockEditor.nodeTransform.createNestedNode = jest.fn().mockReturnValue({
 				parent: strong.cloneNode(true),
-				inner: u.cloneNode(false)
+				inner: u.cloneNode(false),
 			});
 
 			eventManager._retainStyleNodes(formatEl, [strong, em, u]);
@@ -1008,16 +1002,16 @@ describe('EventManager', () => {
 			const formatEl = document.createElement('div');
 			const styleNode = document.createElement('strong');
 			styleNode.textContent = 'bold';
-			
+
 			mockEditor.nodeTransform = {
 				createNestedNode: jest.fn().mockReturnValue({
 					parent: document.createElement('strong'),
-					inner: document.createElement('strong')
-				})
+					inner: document.createElement('strong'),
+				}),
 			};
-			
+
 			eventManager._retainStyleNodes(formatEl, [styleNode]);
-			
+
 			expect(mockEditor.selection.setRange).toHaveBeenCalled();
 			expect(formatEl.children.length).toBeGreaterThan(0);
 		});
@@ -1107,8 +1101,8 @@ describe('EventManager', () => {
 					{
 						notInCarrier: true,
 						inst: { __offset: { top: 100, left: 50 } },
-						form: document.createElement('div')
-					}
+						form: document.createElement('div'),
+					},
 				];
 				mockEditor._controllerTargetContext = null;
 
@@ -1135,7 +1129,7 @@ describe('EventManager', () => {
 				const controller = {
 					notInCarrier: false,
 					inst: { _scrollReposition: jest.fn() },
-					form: document.createElement('div')
+					form: document.createElement('div'),
 				};
 				mockEditor.opendControllers = [controller];
 
@@ -1148,12 +1142,12 @@ describe('EventManager', () => {
 
 	describe('Statusbar resize private methods', () => {
 		it('should enable back wrapper on mousedown', () => {
-			mockEditor.ui.enableBackWrapper = jest.fn();
-			mockEditor.ui.disableBackWrapper = jest.fn();
+			mockEditor.uiManager.enableBackWrapper = jest.fn();
+			mockEditor.uiManager.disableBackWrapper = jest.fn();
 
 			// Test the configuration
-			expect(typeof mockEditor.ui.enableBackWrapper).toBe('function');
-			expect(typeof mockEditor.ui.disableBackWrapper).toBe('function');
+			expect(typeof mockEditor.uiManager.enableBackWrapper).toBe('function');
+			expect(typeof mockEditor.uiManager.disableBackWrapper).toBe('function');
 		});
 
 		it('should resize editor frame on mousemove', () => {

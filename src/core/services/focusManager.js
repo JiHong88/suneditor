@@ -1,31 +1,36 @@
 import { dom } from '../../helper';
 
 export default class FocusManager {
+	#editor;
+	#options;
+	#frameContext;
+	#frameOptions;
+
 	/**
 	 * @constructor
 	 * @param {SunEditor.Instance} editor
 	 */
 	constructor(editor) {
-		this.editor = editor;
-		this.options = editor.options;
-		this.frameContext = editor.frameContext;
-		this.frameOptions = editor.frameOptions;
+		this.#editor = editor;
+		this.#options = editor.options;
+		this.#frameContext = editor.frameContext;
+		this.#frameOptions = editor.frameOptions;
 	}
 
 	get #eventManager() {
-		return this.editor.eventManager;
+		return this.#editor.eventManager;
 	}
 
 	get #selection() {
-		return this.editor.selection;
+		return this.#editor.selection;
 	}
 
 	get #format() {
-		return this.editor.format;
+		return this.#editor.format;
 	}
 
 	get #component() {
-		return this.editor.component;
+		return this.#editor.component;
 	}
 
 	/**
@@ -33,11 +38,11 @@ export default class FocusManager {
 	 * @param {*} [rootKey] Root frame key.
 	 */
 	focus(rootKey) {
-		if (rootKey) this.editor.changeFrameContext(rootKey);
-		if (this.frameContext.get('wysiwygFrame').style.display === 'none') return;
+		if (rootKey) this.#editor.changeFrameContext(rootKey);
+		if (this.#frameContext.get('wysiwygFrame').style.display === 'none') return;
 		this._preventBlur = false;
 
-		if (this.frameOptions.get('iframe') || !this.frameContext.get('wysiwyg').contains(this.#selection.getNode())) {
+		if (this.#frameOptions.get('iframe') || !this.#frameContext.get('wysiwyg').contains(this.#selection.getNode())) {
 			this.nativeFocus();
 		} else {
 			try {
@@ -46,8 +51,8 @@ export default class FocusManager {
 					const currentNode = /** @type {HTMLElement} */ (range.commonAncestorContainer).children[range.startOffset];
 					if (!this.#format.isLine(currentNode) && !this.#component.is(currentNode)) {
 						const br = dom.utils.createElement('BR');
-						const format = dom.utils.createElement(this.options.get('defaultLine'), null, br);
-						this.frameContext.get('wysiwyg').insertBefore(format, currentNode);
+						const format = dom.utils.createElement(this.#options.get('defaultLine'), null, br);
+						this.#frameContext.get('wysiwyg').insertBefore(format, currentNode);
 						this.#selection.setRange(br, 0, br, 0);
 						return;
 					}
@@ -59,7 +64,7 @@ export default class FocusManager {
 			}
 		}
 
-		if (this.editor.isBalloon) this.#eventManager._toggleToolbarBalloon();
+		if (this.#editor.isBalloon) this.#eventManager._toggleToolbarBalloon();
 	}
 
 	/**
@@ -69,7 +74,7 @@ export default class FocusManager {
 	 */
 	focusEdge(focusEl) {
 		this._preventBlur = false;
-		focusEl ||= this.frameContext.get('wysiwyg').lastElementChild;
+		focusEl ||= this.#frameContext.get('wysiwyg').lastElementChild;
 
 		const fileComponentInfo = this.#component.get(focusEl);
 		if (fileComponentInfo) {
@@ -103,10 +108,10 @@ export default class FocusManager {
 	 * @description Focusout to wysiwyg area (.blur())
 	 */
 	blur() {
-		if (this.frameOptions.get('iframe')) {
-			this.frameContext.get('wysiwygFrame').blur();
+		if (this.#frameOptions.get('iframe')) {
+			this.#frameContext.get('wysiwygFrame').blur();
 		} else {
-			this.frameContext.get('wysiwyg').blur();
+			this.#frameContext.get('wysiwyg').blur();
 		}
 	}
 }

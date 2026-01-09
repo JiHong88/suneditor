@@ -512,6 +512,15 @@ export function createMockEditor(customOptions = {}) {
 			_isNonSplitNode: jest.fn().mockReturnValue(false)
 		},
 
+		shortcuts: {
+			command: jest.fn().mockReturnValue(false),
+			enable: jest.fn(),
+			disable: jest.fn(),
+			_registerCustomShortcuts: jest.fn(),
+			keyMap: new Map(),
+			reverseKeys: []
+		},
+
 		// Event system
 		eventManager: null, // Will be set after mockEditor is complete
 
@@ -578,14 +587,58 @@ export function createMockEditor(customOptions = {}) {
 			__iframeFocus: false
 		},
 
-		ui: {
+		uiManager: {
+			// Public methods
+			setEditorStyle: jest.fn(),
+			setTheme: jest.fn(),
+			setDir: jest.fn(),
+			readOnly: jest.fn(),
+			disable: jest.fn(),
+			enable: jest.fn(),
+			show: jest.fn(),
+			hide: jest.fn(),
 			showLoading: jest.fn(),
 			hideLoading: jest.fn(),
-			offCurrentController: jest.fn(),
-			_closeAlignMenu: jest.fn(),
+			alertOpen: jest.fn(),
+			alertClose: jest.fn(),
+			showToast: jest.fn(),
+			closeToast: jest.fn(),
+			setControllerOnDisabledButtons: jest.fn().mockReturnValue(true),
+			onControllerContext: jest.fn(),
+			offControllerContext: jest.fn(),
 			enableBackWrapper: jest.fn(),
 			disableBackWrapper: jest.fn(),
-			offCurrentModal: jest.fn()
+			offCurrentController: jest.fn(),
+			offCurrentModal: jest.fn(),
+			getVisibleFigure: jest.fn().mockReturnValue(null),
+			setFigureContainer: jest.fn(),
+			preventToolbarHide: jest.fn(),
+			reset: jest.fn(),
+			// Internal methods
+			_offControllers: jest.fn(),
+			_syncScrollPosition: jest.fn(),
+			_repositionControllers: jest.fn(),
+			_visibleControllers: jest.fn(),
+			_initToggleButtons: jest.fn(),
+			_toggleCodeViewButtons: jest.fn(),
+			_toggleControllerButtons: jest.fn(),
+			isButtonDisabled: jest.fn().mockReturnValue(false),
+			_updatePlaceholder: jest.fn(),
+			_syncFrameState: jest.fn(),
+			_iframeAutoHeight: jest.fn(),
+			_emitResizeEvent: jest.fn(),
+			init: jest.fn(),
+			destroy: jest.fn(),
+			// State properties
+			opendControllers: [],
+			currentControllerName: '',
+			opendModal: null,
+			opendBrowser: null,
+			selectMenuOn: false,
+			_controllerOnDisabledButtons: [],
+			_codeViewDisabledButtons: [],
+			_notHideToolbar: false,
+			_figureContainer: null
 		},
 
 		// Focus manager
@@ -595,6 +648,37 @@ export function createMockEditor(customOptions = {}) {
 			nativeFocus: jest.fn(),
 			focusEdge: jest.fn(),
 			_preventBlur: false
+		},
+
+		// Context Manager
+		contextManager: {
+			frameRoots: frameRoots,
+			context: {
+				get: jest.fn((key) => {
+					const contextMap = {
+						menuTray: elements.menuTray,
+						toolbar_main: elements.toolbarMain,
+						toolbar_sub_main: elements.toolbarSub,
+						topArea: elements.topArea,
+						wrapper: elements.wrapper,
+						wysiwyg: elements.wysiwyg,
+						code: elements.codeArea,
+						statusbar: elements.statusbar
+					};
+					return contextMap[key] || document.createElement('div');
+				}),
+				set: jest.fn(),
+				has: jest.fn(),
+				delete: jest.fn(),
+				clear: jest.fn()
+			},
+			frameContext: frameContext,
+			applyToRoots: jest.fn((callback) => {
+				frameRoots.forEach((root) => callback(root));
+			}),
+			reset: jest.fn(),
+			init: jest.fn(),
+			destroy: jest.fn()
 		},
 
 		// Editor actions
@@ -607,26 +691,47 @@ export function createMockEditor(customOptions = {}) {
 				targets.forEach(callback);
 			}
 		}),
-		applyFrameRoots: jest.fn((callback) => {
-			frameRoots.forEach((root) => callback(root));
-		}),
 		execCommand: jest.fn(),
 		runFromTarget: jest.fn(),
-		_checkComponents: jest.fn(),
-		_resourcesStateChange: jest.fn(),
 		_iframeAutoHeight: jest.fn(),
 		__callResizeFunction: jest.fn(),
 
-		// File manager
-		_fileManager: {
-			pluginRegExp: /^(image|video|audio|fileUpload)$/
+		// Command Dispatcher
+		commandDispatcher: {
+			run: jest.fn(),
+			runFromTarget: jest.fn(),
+			targets: commandTargets,
+			applyTargets: jest.fn((command, callback) => {
+				const targets = commandTargets.get(command);
+				if (targets) {
+					targets.forEach(callback);
+				}
+			}),
+			registerTargets: jest.fn(),
+			resetTargets: jest.fn(),
+			destroy: jest.fn()
 		},
 
-		// Controller state
-		currentControllerName: 'test',
-		opendControllers: [],
-		opendBrowser: null,
-		_controllerTargetContext: null,
+		// Plugin Manager
+		pluginManager: {
+			fileInfo: {
+				tags: [],
+				regExp: null,
+				pluginRegExp: /^(image|video|audio|fileUpload)$/,
+				tagAttrs: {},
+				pluginMap: {}
+			},
+			componentCheckers: [],
+			retainFormatCheckers: new Map(),
+			checkFileInfo: jest.fn(),
+			resetFileInfo: jest.fn(),
+			findComponentInfo: jest.fn().mockReturnValue(null),
+			applyRetainFormat: jest.fn(),
+			emitEvent: jest.fn(),
+			emitEventAsync: jest.fn(),
+			register: jest.fn(),
+			destroy: jest.fn()
+		},
 
 		// Editor modes
 		isBalloon: false,
@@ -636,17 +741,9 @@ export function createMockEditor(customOptions = {}) {
 		isSubBalloonAlways: false,
 
 		// Editor flags
-		_notHideToolbar: false,
 		_preventBlur: false,
 		_preventFocus: false,
-		_preventSelection: false,
-
-		// Line breakers
-		_lineBreaker_t: elements.lineBreaker_t,
-		_lineBreaker_b: elements.lineBreaker_b,
-
-		// Code view
-		_codeViewDisabledButtons: []
+		_preventSelection: false
 	};
 
 	// Create eventManager with both CoreInjector and ClassInjector properties
@@ -690,7 +787,7 @@ export function createMockEditor(customOptions = {}) {
 		offset: mockEditor.offset,
 		selection: mockEditor.selection,
 		shortcuts: mockEditor.shortcuts,
-		ui: mockEditor.ui,
+		uiManager: mockEditor.uiManager,
 		viewer: mockEditor.viewer,
 		inline: mockEditor.inline,
 
@@ -723,7 +820,7 @@ export function createMockThis(editor = null, customProps = {}) {
 		html: mockEditor.html,
 		char: mockEditor.char,
 		history: mockEditor.history,
-		ui: mockEditor.ui,
+		uiManager: mockEditor.uiManager,
 		toolbar: mockEditor.toolbar,
 		subToolbar: mockEditor.subToolbar,
 		menu: mockEditor.menu,
@@ -734,6 +831,9 @@ export function createMockThis(editor = null, customProps = {}) {
 		status: mockEditor.status,
 		plugins: mockEditor.plugins,
 		focusManager: mockEditor.focusManager,
+		commandDispatcher: mockEditor.commandDispatcher,
+		pluginManager: mockEditor.pluginManager,
+		contextManager: mockEditor.contextManager,
 
 		// Event manager specific properties
 		isComposing: false,

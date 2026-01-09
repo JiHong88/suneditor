@@ -1,5 +1,5 @@
 import { createTestEditor, destroyTestEditor, waitForEditorReady } from '../../../__mocks__/editorIntegration';
-import * as actives from '../../../../src/core/support/actives';
+import * as actives from '../../../../src/core/services/actives';
 import { dom, env } from '../../../../src/helper';
 
 describe('actives', () => {
@@ -275,47 +275,6 @@ describe('actives', () => {
 		});
 	});
 
-	describe('DIR_BTN_ACTIVE', () => {
-		it('should toggle direction buttons', () => {
-			// Be careful not to overwrite objects needed for destroy
-			editor.icons = { dir_ltr: 'Left', dir_rtl: 'Right' };
-
-			// Mock DOM elements
-			const ltrBtn = document.createElement('button');
-			const tooltip = document.createElement('span');
-			tooltip.className = 'se-tooltip-text';
-			ltrBtn.appendChild(document.createElement('span')); // icon
-			ltrBtn.appendChild(tooltip);
-
-			const rtlBtn = document.createElement('button');
-			const tooltip2 = document.createElement('span');
-			tooltip2.className = 'se-tooltip-text';
-			rtlBtn.appendChild(document.createElement('span')); // icon
-			rtlBtn.appendChild(tooltip2);
-
-			editor.commandTargets.set('dir_ltr', ltrBtn);
-			editor.commandTargets.set('dir_rtl', rtlBtn);
-			editor.shortcutsKeyMap.clear();
-
-            if (!editor.reverseKeys.forEach) {
-                editor.reverseKeys = new Map();
-            }
-
-			editor.lang = { dir_ltr: 'LTR', dir_rtl: 'RTL' };
-
-			// Mock applyCommandTargets
-			editor.applyCommandTargets = jest.fn((name, cb) => {
-				cb(ltrBtn);
-				cb(rtlBtn);
-			});
-
-			actives.DIR_BTN_ACTIVE(editor, true); // RTL
-
-			expect(editor.commandTargets.get('dir_rtl').classList.contains('active')).toBe(true);
-			expect(editor.commandTargets.get('dir_ltr').classList.contains('active')).toBe(false);
-
-			actives.DIR_BTN_ACTIVE(editor, false); // LTR
-			expect(editor.commandTargets.get('dir_ltr').classList.contains('active')).toBe(true);
-		});
-	});
+	// Note: DIR_BTN_ACTIVE has been moved to ui.setDir
+	// See test/unit/core/class/ui.spec.js for related tests
 });

@@ -443,7 +443,7 @@ export class TableSelectionService {
 	 * @description Removes global event listeners and resets resize-related properties.
 	 */
 	#removeGlobalEvents() {
-		this.#main.ui.disableBackWrapper();
+		this.#main.uiManager.disableBackWrapper();
 		const globalEvents = this.#globalEvents;
 		for (const k in globalEvents) {
 			globalEvents[k] &&= this.#main.eventManager.removeGlobalEvent(globalEvents[k]);

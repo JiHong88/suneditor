@@ -10,8 +10,6 @@ export default class DefaultLineManager {
 	 * @param {SunEditor.Instance} editor
 	 */
 	constructor(editor: SunEditor.Instance);
-	editor: import('../../editor').default;
-	options: any;
 	/**
 	 * @description Executes the default line creation logic.
 	 * - If no formatName is provided, it uses the 'defaultLine' option (usually 'P').

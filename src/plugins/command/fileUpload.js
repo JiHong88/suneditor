@@ -208,7 +208,7 @@ class FileUpload extends PluginCommand {
 		const isInlineComp = this.component.isInline(containerTarget);
 		const focusEl = isInlineComp ? containerTarget.previousSibling || containerTarget.nextSibling : containerTarget.previousElementSibling || containerTarget.nextElementSibling;
 		dom.utils.removeItem(containerTarget);
-		this.ui.offCurrentController();
+		this.uiManager.offCurrentController();
 
 		this.focusManager.focusEdge(focusEl);
 		this.history.push(false);
@@ -237,7 +237,7 @@ class FileUpload extends PluginCommand {
 					file: f,
 				});
 
-				this.ui.alertOpen(message === NO_EVENT ? err : message || err, 'error');
+				this.uiManager.alertOpen(message === NO_EVENT ? err : message || err, 'error');
 
 				return false;
 			}
@@ -257,7 +257,7 @@ class FileUpload extends PluginCommand {
 				uploadSize: fileSize,
 			});
 
-			this.ui.alertOpen(message === NO_EVENT ? err : message || err, 'error');
+			this.uiManager.alertOpen(message === NO_EVENT ? err : message || err, 'error');
 
 			return false;
 		}
@@ -403,7 +403,7 @@ class FileUpload extends PluginCommand {
 		const message = await this.triggerEvent('onFileUploadError', { error: response });
 		if (message === false) return;
 		const err = message === NO_EVENT ? response.errorMessage : message || response.errorMessage;
-		this.ui.alertOpen(err, 'error');
+		this.uiManager.alertOpen(err, 'error');
 		console.error('[SUNEDITOR.plugin.fileUpload.error]', err);
 	}
 

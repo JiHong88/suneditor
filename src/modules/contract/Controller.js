@@ -74,14 +74,6 @@ class Controller extends CoreInjector {
 	constructor(inst, element, params, _name) {
 		super(inst.editor);
 
-		// editor class
-		this.toolbar = this.editor.toolbar;
-		this.subToolbar = this.editor.subToolbar;
-		this.component = this.editor.component;
-		this.ui = this.editor.ui;
-		this.selection = this.editor.selection;
-		this.offset = this.editor.offset;
-
 		// members
 		this.kind = _name || inst.constructor.key || inst.constructor.name;
 		this.inst = inst;
@@ -124,6 +116,26 @@ class Controller extends CoreInjector {
 		this.eventManager.addEvent(element, 'mouseleave', this.#MouseLeave.bind(this));
 	}
 
+	get #toolbar() {
+		return this.editor.toolbar;
+	}
+
+	get #subToolbar() {
+		return this.editor.subToolbar;
+	}
+
+	get #component() {
+		return this.editor.component;
+	}
+
+	get #selection() {
+		return this.editor.selection;
+	}
+
+	get #offset() {
+		return this.editor.offset;
+	}
+
 	/**
 	 * @description Open a modal plugin
 	 * @param {Node|Range} target Target element
@@ -148,27 +160,27 @@ class Controller extends CoreInjector {
 		this.form.removeAttribute('data-se-hidden-by-children');
 		this.#__hiddenByParents__.clear();
 
-		if (this.editor.isBalloon) this.toolbar.hide();
-		else if (this.editor.isSubBalloon) this.subToolbar.hide();
+		if (this.editor.isBalloon) this.#toolbar.hide();
+		else if (this.editor.isSubBalloon) this.#subToolbar.hide();
 
 		if (!this.status.hasFocus) {
 			if (disabled ?? this.disabled) {
-				this.ui.setControllerOnDisabledButtons(true);
+				this.uiManager.setControllerOnDisabledButtons(true);
 			} else {
-				this.ui.setControllerOnDisabledButtons(false);
+				this.uiManager.setControllerOnDisabledButtons(false);
 			}
 		}
 
 		this.currentPositionTarget = positionTarget || target;
 		this.isWWTarget = isWWTarget ?? this.isWWTarget;
 		if (typeof initMethod === 'function') this.#initMethod = initMethod;
-		this.editor.currentControllerName = this.kind;
+		this.uiManager.currentControllerName = this.kind;
 
 		this.#addOffset = { left: 0, top: 0 };
 		if (addOffset) this.#addOffset = { ...this.#addOffset, ...addOffset };
 
 		const parents = this.isOutsideForm ? this.parentsForm : [];
-		this.editor.opendControllers?.forEach((e) => {
+		this.uiManager.opendControllers?.forEach((e) => {
 			if (!parents.includes(e.form)) e.form.style.zIndex = INDEX_1;
 		});
 
@@ -225,7 +237,7 @@ class Controller extends CoreInjector {
 
 		if (this.parentsForm.length > 0) return;
 
-		this.component.deselect();
+		this.#component.deselect();
 	}
 
 	/**
@@ -347,10 +359,10 @@ class Controller extends CoreInjector {
 			form.addEventListener('mousedown', this.#shadowRootEventListener);
 		}
 
-		this.editor._controllerTargetContext = this.frameContext.get('topArea');
+		this.uiManager.onControllerContext();
 
 		if (!this.isOpen) {
-			this.editor.opendControllers.push(info);
+			this.uiManager.opendControllers.push(info);
 		}
 
 		this.isOpen = true;
@@ -366,16 +378,16 @@ class Controller extends CoreInjector {
 	 */
 	#controllerOff() {
 		this.form.style.display = 'none';
-		this.editor.opendControllers = this.editor.opendControllers.filter((v) => v.form !== this.form);
-		if (this.editor.currentControllerName !== this.kind && this.editor.opendControllers.length > 0) return;
+		this.uiManager.opendControllers = this.uiManager.opendControllers.filter((v) => v.form !== this.form);
+		if (this.uiManager.currentControllerName !== this.kind && this.uiManager.opendControllers.length > 0) return;
 
-		this.ui.setControllerOnDisabledButtons(false);
+		this.uiManager.setControllerOnDisabledButtons(false);
+		this.uiManager.offControllerContext();
 
 		this.frameContext.get('lineBreaker_t').style.display = this.frameContext.get('lineBreaker_b').style.display = 'none';
 		this.editor.effectNode = null;
-		this.editor.currentControllerName = '';
+		this.uiManager.currentControllerName = '';
 		this.editor._preventBlur = false;
-		this.editor._controllerTargetContext = null;
 
 		_w.setTimeout(() => {
 			this.editor.status.onSelected = false;
@@ -404,13 +416,13 @@ class Controller extends CoreInjector {
 			this.sibling.style.display = 'block';
 		}
 
-		if (this.selection.isRange(refer)) {
-			if (!this.offset.setRangePosition(this.form, /** @type {Range} */ (refer), { position: 'bottom' })) {
+		if (this.#selection.isRange(refer)) {
+			if (!this.#offset.setRangePosition(this.form, /** @type {Range} */ (refer), { position: 'bottom' })) {
 				this.hide();
 				return false;
 			}
 		} else {
-			const positionResult = this.offset.setAbsPosition(controller, /** @type {HTMLElement} */ (refer), {
+			const positionResult = this.#offset.setAbsPosition(controller, /** @type {HTMLElement} */ (refer), {
 				addOffset: this.#addOffset,
 				position: this.position,
 				isWWTarget: this.isWWTarget,
@@ -456,7 +468,7 @@ class Controller extends CoreInjector {
 	 * - When the ESC key is pressed, the controller is closed.
 	 */
 	#removeGlobalEvent() {
-		this.component.__removeGlobalEvent();
+		this.#component.__removeGlobalEvent();
 		this.#bindClose_key &&= this.eventManager.removeGlobalEvent(this.#bindClose_key);
 		this.#bindClose_mouse &&= this.eventManager.removeGlobalEvent(this.#bindClose_mouse);
 	}
@@ -466,9 +478,9 @@ class Controller extends CoreInjector {
 	 * @returns {boolean} True if the controller is fixed.
 	 */
 	#checkFixed() {
-		if (this.editor.selectMenuOn) return true;
+		if (this.uiManager.selectMenuOn) return true;
 
-		const cont = this.editor.opendControllers;
+		const cont = this.uiManager.opendControllers;
 		for (let i = 0; i < cont.length; i++) {
 			if (cont[i].inst === this && cont[i].fixed) {
 				return true;
@@ -497,7 +509,7 @@ class Controller extends CoreInjector {
 		}
 
 		const _element = this.inst._element;
-		return !isParentForm && (!!dom.query.getParentElement(target, '.se-controller') || (this.component.isInline(_element) ? target === _element : target?.contains(_element)));
+		return !isParentForm && (!!dom.query.getParentElement(target, '.se-controller') || (this.#component.isInline(_element) ? target === _element : target?.contains(_element)));
 	}
 
 	/**
@@ -518,7 +530,7 @@ class Controller extends CoreInjector {
 	 * @param {MouseEvent} e - Event object
 	 */
 	#MouseEnter(e) {
-		this.editor.currentControllerName = this.kind;
+		this.uiManager.currentControllerName = this.kind;
 		if (this.parentsForm.length > 0 && this.isInsideForm) return;
 
 		const eventTarget = dom.query.getEventTarget(e);
@@ -547,7 +559,7 @@ class Controller extends CoreInjector {
 		const eventTarget = dom.query.getEventTarget(e);
 		if (!keyCodeMap.isEsc(keyCode)) {
 			if (this.form.contains(eventTarget) || this.#checkForm(eventTarget)) return;
-			if (this.editor._fileManager.pluginRegExp.test(this.kind)) return;
+			if (this.pluginManager.fileInfo.pluginRegExp.test(this.kind)) return;
 		} else {
 			if (this.#__childrenControllers__.some(({ isOpen }) => isOpen)) return;
 		}
@@ -587,7 +599,7 @@ class Controller extends CoreInjector {
 	 */
 	#PostCloseEvent(eventTarget) {
 		if (!this.frameContext.get('wysiwyg').contains(eventTarget)) {
-			this.component.__prevent = false;
+			this.#component.__prevent = false;
 		}
 	}
 }

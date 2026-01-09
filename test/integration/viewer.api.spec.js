@@ -75,10 +75,10 @@ describe('Viewer API integration tests', () => {
 		it('should use commandHandler for code view toggle', async () => {
 			expect(editor.frameContext.get('isCodeView')).toBe(false);
 
-			await editor.commandExecutor.execute('codeView');
+			await editor.commandDispatcher.run('codeView');
 			expect(editor.frameContext.get('isCodeView')).toBe(true);
 
-			await editor.commandExecutor.execute('codeView');
+			await editor.commandDispatcher.run('codeView');
 			expect(editor.frameContext.get('isCodeView')).toBe(false);
 		});
 	});
@@ -115,10 +115,10 @@ describe('Viewer API integration tests', () => {
 		it('should use commandHandler for fullscreen toggle', async () => {
 			expect(editor.frameContext.get('isFullScreen')).toBe(false);
 
-			await editor.commandExecutor.execute('fullScreen');
+			await editor.commandDispatcher.run('fullScreen');
 			expect(editor.frameContext.get('isFullScreen')).toBe(true);
 
-			await editor.commandExecutor.execute('fullScreen');
+			await editor.commandDispatcher.run('fullScreen');
 			expect(editor.frameContext.get('isFullScreen')).toBe(false);
 		});
 
@@ -157,11 +157,11 @@ describe('Viewer API integration tests', () => {
 		it('should use commandHandler for show blocks', async () => {
 			// Should not throw
 			await expect(async () => {
-				await editor.commandExecutor.execute('showBlocks');
+				await editor.commandDispatcher.run('showBlocks');
 			}).not.toThrow();
 
 			await expect(async () => {
-				await editor.commandExecutor.execute('showBlocks');
+				await editor.commandDispatcher.run('showBlocks');
 			}).not.toThrow();
 		});
 	});
@@ -181,7 +181,7 @@ describe('Viewer API integration tests', () => {
 
 			// Should not throw
 			await expect(async () => {
-				await editor.commandExecutor.execute('print');
+				await editor.commandDispatcher.run('print');
 			}).not.toThrow();
 		});
 	});

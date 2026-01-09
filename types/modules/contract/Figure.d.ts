@@ -318,13 +318,6 @@ declare class Figure extends CoreInjector {
 		right: string;
 		center: string;
 	};
-	component: import('../../core/class/component').default;
-	ui: import('../../core/class/ui').default;
-	offset: import('../../core/class/offset').default;
-	selection: import('../../core/class/selection').default;
-	html: import('../../core/class/html').default;
-	format: import('../../core/class/format').default;
-	nodeTransform: import('../../core/class/nodeTransform').default;
 	/** @type {Object<string, *>} */
 	_action: {
 		[x: string]: any;

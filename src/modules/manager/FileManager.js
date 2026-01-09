@@ -40,11 +40,6 @@ class FileManager extends CoreInjector {
 		void this._checkInfo;
 	}
 
-	/** @type {SunEditor.Core['ui']} */
-	get #ui() {
-		return this.editor.ui;
-	}
-
 	/**
 	 * @description Upload the file to the server.
 	 * @param {string} uploadUrl Upload server url
@@ -54,7 +49,7 @@ class FileManager extends CoreInjector {
 	 * @param {?(res: *, xmlHttp: XMLHttpRequest) => string} [errorCallBack] Error call back function
 	 */
 	upload(uploadUrl, uploadHeader, data, callBack, errorCallBack) {
-		this.#ui.showLoading();
+		this.uiManager.showLoading();
 
 		let formData = null;
 		// create formData
@@ -80,7 +75,7 @@ class FileManager extends CoreInjector {
 	 * @returns {Promise<XMLHttpRequest>}
 	 */
 	async asyncUpload(uploadUrl, uploadHeader, data) {
-		this.#ui.showLoading();
+		this.uiManager.showLoading();
 
 		let formData = null;
 		// create formData

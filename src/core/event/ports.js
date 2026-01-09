@@ -162,7 +162,7 @@ export function makePorts(inst, { _styleNodes }) {
 		 * @param {Range} range Range object
 		 */
 		enterScrollTo(range) {
-			inst.editor._iframeAutoHeight(inst.frameContext);
+			inst.uiManager._iframeAutoHeight(inst.frameContext);
 
 			// scroll to
 			if (isMobile && inst.scrollparents.length > 0) return;

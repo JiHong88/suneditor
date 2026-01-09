@@ -72,7 +72,7 @@ jest.mock('../../../../src/editorInjector/_core.js', () => {
     return jest.fn().mockImplementation(function(editor) {
         this.editor = editor;
         this.lang = editor.lang;
-        this.ui = editor.ui;
+        this.uiManager = editor.uiManager;
         this.options = editor.options;
         this.frameContext = editor.frameContext;
         this.focusManager = editor.focusManager;
@@ -102,7 +102,7 @@ describe('Plugins - Command - ExportPDF', () => {
             lang: {
                 exportPDF: 'Export PDF'
             },
-            ui: {
+            uiManager: {
                 showLoading: jest.fn(),
                 hideLoading: jest.fn()
             },
@@ -182,7 +182,7 @@ describe('Plugins - Command - ExportPDF', () => {
             await exportPDF.action();
 
             expect(consoleSpy).toHaveBeenCalledWith('[SUNEDITOR.plugins.exportPDF.error] Requires exportPDF."apiUrl" options.');
-            expect(mockEditor.ui.showLoading).not.toHaveBeenCalled();
+            expect(mockEditor.uiManager.showLoading).not.toHaveBeenCalled();
 
             consoleSpy.mockRestore();
         });
@@ -197,13 +197,13 @@ describe('Plugins - Command - ExportPDF', () => {
             const { dom } = require('../../../../src/helper');
             await exportPDF.action();
 
-            expect(mockEditor.ui.showLoading).toHaveBeenCalled();
+            expect(mockEditor.uiManager.showLoading).toHaveBeenCalled();
             expect(dom.utils.createElement).toHaveBeenCalledWith('div',
                 { class: 'se-wrapper-wysiwyg' },
                 '<p>Test content</p>'
             );
             expect(dom.utils.applyInlineStylesAll).toHaveBeenCalled();
-            expect(mockEditor.ui.hideLoading).toHaveBeenCalled();
+            expect(mockEditor.uiManager.hideLoading).toHaveBeenCalled();
         });
 
         it('should handle triggerEvent onExportPDFBefore returning false', async () => {
@@ -259,7 +259,7 @@ describe('Plugins - Command - ExportPDF', () => {
             await exportPDF.action();
 
             expect(consoleSpy).toHaveBeenCalledWith('[SUNEDITOR.plugins.exportPDF.error]', 'DOM error');
-            expect(mockEditor.ui.hideLoading).toHaveBeenCalled();
+            expect(mockEditor.uiManager.hideLoading).toHaveBeenCalled();
 
             consoleSpy.mockRestore();
         });
@@ -272,7 +272,7 @@ describe('Plugins - Command - ExportPDF', () => {
             await exportPDF.action();
 
             expect(dom.utils.removeItem).toHaveBeenCalled();
-            expect(mockEditor.ui.hideLoading).toHaveBeenCalled();
+            expect(mockEditor.uiManager.hideLoading).toHaveBeenCalled();
 
             consoleSpy.mockRestore();
         });
@@ -384,7 +384,7 @@ describe('Plugins - Command - ExportPDF', () => {
             await exportPDF.action();
 
             expect(consoleSpy).toHaveBeenCalledWith('[SUNEDITOR.plugins.exportPDF.error]', 'API call failed');
-            expect(mockEditor.ui.hideLoading).toHaveBeenCalled();
+            expect(mockEditor.uiManager.hideLoading).toHaveBeenCalled();
 
             consoleSpy.mockRestore();
         });

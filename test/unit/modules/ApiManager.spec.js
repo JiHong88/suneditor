@@ -68,7 +68,7 @@ describe('Modules - ApiManager', () => {
 		};
 
 		mockEditor = {
-			ui: mockUI
+			uiManager: mockUI
 		};
 
 		mockInst = {
@@ -266,7 +266,7 @@ describe('Modules - ApiManager', () => {
 			};
 
 			const mockEditor2 = {
-				ui: mockUI2
+				uiManager: mockUI2
 			};
 
 			const mockInst2 = {

@@ -18,23 +18,22 @@ class ListFormat extends CoreInjector {
 		super(editor);
 	}
 
-	/** @type {SunEditor.Core['selection']} */
 	get #selection() {
 		return this.editor.selection;
 	}
-	/** @type {SunEditor.Core['format']} */
+
 	get #format() {
 		return this.editor.format;
 	}
-	/** @type {SunEditor.Core['component']} */
+
 	get #component() {
 		return this.editor.component;
 	}
-	/** @type {SunEditor.Core['inline']} */
+
 	get #inline() {
 		return this.editor.inline;
 	}
-	/** @type {SunEditor.Core['nodeTransform']} */
+
 	get #nodeTransform() {
 		return this.editor.nodeTransform;
 	}

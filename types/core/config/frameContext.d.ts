@@ -1,11 +1,5 @@
 import type {} from '../../typedef';
 /**
- * ================================================================================================================================
- * === FRAME CONTEXT TYPES : Store
- * =================================================================================================================================
- */
-/**
- * ================================================================================================================================
  * @typedef {Object} FrameContextStore
  *
  * This object stores **all frame-specific states and DOM references** for a SunEditor instance.
@@ -80,23 +74,7 @@ import type {} from '../../typedef';
  * @property {number} [_editorHeight] - Current height of the editor.
  * ================================================================================================================================
  */
-/** @typedef {Map<keyof FrameContextStore|null, *>} FrameContextMap */
-/** --+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+-- */
-/**
- * ================================================================================================================================
- * === UTILITIES : Manage Frame Context Map
- * =================================================================================================================================
- */
-/**
- * @typedef {Object} FrameContextUtil
- * @property {<K extends keyof FrameContextStore>(k: K) => FrameContextStore[K]} get - Get a DOM element from the context by key.
- * @property {<K extends keyof FrameContextStore>(k: K, v: FrameContextStore[K]) => void} set - Set a DOM element in the context by key.
- * @property {<K extends keyof FrameContextStore>(k: K) => boolean} has - Check if a key exists in the context.
- * @property {<K extends keyof FrameContextStore>(k: K) => boolean} delete - Delete a key from the context.
- * @property {() => Object<keyof FrameContextStore, *>} [getAll] - Get all DOM elements in the context as an object.
- * @property {(newMap: *) => void} [reset] - Reset the context with a new Map.
- * @property {() => void} clear - Clear all elements in the context.
- */
+/** @typedef {Map<keyof FrameContextStore|null, *>} FrameContexType */
 /**
  * @description Elements and variables you should have
  * @param {{target: Element, key: *, options: SunEditor.FrameOptions}} editorTarget Target textarea
@@ -107,7 +85,7 @@ import type {} from '../../typedef';
  * @param {{inner: HTMLElement, page: HTMLElement, pageMirror: HTMLElement}} documentTypeInner Document type elements
  * @param {?HTMLElement} statusbar Editor statusbar
  * @param {*} key root key
- * @returns {FrameContextMap}
+ * @returns {FrameContexType}
  */
 export function CreateFrameContext(
 	editorTarget: {
@@ -126,50 +104,13 @@ export function CreateFrameContext(
 		pageMirror: HTMLElement;
 	},
 	key: any,
-): FrameContextMap;
+): FrameContexType;
 /**
  * @description Update statusbar context
  * @param {HTMLElement} statusbar Statusbar element
- * @param {FrameContextMap|FrameContextUtil} mapper FrameContext map
+ * @param {FrameContexType|import('../services/contextManager').FrameContextMap} mapper FrameContext map
  */
-export function UpdateStatusbarContext(statusbar: HTMLElement, mapper: FrameContextMap | FrameContextUtil): void;
-/**
- * @description Creates a utility wrapper for editor base options.
- * - Provides get, set, has, getAll, and setMany methods with internal Map support.
- * @param {*} editor - The editor instance
- * @returns {FrameContextUtil}
- */
-export function FrameContextUtil(editor: any): FrameContextUtil;
-export type FrameContextUtil = {
-	/**
-	 * - Get a DOM element from the context by key.
-	 */
-	get: <K extends keyof FrameContextStore>(k: K) => FrameContextStore[K];
-	/**
-	 * - Set a DOM element in the context by key.
-	 */
-	set: <K extends keyof FrameContextStore>(k: K, v: FrameContextStore[K]) => void;
-	/**
-	 * - Check if a key exists in the context.
-	 */
-	has: <K extends keyof FrameContextStore>(k: K) => boolean;
-	/**
-	 * - Delete a key from the context.
-	 */
-	delete: <K extends keyof FrameContextStore>(k: K) => boolean;
-	/**
-	 * - Get all DOM elements in the context as an object.
-	 */
-	getAll?: () => any;
-	/**
-	 * - Reset the context with a new Map.
-	 */
-	reset?: (newMap: any) => void;
-	/**
-	 * - Clear all elements in the context.
-	 */
-	clear: () => void;
-};
+export function UpdateStatusbarContext(statusbar: HTMLElement, mapper: FrameContexType | import('../services/contextManager').FrameContextMap): void;
 /**
  * This object stores **all frame-specific states and DOM references** for a SunEditor instance.
  *
@@ -376,4 +317,4 @@ export type FrameContextStore = {
 	 */
 	_editorHeight?: number;
 };
-export type FrameContextMap = Map<keyof FrameContextStore | null, any>;
+export type FrameContexType = Map<keyof FrameContextStore | null, any>;
