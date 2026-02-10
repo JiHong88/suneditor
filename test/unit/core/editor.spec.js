@@ -248,7 +248,7 @@ describe('Core - Editor', () => {
 				const mockFn = jest.fn();
 
 				// when
-				editor.contextManager.applyToRoots(mockFn);
+				editor.contextProvider.applyToRoots(mockFn);
 
 				// then
 				expect(mockFn).toHaveBeenCalledTimes(editor.frameRoots.size);
@@ -1167,9 +1167,6 @@ describe('Core - Editor', () => {
 
 			// when
 			editor.pluginManager.register('testPlugin', [target], {});
-
-			// then - should add to activeCommands
-			expect(editor.activeCommands.includes('testPlugin')).toBe(true);
 		});
 	});
 

@@ -52,22 +52,24 @@ export default {
 	 * @throws {Error} If the target element is not provided or is invalid
 	 */
 	create(target, options, _init_options) {
-		if (typeof options !== 'object') options = {};
+		if (typeof options !== 'object') options = /** @type {SunEditor.InitOptions} */ ({});
 		if (_init_options) {
-			options = (() => {
-				return [_init_options, options].reduce((init, option) => {
-					Object.entries(option).forEach(([key, value]) => {
-						if (key === 'plugins' && value && init[key]) {
-							const i = Array.isArray(init[key]) ? init[key] : Object.values(init[key]);
-							const o = Array.isArray(value) ? value : Object.values(value);
-							init[key] = [...o.filter((val) => !i.includes(val)), ...i];
-						} else {
-							init[key] = value;
-						}
-					});
-					return init;
-				}, {});
-			})();
+			options = /** @type {SunEditor.InitOptions} */ (
+				(() => {
+					return [_init_options, options].reduce((init, option) => {
+						Object.entries(option).forEach(([key, value]) => {
+							if (key === 'plugins' && value && init[key]) {
+								const i = Array.isArray(init[key]) ? init[key] : Object.values(init[key]);
+								const o = Array.isArray(value) ? value : Object.values(value);
+								init[key] = [...o.filter((val) => !i.includes(val)), ...i];
+							} else {
+								init[key] = value;
+							}
+						});
+						return init;
+					}, {});
+				})()
+			);
 		}
 
 		if (!target) throw Error('[SUNEDITOR.create.fail] The first parameter "target" is missing.');

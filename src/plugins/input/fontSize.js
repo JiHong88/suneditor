@@ -116,7 +116,7 @@ class FontSize extends PluginInput {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {FontSizePluginOptions} pluginOptions - Configuration options for the FontSize plugin.
 	 */
 	constructor(editor, pluginOptions) {
@@ -124,49 +124,49 @@ class FontSize extends PluginInput {
 
 		// create HTML
 		this.unitMap = { ...DEFAULT_UNIT_MAP, ...(pluginOptions.unitMap || {}) };
-		this.sizeUnit = /text/.test(pluginOptions.sizeUnit) ? '' : pluginOptions.sizeUnit || this.options.get('fontSizeUnits')[0];
+		this.sizeUnit = /text/.test(pluginOptions.sizeUnit) ? '' : pluginOptions.sizeUnit || this.$.options.get('fontSizeUnits')[0];
 
 		const unitMap = this.unitMap[this.sizeUnit || 'text'];
-		const menu = CreateHTML(editor, unitMap, this.sizeUnit, pluginOptions.showDefaultSizeLabel);
+		const menu = CreateHTML(this.$, unitMap, this.sizeUnit, pluginOptions.showDefaultSizeLabel);
 
 		// plugin basic properties
 		const showIncDec = this.sizeUnit ? (pluginOptions.showIncDecControls ?? false) : false;
 		const disableInput = this.sizeUnit ? (pluginOptions.disableInput ?? false) : true;
 
-		this.title = this.lang.fontSize;
+		this.title = this.$.lang.fontSize;
 		this.inner =
 			disableInput && !showIncDec
 				? false
 				: disableInput
-					? `<span class="se-txt se-not-arrow-text __se__font_size">${this.lang.fontSize}</span>`
-					: `<input type="text" class="__se__font_size se-not-arrow-text" placeholder="${this.lang.fontSize}" />`;
+					? `<span class="se-txt se-not-arrow-text __se__font_size">${this.$.lang.fontSize}</span>`
+					: `<input type="text" class="__se__font_size se-not-arrow-text" placeholder="${this.$.lang.fontSize}" />`;
 
 		// increase, decrease buttons
 		if (showIncDec) {
 			this.beforeItem = dom.utils.createElement(
 				'button',
 				{ class: 'se-btn se-tooltip se-sub-btn', 'data-command': FontSize.key, 'data-type': 'command', 'data-value': 'dec' },
-				`${this.icons.minus}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.decrease}</span></span>`,
+				`${this.$.icons.minus}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.$.lang.decrease}</span></span>`,
 			);
 			this.afterItem = dom.utils.createElement(
 				'button',
 				{ class: 'se-btn se-tooltip se-sub-btn', 'data-command': FontSize.key, 'data-type': 'command', 'data-value': 'inc' },
-				`${this.icons.plus}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.increase}</span></span>`,
+				`${this.$.icons.plus}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.$.lang.increase}</span></span>`,
 			);
 		} else if (!disableInput) {
 			this.afterItem = dom.utils.createElement(
 				'button',
 				{ class: 'se-btn se-tooltip se-sub-arrow-btn', 'data-command': FontSize.key, 'data-type': 'dropdown' },
-				`${this.icons.arrow_down}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.fontSize}</span></span>`,
+				`${this.$.icons.arrow_down}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.$.lang.fontSize}</span></span>`,
 			);
-			this.menu.initDropdownTarget({ key: FontSize.key, type: 'dropdown' }, menu);
+			this.$.menu.initDropdownTarget({ key: FontSize.key, type: 'dropdown' }, menu);
 		} else if (disableInput && !showIncDec) {
 			this.replaceButton = dom.utils.createElement(
 				'button',
 				{ class: 'se-btn se-tooltip se-btn-select se-btn-tool-font-size', 'data-command': FontSize.key, 'data-type': 'dropdown' },
-				`<span class="se-txt __se__font_size">${this.lang.fontSize}</span>${this.icons.arrow_down}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.fontSize}</span></span>`,
+				`<span class="se-txt __se__font_size">${this.$.lang.fontSize}</span>${this.$.icons.arrow_down}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.$.lang.fontSize}</span></span>`,
 			);
-			this.menu.initDropdownTarget({ key: FontSize.key, type: 'dropdown' }, menu);
+			this.$.menu.initDropdownTarget({ key: FontSize.key, type: 'dropdown' }, menu);
 		}
 
 		// members
@@ -177,7 +177,7 @@ class FontSize extends PluginInput {
 		this.#disableInput = disableInput;
 
 		// init
-		this.menu.initDropdownTarget(FontSize, menu);
+		this.$.menu.initDropdownTarget(FontSize, menu);
 	}
 
 	/**
@@ -190,7 +190,7 @@ class FontSize extends PluginInput {
 		let fontSize = '';
 		if (!element) {
 			this.#setSize(target, this.#getDefaultSize());
-		} else if (this.format.isLine(element)) {
+		} else if (this.$.format.isLine(element)) {
 			return undefined;
 		} else if ((fontSize = dom.utils.getStyle(element, 'fontSize'))) {
 			this.#setSize(target, fontSize);
@@ -238,7 +238,7 @@ class FontSize extends PluginInput {
 			if (this.#disableInput) return;
 
 			const newNode = dom.utils.createElement('SPAN', { style: 'font-size: ' + size + ';' });
-			this.inline.apply(newNode, { stylesToModify: ['font-size'], nodesToRemove: null, strictRemove: null });
+			this.$.inline.apply(newNode, { stylesToModify: ['font-size'], nodesToRemove: null, strictRemove: null });
 
 			if (!keyCodeMap.isEnter(keyCode)) target.focus();
 		} finally {
@@ -262,11 +262,11 @@ class FontSize extends PluginInput {
 			value = value > max ? max : value < min ? min : value;
 
 			const newNode = dom.utils.createElement('SPAN', { style: 'font-size: ' + this.#setSize(target, value + unit) + ';' });
-			this.inline.apply(newNode, { stylesToModify: ['font-size'], nodesToRemove: null, strictRemove: null });
+			this.$.inline.apply(newNode, { stylesToModify: ['font-size'], nodesToRemove: null, strictRemove: null });
 		} finally {
 			this.isInputActive = false;
 			event.preventDefault();
-			this.focusManager.focus();
+			this.$.focusManager.focus();
 		}
 	}
 
@@ -306,15 +306,15 @@ class FontSize extends PluginInput {
 			newSize = newSize < min ? min : newSize > max ? max : newSize;
 
 			const newNode = dom.utils.createElement('SPAN', { style: 'font-size: ' + newSize + unit + ';' });
-			this.inline.apply(newNode, { stylesToModify: ['font-size'], nodesToRemove: null, strictRemove: null });
+			this.$.inline.apply(newNode, { stylesToModify: ['font-size'], nodesToRemove: null, strictRemove: null });
 		} else if (commandValue) {
 			const newNode = dom.utils.createElement('SPAN', { style: 'font-size: ' + commandValue + ';' });
-			this.inline.apply(newNode, { stylesToModify: ['font-size'], nodesToRemove: null, strictRemove: null });
+			this.$.inline.apply(newNode, { stylesToModify: ['font-size'], nodesToRemove: null, strictRemove: null });
 		} else {
-			this.inline.apply(null, { stylesToModify: ['font-size'], nodesToRemove: ['span'], strictRemove: true });
+			this.$.inline.apply(null, { stylesToModify: ['font-size'], nodesToRemove: ['span'], strictRemove: true });
 		}
 
-		this.menu.dropdownOff();
+		this.$.menu.dropdownOff();
 	}
 
 	/**
@@ -322,7 +322,7 @@ class FontSize extends PluginInput {
 	 * @returns {string} - The computed font size from the editor.
 	 */
 	#getDefaultSize() {
-		return this.frameContext.get('wwComputedStyle').fontSize;
+		return this.$.frameContext.get('wwComputedStyle').fontSize;
 	}
 
 	/**
@@ -344,7 +344,7 @@ class FontSize extends PluginInput {
 		const splitValue = this.sizeUnit ? size.split(/(\d+)/) : [size, ''];
 
 		let unit = (splitValue.pop() || '').trim().toLowerCase();
-		unit = this.options.get('fontSizeUnits').includes(unit) ? unit : this.sizeUnit;
+		unit = this.$.options.get('fontSizeUnits').includes(unit) ? unit : this.sizeUnit;
 
 		const tempValue = splitValue.pop();
 		const value = unit ? Number(tempValue) : tempValue;
@@ -373,6 +373,13 @@ class FontSize extends PluginInput {
 	}
 }
 
+/**
+ * @param {SunEditor.Deps} $ - Kernel dependencies
+ * @param {{list: Array<number|{title: string, size: string}>, default?: number|string}} unitMap - Font size unit map
+ * @param {string} sizeUnit - Size unit string
+ * @param {boolean} showDefaultSizeLabel - Whether to show default size label
+ * @returns {HTMLElement}
+ */
 function CreateHTML({ lang }, unitMap, sizeUnit, showDefaultSizeLabel) {
 	const sizeList = unitMap.list;
 	const defaultSize = unitMap.default;

@@ -47,6 +47,9 @@ export type HueSliderParams = {
 	 */
 	controllerOptions?: import('./Controller').ControllerParams;
 };
+/**
+ * @returns {{slider: HTMLElement, offscreenCanvas: HTMLCanvasElement, offscreenCtx: CanvasRenderingContext2D, wheel: HTMLCanvasElement, wheelCtx: CanvasRenderingContext2D, wheelPointer: HTMLElement, gradientBar: HTMLCanvasElement, gradientPointer: HTMLElement, fanalColorHex: HTMLElement, fanalColorBackground: HTMLElement}}
+ */
 export function CreateSliderCtx(): {
 	slider: HTMLElement;
 	offscreenCanvas: HTMLCanvasElement;
@@ -82,14 +85,15 @@ export function CreateSliderCtx(): {
  * - When you call the .attach() method, the hue slider is appended to the form element.
  * It must be called every time it is used.
  */
-declare class HueSlider extends CoreInjector {
+declare class HueSlider {
 	/**
 	 * @constructor
 	 * @param {import('./ColorPicker').default} inst The instance object that called the constructor.
+	 * @param {SunEditor.Deps} $ Kernel dependencies
 	 * @param {HueSliderParams} [params={}] Hue slider options
 	 * @param {string} [className=""] The class name of the hue slider.
 	 */
-	constructor(inst: import('./ColorPicker').default, params?: HueSliderParams, className?: string);
+	constructor(inst: import('./ColorPicker').default, $: SunEditor.Deps, params?: HueSliderParams, className?: string);
 	inst: import('./ColorPicker').default;
 	ctx: {
 		wheelX: number;
@@ -140,5 +144,4 @@ declare class HueSlider extends CoreInjector {
 	init(): void;
 	#private;
 }
-import CoreInjector from '../../editorInjector/_core';
 import Controller from './Controller';

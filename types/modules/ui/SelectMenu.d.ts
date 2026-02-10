@@ -39,12 +39,13 @@ export type SelectMenuParams = {
  * @class
  * @description Creates a select menu
  */
-declare class SelectMenu extends CoreInjector {
+declare class SelectMenu {
 	/**
 	 * @constructor
-	 * @param {SunEditor.Instance} editor The instance object that called the constructor.
+	 * @param {SunEditor.Deps} $ Kernel dependencies
+	 * @param {SelectMenuParams} params SelectMenu options
 	 */
-	constructor(editor: SunEditor.Instance, params: any);
+	constructor($: SunEditor.Deps, params: SelectMenuParams);
 	form: HTMLElement;
 	items: any[];
 	/** @type {HTMLLIElement[]} */
@@ -54,12 +55,12 @@ declare class SelectMenu extends CoreInjector {
 	item: any;
 	isOpen: boolean;
 	checkList: boolean;
-	position: any;
-	subPosition: any;
-	splitNum: any;
+	position: string;
+	subPosition: string;
+	splitNum: number;
 	horizontal: boolean;
-	openMethod: any;
-	closeMethod: any;
+	openMethod: () => void;
+	closeMethod: () => void;
 	/**
 	 * @description Creates the select menu items.
 	 * @param {Array<string>|SunEditor.NodeCollection} items - Command list of selectable items.
@@ -104,4 +105,3 @@ declare class SelectMenu extends CoreInjector {
 	_onItem: Element;
 	#private;
 }
-import CoreInjector from '../../editorInjector/_core';

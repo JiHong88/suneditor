@@ -147,10 +147,10 @@ declare class Image_ extends PluginModal {
 	static component(node: Element): Element | null;
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {ImagePluginOptions} pluginOptions
 	 */
-	constructor(editor: SunEditor.Core, pluginOptions: ImagePluginOptions);
+	constructor(editor: SunEditor.Kernel, pluginOptions: ImagePluginOptions);
 	title: any;
 	pluginOptions: {
 		canResize: boolean;
@@ -169,7 +169,7 @@ declare class Image_ extends PluginModal {
 		allowMultiple: boolean;
 		acceptedFormats: string;
 		useFormatType: boolean;
-		defaultFormatType: 'inline' | 'block';
+		defaultFormatType: 'block' | 'inline';
 		keepFormatType: boolean;
 		insertBehavior: SunEditor.ComponentInsertType;
 	};
@@ -188,7 +188,7 @@ declare class Image_ extends PluginModal {
 	captionCheckEl: HTMLInputElement;
 	captionEl: HTMLElement;
 	previewSrc: HTMLElement;
-	as: 'inline' | 'block';
+	as: 'block' | 'inline';
 	sizeService: ImageSizeService;
 	uploadService: ImageUploadService;
 	asBlock: HTMLButtonElement;

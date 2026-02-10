@@ -19,22 +19,22 @@ class FileGallery extends PluginBrowser {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {FileGalleryPluginOptions} pluginOptions
 	 */
 	constructor(editor, pluginOptions) {
 		// plugin bisic properties
 		super(editor);
-		this.title = this.lang.fileGallery;
+		this.title = this.$.lang.fileGallery;
 		this.icon = 'file_gallery';
 
 		// members
 		this.onSelectfunction = null;
 
 		// modules
-		const thumbnail = typeof pluginOptions.thumbnail === 'string' ? pluginOptions.thumbnail : this.icons.file_thumbnail;
-		this.browser = new Browser(this, {
-			title: this.lang.fileGallery,
+		const thumbnail = typeof pluginOptions.thumbnail === 'string' ? pluginOptions.thumbnail : this.$.icons.file_thumbnail;
+		this.browser = new Browser(this, this.$, {
+			title: this.$.lang.fileGallery,
 			data: pluginOptions.data,
 			url: pluginOptions.url,
 			headers: pluginOptions.headers,
@@ -72,7 +72,7 @@ class FileGallery extends PluginBrowser {
 			this.onSelectfunction(target);
 		} else {
 			const file = { name: target.getAttribute('data-name'), size: 0 };
-			this.plugins.fileUpload.create(target.getAttribute('data-command'), file, true);
+			this.$.plugins.fileUpload.create(target.getAttribute('data-command'), file, true);
 		}
 	}
 }

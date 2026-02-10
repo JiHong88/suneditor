@@ -48,13 +48,13 @@ class Audio_ extends PluginModal {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {AudioPluginOptions} pluginOptions
 	 */
 	constructor(editor, pluginOptions) {
 		// plugin basic properties
 		super(editor);
-		this.title = this.lang.audio;
+		this.title = this.$.lang.audio;
 		this.icon = 'audio';
 
 		// define plugin options
@@ -74,20 +74,20 @@ class Audio_ extends PluginModal {
 		};
 
 		// create HTML
-		const modalEl = CreateHTML_modal(editor, this.pluginOptions);
-		const controllerEl = CreateHTML_controller(editor);
+		const modalEl = CreateHTML_modal(this.$, this.pluginOptions);
+		const controllerEl = CreateHTML_controller(this.$);
 
 		// modules
-		this.modal = new Modal(this, modalEl);
-		this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true });
-		this.fileManager = new FileManager(this, {
+		this.modal = new Modal(this, this.$, modalEl);
+		this.controller = new Controller(this, this.$, controllerEl, { position: 'bottom', disabled: true });
+		this.fileManager = new FileManager(this, this.$, {
 			query: 'audio',
 			loadEventName: 'onAudioLoad',
 			actionEventName: 'onAudioAction',
 		});
 
 		// members
-		this.figure = new Figure(this, null, {});
+		this.figure = new Figure(this, this.$, null, {});
 
 		/** @type {HTMLElement} */
 		this.fileModalWrapper = modalEl.querySelector('.se-flex-input-wrapper');
@@ -103,17 +103,17 @@ class Audio_ extends PluginModal {
 		this.#defaultHeight = this.pluginOptions.defaultHeight;
 
 		const galleryButton = modalEl.querySelector('.__se__gallery');
-		if (galleryButton) this.eventManager.addEvent(galleryButton, 'click', this.#OpenGallery.bind(this));
+		if (galleryButton) this.$.eventManager.addEvent(galleryButton, 'click', this.#OpenGallery.bind(this));
 
 		// init
 		if (this.audioInputFile) {
-			this.eventManager.addEvent(modalEl.querySelector('.se-modal-files-edge-button'), 'click', this.#RemoveSelectedFiles.bind(this, this.audioUrlFile, this.preview));
+			this.$.eventManager.addEvent(modalEl.querySelector('.se-modal-files-edge-button'), 'click', this.#RemoveSelectedFiles.bind(this, this.audioUrlFile, this.preview));
 			if (this.audioUrlFile) {
-				this.eventManager.addEvent(this.audioInputFile, 'change', this.#FileInputChange.bind(this));
+				this.$.eventManager.addEvent(this.audioInputFile, 'change', this.#FileInputChange.bind(this));
 			}
 		}
 		if (this.audioUrlFile) {
-			this.eventManager.addEvent(this.audioUrlFile, 'input', this.#OnLinkPreview.bind(this));
+			this.$.eventManager.addEvent(this.audioUrlFile, 'input', this.#OnLinkPreview.bind(this));
 		}
 	}
 
@@ -151,7 +151,7 @@ class Audio_ extends PluginModal {
 		if (!/^audio/.test(file.type)) return;
 
 		this.submitFile([file]);
-		this.focusManager.focus();
+		this.$.focusManager.focus();
 	}
 
 	/**
@@ -208,7 +208,7 @@ class Audio_ extends PluginModal {
 				break;
 			case 'copy': {
 				const figure = Figure.GetContainer(this.#element);
-				this.component.copy(figure.container);
+				this.$.component.copy(figure.container);
 				break;
 			}
 			case 'delete':
@@ -236,7 +236,7 @@ class Audio_ extends PluginModal {
 		const container = figure.container || element;
 		const focusEl = container.previousElementSibling || container.nextElementSibling;
 
-		const message = await this.triggerEvent('onAudioDeleteBefore', { element: element, container: figure, url: element.getAttribute('src') });
+		const message = await this.$.eventManager.triggerEvent('onAudioDeleteBefore', { element: element, container: figure, url: element.getAttribute('src') });
 		if (message === false) return;
 
 		const emptyDiv = container.parentNode;
@@ -244,8 +244,8 @@ class Audio_ extends PluginModal {
 		this.modalInit();
 		this.controller.close();
 
-		if (emptyDiv !== this.frameContext.get('wysiwyg')) {
-			this.nodeTransform.removeAllParents(
+		if (emptyDiv !== this.$.frameContext.get('wysiwyg')) {
+			this.$.nodeTransform.removeAllParents(
 				emptyDiv,
 				function (current) {
 					return current.childNodes.length === 0;
@@ -255,8 +255,8 @@ class Audio_ extends PluginModal {
 		}
 
 		// focus
-		this.focusManager.focusEdge(focusEl);
-		this.history.push(false);
+		this.$.focusManager.focusEdge(focusEl);
+		this.$.history.push(false);
 	}
 
 	/**
@@ -277,14 +277,14 @@ class Audio_ extends PluginModal {
 			s = f.size;
 			if (singleSizeLimit > 0 && s > singleSizeLimit) {
 				const err = '[SUNEDITOR.audioUpload.fail] Size of uploadable single file: ' + singleSizeLimit / 1000 + 'KB';
-				const message = await this.triggerEvent('onAudioUploadError', {
+				const message = await this.$.eventManager.triggerEvent('onAudioUploadError', {
 					error: err,
 					limitSize: singleSizeLimit,
 					uploadSize: s,
 					file: f,
 				});
 
-				this.uiManager.alertOpen(message === NO_EVENT ? err : message || err, 'error');
+				this.$.ui.alertOpen(message === NO_EVENT ? err : message || err, 'error');
 
 				return false;
 			}
@@ -296,9 +296,9 @@ class Audio_ extends PluginModal {
 		const limitSize = this.pluginOptions.uploadSizeLimit;
 		if (limitSize > 0 && fileSize + this.fileManager.getSize() > limitSize) {
 			const err = '[SUNEDITOR.audioUpload.fail] Size of uploadable total audios: ' + limitSize / 1000 + 'KB';
-			const message = await this.triggerEvent('onAudioUploadError', { error: err, limitSize, currentSize: this.fileManager.getSize(), uploadSize: fileSize });
+			const message = await this.$.eventManager.triggerEvent('onAudioUploadError', { error: err, limitSize, currentSize: this.fileManager.getSize(), uploadSize: fileSize });
 
-			this.uiManager.alertOpen(message === NO_EVENT ? err : message || err, 'error');
+			this.$.ui.alertOpen(message === NO_EVENT ? err : message || err, 'error');
 
 			return false;
 		}
@@ -314,7 +314,7 @@ class Audio_ extends PluginModal {
 			uploadCallback(infos, infos.files);
 		}.bind(this, this.#serverUpload.bind(this), audioInfo);
 
-		const result = await this.triggerEvent('onAudioUploadBefore', {
+		const result = await this.$.eventManager.triggerEvent('onAudioUploadBefore', {
 			info: audioInfo,
 			handler,
 		});
@@ -349,7 +349,7 @@ class Audio_ extends PluginModal {
 			uploadCallback(infos.element, infos.url, infos.files, infos.isUpdate, true);
 		}.bind(this, this.create.bind(this), audioInfo);
 
-		const result = await this.triggerEvent('onAudioUploadBefore', {
+		const result = await this.$.eventManager.triggerEvent('onAudioUploadBefore', {
 			info: audioInfo,
 			handler,
 		});
@@ -379,27 +379,27 @@ class Audio_ extends PluginModal {
 			this.fileManager.setFileData(element, file);
 			element.src = src;
 			const figure = Figure.CreateContainer(element, 'se-flex-component');
-			if (!this.component.insert(figure.container, { scrollTo: isLast ? true : false, insertBehavior: isLast ? this.pluginOptions.insertBehavior : 'line' })) {
-				if (isLast) this.focusManager.focus();
+			if (!this.$.component.insert(figure.container, { scrollTo: isLast ? true : false, insertBehavior: isLast ? this.pluginOptions.insertBehavior : 'line' })) {
+				if (isLast) this.$.focusManager.focus();
 				return;
 			}
-			if (!this.options.get('componentInsertBehavior')) {
-				const line = this.format.addLine(figure.container, null);
-				if (line) this.selection.setRange(line, 0, line, 0);
+			if (!this.$.options.get('componentInsertBehavior')) {
+				const line = this.$.format.addLine(figure.container, null);
+				if (line) this.$.selection.setRange(line, 0, line, 0);
 			}
 		} else {
 			if (this.#element) element = this.#element;
 			this.fileManager.setFileData(element, file);
 			if (element && element.src !== src) {
 				element.src = src;
-				this.component.select(element, Audio_.key);
+				this.$.component.select(element, Audio_.key);
 			} else {
-				this.component.select(element, Audio_.key);
+				this.$.component.select(element, Audio_.key);
 				return;
 			}
 		}
 
-		if (isUpdate) this.history.push(false);
+		if (isUpdate) this.$.history.push(false);
 	}
 
 	/**
@@ -484,9 +484,9 @@ class Audio_ extends PluginModal {
 	 * @returns {Promise<void>}
 	 */
 	async #error(response) {
-		const message = await this.triggerEvent('onAudioUploadError', { error: response });
+		const message = await this.$.eventManager.triggerEvent('onAudioUploadError', { error: response });
 		const err = message === NO_EVENT ? response.errorMessage : message || response.errorMessage;
-		this.uiManager.alertOpen(err, 'error');
+		this.$.ui.alertOpen(err, 'error');
 		console.error('[SUNEDITOR.plugin.audio.error]', err);
 	}
 
@@ -498,7 +498,7 @@ class Audio_ extends PluginModal {
 	 * @param {XMLHttpRequest} xmlHttp - The completed XHR request.
 	 */
 	async #UploadCallBack(info, xmlHttp) {
-		if ((await this.triggerEvent('audioUploadHandler', { xmlHttp, info })) === NO_EVENT) {
+		if ((await this.$.eventManager.triggerEvent('audioUploadHandler', { xmlHttp, info })) === NO_EVENT) {
 			const response = JSON.parse(xmlHttp.responseText);
 			if (response.errorMessage) {
 				this.#error(response);
@@ -519,8 +519,8 @@ class Audio_ extends PluginModal {
 		const value = target.value.trim();
 		this.#urlValue = this.preview.textContent = !value
 			? ''
-			: this.options.get('defaultUrlProtocol') && !value.includes('://') && value.indexOf('#') !== 0
-				? this.options.get('defaultUrlProtocol') + value
+			: this.$.options.get('defaultUrlProtocol') && !value.includes('://') && value.indexOf('#') !== 0
+				? this.$.options.get('defaultUrlProtocol') + value
 				: !value.includes('://')
 					? '/' + value
 					: value;
@@ -531,7 +531,7 @@ class Audio_ extends PluginModal {
 	 * - Calls a function to populate the URL input with the selected audio file.
 	 */
 	#OpenGallery() {
-		this.plugins.audioGallery.open(this.#SetUrlInput.bind(this));
+		this.$.plugins.audioGallery.open(this.#SetUrlInput.bind(this));
 	}
 
 	/**
@@ -578,6 +578,11 @@ class Audio_ extends PluginModal {
 	}
 }
 
+/**
+ * @param {SunEditor.Deps} $ - Kernel dependencies
+ * @param {import('./audio').AudioPluginOptions} pluginOptions - Audio plugin options
+ * @returns {HTMLElement}
+ */
 function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 	let html = /*html*/ `
     <form method="post" enctype="multipart/form-data">
@@ -625,6 +630,10 @@ function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 	return dom.utils.createElement('DIV', { class: 'se-modal-content' }, html);
 }
 
+/**
+ * @param {SunEditor.Deps} $ - Kernel dependencies
+ * @returns {HTMLElement}
+ */
 function CreateHTML_controller({ lang, icons }) {
 	const html = /*html*/ `
     <div class="se-arrow se-arrow-up"></div>

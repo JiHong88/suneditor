@@ -38,13 +38,13 @@ class Drawing extends PluginModal {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {DrawingPluginOptions} pluginOptions
 	 */
 	constructor(editor, pluginOptions) {
 		// plugin basic properties
 		super(editor);
-		this.title = this.lang.drawing;
+		this.title = this.$.lang.drawing;
 		this.icon = 'drawing';
 		this.pluginOptions = {
 			outputFormat: pluginOptions.outputFormat || 'dataurl', // dataurl, svg
@@ -69,24 +69,24 @@ class Drawing extends PluginModal {
 		};
 
 		// exception
-		if (!this.plugins.image) {
+		if (!this.$.plugins.image) {
 			console.warn('[SUNEDITOR.plugins.drawing.warn] The drawing plugin must need either "image" plugin. Please add the "image" plugin.');
-		} else if (this.pluginOptions.outputFormat === 'svg' && !this.plugins.image.pluginOptions.uploadUrl) {
+		} else if (this.pluginOptions.outputFormat === 'svg' && !this.$.plugins.image.pluginOptions.uploadUrl) {
 			console.warn('[SUNEDITOR.plugins.drawing.warn] The drawing plugin must need the "image" plugin with the "uploadUrl" option. Please add the "image" plugin with the "uploadUrl" option.');
 		}
 
 		// create HTML
-		const modalEl = CreateHTML_modal(this);
+		const modalEl = CreateHTML_modal(this.$, this.pluginOptions);
 
 		// modules
-		this.modal = new Modal(this, modalEl);
+		this.modal = new Modal(this, this.$, modalEl);
 
 		// members
 		this.as = this.pluginOptions.defaultFormatType;
 		if (this.pluginOptions.useFormatType) {
 			this.asBlock = modalEl.querySelector('[data-command="asBlock"]');
 			this.asInline = modalEl.querySelector('[data-command="asInline"]');
-			this.eventManager.addEvent([this.asBlock, this.asInline], 'click', this.#OnClickAsButton.bind(this));
+			this.$.eventManager.addEvent([this.asBlock, this.asInline], 'click', this.#OnClickAsButton.bind(this));
 		}
 
 		/**
@@ -119,7 +119,7 @@ class Drawing extends PluginModal {
 		};
 
 		// init
-		this.eventManager.addEvent(modalEl.querySelector('[data-command="remove"]'), 'click', this.#OnRemove.bind(this));
+		this.$.eventManager.addEvent(modalEl.querySelector('[data-command="remove"]'), 'click', this.#OnRemove.bind(this));
 	}
 
 	/**
@@ -149,17 +149,17 @@ class Drawing extends PluginModal {
 	async modalAction() {
 		if (this.pluginOptions.outputFormat === 'svg') {
 			const files = this.#getSVGFileList();
-			this.plugins.image.modalInit();
-			this.plugins.image.submitFile(files);
+			this.$.plugins.image.modalInit();
+			this.$.plugins.image.submitFile(files);
 		} else {
 			// dataurl | svg
 			const data = this.canvas.toDataURL();
 			const file = { name: 'drawing', size: 0 };
-			this.plugins.image.modalInit();
+			this.$.plugins.image.modalInit();
 			if (this.as !== 'inline') {
-				this.plugins.image.create(data, null, 'auto', '', 'none', file, '');
+				this.$.plugins.image.create(data, null, 'auto', '', 'none', file, '');
 			} else {
-				this.plugins.image.createInline(data, null, 'auto', '', 'none', file, '');
+				this.$.plugins.image.createInline(data, null, 'auto', '', 'none', file, '');
 			}
 		}
 
@@ -180,13 +180,13 @@ class Drawing extends PluginModal {
 
 		this.#setCtx();
 
-		this.#eventsRegister.touchstart = this.eventManager.addEvent(canvas, 'touchstart', this.#events.touchstart, { passive: false, capture: true });
-		this.#eventsRegister.touchmove = this.eventManager.addEvent(canvas, 'touchmove', this.#events.touchmove, true);
-		this.#eventsRegister.mousedown = this.eventManager.addEvent(canvas, 'mousedown', this.#events.mousedown, { passive: false, capture: true });
-		this.#eventsRegister.mousemove = this.eventManager.addEvent(canvas, 'mousemove', this.#events.mousemove, true);
-		this.#eventsRegister.mouseup = this.eventManager.addEvent(canvas, 'mouseup', this.#events.mouseup, true);
-		this.#eventsRegister.mouseleave = this.eventManager.addEvent(canvas, 'mouseleave', this.#events.mouseleave);
-		this.#eventsRegister.mouseenter = this.eventManager.addEvent(canvas, 'mouseenter', this.#events.mouseenter);
+		this.#eventsRegister.touchstart = this.$.eventManager.addEvent(canvas, 'touchstart', this.#events.touchstart, { passive: false, capture: true });
+		this.#eventsRegister.touchmove = this.$.eventManager.addEvent(canvas, 'touchmove', this.#events.touchmove, true);
+		this.#eventsRegister.mousedown = this.$.eventManager.addEvent(canvas, 'mousedown', this.#events.mousedown, { passive: false, capture: true });
+		this.#eventsRegister.mousemove = this.$.eventManager.addEvent(canvas, 'mousemove', this.#events.mousemove, true);
+		this.#eventsRegister.mouseup = this.$.eventManager.addEvent(canvas, 'mouseup', this.#events.mouseup, true);
+		this.#eventsRegister.mouseleave = this.$.eventManager.addEvent(canvas, 'mouseleave', this.#events.mouseleave);
+		this.#eventsRegister.mouseenter = this.$.eventManager.addEvent(canvas, 'mouseenter', this.#events.mouseenter);
 
 		if (this.resizeObserver) {
 			this.resizeObserver.disconnect();
@@ -221,11 +221,11 @@ class Drawing extends PluginModal {
 		}
 
 		if (this.canvas) {
-			this.eventManager.removeEvent(this.#eventsRegister.mousedown);
-			this.eventManager.removeEvent(this.#eventsRegister.mousemove);
-			this.eventManager.removeEvent(this.#eventsRegister.mouseup);
-			this.eventManager.removeEvent(this.#eventsRegister.mouseleave);
-			this.eventManager.removeEvent(this.#eventsRegister.mouseenter);
+			this.$.eventManager.removeEvent(this.#eventsRegister.mousedown);
+			this.$.eventManager.removeEvent(this.#eventsRegister.mousemove);
+			this.$.eventManager.removeEvent(this.#eventsRegister.mouseup);
+			this.$.eventManager.removeEvent(this.#eventsRegister.mouseleave);
+			this.$.eventManager.removeEvent(this.#eventsRegister.mouseenter);
 		}
 
 		this.canvas = null;
@@ -241,7 +241,7 @@ class Drawing extends PluginModal {
 	#setCtx() {
 		this.ctx.lineWidth = this.pluginOptions.lineWidth;
 		this.ctx.lineCap = this.pluginOptions.lineCap;
-		this.ctx.strokeStyle = this.pluginOptions.lineColor || _w.getComputedStyle(this.carrierWrapper).color;
+		this.ctx.strokeStyle = this.pluginOptions.lineColor || _w.getComputedStyle(this.$.contextProvider.carrierWrapper).color;
 	}
 
 	/**
@@ -460,7 +460,12 @@ class Drawing extends PluginModal {
 	}
 }
 
-function CreateHTML_modal({ lang, icons, pluginOptions }) {
+/**
+ * @param {SunEditor.Deps} $ - Kernel dependencies
+ * @param {DrawingPluginOptions} pluginOptions - Drawing plugin options
+ * @returns {HTMLElement}
+ */
+function CreateHTML_modal({ lang, icons }, pluginOptions) {
 	const { width, height, maxWidth, maxHeight, minWidth, minHeight } = pluginOptions.formSize;
 	const html = /*html*/ `
     <form>

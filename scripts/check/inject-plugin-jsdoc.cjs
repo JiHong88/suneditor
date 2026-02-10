@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { globSync } = require('glob');
 
-const targetPath = path.join(__dirname, '../../src/core/config/options.js');
+const targetPath = path.join(__dirname, '../../src/core/schema/options.js');
 const original = fs.readFileSync(targetPath, 'utf-8');
 
 /**

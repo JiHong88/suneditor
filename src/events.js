@@ -5,14 +5,14 @@
 // --- native events
 /**
  * @typedef {Object} BaseEvent
- * @property {SunEditor.Core} editor - The root editor instance
+ * @property {SunEditor.Deps} $ - Kernel dependencies
  * @property {SunEditor.FrameContext} frameContext - frame context
  * @property {Event} event - event object
  */
 
 /**
  * @typedef {Object} ClipboardEvent
- * @property {SunEditor.Core} editor - The root editor instance
+ * @property {SunEditor.Deps} $ - Kernel dependencies
  * @property {SunEditor.FrameContext} frameContext - frame context
  * @property {Event} event - event object
  * @property {string} data - drop data
@@ -104,7 +104,7 @@
  * toolbar is visible, ResizeObserver is registered, and history stack is initialized.
  * Use this event to safely call editor methods immediately after creation.
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  */
 function onload(params) {}
 
@@ -229,7 +229,7 @@ function onNativeBlur(params) {}
  * Triggered before copying to clipboard.
  * Return false to prevent the copy operation.
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {SunEditor.FrameContext} params.frameContext - frame context
  * @param {Event} params.event - event object
  * @param {Event} params.clipboardData - clipboardData
@@ -242,7 +242,7 @@ function onCopy(params) {}
  * Triggered before cutting to clipboard.
  * Return false to prevent the cut operation and history push.
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {SunEditor.FrameContext} params.frameContext - frame context
  * @param {Event} params.event - event object
  * @param {Event} params.clipboardData - clipboardData
@@ -256,7 +256,7 @@ function onCut(params) {}
  * Use this to sync external state or validate content.
  * The data parameter contains the current HTML content.
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {SunEditor.FrameContext} params.frameContext - frame context
  * @param {string} params.data - editor HTML content
  */
@@ -268,7 +268,7 @@ function onChange(params) {}
  * Triggered for balloon mode and inline mode toolbars.
  * The mode parameter indicates the toolbar type ('balloon' or 'inline').
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {HTMLElement} params.toolbar - Toolbar element
  * @param {string} params.mode - Toolbar mode
  * @param {SunEditor.FrameContext} params.frameContext - frame context
@@ -281,7 +281,7 @@ function onShowToolbar(params) {}
  * Triggered when components (images, videos, tables) are selected.
  * The caller parameter indicates which plugin triggered the controller.
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {SunEditor.FrameContext} params.frameContext - frame context
  * @param {string} params.caller - caller plugin name
  * @param {SunEditor.Module.Controller.Info} params.info - info object
@@ -294,7 +294,7 @@ function onShowController(params) {}
  * Triggered when components (images, videos, tables) are about to be selected.
  * Return false to prevent the controller from showing.
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {SunEditor.FrameContext} params.frameContext - frame context
  * @param {string} params.caller - caller plugin name
  * @param {SunEditor.Module.Controller.Info} params.info - info object
@@ -306,7 +306,7 @@ function onBeforeShowController(params) {}
  * @description Fired when the editor switches between WYSIWYG view and code view.
  * The is parameter indicates whether code view is now active (true) or WYSIWYG view is active (false).
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {SunEditor.FrameContext} params.frameContext - frame context
  * @param {boolean} params.is - code view status
  */
@@ -317,7 +317,7 @@ function onToggleCodeView(params) {}
  * @description Fired when the editor enters or exits fullscreen mode.
  * The is parameter indicates whether fullscreen mode is now active (true) or normal mode is active (false).
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {SunEditor.FrameContext} params.frameContext - frame context
  * @param {boolean} params.is - full screen status
  */
@@ -330,7 +330,7 @@ function onToggleFullScreen(params) {}
  * Use this to sync external UI elements or implement custom resize behaviors.
  * Parameters include current height, previous height, and the ResizeObserverEntry.
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {SunEditor.FrameContext} params.frameContext - frame context
  * @param {number} params.height - wysiwyg area frame height
  * @param {boolean} params.prevHeight - wysiwyg area previous height
@@ -344,7 +344,7 @@ function onResizeEditor(params) {}
  * Triggered during toolbar initialization and resetToolbarButtons().
  * Use this to customize toolbar DOM or add custom elements to the buttonTray.
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {SunEditor.FrameContext} params.frameContext - frame context
  * @param {HTMLElement} params.buttonTray - button tray element
  */
@@ -356,7 +356,7 @@ function onSetToolbarButtons(params) {}
  * Use this to send editor content to a server or perform custom save logic.
  * Return a Promise resolving to false to prevent the save operation from completing.
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {SunEditor.FrameContext} params.frameContext - frame context
  * @param {Event} params.data - editor data
  * @returns {PromiseLike<boolean>}
@@ -371,7 +371,7 @@ function onSave(params) {
  * Triggered during undo/redo operations and history navigation.
  * Use this to update custom toolbar buttons or external UI state.
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {string} params.rootKey - frame key
  */
 function onResetButtons(params) {}
@@ -382,7 +382,7 @@ function onResetButtons(params) {}
  * Triggered by font dropdown selection.
  * Return a Promise resolving to false to cancel the font change operation.
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {string} params.value - font value
  * @returns {PromiseLike<boolean | void>}
  */
@@ -421,7 +421,7 @@ function onPaste(params) {
  * Return a Promise resolving to true if you handle the upload response yourself,
  * or false to use default processing. The xmlHttp parameter provides access to the XMLHttpRequest object.
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {XMLHttpRequest} params.xmlHttp - XMLHttpRequest
  * @param {ImageInfo} params.info - info object
  * @returns {PromiseLike<boolean | void>}
@@ -437,7 +437,7 @@ function imageUploadHandler(params) {
  * Return false to cancel upload, return an ImageInfo object to modify the upload data,
  * or call the handler parameter to proceed with modified data.
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {ImageInfo} params.info - info object
  * @param {(newInfo?: ImageInfo | null) => void} params.handler - handler function
  * @returns {PromiseLike<boolean | ImageInfo | void>}
@@ -452,7 +452,7 @@ function onImageUploadBefore(params) {
  * Triggered after upload completion or URL-based image insertion.
  * The infoList parameter contains an array of FileManagementInfo objects for all loaded images.
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {Array<FileManagementInfo>} params.infoList - info list
  */
 function onImageLoad(params) {}
@@ -463,7 +463,7 @@ function onImageLoad(params) {}
  * The state parameter indicates the action type ('create', 'update', or 'delete').
  * Use this to sync image state with external systems or track image modifications.
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {FileManagementInfo} params.info - info object
  * @param {HTMLElement | null} params.element - target element
  * @param {"create" | "update" | "delete"} params.state - state
@@ -479,7 +479,7 @@ function onImageAction(params) {}
  * Return a Promise resolving to a custom error message string to override the default error message,
  * or undefined to use the default message.
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {string} params.error - error message
  * @param {number} [params.limitSize] - limit size
  * @param {number} [params.uploadSize] - upload size
@@ -497,7 +497,7 @@ function onImageUploadError(params) {
  * Use this to confirm deletion, notify server, or perform cleanup.
  * Return a Promise resolving to false to prevent the image from being deleted.
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {HTMLElement} params.element - target element
  * @param {HTMLElement} params.container - target's container element (div)
  * @param {string} params.align - align value
@@ -517,7 +517,7 @@ function onImageDeleteBefore(params) {
  * or false to use default processing.
  * The xmlHttp parameter provides access to the XMLHttpRequest object.
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {XMLHttpRequest} params.xmlHttp - XMLHttpRequest
  * @param {VideoInfo} params.info - info object
  * @returns {PromiseLike<boolean>}
@@ -533,7 +533,7 @@ function videoUploadHandler(params) {
  * Return false to cancel upload, return a VideoInfo object to modify the upload data,
  * or call the handler parameter to proceed with modified data.
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {VideoInfo} params.info - info object
  * @param {(newInfo?: VideoInfo | null) => void} params.handler - handler function
  * @returns {PromiseLike<boolean | VideoInfo | void>}
@@ -548,7 +548,7 @@ function onVideoUploadBefore(params) {
  * Triggered after upload completion or URL-based video insertion (iframe/video tag).
  * The infoList parameter contains an array of FileManagementInfo objects for all loaded videos.
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {Array<FileManagementInfo>} params.infoList - info list
  */
 function onVideoLoad(params) {}
@@ -559,7 +559,7 @@ function onVideoLoad(params) {}
  * The state parameter indicates the action type ('create', 'update', or 'delete').
  * Use this to sync video state with external systems or track video modifications.
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {FileManagementInfo} params.info - info object
  * @param {HTMLElement | null} params.element - target element
  * @param {"create" | "update" | "delete"} params.state - state
@@ -575,7 +575,7 @@ function onVideoAction(params) {}
  * Return a Promise resolving to a custom error message string to override the default error message,
  * or undefined to use the default message.
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {string} params.error - error message
  * @param {number} [params.limitSize] - limit size
  * @param {number} [params.uploadSize] - upload size
@@ -593,7 +593,7 @@ function onVideoUploadError(params) {
  * Use this to confirm deletion, notify server, or perform cleanup.
  * Return a Promise resolving to false to prevent the video from being deleted.
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {HTMLElement} params.element - target element
  * @param {HTMLElement} params.container - target's container element (div)
  * @param {string} params.align - align value
@@ -612,7 +612,7 @@ function onVideoDeleteBefore(params) {
  * or false to use default processing.
  * The xmlHttp parameter provides access to the XMLHttpRequest object.
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {XMLHttpRequest} params.xmlHttp - XMLHttpRequest
  * @param {AudioInfo} params.info - info object
  * @returns {PromiseLike<boolean>}
@@ -628,7 +628,7 @@ function audioUploadHandler(params) {
  * Return false to cancel upload, return an AudioInfo object to modify the upload data,
  * or call the handler parameter to proceed with modified data.
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {AudioInfo} params.info - info object
  * @param {(newInfo?: AudioInfo | null) => void} params.handler - handler function
  * @returns {PromiseLike<boolean | AudioInfo| void>}
@@ -643,7 +643,7 @@ function onAudioUploadBefore(params) {
  * Return a Promise resolving to a custom error message string to override the default error message,
  * or undefined to use the default message.
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {string} params.error - error message
  * @param {number} [params.limitSize] - limit size
  * @param {number} [params.uploadSize] - upload size
@@ -661,7 +661,7 @@ function onAudioUploadError(params) {
  * Triggered after upload completion or URL-based audio insertion.
  * The infoList parameter contains an array of FileManagementInfo objects for all loaded audio files.
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {Array<FileManagementInfo>} params.infoList - info list
  */
 function onAudioLoad(params) {}
@@ -672,7 +672,7 @@ function onAudioLoad(params) {}
  * The state parameter indicates the action type ('create', 'update', or 'delete').
  * Use this to sync audio state with external systems or track audio modifications.
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {FileManagementInfo} params.info - info object
  * @param {HTMLElement | null} params.element - target element
  * @param {"create" | "update" | "delete"} params.state - state
@@ -688,7 +688,7 @@ function onAudioAction(params) {}
  * Use this to confirm deletion, notify server, or perform cleanup.
  * Return a Promise resolving to false to prevent the audio from being deleted.
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {HTMLElement} params.element - target element
  * @param {HTMLElement} params.container - target's container element (div)
  * @param {string} params.url - audio url
@@ -705,7 +705,7 @@ function onAudioDeleteBefore(params) {
  * Return false to cancel upload, return a FileInfo object to modify the upload data,
  * or call the handler parameter to proceed with modified data.
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {FileInfo} params.info - info object
  * @param {(newInfo?: FileInfo | null) => void} params.handler - handler function
  * @returns {PromiseLike<boolean | FileInfo | void>}
@@ -720,7 +720,7 @@ function onFileUploadBefore(params) {
  * Triggered by the fileUpload plugin after upload completion.
  * The infoList parameter contains an array of FileManagementInfo objects for all loaded files.
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {Array<FileManagementInfo>} params.infoList - info list
  */
 function onFileLoad(params) {}
@@ -731,7 +731,7 @@ function onFileLoad(params) {}
  * The state parameter indicates the action type ('create', 'update', or 'delete').
  * Use this to sync file state with external systems or track file modifications.
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {FileManagementInfo} params.info - info object
  * @param {HTMLElement | null} params.element - target element
  * @param {"create" | "update" | "delete"} params.state - state
@@ -747,7 +747,7 @@ function onFileAction(params) {}
  * Return a Promise resolving to a custom error message string to override the default error message,
  * or undefined to use the default message.
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {string} params.error - error message
  * @param {number} [params.limitSize] - limit size
  * @param {number} [params.uploadSize] - upload size
@@ -765,7 +765,7 @@ function onFileUploadError(params) {
  * Use this to confirm deletion, notify server, or perform cleanup.
  * Return a Promise resolving to false to prevent the file link from being deleted.
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {HTMLElement} params.element - target element
  * @param {HTMLElement} params.container - target's container element (div)
  * @param {string} params.url - file url
@@ -781,7 +781,7 @@ function onFileDeleteBefore(params) {
  * Use this to modify content, add metadata, or cancel the export.
  * Return a Promise resolving to false to prevent the PDF export.
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {HTMLElement} params.target - wysiwyg editable element
  * @returns {PromiseLike<boolean>}
  */
@@ -795,7 +795,7 @@ function onExportPDFBefore(params) {
  * This is a unified event that triggers for all media types.
  * The pluginName parameter indicates which plugin triggered the action ('image', 'video', 'audio', or 'file').
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {FileManagementInfo} params.info - info object
  * @param {HTMLElement | null} params.element - target element
  * @param {"create" | "update" | "delete"} params.state - state
@@ -811,7 +811,7 @@ function onFileManagerAction(params) {}
  * Use this to validate URLs, add custom embed processors, or modify embed parameters.
  * Return false to cancel insertion, return an EmbedInfo object to modify the embed data,
  * or call the handler parameter to proceed with modified data.
- * @param {EmbedInfo & {editor: SunEditor.Core, handler: (newInfo?: EmbedInfo | null) => void}} params
+ * @param {EmbedInfo & {$: SunEditor.Deps, handler: (newInfo?: EmbedInfo | null) => void}} params
  * @returns {PromiseLike<boolean | EmbedInfo | void>}
  */
 function onEmbedInputBefore(params) {
@@ -824,7 +824,7 @@ function onEmbedInputBefore(params) {
  * Use this to confirm deletion or perform cleanup.
  * Return a Promise resolving to false to prevent the embed from being deleted.
  * @param {Object} params
- * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
  * @param {HTMLElement} params.element - target element
  * @param {HTMLElement} params.container - target's container element (div)
  * @param {string} params.align - align value

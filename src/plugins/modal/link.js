@@ -30,13 +30,13 @@ class Link extends PluginModal {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {LinkPluginOptions} pluginOptions
 	 */
 	constructor(editor, pluginOptions) {
 		// plugin bisic properties
 		super(editor);
-		this.title = this.lang.link;
+		this.title = this.$.lang.link;
 		this.icon = 'link';
 
 		// define plugin options
@@ -44,8 +44,8 @@ class Link extends PluginModal {
 		pluginOptions.title = true;
 
 		// create HTML
-		const modalEl = CreateHTML_modal(editor);
-		const controllerEl = CreateHTML_controller(editor);
+		const modalEl = CreateHTML_modal(this.$);
+		const controllerEl = CreateHTML_controller(this.$);
 
 		// members
 		const uploadUrl = typeof pluginOptions.uploadUrl === 'string' ? pluginOptions.uploadUrl : null;
@@ -62,9 +62,9 @@ class Link extends PluginModal {
 		};
 
 		// modules
-		this.anchor = new ModalAnchorEditor(this.editor, modalEl, this.pluginOptions);
-		this.modal = new Modal(this, modalEl);
-		this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: false });
+		this.anchor = new ModalAnchorEditor(this.$, modalEl, this.pluginOptions);
+		this.modal = new Modal(this, this.$, modalEl);
+		this.controller = new Controller(this, this.$, controllerEl, { position: 'bottom', disabled: false });
 
 		this.#controllerATarget = this.controller.form.querySelector('a');
 	}
@@ -121,21 +121,21 @@ class Link extends PluginModal {
 		if (oA === null) return false;
 
 		if (!this.isUpdateState) {
-			const selectedFormats = this.format.getLines();
+			const selectedFormats = this.$.format.getLines();
 			if (selectedFormats.length > 1) {
-				if (!this.html.insertNode(dom.utils.createElement(selectedFormats[0].nodeName, null, oA), { afterNode: null, skipCharCount: false })) return true;
+				if (!this.$.html.insertNode(dom.utils.createElement(selectedFormats[0].nodeName, null, oA), { afterNode: null, skipCharCount: false })) return true;
 			} else {
-				if (!this.html.insertNode(oA, { afterNode: null, skipCharCount: false })) return true;
+				if (!this.$.html.insertNode(oA, { afterNode: null, skipCharCount: false })) return true;
 			}
 
-			this.selection.setRange(oA.childNodes[0], 0, oA.childNodes[0], oA.textContent.length);
+			this.$.selection.setRange(oA.childNodes[0], 0, oA.childNodes[0], oA.textContent.length);
 		} else {
 			// set range
 			const textNode = this.controller.currentTarget.childNodes[0];
-			this.selection.setRange(textNode, 0, textNode, textNode.textContent.length);
+			this.$.selection.setRange(textNode, 0, textNode, textNode.textContent.length);
 		}
 
-		this.history.push(false);
+		this.$.history.push(false);
 		return true;
 	}
 
@@ -158,7 +158,7 @@ class Link extends PluginModal {
 		if (/update/.test(command)) {
 			this.modal.open();
 		} else if (/copy/.test(command)) {
-			this.html.copy(this.target);
+			this.$.html.copy(this.target);
 		} else if (/unlink/.test(command)) {
 			const sc = dom.query.getEdgeChild(
 				this.controller.currentTarget,
@@ -174,14 +174,14 @@ class Link extends PluginModal {
 				},
 				true,
 			);
-			this.selection.setRange(sc, 0, ec, ec.textContent.length);
-			this.inline.apply(null, { stylesToModify: null, nodesToRemove: ['A'], strictRemove: false });
+			this.$.selection.setRange(sc, 0, ec, ec.textContent.length);
+			this.$.inline.apply(null, { stylesToModify: null, nodesToRemove: ['A'], strictRemove: false });
 		} else {
 			/** delete */
 			dom.utils.removeItem(this.controller.currentTarget);
 			this.controller.currentTarget = null;
-			this.focusManager.focus();
-			this.history.push(false);
+			this.$.focusManager.focus();
+			this.$.history.push(false);
 		}
 	}
 
@@ -194,6 +194,10 @@ class Link extends PluginModal {
 	}
 }
 
+/**
+ * @param {SunEditor.Deps} $ - Kernel dependencies
+ * @returns {HTMLElement}
+ */
 function CreateHTML_modal({ lang, icons }) {
 	const html = /*html*/ `
 	<form>
@@ -214,6 +218,10 @@ function CreateHTML_modal({ lang, icons }) {
 	return dom.utils.createElement('DIV', { class: 'se-modal-content' }, html);
 }
 
+/**
+ * @param {SunEditor.Deps} $ - Kernel dependencies
+ * @returns {HTMLElement}
+ */
 function CreateHTML_controller({ lang, icons }) {
 	const html = /*html*/ `
 	<div class="se-arrow se-arrow-up"></div>

@@ -1,0 +1,160 @@
+import { get as getNumber } from '../../helper/numbers';
+
+/**
+ * @typedef {Object} FrameContextStore
+ *
+ * This object stores **all frame-specific states and DOM references** for a SunEditor instance.
+ *
+ * - Used to manage **multi-root editors** (each frame has its own context).
+ * - Holds references to all **key DOM nodes** (WYSIWYG area, toolbars, status bar, code view, etc.).
+ * - Maintains **editor state flags** (fullscreen, readonly, code view, content changes).
+ * - Provides storage for **document-type editing features** (page layout, headers, etc.).
+ * - Keeps **history positions** and other runtime values for undo/redo operations.
+ *
+ * This structure is **core to how SunEditor manages each editing frame** and is accessed throughout
+ * the editor modules (history, toolbar actions, plugins, etc.).
+ * -----------------
+ *
+ * === Identification ===
+ * @property {*} key - Unique key identifying this editor instance (useful for multi-root editors).
+ * @property {SunEditor.FrameOptions} options - Frame-specific options (toolbar, plugins, behaviors, etc.).
+ *
+ * === Core DOM References ===
+ * @property {HTMLElement & HTMLTextAreaElement} originElement - The original source element (usually a <textarea> or target element).
+ * @property {HTMLElement} topArea - The outermost container wrapping the entire editor (toolbar + editor + status bar).
+ * @property {HTMLElement} container - The `.se-container` element that holds the editor's UI.
+ * @property {HTMLElement} wrapper - The `.se-wrapper` element containing the editable area and internal components.
+ * @property {SunEditor.WysiwygFrame} wysiwygFrame - The WYSIWYG frame element (either an <iframe> or a div in inline mode).
+ * @property {HTMLElement} wysiwyg - The actual editable content area (usually the iframe’s <body> or a contentEditable div).
+ * @property {SunEditor.EventWysiwyg} eventWysiwyg - Internal reference for wysiwyg events (set on initialization).
+ * @property {HTMLElement} codeWrapper - Wrapper element for the code-view mode.
+ * @property {HTMLElement & HTMLTextAreaElement} code - Code view editing element (a <textarea> or <pre>).
+ * @property {HTMLTextAreaElement} codeNumbers - Element displaying line numbers in code view mode.
+ * @property {HTMLElement} placeholder - Placeholder element shown when the editor is empty.
+ * @property {HTMLElement} statusbar - Editor status bar element (for resizing, info, etc.).
+ * @property {HTMLElement} navigation - Navigation element (e.g., for outline or bookmarks).
+ * @property {HTMLElement} charWrapper - Wrapper for the character counter element.
+ * @property {HTMLElement} charCounter - Element showing the character counter.
+ * @property {Window} [_ww] - The window object of the WYSIWYG frame (iframe window).
+ * @property {Document} [_wd] - The document object of the WYSIWYG frame (iframe document).
+ *
+ * === UI Utilities & Visual Components ===
+ * @property {HTMLElement} lineBreaker_t - Top floating line-breaker UI element (for line insertion).
+ * @property {HTMLElement} lineBreaker_b - Bottom floating line-breaker UI element (for line insertion).
+ * @property {HTMLElement} [_stickyDummy] - Placeholder element used for sticky toolbar behavior.
+ * @property {HTMLElement} [_toolbarShadow] - Shadow element below the toolbar for visual effects.
+ * @property {{main: HTMLElement, border: HTMLElement, display: HTMLElement, handles: HTMLElement[]}} [_figure] - Current active figure component (image, table, etc.).
+ *
+ * === State Flags ===
+ * @property {boolean} isCodeView - Whether the editor is currently in code view mode.
+ * @property {boolean} isFullScreen - Whether the editor is currently in fullscreen mode.
+ * @property {boolean} isReadOnly - Whether the editor is set to readonly mode.
+ * @property {boolean} isDisabled - Whether the editor is currently disabled.
+ * @property {boolean} [isShowBlocks] - Whether block structure visualization is enabled.
+ * @property {boolean} isChanged - Whether the content has been changed (-1 means initial state).
+ *
+ * === History Tracking ===
+ * @property {number} historyIndex - Current index in the history stack (undo/redo).
+ * @property {number} savedIndex - Last saved index in the history stack.
+ *
+ * === DocumentType Editing (Optional) ===
+ * @property {*} [documentType] - Document-type specific configuration or module reference.
+ * @property {HTMLElement} [documentTypeInner] - Inner container for document-type editors.
+ * @property {HTMLElement} [documentTypePage] - Page wrapper for paginated editing mode.
+ * @property {HTMLElement} [documentTypePageMirror] - Mirror page element used for selection/layout adjustments.
+ * @property {boolean} [documentType_use_header] - Whether headers are used in document-type mode.
+ * @property {boolean} [documentType_use_page] - Whether page layout is enabled in document-type mode.
+ *
+ * === Runtime / Computed Values ===
+ * @property {number} _minHeight - Minimum height of the wysiwyg area (parsed from inline style or options).
+ * @property {CSSStyleDeclaration} [wwComputedStyle] - Cached computed styles for the wysiwyg element.
+ *   - Set during editor initialization via `window.getComputedStyle(wysiwyg)`.
+ *   - Used for retrieving runtime CSS values (padding, margins, font-family, etc.).
+ *   - Improves performance by avoiding repeated `getComputedStyle()` calls.
+ * @property {HTMLElement} [_iframeAuto] - Auto-resizing helper iframe (used for dynamic sizing).
+ * @property {number} [_editorHeight] - Current height of the editor.
+ * ================================================================================================================================
+ */
+
+/** @typedef {Map<keyof FrameContextStore, *>} FrameContexType */
+
+/**
+ * @description Elements and variables you should have
+ * @param {{target: Element, key: *, options: SunEditor.FrameOptions}} editorTarget Target textarea
+ * @param {HTMLElement} top Editor top area
+ * @param {HTMLElement} wwFrame Editor wysiwyg frame
+ * @param {HTMLElement} codeWrapper Editor code view wrapper
+ * @param {HTMLElement} codeFrame Editor code view frame
+ * @param {{inner: HTMLElement, page: HTMLElement, pageMirror: HTMLElement}} documentTypeInner Document type elements
+ * @param {?HTMLElement} statusbar Editor statusbar
+ * @param {*} key root key
+ * @returns {FrameContexType}
+ */
+export function CreateFrameContext(editorTarget, top, wwFrame, codeWrapper, codeFrame, statusbar, documentTypeInner, key) {
+	const m = /** @type {FrameContexType} */ (
+		new Map([
+			['key', key],
+			['options', editorTarget.options],
+			['originElement', editorTarget.target],
+			['topArea', top],
+			['container', top.querySelector('.se-container')],
+			['wrapper', top.querySelector('.se-wrapper')],
+			['wysiwygFrame', wwFrame],
+			['wysiwyg', wwFrame], // options.iframe ? wwFrame.contentDocument.body : wwFrame
+			['codeWrapper', codeWrapper],
+			['code', codeFrame],
+			['codeNumbers', /** @type {HTMLTextAreaElement} */ (codeWrapper?.querySelector('.se-code-view-line'))],
+			['lineBreaker_t', top.querySelector('.se-line-breaker-component-t')],
+			['lineBreaker_b', top.querySelector('.se-line-breaker-component-b')],
+			['_stickyDummy', top.querySelector('.se-toolbar-sticky-dummy')],
+			['_toolbarShadow', top.querySelector('.se-toolbar-shadow')],
+			['_minHeight', getNumber(wwFrame.style.minHeight || '65', 0)],
+			['isCodeView', false],
+			['isFullScreen', false],
+			['isReadOnly', false],
+			['isDisabled', false],
+			['isChanged', false],
+			['historyIndex', -1],
+			['savedIndex', -1],
+			['documentTypeInner', documentTypeInner.inner],
+			['documentTypePage', documentTypeInner.page],
+			['documentTypePageMirror', documentTypeInner.pageMirror],
+			// Runtime properties (set dynamically during editor lifecycle)
+			/*
+			['eventWysiwyg', null], // Set in eventManager.js during event initialization
+			['wwComputedStyle', null], // Set in editor.js (#setEditorParams) via getComputedStyle
+			['_ww', null], // Set in editor.js (#setEditorParams) - iframe window object
+			['_wd', null], // Set in editor.js (#setEditorParams) - iframe document object
+			['_iframeAuto', null], // Set in editor.js for iframe auto-resize mode
+			['_editorHeight', null], // Set during resize operations
+			['_figure', null], // Set when figure component (image/table) is active
+			['isShowBlocks', false], // Set by toggleShowBlocks in viewer.js
+			['documentType', null], // Set for document-type editors
+			['documentType_use_header', false], // Set when document uses headers
+			['documentType_use_page', false], // Set when document uses page layout
+			*/
+		])
+	);
+
+	if (statusbar) UpdateStatusbarContext(statusbar, m);
+
+	const placeholder = top.querySelector('.se-placeholder');
+	if (placeholder) m.set('placeholder', placeholder);
+
+	return m;
+}
+
+/**
+ * @description Update statusbar context
+ * @param {HTMLElement} statusbar Statusbar element
+ * @param {FrameContexType|import('../config/contextProvider').FrameContextMap} mapper FrameContext map
+ */
+export function UpdateStatusbarContext(statusbar, mapper) {
+	statusbar ? mapper.set('statusbar', statusbar) : mapper.delete('statusbar');
+	const navigation = statusbar ? statusbar.querySelector('.se-navigation') : null;
+	const charWrapper = statusbar ? statusbar.querySelector('.se-char-counter-wrapper') : null;
+	const charCounter = statusbar ? statusbar.querySelector('.se-char-counter-wrapper .se-char-counter') : null;
+	navigation ? mapper.set('navigation', navigation) : mapper.delete('navigation');
+	charWrapper ? mapper.set('charWrapper', charWrapper) : mapper.delete('charWrapper');
+	charCounter ? mapper.set('charCounter', charCounter) : mapper.delete('charCounter');
+}

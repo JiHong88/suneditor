@@ -6,43 +6,18 @@ import { dom, numbers } from '../../../helper';
  * - Manages the 'active' state of plugins and commands.
  */
 export default class SelectionState {
-	#editor;
-	#options;
-	#status;
-	#frameContext;
-	#frameOptions;
-	#plugins;
-	#commandTargets;
+	#$;
 
 	/** @type {RegExp} */
 	#onButtonsCheck;
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Instance} editor
+	 * @param {import('../eventOrchestrator').default} inst
 	 */
-	constructor(editor) {
-		this.#editor = editor;
-		this.#options = editor.options;
-		this.#status = editor.status;
-		this.#frameContext = editor.frameContext;
-		this.#frameOptions = editor.frameOptions;
-		this.#plugins = editor.plugins;
-		this.#commandTargets = editor.commandDispatcher.targets;
-
-		this.#onButtonsCheck = new RegExp(`^(${Object.keys(editor.options.get('_defaultStyleTagMap')).join('|')})$`, 'i');
-	}
-
-	get #selection() {
-		return this.#editor.selection;
-	}
-
-	get #format() {
-		return this.#editor.format;
-	}
-
-	get #component() {
-		return this.#editor.component;
+	constructor({ $ }) {
+		this.#$ = $;
+		this.#onButtonsCheck = new RegExp(`^(${Object.keys($.options.get('_defaultStyleTagMap')).join('|')})$`, 'i');
 	}
 
 	/**
@@ -54,31 +29,31 @@ export default class SelectionState {
 	 * @returns {Node|undefined} The processed selection node.
 	 */
 	update(selectionNode) {
-		selectionNode ||= this.#selection.getNode();
-		if (selectionNode === this.#editor.effectNode) return;
-		this.#editor.effectNode = selectionNode;
+		selectionNode ||= this.#$.selection.getNode();
+		if (selectionNode === this.#$.store.get('_lastSelectionNode')) return;
+		this.#$.store.set('_lastSelectionNode', selectionNode);
 
-		const marginDir = this.#options.get('_rtl') ? 'marginRight' : 'marginLeft';
-		const plugins = this.#plugins;
-		const commandTargets = this.#commandTargets;
+		const marginDir = this.#$.options.get('_rtl') ? 'marginRight' : 'marginLeft';
+		const plugins = this.#$.plugins;
+		const commandTargets = this.#$.commandDispatcher.targets;
 		const classOnCheck = this.#onButtonsCheck;
-		const styleCommand = this.#options.get('_styleCommandMap');
+		const styleCommand = this.#$.options.get('_styleCommandMap');
 		const commandMapNodes = [];
 		const currentNodes = [];
 
-		const styleTags = this.#options.get('_textStyleTags');
+		const styleTags = this.#$.options.get('_textStyleTags');
 		const styleNodes = [];
 
 		const ignoreCommands = [];
-		const activeCommands = this.#editor.activeCommands;
+		const activeCommands = this.#$.commandDispatcher.activeCommands;
 		const cLen = activeCommands.length;
 		let nodeName = '';
 
-		if (this.#component.is(selectionNode) && !this.#component.__selectionSelected) {
-			const component = this.#component.get(selectionNode);
+		if (this.#$.component.is(selectionNode) && !this.#$.component.__selectionSelected) {
+			const component = this.#$.component.get(selectionNode);
 			if (!component) return;
-			this.#editor.effectNode = null;
-			this.#component.select(component.target, component.pluginName);
+			this.#$.store.set('_lastSelectionNode', null);
+			this.#$.component.select(component.target, component.pluginName);
 			return;
 		}
 
@@ -86,19 +61,19 @@ export default class SelectionState {
 			selectionNode = selectionNode.firstChild;
 		}
 
-		const fc = this.#frameContext;
+		const fc = this.#$.frameContext;
 		const notReadonly = !fc.get('isReadOnly');
 		for (let element = selectionNode; !dom.check.isWysiwygFrame(element); element = element.parentElement) {
 			if (!element) break;
 			if (element.nodeType !== 1 || dom.check.isBreak(element)) continue;
 			if (this.#isNonFocusNode(element)) {
-				this.#editor.focusManager.blur();
+				this.#$.focusManager.blur();
 				return;
 			}
 
 			nodeName = element.nodeName.toLowerCase();
 			currentNodes.push(nodeName);
-			if (styleTags.includes(nodeName) && !this.#format.isLine(nodeName)) styleNodes.push(element);
+			if (styleTags.includes(nodeName) && !this.#$.format.isLine(nodeName)) styleNodes.push(element);
 
 			/* Active plugins */
 			if (notReadonly) {
@@ -122,7 +97,7 @@ export default class SelectionState {
 			}
 
 			/** indent, outdent */
-			if (this.#format.isLine(element)) {
+			if (this.#$.format.isLine(element)) {
 				/* Outdent */
 				if (!commandMapNodes.includes('outdent') && commandTargets.has('outdent') && (dom.check.isListCell(element) || (element.style[marginDir] && numbers.get(element.style[marginDir], 0) > 0))) {
 					if (
@@ -166,12 +141,12 @@ export default class SelectionState {
 		this.__cacheStyleNodes = styleNodes.reverse();
 
 		/** save current nodes */
-		this.#status.currentNodes = currentNodes.reverse();
-		this.#status.currentNodesMap = commandMapNodes;
+		this.#$.store.set('currentNodes', currentNodes.reverse());
+		this.#$.store.set('currentNodesMap', commandMapNodes);
 
 		/**  Displays the current node structure to statusbar */
-		if (this.#frameOptions.get('statusbar_showPathLabel') && fc.get('navigation')) {
-			fc.get('navigation').textContent = this.#options.get('_rtl') ? this.#status.currentNodes.reverse().join(' < ') : this.#status.currentNodes.join(' > ');
+		if (this.#$.frameOptions.get('statusbar_showPathLabel') && fc.get('navigation')) {
+			fc.get('navigation').textContent = this.#$.options.get('_rtl') ? this.#$.store.get('currentNodes').reverse().join(' < ') : this.#$.store.get('currentNodes').join(' > ');
 		}
 
 		return selectionNode;
@@ -192,9 +167,9 @@ export default class SelectionState {
 	 * @param {Array<string>} ignoredList List of formatting commands to keep active (others will be deactivated).
 	 */
 	#setKeyEffect(ignoredList) {
-		const activeCommands = this.#editor.activeCommands;
-		const commandTargets = this.#commandTargets;
-		const plugins = this.#plugins;
+		const activeCommands = this.#$.commandDispatcher.activeCommands;
+		const commandTargets = this.#$.commandDispatcher.targets;
+		const plugins = this.#$.plugins;
 		for (let i = 0, len = activeCommands.length, k, c, p; i < len; i++) {
 			k = activeCommands[i];
 			if (ignoredList.includes(k) || !(c = commandTargets.get(k))) continue;

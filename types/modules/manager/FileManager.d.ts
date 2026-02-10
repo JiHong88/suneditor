@@ -24,13 +24,14 @@ export type FileManagerParams = {
  * @class
  * @description This module manages the file information of the editor.
  */
-declare class FileManager extends CoreInjector {
+declare class FileManager {
 	/**
 	 * @constructor
 	 * @param {*} inst The instance object that called the constructor.
+	 * @param {SunEditor.Deps} $ Kernel dependencies
 	 * @param {FileManagerParams} params FileManager options
 	 */
-	constructor(inst: any, params: FileManagerParams);
+	constructor(inst: any, $: SunEditor.Deps, params: FileManagerParams);
 	kind: any;
 	inst: any;
 	query: string;
@@ -120,5 +121,4 @@ declare class FileManager extends CoreInjector {
 	_resetInfo(): void;
 	#private;
 }
-import CoreInjector from '../../editorInjector/_core';
 import ApiManager from './ApiManager';

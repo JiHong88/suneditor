@@ -1,4 +1,3 @@
-import CoreInjector from '../../editorInjector/_core';
 import { dom, env, keyCodeMap } from '../../helper';
 import { _DragHandle } from '../ui/_DragHandle';
 
@@ -41,7 +40,9 @@ const INDEX_1 = '2147483641';
  * @description Controller module class that handles the UI and interaction logic for a specific editor controller element.
  * @see EditorComponent for `inst._element` requirement
  */
-class Controller extends CoreInjector {
+class Controller {
+	#$;
+
 	#initMethod;
 	#globalEventHandlers;
 
@@ -66,17 +67,18 @@ class Controller extends CoreInjector {
 
 	/**
 	 * @constructor
-	 * @param {*} inst The instance object that called the constructor.
+	 * @param {*} host The instance object that called the constructor.
+	 * @param {SunEditor.Deps} $ Kernel dependencies
 	 * @param {Node} element Controller element
 	 * @param {ControllerParams} params Controller options
 	 * @param {?string} [_name] An optional name for the controller key.
 	 */
-	constructor(inst, element, params, _name) {
-		super(inst.editor);
+	constructor(host, $, element, params, _name) {
+		this.#$ = $;
 
 		// members
-		this.kind = _name || inst.constructor.key || inst.constructor.name;
-		this.inst = inst;
+		this.kind = _name || host.constructor['key'] || host.constructor.name;
+		this.host = host;
 		this.form = /** @type {HTMLFormElement} */ (element);
 		this.isOpen = false;
 		this.currentTarget = null;
@@ -108,32 +110,12 @@ class Controller extends CoreInjector {
 		}
 
 		// add element
-		this.carrierWrapper.appendChild(element);
+		this.#$.contextProvider.carrierWrapper.appendChild(element);
 
 		// init
-		this.eventManager.addEvent(element, 'click', this.#Action.bind(this));
-		this.eventManager.addEvent(element, 'mouseenter', this.#MouseEnter.bind(this));
-		this.eventManager.addEvent(element, 'mouseleave', this.#MouseLeave.bind(this));
-	}
-
-	get #toolbar() {
-		return this.editor.toolbar;
-	}
-
-	get #subToolbar() {
-		return this.editor.subToolbar;
-	}
-
-	get #component() {
-		return this.editor.component;
-	}
-
-	get #selection() {
-		return this.editor.selection;
-	}
-
-	get #offset() {
-		return this.editor.offset;
+		this.#$.eventManager.addEvent(element, 'click', this.#Action.bind(this));
+		this.#$.eventManager.addEvent(element, 'mouseenter', this.#MouseEnter.bind(this));
+		this.#$.eventManager.addEvent(element, 'mouseleave', this.#MouseLeave.bind(this));
 	}
 
 	/**
@@ -160,27 +142,27 @@ class Controller extends CoreInjector {
 		this.form.removeAttribute('data-se-hidden-by-children');
 		this.#__hiddenByParents__.clear();
 
-		if (this.editor.isBalloon) this.#toolbar.hide();
-		else if (this.editor.isSubBalloon) this.#subToolbar.hide();
+		if (this.#$.store.mode.isBalloon) this.#$.toolbar.hide();
+		else if (this.#$.store.mode.isSubBalloon) this.#$.subToolbar.hide();
 
-		if (!this.status.hasFocus) {
+		if (!this.#$.store.get('hasFocus')) {
 			if (disabled ?? this.disabled) {
-				this.uiManager.setControllerOnDisabledButtons(true);
+				this.#$.ui.setControllerOnDisabledButtons(true);
 			} else {
-				this.uiManager.setControllerOnDisabledButtons(false);
+				this.#$.ui.setControllerOnDisabledButtons(false);
 			}
 		}
 
 		this.currentPositionTarget = positionTarget || target;
 		this.isWWTarget = isWWTarget ?? this.isWWTarget;
 		if (typeof initMethod === 'function') this.#initMethod = initMethod;
-		this.uiManager.currentControllerName = this.kind;
+		this.#$.ui.currentControllerName = this.kind;
 
 		this.#addOffset = { left: 0, top: 0 };
 		if (addOffset) this.#addOffset = { ...this.#addOffset, ...addOffset };
 
 		const parents = this.isOutsideForm ? this.parentsForm : [];
-		this.uiManager.opendControllers?.forEach((e) => {
+		this.#$.ui.opendControllers?.forEach((e) => {
 			if (!parents.includes(e.form)) e.form.style.zIndex = INDEX_1;
 		});
 
@@ -196,7 +178,7 @@ class Controller extends CoreInjector {
 		// display controller
 		this.#setControllerPosition(this.form, this.currentPositionTarget, false);
 
-		const isRangeTarget = this.instanceCheck.isRange(target);
+		const isRangeTarget = this.#$.instanceCheck.isRange(target);
 		this.currentTarget = /** @type {HTMLElement} */ (isRangeTarget ? null : target);
 		this.#controllerOn(this.form, target, isRangeTarget);
 		_w.setTimeout(() => _DragHandle.set('__overInfo', false), 0);
@@ -233,11 +215,11 @@ class Controller extends CoreInjector {
 			});
 		}
 
-		this.inst.controllerClose?.();
+		this.host.controllerClose?.();
 
 		if (this.parentsForm.length > 0) return;
 
-		this.#component.deselect();
+		this.#$.component.deselect();
 	}
 
 	/**
@@ -347,30 +329,30 @@ class Controller extends CoreInjector {
 			form: /** @type {HTMLElement} */ (form),
 			target: /** @type {HTMLElement} */ (target),
 			isRangeTarget,
-			notInCarrier: !this.carrierWrapper.contains(form),
+			notInCarrier: !this.#$.contextProvider.carrierWrapper.contains(form),
 		};
 
-		if ((await this.triggerEvent('onBeforeShowController', { caller: this.kind, frameContext: this.frameContext, info })) === false) return;
+		if ((await this.#$.eventManager.triggerEvent('onBeforeShowController', { caller: this.kind, frameContext: this.#$.frameContext, info })) === false) return;
 
 		form.style.display = 'block';
-		if (this.editor.shadowRoot) {
+		if (this.#$.contextProvider.shadowRoot) {
 			this.#shadowRootEventForm = form;
 			this.#shadowRootEventListener = (e) => e.stopPropagation();
 			form.addEventListener('mousedown', this.#shadowRootEventListener);
 		}
 
-		this.uiManager.onControllerContext();
+		this.#$.ui.onControllerContext();
 
 		if (!this.isOpen) {
-			this.uiManager.opendControllers.push(info);
+			this.#$.ui.opendControllers.push(info);
 		}
 
 		this.isOpen = true;
-		this.editor._preventBlur = true;
-		this.editor.status.onSelected = true;
+		this.#$.store.set('_preventBlur', true);
+		this.#$.store.set('controlActive', true);
 
-		this.inst.controllerOn?.(form, target);
-		this.triggerEvent('onShowController', { caller: this.kind, frameContext: this.frameContext, info });
+		this.host.controllerOn?.(form, target);
+		this.#$.eventManager.triggerEvent('onShowController', { caller: this.kind, frameContext: this.#$.frameContext, info });
 	}
 
 	/**
@@ -378,19 +360,19 @@ class Controller extends CoreInjector {
 	 */
 	#controllerOff() {
 		this.form.style.display = 'none';
-		this.uiManager.opendControllers = this.uiManager.opendControllers.filter((v) => v.form !== this.form);
-		if (this.uiManager.currentControllerName !== this.kind && this.uiManager.opendControllers.length > 0) return;
+		this.#$.ui.opendControllers = this.#$.ui.opendControllers.filter((v) => v.form !== this.form);
+		if (this.#$.ui.currentControllerName !== this.kind && this.#$.ui.opendControllers.length > 0) return;
 
-		this.uiManager.setControllerOnDisabledButtons(false);
-		this.uiManager.offControllerContext();
+		this.#$.ui.setControllerOnDisabledButtons(false);
+		this.#$.ui.offControllerContext();
 
-		this.frameContext.get('lineBreaker_t').style.display = this.frameContext.get('lineBreaker_b').style.display = 'none';
-		this.editor.effectNode = null;
-		this.uiManager.currentControllerName = '';
-		this.editor._preventBlur = false;
+		this.#$.frameContext.get('lineBreaker_t').style.display = this.#$.frameContext.get('lineBreaker_b').style.display = 'none';
+		this.#$.store.set('_lastSelectionNode', null);
+		this.#$.ui.currentControllerName = '';
+		this.#$.store.set('_preventBlur', false);
 
 		_w.setTimeout(() => {
-			this.editor.status.onSelected = false;
+			this.#$.store.set('controlActive', false);
 		}, 0);
 		if (this.#shadowRootEventForm) {
 			this.#shadowRootEventForm.removeEventListener('mousedown', this.#shadowRootEventListener);
@@ -416,13 +398,13 @@ class Controller extends CoreInjector {
 			this.sibling.style.display = 'block';
 		}
 
-		if (this.#selection.isRange(refer)) {
-			if (!this.#offset.setRangePosition(this.form, /** @type {Range} */ (refer), { position: 'bottom' })) {
+		if (this.#$.selection.isRange(refer)) {
+			if (!this.#$.offset.setRangePosition(this.form, /** @type {Range} */ (refer), { position: 'bottom' })) {
 				this.hide();
 				return false;
 			}
 		} else {
-			const positionResult = this.#offset.setAbsPosition(controller, /** @type {HTMLElement} */ (refer), {
+			const positionResult = this.#$.offset.setAbsPosition(controller, /** @type {HTMLElement} */ (refer), {
 				addOffset: this.#addOffset,
 				position: this.position,
 				isWWTarget: this.isWWTarget,
@@ -459,8 +441,8 @@ class Controller extends CoreInjector {
 	 */
 	#addGlobalEvent() {
 		this.#removeGlobalEvent();
-		this.#bindClose_key = this.eventManager.addGlobalEvent('keydown', this.#globalEventHandlers.keydown, true);
-		this.#bindClose_mouse = this.eventManager.addGlobalEvent(isMobile ? 'click' : 'mousedown', this.#globalEventHandlers.mousedown, true);
+		this.#bindClose_key = this.#$.eventManager.addGlobalEvent('keydown', this.#globalEventHandlers.keydown, true);
+		this.#bindClose_mouse = this.#$.eventManager.addGlobalEvent(isMobile ? 'click' : 'mousedown', this.#globalEventHandlers.mousedown, true);
 	}
 
 	/**
@@ -468,9 +450,9 @@ class Controller extends CoreInjector {
 	 * - When the ESC key is pressed, the controller is closed.
 	 */
 	#removeGlobalEvent() {
-		this.#component.__removeGlobalEvent();
-		this.#bindClose_key &&= this.eventManager.removeGlobalEvent(this.#bindClose_key);
-		this.#bindClose_mouse &&= this.eventManager.removeGlobalEvent(this.#bindClose_mouse);
+		this.#$.component.__removeGlobalEvent();
+		this.#bindClose_key &&= this.#$.eventManager.removeGlobalEvent(this.#bindClose_key);
+		this.#bindClose_mouse &&= this.#$.eventManager.removeGlobalEvent(this.#bindClose_mouse);
 	}
 
 	/**
@@ -478,9 +460,9 @@ class Controller extends CoreInjector {
 	 * @returns {boolean} True if the controller is fixed.
 	 */
 	#checkFixed() {
-		if (this.uiManager.selectMenuOn) return true;
+		if (this.#$.ui.selectMenuOn) return true;
 
-		const cont = this.uiManager.opendControllers;
+		const cont = this.#$.ui.opendControllers;
 		for (let i = 0; i < cont.length; i++) {
 			if (cont[i].inst === this && cont[i].fixed) {
 				return true;
@@ -508,8 +490,8 @@ class Controller extends CoreInjector {
 			});
 		}
 
-		const _element = this.inst._element;
-		return !isParentForm && (!!dom.query.getParentElement(target, '.se-controller') || (this.#component.isInline(_element) ? target === _element : target?.contains(_element)));
+		const _element = this.host._element;
+		return !isParentForm && (!!dom.query.getParentElement(target, '.se-controller') || (this.#$.component.isInline(_element) ? target === _element : target?.contains(_element)));
 	}
 
 	/**
@@ -523,14 +505,14 @@ class Controller extends CoreInjector {
 		e.stopPropagation();
 		e.preventDefault();
 
-		this.inst.controllerAction(target);
+		this.host.controllerAction(target);
 	}
 
 	/**
 	 * @param {MouseEvent} e - Event object
 	 */
 	#MouseEnter(e) {
-		this.uiManager.currentControllerName = this.kind;
+		this.#$.ui.currentControllerName = this.kind;
 		if (this.parentsForm.length > 0 && this.isInsideForm) return;
 
 		const eventTarget = dom.query.getEventTarget(e);
@@ -559,7 +541,7 @@ class Controller extends CoreInjector {
 		const eventTarget = dom.query.getEventTarget(e);
 		if (!keyCodeMap.isEsc(keyCode)) {
 			if (this.form.contains(eventTarget) || this.#checkForm(eventTarget)) return;
-			if (this.pluginManager.fileInfo.pluginRegExp.test(this.kind)) return;
+			if (this.#$.pluginManager.fileInfo.pluginRegExp.test(this.kind)) return;
 		} else {
 			if (this.#__childrenControllers__.some(({ isOpen }) => isOpen)) return;
 		}
@@ -573,14 +555,14 @@ class Controller extends CoreInjector {
 	 */
 	#CloseListener_mousedown(e) {
 		const eventTarget = dom.query.getEventTarget(e);
-		if (this.inst?._element?.contains(eventTarget)) {
+		if (this.host?._element?.contains(eventTarget)) {
 			this.#preventClose = true;
 			return;
 		}
 
 		this.#preventClose = false;
 		if (
-			eventTarget === this.inst._element ||
+			eventTarget === this.host._element ||
 			eventTarget === this.currentTarget ||
 			this.#checkFixed() ||
 			this.form.contains(eventTarget) ||
@@ -598,8 +580,8 @@ class Controller extends CoreInjector {
 	 * @param {HTMLElement} eventTarget - The target element that triggered the event.
 	 */
 	#PostCloseEvent(eventTarget) {
-		if (!this.frameContext.get('wysiwyg').contains(eventTarget)) {
-			this.#component.__prevent = false;
+		if (!this.#$.frameContext.get('wysiwyg').contains(eventTarget)) {
+			this.#$.component.__prevent = false;
 		}
 	}
 }

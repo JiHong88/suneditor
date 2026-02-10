@@ -64,13 +64,13 @@ class Table extends PluginDropdownFree {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {TablePluginOptions} pluginOptions - Plugin options
 	 */
 	constructor(editor, pluginOptions) {
 		// plugin bisic properties
 		super(editor);
-		this.title = this.lang.table;
+		this.title = this.$.lang.table;
 		this.icon = 'table';
 
 		// pluginOptions options
@@ -82,10 +82,10 @@ class Table extends PluginDropdownFree {
 		// create HTML
 		const menu = CreateHTML();
 		const commandArea = menu.querySelector('.se-controller-table-picker');
-		const controller_table = CreateHTML_controller_table(editor);
-		const controller_cell = CreateHTML_controller_cell(editor, this.cellControllerTop);
+		const controller_table = CreateHTML_controller_table(this.$);
+		const controller_cell = CreateHTML_controller_cell(this.$, this.cellControllerTop);
 
-		this.contextManager.applyToRoots((e) => {
+		this.$.contextProvider.applyToRoots((e) => {
 			e.get('wrapper').appendChild(dom.utils.createElement('DIV', { class: Constants.RESIZE_CELL_CLASS.replace(/^\./, '') }));
 			e.get('wrapper').appendChild(dom.utils.createElement('DIV', { class: Constants.RESIZE_CELL_PREV_CLASS.replace(/^\./, '') }));
 			e.get('wrapper').appendChild(dom.utils.createElement('DIV', { class: Constants.RESIZE_ROW_CLASS.replace(/^\./, '') }));
@@ -94,17 +94,17 @@ class Table extends PluginDropdownFree {
 
 		// members - Controller
 		if (this.cellControllerTop) {
-			this.controller_cell = new Controller(this, controller_cell.html, { position: 'top' });
-			this.controller_table = new Controller(this, controller_table, { position: 'top' });
+			this.controller_cell = new Controller(this, this.$, controller_cell.html, { position: 'top' });
+			this.controller_table = new Controller(this, this.$, controller_table, { position: 'top' });
 			this.controller_cell.sibling = this.controller_table.form;
 			this.controller_table.sibling = this.controller_cell.form;
 			this.controller_table.siblingMain = true;
 		} else {
-			this.controller_table = new Controller(this, controller_table, { position: 'top' });
-			this.controller_cell = new Controller(this, controller_cell.html, { position: 'bottom' });
+			this.controller_table = new Controller(this, this.$, controller_table, { position: 'top' });
+			this.controller_cell = new Controller(this, this.$, controller_cell.html, { position: 'bottom' });
 		}
 
-		this.figure = new Figure(this, null, {});
+		this.figure = new Figure(this, this.$, null, {});
 
 		// members
 		/**
@@ -136,9 +136,9 @@ class Table extends PluginDropdownFree {
 		this.styleService = new TableStyleService(this, { pluginOptions, controller_table });
 
 		// init
-		this.menu.initDropdownTarget(Table, menu);
-		this.eventManager.addEvent(commandArea, 'mousemove', this.#OnMouseMoveTablePicker.bind(this));
-		this.eventManager.addEvent(commandArea, 'click', this.#OnClickTablePicker.bind(this));
+		this.$.menu.initDropdownTarget(Table, menu);
+		this.$.eventManager.addEvent(commandArea, 'mousemove', this.#OnMouseMoveTablePicker.bind(this));
+		this.$.eventManager.addEvent(commandArea, 'click', this.#OnClickTablePicker.bind(this));
 	}
 
 	/**
@@ -210,16 +210,16 @@ class Table extends PluginDropdownFree {
 
 		this._closeTableSelectInfo();
 
-		if (emptyDiv !== this.frameContext.get('wysiwyg'))
-			this.nodeTransform.removeAllParents(
+		if (emptyDiv !== this.$.frameContext.get('wysiwyg'))
+			this.$.nodeTransform.removeAllParents(
 				emptyDiv,
 				function (current) {
 					return current.childNodes.length === 0;
 				},
 				null,
 			);
-		this.focusManager.focus();
-		this.history.push(false);
+		this.$.focusManager.focus();
+		this.$.history.push(false);
 	}
 
 	/**
@@ -233,7 +233,7 @@ class Table extends PluginDropdownFree {
 
 		if (selectedCells.length > 0) {
 			this.clipboardService.copySelectedTableCells(event, cloneContainer, selectedCells);
-			this.uiManager.showToast(this.lang.message_copy_success, 550);
+			this.$.ui.showToast(this.$.lang.message_copy_success, 550);
 		}
 	}
 
@@ -249,7 +249,7 @@ class Table extends PluginDropdownFree {
 		const domParserBody = doc.body;
 		if (domParserBody.childElementCount !== 1) return;
 
-		const componentInfo = this.component.get(domParserBody.firstElementChild);
+		const componentInfo = this.$.component.get(domParserBody.firstElementChild);
 		if (componentInfo.pluginName !== Table.key) return;
 
 		const copyTable = /** @type {HTMLTableElement} */ (componentInfo.target);
@@ -460,7 +460,7 @@ class Table extends PluginDropdownFree {
 
 		const keyCode = event.code;
 		const isTab = keyCodeMap.isTab(keyCode);
-		if (this.uiManager.selectMenuOn || this.resizeService.isResizing() || (!isTab && this.#_s) || keyCodeMap.isCtrl(event)) return;
+		if (this.$.ui.selectMenuOn || this.resizeService.isResizing() || (!isTab && this.#_s) || keyCodeMap.isCtrl(event)) return;
 
 		if (!this.cellControllerTop) {
 			this.controller_cell.hide();
@@ -489,7 +489,7 @@ class Table extends PluginDropdownFree {
 						const rows = table.rows;
 						const newRow = this.gridService.insertBodyRow(table, rows.length, this.state.cellCnt);
 						const firstTd = newRow.querySelector('td div');
-						this.selection.setRange(firstTd, 0, firstTd, 0);
+						this.$.selection.setRange(firstTd, 0, firstTd, 0);
 					}
 
 					event.preventDefault();
@@ -504,7 +504,7 @@ class Table extends PluginDropdownFree {
 				if (!moveCell) return;
 
 				const rangeCell = moveCell.firstElementChild || moveCell;
-				this.selection.setRange(rangeCell, 0, rangeCell, 0);
+				this.$.selection.setRange(rangeCell, 0, rangeCell, 0);
 
 				event.preventDefault();
 				event.stopPropagation();
@@ -606,7 +606,7 @@ class Table extends PluginDropdownFree {
 				this.styleService.setTableLayout('width', this.#maxWidth, this.#fixedColumn, false);
 				this.historyPush();
 				_w.setTimeout(() => {
-					this.component.select(this._element, Table.key, { isInput: true });
+					this.$.component.select(this._element, Table.key, { isInput: true });
 				}, 0);
 				break;
 			case 'layout':
@@ -614,11 +614,11 @@ class Table extends PluginDropdownFree {
 				this.styleService.setTableLayout('column', this.#maxWidth, this.#fixedColumn, false);
 				this.historyPush();
 				_w.setTimeout(() => {
-					this.component.select(this._element, Table.key, { isInput: true });
+					this.$.component.select(this._element, Table.key, { isInput: true });
 				}, 0);
 				break;
 			case 'copy':
-				this.component.copy(this.state.figureElement);
+				this.$.component.copy(this.state.figureElement);
 				break;
 			case 'remove': {
 				this.componentDestroy(this.state.figureElement);
@@ -737,7 +737,7 @@ class Table extends PluginDropdownFree {
 	 */
 	historyPush() {
 		this.selectionService.deleteStyleSelectedCells();
-		this.history.push(false);
+		this.$.history.push(false);
 		this.selectionService.recallStyleSelectedCells();
 	}
 
@@ -747,7 +747,7 @@ class Table extends PluginDropdownFree {
 	 * @param {HTMLTableCellElement} tdElement - The target table cell.
 	 */
 	_setController(tdElement) {
-		if (!this.selection.get().isCollapsed && !this.state.selectedCell) {
+		if (!this.$.selection.get().isCollapsed && !this.state.selectedCell) {
 			this.selectionService.deleteStyleSelectedCells();
 			return;
 		}
@@ -758,7 +758,7 @@ class Table extends PluginDropdownFree {
 		if (this.state.fixedCell === tdElement) dom.utils.addClass(tdElement, 'se-selected-cell-focus');
 		if (!this.state.selectedCells?.length) this.setState('selectedCells', [tdElement]);
 		const tableElement = this.state.selectedTable || this._element || dom.query.getParentElement(tdElement, 'TABLE');
-		this.component.select(tableElement, Table.key, { isInput: true });
+		this.$.component.select(tableElement, Table.key, { isInput: true });
 	}
 
 	/**
@@ -777,7 +777,7 @@ class Table extends PluginDropdownFree {
 	 * @param {boolean} enabled Whether to enable or disable the editor.
 	 */
 	_editorEnable(enabled) {
-		const wysiwyg = this.frameContext.get('wysiwyg');
+		const wysiwyg = this.$.frameContext.get('wysiwyg');
 		wysiwyg.setAttribute('contenteditable', enabled.toString());
 		if (enabled) dom.utils.removeClass(wysiwyg, 'se-disabled');
 		else dom.utils.addClass(wysiwyg, 'se-disabled');
@@ -795,7 +795,7 @@ class Table extends PluginDropdownFree {
 	 * @description Closes table-related controllers and table figure
 	 */
 	_closeTableSelectInfo() {
-		this.component.deselect();
+		this.$.component.deselect();
 		this._closeController();
 	}
 
@@ -836,7 +836,7 @@ class Table extends PluginDropdownFree {
 		x = x < 1 ? 1 : x;
 		y = y < 1 ? 1 : y;
 
-		const isRTL = this.options.get('_rtl');
+		const isRTL = this.$.options.get('_rtl');
 		if (isRTL) {
 			x = 11 - x;
 		}
@@ -886,11 +886,11 @@ class Table extends PluginDropdownFree {
 		figure.appendChild(oTable);
 		this.#maxWidth = true;
 
-		if (this.component.insert(figure, { insertBehavior: 'none' })) {
+		if (this.$.component.insert(figure, { insertBehavior: 'none' })) {
 			this.#resetTablePicker();
-			this.menu.dropdownOff();
+			this.$.menu.dropdownOff();
 			const target = oTable.querySelector('td div');
-			this.selection.setRange(target, 0, target, 0);
+			this.$.selection.setRange(target, 0, target, 0);
 		}
 	}
 

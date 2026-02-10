@@ -1,0 +1,134 @@
+/**
+ * @fileoverview Shortcuts class
+ */
+
+import { keyCodeMap } from '../../../helper';
+import { CreateShortcuts } from '../../section/constructor';
+
+/**
+ * @typedef {Object} ShortcutInfo
+ * @property {boolean} c - Whether the [Ctrl, Command] key is pressed.
+ * @property {boolean} s - Whether the [Shift] key is pressed.
+ * @property {boolean} space - Whether the [Space] key is pressed.
+ * @property {boolean} enter - Whether the Enter key is pressed.
+ * @property {string} command - The command key. (e.g. "bold")
+ * @property {boolean} edge - Whether the cursor is at the end of the line.
+ * @property {string} [key] - The key pressed (e.g., "1.").
+ * @property {string} [keyCode] - The keyEvent.code.
+ * @property {string|((...args: *) => *)} [method] - A plugin's "shortcut" method that is called instead of the default "editor.run" method.
+ * @property {string} plugin - The plugin name.
+ * @property {string} type - Plugin's type. ("command", "dropdown", "modal", "browser", "input", "field", "popup").
+ * @property {Node} button - The plugin command button.
+ * @property {Array<string>} r - An array of key codes generated with the reverseButtons option, used to reverse the action for a specific key combination.
+ * @property {string} textTrigger - Whether the event was triggered by a text input (e.g., mention like @ab).
+ */
+
+/**
+ * @description Shortcuts class
+ */
+class Shortcuts {
+	#$;
+	#options;
+
+	#isDisabled = false;
+
+	/**
+	 * @constructor
+	 * @param {SunEditor.Kernel} kernel
+	 */
+	constructor(kernel) {
+		this.#$ = kernel.$;
+		this.#options = this.#$.options;
+
+		/**
+		 * @description Shoutcuts key map
+		 * @type {Map<string, *>}
+		 */
+		this.keyMap = new Map();
+
+		/**
+		 * @description Shoutcuts reverse key array
+		 * - An array of key codes generated with the reverseButtons option, used to reverse the action for a specific key combination.
+		 * @type {Set<string>}
+		 */
+		this.reverseKeys = new Set();
+	}
+
+	/**
+	 * @description If there is a shortcut function, run it.
+	 * @param {KeyboardEvent} event Keyboard event object
+	 * @param {boolean} ctrl Whether the Ctrl key is pressed
+	 * @param {boolean} shift Whether the Shift key is pressed
+	 * @param {string} keyCode The keyEvent.code.
+	 * @param {string} text The text content of the key
+	 * @param {boolean} edge Whether the cursor is at the end of the line
+	 * @param {HTMLElement} line The current line node
+	 * @param {Range} range The current range object
+	 * @returns {boolean} Whether to execute shortcuts
+	 */
+	command(event, ctrl, shift, keyCode, text, edge, line, range) {
+		if (this.#isDisabled) return false;
+
+		/** @type {ShortcutInfo} */
+		let info = null;
+
+		if (ctrl) {
+			info = this.keyMap.get(keyCode + (shift ? '1000' : ''));
+		} else {
+			info = this.keyMap.get(text) || this.keyMap.get(text + event.key);
+		}
+
+		if (!info || (!shift && info.s) || (info.space && !keyCodeMap.isSpace(keyCode)) || (info.enter && !keyCodeMap.isEnter(keyCode)) || (info.textTrigger && !event.key.trim()) || (info.edge && !edge)) return false;
+
+		if (info.plugin && typeof info.method === 'string') {
+			this.#$.plugins[info.plugin][info.method]?.({ range, line, info, event, keyCode });
+		} else if (typeof info.method === 'function') {
+			info.method({ range, line, info, event, keyCode });
+		} else {
+			this.#$.commandDispatcher.run(info.command, info.type, info.button);
+		}
+
+		return true;
+	}
+
+	/**
+	 * @description Disable the shortcut activation.
+	 */
+	disable() {
+		this.#isDisabled = true;
+	}
+
+	/**
+	 * @description Enable the shortcut activation.
+	 */
+	enable() {
+		this.#isDisabled = false;
+	}
+
+	/**
+	 * @internal
+	 * @description Registers custom shortcut keys (keys starting with "_") into the shortcut map.
+	 * Called during initialization and when toolbar is reset.
+	 */
+	_registerCustomShortcuts() {
+		const shortcuts = this.#options.get('shortcuts');
+		const reverseCommandArray = this.#options.get('_reverseCommandArray');
+		const keyMap = (this.keyMap = new Map());
+		const reverseKeys = this.reverseKeys;
+		for (const key of Object.keys(shortcuts)) {
+			if (!key.startsWith('_')) continue;
+			CreateShortcuts('', null, shortcuts[key], keyMap, reverseCommandArray, reverseKeys);
+		}
+	}
+
+	/**
+	 * @internal
+	 * @description Destroy the Shortcuts instance and release memory
+	 */
+	_destroy() {
+		this.keyMap.clear();
+		this.reverseKeys.clear();
+	}
+}
+
+export default Shortcuts;

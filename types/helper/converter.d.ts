@@ -151,15 +151,15 @@ export function spanToStyleNode(
  */
 export function addUrlQuery(url: string, query: string): string;
 /**
- * @typedef {import('../core/config/options').OptionStyleResult} OptionStyleResult_converter
+ * @typedef {import('../core/schema/options').OptionStyleResult} OptionStyleResult_converter
  */
 /**
  * @description Converts options-related styles and returns them for each frame.
- * @param {Map<string, *>} fo editor.frameOptions
+ * @param {SunEditor.FrameOptions} fo editor.frameOptions
  * @param {string} cssText Style string
  * @returns {OptionStyleResult_converter}
  */
-export function _setDefaultOptionStyle(fo: Map<string, any>, cssText: string): OptionStyleResult_converter;
+export function _setDefaultOptionStyle(fo: SunEditor.FrameOptions, cssText: string): OptionStyleResult_converter;
 /**
  * @description Set default style tag of the iframe
  * @param {Array<string>} linkNames link names array of CSS files or '*' for all stylesheets
@@ -168,12 +168,12 @@ export function _setDefaultOptionStyle(fo: Map<string, any>, cssText: string): O
 export function _setIframeStyleLinks(linkNames: Array<string>): string;
 /**
  * @description When iframe height options is "auto" return "<style>" tag that required.
- * @param {string} frameHeight height
+ * @param {string|number} frameHeight height
  * @returns {string} "<style>...</style>"
  */
-export function _setAutoHeightStyle(frameHeight: string): string;
+export function _setAutoHeightStyle(frameHeight: string | number): string;
 export default converter;
-export type OptionStyleResult_converter = import('../core/config/options').OptionStyleResult;
+export type OptionStyleResult_converter = import('../core/schema/options').OptionStyleResult;
 declare namespace converter {
 	export { htmlToJson };
 	export { jsonToHtml };

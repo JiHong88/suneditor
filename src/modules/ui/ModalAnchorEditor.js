@@ -1,4 +1,3 @@
-import CoreInjector from '../../editorInjector/_core';
 import SelectMenu from './SelectMenu';
 import FileManager from '../manager/FileManager';
 import { dom, numbers, env, unicode } from '../../helper';
@@ -25,7 +24,9 @@ const { _w, NO_EVENT } = env;
  * @description Modal form Anchor tag editor
  * - Use it by inserting it into Modal in a plugin that uses Modal.
  */
-class ModalAnchorEditor extends CoreInjector {
+class ModalAnchorEditor {
+	#$;
+
 	#modalForm;
 	#isRel;
 	#selectMenu_rel;
@@ -33,10 +34,12 @@ class ModalAnchorEditor extends CoreInjector {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Instance} editor The instance object that called the constructor.
+	 * @param {SunEditor.Deps} $ Kernel dependencies
+	 * @param {HTMLElement} modalForm Modal <form>
+	 * @param {ModalAnchorEditorParams} params ModalAnchorEditor options
 	 */
-	constructor(editor, modalForm, params) {
-		super(editor);
+	constructor($, modalForm, params) {
+		this.#$ = $;
 
 		// params
 		this.openNewWindow = !!params.openNewWindow;
@@ -50,9 +53,9 @@ class ModalAnchorEditor extends CoreInjector {
 			this.uploadSizeLimit = numbers.get(params.uploadSizeLimit, 0) || null;
 			this.uploadSingleSizeLimit = numbers.get(params.uploadSingleSizeLimit, 0) || null;
 			this.input = dom.utils.createElement('input', { type: 'file', accept: params.acceptedFormats || '*' });
-			this.eventManager.addEvent(this.input, 'change', this.#OnChangeFile.bind(this));
+			this.#$.eventManager.addEvent(this.input, 'change', this.#OnChangeFile.bind(this));
 			// file manager
-			this.fileManager = new FileManager(this, {
+			this.fileManager = new FileManager(this, $, {
 				query: 'a[download]:not([data-se-file-download])',
 				loadEventName: 'onFileLoad',
 				actionEventName: 'onFileAction',
@@ -60,7 +63,7 @@ class ModalAnchorEditor extends CoreInjector {
 		}
 
 		// create HTML
-		const forms = CreateModalForm(this.editor, params, this.relList);
+		const forms = CreateModalForm($, params, this.relList);
 
 		// members
 		this.host = (_w.location.origin + _w.location.pathname).replace(/\/$/, '');
@@ -111,31 +114,27 @@ class ModalAnchorEditor extends CoreInjector {
 							title: rel,
 							'aria-label': rel,
 						},
-						rel + '<span class="se-svg">' + this.icons.checked + '</span>',
+						rel + '<span class="se-svg">' + this.#$.icons.checked + '</span>',
 					),
 				);
 			}
-			this.#selectMenu_rel = new SelectMenu(this.editor, { checkList: true, position: 'right-middle', dir: 'ltr' });
+			this.#selectMenu_rel = new SelectMenu($, { checkList: true, position: 'right-middle', dir: 'ltr' });
 			this.#selectMenu_rel.on(this.relButton, this.#SetRelItem.bind(this));
 			this.#selectMenu_rel.create(list);
-			this.eventManager.addEvent(this.relButton, 'click', this.#OnClick_relbutton.bind(this));
+			this.#$.eventManager.addEvent(this.relButton, 'click', this.#OnClick_relbutton.bind(this));
 		}
 
 		// init
 		this.#modalForm = /** @type {HTMLElement} */ (modalForm);
 		this.#modalForm.querySelector('.se-anchor-editor').appendChild(forms);
-		this.#selectMenu_bookmark = new SelectMenu(this.editor, { checkList: false, position: 'bottom-left', dir: 'ltr' });
+		this.#selectMenu_bookmark = new SelectMenu($, { checkList: false, position: 'bottom-left', dir: 'ltr' });
 		this.#selectMenu_bookmark.on(this.urlInput, this.#SetHeaderBookmark.bind(this));
-		this.eventManager.addEvent(this.newWindowCheck, 'change', this.#OnChange_newWindowCheck.bind(this));
-		this.eventManager.addEvent(this.downloadCheck, 'change', this.#OnChange_downloadCheck.bind(this));
-		this.eventManager.addEvent(this.urlInput, 'input', this.#OnChange_urlInput.bind(this));
-		this.eventManager.addEvent(this.urlInput, 'focus', this.#OnFocus_urlInput.bind(this));
-		this.eventManager.addEvent(this.bookmarkButton, 'click', this.#OnClick_bookmarkButton.bind(this));
-		this.eventManager.addEvent(forms.querySelector('._se_upload_button'), 'click', () => this.input.click());
-	}
-
-	get #selection() {
-		return this.editor.selection;
+		this.#$.eventManager.addEvent(this.newWindowCheck, 'change', this.#OnChange_newWindowCheck.bind(this));
+		this.#$.eventManager.addEvent(this.downloadCheck, 'change', this.#OnChange_downloadCheck.bind(this));
+		this.#$.eventManager.addEvent(this.urlInput, 'input', this.#OnChange_urlInput.bind(this));
+		this.#$.eventManager.addEvent(this.urlInput, 'focus', this.#OnFocus_urlInput.bind(this));
+		this.#$.eventManager.addEvent(this.bookmarkButton, 'click', this.#OnClick_bookmarkButton.bind(this));
+		this.#$.eventManager.addEvent(forms.querySelector('._se_upload_button'), 'click', () => this.input.click());
 	}
 
 	/**
@@ -154,7 +153,7 @@ class ModalAnchorEditor extends CoreInjector {
 	on(isUpdate) {
 		if (!isUpdate) {
 			this.init();
-			this.displayInput.value = this.#selection.get().toString().trim();
+			this.displayInput.value = this.#$.selection.get().toString().trim();
 			this.newWindowCheck.checked = this.openNewWindow;
 			this.titleInput.value = '';
 		} else if (this.currentTarget) {
@@ -278,7 +277,7 @@ class ModalAnchorEditor extends CoreInjector {
 	 * @param {string} urlValue - The current URL input value.
 	 */
 	#createBookmarkList(urlValue) {
-		const headers = dom.query.getListChildren(this.frameContext.get('wysiwyg'), (current) => /h[1-6]/i.test(current.nodeName) || (dom.check.isAnchor(current) && !!current.id), null);
+		const headers = dom.query.getListChildren(this.#$.frameContext.get('wysiwyg'), (current) => /h[1-6]/i.test(current.nodeName) || (dom.check.isAnchor(current) && !!current.id), null);
 		if (headers.length === 0) return;
 
 		const valueRegExp = new RegExp(`^${urlValue.replace(/^#/, '')}`, 'i');
@@ -288,14 +287,14 @@ class ModalAnchorEditor extends CoreInjector {
 			v = headers[i];
 			if (!valueRegExp.test(v.textContent)) continue;
 			list.push(v);
-			menus.push(dom.check.isAnchor(v) ? `<div><span class="se-text-prefix-icon">${this.icons.bookmark_anchor}</span>${v.id}</div>` : `<div style="${v.style.cssText}">${v.textContent}</div>`);
+			menus.push(dom.check.isAnchor(v) ? `<div><span class="se-text-prefix-icon">${this.#$.icons.bookmark_anchor}</span>${v.id}</div>` : `<div style="${v.style.cssText}">${v.textContent}</div>`);
 		}
 
 		if (list.length === 0) {
 			this.#selectMenu_bookmark.close();
 		} else {
 			this.#selectMenu_bookmark.create(list, menus);
-			this.#selectMenu_bookmark.open(this.options.get('_rtl') ? 'bottom-right' : '');
+			this.#selectMenu_bookmark.open(this.#$.options.get('_rtl') ? 'bottom-right' : '');
 		}
 	}
 
@@ -305,7 +304,7 @@ class ModalAnchorEditor extends CoreInjector {
 	 */
 	#setLinkPreview(value) {
 		const preview = this.preview;
-		const protocol = this.options.get('defaultUrlProtocol');
+		const protocol = this.#$.options.get('defaultUrlProtocol');
 		const noPrefix = this.noAutoPrefix;
 		const reservedProtocol = /^(mailto:|tel:|sms:|https*:\/\/|#)/.test(value) || value.indexOf(protocol) === 0;
 		const sameProtocol = !protocol ? false : RegExp('^' + unicode.escapeStringRegexp(value.substring(0, protocol.length))).test(protocol);
@@ -385,10 +384,10 @@ class ModalAnchorEditor extends CoreInjector {
 	 * @returns {Promise<void>}
 	 */
 	async #error(response) {
-		const message = await this.triggerEvent('onFileUploadError', { error: response });
+		const message = await this.#$.eventManager.triggerEvent('onFileUploadError', { error: response });
 		if (message === false) return;
 		const err = message === NO_EVENT ? response.errorMessage : message || response.errorMessage;
-		this.uiManager.alertOpen(err, 'error');
+		this.#$.ui.alertOpen(err, 'error');
 		console.error('[SUNEDITOR.plugin.fileUpload.error]', err);
 	}
 
@@ -427,7 +426,7 @@ class ModalAnchorEditor extends CoreInjector {
 			uploadCallback(xmlHttp);
 		}.bind(this, this.#uploadCallBack.bind(this), fileInfo);
 
-		const result = await this.triggerEvent('onFileUploadBefore', {
+		const result = await this.#$.eventManager.triggerEvent('onFileUploadBefore', {
 			info: fileInfo,
 			handler,
 		});
@@ -443,7 +442,7 @@ class ModalAnchorEditor extends CoreInjector {
 	 * @description Opens the `rel` attribute selection menu.
 	 */
 	#OnClick_relbutton() {
-		this.#selectMenu_rel.open(this.options.get('_rtl') ? 'left-middle' : '');
+		this.#selectMenu_rel.open(this.#$.options.get('_rtl') ? 'left-middle' : '');
 	}
 
 	/**
@@ -550,14 +549,14 @@ class ModalAnchorEditor extends CoreInjector {
 }
 
 /**
- * @param {SunEditor.Core} editor - Editor instance
+ * @param {SunEditor.Deps} $ - Editor instance
  * @param {ModalAnchorEditorParams} params - ModalAnchorEditor options
  * @param {Array<string>} relList - REL attribute list
  * @returns {HTMLElement} - Modal form element
  */
-function CreateModalForm(editor, params, relList) {
-	const lang = editor.lang;
-	const icons = editor.icons;
+function CreateModalForm($, params, relList) {
+	const lang = $.lang;
+	const icons = $.icons;
 	const textDisplayShow = params.textToDisplay ? '' : 'style="display: none;"';
 	const titleShow = params.title ? '' : 'style="display: none;"';
 
@@ -566,7 +565,7 @@ function CreateModalForm(editor, params, relList) {
 			<div class="se-modal-form">
 				<label>${lang.link_modal_url}</label>
 				<div class="se-modal-form-files">
-					<input data-focus class="se-input-form se-input-url" type="text" placeholder="${editor.options.get('defaultUrlProtocol') || ''}" />
+					<input data-focus class="se-input-form se-input-url" type="text" placeholder="${$.options.get('defaultUrlProtocol') || ''}" />
 					${
 						params.enableFileUpload
 							? `<button type="button" class="se-btn se-tooltip se-modal-files-edge-button _se_upload_button" aria-label="${lang.fileUpload}">

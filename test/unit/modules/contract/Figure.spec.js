@@ -127,7 +127,7 @@ describe('Figure', () => {
                 ['wysiwygFrame', { clientWidth: 800 }],
                 ['wwComputedStyle', { getPropertyValue: jest.fn().mockReturnValue('0px') }]
             ]),
-            contextManager: {
+            contextProvider: {
                 applyToRoots: jest.fn((cb) => {
                     cb(editor.frameContext);
                 })

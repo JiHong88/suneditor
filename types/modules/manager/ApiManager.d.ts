@@ -46,13 +46,14 @@ export type ApiManagerParams = {
  * @class
  * @description API Manager
  */
-declare class ApiManager extends CoreInjector {
+declare class ApiManager {
 	/**
 	 * @constructor
 	 * @param {*} inst The instance object that called the constructor.
+	 * @param {SunEditor.Deps} $ Kernel dependencies
 	 * @param {ApiManagerParams} [params] API options
 	 */
-	constructor(inst: any, params?: ApiManagerParams);
+	constructor(inst: any, $: SunEditor.Deps, params?: ApiManagerParams);
 	/**
 	 * @description Caller instance key name
 	 * @type {string}
@@ -103,4 +104,3 @@ declare class ApiManager extends CoreInjector {
 	cancel(): void;
 	#private;
 }
-import CoreInjector from '../../editorInjector/_core';

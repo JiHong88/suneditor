@@ -6,7 +6,7 @@ import type {} from '../../../typedef';
  * @typedef {Object} KeydownReducerCtx - Keydown Reducer Context object
  * @property {KeyboardEvent} ctx.e - The keyboard event
  * @property {SunEditor.FrameContext} ctx.fc - Frame context object
- * @property {SunEditor.Status} ctx.status - Editor status object
+ * @property {SunEditor.Store} ctx.store - Editor store object
  * @property {SunEditor.Options} ctx.options - Options object
  * @property {SunEditor.FrameOptions} ctx.frameOptions - Frame options object
  * @property {Range} ctx.range - Current selection range
@@ -41,9 +41,9 @@ export type KeydownReducerCtx = {
 	 */
 	fc: SunEditor.FrameContext;
 	/**
-	 * - Editor status object
+	 * - Editor store object
 	 */
-	status: SunEditor.Status;
+	store: SunEditor.Store;
 	/**
 	 * - Options object
 	 */

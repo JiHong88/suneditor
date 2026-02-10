@@ -1,4 +1,4 @@
-import InstanceCheck from '../../../../src/core/services/instanceCheck';
+import InstanceCheck from '../../../../src/core/config/instanceCheck';
 
 describe('InstanceCheck', () => {
 	let instanceCheck;

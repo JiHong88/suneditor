@@ -7,9 +7,9 @@ import type {} from '../../../typedef';
 export default class SelectionState {
 	/**
 	 * @constructor
-	 * @param {SunEditor.Instance} editor
+	 * @param {import('../eventOrchestrator').default} inst
 	 */
-	constructor(editor: SunEditor.Instance);
+	constructor({ $ }: import('../eventOrchestrator').default);
 	/**
 	 * @description Updates the toolbar state based on the current selection.
 	 * - Traverses the DOM from the selection to the root.

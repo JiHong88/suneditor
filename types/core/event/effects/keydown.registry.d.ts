@@ -1,7 +1,9 @@
 import type {} from '../../../typedef';
 declare const _default: {
+	/**  [backspace and delete]  */
 	/** @action delFormatRemoveAndMove */
 	'del.format.removeAndMove': ({ ports }: EffectContext_keydown, { container, formatEl }: any) => void;
+	/** [backspace]  */
 	/** @action backspaceFormatMaintain */
 	'backspace.format.maintain': ({ ctx }: EffectContext_keydown, { formatEl }: any) => void;
 	/** @action backspaceComponentSelect */
@@ -12,14 +14,17 @@ declare const _default: {
 	'backspace.list.mergePrev': ({ ports }: EffectContext_keydown, { prev, formatEl, rangeEl }: any) => void;
 	/** @action backspaceListRemoveNested */
 	'backspace.list.removeNested': ({ ports }: EffectContext_keydown, { range }: any) => void;
+	/** [delete] */
 	/** @action deleteComponentSelect */
 	'delete.component.select': ({ ports }: EffectContext_keydown, { formatEl, fileComponentInfo }: any) => void;
 	/** @action deleteComponentSelectNext */
 	'delete.component.selectNext': ({ ports, ctx }: EffectContext_keydown, { formatEl, nextEl }: any) => void;
 	/** @action deleteListRemoveNested */
 	'delete.list.removeNested': ({ ports, ctx }: EffectContext_keydown, { range, formatEl, rangeEl }: any) => void;
+	/** [tab] */
 	/** @action tabFormatIndent */
 	'tab.format.indent': ({ ports, ctx }: EffectContext_keydown, { range, formatEl, shift }: any) => boolean;
+	/** [enter] */
 	/** @action enterScrollTo */
 	'enter.scrollTo': ({ ports }: EffectContext_keydown, { range }: any) => void;
 	/** @action enterLineAddDefault */
@@ -42,6 +47,7 @@ declare const _default: {
 	'enter.format.breakAtCursor': ({ ports, ctx }: EffectContext_keydown, { formatEl, range }: any) => void;
 	/** @action enterFigcaptionExitInList */
 	'enter.figcaption.exitInList': ({ ports }: EffectContext_keydown, { formatEl }: any) => void;
+	/** [keydown reducer] */
 	/** @action keydownInputInsertNbsp */
 	'keydown.input.insertNbsp': ({ ports }: EffectContext_keydown) => void;
 	/** @action keydownInputInsertZWS */

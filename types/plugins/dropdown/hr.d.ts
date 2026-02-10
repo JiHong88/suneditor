@@ -7,11 +7,12 @@ export type HRPluginOptions = {
 	items?: Array<{
 		name: string;
 		class: string;
+		style?: string;
 	}>;
 };
 /**
  * @typedef {Object} HRPluginOptions
- * @property {Array<{name: string, class: string}>} [items] - HR list
+ * @property {Array<{name: string, class: string, style?: string}>} [items] - HR list
  */
 /**
  * @class
@@ -25,10 +26,10 @@ declare class HR extends PluginDropdown {
 	static component(node: HTMLElement): HTMLElement | null;
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {HRPluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(editor: SunEditor.Core, pluginOptions: HRPluginOptions);
+	constructor(editor: SunEditor.Kernel, pluginOptions: HRPluginOptions);
 	title: any;
 	list: NodeListOf<HTMLButtonElement>;
 	componentSelect(target: HTMLElement): void | boolean;

@@ -67,10 +67,10 @@ export type MentionPluginOptions = {
 declare class Mention extends PluginField {
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {MentionPluginOptions} pluginOptions
 	 */
-	constructor(editor: SunEditor.Core, pluginOptions: MentionPluginOptions);
+	constructor(editor: SunEditor.Kernel, pluginOptions: MentionPluginOptions);
 	title: any;
 	triggerText: string;
 	limitSize: number;

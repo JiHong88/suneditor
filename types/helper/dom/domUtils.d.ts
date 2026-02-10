@@ -183,10 +183,10 @@ export function getViewportSize(): {
  * @description Copies the "wwTarget" element and returns it with inline all styles applied.
  * @param {Node} wwTarget Target element to copy(.sun-editor.sun-editor-editable)
  * @param {boolean} includeWW Include the "wwTarget" element in the copy
- * @param {Array<string>} styles Style list - kamel case
+ * @param {Iterable<string>} styles Style list - kamel case
  * @returns
  */
-export function applyInlineStylesAll(wwTarget: Node, includeWW: boolean, styles: Array<string>): HTMLElement;
+export function applyInlineStylesAll(wwTarget: Node, includeWW: boolean, styles: Iterable<string>): HTMLElement;
 /**
  * @description Wait for media elements to load
  * @param {Node} target Target element

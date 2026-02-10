@@ -7,6 +7,7 @@ const { NO_EVENT } = env;
  */
 export class VideoUploadService {
 	#main;
+	#$;
 	#pluginOptions;
 
 	/**
@@ -14,6 +15,7 @@ export class VideoUploadService {
 	 */
 	constructor(main) {
 		this.#main = main;
+		this.#$ = main.$;
 		this.#pluginOptions = main.pluginOptions;
 	}
 
@@ -64,9 +66,9 @@ export class VideoUploadService {
 	 * @returns {Promise<void>}
 	 */
 	async #error(response) {
-		const message = await this.#main.triggerEvent('onVideoUploadError', { error: response });
+		const message = await this.#$.eventManager.triggerEvent('onVideoUploadError', { error: response });
 		const err = message === NO_EVENT ? response.errorMessage : message || response.errorMessage;
-		this.#main.uiManager.alertOpen(err, 'error');
+		this.#$.ui.alertOpen(err, 'error');
 		console.error('[SUNEDITOR.plugin.video.error]', message);
 	}
 
@@ -76,7 +78,7 @@ export class VideoUploadService {
 	 * @param {XMLHttpRequest} xmlHttp - The XMLHttpRequest object.
 	 */
 	async #UploadCallBack(info, xmlHttp) {
-		if ((await this.#main.triggerEvent('videoUploadHandler', { xmlHttp, info })) === NO_EVENT) {
+		if ((await this.#$.eventManager.triggerEvent('videoUploadHandler', { xmlHttp, info })) === NO_EVENT) {
 			const response = JSON.parse(xmlHttp.responseText);
 			if (response.errorMessage) {
 				this.#error(response);

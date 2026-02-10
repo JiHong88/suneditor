@@ -136,7 +136,7 @@ export class PluginPopup extends Base {
  * @abstract
  * Base class for all plugins - contains common properties
  */
-declare class Base extends EditorInjector {
+declare class Base extends KernelInjector {
 	/** @type {string} - Plugin type ("browser"|"command"|"dropdown"|"field"|"input"|"modal"|"popup") */
 	static type: string;
 	/** @type {string} - Unique plugin identifier */
@@ -164,5 +164,5 @@ declare class Base extends EditorInjector {
 	/** @type {HTMLElement} */
 	replaceButton: HTMLElement;
 }
-import EditorInjector from '../editorInjector';
+import KernelInjector from '../core/kernel/kernelInjector';
 export {};

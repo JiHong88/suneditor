@@ -2,7 +2,7 @@ import { dom } from '../../../helper';
 import { _DragHandle } from '../../../modules/ui';
 
 /**
- * @typedef {import('../eventManager').default} EventManagerThis_handler_ww_dragDrop
+ * @typedef {import('../eventOrchestrator').default} EventManagerThis_handler_ww_dragDrop
  */
 
 /**
@@ -14,7 +14,7 @@ import { _DragHandle } from '../../../modules/ui';
  * @param {DragEvent} e - Event object
  */
 export function OnDragOver_wysiwyg(fc, dragCursor, _iframeTopArea, _innerToolbar, e) {
-	const { sc, so, ec, eo } = this.selection.getDragEventLocationRange(e);
+	const { sc, so, ec, eo } = this.$.selection.getDragEventLocationRange(e);
 	if (!sc) return;
 
 	e.preventDefault();
@@ -25,10 +25,10 @@ export function OnDragOver_wysiwyg(fc, dragCursor, _iframeTopArea, _innerToolbar
 
 	const _offset = { y: 0, x: 0 };
 	if (_iframeTopArea) {
-		const iframeOffset = this.offset.getGlobal(_iframeTopArea);
-		const toolbarH = _innerToolbar ? this.context.get('toolbar_main').offsetHeight : 0;
-		_offset.y = iframeOffset.top + toolbarH - this._w.scrollY;
-		_offset.x = iframeOffset.left - this._w.scrollX;
+		const iframeOffset = this.$.offset.getGlobal(_iframeTopArea);
+		const toolbarH = _innerToolbar ? this.$.context.get('toolbar_main').offsetHeight : 0;
+		_offset.y = iframeOffset.top + toolbarH - this.$._w.scrollY;
+		_offset.x = iframeOffset.left - this.$._w.scrollX;
 	}
 
 	const rect = cursorRange.getBoundingClientRect();
@@ -40,8 +40,8 @@ export function OnDragOver_wysiwyg(fc, dragCursor, _iframeTopArea, _innerToolbar
 			frameX = wwFrame.offsetLeft;
 			frameY = wwFrame.offsetTop;
 		}
-		dragCursor.style.left = `${rect.right + this._w.scrollX + _offset.x + frameX}px`;
-		dragCursor.style.top = `${rect.top + this._w.scrollY + _offset.y - 5 + frameY}px`;
+		dragCursor.style.left = `${rect.right + this.$._w.scrollX + _offset.x + frameX}px`;
+		dragCursor.style.top = `${rect.top + this.$._w.scrollY + _offset.y - 5 + frameY}px`;
 		dragCursor.style.height = `${rect.height + 10}px`;
 		dragCursor.style.display = 'block';
 	} else {
@@ -74,7 +74,7 @@ export function OnDrop_wysiwyg(fc, dragCursor, e) {
 		const dataTransfer = e.dataTransfer;
 		if (!dataTransfer) return true;
 
-		const { sc, so, ec, eo } = this.selection.getDragEventLocationRange(e);
+		const { sc, so, ec, eo } = this.$.selection.getDragEventLocationRange(e);
 		if (!sc) return;
 
 		if (dom.query.getParentElement(sc, '.se-disable-pointer')) {
@@ -85,14 +85,14 @@ export function OnDrop_wysiwyg(fc, dragCursor, e) {
 		if (_DragHandle.get('__dragContainer')) {
 			e.preventDefault();
 			if (_DragHandle.get('__dragContainer').contains(e.target)) {
-				this.component.deselect();
+				this.$.component.deselect();
 				return;
 			}
 
 			const dragContainer = _DragHandle.get('__dragContainer');
-			this.component.deselect();
-			this.selection.setRange(sc, so, ec, eo);
-			this.html.insertNode(dragContainer, { afterNode: null, skipCharCount: true });
+			this.$.component.deselect();
+			this.$.selection.setRange(sc, so, ec, eo);
+			this.$.html.insertNode(dragContainer, { afterNode: null, skipCharCount: true });
 
 			// document type page
 			if (fc.has('documentType_use_page')) {
@@ -103,8 +103,8 @@ export function OnDrop_wysiwyg(fc, dragCursor, e) {
 			return;
 		}
 
-		this.html.remove();
-		this.selection.setRange(sc, so, ec, eo);
+		this.$.html.remove();
+		this.$.selection.setRange(sc, so, ec, eo);
 		return this._dataTransferAction('drop', e, dataTransfer, fc);
 	} finally {
 		dragCursor.style.display = 'none';

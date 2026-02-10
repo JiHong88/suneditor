@@ -1,4 +1,3 @@
-import CoreInjector from '../../editorInjector/_core';
 import { dom, keyCodeMap } from '../../helper';
 import { _w } from '../../helper/env';
 import ApiManager from '../manager/ApiManager';
@@ -40,7 +39,9 @@ import ApiManager from '../manager/ApiManager';
  * @class
  * @description File browser plugin
  */
-class Browser extends CoreInjector {
+class Browser {
+	#$;
+
 	#loading;
 	#globalEventHandler;
 
@@ -49,21 +50,22 @@ class Browser extends CoreInjector {
 
 	/**
 	 * @constructor
-	 * @param {*} inst The instance object that called the constructor.
+	 * @param {*} host The instance object that called the constructor.
+	 * @param {SunEditor.Deps} $ Kernel dependencies
 	 * @param {BrowserParams} params Browser options
 	 */
-	constructor(inst, params) {
-		super(inst.editor);
+	constructor(host, $, params) {
+		this.#$ = $;
 
 		// create HTML
 		this.useSearch = params.useSearch ?? true;
 		const browserFrame = dom.utils.createElement('DIV', { class: 'se-browser sun-editor-common' + (params.className ? ` ${params.className}` : '') });
-		const contentHTML = CreateHTMLInfos(inst.editor, this.useSearch);
+		const contentHTML = CreateHTMLInfos(this.#$, this.useSearch);
 		const content = contentHTML.html;
 
 		// members
-		this.kind = inst.constructor.key || inst.constructor.name;
-		this.inst = inst;
+		this.kind = host.constructor['key'] || host.constructor.name;
+		this.host = host;
 		this.area = browserFrame;
 		this.header = contentHTML.header;
 		this.titleArea = contentHTML.titleArea;
@@ -85,11 +87,11 @@ class Browser extends CoreInjector {
 		this.selectorHandler = params.selectorHandler;
 		this.columnSize = params.columnSize || 4;
 		this.folderDefaultPath = '';
-		this.closeArrow = this.icons.menu_arrow_right;
-		this.openArrow = this.icons.menu_arrow_down;
-		this.icon_folder = this.icons.side_menu_folder_item;
-		this.icon_folder_item = this.icons.side_menu_folder;
-		this.icon_item = this.icons.side_menu_item;
+		this.closeArrow = this.#$.icons.menu_arrow_right;
+		this.openArrow = this.#$.icons.menu_arrow_down;
+		this.icon_folder = this.#$.icons.side_menu_folder_item;
+		this.icon_folder_item = this.#$.icons.side_menu_folder;
+		this.icon_item = this.#$.icons.side_menu_item;
 
 		/** @type {Array<BrowserFile>} */
 		this.items = [];
@@ -104,7 +106,7 @@ class Browser extends CoreInjector {
 		this.sideInner = null;
 
 		// api manager
-		this.apiManager = new ApiManager(this, { method: 'GET' });
+		this.apiManager = new ApiManager(this, $, { method: 'GET' });
 
 		this.#globalEventHandler = (e) => {
 			if (!keyCodeMap.isEsc(e.code)) return;
@@ -114,20 +116,16 @@ class Browser extends CoreInjector {
 		// init
 		browserFrame.appendChild(dom.utils.createElement('DIV', { class: 'se-browser-back' }));
 		browserFrame.appendChild(content);
-		this.carrierWrapper.appendChild(browserFrame);
+		this.#$.contextProvider.carrierWrapper.appendChild(browserFrame);
 
-		this.eventManager.addEvent(this.tagArea, 'click', this.#OnClickTag.bind(this));
-		this.eventManager.addEvent(this.list, 'click', this.#OnClickFile.bind(this));
-		this.eventManager.addEvent(this.side, 'click', this.#OnClickSide.bind(this));
-		this.eventManager.addEvent(content, 'mousedown', this.#OnMouseDown_browser.bind(this));
-		this.eventManager.addEvent(content, 'click', this.#OnClick_browser.bind(this));
-		this.eventManager.addEvent(browserFrame.querySelector('form.se-browser-search-form'), 'submit', this.#Search.bind(this));
-		this.eventManager.addEvent((this.sideOpenBtn = /** @type {HTMLButtonElement} */ (browserFrame.querySelector('.se-side-open-btn'))), 'click', this.#SideOpen.bind(this));
-		this.eventManager.addEvent([this.header, browserFrame.querySelector('.se-browser-main')], 'mousedown', this.#SideClose.bind(this));
-	}
-
-	get #offset() {
-		return this.editor.offset;
+		this.#$.eventManager.addEvent(this.tagArea, 'click', this.#OnClickTag.bind(this));
+		this.#$.eventManager.addEvent(this.list, 'click', this.#OnClickFile.bind(this));
+		this.#$.eventManager.addEvent(this.side, 'click', this.#OnClickSide.bind(this));
+		this.#$.eventManager.addEvent(content, 'mousedown', this.#OnMouseDown_browser.bind(this));
+		this.#$.eventManager.addEvent(content, 'click', this.#OnClick_browser.bind(this));
+		this.#$.eventManager.addEvent(browserFrame.querySelector('form.se-browser-search-form'), 'submit', this.#Search.bind(this));
+		this.#$.eventManager.addEvent((this.sideOpenBtn = /** @type {HTMLButtonElement} */ (browserFrame.querySelector('.se-side-open-btn'))), 'click', this.#SideOpen.bind(this));
+		this.#$.eventManager.addEvent([this.header, browserFrame.querySelector('.se-browser-main')], 'mousedown', this.#SideClose.bind(this));
 	}
 
 	/**
@@ -148,8 +146,8 @@ class Browser extends CoreInjector {
 
 		this.titleArea.textContent = params.title || this.title;
 		this.area.style.display = 'block';
-		this.uiManager.opendBrowser = this;
-		this.closeArrow = this.options.get('_rtl') ? this.icons.menu_arrow_left : this.icons.menu_arrow_right;
+		this.#$.ui.opendBrowser = this;
+		this.closeArrow = this.#$.options.get('_rtl') ? this.#$.icons.menu_arrow_left : this.#$.icons.menu_arrow_right;
 
 		if (this.directData) {
 			this.#drowItems(this.directData);
@@ -157,7 +155,7 @@ class Browser extends CoreInjector {
 			this.#drawFileList(params.url || this.url, params.urlHeader || this.urlHeader, false);
 		}
 
-		this.body.style.maxHeight = dom.utils.getClientSize().h - (this.#offset.getGlobal(this.body).top - _w.scrollY) - 20 + 'px';
+		this.body.style.maxHeight = dom.utils.getClientSize().h - (this.#$.offset.getGlobal(this.body).top - _w.scrollY) - 20 + 'px';
 	}
 
 	/**
@@ -176,10 +174,10 @@ class Browser extends CoreInjector {
 		this.data = {};
 		this.keyword = '';
 		this.list.innerHTML = this.tagArea.innerHTML = this.titleArea.textContent = '';
-		this.uiManager.opendBrowser = null;
+		this.#$.ui.opendBrowser = null;
 		this.sideInner = null;
 
-		this.inst.browserInit?.();
+		this.host.browserInit?.();
 	}
 
 	/**
@@ -288,14 +286,14 @@ class Browser extends CoreInjector {
 	 */
 	#addGlobalEvent() {
 		this.#removeGlobalEvent();
-		this.#bindClose = this.eventManager.addGlobalEvent('keydown', this.#globalEventHandler, true);
+		this.#bindClose = this.#$.eventManager.addGlobalEvent('keydown', this.#globalEventHandler, true);
 	}
 
 	/**
 	 * @description Removes the global event listener for closing the browser.
 	 */
 	#removeGlobalEvent() {
-		this.#bindClose &&= this.eventManager.removeGlobalEvent(this.#bindClose);
+		this.#bindClose &&= this.#$.eventManager.removeGlobalEvent(this.#bindClose);
 	}
 
 	/**
@@ -579,13 +577,13 @@ class Browser extends CoreInjector {
 }
 
 /**
- * @param {SunEditor.Core} editor - editor instance
+ * @param {SunEditor.Deps} $ - editor instance
  * @param {boolean} useSearch - Whether to use the search function
  * @returns {{ html: HTMLElement, header: HTMLElement, titleArea: HTMLElement, tagArea: HTMLElement, body: HTMLElement, list: HTMLElement, side: HTMLElement, wrapper: HTMLElement, _loading: HTMLElement }} HTML
  */
-function CreateHTMLInfos(editor, useSearch) {
-	const lang = editor.lang;
-	const icons = editor.icons;
+function CreateHTMLInfos($, useSearch) {
+	const lang = $.lang;
+	const icons = $.icons;
 	const htmlString = /*html*/ `
 		<div class="se-browser-content">
 			<div class="se-browser-header">

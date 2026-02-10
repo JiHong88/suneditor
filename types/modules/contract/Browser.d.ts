@@ -148,16 +148,17 @@ export type BrowserParams = {
  * @class
  * @description File browser plugin
  */
-declare class Browser extends CoreInjector {
+declare class Browser {
 	/**
 	 * @constructor
-	 * @param {*} inst The instance object that called the constructor.
+	 * @param {*} host The instance object that called the constructor.
+	 * @param {SunEditor.Deps} $ Kernel dependencies
 	 * @param {BrowserParams} params Browser options
 	 */
-	constructor(inst: any, params: BrowserParams);
+	constructor(host: any, $: SunEditor.Deps, params: BrowserParams);
 	useSearch: boolean;
 	kind: any;
-	inst: any;
+	host: any;
 	area: HTMLElement;
 	header: HTMLElement;
 	titleArea: HTMLElement;
@@ -185,11 +186,11 @@ declare class Browser extends CoreInjector {
 	selectorHandler: (target: Node) => void;
 	columnSize: number;
 	folderDefaultPath: string;
-	closeArrow: string;
-	openArrow: string;
-	icon_folder: string;
-	icon_folder_item: string;
-	icon_item: string;
+	closeArrow: any;
+	openArrow: any;
+	icon_folder: any;
+	icon_folder_item: any;
+	icon_item: any;
 	/** @type {Array<BrowserFile>} */
 	items: Array<BrowserFile>;
 	/** @type {Object<string, {name: string, meta: Object<string, *>}>} */
@@ -258,5 +259,4 @@ declare class Browser extends CoreInjector {
 	closeBrowserLoading(): void;
 	#private;
 }
-import CoreInjector from '../../editorInjector/_core';
 import ApiManager from '../manager/ApiManager';

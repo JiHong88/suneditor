@@ -651,7 +651,7 @@ export function createMockEditor(customOptions = {}) {
 		},
 
 		// Context Manager
-		contextManager: {
+		contextProvider: {
 			frameRoots: frameRoots,
 			context: {
 				get: jest.fn((key) => {
@@ -833,7 +833,7 @@ export function createMockThis(editor = null, customProps = {}) {
 		focusManager: mockEditor.focusManager,
 		commandDispatcher: mockEditor.commandDispatcher,
 		pluginManager: mockEditor.pluginManager,
-		contextManager: mockEditor.contextManager,
+		contextProvider: mockEditor.contextProvider,
 
 		// Event manager specific properties
 		isComposing: false,

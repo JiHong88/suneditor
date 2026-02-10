@@ -17,7 +17,7 @@ const { isOSX_IOS } = env;
  * @typedef {Object} KeydownReducerCtx - Keydown Reducer Context object
  * @property {KeyboardEvent} ctx.e - The keyboard event
  * @property {SunEditor.FrameContext} ctx.fc - Frame context object
- * @property {SunEditor.Status} ctx.status - Editor status object
+ * @property {SunEditor.Store} ctx.store - Editor store object
  * @property {SunEditor.Options} ctx.options - Options object
  * @property {SunEditor.FrameOptions} ctx.frameOptions - Frame options object
  * @property {Range} ctx.range - Current selection range

@@ -41,13 +41,13 @@ class Math_ extends PluginModal {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {MathPluginOptions} pluginOptions
 	 */
 	constructor(editor, pluginOptions) {
 		// plugin basic properties
 		super(editor);
-		this.title = this.lang.math;
+		this.title = this.$.lang.math;
 		this.icon = 'math';
 
 		// external library
@@ -55,7 +55,7 @@ class Math_ extends PluginModal {
 		this.mathjax = null;
 
 		// exception
-		if (!(this.katex = this.#CheckKatex(editor)) && !(this.mathjax = this.#CheckMathJax(editor))) {
+		if (!(this.katex = this.#CheckKatex()) && !(this.mathjax = this.#CheckMathJax())) {
 			console.warn(
 				'[SUNEDITOR.plugins.math.warn] The math plugin must need either "KaTeX" or "MathJax" library. Please add the katex or mathjax option. See: https://github.com/ARA-developer/suneditor/blob/develop/guide/external-libraries.md',
 			);
@@ -100,11 +100,11 @@ class Math_ extends PluginModal {
 		// create HTML
 		this.defaultFontSize = null;
 		const modalEl = CreateHTML_modal(this);
-		const controllerEl = CreateHTML_controller(editor);
+		const controllerEl = CreateHTML_controller(this.$);
 
 		// modules
-		this.modal = new Modal(this, modalEl);
-		this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true });
+		this.modal = new Modal(this, this.$, modalEl);
+		this.controller = new Controller(this, this.$, controllerEl, { position: 'bottom', disabled: true });
 
 		// members
 		/** @type {HTMLTextAreaElement} */
@@ -118,8 +118,8 @@ class Math_ extends PluginModal {
 
 		// init
 		this.previewElement.style.fontSize = this.defaultFontSize;
-		this.eventManager.addEvent(this.textArea, 'input', this.#RenderMathExp.bind(this));
-		this.eventManager.addEvent(
+		this.$.eventManager.addEvent(this.textArea, 'input', this.#RenderMathExp.bind(this));
+		this.$.eventManager.addEvent(
 			this.fontSizeElement,
 			'change',
 			function (e) {
@@ -127,7 +127,7 @@ class Math_ extends PluginModal {
 			}.bind(this.previewElement.style),
 		);
 		if (this.pluginOptions.onPaste) {
-			this.eventManager.addEvent(this.textArea, 'paste', this.pluginOptions.onPaste.bind(this));
+			this.$.eventManager.addEvent(this.textArea, 'paste', this.pluginOptions.onPaste.bind(this));
 		}
 	}
 
@@ -219,19 +219,19 @@ class Math_ extends PluginModal {
 		}
 
 		if (!this.isUpdateState) {
-			const selectedFormats = this.format.getLines();
+			const selectedFormats = this.$.format.getLines();
 
 			if (selectedFormats.length > 1) {
 				const oFormat = dom.utils.createElement(selectedFormats[0].nodeName, null, mathEl);
-				this.component.insert(oFormat, { insertBehavior: 'none', scrollTo: false });
+				this.$.component.insert(oFormat, { insertBehavior: 'none', scrollTo: false });
 			} else {
-				this.component.insert(mathEl, { insertBehavior: 'none', scrollTo: false });
+				this.$.component.insert(mathEl, { insertBehavior: 'none', scrollTo: false });
 			}
 		} else {
 			const containerEl = dom.query.getParentElement(this.controller.currentTarget, '.se-component');
 			containerEl.replaceWith(mathEl);
-			const compInfo = this.component.get(mathEl);
-			this.component.select(compInfo.target, compInfo.pluginName);
+			const compInfo = this.$.component.get(mathEl);
+			this.$.component.select(compInfo.target, compInfo.pluginName);
 			return true;
 		}
 
@@ -239,11 +239,11 @@ class Math_ extends PluginModal {
 			this.#renderMathJax(this.mathjax);
 		}
 
-		const r = this.selection.getNearRange(mathEl);
+		const r = this.$.selection.getNearRange(mathEl);
 		if (r) {
-			this.selection.setRange(r.container, r.offset, r.container, r.offset);
+			this.$.selection.setRange(r.container, r.offset, r.container, r.offset);
 		} else {
-			this.component.select(mathEl, Math_.key);
+			this.$.component.select(mathEl, Math_.key);
 		}
 
 		return true;
@@ -304,8 +304,8 @@ class Math_ extends PluginModal {
 	async componentDestroy(target) {
 		dom.utils.removeItem(target);
 		this.controller.close();
-		this.focusManager.focus();
-		this.history.push(false);
+		this.$.focusManager.focus();
+		this.$.history.push(false);
 	}
 
 	/**
@@ -367,7 +367,7 @@ class Math_ extends PluginModal {
 
 		try {
 			const text = getValue(element);
-			await this.html.copy(text);
+			await this.$.html.copy(text);
 			dom.utils.addClass(element, 'se-copy');
 			// copy effect
 			_w.setTimeout(() => {
@@ -403,11 +403,10 @@ class Math_ extends PluginModal {
 	}
 
 	/**
-	 * @param {SunEditor.Core} editor - The root editor instance.
 	 * @returns {*} - The KaTeX instance or null if the instance is invalid.
 	 */
-	#CheckKatex(editor) {
-		const katex = editor.options.get('externalLibs').katex;
+	#CheckKatex() {
+		const katex = this.$.options.get('externalLibs').katex;
 		if (!katex) return null;
 		if (!katex.src) {
 			console.warn('[SUNEDITOR.math.katex.fail] The katex option is set incorrectly.');
@@ -431,13 +430,12 @@ class Math_ extends PluginModal {
 	}
 
 	/**
-	 * @param {SunEditor.Core} editor - The root editor instance.
 	 * @returns {*}
 	 */
-	#CheckMathJax(editor) {
-		const mathjax = editor.options.get('externalLibs').mathjax;
+	#CheckMathJax() {
+		const mathjax = this.$.options.get('externalLibs').mathjax;
 		if (!mathjax) return null;
-		if (editor.frameOptions.get('iframe')) {
+		if (this.$.frameOptions.get('iframe')) {
 			console.warn('[SUNEDITOR.math.mathjax.fail] The MathJax option is not supported in the iframe.');
 		}
 
@@ -459,8 +457,13 @@ class Math_ extends PluginModal {
 	}
 }
 
+/**
+ * @param {Math_} inst - Math plugin instance
+ * @returns {HTMLElement}
+ */
 function CreateHTML_modal(inst) {
-	const { lang, icons, pluginOptions, katex } = inst;
+	const { $, pluginOptions, katex } = inst;
+	const { lang, icons } = $;
 	const { formSize, fontSizeList, canResize, autoHeight } = pluginOptions;
 	const { width, height, maxWidth, maxHeight, minWidth, minHeight } = formSize;
 	const resizeType = !canResize ? 'none' : autoHeight ? 'horizontal' : 'auto';
@@ -507,6 +510,10 @@ function CreateHTML_modal(inst) {
 	return dom.utils.createElement('DIV', { class: 'se-modal-content se-modal-responsive', style: `max-width: ${maxWidth}; max-height: ${maxHeight};` }, html);
 }
 
+/**
+ * @param {SunEditor.Deps} $ - Kernel dependencies
+ * @returns {HTMLElement}
+ */
 function CreateHTML_controller({ lang, icons }) {
 	const html = /*html*/ `
     <div class="se-arrow se-arrow-up"></div>

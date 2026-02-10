@@ -1,4 +1,3 @@
-import CoreInjector from '../../editorInjector/_core';
 import { dom, env, keyCodeMap } from '../../helper';
 
 const { _w } = env;
@@ -18,7 +17,9 @@ const MENU_MIN_HEIGHT = 38;
  * @class
  * @description Creates a select menu
  */
-class SelectMenu extends CoreInjector {
+class SelectMenu {
+	#$;
+
 	#dirPosition;
 	#dirSubPosition;
 	#textDirDiff;
@@ -35,10 +36,11 @@ class SelectMenu extends CoreInjector {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Instance} editor The instance object that called the constructor.
+	 * @param {SunEditor.Deps} $ Kernel dependencies
+	 * @param {SelectMenuParams} params SelectMenu options
 	 */
-	constructor(editor, params) {
-		super(editor);
+	constructor($, params) {
+		this.#$ = $;
 
 		// members
 		const positionItems = params.position.split('-');
@@ -69,10 +71,6 @@ class SelectMenu extends CoreInjector {
 			keydown: this.#OnKeyDown_refer.bind(this),
 		};
 		this.#globalEventHandlers = { keydown: this.#CloseListener_key.bind(this), mousedown: this.#CloseListener_mousedown.bind(this), click: this.#CloseListener_click.bind(this) };
-	}
-
-	get #offset() {
-		return this.editor.offset;
 	}
 
 	/**
@@ -106,7 +104,7 @@ class SelectMenu extends CoreInjector {
 	 */
 	on(referElement, selectMethod, attr = {}) {
 		this.#refer = /** @type {HTMLElement} */ (referElement);
-		this.#keydownTarget = dom.check.isInputElement(referElement) ? referElement : this.frameContext.get('_ww');
+		this.#keydownTarget = dom.check.isInputElement(referElement) ? referElement : this.#$.frameContext.get('_ww');
 		this.#selectMethod = selectMethod;
 		this.form = dom.utils.createElement(
 			'DIV',
@@ -125,15 +123,15 @@ class SelectMenu extends CoreInjector {
 	 * @param {?string} [onItemQuerySelector] The querySelector string of the menu to be activated
 	 */
 	open(position, onItemQuerySelector) {
-		this.uiManager.selectMenuOn = true;
+		this.#$.ui.selectMenuOn = true;
 
 		this.openMethod?.();
 
 		this.#addEvents();
 		this.#addGlobalEvent();
 		const positionItems = position ? position.split('-') : [];
-		const mainPosition = positionItems[0] || (this.#textDirDiff !== null && this.#textDirDiff !== this.options.get('_rtl') ? this.#dirPosition : this.position);
-		const subPosition = positionItems[1] || (this.#textDirDiff !== null && this.#textDirDiff !== this.options.get('_rtl') ? this.#dirSubPosition : this.subPosition);
+		const mainPosition = positionItems[0] || (this.#textDirDiff !== null && this.#textDirDiff !== this.#$.options.get('_rtl') ? this.#dirPosition : this.position);
+		const subPosition = positionItems[1] || (this.#textDirDiff !== null && this.#textDirDiff !== this.#$.options.get('_rtl') ? this.#dirSubPosition : this.subPosition);
 		this.#setPosition(mainPosition, subPosition, onItemQuerySelector);
 		this.isOpen = true;
 	}
@@ -142,7 +140,7 @@ class SelectMenu extends CoreInjector {
 	 * @description Select menu close
 	 */
 	close() {
-		this.uiManager.selectMenuOn = false;
+		this.#$.ui.selectMenuOn = false;
 		dom.utils.removeClass(this.#refer, 'on');
 		this.#init();
 		this.form?.removeAttribute('style');
@@ -256,7 +254,7 @@ class SelectMenu extends CoreInjector {
 		}
 
 		// set top position
-		const globalTarget = this.#offset.get(target);
+		const globalTarget = this.#$.offset.get(target);
 		const targetOffsetTop = target.offsetTop;
 		const targetGlobalTop = globalTarget.top;
 		const targetHeight = target.offsetHeight;
@@ -274,14 +272,14 @@ class SelectMenu extends CoreInjector {
 					form.style.top = t + 'px';
 				}
 				// over bottom
-				let formT = this.#offset.getGlobal(form).top;
+				let formT = this.#$.offset.getGlobal(form).top;
 				const modH = h - (targetGlobalTop - formT) - wbottom - targetHeight;
 				if (modH > 0) {
 					t -= modH + 4;
 					form.style.top = t + 'px';
 				}
 				// over height
-				formT = this.#offset.getGlobal(form).top;
+				formT = this.#$.offset.getGlobal(form).top;
 				if (formT < 0) {
 					h += formT - 4;
 					t -= formT - 4;
@@ -333,7 +331,7 @@ class SelectMenu extends CoreInjector {
 		}
 
 		form.style.left = l + 'px';
-		const fl = this.#offset.getGlobal(form).left;
+		const fl = this.#$.offset.getGlobal(form).left;
 		let overW = 0;
 		switch (side + '-' + (side ? originP : subPosition)) {
 			case 'true-left':
@@ -348,7 +346,7 @@ class SelectMenu extends CoreInjector {
 				overW = _w.innerWidth - (fl + formW);
 				if (overW < 0) l += overW - 4;
 				form.style.left = l + 'px';
-				const centerfl = this.#offset.getGlobal(form).left;
+				const centerfl = this.#$.offset.getGlobal(form).left;
 				if (centerfl < 0) l -= centerfl - 4;
 				break;
 			}
@@ -412,17 +410,17 @@ class SelectMenu extends CoreInjector {
 	 */
 	#addGlobalEvent() {
 		this.#removeGlobalEvent();
-		this.#bindClose_key = this.eventManager.addGlobalEvent('keydown', this.#globalEventHandlers.keydown, true);
-		this.#bindClose_mousedown = this.eventManager.addGlobalEvent('mousedown', this.#globalEventHandlers.mousedown, true);
+		this.#bindClose_key = this.#$.eventManager.addGlobalEvent('keydown', this.#globalEventHandlers.keydown, true);
+		this.#bindClose_mousedown = this.#$.eventManager.addGlobalEvent('mousedown', this.#globalEventHandlers.mousedown, true);
 	}
 
 	/**
 	 * @description Removes global event listeners for closing the menu.
 	 */
 	#removeGlobalEvent() {
-		this.#bindClose_key &&= this.eventManager.removeGlobalEvent(this.#bindClose_key);
-		this.#bindClose_mousedown &&= this.eventManager.removeGlobalEvent(this.#bindClose_mousedown);
-		this.#bindClose_click &&= this.eventManager.removeGlobalEvent(this.#bindClose_click);
+		this.#bindClose_key &&= this.#$.eventManager.removeGlobalEvent(this.#bindClose_key);
+		this.#bindClose_mousedown &&= this.#$.eventManager.removeGlobalEvent(this.#bindClose_mousedown);
+		this.#bindClose_click &&= this.#$.eventManager.removeGlobalEvent(this.#bindClose_click);
 	}
 
 	/**
@@ -483,7 +481,7 @@ class SelectMenu extends CoreInjector {
 		if (env.isGecko) {
 			const eventTarget = dom.query.getEventTarget(e);
 			const target = dom.query.getParentElement(eventTarget, '.se-select-item');
-			if (target) this.eventManager._injectActiveEvent(target);
+			if (target) this.#$.eventManager._injectActiveEvent(target);
 		}
 	}
 
@@ -531,7 +529,7 @@ class SelectMenu extends CoreInjector {
 		if (e.target !== this.#refer) {
 			this.close();
 		} else if (!dom.check.isInputElement(eventTarget)) {
-			this.#bindClose_click = this.eventManager.addGlobalEvent('click', this.#globalEventHandlers.click, true);
+			this.#bindClose_click = this.#$.eventManager.addGlobalEvent('click', this.#globalEventHandlers.click, true);
 		}
 	}
 
@@ -539,7 +537,7 @@ class SelectMenu extends CoreInjector {
 	 * @param {MouseEvent} e - Event object
 	 */
 	#CloseListener_click(e) {
-		this.#bindClose_click = this.eventManager.removeGlobalEvent(this.#bindClose_click);
+		this.#bindClose_click = this.#$.eventManager.removeGlobalEvent(this.#bindClose_click);
 		if (e.target === this.#refer) {
 			e.stopPropagation();
 			this.close();

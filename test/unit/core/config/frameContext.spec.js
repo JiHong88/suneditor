@@ -5,7 +5,7 @@
 import {
     CreateFrameContext,
     UpdateStatusbarContext
-    // FrameContextUtil moved to contextManager service
+    // FrameContextUtil moved to contextProvider service
 } from '../../../../src/core/config/frameContext';
 
 // Mock the helper numbers module
@@ -293,5 +293,5 @@ describe('Core Config - Frame Context', () => {
     });
 
     // Note: FrameContextUtil and Integration tests have been moved to
-    // test/unit/core/services/contextManager.spec.js
+    // test/unit/core/config/contextProvider.spec.js
 });

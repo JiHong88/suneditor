@@ -3,15 +3,15 @@ export default DocumentType;
 /**
  * @description DocumentType, page, header management class
  */
-declare class DocumentType extends CoreInjector {
+declare class DocumentType {
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
-	 * @param {SunEditor.FrameContext} fc - frame context object
+	 * @param {SunEditor.Kernel} kernel
+	 * @param {SunEditor.FrameContext} fc - Frame context object
 	 */
-	constructor(editor: SunEditor.Core, fc: SunEditor.FrameContext);
-	useHeader: any;
-	usePage: any;
+	constructor(kernel: SunEditor.Kernel, fc: SunEditor.FrameContext);
+	useHeader: boolean;
+	usePage: boolean;
 	/**
 	 * @description Refresh the document header area
 	 */
@@ -158,4 +158,3 @@ declare class DocumentType extends CoreInjector {
 	_destroy(): void;
 	#private;
 }
-import CoreInjector from '../../editorInjector/_core';

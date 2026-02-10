@@ -1,9 +1,9 @@
 import { dom, env } from '../../../helper';
 
-const { isMobile } = env;
+const { isMobile, _w } = env;
 
 /**
- * @typedef {import('../eventManager').default} EventManagerThis_handler_toolbar
+ * @typedef {import('../eventOrchestrator').default} EventManagerThis_handler_toolbar
  */
 
 /**
@@ -14,21 +14,21 @@ export function ButtonsHandler(e) {
 	const eventTarget = dom.query.getEventTarget(e);
 	let target = eventTarget;
 
-	if (this.editor.isSubBalloon && !this.context.get('toolbar_sub_main')?.contains(target)) {
+	if (this.$.store.mode.isBalloon && !this.$.context.get('toolbar_sub_main')?.contains(target)) {
 		this._hideToolbar_sub();
 	}
 
 	const isInput = dom.check.isInputElement(target);
 
 	if (isInput) {
-		this.editor._preventBlur = false;
-	} else if (!this.frameContext.get('wysiwyg').contains(this.selection.getNode())) {
-		this.focusManager.focus();
+		this.$.store.set('_preventBlur', false);
+	} else if (!this.$.frameContext.get('wysiwyg').contains(this.$.selection.getNode())) {
+		this.$.focusManager.focus();
 	}
 
 	if (dom.query.getParentElement(target, '.se-dropdown')) {
 		e.stopPropagation();
-		this.uiManager.preventToolbarHide(true);
+		this.$.ui.preventToolbarHide(true);
 	} else {
 		let command = target.getAttribute('data-command');
 		let className = target.className;
@@ -41,26 +41,27 @@ export function ButtonsHandler(e) {
 
 		// toolbar input button
 		if (isInput && /^INPUT$/i.test(target?.getAttribute('data-type'))) {
-			this.editor._preventBlur = this._inputFocus = true;
-			if (!this.status.hasFocus) this.applyTagEffect();
+			this.$.store.set('_preventBlur', true);
+			this._inputFocus = true;
+			if (!this.$.store.get('hasFocus')) this.applyTagEffect();
 			/* event */
 			if (!dom.check.isInputElement(eventTarget) || eventTarget.disabled) return;
 
-			const plugin = this.plugins[command];
+			const plugin = this.$.plugins[command];
 			if (!plugin) return;
 
 			if (this.__inputBlurEvent) this.__removeInput();
 
 			// blur event
 			if (typeof plugin.toolbarInputChange === 'function') this.__inputPlugin = { obj: plugin, target: eventTarget, value: eventTarget.value };
-			this.__inputBlurEvent = this.addEvent(eventTarget, 'blur', (ev) => {
+			this.__inputBlurEvent = this.$.eventManager.addEvent(eventTarget, 'blur', (ev) => {
 				if (plugin.isInputActive) return;
 
 				try {
 					const value = eventTarget.value.trim();
 					if (typeof plugin.toolbarInputChange === 'function' && value !== this.__inputPlugin.value) plugin.toolbarInputChange({ target: eventTarget, value, event: ev });
 				} finally {
-					this._w.setTimeout(() => (this._inputFocus = false), 0);
+					_w.setTimeout(() => (this._inputFocus = false), 0);
 					this.__removeInput();
 				}
 			});
@@ -69,7 +70,7 @@ export function ButtonsHandler(e) {
 
 			// keydown event
 			if (typeof plugin.toolbarInputKeyDown === 'function') {
-				this.__inputKeyEvent = this.addEvent(eventTarget, 'keydown', (event) => {
+				this.__inputKeyEvent = this.$.eventManager.addEvent(eventTarget, 'keydown', (event) => {
 					plugin.toolbarInputKeyDown({ target: eventTarget, event });
 				});
 			}
@@ -81,18 +82,18 @@ export function ButtonsHandler(e) {
 
 			this.__removeInput();
 			return;
-		} else if (!this.frameContext.get('isCodeView')) {
+		} else if (!this.$.frameContext.get('isCodeView')) {
 			if (isMobile) {
-				this.editor._preventBlur = true;
+				this.$.store.set('_preventBlur', true);
 			} else {
 				e.preventDefault();
 				if (env.isGecko && command) {
-					this._injectActiveEvent(target);
+					this.$.eventManager._injectActiveEvent(target);
 				}
 			}
 		}
 
-		if (command === this.menu.currentDropdownName || command === this.menu.currentContainerName) {
+		if (command === this.$.menu.currentDropdownName || command === this.$.menu.currentContainerName) {
 			e.stopPropagation();
 		}
 	}
@@ -115,7 +116,7 @@ export function OnClick_menuTray(e) {
 	}
 	if (!k) return;
 
-	const plugin = this.plugins[k];
+	const plugin = this.$.plugins[k];
 	if (!plugin || typeof plugin.action !== 'function') return;
 
 	e.stopPropagation();
@@ -128,5 +129,5 @@ export function OnClick_menuTray(e) {
  */
 export function OnClick_toolbar(e) {
 	const eventTarget = dom.query.getEventTarget(e);
-	this.commandDispatcher.runFromTarget(eventTarget);
+	this.$.commandDispatcher.runFromTarget(eventTarget);
 }

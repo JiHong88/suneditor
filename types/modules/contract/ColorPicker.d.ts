@@ -51,16 +51,17 @@ export type ColorPickerParams = {
  * @description Create a color picker element and register for related events. (this.target)
  * - When calling the color selection, "submit", and "remove" buttons, the "action" method of the instance is called with the "color" value as an argument.
  */
-declare class ColorPicker extends CoreInjector {
+declare class ColorPicker {
 	/**
 	 * @constructor
-	 * @param {*} inst The instance object that called the constructor.
+	 * @param {*} host The instance object that called the constructor.
+	 * @param {SunEditor.Deps} $ Kernel dependencies
 	 * @param {string} styles style property ("color", "backgroundColor"..)
 	 * @param {ColorPickerParams} params Color picker options
 	 */
-	constructor(inst: any, styles: string, params: ColorPickerParams);
+	constructor(host: any, $: SunEditor.Deps, styles: string, params: ColorPickerParams);
 	kind: any;
-	inst: any;
+	host: any;
 	form: HTMLElement;
 	target: HTMLElement;
 	targetButton: Node;
@@ -95,5 +96,4 @@ declare class ColorPicker extends CoreInjector {
 	hueSliderCancelAction(): void;
 	#private;
 }
-import CoreInjector from '../../editorInjector/_core';
 import HueSlider from './HueSlider';

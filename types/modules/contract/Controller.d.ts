@@ -108,17 +108,18 @@ export type ControllerParams = {
  * @description Controller module class that handles the UI and interaction logic for a specific editor controller element.
  * @see EditorComponent for `inst._element` requirement
  */
-declare class Controller extends CoreInjector {
+declare class Controller {
 	/**
 	 * @constructor
-	 * @param {*} inst The instance object that called the constructor.
+	 * @param {*} host The instance object that called the constructor.
+	 * @param {SunEditor.Deps} $ Kernel dependencies
 	 * @param {Node} element Controller element
 	 * @param {ControllerParams} params Controller options
 	 * @param {?string} [_name] An optional name for the controller key.
 	 */
-	constructor(inst: any, element: Node, params: ControllerParams, _name?: string | null);
+	constructor(host: any, $: SunEditor.Deps, element: Node, params: ControllerParams, _name?: string | null);
 	kind: any;
-	inst: any;
+	host: any;
 	form: HTMLFormElement;
 	isOpen: boolean;
 	currentTarget: HTMLElement;
@@ -201,4 +202,3 @@ declare class Controller extends CoreInjector {
 	_scrollReposition(): void;
 	#private;
 }
-import CoreInjector from '../../editorInjector/_core';

@@ -1,4 +1,3 @@
-import CoreInjector from '../../editorInjector/_core';
 import { dom, env, keyCodeMap } from '../../helper';
 
 const { _w } = env;
@@ -8,7 +7,9 @@ const DIRECTION_CURSOR_MAP = { w: 'ns-resize', h: 'ew-resize', c: 'nwse-resize',
  * @class
  * @description Modal window module
  */
-class Modal extends CoreInjector {
+class Modal {
+	#$;
+
 	/** @type {HTMLElement} */
 	#modalArea;
 	/** @type {HTMLElement} */
@@ -29,11 +30,12 @@ class Modal extends CoreInjector {
 
 	/**
 	 * @description Modal window module
-	 * @param {* & {editor: SunEditor.Core}} inst The instance object that called the constructor.
+	 * @param {*} inst The instance object that called the constructor.
+	 * @param {SunEditor.Deps} $ Kernel dependencies
 	 * @param {Element} element Modal element
 	 */
-	constructor(inst, element) {
-		super(inst.editor);
+	constructor(inst, $, element) {
+		this.#$ = $;
 
 		// members
 		this.inst = inst;
@@ -44,23 +46,23 @@ class Modal extends CoreInjector {
 		/** @type {HTMLInputElement} */
 		this.focusElement = element.querySelector('[data-focus]');
 
-		this.#modalArea = this.carrierWrapper.querySelector('.se-modal');
-		this.#modalInner = this.carrierWrapper.querySelector('.se-modal .se-modal-inner');
+		this.#modalArea = this.#$.contextProvider.carrierWrapper.querySelector('.se-modal');
+		this.#modalInner = this.#$.contextProvider.carrierWrapper.querySelector('.se-modal .se-modal-inner');
 		this.#closeListener = [this.#CloseListener.bind(this), this.#OnClick_dialog.bind(this)];
 
 		// add element
 		this.#modalInner.appendChild(element);
 
 		// init
-		this.eventManager.addEvent(element.querySelector('form'), 'submit', this.#Action.bind(this));
-		this.#closeSignal = !this.eventManager.addEvent(element.querySelector('[data-command="close"]'), 'click', this.close.bind(this));
+		this.#$.eventManager.addEvent(element.querySelector('form'), 'submit', this.#Action.bind(this));
+		this.#closeSignal = !this.#$.eventManager.addEvent(element.querySelector('[data-command="close"]'), 'click', this.close.bind(this));
 
 		// resize
 		if (element.querySelector('.se-modal-resize-handle-w') || element.querySelector('.se-modal-resize-handle-h') || element.querySelector('.se-modal-resize-handle-c') || element.querySelector('.se-modal-resize-form')) {
 			if (!(this.#resizeBody = element.querySelector('.se-modal-resize-form')) && (this.#resizeBody = element.querySelector('.se-modal-body'))) {
-				this.eventManager.addEvent(element.querySelector('.se-modal-resize-handle-w'), 'mousedown', this.#OnResizeMouseDown.bind(this, 'w'));
-				this.eventManager.addEvent(element.querySelector('.se-modal-resize-handle-h'), 'mousedown', this.#OnResizeMouseDown.bind(this, 'h'));
-				this.eventManager.addEvent(element.querySelector('.se-modal-resize-handle-c'), 'mousedown', this.#OnResizeMouseDown.bind(this, 'c'));
+				this.#$.eventManager.addEvent(element.querySelector('.se-modal-resize-handle-w'), 'mousedown', this.#OnResizeMouseDown.bind(this, 'w'));
+				this.#$.eventManager.addEvent(element.querySelector('.se-modal-resize-handle-h'), 'mousedown', this.#OnResizeMouseDown.bind(this, 'h'));
+				this.#$.eventManager.addEvent(element.querySelector('.se-modal-resize-handle-c'), 'mousedown', this.#OnResizeMouseDown.bind(this, 'c'));
 
 				this.#globalEventHandlers = {
 					mousemove: this.#OnResize.bind(this),
@@ -70,18 +72,10 @@ class Modal extends CoreInjector {
 		}
 	}
 
-	get #offset() {
-		return this.editor.offset;
-	}
-
-	get #uiManager() {
-		return this.editor.uiManager;
-	}
-
 	/**
 	 * @description Create a file input tag in the modal window.
-	 * @param {{icons: SunEditor.Core['icons'], lang: SunEditor.Core['lang']}} param0 - icons and language object
-	 * @param {{acceptedFormats: string, allowMultiple}} param1 - options
+	 * @param {{icons: SunEditor.Deps['icons'], lang: SunEditor.Deps['lang']}} param0 - icons and language object
+	 * @param {{acceptedFormats?: string, allowMultiple?: boolean}} param1 - options
 	 * - acceptedFormats: "image/*, video/*, audio/*", etc.
 	 * - allowMultiple: true or false
 	 * @returns {string} HTML string
@@ -143,14 +137,14 @@ class Modal extends CoreInjector {
 	 * - The plugin's "init" method is called.
 	 */
 	open() {
-		this.#uiManager.offCurrentModal();
+		this.#$.ui.offCurrentModal();
 		this.#fixCurrentController(true);
 
 		if (this.#closeSignal) this.#modalInner.addEventListener('click', this.#closeListener[1]);
-		this.#bindClose &&= this.eventManager.removeGlobalEvent(this.#bindClose);
-		this.#bindClose = this.eventManager.addGlobalEvent('keydown', this.#closeListener[0]);
-		this.isUpdate = this.kind === this.#uiManager.currentControllerName;
-		this.#uiManager.opendModal = this;
+		this.#bindClose &&= this.#$.eventManager.removeGlobalEvent(this.#bindClose);
+		this.#bindClose = this.#$.eventManager.addGlobalEvent('keydown', this.#closeListener[0]);
+		this.isUpdate = this.kind === this.#$.ui.currentControllerName;
+		this.#$.ui.opendModal = this;
 
 		if (!this.isUpdate) this.inst.modalInit?.();
 		this.inst.modalOn?.(this.isUpdate);
@@ -179,11 +173,11 @@ class Modal extends CoreInjector {
 		this.#removeGlobalEvent();
 		this.#fixCurrentController(false);
 		_w.setTimeout(() => {
-			this.#uiManager.opendModal = null;
+			this.#$.ui.opendModal = null;
 		}, 0);
 
 		if (this.#closeSignal) this.#modalInner.removeEventListener('click', this.#closeListener[1]);
-		this.#bindClose &&= this.eventManager.removeGlobalEvent(this.#bindClose);
+		this.#bindClose &&= this.#$.eventManager.removeGlobalEvent(this.#bindClose);
 
 		// close
 		dom.utils.removeClass(this.#modalArea, 'se-backdrop-show');
@@ -192,7 +186,7 @@ class Modal extends CoreInjector {
 		this.inst.modalInit?.();
 		this.inst.modalOff?.(this.isUpdate);
 
-		if (!this.isUpdate) this.focusManager.focus();
+		if (!this.isUpdate) this.#$.focusManager.focus();
 	}
 
 	/**
@@ -200,7 +194,7 @@ class Modal extends CoreInjector {
 	 * @param {boolean} fixed - Whether to fix or unfix the controller.
 	 */
 	#fixCurrentController(fixed) {
-		const cont = this.#uiManager.opendControllers;
+		const cont = this.#$.ui.opendControllers;
 		for (let i = 0; i < cont.length; i++) {
 			cont[i].fixed = fixed;
 			cont[i].form.style.display = fixed ? 'none' : 'block';
@@ -209,10 +203,10 @@ class Modal extends CoreInjector {
 
 	/**
 	 * @description Saves the current offset position of the modal for resizing calculations.
-	 * @returns {import('../../core/class/offset').OffsetGlobalInfo} The offset position of the modal.
+	 * @returns {import('../../core/logic/dom/offset').OffsetGlobalInfo} The offset position of the modal.
 	 */
 	#saveOffset() {
-		const offset = this.#offset.getGlobal(this.#resizeBody);
+		const offset = this.#$.offset.getGlobal(this.#resizeBody);
 		this.#offetTop = offset.top;
 		this.#offetLeft = offset.left;
 		return offset;
@@ -224,18 +218,18 @@ class Modal extends CoreInjector {
 	 */
 	#addGlobalEvent(dir) {
 		this.#removeGlobalEvent();
-		this.#uiManager.enableBackWrapper(DIRECTION_CURSOR_MAP[dir]);
-		this.#bindClose_mousemove = this.eventManager.addGlobalEvent('mousemove', this.#globalEventHandlers.mousemove, true);
-		this.#bindClose_mouseup = this.eventManager.addGlobalEvent('mouseup', this.#globalEventHandlers.mouseup, true);
+		this.#$.ui.enableBackWrapper(DIRECTION_CURSOR_MAP[dir]);
+		this.#bindClose_mousemove = this.#$.eventManager.addGlobalEvent('mousemove', this.#globalEventHandlers.mousemove, true);
+		this.#bindClose_mouseup = this.#$.eventManager.addGlobalEvent('mouseup', this.#globalEventHandlers.mouseup, true);
 	}
 
 	/**
 	 * @description Removes global event listeners related to modal resizing.
 	 */
 	#removeGlobalEvent() {
-		this.#uiManager.disableBackWrapper();
-		this.#bindClose_mousemove &&= this.eventManager.removeGlobalEvent(this.#bindClose_mousemove);
-		this.#bindClose_mouseup &&= this.eventManager.removeGlobalEvent(this.#bindClose_mouseup);
+		this.#$.ui.disableBackWrapper();
+		this.#bindClose_mousemove &&= this.#$.eventManager.removeGlobalEvent(this.#bindClose_mousemove);
+		this.#bindClose_mouseup &&= this.#$.eventManager.removeGlobalEvent(this.#bindClose_mouseup);
 	}
 
 	/**
@@ -252,21 +246,21 @@ class Modal extends CoreInjector {
 		e.preventDefault();
 		e.stopPropagation();
 
-		this.#uiManager.showLoading();
+		this.#$.ui.showLoading();
 
 		try {
 			const result = await this.inst.modalAction();
 			if (result === false) {
-				this.#uiManager.hideLoading();
+				this.#$.ui.hideLoading();
 			} else if (result === undefined) {
 				this.close();
 			} else {
 				this.close();
-				this.#uiManager.hideLoading();
+				this.#$.ui.hideLoading();
 			}
 		} catch (error) {
 			this.close();
-			this.#uiManager.hideLoading();
+			this.#$.ui.hideLoading();
 			throw Error(`[SUNEDITOR.Modal[${this.kind}].warn] ${error.message}`);
 		}
 	}
@@ -297,7 +291,7 @@ class Modal extends CoreInjector {
 	#OnResizeMouseDown(dir, e) {
 		this.#currentHandle = dom.query.getEventTarget(e);
 		dom.utils.addClass(this.#currentHandle, 'active');
-		this.#addGlobalEvent((this.#resizeDir = dir + (this.options.get('_rtl') ? 'RTL' : '')));
+		this.#addGlobalEvent((this.#resizeDir = dir + (this.#$.options.get('_rtl') ? 'RTL' : '')));
 	}
 
 	/**

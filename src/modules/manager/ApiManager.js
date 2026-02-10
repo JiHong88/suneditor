@@ -1,4 +1,3 @@
-import CoreInjector from '../../editorInjector/_core';
 import { env } from '../../helper';
 
 /**
@@ -16,17 +15,20 @@ import { env } from '../../helper';
  * @class
  * @description API Manager
  */
-class ApiManager extends CoreInjector {
+class ApiManager {
+	#$;
+
 	/** @type {XMLHttpRequest} */
 	#xhr;
 
 	/**
 	 * @constructor
 	 * @param {*} inst The instance object that called the constructor.
+	 * @param {SunEditor.Deps} $ Kernel dependencies
 	 * @param {ApiManagerParams} [params] API options
 	 */
-	constructor(inst, params) {
-		super(inst.editor);
+	constructor(inst, $, params) {
+		this.#$ = $;
 
 		/**
 		 * @description Caller instance key name
@@ -68,7 +70,7 @@ class ApiManager extends CoreInjector {
 
 		const xhr = this.#xhr;
 		if (responseType) xhr.responseType = responseType;
-		xhr.onreadystatechange = CallBackApi.bind(this, xhr, callBack, errorCallBack);
+		xhr.onreadystatechange = this.#CallBackApi.bind(this, xhr, callBack, errorCallBack);
 		xhr.open(method, url, true);
 		if (headers !== null && typeof headers === 'object' && Object.keys(headers).length > 0) {
 			for (const key in headers) {
@@ -113,20 +115,20 @@ class ApiManager extends CoreInjector {
 					try {
 						resolve(xhr);
 					} finally {
-						this.uiManager.hideLoading();
+						this.#$.ui.hideLoading();
 					}
 				} else {
 					try {
 						const res = !xhr.responseText ? xhr : JSON.parse(xhr.responseText);
 						reject(res);
 					} finally {
-						this.uiManager.hideLoading();
+						this.#$.ui.hideLoading();
 					}
 				}
 			};
 
 			xhr.onerror = () => {
-				this.uiManager.hideLoading();
+				this.#$.ui.hideLoading();
 				reject(new Error('Network error'));
 			};
 
@@ -149,39 +151,39 @@ class ApiManager extends CoreInjector {
 	#normalizeUrl(url) {
 		return url.replace(/([^:])\/+/g, '$1/').replace(/\/(\?|#|$)/, '$1');
 	}
-}
 
-/**
- * @description API callback
- * @param {XMLHttpRequest} xmlHttp - XMLHttpRequest
- * @param {(xmlHttp: XMLHttpRequest) => Promise<void>} callBack - Callback function
- * @param {(res: *, xmlHttp: XMLHttpRequest) => Promise<string>} errorCallBack - Error callback function
- */
-async function CallBackApi(xmlHttp, callBack, errorCallBack) {
-	if (xmlHttp.readyState === 4) {
-		if (xmlHttp.status === 200) {
-			try {
-				await callBack(xmlHttp);
-			} catch (error) {
-				throw Error(`[SUNEDITOR.ApiManager[${this.kind}].upload.callBack.fail] ${error.message}`);
-			} finally {
-				this.uiManager.hideLoading();
-			}
-		} else {
-			// exception
-			console.error(`[SUNEDITOR.ApiManager[${this.kind}].upload.serverException]`, xmlHttp);
-			try {
-				const res = !xmlHttp.responseText ? xmlHttp : JSON.parse(xmlHttp.responseText);
-				let message = '';
-				if (typeof errorCallBack === 'function') {
-					message = await errorCallBack(res, xmlHttp);
+	/**
+	 * @description API callback
+	 * @param {XMLHttpRequest} xmlHttp - XMLHttpRequest
+	 * @param {(xmlHttp: XMLHttpRequest) => Promise<void>} callBack - Callback function
+	 * @param {(res: *, xmlHttp: XMLHttpRequest) => Promise<string>} errorCallBack - Error callback function
+	 */
+	async #CallBackApi(xmlHttp, callBack, errorCallBack) {
+		if (xmlHttp.readyState === 4) {
+			if (xmlHttp.status === 200) {
+				try {
+					await callBack(xmlHttp);
+				} catch (error) {
+					throw Error(`[SUNEDITOR.ApiManager[${this.kind}].upload.callBack.fail] ${error.message}`);
+				} finally {
+					this.#$.ui.hideLoading();
 				}
-				const err = `[SUNEDITOR.ApiManager[${this.kind}].upload.serverException] status: ${xmlHttp.status}, response: ${message || res.errorMessage || xmlHttp.responseText}`;
-				this.uiManager.alertOpen(err, 'error');
-			} catch (error) {
-				throw Error(`[SUNEDITOR.ApiManager[${this.kind}].upload.errorCallBack.fail] ${error.message}`);
-			} finally {
-				this.uiManager.hideLoading();
+			} else {
+				// exception
+				console.error(`[SUNEDITOR.ApiManager[${this.kind}].upload.serverException]`, xmlHttp);
+				try {
+					const res = !xmlHttp.responseText ? xmlHttp : JSON.parse(xmlHttp.responseText);
+					let message = '';
+					if (typeof errorCallBack === 'function') {
+						message = await errorCallBack(res, xmlHttp);
+					}
+					const err = `[SUNEDITOR.ApiManager[${this.kind}].upload.serverException] status: ${xmlHttp.status}, response: ${message || res.errorMessage || xmlHttp.responseText}`;
+					this.#$.ui.alertOpen(err, 'error');
+				} catch (error) {
+					throw Error(`[SUNEDITOR.ApiManager[${this.kind}].upload.errorCallBack.fail] ${error.message}`);
+				} finally {
+					this.#$.ui.hideLoading();
+				}
 			}
 		}
 	}

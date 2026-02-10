@@ -20,23 +20,23 @@ class FileBrowser extends PluginBrowser {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {FileBrowserPluginOptions} pluginOptions
 	 */
 	constructor(editor, pluginOptions) {
 		// plugin bisic properties
 		super(editor);
-		this.title = this.lang.fileBrowser;
+		this.title = this.$.lang.fileBrowser;
 		this.icon = 'file_browser';
 
 		// members
 		this.onSelectfunction = null;
 
 		// modules
-		const thumbnail = { video: this.icons.video_thumbnail, audio: this.icons.audio_thumbnail, file: this.icons.file_thumbnail };
-		const defaultThumbnail = this.icons.file_thumbnail;
-		this.browser = new Browser(this, {
-			title: this.lang.fileBrowser,
+		const thumbnail = { video: this.$.icons.video_thumbnail, audio: this.$.icons.audio_thumbnail, file: this.$.icons.file_thumbnail };
+		const defaultThumbnail = this.$.icons.file_thumbnail;
+		this.browser = new Browser(this, this.$, {
+			title: this.$.lang.fileBrowser,
 			data: pluginOptions.data,
 			url: pluginOptions.url,
 			headers: pluginOptions.headers,
@@ -77,19 +77,19 @@ class FileBrowser extends PluginBrowser {
 			const type = target.getAttribute('data-type');
 			switch (type) {
 				case 'image': {
-					this.plugins.imageGallery.browser.selectorHandler(target);
+					this.$.plugins.imageGallery.browser.selectorHandler(target);
 					break;
 				}
 				case 'video': {
-					this.plugins.videoGallery.browser.selectorHandler(target);
+					this.$.plugins.videoGallery.browser.selectorHandler(target);
 					break;
 				}
 				case 'audio': {
-					this.plugins.audioGallery.browser.selectorHandler(target);
+					this.$.plugins.audioGallery.browser.selectorHandler(target);
 					break;
 				}
 				case 'file': {
-					this.plugins.fileGallery.browser.selectorHandler(target);
+					this.$.plugins.fileGallery.browser.selectorHandler(target);
 					break;
 				}
 			}

@@ -1,6 +1,5 @@
 import { dom, converter } from '../../helper';
 import { isElement } from '../../helper/dom/domCheck';
-import CoreInjector from '../../editorInjector/_core';
 import HueSlider from './HueSlider';
 
 const DEFAULT_COLOR_LIST = [
@@ -78,22 +77,24 @@ const DEFAULLT_COLOR_SPLITNUM = 9;
  * @description Create a color picker element and register for related events. (this.target)
  * - When calling the color selection, "submit", and "remove" buttons, the "action" method of the instance is called with the "color" value as an argument.
  */
-class ColorPicker extends CoreInjector {
+class ColorPicker {
+	#$;
+
 	/**
 	 * @constructor
-	 * @param {*} inst The instance object that called the constructor.
+	 * @param {*} host The instance object that called the constructor.
+	 * @param {SunEditor.Deps} $ Kernel dependencies
 	 * @param {string} styles style property ("color", "backgroundColor"..)
 	 * @param {ColorPickerParams} params Color picker options
 	 */
-	constructor(inst, styles, params) {
-		const editor = inst.editor;
-		super(editor);
+	constructor(host, $, styles, params) {
+		this.#$ = $;
 
 		// members
-		this.kind = inst.constructor.key || inst.constructor.name;
-		this.inst = inst;
+		this.kind = host.constructor['key'] || host.constructor.name;
+		this.host = host;
 		this.form = params.form;
-		this.target = CreateHTML(editor, params);
+		this.target = CreateHTML(this.#$, params);
 		this.targetButton = null;
 		this.inputElement = /** @type {HTMLInputElement} */ (this.target.querySelector('.se-color-input'));
 		this.styleProperties = styles;
@@ -106,24 +107,24 @@ class ColorPicker extends CoreInjector {
 
 		// check icon
 		const parser = new DOMParser();
-		const svgDoc = parser.parseFromString(this.icons.color_checked, 'image/svg+xml');
+		const svgDoc = parser.parseFromString(this.#$.icons.color_checked, 'image/svg+xml');
 		this.checkedIcon = svgDoc.documentElement;
 
 		// modules - hex, hue slider
 		if (!params.disableHEXInput) {
-			this.hueSlider = new HueSlider(this, params.hueSliderOptions, 'se-dropdown');
+			this.hueSlider = new HueSlider(this, $, params.hueSliderOptions, 'se-dropdown');
 			// hue open
-			this.eventManager.addEvent(this.target.querySelector('.__se_hue'), 'click', this.#OnColorPalette.bind(this));
-			this.eventManager.addEvent(this.inputElement, 'input', this.#OnChangeInput.bind(this));
-			this.eventManager.addEvent(this.target.querySelector('form'), 'submit', this.#Submit.bind(this));
+			this.#$.eventManager.addEvent(this.target.querySelector('.__se_hue'), 'click', this.#OnColorPalette.bind(this));
+			this.#$.eventManager.addEvent(this.inputElement, 'input', this.#OnChangeInput.bind(this));
+			this.#$.eventManager.addEvent(this.target.querySelector('form'), 'submit', this.#Submit.bind(this));
 		}
 
 		// remove style
 		if (!params.disableRemove) {
-			this.eventManager.addEvent(this.target.querySelector('.__se_remove'), 'click', this.#Remove.bind(this));
+			this.#$.eventManager.addEvent(this.target.querySelector('.__se_remove'), 'click', this.#Remove.bind(this));
 		}
 
-		this.eventManager.addEvent(this.target, 'click', this.#OnClickColor.bind(this));
+		this.#$.eventManager.addEvent(this.target, 'click', this.#OnClickColor.bind(this));
 
 		// append to form
 		this.form.appendChild(this.target);
@@ -189,7 +190,7 @@ class ColorPicker extends CoreInjector {
 	 */
 	hueSliderCancelAction() {
 		this.form.style.display = 'block';
-		this.inst.colorPickerHueSliderClose?.();
+		this.host.colorPickerHueSliderClose?.();
 	}
 
 	/**
@@ -228,8 +229,8 @@ class ColorPicker extends CoreInjector {
 	#colorName2hex(colorName) {
 		if (!colorName || /^#/.test(colorName)) return colorName;
 		const temp = dom.utils.createElement('div', { style: 'display: none; color: ' + colorName });
-		const colors = this._w
-			.getComputedStyle(this._d.body.appendChild(temp))
+		const colors = this.#$._w
+			.getComputedStyle(this.#$._d.body.appendChild(temp))
 			.color.match(/\d+/g)
 			.map(function (a) {
 				return parseInt(a, 10);
@@ -240,7 +241,7 @@ class ColorPicker extends CoreInjector {
 
 	#OnColorPalette() {
 		this.hueSlider.open(this.targetButton);
-		this.inst.colorPickerHueSliderOpen?.();
+		this.host.colorPickerHueSliderOpen?.();
 	}
 
 	/**
@@ -248,7 +249,7 @@ class ColorPicker extends CoreInjector {
 	 */
 	#Submit(e) {
 		e.preventDefault();
-		this.inst.colorPickerAction?.(this.currentColor);
+		this.host.colorPickerAction?.(this.currentColor);
 	}
 
 	/**
@@ -259,11 +260,11 @@ class ColorPicker extends CoreInjector {
 		const color = eventTarget.getAttribute('data-value');
 		if (!color) return;
 
-		this.inst.colorPickerAction?.(color);
+		this.host.colorPickerAction?.(color);
 	}
 
 	#Remove() {
-		this.inst.colorPickerAction?.(null);
+		this.host.colorPickerAction?.(null);
 	}
 
 	/**
@@ -278,7 +279,7 @@ class ColorPicker extends CoreInjector {
 
 /**
  * @description Create a color picker element
- * @param {*} param0
+ * @param {SunEditor.Deps} param0
  * @param {*} param1
  * @returns
  */
@@ -314,6 +315,11 @@ function CreateHTML({ lang, icons }, { colorList, disableHEXInput, disableRemove
 	return dom.utils.createElement('DIV', { class: 'se-list-inner' }, list);
 }
 
+/**
+ * @param {Array<string|{value: string, name?: string}>} colorList - Color list
+ * @param {number} splitNum - Number of colors per row
+ * @returns {string} HTML string
+ */
 function _makeColor(colorList, splitNum) {
 	const ulHTML = `<ul class="se-color-pallet${splitNum ? ' se-list-horizontal' : ''}">`;
 

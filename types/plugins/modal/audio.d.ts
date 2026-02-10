@@ -89,10 +89,10 @@ declare class Audio_ extends PluginModal {
 	static component(node: HTMLElement): HTMLElement | null;
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {AudioPluginOptions} pluginOptions
 	 */
-	constructor(editor: SunEditor.Core, pluginOptions: AudioPluginOptions);
+	constructor(editor: SunEditor.Kernel, pluginOptions: AudioPluginOptions);
 	title: any;
 	pluginOptions: {
 		defaultWidth: string;

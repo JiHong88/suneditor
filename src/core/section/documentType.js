@@ -2,7 +2,6 @@
  * @fileoverview DocumentType class
  */
 
-import CoreInjector from '../../editorInjector/_core';
 import { dom, numbers, converter, env } from '../../helper';
 
 const { _w } = env;
@@ -16,7 +15,15 @@ const A4_PAGE_HEIGHT = Math.floor(A4_HEIGHT_MM * MM_TO_POINTS * POINTS_TO_PIXELS
 /**
  * @description DocumentType, page, header management class
  */
-class DocumentType extends CoreInjector {
+class DocumentType {
+	#store;
+	#context;
+	#isScrollable;
+
+	#offset;
+	#selection;
+	#toolbar;
+
 	#fc;
 	#ww;
 	#wwFrame;
@@ -45,15 +52,23 @@ class DocumentType extends CoreInjector {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
-	 * @param {SunEditor.FrameContext} fc - frame context object
+	 * @param {SunEditor.Kernel} kernel
+	 * @param {SunEditor.FrameContext} fc - Frame context object
 	 */
-	constructor(editor, fc) {
-		super(editor);
+	constructor(kernel, fc) {
+		const $ = kernel.$;
+
+		this.#store = $.store;
+		this.#context = $.context;
+		this.#isScrollable = this.#store.get('isScrollable');
+
+		this.#offset = $.offset;
+		this.#selection = $.selection;
+		this.#toolbar = $.toolbar;
 
 		// members
-		this.useHeader = this.options.get('_type_options').includes('header');
-		this.usePage = this.options.get('_type_options').includes('page');
+		this.useHeader = $.options.get('_type_options').includes('header');
+		this.usePage = $.options.get('_type_options').includes('page');
 
 		this.#fc = fc;
 		this.#ww = fc.get('wysiwyg');
@@ -77,26 +92,14 @@ class DocumentType extends CoreInjector {
 			inner.innerHTML = headerHTML;
 			this.#innerHeaders = inner.querySelectorAll('div');
 
-			this.eventManager.addEvent(inner, 'click', this.#OnClickHeader.bind(this, this.#ww));
+			$.eventManager.addEvent(inner, 'click', this.#OnClickHeader.bind(this, this.#ww));
 		}
 
 		// init page
 		if (this.usePage) {
 			this.#page = fc.get('documentTypePage');
-			this.#pageNavigator = this.plugins.pageNavigator;
+			this.#pageNavigator = $.plugins.pageNavigator;
 		}
-	}
-
-	get #offset() {
-		return this.editor.offset;
-	}
-
-	get #selection() {
-		return this.editor.selection;
-	}
-
-	get #toolbar() {
-		return this.editor.toolbar;
 	}
 
 	/**
@@ -175,7 +178,7 @@ class DocumentType extends CoreInjector {
 				if (lastSectionHeight > 0 && lastSectionHeight % A4_PAGE_HEIGHT !== 0) additionalPages++;
 			}
 
-			const scrollTop = !this.status.isScrollable(this.#fc) ? 0 : this._getWWScrollTop();
+			const scrollTop = !this.#isScrollable(this.#fc) ? 0 : this._getWWScrollTop();
 			const totalPages = Math.ceil(mirrorHeight / A4_PAGE_HEIGHT) + additionalPages;
 			const wwWidth = this.#wwFrame.offsetWidth + 1;
 			const pages = [];
@@ -237,7 +240,7 @@ class DocumentType extends CoreInjector {
 	}
 
 	_getDisplayPage() {
-		return /** @type {SunEditor.EventWysiwyg} */ (!this.status.isScrollable(this.#fc) ? _w : this.#fc.get('wysiwyg'));
+		return /** @type {SunEditor.EventWysiwyg} */ (!this.#isScrollable(this.#fc) ? _w : this.#fc.get('wysiwyg'));
 	}
 
 	/**
@@ -366,7 +369,7 @@ class DocumentType extends CoreInjector {
 	 * @description Scrolls the window to a specific position.
 	 */
 	scrollWindow() {
-		if (this.status.isScrollable(this.#fc)) return;
+		if (this.#isScrollable(this.#fc)) return;
 		this._displayCurrentPage();
 	}
 
@@ -378,7 +381,7 @@ class DocumentType extends CoreInjector {
 		if (this.#totalPages <= 1) return 1;
 
 		let targetPosition = 0;
-		if (!this.status.isScrollable(this.#fc)) {
+		if (!this.#isScrollable(this.#fc)) {
 			const globalTop = this._getGlobalTop();
 			targetPosition = _w.scrollY - globalTop + A4_PAGE_HEIGHT / 2;
 			if (targetPosition <= 0) return 1;
@@ -478,7 +481,7 @@ class DocumentType extends CoreInjector {
 	 */
 	_movePage(pageNum, force) {
 		const globalTop = this._getGlobalTop();
-		const isScrollable = this.status.isScrollable(this.#fc);
+		const isScrollable = this.#isScrollable(this.#fc);
 		const children = converter.nodeListToArray(this.#ww.children);
 		const pageTop = this.#page.offsetTop + numbers.get(this.#pages[pageNum - 1].style.top) + (!isScrollable ? 0 : this._getWWScrollTop());
 		for (let i = 0, len = children.length, c; i < len; i++) {
@@ -488,7 +491,7 @@ class DocumentType extends CoreInjector {
 				const scrollTop = i === 0 && isScrollable ? 0 : c.offsetTop - this.#page.offsetTop - c.offsetHeight + globalTop;
 				this._applyPageScroll(scrollTop, () => {
 					if (this.#toolbar.isSticky) {
-						this._getDisplayPage().scrollTo({ top: scrollTop - this.context.get('toolbar_main').offsetHeight, behavior: 'smooth' });
+						this._getDisplayPage().scrollTo({ top: scrollTop - this.#context.get('toolbar_main').offsetHeight, behavior: 'smooth' });
 					}
 				});
 
@@ -523,7 +526,7 @@ class DocumentType extends CoreInjector {
 	 * @returns {number} The top offset of the element.
 	 */
 	_getGlobalTop() {
-		return !this.status.isScrollable(this.#fc) ? this.#offset.getGlobal(this.#wwFrame).top : 0;
+		return !this.#isScrollable(this.#fc) ? this.#offset.getGlobal(this.#wwFrame).top : 0;
 	}
 
 	/**
@@ -587,7 +590,7 @@ class DocumentType extends CoreInjector {
 		e.preventDefault();
 
 		try {
-			this.editor._preventBlur = true;
+			this.#store.set('_preventBlur', true);
 			const clickedHeader = dom.query.getEventTarget(e);
 			if (dom.utils.hasClass(clickedHeader, 'se-doc-item')) {
 				const innerIndex = Array.prototype.indexOf.call(this.#innerHeaders, clickedHeader);
@@ -599,7 +602,7 @@ class DocumentType extends CoreInjector {
 				}
 			}
 		} finally {
-			this.editor._preventBlur = false;
+			this.#store.set('_preventBlur', false);
 		}
 	}
 

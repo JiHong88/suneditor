@@ -1,11 +1,11 @@
 /**
- * @fileoverview Unit tests for core/services/optionManager.js
+ * @fileoverview Unit tests for core/config/optionProvider.js
  */
 
-import OptionManager from '../../../../src/core/services/optionManager';
+import OptionProvider from '../../../../src/core/config/optionProvider';
 
-describe('OptionManager', () => {
-	let optionManager;
+describe('OptionProvider', () => {
+	let optionProvider;
 	let mockEditor;
 	let mockProduct;
 	let mockOptions;
@@ -35,41 +35,41 @@ describe('OptionManager', () => {
 
 		mockOptions = {};
 
-		optionManager = new OptionManager(mockEditor, mockProduct, mockOptions);
+		optionProvider = new OptionProvider(mockEditor, mockProduct, mockOptions);
 	});
 
 	describe('constructor', () => {
-		it('should create an OptionManager instance', () => {
-			expect(optionManager).toBeInstanceOf(OptionManager);
+		it('should create an OptionProvider instance', () => {
+			expect(optionProvider).toBeInstanceOf(OptionProvider);
 		});
 
 		it('should have options and frameOptions getters', () => {
-			expect(optionManager.options).toBeDefined();
-			expect(optionManager.frameOptions).toBeDefined();
+			expect(optionProvider.options).toBeDefined();
+			expect(optionProvider.frameOptions).toBeDefined();
 		});
 	});
 
 	describe('options (BaseOptionsMap)', () => {
 		it('should get values correctly', () => {
-			expect(optionManager.options.get('plugins')).toEqual([]);
-			expect(optionManager.options.get('buttonList')).toEqual(['bold', 'italic']);
-			expect(optionManager.options.get('strictMode')).toBe(true);
-			expect(optionManager.options.get('nonexistent')).toBeUndefined();
+			expect(optionProvider.options.get('plugins')).toEqual([]);
+			expect(optionProvider.options.get('buttonList')).toEqual(['bold', 'italic']);
+			expect(optionProvider.options.get('strictMode')).toBe(true);
+			expect(optionProvider.options.get('nonexistent')).toBeUndefined();
 		});
 
 		it('should set values correctly', () => {
-			optionManager.options.set('theme', 'custom');
-			expect(optionManager.options.get('theme')).toBe('custom');
+			optionProvider.options.set('theme', 'custom');
+			expect(optionProvider.options.get('theme')).toBe('custom');
 		});
 
 		it('should check existence correctly', () => {
-			expect(optionManager.options.has('plugins')).toBe(true);
-			expect(optionManager.options.has('buttonList')).toBe(true);
-			expect(optionManager.options.has('nonexistent')).toBe(false);
+			expect(optionProvider.options.has('plugins')).toBe(true);
+			expect(optionProvider.options.has('buttonList')).toBe(true);
+			expect(optionProvider.options.has('nonexistent')).toBe(false);
 		});
 
 		it('should get all values as object', () => {
-			const all = optionManager.options.getAll();
+			const all = optionProvider.options.getAll();
 			expect(all).toEqual({
 				plugins: [],
 				buttonList: ['bold', 'italic'],
@@ -78,15 +78,15 @@ describe('OptionManager', () => {
 		});
 
 		it('should set many values at once', () => {
-			optionManager.options.setMany({
+			optionProvider.options.setMany({
 				mode: 'balloon',
 				lang: 'ko',
 				shortcuts: { 'ctrl+b': 'bold' }
 			});
 
-			expect(optionManager.options.get('mode')).toBe('balloon');
-			expect(optionManager.options.get('lang')).toBe('ko');
-			expect(optionManager.options.get('shortcuts')).toEqual({ 'ctrl+b': 'bold' });
+			expect(optionProvider.options.get('mode')).toBe('balloon');
+			expect(optionProvider.options.get('lang')).toBe('ko');
+			expect(optionProvider.options.get('shortcuts')).toEqual({ 'ctrl+b': 'bold' });
 		});
 
 		it('should reset with new map', () => {
@@ -94,17 +94,17 @@ describe('OptionManager', () => {
 				['elementWhitelist', 'p|div'],
 				['textDirection', 'rtl']
 			]);
-			optionManager.options.reset(newMap);
+			optionProvider.options.reset(newMap);
 
-			expect(optionManager.options.get('elementWhitelist')).toBe('p|div');
-			expect(optionManager.options.get('textDirection')).toBe('rtl');
-			expect(optionManager.options.get('plugins')).toBeUndefined();
+			expect(optionProvider.options.get('elementWhitelist')).toBe('p|div');
+			expect(optionProvider.options.get('textDirection')).toBe('rtl');
+			expect(optionProvider.options.get('plugins')).toBeUndefined();
 		});
 
 		it('should clear all values', () => {
-			optionManager.options.clear();
-			expect(optionManager.options.getAll()).toEqual({});
-			expect(optionManager.options.has('plugins')).toBe(false);
+			optionProvider.options.clear();
+			expect(optionProvider.options.getAll()).toEqual({});
+			expect(optionProvider.options.has('plugins')).toBe(false);
 		});
 
 		it('should handle complex data types', () => {
@@ -116,50 +116,50 @@ describe('OptionManager', () => {
 				undefined: undefined
 			};
 
-			optionManager.options.setMany(complexData);
+			optionProvider.options.setMany(complexData);
 
-			expect(optionManager.options.get('array')).toEqual([1, 2, 3]);
-			expect(optionManager.options.get('object')).toEqual({ a: 1, b: 2 });
-			expect(typeof optionManager.options.get('function')).toBe('function');
-			expect(optionManager.options.get('null')).toBeNull();
-			expect(optionManager.options.get('undefined')).toBeUndefined();
+			expect(optionProvider.options.get('array')).toEqual([1, 2, 3]);
+			expect(optionProvider.options.get('object')).toEqual({ a: 1, b: 2 });
+			expect(typeof optionProvider.options.get('function')).toBe('function');
+			expect(optionProvider.options.get('null')).toBeNull();
+			expect(optionProvider.options.get('undefined')).toBeUndefined();
 		});
 
 		it('should return size correctly', () => {
-			expect(optionManager.options.size()).toBe(3);
-			optionManager.options.set('newKey', 'value');
-			expect(optionManager.options.size()).toBe(4);
+			expect(optionProvider.options.size()).toBe(3);
+			optionProvider.options.set('newKey', 'value');
+			expect(optionProvider.options.size()).toBe(4);
 		});
 	});
 
 	describe('frameOptions (FrameOptionsMap)', () => {
 		beforeEach(() => {
 			// Initialize with some frame options
-			optionManager.frameOptions.set('width', '100%');
-			optionManager.frameOptions.set('height', '300px');
-			optionManager.frameOptions.set('iframe', false);
+			optionProvider.frameOptions.set('width', '100%');
+			optionProvider.frameOptions.set('height', '300px');
+			optionProvider.frameOptions.set('iframe', false);
 		});
 
 		it('should get values correctly', () => {
-			expect(optionManager.frameOptions.get('width')).toBe('100%');
-			expect(optionManager.frameOptions.get('height')).toBe('300px');
-			expect(optionManager.frameOptions.get('iframe')).toBe(false);
-			expect(optionManager.frameOptions.get('nonexistent')).toBeUndefined();
+			expect(optionProvider.frameOptions.get('width')).toBe('100%');
+			expect(optionProvider.frameOptions.get('height')).toBe('300px');
+			expect(optionProvider.frameOptions.get('iframe')).toBe(false);
+			expect(optionProvider.frameOptions.get('nonexistent')).toBeUndefined();
 		});
 
 		it('should set values correctly', () => {
-			optionManager.frameOptions.set('maxWidth', '800px');
-			expect(optionManager.frameOptions.get('maxWidth')).toBe('800px');
+			optionProvider.frameOptions.set('maxWidth', '800px');
+			expect(optionProvider.frameOptions.get('maxWidth')).toBe('800px');
 		});
 
 		it('should check existence correctly', () => {
-			expect(optionManager.frameOptions.has('width')).toBe(true);
-			expect(optionManager.frameOptions.has('height')).toBe(true);
-			expect(optionManager.frameOptions.has('nonexistent')).toBe(false);
+			expect(optionProvider.frameOptions.has('width')).toBe(true);
+			expect(optionProvider.frameOptions.has('height')).toBe(true);
+			expect(optionProvider.frameOptions.has('nonexistent')).toBe(false);
 		});
 
 		it('should get all values as object', () => {
-			const all = optionManager.frameOptions.getAll();
+			const all = optionProvider.frameOptions.getAll();
 			expect(all).toEqual({
 				width: '100%',
 				height: '300px',
@@ -168,15 +168,15 @@ describe('OptionManager', () => {
 		});
 
 		it('should set many values at once', () => {
-			optionManager.frameOptions.setMany({
+			optionProvider.frameOptions.setMany({
 				minWidth: '200px',
 				maxHeight: '500px',
 				statusbar: true
 			});
 
-			expect(optionManager.frameOptions.get('minWidth')).toBe('200px');
-			expect(optionManager.frameOptions.get('maxHeight')).toBe('500px');
-			expect(optionManager.frameOptions.get('statusbar')).toBe(true);
+			expect(optionProvider.frameOptions.get('minWidth')).toBe('200px');
+			expect(optionProvider.frameOptions.get('maxHeight')).toBe('500px');
+			expect(optionProvider.frameOptions.get('statusbar')).toBe(true);
 		});
 
 		it('should reset with new map', () => {
@@ -184,51 +184,51 @@ describe('OptionManager', () => {
 				['theme', 'dark'],
 				['mode', 'inline']
 			]);
-			optionManager.frameOptions.reset(newMap);
+			optionProvider.frameOptions.reset(newMap);
 
-			expect(optionManager.frameOptions.get('theme')).toBe('dark');
-			expect(optionManager.frameOptions.get('mode')).toBe('inline');
-			expect(optionManager.frameOptions.get('width')).toBeUndefined();
+			expect(optionProvider.frameOptions.get('theme')).toBe('dark');
+			expect(optionProvider.frameOptions.get('mode')).toBe('inline');
+			expect(optionProvider.frameOptions.get('width')).toBeUndefined();
 		});
 
 		it('should clear all values', () => {
-			optionManager.frameOptions.clear();
-			expect(optionManager.frameOptions.getAll()).toEqual({});
-			expect(optionManager.frameOptions.has('width')).toBe(false);
+			optionProvider.frameOptions.clear();
+			expect(optionProvider.frameOptions.getAll()).toEqual({});
+			expect(optionProvider.frameOptions.has('width')).toBe(false);
 		});
 
 		it('should return size correctly', () => {
-			expect(optionManager.frameOptions.size()).toBe(3);
-			optionManager.frameOptions.set('newKey', 'value');
-			expect(optionManager.frameOptions.size()).toBe(4);
+			expect(optionProvider.frameOptions.size()).toBe(3);
+			optionProvider.frameOptions.set('newKey', 'value');
+			expect(optionProvider.frameOptions.size()).toBe(4);
 		});
 	});
 
 	describe('Integration tests', () => {
 		it('should work with both options and frameOptions independently', () => {
 			// Set base options
-			optionManager.options.set('theme', 'dark');
+			optionProvider.options.set('theme', 'dark');
 			// Set frame options
-			optionManager.frameOptions.set('width', '100%');
+			optionProvider.frameOptions.set('width', '100%');
 
-			expect(optionManager.options.get('theme')).toBe('dark');
-			expect(optionManager.frameOptions.get('width')).toBe('100%');
+			expect(optionProvider.options.get('theme')).toBe('dark');
+			expect(optionProvider.frameOptions.get('width')).toBe('100%');
 
 			// Should not interfere with each other
-			expect(optionManager.options.has('width')).toBe(false);
-			expect(optionManager.frameOptions.has('theme')).toBe(false);
+			expect(optionProvider.options.has('width')).toBe(false);
+			expect(optionProvider.frameOptions.has('theme')).toBe(false);
 		});
 	});
 
 	describe('destroy', () => {
 		it('should clear all options on destroy', () => {
-			optionManager.options.set('key1', 'value1');
-			optionManager.frameOptions.set('key2', 'value2');
+			optionProvider.options.set('key1', 'value1');
+			optionProvider.frameOptions.set('key2', 'value2');
 
-			optionManager.destroy();
+			optionProvider.destroy();
 
-			expect(optionManager.options.size()).toBe(0);
-			expect(optionManager.frameOptions.size()).toBe(0);
+			expect(optionProvider.options.size()).toBe(0);
+			expect(optionProvider.frameOptions.size()).toBe(0);
 		});
 	});
 });

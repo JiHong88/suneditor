@@ -221,7 +221,7 @@ describe('History', () => {
 			expect(mockEditor.commandDispatcher.applyTargets).toHaveBeenCalledWith('undo', expect.any(Function));
 			expect(mockEditor.commandDispatcher.applyTargets).toHaveBeenCalledWith('redo', expect.any(Function));
 			expect(mockEditor.commandDispatcher.applyTargets).toHaveBeenCalledWith('save', expect.any(Function));
-			expect(mockEditor.contextManager.applyToRoots).toHaveBeenCalled();
+			expect(mockEditor.contextProvider.applyToRoots).toHaveBeenCalled();
 
 			const rootStack = history.getRootStack();
 			expect(rootStack['test-frame']).toEqual({ value: [], index: -1 });

@@ -1,16 +1,16 @@
 import type {} from '../../typedef';
 /**
- * @typedef {import('./eventManager').default} EventManagerInstanceType
+ * @typedef {import('./eventOrchestrator').default} EventManagerInstanceType
  */
 /**
- * @typedef {import('../class/selection').default} Selection
- * @typedef {import('../class/format').default} Format
- * @typedef {import('../class/listFormat').default} ListFormat
- * @typedef {import('../class/component').default} Component
- * @typedef {import('../class/html').default} Html
- * @typedef {import('../class/nodeTransform').default} NodeTransform
- * @typedef {import('../class/char').default} Char
- * @typedef {import('../class/menu').default} Menu
+ * @typedef {import('../logic/dom/selection').default} Selection
+ * @typedef {import('../logic/dom/format').default} Format
+ * @typedef {import('../logic/dom/listFormat').default} ListFormat
+ * @typedef {import('../logic/shell/component').default} Component
+ * @typedef {import('../logic/dom/html').default} Html
+ * @typedef {import('../logic/dom/nodeTransform').default} NodeTransform
+ * @typedef {import('../logic/dom/char').default} Char
+ * @typedef {import('../logic/panel/menu').default} Menu
  */
 /**
  * @typedef {Object} SelectionPorts
@@ -176,15 +176,15 @@ export function makePorts(
 	 */
 	enterPrevent(e: Event): void;
 };
-export type EventManagerInstanceType = import('./eventManager').default;
-export type Selection = import('../class/selection').default;
-export type Format = import('../class/format').default;
-export type ListFormat = import('../class/listFormat').default;
-export type Component = import('../class/component').default;
-export type Html = import('../class/html').default;
-export type NodeTransform = import('../class/nodeTransform').default;
-export type Char = import('../class/char').default;
-export type Menu = import('../class/menu').default;
+export type EventManagerInstanceType = import('./eventOrchestrator').default;
+export type Selection = import('../logic/dom/selection').default;
+export type Format = import('../logic/dom/format').default;
+export type ListFormat = import('../logic/dom/listFormat').default;
+export type Component = import('../logic/shell/component').default;
+export type Html = import('../logic/dom/html').default;
+export type NodeTransform = import('../logic/dom/nodeTransform').default;
+export type Char = import('../logic/dom/char').default;
+export type Menu = import('../logic/panel/menu').default;
 export type SelectionPorts = {
 	getRange: (...args: Parameters<Selection['getRange']>) => ReturnType<Selection['getRange']>;
 	getNode: (...args: Parameters<Selection['getNode']>) => ReturnType<Selection['getNode']>;

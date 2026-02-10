@@ -16,13 +16,13 @@ class Layout extends PluginDropdown {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {LayoutPluginOptions} pluginOptions - Plugin options
 	 */
 	constructor(editor, pluginOptions) {
 		// plugin bisic properties
 		super(editor);
-		this.title = this.lang.layout;
+		this.title = this.$.lang.layout;
 		this.icon = 'layout';
 
 		// members
@@ -33,7 +33,7 @@ class Layout extends PluginDropdown {
 		const menu = CreateHTML(this.items);
 
 		// init
-		this.menu.initDropdownTarget(Layout, menu);
+		this.$.menu.initDropdownTarget(Layout, menu);
 	}
 
 	/**
@@ -45,16 +45,20 @@ class Layout extends PluginDropdown {
 		const temp = this.items[(this.selectedIndex = index)];
 
 		if (temp.html) {
-			this.html.set(temp.html);
+			this.$.html.set(temp.html);
 		} else {
-			this.menu.dropdownOff();
+			this.$.menu.dropdownOff();
 			throw Error('[SUNEDITOR.layout.fail] cause : "layouts[i].html not found"');
 		}
 
-		this.menu.dropdownOff();
+		this.$.menu.dropdownOff();
 	}
 }
 
+/**
+ * @param {Array<{name: string, html: string}>} layoutList - Layout items
+ * @returns {HTMLElement}
+ */
 function CreateHTML(layoutList) {
 	if (!layoutList || layoutList.length === 0) {
 		console.warn('[SUNEDITOR.plugins.layout.warn] To use the "layout" plugin, please define the "layouts" option.');

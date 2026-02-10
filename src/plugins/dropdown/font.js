@@ -18,18 +18,18 @@ class Font extends PluginDropdown {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {FontPluginOptions} pluginOptions - plugin options
 	 */
 	constructor(editor, pluginOptions) {
 		super(editor);
 		// plugin basic properties
-		this.title = this.lang.font;
-		this.inner = '<span class="se-txt">' + this.lang.font + '</span>' + this.icons.arrow_down;
+		this.title = this.$.lang.font;
+		this.inner = '<span class="se-txt">' + this.$.lang.font + '</span>' + this.$.icons.arrow_down;
 
 		// create HTML
 		const fontList = pluginOptions.items || ['Arial', 'Comic Sans MS', 'Courier New', 'Impact', 'Georgia', 'tahoma', 'Trebuchet MS', 'Verdana'];
-		const menu = CreateHTML(editor, fontList);
+		const menu = CreateHTML(this.$, fontList);
 
 		// members
 		this.currentFont = '';
@@ -39,7 +39,7 @@ class Font extends PluginDropdown {
 		this.#defaultValue = /** @type {HTMLSpanElement} */ (menu.querySelector('.se-sub-list span'));
 
 		// init
-		this.menu.initDropdownTarget(Font, menu);
+		this.$.menu.initDropdownTarget(Font, menu);
 	}
 
 	/**
@@ -52,15 +52,15 @@ class Font extends PluginDropdown {
 
 		let fontFamily = '';
 		if (!element) {
-			const font = this.status.hasFocus ? this.frameContext.get('wwComputedStyle').fontFamily : this.lang.font;
+			const font = this.$.store.get('hasFocus') ? this.$.frameContext.get('wwComputedStyle').fontFamily : this.$.lang.font;
 			dom.utils.changeTxt(targetText, font);
-			dom.utils.changeTxt(tooltip, this.status.hasFocus ? this.lang.font + (font ? ' (' + font + ')' : '') : font);
-		} else if (this.format.isLine(element)) {
+			dom.utils.changeTxt(tooltip, this.$.store.get('hasFocus') ? this.$.lang.font + (font ? ' (' + font + ')' : '') : font);
+		} else if (this.$.format.isLine(element)) {
 			return undefined;
 		} else if ((fontFamily = dom.utils.getStyle(element, 'fontFamily'))) {
 			const selectFont = fontFamily.replace(/["']/g, '');
 			dom.utils.changeTxt(targetText, selectFont);
-			dom.utils.changeTxt(tooltip, this.lang.font + ' (' + selectFont + ')');
+			dom.utils.changeTxt(tooltip, this.$.lang.font + ' (' + selectFont + ')');
 			return true;
 		}
 
@@ -109,18 +109,23 @@ class Font extends PluginDropdown {
 			}
 
 			// before event
-			if ((await this.triggerEvent('onFontActionBefore', { value })) === false) return;
+			if ((await this.$.eventManager.triggerEvent('onFontActionBefore', { value })) === false) return;
 
 			const newNode = dom.utils.createElement('SPAN', { style: 'font-family: ' + value + ';' });
-			this.inline.apply(newNode, { stylesToModify: ['font-family'], nodesToRemove: null, strictRemove: null });
+			this.$.inline.apply(newNode, { stylesToModify: ['font-family'], nodesToRemove: null, strictRemove: null });
 		} else {
-			this.inline.apply(null, { stylesToModify: ['font-family'], nodesToRemove: ['span'], strictRemove: true });
+			this.$.inline.apply(null, { stylesToModify: ['font-family'], nodesToRemove: ['span'], strictRemove: true });
 		}
 
-		this.menu.dropdownOff();
+		this.$.menu.dropdownOff();
 	}
 }
 
+/**
+ * @param {SunEditor.Deps} $ - Kernel dependencies
+ * @param {string[]} fontList - Font name list
+ * @returns {HTMLElement}
+ */
 function CreateHTML({ lang }, fontList) {
 	let list = /*html*/ `
 	<div class="se-list-inner">

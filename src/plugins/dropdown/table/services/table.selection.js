@@ -14,6 +14,7 @@ function getCacheKey(startCell, endCell) {
 
 export class TableSelectionService {
 	#main;
+	#$;
 	#state;
 
 	#bindMultiOn;
@@ -29,6 +30,7 @@ export class TableSelectionService {
 	 */
 	constructor(main) {
 		this.#main = main;
+		this.#$ = main.$;
 		this.#state = main.state;
 
 		// member - global events
@@ -307,14 +309,14 @@ export class TableSelectionService {
 		this.initCellSelection(tdElement);
 
 		if (!shift) {
-			this.#globalEvents.on = this.#main.eventManager.addGlobalEvent('mousemove', this.#bindMultiOn, false);
+			this.#globalEvents.on = this.#$.eventManager.addGlobalEvent('mousemove', this.#bindMultiOn, false);
 		} else {
-			this.#globalEvents.shiftOff = this.#main.eventManager.addGlobalEvent('keyup', this.#bindShiftOff, false);
-			this.#globalEvents.on = this.#main.eventManager.addGlobalEvent('mousedown', this.#bindMultiOn, false);
+			this.#globalEvents.shiftOff = this.#$.eventManager.addGlobalEvent('keyup', this.#bindShiftOff, false);
+			this.#globalEvents.on = this.#$.eventManager.addGlobalEvent('mousedown', this.#bindMultiOn, false);
 		}
 
-		this.#globalEvents.off = this.#main.eventManager.addGlobalEvent('mouseup', this.#bindMultiOff, false);
-		this.#globalEvents.touchOff = this.#main.eventManager.addGlobalEvent('touchmove', this.#bindTouchOff, false);
+		this.#globalEvents.off = this.#$.eventManager.addGlobalEvent('mouseup', this.#bindMultiOff, false);
+		this.#globalEvents.touchOff = this.#$.eventManager.addGlobalEvent('touchmove', this.#bindTouchOff, false);
 	}
 
 	/**
@@ -348,7 +350,7 @@ export class TableSelectionService {
 	 * @param {HTMLElement} cell Target node
 	 */
 	focusCellEdge(cell) {
-		if (!env.isMobile) this.#main.focusManager.focusEdge(cell);
+		if (!env.isMobile) this.#$.focusManager.focusEdge(cell);
 	}
 
 	/**
@@ -356,7 +358,7 @@ export class TableSelectionService {
 	 * @param {MouseEvent} e The mouse event.
 	 */
 	#OnCellMultiSelect(e) {
-		this.#main.editor._preventBlur = true;
+		this.#$.store.set('_preventBlur', true);
 		const target = /** @type {HTMLTableCellElement} */ (dom.query.getParentElement(dom.query.getEventTarget(e), dom.check.isTableCell));
 
 		if (this.#state.isShiftPressed) {
@@ -393,7 +395,7 @@ export class TableSelectionService {
 			this.#main._editorEnable(true);
 			this.#removeGlobalEvents();
 		} else {
-			this.#globalEvents.touchOff &&= this.#main.eventManager.removeGlobalEvent(this.#globalEvents.touchOff);
+			this.#globalEvents.touchOff &&= this.#$.eventManager.removeGlobalEvent(this.#globalEvents.touchOff);
 		}
 
 		const fixedCell = this.#state.fixedCell;
@@ -443,10 +445,10 @@ export class TableSelectionService {
 	 * @description Removes global event listeners and resets resize-related properties.
 	 */
 	#removeGlobalEvents() {
-		this.#main.uiManager.disableBackWrapper();
+		this.#$.ui.disableBackWrapper();
 		const globalEvents = this.#globalEvents;
 		for (const k in globalEvents) {
-			globalEvents[k] &&= this.#main.eventManager.removeGlobalEvent(globalEvents[k]);
+			globalEvents[k] &&= this.#$.eventManager.removeGlobalEvent(globalEvents[k]);
 		}
 	}
 

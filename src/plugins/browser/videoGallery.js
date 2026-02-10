@@ -19,22 +19,22 @@ class VideoGallery extends PluginBrowser {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {VideoGalleryPluginOptions} pluginOptions
 	 */
 	constructor(editor, pluginOptions) {
 		// plugin bisic properties
 		super(editor);
-		this.title = this.lang.videoGallery;
+		this.title = this.$.lang.videoGallery;
 		this.icon = 'video_gallery';
 
 		// members
 		this.onSelectfunction = null;
 
 		// modules
-		const thumbnail = typeof pluginOptions.thumbnail === 'string' ? pluginOptions.thumbnail : this.icons.video_thumbnail;
-		this.browser = new Browser(this, {
-			title: this.lang.videoGallery,
+		const thumbnail = typeof pluginOptions.thumbnail === 'string' ? pluginOptions.thumbnail : this.$.icons.video_thumbnail;
+		this.browser = new Browser(this, this.$, {
+			title: this.$.lang.videoGallery,
 			data: pluginOptions.data,
 			url: pluginOptions.url,
 			headers: pluginOptions.headers,
@@ -46,8 +46,8 @@ class VideoGallery extends PluginBrowser {
 		});
 
 		// members
-		this.width = this.plugins.video.pluginOptions.defaultWidth === 'auto' ? '' : this.plugins.video.pluginOptions.defaultWidth;
-		this.height = this.plugins.video.pluginOptions.defaultHeight === 'auto' ? '' : this.plugins.video.pluginOptions.defaultHeight;
+		this.width = this.$.plugins.video.pluginOptions.defaultWidth === 'auto' ? '' : this.$.plugins.video.pluginOptions.defaultWidth;
+		this.height = this.$.plugins.video.pluginOptions.defaultHeight === 'auto' ? '' : this.$.plugins.video.pluginOptions.defaultHeight;
 	}
 
 	/**
@@ -77,15 +77,15 @@ class VideoGallery extends PluginBrowser {
 			this.onSelectfunction(target);
 		} else {
 			let url = target.getAttribute('data-command');
-			const processUrl = this.plugins.video.findProcessUrl(url);
+			const processUrl = this.$.plugins.video.findProcessUrl(url);
 			if (processUrl) {
 				url = processUrl.url;
 			}
 
 			const file = { name: target.getAttribute('data-name'), size: 0 };
-			this.plugins.video.modalInit();
-			this.plugins.video.create(
-				this.plugins.video[target.getAttribute('data-frame') === 'iframe' ? 'createIframeTag' : 'createVideoTag']({ poster: target.getAttribute('data-thumbnail') }),
+			this.$.plugins.video.modalInit();
+			this.$.plugins.video.create(
+				this.$.plugins.video[target.getAttribute('data-frame') === 'iframe' ? 'createIframeTag' : 'createVideoTag']({ poster: target.getAttribute('data-thumbnail') }),
 				url,
 				null,
 				this.width,

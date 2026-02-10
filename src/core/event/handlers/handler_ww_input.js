@@ -1,7 +1,7 @@
 import { dom, keyCodeMap } from '../../../helper';
 
 /**
- * @typedef {import('../eventManager').default} EventManagerThis_handler_ww_input
+ * @typedef {import('../eventOrchestrator').default} EventManagerThis_handler_ww_input
  */
 
 /**
@@ -18,7 +18,7 @@ export async function OnBeforeInput_wysiwyg(fc, e) {
 
 	const data = (e.data === null ? '' : e.data === undefined ? ' ' : e.data) || '';
 	if (!keyCodeMap.isComposing(e)) {
-		if (!this.char.test(data, false)) {
+		if (!this.$.char.test(data, false)) {
 			e.preventDefault();
 			e.stopPropagation();
 			return false;
@@ -29,7 +29,7 @@ export async function OnBeforeInput_wysiwyg(fc, e) {
 	}
 
 	// user event
-	if ((await this.triggerEvent('onBeforeInput', { frameContext: fc, event: e, data })) === false) return;
+	if ((await this.$.eventManager.triggerEvent('onBeforeInput', { frameContext: fc, event: e, data })) === false) return;
 	// plugin event
 	await this._callPluginEventAsync('onBeforeInput', { frameContext: fc, event: e, data });
 }
@@ -46,19 +46,19 @@ export async function OnInput_wysiwyg(fc, e) {
 		return false;
 	}
 
-	const range = this.selection.getRange();
-	const selectionNode = this.selection.getNode();
-	const formatEl = this.format.getLine(selectionNode, null);
-	if (!this.format.isNormalLine(formatEl) && !this.format.isBrLine(formatEl) && range.collapsed && !this.component.is(selectionNode) && !dom.check.isList(selectionNode)) {
-		const rangeEl = this.format.getBlock(selectionNode, null);
-		this._setDefaultLine(this.format.isBlock(rangeEl) ? 'DIV' : this.options.get('defaultLine'));
+	const range = this.$.selection.getRange();
+	const selectionNode = this.$.selection.getNode();
+	const formatEl = this.$.format.getLine(selectionNode, null);
+	if (!this.$.format.isNormalLine(formatEl) && !this.$.format.isBrLine(formatEl) && range.collapsed && !this.$.component.is(selectionNode) && !dom.check.isList(selectionNode)) {
+		const rangeEl = this.$.format.getBlock(selectionNode, null);
+		this._setDefaultLine(this.$.format.isBlock(rangeEl) ? 'DIV' : this.$.options.get('defaultLine'));
 	}
 
-	this.selection.init();
+	this.$.selection.init();
 
 	const data = (e.data === null ? '' : e.data === undefined ? ' ' : e.data) || '';
 	if (!this._handledInBefore) {
-		if (!this.char.test(data, true)) {
+		if (!this.$.char.test(data, true)) {
 			e.preventDefault();
 			e.stopPropagation();
 			return false;
@@ -67,9 +67,9 @@ export async function OnInput_wysiwyg(fc, e) {
 	this._handledInBefore = false;
 
 	// user event
-	if ((await this.triggerEvent('onInput', { frameContext: fc, event: e, data })) === false) return;
+	if ((await this.$.eventManager.triggerEvent('onInput', { frameContext: fc, event: e, data })) === false) return;
 	// plugin event
 	await this._callPluginEventAsync('onInput', { frameContext: fc, event: e, data });
 
-	this.history.push(true);
+	this.$.history.push(true);
 }

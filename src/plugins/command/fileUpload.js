@@ -44,13 +44,13 @@ class FileUpload extends PluginCommand {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {FileUploadPluginOptions} pluginOptions - plugin options
 	 */
 	constructor(editor, pluginOptions) {
 		super(editor);
 		// plugin basic properties
-		this.title = this.lang.fileUpload;
+		this.title = this.$.lang.fileUpload;
 		this.icon = 'file_upload';
 
 		if (!pluginOptions.uploadUrl) console.warn('[SUNEDITOR.fileUpload.warn] "fileUpload" plugin must be have "uploadUrl" option.');
@@ -75,7 +75,7 @@ class FileUpload extends PluginCommand {
 		const customItems = {
 			'custom-download': {
 				command: 'download',
-				title: this.lang.download,
+				title: this.$.lang.download,
 				icon: 'download',
 				action: (target) => {
 					const url = target.getAttribute('href');
@@ -85,7 +85,7 @@ class FileUpload extends PluginCommand {
 			'custom-as': {
 				command: 'as',
 				value: 'link', // 'block' or 'link'
-				title: this.lang.asLink,
+				title: this.$.lang.asLink,
 				icon: 'reduction',
 				action: (target, value) => {
 					this.convertFormat(target, value);
@@ -94,10 +94,10 @@ class FileUpload extends PluginCommand {
 		};
 
 		const figureControls = (pluginOptions.controls || [['custom-as', 'align', 'edit', 'custom-download', 'copy', 'remove']]).map((subArray) => subArray.map((item) => (item.startsWith('custom-') ? customItems[item] : item)));
-		this.figure = new Figure(this, figureControls, {});
+		this.figure = new Figure(this, this.$, figureControls, {});
 
 		// file manager
-		this.fileManager = new FileManager(this, {
+		this.fileManager = new FileManager(this, this.$, {
 			query: 'a[download][data-se-file-download]',
 			loadEventName: 'onFileLoad',
 			actionEventName: 'onFileAction',
@@ -105,13 +105,13 @@ class FileUpload extends PluginCommand {
 
 		// controller
 		if (/\bedit\b/.test(JSON.stringify(figureControls))) {
-			const controllerEl = CreateHTML_controller(this);
-			this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true }, FileUpload.key);
+			const controllerEl = CreateHTML_controller(this.$);
+			this.controller = new Controller(this, this.$, controllerEl, { position: 'bottom', disabled: true }, FileUpload.key);
 			this.editInput = controllerEl.querySelector('input');
 		}
 
 		// init
-		this.eventManager.addEvent(this.input, 'change', this.#OnChangeFile.bind(this));
+		this.$.eventManager.addEvent(this.input, 'change', this.#OnChangeFile.bind(this));
 	}
 
 	/**
@@ -119,7 +119,7 @@ class FileUpload extends PluginCommand {
 	 * @type {PluginCommand['action']}
 	 */
 	action() {
-		this.editor._preventBlur = true;
+		this.$.store.set('_preventBlur', true);
 		this.input.click();
 	}
 
@@ -139,7 +139,7 @@ class FileUpload extends PluginCommand {
 		}
 
 		this.submitFile([file]);
-		this.focusManager.focus();
+		this.$.focusManager.focus();
 	}
 
 	/**
@@ -156,7 +156,7 @@ class FileUpload extends PluginCommand {
 		}
 
 		this.controller.close();
-		this.component.select(this.#element, FileUpload.key);
+		this.$.component.select(this.#element, FileUpload.key);
 	}
 
 	/**
@@ -170,11 +170,11 @@ class FileUpload extends PluginCommand {
 		if (!asBtn) return;
 
 		if (dom.check.isFigure(target.parentElement)) {
-			asBtn.innerHTML = this.icons.reduction + dom.utils.createTooltipInner(this.lang.asLink);
+			asBtn.innerHTML = this.$.icons.reduction + dom.utils.createTooltipInner(this.$.lang.asLink);
 			asBtn.setAttribute('data-value', 'link');
 			this.figure.open(target, { nonResizing: true, nonSizeInfo: true, nonBorder: true, figureTarget: true, infoOnly: false });
 		} else {
-			asBtn.innerHTML = this.icons.expansion + dom.utils.createTooltipInner(this.lang.asBlock);
+			asBtn.innerHTML = this.$.icons.expansion + dom.utils.createTooltipInner(this.$.lang.asBlock);
 			asBtn.setAttribute('data-value', 'box');
 			this.figure.controllerOpen(target, { isWWTarget: true });
 			return true;
@@ -202,16 +202,16 @@ class FileUpload extends PluginCommand {
 		const figure = Figure.GetContainer(target);
 		const containerTarget = dom.query.getParentElement(target, '.se-component') || target;
 
-		const message = await this.triggerEvent('onFileDeleteBefore', { element: figure.target, container: figure, url: figure.target.getAttribute('href') });
+		const message = await this.$.eventManager.triggerEvent('onFileDeleteBefore', { element: figure.target, container: figure, url: figure.target.getAttribute('href') });
 		if (message === false) return;
 
-		const isInlineComp = this.component.isInline(containerTarget);
+		const isInlineComp = this.$.component.isInline(containerTarget);
 		const focusEl = isInlineComp ? containerTarget.previousSibling || containerTarget.nextSibling : containerTarget.previousElementSibling || containerTarget.nextElementSibling;
 		dom.utils.removeItem(containerTarget);
-		this.uiManager.offCurrentController();
+		this.$.ui.offCurrentController();
 
-		this.focusManager.focusEdge(focusEl);
-		this.history.push(false);
+		this.$.focusManager.focusEdge(focusEl);
+		this.$.history.push(false);
 	}
 
 	/**
@@ -230,14 +230,14 @@ class FileUpload extends PluginCommand {
 			s = f.size;
 			if (slngleSizeLimit > 0 && s > slngleSizeLimit) {
 				const err = '[SUNEDITOR.fileUpload.fail] Size of uploadable single file: ' + slngleSizeLimit / 1000 + 'KB';
-				const message = await this.triggerEvent('onFileUploadError', {
+				const message = await this.$.eventManager.triggerEvent('onFileUploadError', {
 					error: err,
 					limitSize: slngleSizeLimit,
 					uploadSize: s,
 					file: f,
 				});
 
-				this.uiManager.alertOpen(message === NO_EVENT ? err : message || err, 'error');
+				this.$.ui.alertOpen(message === NO_EVENT ? err : message || err, 'error');
 
 				return false;
 			}
@@ -250,14 +250,14 @@ class FileUpload extends PluginCommand {
 		const currentSize = this.fileManager.getSize();
 		if (limitSize > 0 && fileSize + currentSize > limitSize) {
 			const err = '[SUNEDITOR.fileUpload.fail] Size of uploadable total files: ' + limitSize / 1000 + 'KB';
-			const message = await this.triggerEvent('onFileUploadError', {
+			const message = await this.$.eventManager.triggerEvent('onFileUploadError', {
 				error: err,
 				limitSize,
 				currentSize,
 				uploadSize: fileSize,
 			});
 
-			this.uiManager.alertOpen(message === NO_EVENT ? err : message || err, 'error');
+			this.$.ui.alertOpen(message === NO_EVENT ? err : message || err, 'error');
 
 			return false;
 		}
@@ -274,7 +274,7 @@ class FileUpload extends PluginCommand {
 			uploadCallback(xmlHttp);
 		}.bind(this, this.#uploadCallBack.bind(this), fileInfo);
 
-		const result = await this.triggerEvent('onFileUploadBefore', {
+		const result = await this.$.eventManager.triggerEvent('onFileUploadBefore', {
 			info: fileInfo,
 			handler,
 		});
@@ -302,14 +302,14 @@ class FileUpload extends PluginCommand {
 			target.setAttribute('contenteditable', 'false');
 			dom.utils.addClass(target, 'se-component|se-inline-component');
 
-			const line = dom.utils.createElement(this.options.get('defaultLine'), null, target);
+			const line = dom.utils.createElement(this.$.options.get('defaultLine'), null, target);
 			parent.insertBefore(line, next);
 			dom.utils.removeItem(container);
 		} else {
 			// block
-			this.selection.setRange(target, 0, target, 1);
-			const r = this.html.remove();
-			const s = this.nodeTransform.split(r.container, r.offset, 0);
+			this.$.selection.setRange(target, 0, target, 1);
+			const r = this.$.html.remove();
+			const s = this.$.nodeTransform.split(r.container, r.offset, 0);
 
 			if (s?.previousElementSibling && dom.check.isZeroWidth(s.previousElementSibling)) {
 				dom.utils.removeItem(s.previousElementSibling);
@@ -323,8 +323,8 @@ class FileUpload extends PluginCommand {
 			(s || r.container).parentElement.insertBefore(figure.container, s);
 		}
 
-		this.history.push(false);
-		this.component.select(target, FileUpload.key);
+		this.$.history.push(false);
+		this.$.component.select(target, FileUpload.key);
 	}
 
 	/**
@@ -353,25 +353,25 @@ class FileUpload extends PluginCommand {
 
 		if (this.as === 'link') {
 			a.className = 'se-component se-inline-component';
-			this.component.insert(a, { scrollTo: isLast ? true : false, insertBehavior: isLast ? this.insertBehavior : null });
+			this.$.component.insert(a, { scrollTo: isLast ? true : false, insertBehavior: isLast ? this.insertBehavior : null });
 			return;
 		}
 
 		const figure = Figure.CreateContainer(a);
 		dom.utils.addClass(figure.container, 'se-file-figure|se-flex-component');
 
-		if (!this.component.insert(figure.container, { scrollTo: isLast ? true : false, insertBehavior: isLast ? this.insertBehavior : null })) {
-			this.focusManager.focus();
+		if (!this.$.component.insert(figure.container, { scrollTo: isLast ? true : false, insertBehavior: isLast ? this.insertBehavior : null })) {
+			this.$.focusManager.focus();
 			return;
 		}
 
 		if (!isLast) return;
 
-		if (!this.options.get('componentInsertBehavior')) {
-			const line = this.format.addLine(figure.container, null);
-			if (line) this.selection.setRange(line, 0, line, 0);
+		if (!this.$.options.get('componentInsertBehavior')) {
+			const line = this.$.format.addLine(figure.container, null);
+			if (line) this.$.selection.setRange(line, 0, line, 0);
 		} else {
-			this.component.select(a, FileUpload.key);
+			this.$.component.select(a, FileUpload.key);
 		}
 	}
 
@@ -400,10 +400,10 @@ class FileUpload extends PluginCommand {
 	 * @returns {Promise<void>}
 	 */
 	async #error(response) {
-		const message = await this.triggerEvent('onFileUploadError', { error: response });
+		const message = await this.$.eventManager.triggerEvent('onFileUploadError', { error: response });
 		if (message === false) return;
 		const err = message === NO_EVENT ? response.errorMessage : message || response.errorMessage;
-		this.uiManager.alertOpen(err, 'error');
+		this.$.ui.alertOpen(err, 'error');
 		console.error('[SUNEDITOR.plugin.fileUpload.error]', err);
 	}
 
@@ -433,6 +433,10 @@ class FileUpload extends PluginCommand {
 	}
 }
 
+/**
+ * @param {SunEditor.Deps} $ - Kernel dependencies
+ * @returns {HTMLElement}
+ */
 function CreateHTML_controller({ lang, icons }) {
 	const html = /*html*/ `
 		<div class="se-arrow se-arrow-up"></div>

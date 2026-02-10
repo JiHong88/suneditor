@@ -6,7 +6,7 @@ import {
     DEFAULTS,
     OPTION_FRAME_FIXED_FLAG,
     OPTION_FIXED_FLAG
-    // FrameOptionsMap, BaseOptionsMap moved to optionManager service
+    // FrameOptionsMap, BaseOptionsMap moved to optionProvider service
 } from '../../../../src/core/config/options';
 
 describe('Core Config - Options', () => {
@@ -116,5 +116,5 @@ describe('Core Config - Options', () => {
     });
 
     // Note: FrameOptionsMap, BaseOptionsMap, and Integration tests have been moved to
-    // test/unit/core/services/optionManager.spec.js
+    // test/unit/core/config/optionProvider.spec.js
 });

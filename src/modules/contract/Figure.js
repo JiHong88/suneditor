@@ -1,4 +1,3 @@
-import CoreInjector from '../../editorInjector/_core';
 import Controller from './Controller';
 import SelectMenu from '../ui/SelectMenu';
 import { _DragHandle } from '../ui/_DragHandle';
@@ -112,7 +111,9 @@ let __resizing_sw = 0;
  * @description Figure module class for handling resizable/alignable components (images, videos, iframes, etc.)
  * @see EditorComponent for `inst._element` requirement
  */
-class Figure extends CoreInjector {
+class Figure {
+	#$;
+
 	#offContainer;
 	#containerResizingESC;
 
@@ -130,48 +131,50 @@ class Figure extends CoreInjector {
 	/**
 	 * @constructor
 	 * @param {*} inst The instance object that called the constructor.
+	 * @param {SunEditor.Deps} $ Kernel dependencies
 	 * @param {FigureControls} controls Controller button array
 	 * @param {FigureParams} params Figure options
 	 */
-	constructor(inst, controls, params) {
-		super(inst.editor);
+	constructor(inst, $, controls, params) {
+		this.#$ = $;
+
 		this.kind = inst.constructor.key || inst.constructor.name;
 		this._alignIcons = {
-			none: this.icons.format_float_none,
-			left: this.icons.format_float_left,
-			right: this.icons.format_float_right,
-			center: this.icons.format_float_center,
+			none: this.#$.icons.format_float_none,
+			left: this.#$.icons.format_float_left,
+			right: this.#$.icons.format_float_right,
+			center: this.#$.icons.format_float_center,
 		};
 
 		// modules
 		/** @type {Object<string, *>} */
 		this._action = {};
 
-		const controllerEl = CreateHTML_controller(this, controls || []);
-		this.controller = controllerEl ? new Controller(this, controllerEl, { position: 'bottom', disabled: true }, this.kind) : null;
+		const controllerEl = CreateHTML_controller(this, $, controls || []);
+		this.controller = controllerEl ? new Controller(this, $, controllerEl, { position: 'bottom', disabled: true }, this.kind) : null;
 
 		if (controllerEl) {
 			// align selectmenu
 			this.alignButton = controllerEl.querySelector('[data-command="onalign"]');
-			const alignMenus = CreateAlign(this, this.alignButton);
+			const alignMenus = CreateAlign(this, $, this.alignButton);
 			if (alignMenus) {
-				this.selectMenu_align = new SelectMenu(this.editor, { checkList: false, position: 'bottom-center' });
+				this.selectMenu_align = new SelectMenu($, { checkList: false, position: 'bottom-center' });
 				this.selectMenu_align.on(this.alignButton, this.#SetMenuAlign.bind(this), { class: 'se-figure-select-list' });
 				this.selectMenu_align.create(alignMenus.items, alignMenus.html);
 			}
 			// as [block, inline] selectmenu
 			this.asButton = controllerEl.querySelector('[data-command="onas"]');
-			const asMenus = CreateAs(this, this.asButton);
+			const asMenus = CreateAs($, this.asButton);
 			if (asMenus) {
-				this.selectMenu_as = new SelectMenu(this.editor, { checkList: false, position: 'bottom-center' });
+				this.selectMenu_as = new SelectMenu($, { checkList: false, position: 'bottom-center' });
 				this.selectMenu_as.on(this.asButton, this.#SetMenuAs.bind(this), { class: 'se-figure-select-list' });
 				this.selectMenu_as.create(asMenus.items, asMenus.html);
 			}
 			// resize selectmenu
 			this.resizeButton = controllerEl.querySelector('[data-command="onresize"]');
-			const resizeMenus = CreateResize(this, this.resizeButton);
+			const resizeMenus = CreateResize($, this.resizeButton);
 			if (resizeMenus) {
-				this.selectMenu_resize = new SelectMenu(this.editor, { checkList: false, position: 'bottom-left', dir: 'ltr' });
+				this.selectMenu_resize = new SelectMenu($, { checkList: false, position: 'bottom-left', dir: 'ltr' });
 				this.selectMenu_resize.on(this.resizeButton, this.#SetResize.bind(this));
 				this.selectMenu_resize.create(resizeMenus.items, resizeMenus.html);
 			}
@@ -205,22 +208,22 @@ class Figure extends CoreInjector {
 		this.#containerResizingESC = this.#ContainerResizingESC.bind(this);
 
 		// init
-		this.eventManager.addEvent(this.alignButton, 'click', this.#OnClick_alignButton.bind(this));
-		this.eventManager.addEvent(this.asButton, 'click', this.#OnClick_asButton.bind(this));
-		this.eventManager.addEvent(this.resizeButton, 'click', this.#OnClick_resizeButton.bind(this));
-		this.contextManager.applyToRoots((e) => {
+		this.#$.eventManager.addEvent(this.alignButton, 'click', this.#OnClick_alignButton.bind(this));
+		this.#$.eventManager.addEvent(this.asButton, 'click', this.#OnClick_asButton.bind(this));
+		this.#$.eventManager.addEvent(this.resizeButton, 'click', this.#OnClick_resizeButton.bind(this));
+		this.#$.contextProvider.applyToRoots((e) => {
 			if (!e.get('wrapper').querySelector('.se-controller.se-resizing-container')) {
 				// resizing
 				const main = CreateHTML_resizeDot();
 				const handles = main.querySelectorAll('.se-resize-dot > span');
 				e.set('_figure', {
 					main: main,
-					border: main.querySelector('.se-resize-dot'),
-					display: main.querySelector('.se-resize-display'),
-					handles: handles,
+					border: /** @type {HTMLElement} */ (main.querySelector('.se-resize-dot')),
+					display: /** @type {HTMLElement} */ (main.querySelector('.se-resize-display')),
+					handles: /** @type {*} */ (handles),
 				});
 				e.get('wrapper').appendChild(main);
-				this.eventManager.addEvent(handles, 'mousedown', this.#OnResizeContainer.bind(this));
+				this.#$.eventManager.addEvent(handles, 'mousedown', this.#OnResizeContainer.bind(this));
 			}
 		});
 	}
@@ -342,37 +345,13 @@ class Figure extends CoreInjector {
 		return dom.check.isComponentContainer(element) || /^(HR)$/.test(element?.nodeName);
 	}
 
-	get #component() {
-		return this.editor.component;
-	}
-
-	get #offset() {
-		return this.editor.offset;
-	}
-
-	get #selection() {
-		return this.editor.selection;
-	}
-
-	get #html() {
-		return this.editor.html;
-	}
-
-	get #format() {
-		return this.editor.format;
-	}
-
-	get #nodeTransform() {
-		return this.editor.nodeTransform;
-	}
-
 	/**
 	 * @description Close the figure's controller
 	 */
 	close() {
-		this.editor._preventBlur = false;
+		this.#$.store.set('_preventBlur', false);
 		dom.utils.removeClass(this._cover, 'se-figure-selected');
-		this.#component.__removeDragEvent();
+		this.#$.component.__removeDragEvent();
 		this.#removeGlobalEvents();
 		this.controller?.close();
 	}
@@ -402,7 +381,7 @@ class Figure extends CoreInjector {
 		const target = figureInfo.target;
 		let exceptionFormat = false;
 		if (!figureInfo.container) {
-			if (!this.options.get('strictMode').formatFilter) {
+			if (!this.#$.options.get('strictMode').formatFilter) {
 				figureInfo.container = target;
 				figureInfo.cover = target;
 				exceptionFormat = true;
@@ -424,7 +403,7 @@ class Figure extends CoreInjector {
 		const sizeTarget = /** @type {HTMLElement} */ (figureTarget ? this._cover || this._container || target : target);
 		const w = sizeTarget.offsetWidth || null;
 		const h = sizeTarget.offsetHeight || null;
-		const { top, left, scrollX, scrollY } = this.#offset.getLocal(sizeTarget);
+		const { top, left, scrollX, scrollY } = this.#$.offset.getLocal(sizeTarget);
 
 		const dataSize = (target.getAttribute('data-se-size') || '').split(',');
 
@@ -454,9 +433,9 @@ class Figure extends CoreInjector {
 		this.#height = targetInfo.height;
 		if (infoOnly) return targetInfo;
 
-		const _figure = this.frameContext.get('_figure');
-		this.uiManager.setFigureContainer(_figure.main);
-		this.uiManager.opendControllers = this.uiManager.opendControllers.filter((c) => c.form !== _figure.main);
+		const _figure = this.#$.frameContext.get('_figure');
+		this.#$.ui.setFigureContainer(_figure.main);
+		this.#$.ui.opendControllers = this.#$.ui.opendControllers.filter((c) => c.form !== _figure.main);
 
 		_figure.main.style.top = top + 'px';
 		_figure.main.style.left = left + 'px';
@@ -469,7 +448,7 @@ class Figure extends CoreInjector {
 
 		this.__offset = { left: left + scrollX, top: top + scrollY };
 
-		this.uiManager.opendControllers.push({
+		this.#$.ui.opendControllers.push({
 			position: 'none',
 			form: _figure.main,
 			target: sizeTarget,
@@ -511,13 +490,13 @@ class Figure extends CoreInjector {
 			if (this.controller) {
 				// size display
 				const size = this.getSize(target);
-				dom.utils.changeTxt(_figure.display, this.lang[this.align === 'none' ? 'basic' : this.align] + ' (' + size.dw + ', ' + size.dh + ')');
+				dom.utils.changeTxt(_figure.display, this.#$.lang[this.align === 'none' ? 'basic' : this.align] + ' (' + size.dw + ', ' + size.dh + ')');
 
 				// align button
 				this.#setAlignIcon();
 				// as button
 				this.#setAsIcon();
-				this.uiManager._visibleControllers(true, true);
+				this.#$.ui._visibleControllers(true, true);
 
 				// rotate, aption, align, onresize - display;
 				const transformButtons = this.controller.form.querySelectorAll(
@@ -631,7 +610,7 @@ class Figure extends CoreInjector {
 		const target = figure.target;
 		if (!figure.container) {
 			// exceptionFormat
-			if (!this.options.get('strictMode').formatFilter) {
+			if (!this.#$.options.get('strictMode').formatFilter) {
 				w = target.style.width || 'auto';
 				h = target.style.height || 'auto';
 			} else {
@@ -678,7 +657,7 @@ class Figure extends CoreInjector {
 		const target = figure.target;
 		const container = figure.container;
 		const cover = figure.cover;
-		if (/%$/.test(target.style.width) && align === 'center' && !this.#component.isInline(container)) {
+		if (/%$/.test(target.style.width) && align === 'center' && !this.#$.component.isInline(container)) {
 			container.style.minWidth = '100%';
 			cover.style.width = container.style.width;
 		} else {
@@ -720,7 +699,7 @@ class Figure extends CoreInjector {
 		switch (formatStyle) {
 			case 'inline': {
 				if (inlineCover) break;
-				this.#component.deselect();
+				this.#$.component.deselect();
 
 				const next = container.nextElementSibling;
 				const parent = container.parentElement;
@@ -736,7 +715,7 @@ class Figure extends CoreInjector {
 
 				this.#asFormatChange(figure, w, h);
 
-				const line = dom.utils.createElement(this.options.get('defaultLine'), null, figure.container);
+				const line = dom.utils.createElement(this.#$.options.get('defaultLine'), null, figure.container);
 				parent.insertBefore(line, next);
 				dom.utils.removeItem(container);
 
@@ -744,11 +723,11 @@ class Figure extends CoreInjector {
 			}
 			case 'block': {
 				if (!inlineCover) break;
-				this.#component.deselect();
+				this.#$.component.deselect();
 
-				this.#selection.setRange(container, 0, container, 1);
-				const r = this.#html.remove();
-				const s = this.#nodeTransform.split(r.container, r.offset, 0);
+				this.#$.selection.setRange(container, 0, container, 1);
+				const r = this.#$.html.remove();
+				const s = this.#$.nodeTransform.split(r.container, r.offset, 0);
 
 				if (s?.previousElementSibling && dom.check.isZeroWidth(s.previousElementSibling)) {
 					dom.utils.removeItem(s.previousElementSibling);
@@ -806,20 +785,20 @@ class Figure extends CoreInjector {
 			}
 			case 'caption': {
 				if (!this._caption) {
-					const caption = Figure.CreateCaption(this._cover, this.lang.caption);
+					const caption = Figure.CreateCaption(this._cover, this.#$.lang.caption);
 					const captionText = dom.query.getEdgeChild(caption, (current) => current.nodeType === 3, false);
 
 					if (!captionText) {
 						caption.focus();
 					} else {
-						this.#selection.setRange(captionText, 0, captionText, captionText.textContent.length);
+						this.#$.selection.setRange(captionText, 0, captionText, captionText.textContent.length);
 					}
 
 					this._caption = caption;
 					this.controller.close();
 				} else {
 					dom.utils.removeItem(this._caption);
-					_w.setTimeout(this.#component.select.bind(this.#component, element, this.kind), 0);
+					_w.setTimeout(this.#$.component.select.bind(this.#$.component, element, this.kind), 0);
 					this._caption = null;
 				}
 
@@ -841,7 +820,7 @@ class Figure extends CoreInjector {
 				break;
 			}
 			case 'copy': {
-				this.#component.copy(this._container);
+				this.#$.component.copy(this._container);
 				break;
 			}
 			case 'remove': {
@@ -858,9 +837,9 @@ class Figure extends CoreInjector {
 
 		if (command === 'edit') return;
 
-		this.history.push(false);
+		this.#$.history.push(false);
 		if (!/^remove|caption$/.test(command)) {
-			this.#component.select(element, this.kind);
+			this.#$.component.select(element, this.kind);
 		}
 	}
 
@@ -872,29 +851,29 @@ class Figure extends CoreInjector {
 	 * @param {import('../manager/FileManager').default} [fileManagerInst=null] - FileManager module instance, if used.
 	 */
 	retainFigureFormat(container, originEl, anchorCover, fileManagerInst) {
-		const isInline = this.#component.isInline(container);
+		const isInline = this.#$.component.isInline(container);
 		const originParent = originEl.parentNode;
-		let existElement = this.#format.isBlock(originParent) || dom.check.isWysiwygFrame(originParent) ? originEl : Figure.GetContainer(originEl)?.container || originParent || originEl;
+		let existElement = this.#$.format.isBlock(originParent) || dom.check.isWysiwygFrame(originParent) ? originEl : Figure.GetContainer(originEl)?.container || originParent || originEl;
 
 		if (dom.query.getParentElement(originEl, dom.check.isExcludeFormat)) {
 			existElement = anchorCover && anchorCover !== originEl ? anchorCover : originEl;
 			existElement.parentNode.replaceChild(container, existElement);
-		} else if (isInline && this.#format.isLine(existElement)) {
+		} else if (isInline && this.#$.format.isLine(existElement)) {
 			const refer = isInline && /^SPAN$/i.test(originEl.parentElement.nodeName) ? originEl.parentElement : originEl;
 			refer.parentElement.replaceChild(container, refer);
 		} else if (dom.check.isListCell(existElement)) {
 			const refer = dom.query.getParentElement(originEl, (current) => current.parentNode === existElement);
 			existElement.insertBefore(container, refer);
 			dom.utils.removeItem(originEl);
-			this.#nodeTransform.removeEmptyNode(refer, null, true);
-		} else if (this.#format.isLine(existElement)) {
+			this.#$.nodeTransform.removeEmptyNode(refer, null, true);
+		} else if (this.#$.format.isLine(existElement)) {
 			const refer = dom.query.getParentElement(originEl, (current) => current.parentNode === existElement);
-			existElement = this.#nodeTransform.split(existElement, refer);
+			existElement = this.#$.nodeTransform.split(existElement, refer);
 			existElement.parentNode.insertBefore(container, existElement);
 			dom.utils.removeItem(originEl);
-			this.#nodeTransform.removeEmptyNode(existElement, null, true);
+			this.#$.nodeTransform.removeEmptyNode(existElement, null, true);
 		} else {
-			if (this.#format.isLine(existElement.parentNode)) {
+			if (this.#$.format.isLine(existElement.parentNode)) {
 				const formats = existElement.parentNode;
 				formats.parentNode.insertBefore(container, existElement.previousSibling ? formats.nextElementSibling : formats);
 				if (fileManagerInst?.__updateTags.map((current) => existElement.contains(current)).length === 0) dom.utils.removeItem(existElement);
@@ -998,7 +977,7 @@ class Figure extends CoreInjector {
 		const type = !display ? 'none' : 'flex';
 		if (this.controller) this.controller.form.style.display = type;
 
-		const _figure = this.frameContext.get('_figure');
+		const _figure = this.#$.frameContext.get('_figure');
 		const resizeHandles = _figure.handles;
 		for (let i = 0, len = resizeHandles.length; i < len; i++) {
 			resizeHandles[i].style.display = type;
@@ -1006,7 +985,7 @@ class Figure extends CoreInjector {
 
 		if (type === 'none') {
 			dom.utils.addClass(_figure.main, 'se-resize-ing');
-			this.#onResizeESCEvent = this.eventManager.addGlobalEvent('keydown', this.#containerResizingESC);
+			this.#onResizeESCEvent = this.#$.eventManager.addGlobalEvent('keydown', this.#containerResizingESC);
 		} else {
 			dom.utils.removeClass(_figure.main, 'se-resize-ing');
 		}
@@ -1020,7 +999,7 @@ class Figure extends CoreInjector {
 	 */
 	#asFormatChange(figureinfo, w, h) {
 		const kind = this.kind;
-		figureinfo.target.onload = () => this.#component.select(figureinfo.target, kind);
+		figureinfo.target.onload = () => this.#$.component.select(figureinfo.target, kind);
 
 		this.#setFigureInfo(figureinfo);
 
@@ -1188,7 +1167,7 @@ class Figure extends CoreInjector {
 		this._container.style.height = '';
 
 		// exceptionFormat
-		if (this._element === this._cover && !this.options.get('strictMode').formatFilter) {
+		if (this._element === this._cover && !this.#$.options.get('strictMode').formatFilter) {
 			this.#saveCurrentSize();
 			return;
 		}
@@ -1252,7 +1231,7 @@ class Figure extends CoreInjector {
 	 */
 	#setAsIcon() {
 		if (!this.asButton) return;
-		dom.utils.changeElement(this.asButton.firstElementChild, this.icons[`as_${this.as}`]);
+		dom.utils.changeElement(this.asButton.firstElementChild, this.#$.icons[`as_${this.as}`]);
 	}
 
 	/**
@@ -1306,21 +1285,21 @@ class Figure extends CoreInjector {
 	 * @description Removes the resize event listeners.
 	 */
 	#offResizeEvent() {
-		this.#component.__removeDragEvent();
+		this.#$.component.__removeDragEvent();
 		this.#removeGlobalEvents();
 
 		this._displayResizeHandles(true);
-		this.uiManager.offCurrentController();
-		this.uiManager.disableBackWrapper();
+		this.#$.ui.offCurrentController();
+		this.#$.ui.disableBackWrapper();
 	}
 
 	/**
 	 * @description Removes global event listeners related to resizing.
 	 */
 	#removeGlobalEvents() {
-		this.eventManager.removeGlobalEvent(this.__onContainerEvent);
-		this.eventManager.removeGlobalEvent(this.__offContainerEvent);
-		this.eventManager.removeGlobalEvent(this.#onResizeESCEvent);
+		this.#$.eventManager.removeGlobalEvent(this.__onContainerEvent);
+		this.#$.eventManager.removeGlobalEvent(this.__offContainerEvent);
+		this.#$.eventManager.removeGlobalEvent(this.#onResizeESCEvent);
 	}
 
 	/**
@@ -1328,7 +1307,7 @@ class Figure extends CoreInjector {
 	 * @param {Node} figureMain The main figure container element.
 	 */
 	#setDragEvent(figureMain) {
-		const dragHandle = /** @type {HTMLElement} */ (this.frameContext.get('wrapper').querySelector('.se-drag-handle'));
+		const dragHandle = /** @type {HTMLElement} */ (this.#$.frameContext.get('wrapper').querySelector('.se-drag-handle'));
 		dom.utils.removeClass(dragHandle, 'se-drag-handle-full');
 
 		dragHandle.style.opacity = '';
@@ -1351,7 +1330,7 @@ class Figure extends CoreInjector {
 	 */
 	#OnScrollDragHandler(dragHandle, figureMain) {
 		dragHandle.style.display = 'block';
-		dragHandle.style.left = figureMain.offsetLeft + (this.options.get('_rtl') ? dragHandle.offsetWidth : figureMain.offsetWidth - dragHandle.offsetWidth * 1.5) + 'px';
+		dragHandle.style.left = figureMain.offsetLeft + (this.#$.options.get('_rtl') ? dragHandle.offsetWidth : figureMain.offsetWidth - dragHandle.offsetWidth * 1.5) + 'px';
 		dragHandle.style.top = figureMain.offsetTop - dragHandle.offsetHeight + 0.5 + 'px';
 	}
 
@@ -1369,8 +1348,8 @@ class Figure extends CoreInjector {
 		const direction = (inst._resize_direction = eventTarget.classList[0]);
 		inst._resizeClientX = e.clientX;
 		inst._resizeClientY = e.clientY;
-		inst.frameContext.get('_figure').main.style.float = /l/.test(direction) ? 'right' : /r/.test(direction) ? 'left' : 'none';
-		this.uiManager.enableBackWrapper(DIRECTION_CURSOR_MAP[direction]);
+		this.#$.frameContext.get('_figure').main.style.float = /l/.test(direction) ? 'right' : /r/.test(direction) ? 'left' : 'none';
+		this.#$.ui.enableBackWrapper(DIRECTION_CURSOR_MAP[direction]);
 
 		const { w, h, dw, dh } = this.getSize(inst._element);
 		__resizing_p_wh = __resizing_p_ow = false;
@@ -1387,15 +1366,15 @@ class Figure extends CoreInjector {
 			if (__resizing_p_wh || __resizing_p_ow) {
 				const sizeTarget = inst._cover || inst._element;
 				__resizing_sw = sizeTarget.offsetWidth;
-				__resizing_cw = converter.getWidthInPercentage(sizeTarget, this.frameContext.get('wysiwygFrame')) / 100;
+				__resizing_cw = converter.getWidthInPercentage(sizeTarget, this.#$.frameContext.get('wysiwygFrame')) / 100;
 			}
 		}
 
-		inst.__onContainerEvent = inst.eventManager.addGlobalEvent('mousemove', inst.__containerResizing);
-		inst.__offContainerEvent = inst.eventManager.addGlobalEvent('mouseup', inst.__containerResizingOff);
+		inst.__onContainerEvent = this.#$.eventManager.addGlobalEvent('mousemove', inst.__containerResizing);
+		inst.__offContainerEvent = this.#$.eventManager.addGlobalEvent('mouseup', inst.__containerResizingOff);
 		inst._displayResizeHandles(false);
 
-		const _display = this.frameContext.get('_figure').display;
+		const _display = this.#$.frameContext.get('_figure').display;
 		_display.style.display = 'block';
 		dom.utils.changeTxt(_display, dw + ' * ' + dh);
 	}
@@ -1416,7 +1395,7 @@ class Figure extends CoreInjector {
 		const w = resultW + (/r/.test(direction) ? clientX - this._resizeClientX : this._resizeClientX - clientX);
 		const h = resultH + (/b/.test(direction) ? clientY - this._resizeClientY : this._resizeClientY - clientY);
 		const wh = (resultH / resultW) * w;
-		const resizeBorder = this.frameContext.get('_figure').border;
+		const resizeBorder = this.#$.frameContext.get('_figure').border;
 
 		if (/t/.test(direction)) resizeBorder.style.top = resultH - (/h/.test(direction) ? h : wh) + 'px';
 		if (/l/.test(direction)) resizeBorder.style.left = resultW - w + 'px';
@@ -1437,7 +1416,7 @@ class Figure extends CoreInjector {
 		const resize_w = /** @type {number} */ (!v && /h$/.test(direction) ? this.#width : Math.round(resultW));
 		const resize_h = /** @type {number} */ (!v && /w$/.test(direction) ? this.#height : Math.round(resultH));
 		const rw = __resizing_cw ? (resize_w / __resizing_sw) * __resizing_cw * 100 : resize_w;
-		dom.utils.changeTxt(this.frameContext.get('_figure').display, __resizing_cw ? numbers.get(rw > 100 ? 100 : rw, 2).toFixed(2) + '%' : rw + ' * ' + resize_h);
+		dom.utils.changeTxt(this.#$.frameContext.get('_figure').display, __resizing_cw ? numbers.get(rw > 100 ? 100 : rw, 2).toFixed(2) + '%' : rw + ' * ' + resize_h);
 
 		this.#resize_w = resize_w;
 		this.#resize_h = resize_h;
@@ -1457,9 +1436,9 @@ class Figure extends CoreInjector {
 
 		if (!this.isVertical && !/%$/.test(w + '')) {
 			const limit =
-				this.frameContext.get('wysiwygFrame').clientWidth -
-				numbers.get(this.frameContext.get('wwComputedStyle').getPropertyValue('padding-left')) +
-				numbers.get(this.frameContext.get('wwComputedStyle').getPropertyValue('padding-right')) -
+				this.#$.frameContext.get('wysiwygFrame').clientWidth -
+				numbers.get(this.#$.frameContext.get('wwComputedStyle').getPropertyValue('padding-left')) +
+				numbers.get(this.#$.frameContext.get('wwComputedStyle').getPropertyValue('padding-right')) -
 				2;
 			if (numbers.get(w, 0) > limit) {
 				h = Math.round((h / w) * limit);
@@ -1477,8 +1456,8 @@ class Figure extends CoreInjector {
 			if (this.isVertical) this.setTransform(this._element, w, h, 0);
 		}
 
-		this.history.push(false);
-		this.#component.select(this._element, this.kind);
+		this.#$.history.push(false);
+		this.#$.component.select(this._element, this.kind);
 	}
 
 	/**
@@ -1488,7 +1467,7 @@ class Figure extends CoreInjector {
 	#ContainerResizingESC(e) {
 		if (!keyCodeMap.isEsc(e.code)) return;
 		this.#offResizeEvent();
-		this.#component.select(this._element, this.kind);
+		this.#$.component.select(this._element, this.kind);
 	}
 
 	/**
@@ -1497,7 +1476,7 @@ class Figure extends CoreInjector {
 	#SetMenuAlign(value) {
 		this.setAlign(this._element, value);
 		this.selectMenu_align.close();
-		this.#component.select(this._element, this.kind);
+		this.#$.component.select(this._element, this.kind);
 	}
 
 	/**
@@ -1527,14 +1506,14 @@ class Figure extends CoreInjector {
 		}
 
 		this.selectMenu_resize.close();
-		this.#component.select(this._element, this.kind);
+		this.#$.component.select(this._element, this.kind);
 	}
 
 	#OffFigureContainer() {
-		const _figure = this.frameContext.get('_figure');
+		const _figure = this.#$.frameContext.get('_figure');
 		_figure.main.style.display = 'none';
-		this.uiManager.setFigureContainer(null);
-		this.uiManager.opendControllers = this.uiManager.opendControllers.filter((c) => c.form !== _figure.main);
+		this.#$.ui.setFigureContainer(null);
+		this.#$.ui.opendControllers = this.#$.ui.opendControllers.filter((c) => c.form !== _figure.main);
 	}
 
 	#OnClick_alignButton() {
@@ -1590,11 +1569,17 @@ function IsVertical(elementOrDeg) {
 	return /^(90|270)$/.test(Math.abs(numbers.is(elementOrDeg) ? elementOrDeg : GetRotateValue(/** @type{Node} */ (elementOrDeg)).r).toString());
 }
 
-function CreateAlign(inst, button) {
+/**
+ * @param {Figure} inst - Figure instance
+ * @param {SunEditor.Deps} $ - Kernel dependencies
+ * @param {Element} button - Align button element
+ * @returns {{html: string[], items: string[]}|null}
+ */
+function CreateAlign(inst, $, button) {
 	if (!button) return null;
 
 	const icons = [inst._alignIcons.none, inst._alignIcons.left, inst._alignIcons.center, inst._alignIcons.right];
-	const langs = [inst.lang.basic, inst.lang.left, inst.lang.center, inst.lang.right];
+	const langs = [$.lang.basic, $.lang.left, $.lang.center, $.lang.right];
 	const commands = ['none', 'left', 'center', 'right'];
 	const html = [];
 	const items = [];
@@ -1612,11 +1597,16 @@ function CreateAlign(inst, button) {
 	return { html: html, items: items };
 }
 
-function CreateAs(inst, button) {
+/**
+ * @param {SunEditor.Deps} $ - Kernel dependencies
+ * @param {Element} button - As button element
+ * @returns {{html: string[], items: string[]}|null}
+ */
+function CreateAs($, button) {
 	if (!button) return null;
 
-	const icons = [inst.icons.as_block, inst.icons.as_inline];
-	const langs = [inst.lang.asBlock, inst.lang.asInline];
+	const icons = [$.icons.as_block, $.icons.as_inline];
+	const langs = [$.lang.asBlock, $.lang.asInline];
 	const commands = ['block', 'inline'];
 	const html = [];
 	const items = [];
@@ -1634,7 +1624,12 @@ function CreateAs(inst, button) {
 	return { html: html, items: items };
 }
 
-function CreateResize(editor, button) {
+/**
+ * @param {SunEditor.Deps} $ - Kernel dependencies
+ * @param {Element} button - Resize button element
+ * @returns {{html: string[], items: string[]}|null}
+ */
+function CreateResize($, button) {
 	if (!button) return null;
 
 	const items = button.getAttribute('data-value').split(',');
@@ -1643,13 +1638,16 @@ function CreateResize(editor, button) {
 		v = items[i];
 		n = numbers.is(v);
 		c = n ? 'resize_percent' + v : 'auto';
-		l = n ? v + '%' : editor.lang.autoSize;
+		l = n ? v + '%' : $.lang.autoSize;
 		html.push('<button type="button" class="se-btn-list" data-command="' + c + '" data-value="' + v + '"><span>' + l + '</span></button>');
 	}
 
 	return { html: html, items: items };
 }
 
+/**
+ * @returns {HTMLElement}
+ */
 function CreateHTML_resizeDot() {
 	const html = /*html*/ `
 		<div class="se-resize-dot">
@@ -1667,6 +1665,10 @@ function CreateHTML_resizeDot() {
 	return dom.utils.createElement('DIV', { class: 'se-controller se-resizing-container', style: 'display: none;' }, html);
 }
 
+/**
+ * @param {string} group - Button group string (e.g. "resize_100", "rotate_l")
+ * @returns {{c: string, v: *, l: string, t: *, i: string}|null}
+ */
 function GET_CONTROLLER_BUTTONS(group) {
 	const g = group.split('_');
 	const command = g[0];
@@ -1745,11 +1747,17 @@ function GET_CONTROLLER_BUTTONS(group) {
 	};
 }
 
-function CreateHTML_controller(inst, controls) {
+/**
+ * @param {Figure} inst - Figure instance
+ * @param {SunEditor.Deps} $ - Kernel dependencies
+ * @param {FigureControls} controls - Controller button array
+ * @returns {HTMLElement|null}
+ */
+function CreateHTML_controller(inst, $, controls) {
 	let html = null;
 
 	if (controls?.length > 0) {
-		const { lang, icons } = inst;
+		const { lang, icons } = $;
 		html = '<div class="se-arrow se-arrow-up"></div>';
 		for (let i = 0, group; i < controls.length; i++) {
 			group = controls[i];
@@ -1757,8 +1765,8 @@ function CreateHTML_controller(inst, controls) {
 			for (let j = 0, len = group.length, m; j < len; j++) {
 				m = group[j];
 
-				if (typeof m?.action === 'function') {
-					const g = m;
+				if (typeof (/** @type {ControlCustomAction} */ (m)?.action) === 'function') {
+					const g = /** @type {ControlCustomAction} */ (m);
 					m = {
 						c: `__c__${g.command}`,
 						v: g.value || '',
@@ -1767,7 +1775,7 @@ function CreateHTML_controller(inst, controls) {
 					};
 					inst._action[m.c] = g.action;
 				} else {
-					m = GET_CONTROLLER_BUTTONS(m);
+					m = GET_CONTROLLER_BUTTONS(/** @type {string} */ (m));
 					if (!m) continue;
 				}
 

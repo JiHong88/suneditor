@@ -33,10 +33,10 @@ export type ParagraphStylePluginOptions = {
 declare class ParagraphStyle extends PluginDropdown {
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {ParagraphStylePluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(editor: SunEditor.Core, pluginOptions: ParagraphStylePluginOptions);
+	constructor(editor: SunEditor.Kernel, pluginOptions: ParagraphStylePluginOptions);
 	title: any;
 	classList: NodeListOf<Element>;
 }

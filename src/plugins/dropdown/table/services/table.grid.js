@@ -6,6 +6,7 @@ import { CreateColumnMenu, CreateRowMenu } from '../render/table.menu';
 
 export class TableGridService {
 	#main;
+	#$;
 	#state;
 
 	/**
@@ -19,17 +20,18 @@ export class TableGridService {
 	 */
 	constructor(main, { columnButton, rowButton, openCellMenuFunc, closeCellMenuFunc }) {
 		this.#main = main;
+		this.#$ = main.$;
 		this.#state = main.state;
 
 		// members - SelectMenu - column
-		const columnMenu = CreateColumnMenu(this.#main.lang, this.#main.icons);
-		this.selectMenu_column = new SelectMenu(main.editor, { checkList: false, position: 'bottom-center', openMethod: openCellMenuFunc, closeMethod: closeCellMenuFunc });
+		const columnMenu = CreateColumnMenu(this.#$.lang, this.#$.icons);
+		this.selectMenu_column = new SelectMenu(this.#$, { checkList: false, position: 'bottom-center', openMethod: openCellMenuFunc, closeMethod: closeCellMenuFunc });
 		this.selectMenu_column.on(columnButton, this.#OnColumnEdit.bind(this));
 		this.selectMenu_column.create(columnMenu.items, columnMenu.menus);
 
 		// members - SelectMenu - row
-		const rownMenu = CreateRowMenu(this.#main.lang, this.#main.icons);
-		this.selectMenu_row = new SelectMenu(main.editor, { checkList: false, position: 'bottom-center', openMethod: openCellMenuFunc, closeMethod: closeCellMenuFunc });
+		const rownMenu = CreateRowMenu(this.#$.lang, this.#$.icons);
+		this.selectMenu_row = new SelectMenu(this.#$, { checkList: false, position: 'bottom-center', openMethod: openCellMenuFunc, closeMethod: closeCellMenuFunc });
 		this.selectMenu_row.on(rowButton, this.#OnRowEdit.bind(this));
 		this.selectMenu_row.create(rownMenu.items, rownMenu.menus);
 	}

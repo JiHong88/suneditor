@@ -25,23 +25,23 @@ class ParagraphStyle extends PluginDropdown {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {ParagraphStylePluginOptions} pluginOptions - Plugin options
 	 */
 	constructor(editor, pluginOptions) {
 		// plugin bisic properties
 		super(editor);
-		this.title = this.lang.paragraphStyle;
+		this.title = this.$.lang.paragraphStyle;
 		this.icon = 'paragraph_style';
 
 		// create HTML
-		const menu = CreateHTML(editor, pluginOptions.items);
+		const menu = CreateHTML(this.$, pluginOptions.items);
 
 		// members
 		this.classList = menu.querySelectorAll('li button');
 
 		// init
-		this.menu.initDropdownTarget(ParagraphStyle, menu);
+		this.$.menu.initDropdownTarget(ParagraphStyle, menu);
 	}
 
 	/**
@@ -50,7 +50,7 @@ class ParagraphStyle extends PluginDropdown {
 	 */
 	on() {
 		const paragraphList = this.classList;
-		const currentFormat = this.format.getLine(this.selection.getNode());
+		const currentFormat = this.$.format.getLine(this.$.selection.getNode());
 
 		for (let i = 0, len = paragraphList.length; i < len; i++) {
 			if (dom.utils.hasClass(currentFormat, paragraphList[i].getAttribute('data-command'))) {
@@ -67,10 +67,10 @@ class ParagraphStyle extends PluginDropdown {
 	 */
 	action(target) {
 		const value = target.getAttribute('data-command');
-		let selectedFormsts = this.format.getLines();
+		let selectedFormsts = this.$.format.getLines();
 		if (selectedFormsts.length === 0) {
-			this.selection.getRangeAndAddLine(this.selection.getRange(), null);
-			selectedFormsts = this.format.getLines();
+			this.$.selection.getRangeAndAddLine(this.$.selection.getRange(), null);
+			selectedFormsts = this.$.format.getLines();
 			if (selectedFormsts.length === 0) return;
 		}
 
@@ -80,11 +80,16 @@ class ParagraphStyle extends PluginDropdown {
 			toggleClass(selectedFormsts[i], value);
 		}
 
-		this.menu.dropdownOff();
-		this.history.push(false);
+		this.$.menu.dropdownOff();
+		this.$.history.push(false);
 	}
 }
 
+/**
+ * @param {SunEditor.Deps} $ - Kernel dependencies
+ * @param {Array<string|{name: string, class: string, _class?: string}>} [items] - Paragraph style items
+ * @returns {HTMLElement}
+ */
 function CreateHTML({ lang }, items) {
 	const defaultList = {
 		spaced: {

@@ -3,13 +3,13 @@
  * These types define required methods for different plugin types.
  */
 
-import EditorInjector from '../editorInjector';
+import KernelInjector from '../core/kernel/kernelInjector';
 
 /**
  * @abstract
  * Base class for all plugins - contains common properties
  */
-class Base extends EditorInjector {
+class Base extends KernelInjector {
 	/** @type {string} - Plugin type ("browser"|"command"|"dropdown"|"field"|"input"|"modal"|"popup") */
 	static type = '';
 
@@ -28,7 +28,7 @@ class Base extends EditorInjector {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 */
 	constructor(editor) {
 		super(editor);

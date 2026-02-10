@@ -128,13 +128,13 @@ class Embed extends PluginModal {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {EmbedPluginOptions} pluginOptions
 	 */
 	constructor(editor, pluginOptions) {
 		// plugin basic properties
 		super(editor);
-		this.title = this.lang.embed;
+		this.title = this.$.lang.embed;
 		this.icon = 'embed';
 
 		// define plugin options
@@ -156,15 +156,15 @@ class Embed extends PluginModal {
 
 		// create HTML
 		const sizeUnit = this.pluginOptions.percentageOnlySize ? '%' : 'px';
-		const modalEl = CreateHTML_modal(editor, this.pluginOptions);
+		const modalEl = CreateHTML_modal(this.$, this.pluginOptions);
 		const figureControls = pluginOptions.controls || (!this.pluginOptions.canResize ? [['align', 'edit', 'copy', 'remove']] : [['resize_auto,75,50', 'align', 'edit', 'revert', 'copy', 'remove']]);
 
 		// show align
 		if (!figureControls.some((subArray) => subArray.includes('align'))) modalEl.figureAlignBtn.style.display = 'none';
 
 		// modules
-		this.modal = new Modal(this, modalEl.html);
-		this.figure = new Figure(this, figureControls, { sizeUnit: sizeUnit });
+		this.modal = new Modal(this, this.$, modalEl.html);
+		this.figure = new Figure(this, this.$, figureControls, { sizeUnit: sizeUnit });
 
 		// members
 		this.fileModalWrapper = modalEl.fileModalWrapper;
@@ -250,7 +250,7 @@ class Embed extends PluginModal {
 		Embed.#urlPatterns = urlPatterns.concat(pluginOptions.urlPatterns || []);
 
 		// init
-		this.eventManager.addEvent(this.embedInput, 'input', this.#OnLinkPreview.bind(this));
+		this.$.eventManager.addEvent(this.embedInput, 'input', this.#OnLinkPreview.bind(this));
 
 		if (this.#resizing) {
 			this.proportion = modalEl.proportion;
@@ -259,9 +259,9 @@ class Embed extends PluginModal {
 			this.inputX.value = this.pluginOptions.defaultWidth;
 			this.inputY.value = this.pluginOptions.defaultHeight;
 
-			this.eventManager.addEvent(this.inputX, 'keyup', this.#OnInputSize.bind(this, 'x'));
-			this.eventManager.addEvent(this.inputY, 'keyup', this.#OnInputSize.bind(this, 'y'));
-			this.eventManager.addEvent(modalEl.revertBtn, 'click', this.#OnClickRevert.bind(this));
+			this.$.eventManager.addEvent(this.inputX, 'keyup', this.#OnInputSize.bind(this, 'x'));
+			this.$.eventManager.addEvent(this.inputY, 'keyup', this.#OnInputSize.bind(this, 'y'));
+			this.$.eventManager.addEvent(modalEl.revertBtn, 'click', this.#OnClickRevert.bind(this));
 		}
 	}
 
@@ -288,7 +288,7 @@ class Embed extends PluginModal {
 				if (figureInfo && figureInfo.container && figureInfo.cover) return;
 
 				this.#ready(element, true);
-				const line = this.format.getLine(element);
+				const line = this.$.format.getLine(element);
 				if (line) this.#align = line.style.textAlign || line.style.float;
 
 				this.#fixTagStructure(element);
@@ -322,7 +322,7 @@ class Embed extends PluginModal {
 			result = await this.submitSRC(this.#linkValue);
 		}
 
-		if (result) _w.setTimeout(this.component.select.bind(this.component, this.#element, Embed.key), 0);
+		if (result) _w.setTimeout(this.$.component.select.bind(this.$.component, this.#element, Embed.key), 0);
 
 		return result;
 	}
@@ -373,14 +373,14 @@ class Embed extends PluginModal {
 		const focusEl = container.previousElementSibling || container.nextElementSibling;
 		const emptyDiv = container.parentNode;
 
-		const message = await this.triggerEvent('onEmbedDeleteBefore', { element: targetEl, container, align: this.#align, url: this.#linkValue });
+		const message = await this.$.eventManager.triggerEvent('onEmbedDeleteBefore', { element: targetEl, container, align: this.#align, url: this.#linkValue });
 		if (message === false) return;
 
 		dom.utils.removeItem(container);
 		this.modalInit();
 
-		if (emptyDiv !== this.frameContext.get('wysiwyg')) {
-			this.nodeTransform.removeAllParents(
+		if (emptyDiv !== this.$.frameContext.get('wysiwyg')) {
+			this.$.nodeTransform.removeAllParents(
 				emptyDiv,
 				function (current) {
 					return current.childNodes.length === 0;
@@ -390,8 +390,8 @@ class Embed extends PluginModal {
 		}
 
 		// focus
-		this.focusManager.focusEdge(focusEl);
-		this.history.push(false);
+		this.$.focusManager.focusEdge(focusEl);
+		this.$.history.push(false);
 	}
 
 	/**
@@ -447,7 +447,7 @@ class Embed extends PluginModal {
 			uploadCallback(src, infos.process, infos.url, infos.children, infos.inputWidth, infos.inputHeight, infos.align, infos.isUpdate);
 		}.bind(this, this.#create.bind(this), embedInfo);
 
-		const result = await this.triggerEvent('onEmbedInputBefore', {
+		const result = await this.$.eventManager.triggerEvent('onEmbedInputBefore', {
 			...embedInfo,
 			handler,
 		});
@@ -622,11 +622,11 @@ class Embed extends PluginModal {
 		cover.setAttribute('data-se-origin', originSrc);
 
 		if (!isUpdate) {
-			this.component.insert(container, { skipHistory: true, scrollTo: false, insertBehavior: this.pluginOptions.insertBehavior });
+			this.$.component.insert(container, { skipHistory: true, scrollTo: false, insertBehavior: this.pluginOptions.insertBehavior });
 
 			if (scriptTag) {
 				try {
-					this.history.pause();
+					this.$.history.pause();
 
 					scriptTag.onload = () => {
 						dom.utils.removeItem(scriptTag);
@@ -638,8 +638,8 @@ class Embed extends PluginModal {
 						for (const mutation of mutations) {
 							if (mutation.type === 'childList') {
 								if (!oFrame.parentElement) {
-									this.history.resume();
-									this.history.push(false);
+									this.$.history.resume();
+									this.$.history.push(false);
 									observer.disconnect();
 									break;
 								}
@@ -647,25 +647,25 @@ class Embed extends PluginModal {
 						}
 					});
 
-					observer.observe(this.frameContext.get('wysiwyg'), {
+					observer.observe(this.$.frameContext.get('wysiwyg'), {
 						subtree: true,
 						childList: true,
 					});
 				} catch (e) {
-					this.history.resume();
+					this.$.history.resume();
 					console.warn('[SUNEDITOR] Embed tag script load error.', e);
 				}
 			}
 
-			if (!this.options.get('componentInsertBehavior')) {
-				const line = this.format.addLine(container, null);
-				if (line) this.selection.setRange(line, 0, line, 0);
+			if (!this.$.options.get('componentInsertBehavior')) {
+				const line = this.$.format.addLine(container, null);
+				if (line) this.$.selection.setRange(line, 0, line, 0);
 			}
 			return;
 		}
 
 		if (!this.#resizing || !changeSize || !this.figure.isVertical) this.figure.setTransform(oFrame, width, height, 0);
-		if (!scriptTag) this.history.push(false);
+		if (!scriptTag) this.$.history.push(false);
 	}
 
 	/**
@@ -691,7 +691,7 @@ class Embed extends PluginModal {
 		this.#applySize(width, height);
 
 		// align
-		const format = this.format.getLine(prevFrame);
+		const format = this.$.format.getLine(prevFrame);
 		if (format) this.#align = format.style.textAlign || format.style.float;
 		this.figure.setAlign(oFrame, this.#align);
 
@@ -765,8 +765,8 @@ class Embed extends PluginModal {
 		} else {
 			this.#linkValue = this.previewSrc.textContent = !value
 				? ''
-				: this.options.get('defaultUrlProtocol') && !value.includes('://') && value.indexOf('#') !== 0
-					? this.options.get('defaultUrlProtocol') + value
+				: this.$.options.get('defaultUrlProtocol') && !value.includes('://') && value.indexOf('#') !== 0
+					? this.$.options.get('defaultUrlProtocol') + value
 					: !value.includes('://')
 						? '/' + value
 						: value;
@@ -809,7 +809,7 @@ class Embed extends PluginModal {
 }
 
 /**
- * @param {SunEditor.Core} editor Editor instance
+ * @param {SunEditor.Deps} $ Kernel deps
  * @param {*} pluginOptions
  * @returns {{
  * html: HTMLElement,

@@ -21,9 +21,7 @@ export function CreateHTML() {
 
 /**
  * @description Creates the table controller HTML.
- * @param {Object} options - Options containing language and icons.
- * @param {Object} options.lang - Language object.
- * @param {Object} options.icons - Icons object.
+ * @param {SunEditor.Deps} $ - Kernel dependencies
  * @returns {HTMLDivElement}
  */
 export function CreateHTML_controller_table({ lang, icons }) {
@@ -78,7 +76,8 @@ export function CreateHTML_controller_table({ lang, icons }) {
 }
 
 /**
- * @param {SunEditor.Core} editor
+ * @param {SunEditor.Deps} $ - Kernel dependencies
+ * @param {boolean} cellControllerTop - Whether to position cell controller on top
  * @returns {{ html: HTMLElement, splitButton: HTMLButtonElement, columnButton: HTMLButtonElement, rowButton: HTMLButtonElement, mergeButton: HTMLButtonElement, unmergeButton: HTMLButtonElement }}
  */
 export function CreateHTML_controller_cell({ lang, icons }, cellControllerTop) {
@@ -155,7 +154,7 @@ export function CreateHTML_controller_cell({ lang, icons }, cellControllerTop) {
  * @property {HTMLButtonElement} font_italic
  * @property {HTMLButtonElement} font_strike
  *
- * @param {SunEditor.Core} editor - Editor instance
+ * @param {SunEditor.Deps} $ - Kernel deps
  * @returns {TableCtrlProps}
  */
 export function CreateHTML_controller_properties({ lang, icons, options }) {

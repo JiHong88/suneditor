@@ -16,13 +16,13 @@ class Template extends PluginDropdown {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {TemplatePluginOptions} pluginOptions - Plugin options
 	 */
 	constructor(editor, pluginOptions) {
 		// plugin bisic properties
 		super(editor);
-		this.title = this.lang.template;
+		this.title = this.$.lang.template;
 		this.icon = 'template';
 
 		// members
@@ -33,7 +33,7 @@ class Template extends PluginDropdown {
 		const menu = CreateHTML(this.items);
 
 		// init
-		this.menu.initDropdownTarget(Template, menu);
+		this.$.menu.initDropdownTarget(Template, menu);
 	}
 
 	/**
@@ -45,16 +45,20 @@ class Template extends PluginDropdown {
 		const temp = this.items[(this.selectedIndex = index)];
 
 		if (temp.html) {
-			this.html.insert(temp.html, { selectInserted: false, skipCharCount: false, skipCleaning: false });
+			this.$.html.insert(temp.html, { selectInserted: false, skipCharCount: false, skipCleaning: false });
 		} else {
-			this.menu.dropdownOff();
+			this.$.menu.dropdownOff();
 			throw Error('[SUNEDITOR.template.fail] cause : "templates[i].html not found"');
 		}
 
-		this.menu.dropdownOff();
+		this.$.menu.dropdownOff();
 	}
 }
 
+/**
+ * @param {Array<{name: string, html: string}>} templateList - Template items
+ * @returns {HTMLElement}
+ */
 function CreateHTML(templateList) {
 	if (!templateList || templateList.length === 0) {
 		console.warn('[SUNEDITOR.plugins.template.warn] To use the "template" plugin, please define the "templates" option.');

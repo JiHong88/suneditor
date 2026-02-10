@@ -26,27 +26,27 @@ class Anchor extends PluginPopup {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 */
 	constructor(editor) {
 		super(editor);
 		// plugin basic properties
-		this.title = this.lang.anchor;
+		this.title = this.$.lang.anchor;
 		this.icon = 'bookmark_anchor';
 
 		// members
 		const parser = new DOMParser();
-		const svgDoc = parser.parseFromString(this.icons.bookmark_anchor, 'image/svg+xml');
+		const svgDoc = parser.parseFromString(this.$.icons.bookmark_anchor, 'image/svg+xml');
 		this.bookmarkIcon = svgDoc.documentElement;
 
 		// controller
-		const controllerSelectEl = CreateHTML_controller_select(this);
+		const controllerSelectEl = CreateHTML_controller_select(this.$);
 		this.displayId = controllerSelectEl.querySelector('.se-controller-display');
-		this.controllerSelect = new Controller(this, controllerSelectEl, { position: 'bottom', disabled: true }, Anchor.key);
+		this.controllerSelect = new Controller(this, this.$, controllerSelectEl, { position: 'bottom', disabled: true }, Anchor.key);
 
-		const controllerEl = CreateHTML_controller(this);
+		const controllerEl = CreateHTML_controller(this.$);
 		this.inputEl = controllerEl.querySelector('input');
-		this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true, parents: [this.controllerSelect.form], parentsHide: true }, Anchor.key);
+		this.controller = new Controller(this, this.$, controllerEl, { position: 'bottom', disabled: true, parents: [this.controllerSelect.form], parentsHide: true }, Anchor.key);
 	}
 
 	/**
@@ -54,7 +54,7 @@ class Anchor extends PluginPopup {
 	 * @type {PluginPopup['show']}
 	 */
 	show() {
-		this.controller.open((this.#range = this.selection.getRange()));
+		this.controller.open((this.#range = this.$.selection.getRange()));
 		_w.setTimeout(() => {
 			this.inputEl.focus();
 		}, 0);
@@ -106,19 +106,19 @@ class Anchor extends PluginPopup {
 						class: 'se-component se-inline-component',
 					});
 
-					this.component.insert(a, { insertBehavior: 'none', scrollTo: false });
+					this.$.component.insert(a, { insertBehavior: 'none', scrollTo: false });
 
-					const r = this.selection.getNearRange(a);
+					const r = this.$.selection.getNearRange(a);
 					if (r) {
-						this.selection.setRange(r.container, r.offset, r.container, r.offset);
+						this.$.selection.setRange(r.container, r.offset, r.container, r.offset);
 					} else {
-						this.component.select(a, Anchor.key);
+						this.$.component.select(a, Anchor.key);
 					}
 
 					this.#init();
 				} else {
 					currentElement.id = this.inputEl.value;
-					this.component.select(currentElement, Anchor.key);
+					this.$.component.select(currentElement, Anchor.key);
 				}
 
 				break;
@@ -126,7 +126,7 @@ class Anchor extends PluginPopup {
 			case 'cancel': {
 				this.controller.close(!currentElement);
 				if (this.#range) {
-					this.selection.setRange(this.#range);
+					this.$.selection.setRange(this.#range);
 				}
 
 				this.#init();
@@ -145,13 +145,13 @@ class Anchor extends PluginPopup {
 				break;
 			}
 			case 'delete': {
-				const r = this.selection.getNearRange(currentElement);
+				const r = this.$.selection.getNearRange(currentElement);
 
 				dom.utils.removeItem(currentElement);
 				this.controllerSelect.close(true);
 
 				if (r) {
-					this.selection.setRange(r.container, r.offset, r.container, r.offset);
+					this.$.selection.setRange(r.container, r.offset, r.container, r.offset);
 				}
 
 				this.#init();
@@ -173,6 +173,10 @@ class Anchor extends PluginPopup {
 	}
 }
 
+/**
+ * @param {SunEditor.Deps} $ - Kernel dependencies
+ * @returns {HTMLElement}
+ */
 function CreateHTML_controller({ lang, icons }) {
 	const html = /*html*/ `
 		<div class="se-arrow se-arrow-up"></div>
@@ -195,6 +199,10 @@ function CreateHTML_controller({ lang, icons }) {
 	return dom.utils.createElement('DIV', { class: 'se-controller se-controller-simple-input' }, html);
 }
 
+/**
+ * @param {SunEditor.Deps} $ - Kernel dependencies
+ * @returns {HTMLElement}
+ */
 function CreateHTML_controller_select({ lang, icons }) {
 	const html = /*html*/ `
 	<div class="se-arrow se-arrow-up"></div>

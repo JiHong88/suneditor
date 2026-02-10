@@ -40,12 +40,12 @@ module.exports = {
 		},
 		// modules
 		{
-			name: 'modules-use-coreinjector-only',
-			comment: 'modules → core/*, editorInjector/_core 허용. classes/index 금지',
+			name: 'modules-no-import-core',
+			comment: 'modules receive deps via injection ($), must not import core directly',
 			severity: 'error',
 			from: { path: '^src/modules' },
 			to: {
-				path: '^src/editorInjector/(index|_classes)\\.js',
+				path: '^src/core',
 			},
 		},
 		{

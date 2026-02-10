@@ -76,18 +76,26 @@ export type ModalAnchorEditorParams = {
  * @description Modal form Anchor tag editor
  * - Use it by inserting it into Modal in a plugin that uses Modal.
  */
-declare class ModalAnchorEditor extends CoreInjector {
+declare class ModalAnchorEditor {
 	/**
 	 * @constructor
-	 * @param {SunEditor.Instance} editor The instance object that called the constructor.
+	 * @param {SunEditor.Deps} $ Kernel dependencies
+	 * @param {HTMLElement} modalForm Modal <form>
+	 * @param {ModalAnchorEditorParams} params ModalAnchorEditor options
 	 */
-	constructor(editor: SunEditor.Instance, modalForm: any, params: any);
+	constructor($: SunEditor.Deps, modalForm: HTMLElement, params: ModalAnchorEditorParams);
 	openNewWindow: boolean;
-	relList: any;
-	defaultRel: any;
+	relList: string[];
+	defaultRel: {
+		default?: string;
+		check_new_window?: string;
+		check_bookmark?: string;
+	};
 	noAutoPrefix: boolean;
-	uploadUrl: any;
-	uploadHeaders: any;
+	uploadUrl: string;
+	uploadHeaders: {
+		[x: string]: string;
+	};
 	uploadSizeLimit: number;
 	uploadSingleSizeLimit: number;
 	input: HTMLElement;
@@ -141,5 +149,4 @@ declare class ModalAnchorEditor extends CoreInjector {
 	init(): void;
 	#private;
 }
-import CoreInjector from '../../editorInjector/_core';
 import FileManager from '../manager/FileManager';

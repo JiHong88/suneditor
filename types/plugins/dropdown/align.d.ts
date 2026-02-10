@@ -16,18 +16,18 @@ export type AlignPluginOptions = {
  */
 declare class Align extends PluginDropdown {
 	/**
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {AlignPluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(editor: SunEditor.Core, pluginOptions: AlignPluginOptions);
+	constructor(editor: SunEditor.Kernel, pluginOptions: AlignPluginOptions);
 	title: any;
 	_itemMenu: HTMLUListElement;
 	defaultDir: string;
 	alignIcons: {
-		justify: string;
-		left: string;
-		right: string;
-		center: string;
+		justify: any;
+		left: any;
+		right: any;
+		center: any;
 	};
 	alignList: NodeListOf<Element>;
 	active(element: HTMLElement | null, target: HTMLElement | null): boolean | void;

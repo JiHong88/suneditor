@@ -34,10 +34,10 @@ export type AudioGalleryPluginOptions = {
 declare class AudioGallery extends PluginBrowser {
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} kernel - The core kernel
 	 * @param {AudioGalleryPluginOptions} pluginOptions
 	 */
-	constructor(editor: SunEditor.Core, pluginOptions: AudioGalleryPluginOptions);
+	constructor(kernel: SunEditor.Kernel, pluginOptions: AudioGalleryPluginOptions);
 	title: any;
 	onSelectfunction: (target: Node) => any;
 	browser: Browser;

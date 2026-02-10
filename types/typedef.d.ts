@@ -4,80 +4,19 @@ export {};
 declare global {
 	namespace SunEditor {
 		type Instance = import('./core/editor').default;
-		type InitOptions = import('./core/config/options').EditorInitOptions;
-		type InitFrameOptions = import('./core/config/options').EditorFrameOptions;
-		type Context = import('./core/services/contextManager').ContextMap;
-		type Options = import('./core/services/optionManager').BaseOptionsMap;
-		type FrameContext = import('./core/services/contextManager').FrameContextMap;
-		type FrameOptions = import('./core/services/optionManager').FrameOptionsMap;
+		type Kernel = import('./core/kernel/coreKernel').default;
+		type Store = import('./core/kernel/store').default;
+		type StorePathMap = import('./core/kernel/store').StoreState;
+		type Deps = import('./core/kernel/coreKernel').Deps;
+		type InitOptions = import('./core/schema/options').EditorInitOptions;
+		type InitFrameOptions = import('./core/schema/options').EditorFrameOptions;
+		type Context = import('./core/config/contextProvider').ContextMap;
+		type Options = import('./core/config/optionProvider').BaseOptionsMap;
+		type FrameContext = import('./core/config/contextProvider').FrameContextMap;
+		type FrameOptions = import('./core/config/optionProvider').FrameOptionsMap;
 		type EventWysiwyg = HTMLElement & Window;
 		type WysiwygFrame = HTMLElement & HTMLIFrameElement;
 		type GlobalWindow = Window & typeof globalThis;
-		type Core = import('./core/editor').default;
-		type Injector_Core = import('./editorInjector/_core').default;
-		type Injector = import('./editorInjector').default;
-		/**
-		 * **Public Properties:**
-		 */
-		type Status = {
-			/**
-			 * Boolean value of whether the editor has focus
-			 */
-			hasFocus: boolean;
-			/**
-			 * Indent size of tab (4)
-			 */
-			tabSize: number;
-			/**
-			 * Indent size (25)px
-			 */
-			indentSize: number;
-			/**
-			 * Indent size of Code view mode (2)
-			 */
-			codeIndentSize: number;
-			/**
-			 * An element array of the current cursor's node structure
-			 */
-			currentNodes: Array<string>;
-			/**
-			 * An element name array of the current cursor's node structure
-			 */
-			currentNodesMap: Array<string>;
-			/**
-			 * Current visual viewport height size
-			 */
-			currentViewportHeight: number;
-			/**
-			 * Height of the initial visual viewport height size
-			 */
-			initViewportHeight: number;
-			/**
-			 * Boolean value of whether component is selected
-			 */
-			onSelected: boolean;
-			/**
-			 * Current root key
-			 */
-			rootKey: any;
-			/**
-			 * Checks if the editor frame is currently scrollable.
-			 * - default fc parameter is this.frameContext
-			 * - Returns true if: (1) height is not 'auto' (fixed height always has scroll),
-			 * - or (2) height is 'auto' with maxHeight set and content exceeds maxHeight
-			 *
-			 * **Internal Properties (⚠️ DO NOT USE - subject to change without notice):**
-			 */
-			isScrollable: (fc?: SunEditor.FrameContext) => boolean;
-			/**
-			 * Internal: Current range object
-			 */
-			_range: Range;
-			/**
-			 * Internal: Mouse down event status
-			 */
-			_onMousedown: boolean;
-		};
 		type ComponentInfo = {
 			/**
 			 * - The target element associated with the component.
@@ -240,7 +179,7 @@ declare global {
 				/**
 				 * Event listener
 				 */
-				listener: (...args: any) => any;
+				listener: EventListenerOrEventListenerObject;
 				/**
 				 * Event useCapture option
 				 */
@@ -310,7 +249,7 @@ declare global {
 			/**
 			 * The event object passed to the plugin event handler
 			 */
-			type PluginEvent = import('./core/services/pluginManager').PluginEventParam;
+			type PluginEvent = import('./core/logic/shell/pluginManager').PluginEventParam;
 		}
 		export namespace UI {
 			/**

@@ -3,7 +3,7 @@ import { dom } from '../../helper';
 
 /**
  * @typedef {Object} TextStylePluginOptions
- * @property {Array<string|{name: string, class: string, tag: string}>} items - Text style item list
+ * @property {Array<string|{name: string, class: string, tag?: string}>} [items] - Text style item list
  */
 
 /**
@@ -16,23 +16,23 @@ class TextStyle extends PluginDropdown {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {TextStylePluginOptions} pluginOptions - Plugin options
 	 */
 	constructor(editor, pluginOptions) {
 		// plugin bisic properties
 		super(editor);
-		this.title = this.lang.textStyle;
+		this.title = this.$.lang.textStyle;
 		this.icon = 'text_style';
 
 		// create HTML
-		const menu = CreateHTML(editor, pluginOptions.items);
+		const menu = CreateHTML(this.$, pluginOptions.items);
 
 		// members
 		this.styleList = menu.querySelectorAll('li button');
 
 		// init
-		this.menu.initDropdownTarget(TextStyle, menu);
+		this.$.menu.initDropdownTarget(TextStyle, menu);
 	}
 
 	/**
@@ -41,7 +41,7 @@ class TextStyle extends PluginDropdown {
 	 */
 	on() {
 		const styleButtonList = this.styleList;
-		const selectionNode = this.selection.getNode();
+		const selectionNode = this.$.selection.getNode();
 
 		for (let i = 0, len = styleButtonList.length, btn, data, active; i < len; i++) {
 			btn = styleButtonList[i];
@@ -51,7 +51,7 @@ class TextStyle extends PluginDropdown {
 				node = selectionNode;
 				active = false;
 
-				while (node && !this.format.isLine(node) && !this.component.is(node)) {
+				while (node && !this.$.format.isLine(node) && !this.$.component.is(node)) {
 					if (node.nodeName.toLowerCase() === btn.getAttribute('data-command').toLowerCase()) {
 						value = data[v];
 						if (/^\./.test(value) ? dom.utils.hasClass(node, value.replace(/^\./, '')) : /** @type {HTMLElement} */ (node).style[value]) {
@@ -85,12 +85,17 @@ class TextStyle extends PluginDropdown {
 
 		const newNode = dom.utils.hasClass(target, 'active') ? null : tempElement.cloneNode(false);
 		const removeNodes = newNode ? null : [tempElement.nodeName];
-		this.inline.apply(newNode, { stylesToModify: checkStyles, nodesToRemove: removeNodes, strictRemove: true });
+		this.$.inline.apply(newNode, { stylesToModify: checkStyles, nodesToRemove: removeNodes, strictRemove: true });
 
-		this.menu.dropdownOff();
+		this.$.menu.dropdownOff();
 	}
 }
 
+/**
+ * @param {SunEditor.Deps} $ - Kernel dependencies
+ * @param {Array<string|{name: string, class: string, tag?: string}>} [items] - Text style items
+ * @returns {HTMLElement}
+ */
 function CreateHTML({ lang }, items) {
 	const defaultList = {
 		code: {

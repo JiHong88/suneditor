@@ -1,5 +1,9 @@
+import { env } from '../../../helper';
+
+const { _w } = env;
+
 /**
- * @typedef {import('../eventManager').default} EventManagerThis_handler_ww_clipboard
+ * @typedef {import('../eventOrchestrator').default} EventManagerThis_handler_ww_clipboard
  */
 
 /**
@@ -20,7 +24,7 @@ export async function OnCopy_wysiwyg(frameContext, e) {
 	const clipboardData = e.clipboardData;
 
 	// user event
-	if ((await this.triggerEvent('onCopy', { frameContext, event: e, clipboardData })) === false) {
+	if ((await this.$.eventManager.triggerEvent('onCopy', { frameContext, event: e, clipboardData })) === false) {
 		e.preventDefault();
 		e.stopPropagation();
 		return false;
@@ -38,7 +42,7 @@ export async function OnCut_wysiwyg(frameContext, e) {
 	const clipboardData = e.clipboardData;
 
 	// user event
-	if ((await this.triggerEvent('onCut', { frameContext, event: e, clipboardData })) === false) {
+	if ((await this.$.eventManager.triggerEvent('onCut', { frameContext, event: e, clipboardData })) === false) {
 		e.preventDefault();
 		e.stopPropagation();
 		return false;
@@ -47,7 +51,7 @@ export async function OnCut_wysiwyg(frameContext, e) {
 	const fcSelection = frameContext.get('_ww').getSelection();
 	this.__secopy = fcSelection.toString();
 
-	this._w.setTimeout(() => {
-		this.history.push(false);
+	_w.setTimeout(() => {
+		this.$.history.push(false);
 	}, 0);
 }

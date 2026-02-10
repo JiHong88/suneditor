@@ -236,7 +236,7 @@ export type FigureParams = {
  * @description Figure module class for handling resizable/alignable components (images, videos, iframes, etc.)
  * @see EditorComponent for `inst._element` requirement
  */
-declare class Figure extends CoreInjector {
+declare class Figure {
 	/**
 	 * @description Create a container for the resizing component and insert the element.
 	 * @param {Node} element Target element
@@ -307,16 +307,17 @@ declare class Figure extends CoreInjector {
 	/**
 	 * @constructor
 	 * @param {*} inst The instance object that called the constructor.
+	 * @param {SunEditor.Deps} $ Kernel dependencies
 	 * @param {FigureControls} controls Controller button array
 	 * @param {FigureParams} params Figure options
 	 */
-	constructor(inst: any, controls: FigureControls, params: FigureParams);
+	constructor(inst: any, $: SunEditor.Deps, controls: FigureControls, params: FigureParams);
 	kind: any;
 	_alignIcons: {
-		none: string;
-		left: string;
-		right: string;
-		center: string;
+		none: any;
+		left: any;
+		right: any;
+		center: any;
 	};
 	/** @type {Object<string, *>} */
 	_action: {
@@ -524,6 +525,5 @@ declare class Figure extends CoreInjector {
 	_setRevert(): void;
 	#private;
 }
-import CoreInjector from '../../editorInjector/_core';
 import SelectMenu from '../ui/SelectMenu';
 import Controller from './Controller';

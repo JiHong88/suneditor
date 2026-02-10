@@ -19,22 +19,22 @@ class AudioGallery extends PluginBrowser {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} kernel - The core kernel
 	 * @param {AudioGalleryPluginOptions} pluginOptions
 	 */
-	constructor(editor, pluginOptions) {
+	constructor(kernel, pluginOptions) {
 		// plugin bisic properties
-		super(editor);
-		this.title = this.lang.audioGallery;
+		super(kernel);
+		this.title = this.$.lang.audioGallery;
 		this.icon = 'audio_gallery';
 
 		// members
 		this.onSelectfunction = null;
 
 		// modules
-		const thumbnail = typeof pluginOptions.thumbnail === 'string' ? pluginOptions.thumbnail : this.icons.audio_thumbnail;
-		this.browser = new Browser(this, {
-			title: this.lang.audioGallery,
+		const thumbnail = typeof pluginOptions.thumbnail === 'string' ? pluginOptions.thumbnail : this.$.icons.audio_thumbnail;
+		this.browser = new Browser(this, this.$, {
+			title: this.$.lang.audioGallery,
 			data: pluginOptions.data,
 			url: pluginOptions.url,
 			headers: pluginOptions.headers,
@@ -71,8 +71,8 @@ class AudioGallery extends PluginBrowser {
 		if (this.onSelectfunction) {
 			this.onSelectfunction(target);
 		} else {
-			this.plugins.audio.modalInit();
-			this.plugins.audio.submitURL(target.getAttribute('data-command'));
+			this.$.plugins.audio.modalInit();
+			this.$.plugins.audio.submitURL(target.getAttribute('data-command'));
 		}
 	}
 }

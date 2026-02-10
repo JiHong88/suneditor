@@ -4,13 +4,14 @@ import { _DragHandle } from '../../../modules/ui';
 const { _w } = env;
 
 let _onDownEv = null;
+
 function _offDownFn() {
-	this.editor.status._onMousedown = false;
-	_onDownEv = this.removeGlobalEvent(_onDownEv);
+	this.$.store.set('_mousedown', false);
+	_onDownEv = this.$.eventManager.removeGlobalEvent(_onDownEv);
 }
 
 /**
- * @typedef {import('../eventManager').default} EventManagerThis_handler_ww_mouse
+ * @typedef {import('../eventOrchestrator').default} EventManagerThis_handler_ww_mouse
  */
 
 /**
@@ -21,29 +22,29 @@ function _offDownFn() {
 export async function OnMouseDown_wysiwyg(fc, e) {
 	const eventTarget = dom.query.getEventTarget(e);
 
-	this.editor.status._onMousedown = true;
+	this.$.store.set('_mousedown', true);
 	if (_onDownEv) _offDownFn.call(this);
-	_onDownEv = this.addGlobalEvent('mouseup', _offDownFn.bind(this));
+	_onDownEv = this.$.eventManager.addGlobalEvent('mouseup', _offDownFn.bind(this));
 
 	if (fc.get('isReadOnly') || dom.check.isNonEditable(fc.get('wysiwyg'))) return;
-	if (this.format._isExcludeSelectionElement(eventTarget)) {
+	if (this.$.format._isExcludeSelectionElement(eventTarget)) {
 		e.preventDefault();
 		return;
 	}
 
 	this._setSelectionSync();
 
-	this._w.setTimeout(this.selection.init.bind(this.selection), 0);
+	_w.setTimeout(this.$.selection.init.bind(this.$.selection), 0);
 
 	// user event
-	if ((await this.triggerEvent('onMouseDown', { frameContext: fc, event: e })) === false) return;
+	if ((await this.$.eventManager.triggerEvent('onMouseDown', { frameContext: fc, event: e })) === false) return;
 
 	// plugin event
 	if ((await this._callPluginEventAsync('onMouseDown', { frameContext: fc, event: e })) === false) return;
 
-	if (this.editor.isBalloon) {
+	if (this.$.store.mode.isBalloon) {
 		this._hideToolbar();
-	} else if (this.editor.isSubBalloon) {
+	} else if (this.$.store.mode.isSubBalloon) {
 		this._hideToolbar_sub();
 	}
 
@@ -57,7 +58,7 @@ export async function OnMouseDown_wysiwyg(fc, e) {
  */
 export async function OnMouseUp_wysiwyg(fc, e) {
 	// user event
-	if ((await this.triggerEvent('onMouseUp', { frameContext: fc, event: e })) === false) return;
+	if ((await this.$.eventManager.triggerEvent('onMouseUp', { frameContext: fc, event: e })) === false) return;
 
 	// plugin event
 	await this._callPluginEventAsync('onMouseUp', { frameContext: fc, event: e });
@@ -82,80 +83,54 @@ export async function OnClick_wysiwyg(fc, e) {
 	if (dom.check.isNonEditable(fc.get('wysiwyg'))) return;
 
 	// user event
-	if ((await this.triggerEvent('onClick', { frameContext: fc, event: e })) === false) return;
+	if ((await this.$.eventManager.triggerEvent('onClick', { frameContext: fc, event: e })) === false) return;
 	// plugin event
 	if ((await this._callPluginEventAsync('onClick', { frameContext: fc, event: e })) === false) return;
 
-	const componentInfo = this.component.get(eventTarget);
+	const componentInfo = this.$.component.get(eventTarget);
 	if (componentInfo) {
 		e.preventDefault();
-		this.component.select(componentInfo.target, componentInfo.pluginName);
+		this.$.component.select(componentInfo.target, componentInfo.pluginName);
 		return;
 	}
 
-	this.selection.init();
+	this.$.selection.init();
 
 	if (e.detail === 3) {
-		const range = this.selection.getRange();
-		if (this.format.isLine(range.endContainer) && range.endOffset === 0) {
-			this.selection.setRange(range.startContainer, range.startOffset, range.startContainer, range.startContainer.textContent.length);
+		const range = this.$.selection.getRange();
+		if (this.$.format.isLine(range.endContainer) && range.endOffset === 0) {
+			this.$.selection.setRange(range.startContainer, range.startOffset, range.startContainer, range.startContainer.textContent.length);
 		}
 	}
 
-	const selectionNode = this.selection.getNode();
-	const formatEl = this.format.getLine(selectionNode, null);
-	const rangeEl = this.format.getBlock(selectionNode, null);
+	const selectionNode = this.$.selection.getNode();
+	const formatEl = this.$.format.getLine(selectionNode, null);
+	const rangeEl = this.$.format.getBlock(selectionNode, null);
 	if (!formatEl && !dom.check.isNonEditable(eventTarget) && !dom.check.isList(rangeEl)) {
-		const range = this.selection.getRange();
-		if (this.format.getLine(range.startContainer) === this.format.getLine(range.endContainer)) {
+		const range = this.$.selection.getRange();
+		if (this.$.format.getLine(range.startContainer) === this.$.format.getLine(range.endContainer)) {
 			if (dom.check.isList(rangeEl)) {
 				e.preventDefault();
 				const prevLi = selectionNode.nextElementSibling;
 				const oLi = dom.utils.createElement('LI', null, selectionNode);
 				rangeEl.insertBefore(oLi, prevLi);
-				this.focusManager.focus();
+				this.$.focusManager.focus();
 			} else if (
 				!dom.check.isWysiwygFrame(selectionNode) &&
-				!this.component.is(selectionNode) &&
+				!this.$.component.is(selectionNode) &&
 				(!dom.check.isTableElements(selectionNode) || dom.check.isTableCell(selectionNode)) &&
-				this._setDefaultLine(this.format.isBlock(rangeEl) ? 'DIV' : this.options.get('defaultLine')) !== null
+				this._setDefaultLine(this.$.format.isBlock(rangeEl) ? 'DIV' : this.$.options.get('defaultLine')) !== null
 			) {
 				e.preventDefault();
-				this.focusManager.focus();
+				this.$.focusManager.focus();
 			}
 		}
 	}
 
 	// copy format
-	if (this.editor._onCopyFormatInfo) {
-		try {
-			const _styleNode = [...this.editor._onCopyFormatInfo];
-			const n = _styleNode.pop();
+	this.$.commandDispatcher._copyFormat();
 
-			this.inline.remove();
-
-			if (n) {
-				const insertedNode = this.inline.apply(n, { stylesToModify: null, nodesToRemove: [n.nodeName], strictRemove: false });
-				const { parent, inner } = this.nodeTransform.createNestedNode(_styleNode);
-				insertedNode.parentNode.insertBefore(parent, insertedNode);
-				inner.appendChild(insertedNode);
-
-				this.selection.setRange(insertedNode, dom.check.isZeroWidth(insertedNode) ? 1 : 0, insertedNode, 1);
-			}
-
-			if (this.options.get('copyFormatKeepOn')) return;
-
-			this.editor._onCopyFormatInitMethod();
-		} catch (err) {
-			console.warn('[SUNEDITOR.copyFormat.error] ', err);
-			if (!this.editor._onCopyFormatInitMethod?.()) {
-				this.editor._onCopyFormatInfo = null;
-				this.editor._onCopyFormatInitMethod = null;
-			}
-		}
-	}
-
-	if (this.editor.isBalloon || this.editor.isSubBalloon) this._w.setTimeout(this._toggleToolbarBalloon.bind(this), 0);
+	if (this.$.store.mode.isBalloon || this.$.store.mode.isSubBalloon) _w.setTimeout(this._toggleToolbarBalloon.bind(this), 0);
 }
 
 /**
@@ -169,7 +144,7 @@ export function OnMouseMove_wysiwyg(fc, e) {
 
 	// over component
 	if (_DragHandle.get('__overInfo') !== false) {
-		this.component.hoverSelect(eventTarget);
+		this.$.component.hoverSelect(eventTarget);
 	}
 
 	this._callPluginEvent('onMouseMove', { frameContext: fc, event: e });
@@ -182,7 +157,7 @@ export function OnMouseMove_wysiwyg(fc, e) {
  */
 export async function OnMouseLeave_wysiwyg(fc, e) {
 	// user event
-	if ((await this.triggerEvent('onMouseLeave', { frameContext: fc, event: e })) === false) return;
+	if ((await this.$.eventManager.triggerEvent('onMouseLeave', { frameContext: fc, event: e })) === false) return;
 	// plugin event
 	await this._callPluginEventAsync('onMouseLeave', { frameContext: fc, event: e });
 }

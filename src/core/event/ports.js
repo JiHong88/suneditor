@@ -1,18 +1,18 @@
 import { isMobile } from '../../helper/env';
 
 /**
- * @typedef {import('./eventManager').default} EventManagerInstanceType
+ * @typedef {import('./eventOrchestrator').default} EventManagerInstanceType
  */
 
 /**
- * @typedef {import('../class/selection').default} Selection
- * @typedef {import('../class/format').default} Format
- * @typedef {import('../class/listFormat').default} ListFormat
- * @typedef {import('../class/component').default} Component
- * @typedef {import('../class/html').default} Html
- * @typedef {import('../class/nodeTransform').default} NodeTransform
- * @typedef {import('../class/char').default} Char
- * @typedef {import('../class/menu').default} Menu
+ * @typedef {import('../logic/dom/selection').default} Selection
+ * @typedef {import('../logic/dom/format').default} Format
+ * @typedef {import('../logic/dom/listFormat').default} ListFormat
+ * @typedef {import('../logic/shell/component').default} Component
+ * @typedef {import('../logic/dom/html').default} Html
+ * @typedef {import('../logic/dom/nodeTransform').default} NodeTransform
+ * @typedef {import('../logic/dom/char').default} Char
+ * @typedef {import('../logic/panel/menu').default} Menu
  */
 
 /**
@@ -82,13 +82,13 @@ import { isMobile } from '../../helper/env';
  * @param {*} param1._styleNodes - Style nodes reference object
  */
 export function makePorts(inst, { _styleNodes }) {
-	const { selection, format, listFormat, component, html, nodeTransform, history, char, menu } = inst;
+	const { frameContext, ui, focusManager, selection, format, listFormat, component, html, nodeTransform, history, char, menu } = inst.$;
 
 	return {
 		// focusManager
 		focusManager: {
-			nativeFocus: () => inst.focusManager.nativeFocus(),
-			blur: () => inst.focusManager.blur(),
+			nativeFocus: () => focusManager.nativeFocus(),
+			blur: () => focusManager.blur(),
 		},
 
 		// === class ===
@@ -162,11 +162,11 @@ export function makePorts(inst, { _styleNodes }) {
 		 * @param {Range} range Range object
 		 */
 		enterScrollTo(range) {
-			inst.uiManager._iframeAutoHeight(inst.frameContext);
+			ui._iframeAutoHeight(frameContext);
 
 			// scroll to
 			if (isMobile && inst.scrollparents.length > 0) return;
-			inst.selection.scrollTo(range, { behavior: 'auto', block: 'nearest', inline: 'nearest' });
+			selection.scrollTo(range, { behavior: 'auto', block: 'nearest', inline: 'nearest' });
 		},
 		/**
 		 * @description Prevents the default behavior of the Enter key and refocuses the editor.
@@ -177,7 +177,7 @@ export function makePorts(inst, { _styleNodes }) {
 			if (!isMobile) return;
 
 			inst.__focusTemp.focus({ preventScroll: true });
-			inst.frameContext.get('wysiwyg').focus({ preventScroll: true });
+			frameContext.get('wysiwyg').focus({ preventScroll: true });
 		},
 	};
 }

@@ -58,8 +58,8 @@ export type KeyEventInfo = {
 export type ShortcutInfo = {
 	range: Range;
 	line: HTMLElement;
-	info: import('../core/class/shortcuts').ShortcutInfo;
+	info: import('../core/logic/shell/shortcuts').ShortcutInfo;
 	event: KeyboardEvent;
 	keyCode: string;
-	editor: SunEditor.Core;
+	$: SunEditor.Deps;
 };

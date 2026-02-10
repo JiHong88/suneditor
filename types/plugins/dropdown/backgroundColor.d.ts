@@ -33,10 +33,10 @@ export type BackgroundColorPluginOptions = {
 declare class BackgroundColor extends PluginDropdownFree {
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {BackgroundColorPluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(editor: SunEditor.Core, pluginOptions: BackgroundColorPluginOptions);
+	constructor(editor: SunEditor.Kernel, pluginOptions: BackgroundColorPluginOptions);
 	title: any;
 	colorPicker: ColorPicker;
 	active(element: HTMLElement | null, target: HTMLElement | null): boolean | void;

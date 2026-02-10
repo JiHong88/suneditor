@@ -11,14 +11,14 @@ import type {} from '../../typedef';
 export function CreateShortcuts(command: string, button: Element | null, values: Array<string>, keyMap: Map<string, any>, rc: any[], reverseKeys: Set<any>): void;
 /**
  * @typedef {Object} InitOptionsReturnType
- * @property {SunEditor.Options} o - Processed base options (Map containing {@link AllBaseOptions_constructor} keys)
+ * @property {Map<string, *>} o - Processed base options (Map containing {@link AllBaseOptions_constructor} keys)
  * @property {Object<string, string>} i - Icon set
  * @property {Object<string, string>} l - Language pack
  * @property {?string} v - Initial editor value
  * @property {SunEditor.UI.ButtonList} buttons - Toolbar button list (arrays for groups, strings for single buttons)
  * @property {?SunEditor.UI.ButtonList} subButtons - Sub-toolbar button list
  * @property {?Element} statusbarContainer - Container element for status bar (if specified)
- * @property {Map<string|null, SunEditor.FrameOptions>} frameMap - Map of frame-specific options (frame key => {@link SunEditor.FrameOptions})
+ * @property {Map<string|null, SunEditor.FrameOptions>} frameMap - Map of frame-specific options (frame key => "SunEditor.FrameOptions")
  */
 /**
  * @description Initialize options
@@ -40,12 +40,12 @@ export function InitOptions(
 ): InitOptionsReturnType;
 /**
  * @description Create a context object for the editor frame.
- * @param {Map<string, *>} targetOptions - editor.frameOptions
+ * @param {SunEditor.FrameOptions} targetOptions - editor.frameOptions
  * @param {HTMLElement} statusbar - statusbar element
  * @returns {{statusbar: HTMLElement, navigation: HTMLElement, charWrapper: HTMLElement, charCounter: HTMLElement}}
  */
 export function CreateStatusbar(
-	targetOptions: Map<string, any>,
+	targetOptions: SunEditor.FrameOptions,
 	statusbar: HTMLElement,
 ): {
 	statusbar: HTMLElement;
@@ -76,7 +76,7 @@ export function UpdateButton(
  * @description Create editor HTML
  * @param {Array} buttonList option.buttonList
  * @param {?Object<string, *>} plugins Plugins
- * @param {Map<string, *>} options options
+ * @param {Map<string, *>|SunEditor.Options} options options
  * @param {Object<string, string>} icons icons
  * @param {Object<string, string>} lang lang
  * @param {boolean} isUpdate Is update
@@ -87,7 +87,7 @@ export function CreateToolBar(
 	plugins: {
 		[x: string]: any;
 	} | null,
-	options: Map<string, any>,
+	options: Map<string, any> | SunEditor.Options,
 	icons: {
 		[x: string]: string;
 	},
@@ -109,7 +109,7 @@ export function CreateToolBar(
 	}>;
 };
 export default Constructor;
-export type AllBaseOptions_constructor = import('../config/options').AllBaseOptions;
+export type AllBaseOptions_constructor = import('../schema/options').AllBaseOptions;
 export type ConstructorReturnType = {
 	/**
 	 * - Editor context object
@@ -122,7 +122,7 @@ export type ConstructorReturnType = {
 	/**
 	 * - Processed editor options (Map)
 	 */
-	options: SunEditor.Options;
+	options: Map<string, any>;
 	/**
 	 * - Loaded plugins
 	 */
@@ -184,7 +184,7 @@ export type InitOptionsReturnType = {
 	/**
 	 * - Processed base options (Map containing {@link AllBaseOptions_constructor} keys)
 	 */
-	o: SunEditor.Options;
+	o: Map<string, any>;
 	/**
 	 * - Icon set
 	 */
@@ -214,25 +214,25 @@ export type InitOptionsReturnType = {
 	 */
 	statusbarContainer: Element | null;
 	/**
-	 * - Map of frame-specific options (frame key => {@link SunEditor.FrameOptions})
+	 * - Map of frame-specific options (frame key => "SunEditor.FrameOptions")
 	 */
 	frameMap: Map<string | null, SunEditor.FrameOptions>;
 };
 /**
- * @typedef {import('../config/options').AllBaseOptions} AllBaseOptions_constructor
+ * @typedef {import('../schema/options').AllBaseOptions} AllBaseOptions_constructor
  */
 /**
  * @typedef {Object} ConstructorReturnType
  * @property {SunEditor.Context} context - Editor context object
  * @property {HTMLElement} carrierWrapper - Carrier wrapper element
- * @property {SunEditor.Options} options - Processed editor options (Map)
+ * @property {Map<string, *>} options - Processed editor options (Map)
  * @property {Object<string, *>} plugins - Loaded plugins
  * @property {Object<string, string>} icons - Icon set
  * @property {Object<string, string>} lang - Language pack
  * @property {?string} value - Initial editor value
  * @property {?string} rootId - Root frame ID
  * @property {Array<string|null>} rootKeys - Array of frame keys
- * @property {Map<string|null, ReturnType<import('../config/frameContext').CreateFrameContext>>} frameRoots - Map of frame contexts
+ * @property {Map<string|null, ReturnType<import('../schema/frameContext').CreateFrameContext>>} frameRoots - Map of frame contexts
  * @property {Object<string, Array<HTMLElement>>} pluginCallButtons - Plugin toolbar buttons
  * @property {Array<HTMLElement>} responsiveButtons - Responsive toolbar buttons
  * @property {Object<string, Array<HTMLElement>>|[]} pluginCallButtons_sub - Sub-toolbar plugin buttons
@@ -252,4 +252,4 @@ declare function Constructor(
 	}>,
 	options: SunEditor.InitOptions,
 ): ConstructorReturnType;
-import { CreateFrameContext } from '../config/frameContext';
+import { CreateFrameContext } from '../schema/frameContext';

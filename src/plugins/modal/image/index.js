@@ -79,13 +79,13 @@ class Image_ extends PluginModal {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {ImagePluginOptions} pluginOptions
 	 */
 	constructor(editor, pluginOptions) {
 		// plugin basic properties
 		super(editor);
-		this.title = this.lang.image;
+		this.title = this.$.lang.image;
 		this.icon = 'image';
 
 		this.pluginOptions = {
@@ -110,7 +110,7 @@ class Image_ extends PluginModal {
 
 		// create HTML
 		const sizeUnit = this.pluginOptions.percentageOnlySize ? SIZE_UNIT.PERCENTAGE : SIZE_UNIT.PIXEL;
-		const modalEl = CreateHTML_modal(editor, this.pluginOptions);
+		const modalEl = CreateHTML_modal(this.$, this.pluginOptions);
 		const ctrlAs = this.pluginOptions.useFormatType ? 'as' : '';
 		const figureControls =
 			pluginOptions.controls ||
@@ -126,20 +126,20 @@ class Image_ extends PluginModal {
 		if (!figureControls.some((subArray) => subArray.includes('align'))) this.alignForm.style.display = 'none';
 
 		// modules
-		const Link = this.plugins.link ? this.plugins.link.pluginOptions : {};
-		this.anchor = new ModalAnchorEditor(this.editor, modalEl.html, {
+		const Link = this.$.plugins.link ? this.$.plugins.link.pluginOptions : {};
+		this.anchor = new ModalAnchorEditor(this.$, modalEl.html, {
 			...Link,
 			textToDisplay: false,
 			title: true,
 		});
 
-		this.modal = new Modal(this, modalEl.html);
+		this.modal = new Modal(this, this.$, modalEl.html);
 
-		this.figure = new Figure(this, figureControls, {
+		this.figure = new Figure(this, this.$, figureControls, {
 			sizeUnit: sizeUnit,
 		});
 
-		this.fileManager = new FileManager(this, {
+		this.fileManager = new FileManager(this, this.$, {
 			query: 'img',
 			loadEventName: 'onImageLoad',
 			actionEventName: 'onImageAction',
@@ -170,19 +170,19 @@ class Image_ extends PluginModal {
 		this.uploadService = new ImageUploadService(this);
 
 		// init
-		this.eventManager.addEvent(modalEl.tabs, 'click', this.#OpenTab.bind(this));
-		if (this.imgInputFile) this.eventManager.addEvent(modalEl.fileRemoveBtn, 'click', this.#RemoveSelectedFiles.bind(this));
-		if (this.imgUrlFile) this.eventManager.addEvent(this.imgUrlFile, 'input', this.#OnLinkPreview.bind(this));
-		if (this.imgInputFile && this.imgUrlFile) this.eventManager.addEvent(this.imgInputFile, 'change', this.#OnfileInputChange.bind(this));
+		this.$.eventManager.addEvent(modalEl.tabs, 'click', this.#OpenTab.bind(this));
+		if (this.imgInputFile) this.$.eventManager.addEvent(modalEl.fileRemoveBtn, 'click', this.#RemoveSelectedFiles.bind(this));
+		if (this.imgUrlFile) this.$.eventManager.addEvent(this.imgUrlFile, 'input', this.#OnLinkPreview.bind(this));
+		if (this.imgInputFile && this.imgUrlFile) this.$.eventManager.addEvent(this.imgInputFile, 'change', this.#OnfileInputChange.bind(this));
 
 		const galleryButton = modalEl.galleryButton;
-		if (galleryButton) this.eventManager.addEvent(galleryButton, 'click', this.#OpenGallery.bind(this));
+		if (galleryButton) this.$.eventManager.addEvent(galleryButton, 'click', this.#OpenGallery.bind(this));
 
 		if (this.pluginOptions.useFormatType) {
 			this.as = this.pluginOptions.defaultFormatType;
 			this.asBlock = modalEl.asBlock;
 			this.asInline = modalEl.asInline;
-			this.eventManager.addEvent([this.asBlock, this.asInline], 'click', this.#OnClickAsButton.bind(this));
+			this.$.eventManager.addEvent([this.asBlock, this.asInline], 'click', this.#OnClickAsButton.bind(this));
 		}
 	}
 
@@ -230,7 +230,7 @@ class Image_ extends PluginModal {
 		if (!/^image/.test(file.type)) return;
 
 		this.submitFile([file]);
-		this.focusManager.focus();
+		this.$.focusManager.focus();
 	}
 
 	/**
@@ -257,7 +257,7 @@ class Image_ extends PluginModal {
 
 		if (this.modal.isUpdate) {
 			this.#fixTagStructure();
-			this.history.push(false);
+			this.$.history.push(false);
 		}
 
 		if (this.imgInputFile && this.imgInputFile.files.length > 0) {
@@ -323,14 +323,14 @@ class Image_ extends PluginModal {
 		const focusEl = container.previousElementSibling || container.nextElementSibling;
 		const emptyDiv = container.parentNode;
 
-		const message = await this.triggerEvent('onImageDeleteBefore', { element: targetEl, container, align: this.#align, alt: this.altText.value, url: this.#linkValue });
+		const message = await this.$.eventManager.triggerEvent('onImageDeleteBefore', { element: targetEl, container, align: this.#align, alt: this.altText.value, url: this.#linkValue });
 		if (message === false) return;
 
 		dom.utils.removeItem(container);
 		this.modalInit();
 
-		if (emptyDiv !== this.frameContext.get('wysiwyg')) {
-			this.nodeTransform.removeAllParents(
+		if (emptyDiv !== this.$.frameContext.get('wysiwyg')) {
+			this.$.nodeTransform.removeAllParents(
 				emptyDiv,
 				function (current) {
 					return current.childNodes.length === 0;
@@ -340,8 +340,8 @@ class Image_ extends PluginModal {
 		}
 
 		// focus
-		this.focusManager.focusEdge(focusEl);
-		this.history.push(false);
+		this.$.focusManager.focusEdge(focusEl);
+		this.$.history.push(false);
 	}
 
 	/**
@@ -362,14 +362,14 @@ class Image_ extends PluginModal {
 			s = f.size;
 			if (singleSizeLimit > 0 && s > singleSizeLimit) {
 				const err = '[SUNEDITOR.imageUpload.fail] Size of uploadable single file: ' + singleSizeLimit / 1000 + 'KB';
-				const message = await this.triggerEvent('onImageUploadError', {
+				const message = await this.$.eventManager.triggerEvent('onImageUploadError', {
 					error: err,
 					limitSize: singleSizeLimit,
 					uploadSize: s,
 					file: f,
 				});
 
-				this.uiManager.alertOpen(message === NO_EVENT ? err : message || err, 'error');
+				this.$.ui.alertOpen(message === NO_EVENT ? err : message || err, 'error');
 
 				return false;
 			}
@@ -382,14 +382,14 @@ class Image_ extends PluginModal {
 		const currentSize = this.fileManager.getSize();
 		if (limitSize > 0 && fileSize + currentSize > limitSize) {
 			const err = '[SUNEDITOR.imageUpload.fail] Size of uploadable total images: ' + limitSize / 1000 + 'KB';
-			const message = await this.triggerEvent('onImageUploadError', {
+			const message = await this.$.eventManager.triggerEvent('onImageUploadError', {
 				error: err,
 				limitSize,
 				currentSize,
 				uploadSize: fileSize,
 			});
 
-			this.uiManager.alertOpen(message === NO_EVENT ? err : message || err, 'error');
+			this.$.ui.alertOpen(message === NO_EVENT ? err : message || err, 'error');
 
 			return false;
 		}
@@ -400,7 +400,7 @@ class Image_ extends PluginModal {
 			uploadCallback(infos);
 		}.bind(this, this.uploadService.serverUpload.bind(this.uploadService), imgInfo);
 
-		const result = await this.triggerEvent('onImageUploadBefore', {
+		const result = await this.$.eventManager.triggerEvent('onImageUploadBefore', {
 			info: imgInfo,
 			handler,
 		});
@@ -432,7 +432,7 @@ class Image_ extends PluginModal {
 			uploadCallback(infos);
 		}.bind(this, this.uploadService.urlUpload.bind(this.uploadService), imgInfo);
 
-		const result = await this.triggerEvent('onImageUploadBefore', {
+		const result = await this.$.eventManager.triggerEvent('onImageUploadBefore', {
 			info: imgInfo,
 			handler,
 		});
@@ -471,7 +471,7 @@ class Image_ extends PluginModal {
 
 		// caption
 		if (this.captionCheckEl.checked) {
-			this.#caption = Figure.CreateCaption(cover, this.lang.caption);
+			this.#caption = Figure.CreateCaption(cover, this.$.lang.caption);
 		}
 
 		this.#element = oImg;
@@ -489,7 +489,7 @@ class Image_ extends PluginModal {
 
 		this.setState('produceIndex', this.state.produceIndex + 1);
 		oImg.onload = this.#OnloadImg.bind(this, oImg, this.#svgDefaultSize, container);
-		this.component.insert(container, { scrollTo: isLast ? true : false, insertBehavior: isLast ? null : 'line' });
+		this.$.component.insert(container, { scrollTo: isLast ? true : false, insertBehavior: isLast ? null : 'line' });
 	}
 
 	/**
@@ -524,7 +524,7 @@ class Image_ extends PluginModal {
 
 		this.setState('produceIndex', this.state.produceIndex + 1);
 		oImg.onload = this.#OnloadImg.bind(this, oImg, this.#svgDefaultSize, container);
-		this.component.insert(container, { scrollTo: isLast ? true : false, insertBehavior: isLast ? null : 'line' });
+		this.$.component.insert(container, { scrollTo: isLast ? true : false, insertBehavior: isLast ? null : 'line' });
 	}
 
 	/**
@@ -565,7 +565,7 @@ class Image_ extends PluginModal {
 		this.sizeService.ready(figureInfo, dw, dh);
 
 		if (this.pluginOptions.useFormatType) {
-			this.#activeAsInline(this.component.isInline(figureInfo.container));
+			this.#activeAsInline(this.$.component.isInline(figureInfo.container));
 		}
 
 		return { w: dw, h: dh };
@@ -648,7 +648,7 @@ class Image_ extends PluginModal {
 		let modifiedCaption = false;
 		if (this.captionCheckEl.checked) {
 			if (!this.#caption) {
-				this.#caption = Figure.CreateCaption(cover, this.lang.caption);
+				this.#caption = Figure.CreateCaption(cover, this.$.lang.caption);
 				modifiedCaption = true;
 			}
 		} else {
@@ -726,7 +726,7 @@ class Image_ extends PluginModal {
 			isNewContainer = true;
 			imageEl = this.#element.cloneNode(true);
 			const figureInfo =
-				this.pluginOptions.useFormatType && width !== 'auto' && (/^span$/i.test(this.#element.parentElement?.nodeName) || this.format.isLine(this.#element.parentElement))
+				this.pluginOptions.useFormatType && width !== 'auto' && (/^span$/i.test(this.#element.parentElement?.nodeName) || this.$.format.isLine(this.#element.parentElement))
 					? Figure.CreateInlineContainer(imageEl, 'se-image-container')
 					: Figure.CreateContainer(imageEl, 'se-image-container');
 			cover = figureInfo.cover;
@@ -743,7 +743,7 @@ class Image_ extends PluginModal {
 		if (!inlineCover) {
 			if (this.captionCheckEl.checked) {
 				if (!this.#caption || isNewContainer) {
-					this.#caption = Figure.CreateCaption(cover, this.lang.caption);
+					this.#caption = Figure.CreateCaption(cover, this.$.lang.caption);
 					modifiedCaption = true;
 				}
 			} else {
@@ -893,8 +893,8 @@ class Image_ extends PluginModal {
 		const value = e.target.value.trim();
 		this.#linkValue = this.previewSrc.textContent = !value
 			? ''
-			: this.options.get('defaultUrlProtocol') && !value.includes('://') && value.indexOf('#') !== 0
-				? this.options.get('defaultUrlProtocol') + value
+			: this.$.options.get('defaultUrlProtocol') && !value.includes('://') && value.indexOf('#') !== 0
+				? this.$.options.get('defaultUrlProtocol') + value
 				: !value.includes('://')
 					? '/' + value
 					: value;
@@ -914,7 +914,7 @@ class Image_ extends PluginModal {
 	}
 
 	#OpenGallery() {
-		this.plugins.imageGallery.open(this.#SetUrlInput.bind(this));
+		this.$.plugins.imageGallery.open(this.#SetUrlInput.bind(this));
 	}
 
 	#SetUrlInput(target) {
@@ -931,10 +931,10 @@ class Image_ extends PluginModal {
 		if (oImg.offsetWidth === 0) this.sizeService.applySize(_svgDefaultSize, '');
 
 		if (this.state.produceIndex === 0) {
-			this.component.applyInsertBehavior(container, null, this.pluginOptions.insertBehavior || this.options.get('componentInsertBehavior'));
+			this.$.component.applyInsertBehavior(container, null, this.pluginOptions.insertBehavior || this.$.options.get('componentInsertBehavior'));
 
-			this.uiManager._iframeAutoHeight(this.frameContext);
-			this.history.push(false);
+			this.$.ui._iframeAutoHeight(this.$.frameContext);
+			this.$.history.push(false);
 		}
 	}
 }

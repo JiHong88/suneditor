@@ -3,7 +3,7 @@
  */
 
 import { CreateContext } from '../../../../src/core/config/context';
-// ContextUtil moved to contextManager service
+// ContextUtil moved to contextProvider service
 
 describe('Core Config - Context', () => {
     let mockDOM;
@@ -165,5 +165,5 @@ describe('Core Config - Context', () => {
     });
 
     // Note: ContextUtil and Integration tests have been moved to
-    // test/unit/core/services/contextManager.spec.js
+    // test/unit/core/config/contextProvider.spec.js
 });

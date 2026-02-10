@@ -6,6 +6,7 @@ import { CreateSplitMenu } from '../render/table.menu';
 
 export class TableCellService {
 	#main;
+	#$;
 	#state;
 
 	/**
@@ -20,6 +21,7 @@ export class TableCellService {
 	 */
 	constructor(main, { mergeButton, unmergeButton, splitButton, openCellMenuFunc, closeCellMenuFunc }) {
 		this.#main = main;
+		this.#$ = main.$;
 		this.#state = main.state;
 
 		this.mergeButton = mergeButton;
@@ -27,8 +29,8 @@ export class TableCellService {
 		this.splitButton = splitButton;
 
 		// members - SelectMenu - split
-		const splitMenu = CreateSplitMenu(this.#main.lang);
-		this.selectMenu_split = new SelectMenu(main.editor, { checkList: false, position: 'bottom-center', openMethod: openCellMenuFunc, closeMethod: closeCellMenuFunc });
+		const splitMenu = CreateSplitMenu(this.#$.lang);
+		this.selectMenu_split = new SelectMenu(this.#$, { checkList: false, position: 'bottom-center', openMethod: openCellMenuFunc, closeMethod: closeCellMenuFunc });
 		this.selectMenu_split.on(this.splitButton, this._OnSplitCells.bind(this));
 		this.selectMenu_split.create(splitMenu.items, splitMenu.menus);
 	}
@@ -76,7 +78,7 @@ export class TableCellService {
 
 			ch = cell.children;
 			for (let c = 0, cLen = ch.length; c < cLen; c++) {
-				if (this.#main.format.isLine(ch[c]) && dom.check.isZeroWidth(ch[c].textContent)) {
+				if (this.#$.format.isLine(ch[c]) && dom.check.isZeroWidth(ch[c].textContent)) {
 					dom.utils.removeItem(ch[c]);
 				}
 			}
@@ -447,7 +449,7 @@ export class TableCellService {
 		this.#selectionService.focusCellEdge(currentCell);
 
 		this.#selectionService.deleteStyleSelectedCells();
-		this.#main.history.push(false);
+		this.#$.history.push(false);
 
 		this.#main._setController(currentCell);
 		this.#main.setState('selectedCell', currentCell);

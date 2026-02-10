@@ -9,28 +9,31 @@ class List extends PluginDropdown {
 	static key = 'list';
 	static className = 'se-icon-flip-rtl';
 
+	#listItems;
+	#listIcons;
+
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 */
 	constructor(editor) {
 		// plugin bisic properties
 		super(editor);
-		this.title = this.lang.list;
+		this.title = this.$.lang.list;
 		this.icon = 'list_numbered';
 
 		// create HTML
-		const menu = CreateHTML(editor);
+		const menu = CreateHTML(this.$);
 
 		// members
-		this.listItems = menu.querySelectorAll('li button');
-		this.icons = {
-			bulleted: editor.icons.list_bulleted,
-			numbered: editor.icons.list_numbered,
+		this.#listItems = menu.querySelectorAll('li button');
+		this.#listIcons = {
+			bulleted: this.$.icons.list_bulleted,
+			numbered: this.$.icons.list_numbered,
 		};
 
 		// init
-		this.menu.initDropdownTarget(List, menu);
+		this.$.menu.initDropdownTarget(List, menu);
 	}
 
 	/**
@@ -46,16 +49,16 @@ class List extends PluginDropdown {
 			dom.utils.addClass(target, 'active');
 
 			if (/^ul$/.test(nodeName)) {
-				dom.utils.changeElement(icon, this.icons.bulleted);
+				dom.utils.changeElement(icon, this.#listIcons.bulleted);
 			} else {
-				dom.utils.changeElement(icon, this.icons.numbered);
+				dom.utils.changeElement(icon, this.#listIcons.numbered);
 			}
 
 			return true;
 		}
 
 		target.removeAttribute('data-focus');
-		dom.utils.changeElement(icon, this.icons.number);
+		dom.utils.changeElement(icon, this.#listIcons.numbered);
 		dom.utils.removeClass(target, 'active');
 
 		return false;
@@ -67,7 +70,7 @@ class List extends PluginDropdown {
 	 */
 	on(target) {
 		const currentList = target.getAttribute('data-focus') || '';
-		const list = this.listItems;
+		const list = this.#listItems;
 		for (let i = 0, len = list.length; i < len; i++) {
 			if (currentList === list[i].getAttribute('data-command')) {
 				dom.utils.addClass(list[i], 'active');
@@ -84,14 +87,18 @@ class List extends PluginDropdown {
 	action(target) {
 		const command = target.getAttribute('data-command');
 		const type = target.getAttribute('data-value') || '';
-		const range = this.listFormat.apply(`${command}:${type}`, null, false);
-		if (range) this.selection.setRange(range.sc, range.so, range.ec, range.eo);
+		const range = this.$.listFormat.apply(`${command}:${type}`, null, false);
+		if (range) this.$.selection.setRange(range.sc, range.so, range.ec, range.eo);
 
-		this.menu.dropdownOff();
-		this.history.push(false);
+		this.$.menu.dropdownOff();
+		this.$.history.push(false);
 	}
 }
 
+/**
+ * @param {SunEditor.Deps} $ - Kernel dependencies
+ * @returns {HTMLElement}
+ */
 function CreateHTML({ lang, icons }) {
 	const html = /*html*/ `
 	<div class="se-list-inner">

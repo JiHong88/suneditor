@@ -1,8 +1,8 @@
 const fs = require('fs');
 const path = require('path');
-const { DEFAULTS } = require('../../src/core/config/options.js');
+const { DEFAULTS } = require('../../src/core/schema/options.js');
 
-const targetPath = path.join(__dirname, '../../types/core/config/options.d.ts');
+const targetPath = path.join(__dirname, '../../types/core/schema/options.d.ts');
 const original = fs.readFileSync(targetPath, 'utf-8');
 
 function toTSValue(val) {

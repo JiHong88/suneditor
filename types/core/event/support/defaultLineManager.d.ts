@@ -7,9 +7,9 @@ import type {} from '../../../typedef';
 export default class DefaultLineManager {
 	/**
 	 * @constructor
-	 * @param {SunEditor.Instance} editor
+	 * @param {import('../eventOrchestrator').default} inst
 	 */
-	constructor(editor: SunEditor.Instance);
+	constructor({ $ }: import('../eventOrchestrator').default);
 	/**
 	 * @description Executes the default line creation logic.
 	 * - If no formatName is provided, it uses the 'defaultLine' option (usually 'P').

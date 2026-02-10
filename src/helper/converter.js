@@ -465,12 +465,12 @@ export function addUrlQuery(url, query) {
 }
 
 /**
- * @typedef {import('../core/config/options').OptionStyleResult} OptionStyleResult_converter
+ * @typedef {import('../core/schema/options').OptionStyleResult} OptionStyleResult_converter
  */
 
 /**
  * @description Converts options-related styles and returns them for each frame.
- * @param {Map<string, *>} fo editor.frameOptions
+ * @param {SunEditor.FrameOptions} fo editor.frameOptions
  * @param {string} cssText Style string
  * @returns {OptionStyleResult_converter}
  */
@@ -563,7 +563,7 @@ export function _setIframeStyleLinks(linkNames) {
 
 /**
  * @description When iframe height options is "auto" return "<style>" tag that required.
- * @param {string} frameHeight height
+ * @param {string|number} frameHeight height
  * @returns {string} "<style>...</style>"
  */
 export function _setAutoHeightStyle(frameHeight) {

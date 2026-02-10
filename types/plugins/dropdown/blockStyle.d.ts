@@ -1,14 +1,23 @@
 import type {} from '../../typedef';
 export default BlockStyle;
+export type BlockStyleItem = {
+	tag: string;
+	command: 'line' | 'br-line' | 'block';
+	name?: string;
+	class?: string;
+};
 export type BlockStylePluginOptions = {
 	/**
 	 * - Format list
 	 */
-	items?: Array<'p' | 'div' | 'blockquote' | 'pre' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | string>;
+	items?: Array<'p' | 'div' | 'blockquote' | 'pre' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | string | BlockStyleItem>;
 };
 /**
+ * @typedef {{tag: string, command: "line"|"br-line"|"block", name?: string, class?: string}} BlockStyleItem
+ */
+/**
  * @typedef {Object} BlockStylePluginOptions
- * @property {Array<"p"|"div"|"blockquote"|"pre"|"h1"|"h2"|"h3"|"h4"|"h5"|"h6"|string>} [items] - Format list
+ * @property {Array<"p"|"div"|"blockquote"|"pre"|"h1"|"h2"|"h3"|"h4"|"h5"|"h6"|string|BlockStyleItem>} [items] - Format list
  */
 /**
  * @class
@@ -17,10 +26,10 @@ export type BlockStylePluginOptions = {
 declare class BlockStyle extends PluginDropdown {
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {BlockStylePluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(editor: SunEditor.Core, pluginOptions: BlockStylePluginOptions);
+	constructor(editor: SunEditor.Kernel, pluginOptions: BlockStylePluginOptions);
 	title: any;
 	inner: string;
 	formatList: NodeListOf<Element>;

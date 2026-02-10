@@ -1,11 +1,11 @@
 /**
- * @fileoverview Unit tests for core/services/contextManager.js
+ * @fileoverview Unit tests for core/config/contextProvider.js
  */
 
-import ContextManager from '../../../../src/core/services/contextManager';
+import ContextProvider from '../../../../src/core/config/contextProvider';
 
-describe('ContextManager', () => {
-	let contextManager;
+describe('ContextProvider', () => {
+	let contextProvider;
 	let mockEditor;
 	let mockProduct;
 	let mockDOM;
@@ -54,50 +54,50 @@ describe('ContextManager', () => {
 			frameRoots: frameRoots
 		};
 
-		contextManager = new ContextManager(mockEditor, mockProduct);
+		contextProvider = new ContextProvider(mockEditor, mockProduct);
 	});
 
 	describe('constructor', () => {
-		it('should create a ContextManager instance', () => {
-			expect(contextManager).toBeInstanceOf(ContextManager);
+		it('should create a ContextProvider instance', () => {
+			expect(contextProvider).toBeInstanceOf(ContextProvider);
 		});
 
 		it('should have context, frameContext, and frameRoots getters', () => {
-			expect(contextManager.context).toBeDefined();
-			expect(contextManager.frameContext).toBeDefined();
-			expect(contextManager.frameRoots).toBeDefined();
+			expect(contextProvider.context).toBeDefined();
+			expect(contextProvider.frameContext).toBeDefined();
+			expect(contextProvider.frameRoots).toBeDefined();
 		});
 	});
 
 	describe('context (ContextMap)', () => {
 		it('should get DOM elements correctly', () => {
-			expect(contextManager.context.get('menuTray')).toBe(mockDOM.menuTray);
-			expect(contextManager.context.get('toolbar_main')).toBe(mockDOM.toolbar);
-			expect(contextManager.context.get('toolbar_sub_main')).toBe(mockDOM.subbar);
-			expect(contextManager.context.get('nonexistent')).toBeUndefined();
+			expect(contextProvider.context.get('menuTray')).toBe(mockDOM.menuTray);
+			expect(contextProvider.context.get('toolbar_main')).toBe(mockDOM.toolbar);
+			expect(contextProvider.context.get('toolbar_sub_main')).toBe(mockDOM.subbar);
+			expect(contextProvider.context.get('nonexistent')).toBeUndefined();
 		});
 
 		it('should set DOM elements correctly', () => {
 			const newElement = document.createElement('div');
-			contextManager.context.set('customElement', newElement);
-			expect(contextManager.context.get('customElement')).toBe(newElement);
+			contextProvider.context.set('customElement', newElement);
+			expect(contextProvider.context.get('customElement')).toBe(newElement);
 		});
 
 		it('should check existence correctly', () => {
-			expect(contextManager.context.has('menuTray')).toBe(true);
-			expect(contextManager.context.has('toolbar_main')).toBe(true);
-			expect(contextManager.context.has('nonexistent')).toBe(false);
+			expect(contextProvider.context.has('menuTray')).toBe(true);
+			expect(contextProvider.context.has('toolbar_main')).toBe(true);
+			expect(contextProvider.context.has('nonexistent')).toBe(false);
 		});
 
 		it('should delete elements correctly', () => {
-			expect(contextManager.context.has('menuTray')).toBe(true);
-			contextManager.context.delete('menuTray');
-			expect(contextManager.context.has('menuTray')).toBe(false);
-			expect(contextManager.context.get('menuTray')).toBeUndefined();
+			expect(contextProvider.context.has('menuTray')).toBe(true);
+			contextProvider.context.delete('menuTray');
+			expect(contextProvider.context.has('menuTray')).toBe(false);
+			expect(contextProvider.context.get('menuTray')).toBeUndefined();
 		});
 
 		it('should get all elements as object', () => {
-			const all = contextManager.context.getAll();
+			const all = contextProvider.context.getAll();
 			expect(typeof all).toBe('object');
 			expect(all.menuTray).toBe(mockDOM.menuTray);
 			expect(all.toolbar_main).toBe(mockDOM.toolbar);
@@ -105,70 +105,70 @@ describe('ContextManager', () => {
 		});
 
 		it('should clear all elements', () => {
-			expect(contextManager.context.has('menuTray')).toBe(true);
-			contextManager.context.clear();
-			expect(contextManager.context.getAll()).toEqual({});
-			expect(contextManager.context.has('menuTray')).toBe(false);
+			expect(contextProvider.context.has('menuTray')).toBe(true);
+			contextProvider.context.clear();
+			expect(contextProvider.context.getAll()).toEqual({});
+			expect(contextProvider.context.has('menuTray')).toBe(false);
 		});
 
 		it('should handle DOM element replacement', () => {
-			const originalToolbar = contextManager.context.get('toolbar_main');
+			const originalToolbar = contextProvider.context.get('toolbar_main');
 			const newToolbar = document.createElement('div');
 
-			contextManager.context.set('toolbar_main', newToolbar);
-			expect(contextManager.context.get('toolbar_main')).toBe(newToolbar);
-			expect(contextManager.context.get('toolbar_main')).not.toBe(originalToolbar);
+			contextProvider.context.set('toolbar_main', newToolbar);
+			expect(contextProvider.context.get('toolbar_main')).toBe(newToolbar);
+			expect(contextProvider.context.get('toolbar_main')).not.toBe(originalToolbar);
 		});
 
 		it('should maintain reference integrity', () => {
-			const menuTray = contextManager.context.get('menuTray');
-			const menuTray2 = contextManager.context.get('menuTray');
+			const menuTray = contextProvider.context.get('menuTray');
+			const menuTray2 = contextProvider.context.get('menuTray');
 			expect(menuTray).toBe(menuTray2);
 			expect(menuTray).toBe(mockDOM.menuTray);
 		});
 
 		it('should return size correctly', () => {
-			expect(contextManager.context.size()).toBe(3);
-			contextManager.context.set('newKey', document.createElement('div'));
-			expect(contextManager.context.size()).toBe(4);
+			expect(contextProvider.context.size()).toBe(3);
+			contextProvider.context.set('newKey', document.createElement('div'));
+			expect(contextProvider.context.size()).toBe(4);
 		});
 	});
 
 	describe('frameContext (FrameContextMap)', () => {
 		beforeEach(() => {
 			// Initialize frameContext with some values
-			contextManager.frameContext.set('wysiwyg', mockDOM.wysiwyg);
-			contextManager.frameContext.set('wrapper', mockDOM.wrapper);
-			contextManager.frameContext.set('topArea', mockDOM.topArea);
+			contextProvider.frameContext.set('wysiwyg', mockDOM.wysiwyg);
+			contextProvider.frameContext.set('wrapper', mockDOM.wrapper);
+			contextProvider.frameContext.set('topArea', mockDOM.topArea);
 		});
 
 		it('should get values correctly', () => {
-			expect(contextManager.frameContext.get('wysiwyg')).toBe(mockDOM.wysiwyg);
-			expect(contextManager.frameContext.get('wrapper')).toBe(mockDOM.wrapper);
-			expect(contextManager.frameContext.get('topArea')).toBe(mockDOM.topArea);
-			expect(contextManager.frameContext.get('nonexistent')).toBeUndefined();
+			expect(contextProvider.frameContext.get('wysiwyg')).toBe(mockDOM.wysiwyg);
+			expect(contextProvider.frameContext.get('wrapper')).toBe(mockDOM.wrapper);
+			expect(contextProvider.frameContext.get('topArea')).toBe(mockDOM.topArea);
+			expect(contextProvider.frameContext.get('nonexistent')).toBeUndefined();
 		});
 
 		it('should set values correctly', () => {
 			const newElement = document.createElement('div');
-			contextManager.frameContext.set('customFrame', newElement);
-			expect(contextManager.frameContext.get('customFrame')).toBe(newElement);
+			contextProvider.frameContext.set('customFrame', newElement);
+			expect(contextProvider.frameContext.get('customFrame')).toBe(newElement);
 		});
 
 		it('should check existence correctly', () => {
-			expect(contextManager.frameContext.has('wysiwyg')).toBe(true);
-			expect(contextManager.frameContext.has('wrapper')).toBe(true);
-			expect(contextManager.frameContext.has('nonexistent')).toBe(false);
+			expect(contextProvider.frameContext.has('wysiwyg')).toBe(true);
+			expect(contextProvider.frameContext.has('wrapper')).toBe(true);
+			expect(contextProvider.frameContext.has('nonexistent')).toBe(false);
 		});
 
 		it('should delete elements correctly', () => {
-			expect(contextManager.frameContext.has('wysiwyg')).toBe(true);
-			contextManager.frameContext.delete('wysiwyg');
-			expect(contextManager.frameContext.has('wysiwyg')).toBe(false);
+			expect(contextProvider.frameContext.has('wysiwyg')).toBe(true);
+			contextProvider.frameContext.delete('wysiwyg');
+			expect(contextProvider.frameContext.has('wysiwyg')).toBe(false);
 		});
 
 		it('should get all values as object', () => {
-			const all = contextManager.frameContext.getAll();
+			const all = contextProvider.frameContext.getAll();
 			expect(typeof all).toBe('object');
 			expect(all.wysiwyg).toBe(mockDOM.wysiwyg);
 			expect(all.wrapper).toBe(mockDOM.wrapper);
@@ -178,42 +178,42 @@ describe('ContextManager', () => {
 			const newFrameContext = new Map([
 				['newElement', document.createElement('div')]
 			]);
-			contextManager.frameContext.reset(newFrameContext);
+			contextProvider.frameContext.reset(newFrameContext);
 
-			expect(contextManager.frameContext.has('newElement')).toBe(true);
-			expect(contextManager.frameContext.has('wysiwyg')).toBe(false);
+			expect(contextProvider.frameContext.has('newElement')).toBe(true);
+			expect(contextProvider.frameContext.has('wysiwyg')).toBe(false);
 		});
 
 		it('should clear all elements', () => {
-			expect(contextManager.frameContext.has('wysiwyg')).toBe(true);
-			contextManager.frameContext.clear();
-			expect(contextManager.frameContext.getAll()).toEqual({});
+			expect(contextProvider.frameContext.has('wysiwyg')).toBe(true);
+			contextProvider.frameContext.clear();
+			expect(contextProvider.frameContext.getAll()).toEqual({});
 		});
 
 		it('should return size correctly', () => {
-			expect(contextManager.frameContext.size()).toBe(3);
-			contextManager.frameContext.set('newKey', document.createElement('div'));
-			expect(contextManager.frameContext.size()).toBe(4);
+			expect(contextProvider.frameContext.size()).toBe(3);
+			contextProvider.frameContext.set('newKey', document.createElement('div'));
+			expect(contextProvider.frameContext.size()).toBe(4);
 		});
 	});
 
 	describe('frameRoots', () => {
 		it('should return the frameRoots map', () => {
-			expect(contextManager.frameRoots).toBeInstanceOf(Map);
-			expect(contextManager.frameRoots.has('main')).toBe(true);
+			expect(contextProvider.frameRoots).toBeInstanceOf(Map);
+			expect(contextProvider.frameRoots.has('main')).toBe(true);
 		});
 	});
 
 	describe('applyToRoots', () => {
 		it('should iterate over all frame roots', () => {
 			const callback = jest.fn();
-			contextManager.applyToRoots(callback);
+			contextProvider.applyToRoots(callback);
 			expect(callback).toHaveBeenCalledTimes(1);
 		});
 
 		it('should pass frame context to callback', () => {
 			let receivedContext = null;
-			contextManager.applyToRoots((fc) => {
+			contextProvider.applyToRoots((fc) => {
 				receivedContext = fc;
 			});
 			expect(receivedContext).toBeInstanceOf(Map);
@@ -224,8 +224,8 @@ describe('ContextManager', () => {
 	describe('reset', () => {
 		it('should reset frameContext with new map', () => {
 			const newMap = new Map([['testKey', 'testValue']]);
-			contextManager.reset(newMap);
-			expect(contextManager.frameContext.get('testKey')).toBe('testValue');
+			contextProvider.reset(newMap);
+			expect(contextProvider.frameContext.get('testKey')).toBe('testValue');
 		});
 	});
 
@@ -233,29 +233,29 @@ describe('ContextManager', () => {
 		it('should work with context and frameContext independently', () => {
 			// Set context
 			const contextElement = document.createElement('div');
-			contextManager.context.set('testContext', contextElement);
+			contextProvider.context.set('testContext', contextElement);
 
 			// Set frameContext
 			const frameElement = document.createElement('div');
-			contextManager.frameContext.set('testFrame', frameElement);
+			contextProvider.frameContext.set('testFrame', frameElement);
 
-			expect(contextManager.context.get('testContext')).toBe(contextElement);
-			expect(contextManager.frameContext.get('testFrame')).toBe(frameElement);
+			expect(contextProvider.context.get('testContext')).toBe(contextElement);
+			expect(contextProvider.frameContext.get('testFrame')).toBe(frameElement);
 
 			// Should not interfere with each other
-			expect(contextManager.context.has('testFrame')).toBe(false);
-			expect(contextManager.frameContext.has('testContext')).toBe(false);
+			expect(contextProvider.context.has('testFrame')).toBe(false);
+			expect(contextProvider.frameContext.has('testContext')).toBe(false);
 		});
 
 		it('should handle dynamic context updates', () => {
 			// Initially should not have certain elements
-			expect(contextManager.context.has('dynamicElement')).toBe(false);
+			expect(contextProvider.context.has('dynamicElement')).toBe(false);
 
 			// Add elements dynamically
 			const dynamicElement = document.createElement('div');
-			contextManager.context.set('dynamicElement', dynamicElement);
+			contextProvider.context.set('dynamicElement', dynamicElement);
 
-			expect(contextManager.context.get('dynamicElement')).toBe(dynamicElement);
+			expect(contextProvider.context.get('dynamicElement')).toBe(dynamicElement);
 		});
 	});
 });

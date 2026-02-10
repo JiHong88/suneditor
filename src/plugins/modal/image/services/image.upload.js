@@ -8,6 +8,7 @@ const { NO_EVENT } = env;
  */
 export class ImageUploadService {
 	#main;
+	#$;
 	#pluginOptions;
 
 	#resizing;
@@ -17,6 +18,7 @@ export class ImageUploadService {
 	 */
 	constructor(main) {
 		this.#main = main;
+		this.#$ = main.$;
 		this.#pluginOptions = main.pluginOptions;
 
 		this.#resizing = this.#pluginOptions.canResize;
@@ -84,7 +86,7 @@ export class ImageUploadService {
 	#updateSrc(src, element, file) {
 		element.src = src;
 		this.#main.fileManager.setFileData(element, file);
-		this.#main.component.select(element, this.#main.constructor['key']);
+		this.#$.component.select(element, this.#main.constructor['key']);
 	}
 
 	/**
@@ -121,7 +123,7 @@ export class ImageUploadService {
 			const filesLen = this.#main.modal.isUpdate ? 1 : files.length;
 
 			if (filesLen === 0) {
-				this.#main.uiManager.hideLoading();
+				this.#$.ui.hideLoading();
 				console.warn('[SUNEDITOR.image.base64.fail] cause : No applicable files');
 				return;
 			}
@@ -145,14 +147,14 @@ export class ImageUploadService {
 
 					if (--this._base64RenderIndex === 0) {
 						loadCallback(update, filesStack, updateElement, anchor, inputWidth, inputHeight, align, alt);
-						this.#main.ui.hideLoading();
+						this.#$.ui.hideLoading();
 					}
 				}.bind(this, renderFunc, reader, isUpdate, element, file, i);
 
 				reader.readAsDataURL(file);
 			}
 		} catch (error) {
-			this.#main.uiManager.hideLoading();
+			this.#$.ui.hideLoading();
 			throw Error(`[SUNEDITOR.plugins.image._setBase64.fail] ${error.message}`);
 		}
 	}
@@ -188,9 +190,9 @@ export class ImageUploadService {
 	 * @returns {Promise<void>}
 	 */
 	async #error(response) {
-		const message = await this.#main.triggerEvent('onImageUploadError', { error: response });
+		const message = await this.#$.eventManager.triggerEvent('onImageUploadError', { error: response });
 		const err = message === NO_EVENT ? response.errorMessage : message || response.errorMessage;
-		this.#main.uiManager.alertOpen(err, 'error');
+		this.#$.ui.alertOpen(err, 'error');
 		console.error('[SUNEDITOR.plugin.image.error]', err);
 	}
 
@@ -200,7 +202,7 @@ export class ImageUploadService {
 	 * @param {XMLHttpRequest} xmlHttp - The XMLHttpRequest object.
 	 */
 	async #UploadCallBack(info, xmlHttp) {
-		if ((await this.#main.triggerEvent('imageUploadHandler', { xmlHttp, info })) === NO_EVENT) {
+		if ((await this.#$.eventManager.triggerEvent('imageUploadHandler', { xmlHttp, info })) === NO_EVENT) {
 			const response = JSON.parse(xmlHttp.responseText);
 			if (response.errorMessage) {
 				this.#error(response);

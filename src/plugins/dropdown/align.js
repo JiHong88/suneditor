@@ -15,30 +15,30 @@ class Align extends PluginDropdown {
 	static className = '';
 
 	/**
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {AlignPluginOptions} pluginOptions - Plugin options
 	 */
 	constructor(editor, pluginOptions) {
 		super(editor);
-		this.title = this.lang.align;
-		this.icon = this.options.get('_rtl') ? 'align_right' : 'align_left';
+		this.title = this.$.lang.align;
+		this.icon = this.$.options.get('_rtl') ? 'align_right' : 'align_left';
 
 		// create HTML
-		const menu = CreateHTML(editor, pluginOptions.items);
+		const menu = CreateHTML(this.$, pluginOptions.items);
 		const commandArea = (this._itemMenu = menu.querySelector('ul'));
 
 		// members
 		this.defaultDir = '';
 		this.alignIcons = {
-			justify: editor.icons.align_justify,
-			left: editor.icons.align_left,
-			right: editor.icons.align_right,
-			center: editor.icons.align_center,
+			justify: this.$.icons.align_justify,
+			left: this.$.icons.align_left,
+			right: this.$.icons.align_right,
+			center: this.$.icons.align_center,
 		};
 		this.alignList = commandArea.querySelectorAll('li button');
 
 		// init
-		this.menu.initDropdownTarget(Align, menu);
+		this.$.menu.initDropdownTarget(Align, menu);
 	}
 
 	/**
@@ -51,7 +51,7 @@ class Align extends PluginDropdown {
 		if (!element) {
 			dom.utils.changeElement(targetChild, this.alignIcons[this.defaultDir]);
 			target.removeAttribute('data-focus');
-		} else if (this.format.isLine(element)) {
+		} else if (this.$.format.isLine(element)) {
 			const textAlign = element.style.textAlign;
 			if (textAlign) {
 				dom.utils.changeElement(targetChild, this.alignIcons[textAlign] || this.alignIcons[this.defaultDir]);
@@ -91,15 +91,15 @@ class Align extends PluginDropdown {
 		if (!value) return;
 
 		const defaultDir = this.defaultDir;
-		const selectedFormsts = this.format.getLines();
+		const selectedFormsts = this.$.format.getLines();
 		for (let i = 0, len = selectedFormsts.length; i < len; i++) {
 			dom.utils.setStyle(selectedFormsts[i], 'textAlign', value === defaultDir ? '' : value);
 		}
 
-		this.editor.effectNode = null;
-		this.menu.dropdownOff();
-		this.focusManager.focus();
-		this.history.push(false);
+		this.$.store.set('_lastSelectionNode', null);
+		this.$.menu.dropdownOff();
+		this.$.focusManager.focus();
+		this.$.history.push(false);
 	}
 
 	/**
@@ -130,12 +130,17 @@ class Align extends PluginDropdown {
 	}
 
 	#findDefaultDir() {
-		const align = this.frameContext.get('wwComputedStyle').getPropertyValue('text-align');
+		const align = this.$.frameContext.get('wwComputedStyle').getPropertyValue('text-align');
 		const valid = ['left', 'center', 'right', 'justify'];
-		return valid.includes(align) ? align : this.options.get('_rtl') ? 'right' : 'left';
+		return valid.includes(align) ? align : this.$.options.get('_rtl') ? 'right' : 'left';
 	}
 }
 
+/**
+ * @param {SunEditor.Deps} $ - Kernel dependencies
+ * @param {string[]} [items] - Align items list
+ * @returns {HTMLElement}
+ */
 function CreateHTML({ lang, icons, options }, items) {
 	const alignItems = Array.isArray(items) ? items : options.get('_rtl') ? ['right', 'center', 'left', 'justify'] : ['left', 'center', 'right', 'justify'];
 

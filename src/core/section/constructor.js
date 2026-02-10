@@ -1,28 +1,28 @@
 import _icons from '../../assets/icons/defaultIcons';
 import _defaultLang from '../../langs/en';
-import { CreateContext } from '../config/context';
-import { CreateFrameContext } from '../config/frameContext';
+import { CreateContext } from '../schema/context';
+import { CreateFrameContext } from '../schema/frameContext';
 import { dom, numbers, converter, env } from '../../helper';
-import { DEFAULTS } from '../config/options';
+import { DEFAULTS } from '../schema/options';
 
 const _d = env._d;
 
 /**
- * @typedef {import('../config/options').AllBaseOptions} AllBaseOptions_constructor
+ * @typedef {import('../schema/options').AllBaseOptions} AllBaseOptions_constructor
  */
 
 /**
  * @typedef {Object} ConstructorReturnType
  * @property {SunEditor.Context} context - Editor context object
  * @property {HTMLElement} carrierWrapper - Carrier wrapper element
- * @property {SunEditor.Options} options - Processed editor options (Map)
+ * @property {Map<string, *>} options - Processed editor options (Map)
  * @property {Object<string, *>} plugins - Loaded plugins
  * @property {Object<string, string>} icons - Icon set
  * @property {Object<string, string>} lang - Language pack
  * @property {?string} value - Initial editor value
  * @property {?string} rootId - Root frame ID
  * @property {Array<string|null>} rootKeys - Array of frame keys
- * @property {Map<string|null, ReturnType<import('../config/frameContext').CreateFrameContext>>} frameRoots - Map of frame contexts
+ * @property {Map<string|null, ReturnType<import('../schema/frameContext').CreateFrameContext>>} frameRoots - Map of frame contexts
  * @property {Object<string, Array<HTMLElement>>} pluginCallButtons - Plugin toolbar buttons
  * @property {Array<HTMLElement>} responsiveButtons - Responsive toolbar buttons
  * @property {Object<string, Array<HTMLElement>>|[]} pluginCallButtons_sub - Sub-toolbar plugin buttons
@@ -36,7 +36,7 @@ const _d = env._d;
  * @returns {ConstructorReturnType} - SunEditor instance with context, options, and DOM elements.
  */
 function Constructor(editorTargets, options) {
-	if (typeof options !== 'object') options = {};
+	if (typeof options !== 'object') options = /** @type {SunEditor.InitOptions} */ ({});
 
 	/** --- Plugins ------------------------------------------------------------------------------------------ */
 	const plugins = {};
@@ -354,14 +354,14 @@ function _mergeObject(a, b) {
 
 /**
  * @typedef {Object} InitOptionsReturnType
- * @property {SunEditor.Options} o - Processed base options (Map containing {@link AllBaseOptions_constructor} keys)
+ * @property {Map<string, *>} o - Processed base options (Map containing {@link AllBaseOptions_constructor} keys)
  * @property {Object<string, string>} i - Icon set
  * @property {Object<string, string>} l - Language pack
  * @property {?string} v - Initial editor value
  * @property {SunEditor.UI.ButtonList} buttons - Toolbar button list (arrays for groups, strings for single buttons)
  * @property {?SunEditor.UI.ButtonList} subButtons - Sub-toolbar button list
  * @property {?Element} statusbarContainer - Container element for status bar (if specified)
- * @property {Map<string|null, SunEditor.FrameOptions>} frameMap - Map of frame-specific options (frame key => {@link SunEditor.FrameOptions})
+ * @property {Map<string|null, SunEditor.FrameOptions>} frameMap - Map of frame-specific options (frame key => "SunEditor.FrameOptions")
  */
 
 /**
@@ -603,7 +603,7 @@ export function InitOptions(options, editorTargets, plugins) {
 	/** root options */
 	const frameMap = new Map();
 	for (let i = 0, len = editorTargets.length; i < len; i++) {
-		frameMap.set(editorTargets[i].key, InitFrameOptions(editorTargets[i].options || {}, options));
+		frameMap.set(editorTargets[i].key, InitFrameOptions(editorTargets[i].options || /** @type {SunEditor.InitFrameOptions} */ ({}), options));
 	}
 
 	/** Key actions */
@@ -725,7 +725,7 @@ export function InitOptions(options, editorTargets, plugins) {
 
 /**
  * @description Create a context object for the editor frame.
- * @param {Map<string, *>} targetOptions - editor.frameOptions
+ * @param {SunEditor.FrameOptions} targetOptions - editor.frameOptions
  * @param {HTMLElement} statusbar - statusbar element
  * @returns {{statusbar: HTMLElement, navigation: HTMLElement, charWrapper: HTMLElement, charCounter: HTMLElement}}
  */
@@ -780,7 +780,7 @@ export function CreateStatusbar(targetOptions, statusbar) {
  * @returns {SunEditor.FrameOptions} Processed frame options Map
  */
 function InitFrameOptions(o, origin) {
-	const fo = new Map();
+	const fo = /** @type {SunEditor.FrameOptions} */ (/** @type {unknown} */ (new Map()));
 
 	fo.set('_origin', o);
 	const barContainer = origin.statusbar_container;
@@ -813,12 +813,12 @@ function InitFrameOptions(o, origin) {
 	fo.set('placeholder', placeholder);
 	fo.set('editableFrameAttributes', { spellcheck: 'false', ...editableFrameAttributes });
 	// styles
-	fo.set('width', width ? (numbers.is(width) ? width + 'px' : width) : '100%');
-	fo.set('minWidth', (numbers.is(minWidth) ? minWidth + 'px' : minWidth) || '');
-	fo.set('maxWidth', (numbers.is(maxWidth) ? maxWidth + 'px' : maxWidth) || '');
-	fo.set('height', height ? (numbers.is(height) ? height + 'px' : height) : 'auto');
-	fo.set('minHeight', (numbers.is(minHeight) ? minHeight + 'px' : minHeight) || '');
-	fo.set('maxHeight', (numbers.is(maxHeight) ? maxHeight + 'px' : maxHeight) || '');
+	fo.set('width', width ? String(numbers.is(width) ? width + 'px' : width) : '100%');
+	fo.set('minWidth', String(numbers.is(minWidth) ? minWidth + 'px' : minWidth) || '');
+	fo.set('maxWidth', String(numbers.is(maxWidth) ? maxWidth + 'px' : maxWidth) || '');
+	fo.set('height', height ? String(numbers.is(height) ? height + 'px' : height) : 'auto');
+	fo.set('minHeight', String(numbers.is(minHeight) ? minHeight + 'px' : minHeight) || '');
+	fo.set('maxHeight', String(numbers.is(maxHeight) ? maxHeight + 'px' : maxHeight) || '');
 	fo.set('editorStyle', editorStyle);
 	fo.set('_defaultStyles', converter._setDefaultOptionStyle(fo, typeof editorStyle === 'string' ? editorStyle : ''));
 	// iframe
@@ -845,7 +845,7 @@ function InitFrameOptions(o, origin) {
  * @param {string} key - The key of the editor frame
  * @param {Map<string, *>} options - options
  * @param {HTMLElement} topDiv - top div
- * @param {Map<string, *>} targetOptions - editor.frameOptions
+ * @param {SunEditor.FrameOptions} targetOptions - editor.frameOptions
  * @returns {{bottomBar: ReturnType<CreateStatusbar>, wysiwygFrame: HTMLElement, codeView: HTMLElement, placeholder: HTMLElement}}
  */
 function _initTargetElements(key, options, topDiv, targetOptions) {
@@ -1035,10 +1035,9 @@ function _createWhitelist(o) {
 
 /**
  * @description Suneditor's Default button list
- * @param {Map<string, *>} options options
+ * @param {boolean} isRTL rtl
  */
-function _defaultButtons(options, icons, lang) {
-	const isRTL = options.get('_rtl');
+function _defaultButtons(isRTL, icons, lang) {
 	return {
 		bold: ['', lang.bold, 'bold', '', icons.bold],
 		underline: ['', lang.underline, 'underline', '', icons.underline],
@@ -1212,7 +1211,7 @@ export function UpdateButton(element, plugin, icons, lang) {
  * @description Create editor HTML
  * @param {Array} buttonList option.buttonList
  * @param {?Object<string, *>} plugins Plugins
- * @param {Map<string, *>} options options
+ * @param {Map<string, *>|SunEditor.Options} options options
  * @param {Object<string, string>} icons icons
  * @param {Object<string, string>} lang lang
  * @param {boolean} isUpdate Is update
@@ -1221,7 +1220,7 @@ export function UpdateButton(element, plugin, icons, lang) {
 export function CreateToolBar(buttonList, plugins, options, icons, lang, isUpdate) {
 	/** create button list */
 	buttonList = JSON.parse(JSON.stringify(buttonList));
-	const defaultButtonList = _defaultButtons(options, icons, lang);
+	const defaultButtonList = _defaultButtons(options.get('_rtl'), icons, lang);
 	/** @type {Object<string, Array<HTMLElement>>} */
 	const pluginCallButtons = {};
 	const responsiveButtons = [];

@@ -4,18 +4,18 @@ export type TextStylePluginOptions = {
 	/**
 	 * - Text style item list
 	 */
-	items: Array<
+	items?: Array<
 		| string
 		| {
 				name: string;
 				class: string;
-				tag: string;
+				tag?: string;
 		  }
 	>;
 };
 /**
  * @typedef {Object} TextStylePluginOptions
- * @property {Array<string|{name: string, class: string, tag: string}>} items - Text style item list
+ * @property {Array<string|{name: string, class: string, tag?: string}>} [items] - Text style item list
  */
 /**
  * @class
@@ -24,10 +24,10 @@ export type TextStylePluginOptions = {
 declare class TextStyle extends PluginDropdown {
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {TextStylePluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(editor: SunEditor.Core, pluginOptions: TextStylePluginOptions);
+	constructor(editor: SunEditor.Kernel, pluginOptions: TextStylePluginOptions);
 	title: any;
 	styleList: NodeListOf<Element>;
 }

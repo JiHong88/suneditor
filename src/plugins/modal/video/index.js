@@ -114,13 +114,13 @@ class Video extends PluginModal {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {VideoPluginOptions} pluginOptions
 	 */
 	constructor(editor, pluginOptions) {
 		// plugin basic properties
 		super(editor);
-		this.title = this.lang.video;
+		this.title = this.$.lang.video;
 		this.icon = 'video';
 
 		// define plugin options
@@ -150,7 +150,7 @@ class Video extends PluginModal {
 
 		// create HTML
 		const sizeUnit = this.pluginOptions.percentageOnlySize ? '%' : 'px';
-		const modalEl = CreateHTML_modal(editor, this.pluginOptions);
+		const modalEl = CreateHTML_modal(this.$, this.pluginOptions);
 		const figureControls = pluginOptions.controls || (!this.pluginOptions.canResize ? [['align', 'edit', 'copy', 'remove']] : [['resize_auto,75,50', 'align', 'edit', 'revert', 'copy', 'remove']]);
 
 		// show align
@@ -158,9 +158,9 @@ class Video extends PluginModal {
 
 		// modules
 		const defaultRatio = this.pluginOptions.defaultRatio * 100 + '%';
-		this.modal = new Modal(this, modalEl.html);
-		this.figure = new Figure(this, figureControls, { sizeUnit: sizeUnit, autoRatio: { current: defaultRatio, default: defaultRatio } });
-		this.fileManager = new FileManager(this, {
+		this.modal = new Modal(this, this.$, modalEl.html);
+		this.figure = new Figure(this, this.$, figureControls, { sizeUnit: sizeUnit, autoRatio: { current: defaultRatio, default: defaultRatio } });
+		this.fileManager = new FileManager(this, this.$, {
 			query: 'iframe, video',
 			loadEventName: 'onVideoLoad',
 			actionEventName: 'onVideoAction',
@@ -215,11 +215,11 @@ class Video extends PluginModal {
 
 		// init
 		const galleryButton = modalEl.galleryButton;
-		if (galleryButton) this.eventManager.addEvent(galleryButton, 'click', this.#OpenGallery.bind(this));
+		if (galleryButton) this.$.eventManager.addEvent(galleryButton, 'click', this.#OpenGallery.bind(this));
 
-		if (this.videoInputFile) this.eventManager.addEvent(modalEl.fileRemoveBtn, 'click', this.#RemoveSelectedFiles.bind(this));
-		if (this.videoUrlFile) this.eventManager.addEvent(this.videoUrlFile, 'input', this.#OnLinkPreview.bind(this));
-		if (this.videoInputFile && this.videoUrlFile) this.eventManager.addEvent(this.videoInputFile, 'change', this.#OnfileInputChange.bind(this));
+		if (this.videoInputFile) this.$.eventManager.addEvent(modalEl.fileRemoveBtn, 'click', this.#RemoveSelectedFiles.bind(this));
+		if (this.videoUrlFile) this.$.eventManager.addEvent(this.videoUrlFile, 'input', this.#OnLinkPreview.bind(this));
+		if (this.videoInputFile && this.videoUrlFile) this.$.eventManager.addEvent(this.videoInputFile, 'change', this.#OnfileInputChange.bind(this));
 	}
 
 	/**
@@ -256,7 +256,7 @@ class Video extends PluginModal {
 				if (figureInfo && figureInfo.container && figureInfo.cover) return;
 
 				this.#ready(element, true);
-				const line = this.format.getLine(element);
+				const line = this.$.format.getLine(element);
 				if (line) this.#align = line.style.textAlign || line.style.float;
 
 				this.#fixTagStructure(element);
@@ -272,7 +272,7 @@ class Video extends PluginModal {
 		if (!/^video/.test(file.type)) return;
 
 		this.submitFile([file]);
-		this.focusManager.focus();
+		this.$.focusManager.focus();
 	}
 
 	/**
@@ -303,7 +303,7 @@ class Video extends PluginModal {
 			result = await this.submitURL(this.#linkValue);
 		}
 
-		if (result) _w.setTimeout(this.component.select.bind(this.component, this.#element, Video.key), 0);
+		if (result) _w.setTimeout(this.$.component.select.bind(this.$.component, this.#element, Video.key), 0);
 
 		return result;
 	}
@@ -354,14 +354,14 @@ class Video extends PluginModal {
 		const focusEl = container.previousElementSibling || container.nextElementSibling;
 		const emptyDiv = container.parentNode;
 
-		const message = await this.triggerEvent('onVideoDeleteBefore', { element: targetEl, container, align: this.#align, url: this.#linkValue });
+		const message = await this.$.eventManager.triggerEvent('onVideoDeleteBefore', { element: targetEl, container, align: this.#align, url: this.#linkValue });
 		if (message === false) return;
 
 		dom.utils.removeItem(container);
 		this.modalInit();
 
-		if (emptyDiv !== this.frameContext.get('wysiwyg')) {
-			this.nodeTransform.removeAllParents(
+		if (emptyDiv !== this.$.frameContext.get('wysiwyg')) {
+			this.$.nodeTransform.removeAllParents(
 				emptyDiv,
 				function (current) {
 					return current.childNodes.length === 0;
@@ -371,8 +371,8 @@ class Video extends PluginModal {
 		}
 
 		// focus
-		this.focusManager.focusEdge(focusEl);
-		this.history.push(false);
+		this.$.focusManager.focusEdge(focusEl);
+		this.$.history.push(false);
 	}
 
 	/**
@@ -507,12 +507,12 @@ class Video extends PluginModal {
 		this.fileManager.setFileData(oFrame, file);
 
 		if (!isUpdate) {
-			this.component.insert(container, { scrollTo: isLast ? true : false, insertBehavior: isLast ? this.pluginOptions.insertBehavior : 'line' });
+			this.$.component.insert(container, { scrollTo: isLast ? true : false, insertBehavior: isLast ? this.pluginOptions.insertBehavior : 'line' });
 			return;
 		}
 
 		if (!this.#resizing || !resolved.isChanged || !this.figure.isVertical) this.figure.setTransform(oFrame, width, height, 0);
-		this.history.push(false);
+		this.$.history.push(false);
 	}
 
 	/**
@@ -569,14 +569,14 @@ class Video extends PluginModal {
 			s = f.size;
 			if (singleSizeLimit > 0 && s > singleSizeLimit) {
 				const err = '[SUNEDITOR.videoUpload.fail] Size of uploadable single file: ' + singleSizeLimit / 1000 + 'KB';
-				const message = await this.triggerEvent('onVideoUploadError', {
+				const message = await this.$.eventManager.triggerEvent('onVideoUploadError', {
 					error: err,
 					limitSize: singleSizeLimit,
 					uploadSize: s,
 					file: f,
 				});
 
-				this.uiManager.alertOpen(message === NO_EVENT ? err : message || err, 'error');
+				this.$.ui.alertOpen(message === NO_EVENT ? err : message || err, 'error');
 
 				return false;
 			}
@@ -589,9 +589,9 @@ class Video extends PluginModal {
 		const currentSize = this.fileManager.getSize();
 		if (limitSize > 0 && fileSize + currentSize > limitSize) {
 			const err = '[SUNEDITOR.videoUpload.fail] Size of uploadable total videos: ' + limitSize / 1000 + 'KB';
-			const message = await this.triggerEvent('onVideoUploadError', { error: err, limitSize, currentSize, uploadSize: fileSize });
+			const message = await this.$.eventManager.triggerEvent('onVideoUploadError', { error: err, limitSize, currentSize, uploadSize: fileSize });
 
-			this.uiManager.alertOpen(message === NO_EVENT ? err : message || err, 'error');
+			this.$.ui.alertOpen(message === NO_EVENT ? err : message || err, 'error');
 
 			return false;
 		}
@@ -607,7 +607,7 @@ class Video extends PluginModal {
 			uploadCallback(infos, infos.files);
 		}.bind(this, this.uploadService.serverUpload.bind(this.uploadService), videoInfo);
 
-		const result = await this.triggerEvent('onVideoUploadBefore', {
+		const result = await this.$.eventManager.triggerEvent('onVideoUploadBefore', {
 			info: videoInfo,
 			handler,
 		});
@@ -647,7 +647,7 @@ class Video extends PluginModal {
 			this.create(this[/^iframe$/i.test(infos.process?.tag) ? 'createIframeTag' : 'createVideoTag'](), infos.url, infos.inputWidth, infos.inputHeight, infos.align, infos.isUpdate, infos.files, true);
 		}.bind(this, videoInfo);
 
-		const result = await this.triggerEvent('onVideoUploadBefore', {
+		const result = await this.$.eventManager.triggerEvent('onVideoUploadBefore', {
 			info: videoInfo,
 			handler,
 		});
@@ -744,7 +744,7 @@ class Video extends PluginModal {
 		this.sizeService.applySize(width, height);
 
 		// align
-		const format = this.format.getLine(prevFrame);
+		const format = this.$.format.getLine(prevFrame);
 		if (format) this.#align = format.style.textAlign || format.style.float;
 		this.figure.setAlign(cloneFrame, this.#align);
 
@@ -812,8 +812,8 @@ class Video extends PluginModal {
 		} else {
 			this.#linkValue = this.previewSrc.textContent = !value
 				? ''
-				: this.options.get('defaultUrlProtocol') && !value.includes('://') && value.indexOf('#') !== 0
-					? this.options.get('defaultUrlProtocol') + value
+				: this.$.options.get('defaultUrlProtocol') && !value.includes('://') && value.indexOf('#') !== 0
+					? this.$.options.get('defaultUrlProtocol') + value
 					: !value.includes('://')
 						? '/' + value
 						: value;
@@ -824,7 +824,7 @@ class Video extends PluginModal {
 	 * @description Opens the video gallery.
 	 */
 	#OpenGallery() {
-		this.plugins.videoGallery.open(this.#SetUrlInput.bind(this));
+		this.$.plugins.videoGallery.open(this.#SetUrlInput.bind(this));
 	}
 
 	/**

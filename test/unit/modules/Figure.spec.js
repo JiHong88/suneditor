@@ -41,7 +41,7 @@ jest.mock('../../../src/modules/ui/_DragHandle.js', () => ({
 jest.mock('../../../src/editorInjector/_core.js', () => {
     return jest.fn().mockImplementation(function(editor) {
         this.editor = editor;
-        this.contextManager = editor.contextManager;
+        this.contextProvider = editor.contextProvider;
         this.frameContext = editor.frameContext;
         this.triggerEvent = editor.triggerEvent || jest.fn();
         this.icons = editor.icons;
@@ -187,7 +187,7 @@ describe('Modules - Figure', () => {
                 removeGlobalEvent: jest.fn()
             },
             triggerEvent: jest.fn(),
-            contextManager: {
+            contextProvider: {
                 applyToRoots: jest.fn((callback) => {
                     const mockContext = new Map();
                     mockContext.set('wrapper', {

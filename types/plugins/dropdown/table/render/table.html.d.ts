@@ -6,19 +6,18 @@ import type {} from '../../../../typedef';
 export function CreateHTML(): HTMLDivElement;
 /**
  * @description Creates the table controller HTML.
- * @param {Object} options - Options containing language and icons.
- * @param {Object} options.lang - Language object.
- * @param {Object} options.icons - Icons object.
+ * @param {SunEditor.Deps} $ - Kernel dependencies
  * @returns {HTMLDivElement}
  */
-export function CreateHTML_controller_table({ lang, icons }: { lang: any; icons: any }): HTMLDivElement;
+export function CreateHTML_controller_table({ lang, icons }: SunEditor.Deps): HTMLDivElement;
 /**
- * @param {SunEditor.Core} editor
+ * @param {SunEditor.Deps} $ - Kernel dependencies
+ * @param {boolean} cellControllerTop - Whether to position cell controller on top
  * @returns {{ html: HTMLElement, splitButton: HTMLButtonElement, columnButton: HTMLButtonElement, rowButton: HTMLButtonElement, mergeButton: HTMLButtonElement, unmergeButton: HTMLButtonElement }}
  */
 export function CreateHTML_controller_cell(
-	{ lang, icons }: SunEditor.Core,
-	cellControllerTop: any,
+	{ lang, icons }: SunEditor.Deps,
+	cellControllerTop: boolean,
 ): {
 	html: HTMLElement;
 	splitButton: HTMLButtonElement;
@@ -47,10 +46,10 @@ export function CreateHTML_controller_cell(
  * @property {HTMLButtonElement} font_italic
  * @property {HTMLButtonElement} font_strike
  *
- * @param {SunEditor.Core} editor - Editor instance
+ * @param {SunEditor.Deps} $ - Kernel deps
  * @returns {TableCtrlProps}
  */
-export function CreateHTML_controller_properties({ lang, icons, options }: SunEditor.Core): TableCtrlProps;
+export function CreateHTML_controller_properties({ lang, icons, options }: SunEditor.Deps): TableCtrlProps;
 export type TableCtrlProps = {
 	html: HTMLElement;
 	controller_props_title: HTMLElement;

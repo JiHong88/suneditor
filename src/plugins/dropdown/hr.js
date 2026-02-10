@@ -3,7 +3,7 @@ import { dom } from '../../helper';
 
 /**
  * @typedef {Object} HRPluginOptions
- * @property {Array<{name: string, class: string}>} [items] - HR list
+ * @property {Array<{name: string, class: string, style?: string}>} [items] - HR list
  */
 
 /**
@@ -24,23 +24,23 @@ class HR extends PluginDropdown {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {HRPluginOptions} pluginOptions - Plugin options
 	 */
 	constructor(editor, pluginOptions) {
 		// plugin bisic properties
 		super(editor);
-		this.title = this.lang.horizontalLine;
+		this.title = this.$.lang.horizontalLine;
 		this.icon = 'horizontal_line';
 
 		// create HTML
-		const HRMenus = CreateHTML(editor, pluginOptions.items);
+		const HRMenus = CreateHTML(this.$, pluginOptions.items);
 
 		// members
 		this.list = HRMenus.querySelectorAll('button');
 
 		// init
-		this.menu.initDropdownTarget(HR, HRMenus);
+		this.$.menu.initDropdownTarget(HR, HRMenus);
 	}
 
 	/**
@@ -70,8 +70,8 @@ class HR extends PluginDropdown {
 		dom.utils.removeItem(target);
 
 		// focus
-		this.focusManager.focusEdge(focusEl);
-		this.history.push(false);
+		this.$.focusManager.focusEdge(focusEl);
+		this.$.history.push(false);
 	}
 
 	/**
@@ -79,10 +79,10 @@ class HR extends PluginDropdown {
 	 * @type {SunEditor.Hook.Core.Shortcut}
 	 */
 	shortcut({ line, range }) {
-		const newLine = this.nodeTransform.split(range.endContainer, range.endOffset, 0);
+		const newLine = this.$.nodeTransform.split(range.endContainer, range.endOffset, 0);
 		this.submit('__se__solid');
 		dom.utils.removeItem(line);
-		this.selection.setRange(newLine, 0, newLine, 0);
+		this.$.selection.setRange(newLine, 0, newLine, 0);
 	}
 
 	/**
@@ -91,9 +91,9 @@ class HR extends PluginDropdown {
 	 */
 	action(target) {
 		const hr = this.submit(target.firstElementChild.className);
-		const line = this.format.addLine(hr);
-		this.selection.setRange(line, 1, line, 1);
-		this.menu.dropdownOff();
+		const line = this.$.format.addLine(hr);
+		this.$.selection.setRange(line, 1, line, 1);
+		this.$.menu.dropdownOff();
 	}
 
 	/**
@@ -102,25 +102,33 @@ class HR extends PluginDropdown {
 	 */
 	submit(className) {
 		const hr = dom.utils.createElement('hr', { class: className });
-		this.focusManager.focus();
-		this.component.insert(hr, { insertBehavior: 'line' });
+		this.$.focusManager.focus();
+		this.$.component.insert(hr, { insertBehavior: 'line' });
 		return hr;
 	}
 }
 
+/**
+ * @param {SunEditor.Deps} $ - Kernel dependencies
+ * @param {Array<{name: string, class: string, style?: string}>} [HRItems] - HR style items
+ * @returns {HTMLElement}
+ */
 function CreateHTML({ lang }, HRItems) {
 	const items = HRItems || [
 		{
 			name: lang.hr_solid,
 			class: '__se__solid',
+			style: null,
 		},
 		{
 			name: lang.hr_dashed,
 			class: '__se__dashed',
+			style: null,
 		},
 		{
 			name: lang.hr_dotted,
 			class: '__se__dotted',
+			style: null,
 		},
 	];
 

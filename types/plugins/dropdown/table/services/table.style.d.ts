@@ -17,7 +17,6 @@ export class TableStyleService {
 			controller_table: HTMLElement;
 		},
 	);
-	editor: import('../../../../core/editor').default;
 	sliderType: string;
 	/** @type {HTMLButtonElement} */
 	resizeButton: HTMLButtonElement;

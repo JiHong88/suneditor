@@ -14,29 +14,31 @@ class List_numbered extends PluginCommand {
 	static key = 'list_numbered';
 	static className = 'se-icon-flip-rtl';
 
+	#listItems;
+
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 */
 	constructor(editor) {
 		// plugin bisic properties
 		super(editor);
-		this.title = this.lang.numberedList;
+		this.title = this.$.lang.numberedList;
 		this.icon = 'list_numbered';
 		this.afterItem = dom.utils.createElement(
 			'button',
 			{ class: 'se-btn se-tooltip se-sub-arrow-btn', 'data-command': List_numbered.key, 'data-type': 'dropdown' },
-			`${this.icons.arrow_down}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.numberedList}</span></span>`,
+			`${this.$.icons.arrow_down}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.$.lang.numberedList}</span></span>`,
 		);
 
 		// create HTML
 		const menu = CreateHTML();
 
 		// members
-		this.listItems = menu.querySelectorAll('li button ol');
+		this.#listItems = menu.querySelectorAll('li button ol');
 
 		// init
-		this.menu.initDropdownTarget({ key: List_numbered.key, type: 'dropdown' }, menu);
+		this.$.menu.initDropdownTarget({ key: List_numbered.key, type: 'dropdown' }, menu);
 	}
 
 	/**
@@ -58,7 +60,7 @@ class List_numbered extends PluginCommand {
 	 * @type {PluginCommand['action']}
 	 */
 	action(target) {
-		const el = this.format.getBlock(this.selection.getNode());
+		const el = this.$.format.getBlock(this.$.selection.getNode());
 		const type = target?.querySelector('ol')?.style.listStyleType;
 
 		if (dom.check.isList(el) && type) {
@@ -67,7 +69,7 @@ class List_numbered extends PluginCommand {
 			this.submit(type);
 		}
 
-		this.menu.dropdownOff();
+		this.$.menu.dropdownOff();
 	}
 
 	/**
@@ -75,8 +77,8 @@ class List_numbered extends PluginCommand {
 	 * @type {PluginDropdown['on']}
 	 */
 	on() {
-		const list = this.listItems;
-		const el = this.format.getBlock(this.selection.getNode());
+		const list = this.#listItems;
+		const el = this.$.format.getBlock(this.$.selection.getNode());
 		const type = el?.style ? el.style.listStyleType || DEFAULT_TYPE : '';
 
 		for (let i = 0, len = list.length, l; i < len; i++) {
@@ -107,13 +109,16 @@ class List_numbered extends PluginCommand {
 	 * @param {string} [type=""] List type
 	 */
 	submit(type) {
-		const range = this.listFormat.apply(`ol:${type || ''}`, null, false);
-		if (range) this.selection.setRange(range.sc, range.so, range.ec, range.eo);
-		this.focusManager.focus();
-		this.history.push(false);
+		const range = this.$.listFormat.apply(`ol:${type || ''}`, null, false);
+		if (range) this.$.selection.setRange(range.sc, range.so, range.ec, range.eo);
+		this.$.focusManager.focus();
+		this.$.history.push(false);
 	}
 }
 
+/**
+ * @returns {HTMLElement}
+ */
 function CreateHTML() {
 	const html = /*html*/ `
 	<div class="se-list-inner">
@@ -128,6 +133,10 @@ function CreateHTML() {
 	return dom.utils.createElement('DIV', { class: 'se-dropdown se-list-layer' }, html);
 }
 
+/**
+ * @param {string[]} types - List style types
+ * @returns {string} HTML string
+ */
 function _CreateLI(types) {
 	return types
 		.map((v) => {

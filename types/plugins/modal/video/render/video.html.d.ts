@@ -15,11 +15,11 @@ import type {} from '../../../../typedef';
  * @property {HTMLButtonElement} revertBtn
  * @property {HTMLButtonElement} fileRemoveBtn
  *
- * @param {SunEditor.Core} editor
+ * @param {SunEditor.Deps} $
  * @param {*} pluginOptions
  * @returns {ModalReturns_video}
  */
-export function CreateHTML_modal({ lang, icons, plugins }: SunEditor.Core, pluginOptions: any): ModalReturns_video;
+export function CreateHTML_modal({ lang, icons, plugins }: SunEditor.Deps, pluginOptions: any): ModalReturns_video;
 export type ModalReturns_video = {
 	html: HTMLElement;
 	alignForm: HTMLElement;

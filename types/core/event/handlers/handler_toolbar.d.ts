@@ -1,21 +1,21 @@
 import type {} from '../../../typedef';
 /**
- * @typedef {import('../eventManager').default} EventManagerThis_handler_toolbar
+ * @typedef {import('../eventOrchestrator').default} EventManagerThis_handler_toolbar
  */
 /**
  * @this {EventManagerThis_handler_toolbar}
  * @param {MouseEvent} e - Event object
  */
-export function ButtonsHandler(this: import('../eventManager').default, e: MouseEvent): void;
+export function ButtonsHandler(this: import('../eventOrchestrator').default, e: MouseEvent): void;
 export class ButtonsHandler {
 	/**
-	 * @typedef {import('../eventManager').default} EventManagerThis_handler_toolbar
+	 * @typedef {import('../eventOrchestrator').default} EventManagerThis_handler_toolbar
 	 */
 	/**
 	 * @this {EventManagerThis_handler_toolbar}
 	 * @param {MouseEvent} e - Event object
 	 */
-	constructor(this: import('../eventManager').default, e: MouseEvent);
+	constructor(this: import('../eventOrchestrator').default, e: MouseEvent);
 	_inputFocus: boolean;
 	__inputPlugin: {
 		obj: any;
@@ -29,10 +29,10 @@ export class ButtonsHandler {
  * @this {EventManagerThis_handler_toolbar}
  * @param {MouseEvent} e - Event object
  */
-export function OnClick_menuTray(this: import('../eventManager').default, e: MouseEvent): void;
+export function OnClick_menuTray(this: import('../eventOrchestrator').default, e: MouseEvent): void;
 /**
  * @this {EventManagerThis_handler_toolbar}
  * @param {MouseEvent} e - Event object
  */
-export function OnClick_toolbar(this: import('../eventManager').default, e: MouseEvent): void;
-export type EventManagerThis_handler_toolbar = import('../eventManager').default;
+export function OnClick_toolbar(this: import('../eventOrchestrator').default, e: MouseEvent): void;
+export type EventManagerThis_handler_toolbar = import('../eventOrchestrator').default;

@@ -6,11 +6,7 @@ export default List;
  */
 declare class List extends PluginDropdown {
 	title: any;
-	listItems: NodeListOf<Element>;
-	icons: {
-		bulleted: string;
-		numbered: string;
-	};
 	active(element: HTMLElement | null, target: HTMLElement | null): boolean | void;
+	#private;
 }
 import { PluginDropdown } from '../../interfaces';

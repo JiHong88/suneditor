@@ -12,6 +12,7 @@ const { _w } = env;
 export class TableStyleService {
 	#main;
 	#state;
+	#$;
 
 	/**
 	 * @constructor
@@ -23,7 +24,7 @@ export class TableStyleService {
 	constructor(main, { pluginOptions, controller_table }) {
 		this.#main = main;
 		this.#state = main.state;
-		this.editor = main.editor;
+		this.#$ = main.$;
 
 		this.sliderType = '';
 		/** @type {HTMLButtonElement} */
@@ -38,14 +39,14 @@ export class TableStyleService {
 		this.captionButton = controller_table.querySelector('._se_table_caption');
 
 		// props
-		const controller_props = CreateHTML_controller_properties(this.#main.editor);
+		const controller_props = CreateHTML_controller_properties(this.#$);
 		const propsTargets = [this.#main.controller_table, this.#main.controller_cell];
-		this.controller_props = new Controller(this, controller_props.html, { position: 'bottom', parents: propsTargets, isInsideForm: true });
+		this.controller_props = new Controller(this, this.#$, controller_props.html, { position: 'bottom', parents: propsTargets, isInsideForm: true });
 		this.controller_props_title = controller_props.controller_props_title;
 
 		// color picker
 		const colorForm = dom.utils.createElement('DIV', { class: 'se-controller se-list-layer' }, null);
-		this.controller_colorPicker = new Controller(this, colorForm, {
+		this.controller_colorPicker = new Controller(this, this.#$, colorForm, {
 			position: 'bottom',
 			parents: [this.controller_props].concat(propsTargets),
 			isInsideForm: true,
@@ -56,7 +57,7 @@ export class TableStyleService {
 			},
 		});
 
-		this.colorPicker = new ColorPicker(this, '', {
+		this.colorPicker = new ColorPicker(this, this.#$, '', {
 			form: colorForm,
 			colorList: pluginOptions.colorList || Constants.DEFAULT_COLOR_LIST,
 			splitNum: 5,
@@ -67,25 +68,25 @@ export class TableStyleService {
 		// members - SelectMenu - properties - border style
 		const borderMenu = CreateBorderMenu();
 		const borderButton = controller_props.borderButton;
-		this.selectMenu_props_border = new SelectMenu(main.editor, { checkList: false, position: 'bottom-center' });
+		this.selectMenu_props_border = new SelectMenu(this.#$, { checkList: false, position: 'bottom-center' });
 		this.selectMenu_props_border.on(borderButton, this.#OnPropsBorderEdit.bind(this));
 		this.selectMenu_props_border.create(borderMenu.items, borderMenu.menus);
 
 		// members - SelectMenu - properties - border format
-		const borderFormatMenu = CreateBorderFormatMenu(this.#main.lang, this.#main.icons, []);
+		const borderFormatMenu = CreateBorderFormatMenu(this.#$.lang, this.#$.icons, []);
 		const borderFormatButton = controller_props.borderFormatButton;
-		this.selectMenu_props_border_format = new SelectMenu(main.editor, { checkList: false, position: 'bottom-left', dir: 'ltr', splitNum: 5 });
+		this.selectMenu_props_border_format = new SelectMenu(this.#$, { checkList: false, position: 'bottom-left', dir: 'ltr', splitNum: 5 });
 		this.selectMenu_props_border_format.on(borderFormatButton, this.#OnPropsBorderFormatEdit.bind(this, 'all'));
 		this.selectMenu_props_border_format.create(borderFormatMenu.items, borderFormatMenu.menus);
 
-		const borderFormatMenu_oneCell = CreateBorderFormatMenu(this.#main.lang, this.#main.icons, Constants.BORDER_FORMAT_INSIDE);
-		this.selectMenu_props_border_format_oneCell = new SelectMenu(main.editor, { checkList: false, position: 'bottom-left', dir: 'ltr', splitNum: 6 });
+		const borderFormatMenu_oneCell = CreateBorderFormatMenu(this.#$.lang, this.#$.icons, Constants.BORDER_FORMAT_INSIDE);
+		this.selectMenu_props_border_format_oneCell = new SelectMenu(this.#$, { checkList: false, position: 'bottom-left', dir: 'ltr', splitNum: 6 });
 		this.selectMenu_props_border_format_oneCell.on(borderFormatButton, this.#OnPropsBorderFormatEdit.bind(this, 'outside'));
 		this.selectMenu_props_border_format_oneCell.create(borderFormatMenu_oneCell.items, borderFormatMenu_oneCell.menus);
 
 		// memberts - elements..
-		this.maxText = this.#main.lang.maxSize;
-		this.minText = this.#main.lang.minSize;
+		this.maxText = this.#$.lang.maxSize;
+		this.minText = this.#$.lang.minSize;
 		this.propTargets = {
 			cell_alignment: controller_props.cell_alignment,
 			cell_alignment_vertical: controller_props.cell_alignment_vertical,
@@ -164,7 +165,7 @@ export class TableStyleService {
 		if (this.controller_props.currentTarget === target && this.controller_props.form?.style.display === 'block') {
 			this.controller_props.close();
 		} else {
-			this.controller_props_title.textContent = this.#main.lang.tableProperties;
+			this.controller_props_title.textContent = this.#$.lang.tableProperties;
 			this.#setCtrlProps('table');
 			this.controller_props.open(target, this.#main.controller_table.form, { isWWTarget: false, initMethod: null, addOffset: null });
 		}
@@ -178,7 +179,7 @@ export class TableStyleService {
 		if (this.controller_props.currentTarget === target && this.controller_props.form?.style.display === 'block') {
 			this.controller_props.close();
 		} else {
-			this.controller_props_title.textContent = this.#main.lang.cellProperties;
+			this.controller_props_title.textContent = this.#$.lang.cellProperties;
 			this.#setCtrlProps('cell');
 			this.controller_props.open(target, this.#main.controller_cell.form, { isWWTarget: false, initMethod: null, addOffset: null });
 		}
@@ -362,11 +363,11 @@ export class TableStyleService {
 
 			let sizeIcon, text;
 			if (!isMaxWidth) {
-				sizeIcon = this.#main.icons.expansion;
+				sizeIcon = this.#$.icons.expansion;
 				text = this.maxText;
 				if (!ondisplay) targets.style.width = 'max-content';
 			} else {
-				sizeIcon = this.#main.icons.reduction;
+				sizeIcon = this.#$.icons.reduction;
 				text = this.minText;
 				if (!ondisplay) targets.style.width = '100%';
 			}
@@ -593,7 +594,7 @@ export class TableStyleService {
 			align_v = verticalAlign;
 		this._propsCache = [];
 
-		const tempColorStyles = _w.getComputedStyle(this.#main.eventManager.__focusTemp);
+		const tempColorStyles = _w.getComputedStyle(this.#$.eventManager.__focusTemp);
 		for (let i = 0, t, isBreak; (t = targets[i]); i++) {
 			// eslint-disable-next-line no-shadow
 			const { cssText, border, backgroundColor, color, textAlign, verticalAlign, fontWeight, textDecoration, fontStyle } = t.style;
@@ -606,11 +607,11 @@ export class TableStyleService {
 			let hexBackColor = backgroundColor;
 			let hexColor = color;
 			if (hexBackColor) {
-				this.#main.eventManager.__focusTemp.style.backgroundColor = hexBackColor;
+				this.#$.eventManager.__focusTemp.style.backgroundColor = hexBackColor;
 				hexBackColor = tempColorStyles.backgroundColor;
 			}
 			if (hexColor) {
-				this.#main.eventManager.__focusTemp.style.color = hexColor;
+				this.#$.eventManager.__focusTemp.style.color = hexColor;
 				hexColor = tempColorStyles.color;
 			}
 
@@ -631,7 +632,7 @@ export class TableStyleService {
 		}
 
 		// border - format
-		border_format.firstElementChild.innerHTML = this.#main.icons[Constants.BORDER_FORMATS[targets.length === 1 ? 'outside' : 'all']];
+		border_format.firstElementChild.innerHTML = this.#$.icons[Constants.BORDER_FORMATS[targets.length === 1 ? 'outside' : 'all']];
 		border_format.setAttribute('se-border-format', 'all');
 		dom.utils.removeClass(border_format, 'active');
 
@@ -820,7 +821,7 @@ export class TableStyleService {
 		const { border_format } = this.propTargets;
 
 		border_format.setAttribute('se-border-format', command);
-		border_format.firstElementChild.innerHTML = this.#main.icons[Constants.BORDER_FORMATS[command]];
+		border_format.firstElementChild.innerHTML = this.#$.icons[Constants.BORDER_FORMATS[command]];
 		if (command !== defaultCommand) dom.utils.addClass(border_format, 'active');
 		else dom.utils.removeClass(border_format, 'active');
 

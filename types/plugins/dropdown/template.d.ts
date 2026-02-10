@@ -20,10 +20,10 @@ export type TemplatePluginOptions = {
 declare class Template extends PluginDropdown {
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {TemplatePluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(editor: SunEditor.Core, pluginOptions: TemplatePluginOptions);
+	constructor(editor: SunEditor.Kernel, pluginOptions: TemplatePluginOptions);
 	title: any;
 	selectedIndex: number;
 	items: {

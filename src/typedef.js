@@ -13,70 +13,34 @@
 // --------------------------------------------------------- [Editor Types] ---------------------------------------------------------------------------------------------------
 /**
  * @typedef {import('./core/editor').default} SunEditor.Instance
+ * @typedef {import('./core/kernel/coreKernel').default} SunEditor.Kernel
+ * @typedef {import('./core/kernel/store').default} SunEditor.Store
+ * @typedef {import('./core/kernel/store').StoreState} SunEditor.StorePathMap
+ * @typedef {import('./core/kernel/coreKernel').Deps} SunEditor.Deps
  */
 
 // --------------------------------------------------------- [Init Options] ---------------------------------------------------------------------------------------------------
 /**
- * @typedef {import('./core/config/options').EditorInitOptions} SunEditor.InitOptions
- */
-
-/**
- * @typedef {import('./core/config/options').EditorFrameOptions} SunEditor.InitFrameOptions
+ * @typedef {import('./core/schema/options').EditorInitOptions} SunEditor.InitOptions
+ * @typedef {import('./core/schema/options').EditorFrameOptions} SunEditor.InitFrameOptions
  */
 
 // --------------------------------------------------------- [Context & Options] ---------------------------------------------------------------------------------------------------
 /**
- * @typedef {import('./core/services/contextManager').ContextMap} SunEditor.Context
- * @typedef {import('./core/services/optionManager').BaseOptionsMap} SunEditor.Options
+ * @typedef {import('./core/config/contextProvider').ContextMap} SunEditor.Context
+ * @typedef {import('./core/config/optionProvider').BaseOptionsMap} SunEditor.Options
  */
 
 // --------------------------------------------------------- [{Frame} Context & Options] ---------------------------------------------------------------------------------------------------
 /**
- * @typedef {import('./core/services/contextManager').FrameContextMap} SunEditor.FrameContext
- * @typedef {import('./core/services/optionManager').FrameOptionsMap} SunEditor.FrameOptions
+ * @typedef {import('./core/config/contextProvider').FrameContextMap} SunEditor.FrameContext
+ * @typedef {import('./core/config/optionProvider').FrameOptionsMap} SunEditor.FrameOptions
  */
 
 /**
  * @typedef {HTMLElement & Window} SunEditor.EventWysiwyg
  * @typedef {HTMLElement & HTMLIFrameElement} SunEditor.WysiwygFrame
  * @typedef {Window & typeof globalThis} SunEditor.GlobalWindow
- */
-
-// --------------------------------------------------------- [Internal Core Types] ---------------------------------------------------------------------------------------------------
-/**
- * @typedef {import('./core/editor').default} SunEditor.Core
- * @deprecated Use SunEditor.Instance instead
- */
-
-/**
- * @typedef {import('./editorInjector/_core').default} SunEditor.Injector_Core
- * @typedef {import('./editorInjector').default} SunEditor.Injector
- */
-
-/**
- * Editor status object containing current state information
- *
- * @typedef {Object} SunEditor.Status
- *
- * **Public Properties:**
- * @property {boolean} hasFocus Boolean value of whether the editor has focus
- * @property {number} tabSize Indent size of tab (4)
- * @property {number} indentSize Indent size (25)px
- * @property {number} codeIndentSize Indent size of Code view mode (2)
- * @property {Array<string>} currentNodes  An element array of the current cursor's node structure
- * @property {Array<string>} currentNodesMap  An element name array of the current cursor's node structure
- * @property {number} currentViewportHeight Current visual viewport height size
- * @property {number} initViewportHeight Height of the initial visual viewport height size
- * @property {boolean} onSelected Boolean value of whether component is selected
- * @property {*} rootKey Current root key
- * @property {(fc?: SunEditor.FrameContext) => boolean} isScrollable Checks if the editor frame is currently scrollable.
- * - default fc parameter is this.frameContext
- * - Returns true if: (1) height is not 'auto' (fixed height always has scroll),
- * - or (2) height is 'auto' with maxHeight set and content exceeds maxHeight
- *
- * **Internal Properties (⚠️ DO NOT USE - subject to change without notice):**
- * @property {Range} _range Internal: Current range object
- * @property {boolean} _onMousedown Internal: Mouse down event status
  */
 
 // --------------------------------------------------------- [Component Types] ---------------------------------------------------------------------------------------------------
@@ -231,7 +195,7 @@
  * @typedef {Object} SunEditor.Event.Info
  * @property {*} target Target element
  * @property {string} type Event type
- * @property {(...args: *) => *} listener Event listener
+ * @property {EventListenerOrEventListenerObject} listener Event listener
  * @property {boolean|AddEventListenerOptions} [useCapture] Event useCapture option
  */
 
@@ -265,7 +229,7 @@
 
 /**
  * The event object passed to the plugin event handler
- * @typedef {import('./core/services/pluginManager').PluginEventParam} SunEditor.EventParams.PluginEvent
+ * @typedef {import('./core/logic/shell/pluginManager').PluginEventParam} SunEditor.EventParams.PluginEvent
  */
 
 // --------------------------------------------------------- [UI Types] ---------------------------------------------------------------------------------------------------

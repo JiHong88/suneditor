@@ -8,6 +8,7 @@ const { _w } = env;
 
 export class TableResizeService {
 	#main;
+	#$;
 	#state;
 
 	#globalEvents;
@@ -21,6 +22,7 @@ export class TableResizeService {
 	 */
 	constructor(main) {
 		this.#main = main;
+		this.#$ = main.$;
 		this.#state = main.state;
 
 		// member - global events
@@ -55,7 +57,7 @@ export class TableResizeService {
 			if (this.#main._element) this.#main._element.style.cursor = '';
 			this.#removeGlobalEvents();
 			if (this.#resizeLine?.style.display === 'block') this.#resizeLine.style.display = 'none';
-			this.#resizeLine = this.#main.frameContext.get('wrapper').querySelector(Constants.RESIZE_CELL_CLASS);
+			this.#resizeLine = this.#$.frameContext.get('wrapper').querySelector(Constants.RESIZE_CELL_CLASS);
 			this.#setResizeLinePosition(dom.query.getParentElement(target, dom.check.isTable), target, this.#resizeLine, cellEdge.isLeft);
 			this.#resizeLine.style.display = 'block';
 			return false;
@@ -67,7 +69,7 @@ export class TableResizeService {
 			this.#main._element = dom.query.getParentElement(target, dom.check.isTable);
 			this.#main._element.style.cursor = 'ns-resize';
 			if (this.#resizeLine?.style.display === 'block') this.#resizeLine.style.display = 'none';
-			this.#resizeLine = this.#main.frameContext.get('wrapper').querySelector(Constants.RESIZE_ROW_CLASS);
+			this.#resizeLine = this.#$.frameContext.get('wrapper').querySelector(Constants.RESIZE_ROW_CLASS);
 			this.#setResizeRowPosition(dom.query.getParentElement(target, dom.check.isTable), target, this.#resizeLine);
 			this.#resizeLine.style.display = 'block';
 			return false;
@@ -96,9 +98,9 @@ export class TableResizeService {
 				const colIndex = this.#state.logical_cellIndex + this.#state.current_colSpan - (cellEdge.isLeft ? 1 : 0);
 
 				// ready
-				this.#main.uiManager.enableBackWrapper('ew-resize');
-				this.#resizeLine ||= this.#main.frameContext.get('wrapper').querySelector(Constants.RESIZE_CELL_CLASS);
-				this.#resizeLinePrev = this.#main.frameContext.get('wrapper').querySelector(Constants.RESIZE_CELL_PREV_CLASS);
+				this.#$.ui.enableBackWrapper('ew-resize');
+				this.#resizeLine ||= this.#$.frameContext.get('wrapper').querySelector(Constants.RESIZE_CELL_CLASS);
+				this.#resizeLinePrev = this.#$.frameContext.get('wrapper').querySelector(Constants.RESIZE_CELL_PREV_CLASS);
 
 				// select figure
 				if (colIndex < 0 || colIndex === this.#state.logical_cellCnt - 1) {
@@ -141,9 +143,9 @@ export class TableResizeService {
 				this.#main.setRowInfo(row);
 
 				// ready
-				this.#main.uiManager.enableBackWrapper('ns-resize');
-				this.#resizeLine ||= this.#main.frameContext.get('wrapper').querySelector(Constants.RESIZE_ROW_CLASS);
-				this.#resizeLinePrev = this.#main.frameContext.get('wrapper').querySelector(Constants.RESIZE_ROW_PREV_CLASS);
+				this.#$.ui.enableBackWrapper('ns-resize');
+				this.#resizeLine ||= this.#$.frameContext.get('wrapper').querySelector(Constants.RESIZE_ROW_CLASS);
+				this.#resizeLinePrev = this.#$.frameContext.get('wrapper').querySelector(Constants.RESIZE_ROW_PREV_CLASS);
 
 				this._startRowResizing(row, rowEdge.startY, numbers.get(_w.getComputedStyle(row).height, Constants.CELL_DECIMAL_END));
 				this.#main._editorEnable(false);
@@ -220,8 +222,8 @@ export class TableResizeService {
 			() => {
 				this.#removeGlobalEvents();
 				this.#resizePercentCol(this.#main._element);
-				this.#main.history.push(true);
-				this.#main.component.hoverSelect(this.#main._element);
+				this.#$.history.push(true);
+				this.#$.component.hoverSelect(this.#main._element);
 				this.#main._editorEnable(true);
 			},
 			(e) => {
@@ -279,8 +281,8 @@ export class TableResizeService {
 			this.#rowResize.bind(this, row, figureElement, this.#resizeLine, startY, startHeight),
 			() => {
 				this.#removeGlobalEvents();
-				this.#main.history.push(true);
-				this.#main.component.hoverSelect(this.#main._element);
+				this.#$.history.push(true);
+				this.#$.component.hoverSelect(this.#main._element);
 				this.#main._editorEnable(true);
 			},
 			this._stopResize.bind(this, row, prevValue, 'height'),
@@ -323,8 +325,8 @@ export class TableResizeService {
 			() => {
 				this.#removeGlobalEvents();
 				if (numbers.get(figure.style.width, 0) > 100) figure.style.width = '100%';
-				this.#main.history.push(true);
-				this.#main.component.hoverSelect(this.#main._element);
+				this.#$.history.push(true);
+				this.#$.component.hoverSelect(this.#main._element);
 				this.#main._editorEnable(true);
 			},
 			this._stopResize.bind(this, figure, figure.style.width, 'width'),
@@ -360,8 +362,8 @@ export class TableResizeService {
 	 * @param {boolean} isLeftEdge Whether the resizing is on the left edge.
 	 */
 	#setResizeLinePosition(figure, target, resizeLine, isLeftEdge) {
-		const tdOffset = this.#main.offset.getLocal(target);
-		const tableOffset = this.#main.offset.getLocal(figure);
+		const tdOffset = this.#$.offset.getLocal(target);
+		const tableOffset = this.#$.offset.getLocal(figure);
 		resizeLine.style.left = `${tdOffset.left + (isLeftEdge ? 0 : target.offsetWidth)}px`;
 		resizeLine.style.top = `${tableOffset.top}px`;
 		resizeLine.style.height = `${figure.offsetHeight}px`;
@@ -374,8 +376,8 @@ export class TableResizeService {
 	 * @param {HTMLElement} resizeLine The resize line element.
 	 */
 	#setResizeRowPosition(figure, target, resizeLine) {
-		const rowOffset = this.#main.offset.getLocal(target);
-		const tableOffset = this.#main.offset.getLocal(figure);
+		const rowOffset = this.#$.offset.getLocal(target);
+		const tableOffset = this.#$.offset.getLocal(figure);
 		resizeLine.style.top = `${rowOffset.top + target.offsetHeight}px`;
 		resizeLine.style.left = `${tableOffset.left}px`;
 		resizeLine.style.width = `${figure.offsetWidth}px`;
@@ -392,12 +394,12 @@ export class TableResizeService {
 	_stopResize(target, prevValue, styleProp, e) {
 		if (!keyCodeMap.isEsc(e.code)) return;
 		this.#removeGlobalEvents();
-		this.#main.component.hoverSelect(this.#main._element);
+		this.#$.component.hoverSelect(this.#main._element);
 		this.#main._editorEnable(true);
 		target.style[styleProp] = prevValue;
 		// figure reopen
 		if (styleProp === 'width') {
-			this.#main.component.select(this.#main._element, this.#main.constructor['key'], { isInput: true });
+			this.#$.component.select(this.#main._element, this.#main.constructor['key'], { isInput: true });
 		}
 	}
 
@@ -408,9 +410,9 @@ export class TableResizeService {
 	 * @param {(...args: *) => void} keyDownFn The function handling the keydown event.
 	 */
 	#addResizeGlobalEvents(resizeFn, stopFn, keyDownFn) {
-		this.#globalEvents.resize = this.#main.eventManager.addGlobalEvent('mousemove', resizeFn, false);
-		this.#globalEvents.resizeStop = this.#main.eventManager.addGlobalEvent('mouseup', stopFn, false);
-		this.#globalEvents.resizeKeyDown = this.#main.eventManager.addGlobalEvent('keydown', keyDownFn, false);
+		this.#globalEvents.resize = this.#$.eventManager.addGlobalEvent('mousemove', resizeFn, false);
+		this.#globalEvents.resizeStop = this.#$.eventManager.addGlobalEvent('mouseup', stopFn, false);
+		this.#globalEvents.resizeKeyDown = this.#$.eventManager.addGlobalEvent('keydown', keyDownFn, false);
 		this.#resizing = true;
 	}
 
@@ -419,7 +421,7 @@ export class TableResizeService {
 	 */
 	#removeGlobalEvents() {
 		this.#resizing = false;
-		this.#main.uiManager.disableBackWrapper();
+		this.#$.ui.disableBackWrapper();
 		this.#hideResizeLine();
 		if (this.#resizeLinePrev) {
 			this.#resizeLinePrev.style.display = 'none';
@@ -427,7 +429,7 @@ export class TableResizeService {
 		}
 		const globalEvents = this.#globalEvents;
 		for (const k in globalEvents) {
-			globalEvents[k] &&= this.#main.eventManager.removeGlobalEvent(globalEvents[k]);
+			globalEvents[k] &&= this.#$.eventManager.removeGlobalEvent(globalEvents[k]);
 		}
 
 		this.#resizing = false;

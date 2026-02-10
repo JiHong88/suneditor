@@ -1,5 +1,6 @@
 import type {} from '../../../typedef';
 declare const _default: {
+	/** [event, cache] */
 	/** @action prevent */
 	'event.prevent': ({ ctx }: EffectContext) => void;
 	/** @action stop */
@@ -10,12 +11,14 @@ declare const _default: {
 	'cache.styleNode': ({ ports }: EffectContext) => void;
 	/** @action cacheFormatAttrsTemp */
 	'cache.formatAttrsTemp': ({ ports }: EffectContext, { attrs }: any) => void;
+	/** [commands] */
 	/** @action editorNativeFocus */
 	'focusManager.nativeFocus': ({ ports }: EffectContext) => void;
 	/** @action historyPush */
 	'history.push': ({ ports }: EffectContext, hard: any) => void;
 	/** @action documentTypeRefreshHeader */
 	'documentType.refreshHeader': ({ ctx }: EffectContext) => void;
+	/** [class] */
 	/** @action componentDeselect */
 	'component.deselect': ({ ports }: EffectContext) => void;
 	/** @action selectionSetRange */
@@ -32,8 +35,10 @@ declare const _default: {
 		eo: number;
 		removeArray: Array<Node> | null;
 	};
+	/** [helper] */
 	/** @action domUtilsRemoveItem */
 	'dom.utils.removeItem': (_: EffectContext, { item }: any) => void;
+	/** [utils] */
 	/** @action selectComponentFallback */
 	'select.component.fallback': ({ ports }: EffectContext, { cmponentInfo }: any) => void;
 };

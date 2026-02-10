@@ -20,13 +20,13 @@ class ExportPDF extends PluginCommand {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {ExportPDFPluginOptions} pluginOptions - plugin options
 	 */
 	constructor(editor, pluginOptions) {
 		super(editor);
 		// plugin basic properties
-		this.title = this.lang.exportPDF;
+		this.title = this.$.lang.exportPDF;
 		this.icon = 'PDF';
 
 		// plugin options
@@ -37,7 +37,7 @@ class ExportPDF extends PluginCommand {
 		if (!this.apiUrl) {
 			console.warn('[SUNEDITOR.plugins.exportPDF.error] Requires exportPDF."apiUrl" options.');
 		} else {
-			this.apiManager = new ApiManager(this, {
+			this.apiManager = new ApiManager(this, this.$, {
 				method: 'POST',
 				url: this.apiUrl,
 				headers: {
@@ -58,16 +58,16 @@ class ExportPDF extends PluginCommand {
 			return;
 		}
 
-		this.uiManager.showLoading();
+		this.$.ui.showLoading();
 		let ww = null;
 
 		try {
-			const standardWW = this.frameContext.get('documentTypePageMirror') || this.frameContext.get('wysiwygFrame');
+			const standardWW = this.$.frameContext.get('documentTypePageMirror') || this.$.frameContext.get('wysiwygFrame');
 			const editableDiv = dom.utils.createElement('div', { class: standardWW.className }, standardWW.innerHTML);
 			ww = dom.utils.createElement('div', { style: `position: absolute; top: -10000px; left: -10000px; width: 21cm; columns: 21cm; height: auto;` }, editableDiv);
 
 			const innerPadding = _w.getComputedStyle(standardWW).padding;
-			const inlineWW = dom.utils.applyInlineStylesAll(editableDiv, true, this.options.get('allUsedStyles'));
+			const inlineWW = dom.utils.applyInlineStylesAll(editableDiv, true, this.$.options.get('allUsedStyles'));
 			inlineWW.style.padding = inlineWW.style.paddingTop = inlineWW.style.paddingBottom = inlineWW.style.paddingLeft = inlineWW.style.paddingRight = '0';
 			ww.innerHTML = `
 				<style>
@@ -81,7 +81,7 @@ class ExportPDF extends PluginCommand {
 			_d.body.appendChild(ww);
 
 			// before event
-			if ((await this.triggerEvent('onExportPDFBefore', { target: ww })) === false) return;
+			if ((await this.$.eventManager.triggerEvent('onExportPDFBefore', { target: ww })) === false) return;
 
 			// at server
 			await this.#createByServer(ww);
@@ -90,7 +90,7 @@ class ExportPDF extends PluginCommand {
 			console.error('[SUNEDITOR.plugins.exportPDF.error]', error.message);
 		} finally {
 			dom.utils.removeItem(ww);
-			this.uiManager.hideLoading();
+			this.$.ui.hideLoading();
 		}
 	}
 

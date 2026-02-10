@@ -37,13 +37,13 @@ class Mention extends PluginField {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {MentionPluginOptions} pluginOptions
 	 */
 	constructor(editor, pluginOptions) {
 		super(editor);
 		// plugin basic properties
-		this.title = this.lang.mention;
+		this.title = this.$.lang.mention;
 		this.icon = 'mention';
 
 		// members
@@ -54,15 +54,16 @@ class Mention extends PluginField {
 		this.directData = pluginOptions.data;
 		this.apiUrl = pluginOptions.apiUrl?.replace(/\s/g, '').replace(/\{limitSize\}/i, String(this.limitSize)) || '';
 		// members - api, caching
-		this.apiManager = new ApiManager(this, { headers: pluginOptions.apiHeaders });
+		this.apiManager = new ApiManager(this, this.$, { headers: pluginOptions.apiHeaders });
 		this.cachingData = (pluginOptions.useCachingData ?? true) ? new Map() : null;
 		this.cachingFieldData = (pluginOptions.useCachingFieldData ?? true) ? [] : null;
 
 		// controller
 		const controllerEl = CreateHTML_controller();
-		this.selectMenu = new SelectMenu(this.editor, { position: 'right-bottom', dir: 'ltr', closeMethod: () => this.controller.close() });
+		this.selectMenu = new SelectMenu(this.$, { position: 'right-bottom', dir: 'ltr', closeMethod: () => this.controller.close() });
 		this.controller = new Controller(
 			this,
+			this.$,
 			controllerEl,
 			{
 				position: 'bottom',
@@ -88,7 +89,7 @@ class Mention extends PluginField {
 			this.apiManager.cancel();
 		}
 
-		const sel = this.selection.get();
+		const sel = this.$.selection.get();
 		if (!sel.rangeCount) {
 			this.selectMenu.close();
 			return;
@@ -219,16 +220,16 @@ class Mention extends PluginField {
 			oA.setAttribute('title', name);
 			oA.textContent = this.triggerText + key;
 		} else {
-			this.selection.setRange(this.#anchorNode, this.#lastAtPos, this.#anchorNode, this.#anchorOffset);
+			this.$.selection.setRange(this.#anchorNode, this.#lastAtPos, this.#anchorNode, this.#anchorOffset);
 			oA = dom.utils.createElement('A', { 'data-se-mention': key, href: url, title: name, target: '_blank' }, this.triggerText + key);
-			if (!this.html.insertNode(oA, { afterNode: null, skipCharCount: false })) return false;
+			if (!this.$.html.insertNode(oA, { afterNode: null, skipCharCount: false })) return false;
 		}
 
 		this.selectMenu.close();
 
 		const space = dom.utils.createTextNode('\u00A0');
 		oA.parentNode.insertBefore(space, oA.nextSibling);
-		this.selection.setRange(space, 1, space, 1);
+		this.$.selection.setRange(space, 1, space, 1);
 
 		if (this.cachingFieldData && !this.cachingFieldData.some((data) => data.key === item.key)) {
 			this.cachingFieldData.push(item);
@@ -236,6 +237,9 @@ class Mention extends PluginField {
 	}
 }
 
+/**
+ * @returns {HTMLElement}
+ */
 function CreateHTML_controller() {
 	return dom.utils.createElement('DIV', { class: 'se-controller se-empty-controller' }, '<div></div>');
 }

@@ -54,10 +54,10 @@ export type FontSizePluginOptions = {
 declare class FontSize extends PluginInput implements PluginCommand, PluginDropdown {
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {FontSizePluginOptions} pluginOptions - Configuration options for the FontSize plugin.
 	 */
-	constructor(editor: SunEditor.Core, pluginOptions: FontSizePluginOptions);
+	constructor(editor: SunEditor.Kernel, pluginOptions: FontSizePluginOptions);
 	unitMap: {
 		text: {
 			default: string;
@@ -115,7 +115,7 @@ declare class FontSize extends PluginInput implements PluginCommand, PluginDropd
 			list: number[];
 		};
 	};
-	sizeUnit: any;
+	sizeUnit: string;
 	title: any;
 	inner: string | boolean;
 	currentSize: string;

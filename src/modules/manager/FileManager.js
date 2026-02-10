@@ -1,4 +1,3 @@
-import CoreInjector from '../../editorInjector/_core';
 import ApiManager from './ApiManager';
 
 /**
@@ -12,14 +11,17 @@ import ApiManager from './ApiManager';
  * @class
  * @description This module manages the file information of the editor.
  */
-class FileManager extends CoreInjector {
+class FileManager {
+	#$;
+
 	/**
 	 * @constructor
 	 * @param {*} inst The instance object that called the constructor.
+	 * @param {SunEditor.Deps} $ Kernel dependencies
 	 * @param {FileManagerParams} params FileManager options
 	 */
-	constructor(inst, params) {
-		super(inst.editor);
+	constructor(inst, $, params) {
+		this.#$ = $;
 
 		// members
 		inst.__fileManagement = this;
@@ -49,7 +51,7 @@ class FileManager extends CoreInjector {
 	 * @param {?(res: *, xmlHttp: XMLHttpRequest) => string} [errorCallBack] Error call back function
 	 */
 	upload(uploadUrl, uploadHeader, data, callBack, errorCallBack) {
-		this.uiManager.showLoading();
+		this.#$.ui.showLoading();
 
 		let formData = null;
 		// create formData
@@ -75,7 +77,7 @@ class FileManager extends CoreInjector {
 	 * @returns {Promise<XMLHttpRequest>}
 	 */
 	async asyncUpload(uploadUrl, uploadHeader, data) {
-		this.uiManager.showLoading();
+		this.#$.ui.showLoading();
 
 		let formData = null;
 		// create formData
@@ -125,31 +127,24 @@ class FileManager extends CoreInjector {
 	 * @param {boolean} loaded Whether the editor is loaded
 	 */
 	_checkInfo(loaded) {
-		const tags = [].slice.call(this.frameContext.get('wysiwyg').querySelectorAll(this.query));
+		const tags = [].slice.call(this.#$.frameContext.get('wysiwyg').querySelectorAll(this.query));
 		const infoList = this.infoList;
 		if (tags.length === infoList.length) {
 			// reset
-			if (this.editor._componentsInfoReset) {
-				for (let i = 0, len = tags.length; i < len; i++) {
-					this.#setInfo(tags[i], null);
+			let infoUpdate = false;
+			for (let i = 0, len = infoList.length, info; i < len; i++) {
+				info = infoList[i];
+				if (
+					tags.filter(function (t) {
+						return info.src === t.src && info.index.toString() === GetAttr(t, 'index');
+					}).length === 0
+				) {
+					infoUpdate = true;
+					break;
 				}
-				return;
-			} else {
-				let infoUpdate = false;
-				for (let i = 0, len = infoList.length, info; i < len; i++) {
-					info = infoList[i];
-					if (
-						tags.filter(function (t) {
-							return info.src === t.src && info.index.toString() === GetAttr(t, 'index');
-						}).length === 0
-					) {
-						infoUpdate = true;
-						break;
-					}
-				}
-				// pass
-				if (!infoUpdate) return;
 			}
+			// pass
+			if (!infoUpdate) return;
 		}
 
 		// check
@@ -174,7 +169,7 @@ class FileManager extends CoreInjector {
 
 		// editor load
 		if (loaded && this.loadEventName) {
-			this.triggerEvent(this.loadEventName, { infoList });
+			this.#$.eventManager.triggerEvent(this.loadEventName, { infoList });
 			return;
 		}
 
@@ -184,11 +179,11 @@ class FileManager extends CoreInjector {
 
 			infoList.splice(i, 1);
 
-			const params = { editor: this.editor, element: null, index: dataIndex, state: 'delete', info: null, remainingFilesCount: 0, pluginName: this.kind };
+			const params = { element: null, index: dataIndex, state: 'delete', info: null, remainingFilesCount: 0, pluginName: this.kind };
 			if (this.actionEventName) {
-				this.triggerEvent(this.actionEventName, params);
+				this.#$.eventManager.triggerEvent(this.actionEventName, params);
 			}
-			this.triggerEvent('onFileManagerAction', { ...params, pluginName: this.kind });
+			this.#$.eventManager.triggerEvent('onFileManagerAction', { ...params, pluginName: this.kind });
 
 			i--;
 		}
@@ -199,12 +194,12 @@ class FileManager extends CoreInjector {
 	 * @description Reset info object and "infoList = []", "infoIndex = 0"
 	 */
 	_resetInfo() {
-		const params = { editor: this.editor, element: null, state: 'delete', info: null, remainingFilesCount: 0, pluginName: this.kind };
+		const params = { element: null, state: 'delete', info: null, remainingFilesCount: 0, pluginName: this.kind };
 		for (let i = 0, len = this.infoList.length; i < len; i++) {
 			if (this.actionEventName) {
-				this.triggerEvent(this.actionEventName, { ...params, index: this.infoList[i].index, pluginName: this.kind });
+				this.#$.eventManager.triggerEvent(this.actionEventName, { ...params, index: this.infoList[i].index, pluginName: this.kind });
 			}
-			this.triggerEvent('onFileManagerAction', { ...params, index: this.infoList[i].index, pluginName: this.kind });
+			this.#$.eventManager.triggerEvent('onFileManagerAction', { ...params, index: this.infoList[i].index, pluginName: this.kind });
 		}
 
 		this.infoList = [];
@@ -221,7 +216,7 @@ class FileManager extends CoreInjector {
 				if (index === this.infoList[i].index) {
 					this.infoList.splice(i, 1);
 					if (this.actionEventName) {
-						this.triggerEvent(this.actionEventName, { editor: this.editor, element: null, index, state: 'delete', info: null, remainingFilesCount: 0, pluginName: this.kind });
+						this.#$.eventManager.triggerEvent(this.actionEventName, { element: null, index, state: 'delete', info: null, remainingFilesCount: 0, pluginName: this.kind });
 					}
 					return;
 				}
@@ -245,7 +240,7 @@ class FileManager extends CoreInjector {
 		};
 
 		// create
-		if (!dataIndex || this.editor._componentsInfoInit) {
+		if (!dataIndex || !this.#$.store._editorInitFinished) {
 			state = 'create';
 			dataIndex = this.infoIndex++;
 
@@ -294,21 +289,21 @@ class FileManager extends CoreInjector {
 			deleteCallback(Number(GetAttr(el, 'index')));
 		}.bind(this, this.#deleteInfo.bind(this), element);
 
-		info.select = function (el) {
+		info.select = function (component, el) {
 			el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
-			const comp = this.component.get(el);
+			const comp = component.get(el);
 			if (comp) {
-				this.component.select(comp.target, comp.pluginName);
+				component.select(comp.target, comp.pluginName);
 			} else {
 				this.inst.componentSelect?.(el);
 			}
-		}.bind(this, element);
+		}.bind(this, this.#$.component, element);
 
-		const params = { editor: this.editor, element, index: dataIndex, state, info, remainingFilesCount: --this.uploadFileLength < 0 ? 0 : this.uploadFileLength, pluginName: this.kind };
+		const params = { element, index: dataIndex, state, info, remainingFilesCount: --this.uploadFileLength < 0 ? 0 : this.uploadFileLength, pluginName: this.kind };
 		if (this.actionEventName) {
-			this.triggerEvent(this.actionEventName, params);
+			this.#$.eventManager.triggerEvent(this.actionEventName, params);
 		}
-		this.triggerEvent('onFileManagerAction', { ...params, pluginName: this.kind });
+		this.#$.eventManager.triggerEvent('onFileManagerAction', { ...params, pluginName: this.kind });
 	}
 }
 

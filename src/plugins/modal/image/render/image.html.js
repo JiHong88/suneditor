@@ -21,7 +21,7 @@ import { Modal } from '../../../../modules/contract';
  * @property {HTMLButtonElement} asInline
  * @property {HTMLButtonElement} fileRemoveBtn
  *
- * @param {SunEditor.Core} editor
+ * @param {SunEditor.Deps} $
  * @param {*} pluginOptions
  * @returns {ModalReturns_image}
  */

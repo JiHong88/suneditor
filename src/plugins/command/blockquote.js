@@ -11,12 +11,12 @@ class Blockquote extends PluginCommand {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 */
 	constructor(editor) {
 		super(editor);
 		// plugin basic properties
-		this.title = this.lang.tag_blockquote;
+		this.title = this.$.lang.tag_blockquote;
 		this.icon = 'blockquote';
 
 		// members
@@ -42,12 +42,12 @@ class Blockquote extends PluginCommand {
 	 * @type {PluginCommand['action']}
 	 */
 	action() {
-		const currentBlockquote = dom.query.getParentElement(this.selection.getNode(), 'blockquote');
+		const currentBlockquote = dom.query.getParentElement(this.$.selection.getNode(), 'blockquote');
 
 		if (currentBlockquote) {
-			this.format.removeBlock(currentBlockquote, { selectedFormats: null, newBlockElement: null, shouldDelete: false, skipHistory: false });
+			this.$.format.removeBlock(currentBlockquote, { selectedFormats: null, newBlockElement: null, shouldDelete: false, skipHistory: false });
 		} else {
-			this.format.applyBlock(this.quoteTag.cloneNode(false));
+			this.$.format.applyBlock(this.quoteTag.cloneNode(false));
 		}
 	}
 }

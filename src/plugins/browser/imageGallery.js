@@ -18,21 +18,21 @@ class ImageGallery extends PluginBrowser {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {ImageGalleryPluginOptions} pluginOptions
 	 */
 	constructor(editor, pluginOptions) {
 		// plugin bisic properties
 		super(editor);
-		this.title = this.lang.imageGallery;
+		this.title = this.$.lang.imageGallery;
 		this.icon = 'image_gallery';
 
 		// members
 		this.onSelectfunction = null;
 
 		// modules
-		this.browser = new Browser(this, {
-			title: this.lang.imageGallery,
+		this.browser = new Browser(this, this.$, {
+			title: this.$.lang.imageGallery,
 			data: pluginOptions.data,
 			url: pluginOptions.url,
 			headers: pluginOptions.headers,
@@ -42,8 +42,8 @@ class ImageGallery extends PluginBrowser {
 		});
 
 		// members
-		this.width = this.plugins.image.pluginOptions.defaultWidth === 'auto' ? '' : this.plugins.image.pluginOptions.defaultWidth;
-		this.height = this.plugins.image.pluginOptions.defaultHeight === 'auto' ? '' : this.plugins.image.pluginOptions.defaultHeight;
+		this.width = this.$.plugins.image.pluginOptions.defaultWidth === 'auto' ? '' : this.$.plugins.image.pluginOptions.defaultWidth;
+		this.height = this.$.plugins.image.pluginOptions.defaultHeight === 'auto' ? '' : this.$.plugins.image.pluginOptions.defaultHeight;
 	}
 
 	/**
@@ -73,8 +73,8 @@ class ImageGallery extends PluginBrowser {
 			this.onSelectfunction(target);
 		} else {
 			const file = { name: target.getAttribute('data-name'), size: 0 };
-			this.plugins.image.modalInit();
-			this.plugins.image.create(target.getAttribute('data-command'), null, this.width, this.height, 'none', file, target.alt, true);
+			this.$.plugins.image.modalInit();
+			this.$.plugins.image.create(target.getAttribute('data-command'), null, this.width, this.height, 'none', file, target.alt, true);
 		}
 	}
 }

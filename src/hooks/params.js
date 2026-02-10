@@ -119,10 +119,10 @@
  * @typedef {{
  *   range: Range,
  *   line: HTMLElement,
- *   info: import('../core/class/shortcuts').ShortcutInfo,
+ *   info: import('../core/logic/shell/shortcuts').ShortcutInfo,
  *   event: KeyboardEvent,
  *   keyCode: string,
- *   editor: SunEditor.Core
+ *   $: SunEditor.Deps
  * }} ShortcutInfo
  * @description Information of the "shortcut" plugin hook
  */

@@ -393,7 +393,7 @@ describe('Editor API integration tests', () => {
 		it('should execute function for all frame roots', () => {
 			const mockFn = jest.fn();
 
-			editor.contextManager.applyToRoots(mockFn);
+			editor.contextProvider.applyToRoots(mockFn);
 
 			expect(mockFn).toHaveBeenCalledTimes(editor.frameRoots.size);
 		});
@@ -401,7 +401,7 @@ describe('Editor API integration tests', () => {
 		it('should receive frame context in callback', () => {
 			let receivedContext = null;
 
-			editor.contextManager.applyToRoots((fc) => {
+			editor.contextProvider.applyToRoots((fc) => {
 				receivedContext = fc;
 			});
 

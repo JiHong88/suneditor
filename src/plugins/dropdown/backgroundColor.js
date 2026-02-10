@@ -19,20 +19,20 @@ class BackgroundColor extends PluginDropdownFree {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {BackgroundColorPluginOptions} pluginOptions - Plugin options
 	 */
 	constructor(editor, pluginOptions) {
 		super(editor);
 		// plugin basic properties
-		this.title = this.lang.backgroundColor;
+		this.title = this.$.lang.backgroundColor;
 		this.icon = 'background_color';
 
 		// create HTML
 		const menu = CreateHTML();
 
 		// members
-		this.colorPicker = new ColorPicker(this, 'backgroundColor', {
+		this.colorPicker = new ColorPicker(this, this.$, 'backgroundColor', {
 			form: menu,
 			colorList: pluginOptions.items,
 			splitNum: pluginOptions.splitNum,
@@ -41,7 +41,7 @@ class BackgroundColor extends PluginDropdownFree {
 		});
 
 		// init
-		this.menu.initDropdownTarget(BackgroundColor, menu);
+		this.$.menu.initDropdownTarget(BackgroundColor, menu);
 	}
 
 	/**
@@ -55,7 +55,7 @@ class BackgroundColor extends PluginDropdownFree {
 		let color = '';
 		if (!element) {
 			colorHelper.style.color = color;
-		} else if (this.format.isLine(element)) {
+		} else if (this.$.format.isLine(element)) {
 			return undefined;
 		} else if ((color = dom.utils.getStyle(element, 'backgroundColor'))) {
 			colorHelper.style.color = color;
@@ -70,7 +70,7 @@ class BackgroundColor extends PluginDropdownFree {
 	 * @type {PluginDropdownFree['on']}
 	 */
 	on(target) {
-		this.colorPicker.init(this.selection.getNode(), target, (current) => this.format.isLine(current));
+		this.colorPicker.init(this.$.selection.getNode(), target, (current) => this.$.format.isLine(current));
 	}
 
 	/**
@@ -88,15 +88,18 @@ class BackgroundColor extends PluginDropdownFree {
 	colorPickerAction(color) {
 		if (color) {
 			const newNode = dom.utils.createElement('SPAN', { style: 'background-color: ' + color + ';' });
-			this.inline.apply(newNode, { stylesToModify: ['background-color'], nodesToRemove: null, strictRemove: null });
+			this.$.inline.apply(newNode, { stylesToModify: ['background-color'], nodesToRemove: null, strictRemove: null });
 		} else {
-			this.inline.apply(null, { stylesToModify: ['background-color'], nodesToRemove: ['span'], strictRemove: true });
+			this.$.inline.apply(null, { stylesToModify: ['background-color'], nodesToRemove: ['span'], strictRemove: true });
 		}
 
-		this.menu.dropdownOff();
+		this.$.menu.dropdownOff();
 	}
 }
 
+/**
+ * @returns {HTMLElement}
+ */
 function CreateHTML() {
 	return dom.utils.createElement('DIV', { class: 'se-dropdown se-list-layer' }, null);
 }

@@ -20,10 +20,10 @@ export type LineHeightPluginOptions = {
 declare class LineHeight extends PluginDropdown {
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {LineHeightPluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(editor: SunEditor.Core, pluginOptions: LineHeightPluginOptions);
+	constructor(editor: SunEditor.Kernel, pluginOptions: LineHeightPluginOptions);
 	title: any;
 	sizeList: NodeListOf<Element>;
 	currentSize: any;

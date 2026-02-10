@@ -12,7 +12,8 @@ import { dom, unicode } from '../../../helper';
 
 /** @type {Record<string, Effect>} */
 export default {
-	// backspace and delete
+	/**  [backspace and delete]  */
+
 	/** @action delFormatRemoveAndMove */
 	'del.format.removeAndMove': ({ ports }, { container, formatEl }) => {
 		const rInfo = ports.html.remove();
@@ -27,7 +28,8 @@ export default {
 		}
 	},
 
-	// backspace
+	/** [backspace]  */
+
 	/** @action backspaceFormatMaintain */
 	'backspace.format.maintain': ({ ctx }, { formatEl }) => {
 		if (formatEl.nodeName.toUpperCase() === ctx.options.get('defaultLine').toUpperCase()) {
@@ -40,6 +42,7 @@ export default {
 			formatEl.parentNode.replaceChild(dom.utils.createElement(ctx.options.get('defaultLine'), null, '<br>'), formatEl);
 		}
 	},
+
 	/** @action backspaceComponentSelect */
 	'backspace.component.select': ({ ports }, { selectionNode, range, fileComponentInfo }) => {
 		let currentZWS = null;
@@ -48,12 +51,14 @@ export default {
 
 		if (ports.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) ports.focusManager.blur();
 	},
+
 	/** @action backspaceComponentRemove */
 	'backspace.component.remove': ({ ports }, { isList, sel, formatEl, fileComponentInfo }) => {
 		if (isList) dom.utils.removeItem(sel);
 		if (formatEl.textContent.length === 0) dom.utils.removeItem(formatEl);
 		if (ports.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) ports.focusManager.blur();
 	},
+
 	/** @action backspaceListMergePrev */
 	'backspace.list.mergePrev': ({ ports }, { prev, formatEl, rangeEl }) => {
 		let con = prev === rangeEl.parentNode ? rangeEl.previousSibling : prev.lastChild;
@@ -75,6 +80,7 @@ export default {
 
 		ports.selection.setRange(con, offset, con, offset);
 	},
+
 	/** @action backspaceListRemoveNested */
 	'backspace.list.removeNested': ({ ports }, { range }) => {
 		ports.html.remove();
@@ -83,7 +89,8 @@ export default {
 		}
 	},
 
-	// delete
+	/** [delete] */
+
 	/** @action deleteComponentSelect */
 	'delete.component.select': ({ ports }, { formatEl, fileComponentInfo }) => {
 		if (dom.check.isListCell(formatEl)) {
@@ -95,6 +102,7 @@ export default {
 
 		if (ports.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) ports.focusManager.blur();
 	},
+
 	/** @action deleteComponentSelectNext */
 	'delete.component.selectNext': ({ ports, ctx }, { formatEl, nextEl }) => {
 		if (dom.check.isZeroWidth(formatEl)) {
@@ -119,6 +127,7 @@ export default {
 			dom.utils.removeItem(nextEl);
 		}
 	},
+
 	/** @action deleteListRemoveNested */
 	'delete.list.removeNested': ({ ports, ctx }, { range, formatEl, rangeEl }) => {
 		if (range.startContainer !== range.endContainer) ports.html.remove();
@@ -150,7 +159,8 @@ export default {
 		}
 	},
 
-	// tab
+	/** [tab] */
+
 	/** @action tabFormatIndent */
 	'tab.format.indent': ({ ports, ctx }, { range, formatEl, shift }) => {
 		const selectedFormats = ports.format.getLines(null);
@@ -187,7 +197,7 @@ export default {
 		if (lines.length > 0) {
 			if (!shift) {
 				if (lines.length === 1) {
-					let tabSize = ctx.status.tabSize + 1;
+					let tabSize = ctx.store.get('tabSize') + 1;
 					if (ctx.options.get('syncTabIndent')) {
 						const baseIndex = dom.query.findTextIndexOnLine(formatEl, range.startContainer, range.startOffset, (current) => ports.component.is(current));
 						const prevTabEndIndex = ports.format.isLine(formatEl.previousElementSibling) ? dom.query.findTabEndIndex(formatEl.previousElementSibling, baseIndex, 2) : 0;
@@ -207,7 +217,7 @@ export default {
 						r.eo = tabText.length;
 					}
 				} else {
-					const tabText = dom.utils.createTextNode(new Array(ctx.status.tabSize + 1).join('\u00A0'));
+					const tabText = dom.utils.createTextNode(new Array(ctx.store.get('tabSize') + 1).join('\u00A0'));
 					const len = lines.length - 1;
 					for (let i = 0, child; i <= len; i++) {
 						child = lines[i].firstChild;
@@ -266,11 +276,13 @@ export default {
 		ports.selection.setRange(r.sc, r.so, r.ec, r.eo);
 	},
 
-	// enter
+	/** [enter] */
+
 	/** @action enterScrollTo */
 	'enter.scrollTo': ({ ports }, { range }) => {
 		ports.enterScrollTo(range);
 	},
+
 	/** @action enterLineAddDefault */
 	'enter.line.addDefault': ({ ports, ctx }, { formatEl }) => {
 		const newFormat = ports.format.addLine(formatEl, ctx.options.get('defaultLine'));
@@ -283,6 +295,7 @@ export default {
 			ports.selection.setRange(temp, 0, temp, 0);
 		}
 	},
+
 	/** @action enterListAddItem */
 	'enter.list.addItem': ({ ports }, { formatEl, selectionNode }) => {
 		const br = dom.utils.createElement('BR');
@@ -293,6 +306,7 @@ export default {
 
 		ports.selection.setRange(br, 1, br, 1);
 	},
+
 	/** @action enterFormatExitEmpty */
 	'enter.format.exitEmpty': ({ ports, ctx }, { formatEl, rangeEl }) => {
 		let newEl = null;
@@ -328,6 +342,7 @@ export default {
 		ports.nodeTransform.removeAllParents(formatEl, null, null);
 		ports.selection.setRange(newEl, 1, newEl, 1);
 	},
+
 	/** @action enterFormatCleanBrAndZWS */
 	'enter.format.cleanBrAndZWS': ({ ports }, { selectionNode, selectionFormat, brBlock, children, offset }) => {
 		if (selectionFormat) dom.utils.removeItem(children[offset - 1]);
@@ -337,6 +352,7 @@ export default {
 		dom.utils.copyFormatAttributes(newEl, brBlock);
 		ports.selection.setRange(newEl, 1, newEl, 1);
 	},
+
 	/** @action enterFormatInsertBrHtml */
 	'enter.format.insertBrHtml': ({ ports }, { brBlock, range, wSelection, offset }) => {
 		ports.html.insert(range.collapsed && dom.check.isBreak(range.startContainer.childNodes[range.startOffset - 1]) ? '<br>' : '<br><br>', { selectInserted: false, skipCharCount: true, skipCleaning: true });
@@ -350,6 +366,7 @@ export default {
 		ports.selection.setRange(focusNode, 1, focusNode, 1);
 		ports.setOnShortcutKey(true);
 	},
+
 	/** @action enterFormatInsertBrNode */
 	'enter.format.insertBrNode': ({ ports }, { wSelection }) => {
 		const focusNext = wSelection.focusNode.nextSibling;
@@ -367,6 +384,7 @@ export default {
 
 		ports.setOnShortcutKey(true);
 	},
+
 	/** @action enterFormatBreakAtEdge */
 	'enter.format.breakAtEdge': ({ ports, ctx }, { formatEl, selectionNode, formatStartEdge, formatEndEdge }) => {
 		const focusBR = dom.utils.createElement('BR');
@@ -394,6 +412,7 @@ export default {
 			ports.selection.setRange(firstEl, 0, firstEl, 0);
 		}
 	},
+
 	/** @action enterFormatBreakWithSelection */
 	'enter.format.breakWithSelection': ({ ports, ctx }, { formatEl, range, formatStartEdge, formatEndEdge }) => {
 		const isMultiLine = ports.format.getLine(range.startContainer, null) !== ports.format.getLine(range.endContainer, null);
@@ -455,6 +474,7 @@ export default {
 		dom.utils.copyTagAttributes(newEl, formatEl, ctx.options.get('lineAttrReset'));
 		ports.selection.setRange(newEl, offset, newEl, offset);
 	},
+
 	/** @action enterFormatBreakAtCursor */
 	'enter.format.breakAtCursor': ({ ports, ctx }, { formatEl, range }) => {
 		let newEl = null;
@@ -469,13 +489,14 @@ export default {
 		dom.utils.copyTagAttributes(newEl, formatEl, ctx.options.get('lineAttrReset'));
 		ports.selection.setRange(newEl, 0, newEl, 0);
 	},
+
 	/** @action enterFigcaptionExitInList */
 	'enter.figcaption.exitInList': ({ ports }, { formatEl }) => {
 		const newEl = ports.format.addLine(formatEl, null);
 		ports.selection.setRange(newEl, 0, newEl, 0);
 	},
 
-	// keydown reducer
+	/** [keydown reducer] */
 	/** @action keydownInputInsertNbsp */
 	'keydown.input.insertNbsp': ({ ports }) => {
 		const nbsp = ports.html.insertNode(dom.utils.createTextNode('\u00a0'), { afterNode: null, skipCharCount: true });
@@ -483,6 +504,7 @@ export default {
 			ports.selection.setRange(nbsp, nbsp.length, nbsp, nbsp.length);
 		}
 	},
+
 	/** @action keydownInputInsertZWS */
 	'keydown.input.insertZWS': ({ ports }) => {
 		const zeroWidth = dom.utils.createTextNode(unicode.zeroWidthSpace);

@@ -2,8 +2,12 @@ import { PluginDropdown } from '../../interfaces';
 import { dom } from '../../helper';
 
 /**
+ * @typedef {{tag: string, command: "line"|"br-line"|"block", name?: string, class?: string}} BlockStyleItem
+ */
+
+/**
  * @typedef {Object} BlockStylePluginOptions
- * @property {Array<"p"|"div"|"blockquote"|"pre"|"h1"|"h2"|"h3"|"h4"|"h5"|"h6"|string>} [items] - Format list
+ * @property {Array<"p"|"div"|"blockquote"|"pre"|"h1"|"h2"|"h3"|"h4"|"h5"|"h6"|string|BlockStyleItem>} [items] - Format list
  */
 
 /**
@@ -16,24 +20,24 @@ class BlockStyle extends PluginDropdown {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {BlockStylePluginOptions} pluginOptions - Plugin options
 	 */
 	constructor(editor, pluginOptions) {
 		super(editor);
 		// plugin basic properties
-		this.title = this.lang.formats;
-		this.inner = '<span class="se-txt">' + this.lang.formats + '</span>' + this.icons.arrow_down;
+		this.title = this.$.lang.formats;
+		this.inner = '<span class="se-txt">' + this.$.lang.formats + '</span>' + this.$.icons.arrow_down;
 
 		// create HTML
-		const menu = CreateHTML(editor, pluginOptions.items);
+		const menu = CreateHTML(this.$, pluginOptions.items);
 
 		// members
 		this.formatList = menu.querySelectorAll('li button');
 		this.currentFormat = '';
 
 		// init
-		this.menu.initDropdownTarget(BlockStyle, menu);
+		this.$.menu.initDropdownTarget(BlockStyle, menu);
 	}
 
 	/**
@@ -41,12 +45,12 @@ class BlockStyle extends PluginDropdown {
 	 * @type {SunEditor.Hook.Event.Active}
 	 */
 	active(element, target) {
-		let formatTitle = this.lang.formats;
+		let formatTitle = this.$.lang.formats;
 		const targetText = target.querySelector('.se-txt');
 
 		if (!element) {
 			dom.utils.changeTxt(targetText, formatTitle);
-		} else if (this.format.isLine(element)) {
+		} else if (this.$.format.isLine(element)) {
 			const formatList = this.formatList;
 			const nodeName = element.nodeName.toLowerCase();
 			const className = (element.className.match(/(\s|^)__se__format__[^\s]+/) || [''])[0].trim();
@@ -101,14 +105,14 @@ class BlockStyle extends PluginDropdown {
 		const command = target.getAttribute('data-command');
 		const tag = target.firstElementChild;
 		if (command === 'block') {
-			this.format.applyBlock(tag);
+			this.$.format.applyBlock(tag);
 		} else if (command === 'br-line') {
-			this.format.setBrLine(tag);
+			this.$.format.setBrLine(tag);
 		} else {
-			this.format.setLine(tag);
+			this.$.format.setLine(tag);
 		}
 
-		this.menu.dropdownOff();
+		this.$.menu.dropdownOff();
 	}
 
 	/**
@@ -119,10 +123,15 @@ class BlockStyle extends PluginDropdown {
 	applyHeaderByShortcut({ keyCode }) {
 		const headerNum = keyCode.match(/\d+$/)?.[0];
 		const tag = dom.utils.createElement(`H${headerNum}`);
-		this.format.setLine(tag);
+		this.$.format.setLine(tag);
 	}
 }
 
+/**
+ * @param {SunEditor.Deps} $ - Kernel dependencies
+ * @param {Array<string|BlockStyleItem>} [items] - Block style items
+ * @returns {HTMLElement}
+ */
 function CreateHTML({ lang }, items) {
 	const defaultFormats = ['p', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
 	const formatList = !items || items.length === 0 ? defaultFormats : items;
@@ -134,7 +143,8 @@ function CreateHTML({ lang }, items) {
 	for (let i = 0, len = formatList.length, format, tagName, command, name, h, attrs, className; i < len; i++) {
 		format = formatList[i];
 
-		if (typeof format === 'string' && defaultFormats.includes(format)) {
+		if (typeof format === 'string') {
+			if (!defaultFormats.includes(format)) continue;
 			tagName = format.toLowerCase();
 			command = tagName === 'blockquote' ? 'block' : tagName === 'pre' ? 'br-line' : 'line';
 			h = /^h/.test(tagName) ? tagName.match(/\d+/)[0] : '';

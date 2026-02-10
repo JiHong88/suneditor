@@ -2,7 +2,6 @@
  * @fileoverview Implements HueSlider.
  */
 
-import CoreInjector from '../../editorInjector/_core';
 import { dom, env } from '../../helper';
 import Controller from './Controller';
 
@@ -28,6 +27,9 @@ let ctx;
 
 let _bootstrapped = false;
 
+/**
+ * @returns {{slider: HTMLElement, offscreenCanvas: HTMLCanvasElement, offscreenCtx: CanvasRenderingContext2D, wheel: HTMLCanvasElement, wheelCtx: CanvasRenderingContext2D, wheelPointer: HTMLElement, gradientBar: HTMLCanvasElement, gradientPointer: HTMLElement, fanalColorHex: HTMLElement, fanalColorBackground: HTMLElement}}
+ */
 function CreateSliderCtx() {
 	const offscreenCanvas = document.createElement('canvas');
 	offscreenCanvas.width = SIZE;
@@ -92,7 +94,9 @@ function CreateSliderCtx() {
  * - When you call the .attach() method, the hue slider is appended to the form element.
  * It must be called every time it is used.
  */
-class HueSlider extends CoreInjector {
+class HueSlider {
+	#$;
+
 	#globalMouseDown;
 	#globalTouchMove;
 	#globalMouseUp;
@@ -103,11 +107,12 @@ class HueSlider extends CoreInjector {
 	/**
 	 * @constructor
 	 * @param {import('./ColorPicker').default} inst The instance object that called the constructor.
+	 * @param {SunEditor.Deps} $ Kernel dependencies
 	 * @param {HueSliderParams} [params={}] Hue slider options
 	 * @param {string} [className=""] The class name of the hue slider.
 	 */
-	constructor(inst, params = {}, className = '') {
-		super(inst.editor);
+	constructor(inst, $, params = {}, className = '') {
+		this.#$ = $;
 
 		// members
 		this.inst = inst;
@@ -132,9 +137,9 @@ class HueSlider extends CoreInjector {
 
 		// init default controller
 		if (!params.isNewForm) {
-			const hueController = CreateHTML_basicControllerForm(inst.editor, className);
+			const hueController = CreateHTML_basicControllerForm($, className);
 			this.circle = hueController.querySelector('.se-hue');
-			this.controller = new Controller(this, hueController, { position: 'bottom', isWWTarget: false, parents: [inst.form], parentsHide: true, ...params.controllerOptions });
+			this.controller = new Controller(this, $, hueController, { position: 'bottom', isWWTarget: false, parents: [inst.form], parentsHide: true, ...params.controllerOptions });
 		}
 	}
 
@@ -223,9 +228,9 @@ class HueSlider extends CoreInjector {
 		// touch event
 		if (isTouchDevice) {
 			// mobile name
-			this.#globalTouchStart = this.eventManager.addGlobalEvent('touchstart', OnTouchstart, { passive: false, capture: true });
-			this.#globalTouchMove = this.eventManager.addGlobalEvent('touchmove', OnTouchmove, true);
-			this.#globalTouchEnd = this.eventManager.addGlobalEvent(
+			this.#globalTouchStart = this.#$.eventManager.addGlobalEvent('touchstart', OnTouchstart, { passive: false, capture: true });
+			this.#globalTouchMove = this.#$.eventManager.addGlobalEvent('touchmove', OnTouchmove, true);
+			this.#globalTouchEnd = this.#$.eventManager.addGlobalEvent(
 				'touchend',
 				() => {
 					isWheelragging = false;
@@ -236,9 +241,9 @@ class HueSlider extends CoreInjector {
 		}
 
 		// mouse event
-		this.#globalMouseDown = this.eventManager.addGlobalEvent('mousedown', OnMousedown, { passive: false, capture: true });
-		this.#globalMouseMove = this.eventManager.addGlobalEvent('mousemove', OnMousemove, true);
-		this.#globalMouseUp = this.eventManager.addGlobalEvent(
+		this.#globalMouseDown = this.#$.eventManager.addGlobalEvent('mousedown', OnMousedown, { passive: false, capture: true });
+		this.#globalMouseMove = this.#$.eventManager.addGlobalEvent('mousemove', OnMousemove, true);
+		this.#globalMouseUp = this.#$.eventManager.addGlobalEvent(
 			'mouseup',
 			() => {
 				isWheelragging = false;
@@ -259,13 +264,13 @@ class HueSlider extends CoreInjector {
 		isWheelragging = false;
 		isBarDragging = false;
 
-		this.#globalMouseDown &&= this.eventManager.removeGlobalEvent(this.#globalMouseDown);
-		this.#globalMouseMove &&= this.eventManager.removeGlobalEvent(this.#globalMouseMove);
-		this.#globalMouseUp &&= this.eventManager.removeGlobalEvent(this.#globalMouseUp);
+		this.#globalMouseDown &&= this.#$.eventManager.removeGlobalEvent(this.#globalMouseDown);
+		this.#globalMouseMove &&= this.#$.eventManager.removeGlobalEvent(this.#globalMouseMove);
+		this.#globalMouseUp &&= this.#$.eventManager.removeGlobalEvent(this.#globalMouseUp);
 
-		this.#globalTouchStart &&= this.eventManager.removeGlobalEvent(this.#globalTouchStart);
-		this.#globalTouchMove &&= this.eventManager.removeGlobalEvent(this.#globalTouchMove);
-		this.#globalTouchEnd &&= this.eventManager.removeGlobalEvent(this.#globalTouchEnd);
+		this.#globalTouchStart &&= this.#$.eventManager.removeGlobalEvent(this.#globalTouchStart);
+		this.#globalTouchMove &&= this.#$.eventManager.removeGlobalEvent(this.#globalTouchMove);
+		this.#globalTouchEnd &&= this.#$.eventManager.removeGlobalEvent(this.#globalTouchEnd);
 	}
 }
 
@@ -578,6 +583,11 @@ function InitRender() {
 
 InitRender();
 
+/**
+ * @param {SunEditor.Deps} $ - Kernel dependencies
+ * @param {string} className - Controller CSS class name
+ * @returns {HTMLElement}
+ */
 function CreateHTML_basicControllerForm({ lang, icons }, className) {
 	const hueController = dom.utils.createElement(
 		'DIV',

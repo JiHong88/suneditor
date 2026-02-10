@@ -19,11 +19,11 @@ import type {} from '../../../../typedef';
  * @property {HTMLButtonElement} asInline
  * @property {HTMLButtonElement} fileRemoveBtn
  *
- * @param {SunEditor.Core} editor
+ * @param {SunEditor.Deps} $
  * @param {*} pluginOptions
  * @returns {ModalReturns_image}
  */
-export function CreateHTML_modal({ lang, icons, plugins }: SunEditor.Core, pluginOptions: any): ModalReturns_image;
+export function CreateHTML_modal({ lang, icons, plugins }: SunEditor.Deps, pluginOptions: any): ModalReturns_image;
 export type ModalReturns_image = {
 	html: HTMLElement;
 	alignForm: HTMLElement;

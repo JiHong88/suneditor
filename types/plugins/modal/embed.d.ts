@@ -160,10 +160,10 @@ declare class Embed extends PluginModal {
 	static #urlPatterns: Array<RegExp>;
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {EmbedPluginOptions} pluginOptions
 	 */
-	constructor(editor: SunEditor.Core, pluginOptions: EmbedPluginOptions);
+	constructor(editor: SunEditor.Kernel, pluginOptions: EmbedPluginOptions);
 	title: any;
 	pluginOptions: {
 		canResize: boolean;

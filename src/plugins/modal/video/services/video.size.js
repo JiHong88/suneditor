@@ -7,6 +7,7 @@ import { Figure } from '../../../../modules/contract';
  */
 export class VideoSizeService {
 	#main;
+	#$;
 	#state;
 	#pluginOptions;
 	#resizing;
@@ -29,6 +30,7 @@ export class VideoSizeService {
 	 */
 	constructor(main, modalEl) {
 		this.#main = main;
+		this.#$ = main.$;
 		this.#state = main.state;
 		this.#pluginOptions = main.pluginOptions;
 		this.#resizing = this.#pluginOptions.canResize;
@@ -48,13 +50,13 @@ export class VideoSizeService {
 			this.#inputY.value = this.#pluginOptions.defaultHeight;
 
 			const ratioChange = this.#OnChangeRatio.bind(this);
-			main.eventManager.addEvent(this.#inputX, 'keyup', this.#OnInputSize.bind(this, 'x'));
-			main.eventManager.addEvent(this.#inputY, 'keyup', this.#OnInputSize.bind(this, 'y'));
-			main.eventManager.addEvent(this.#inputX, 'change', ratioChange);
-			main.eventManager.addEvent(this.#inputY, 'change', ratioChange);
-			main.eventManager.addEvent(this.#proportion, 'change', ratioChange);
-			main.eventManager.addEvent(this.frameRatioOption, 'change', this.#SetRatio.bind(this));
-			main.eventManager.addEvent(modalEl.revertBtn, 'click', this.#OnClickRevert.bind(this));
+			this.#$.eventManager.addEvent(this.#inputX, 'keyup', this.#OnInputSize.bind(this, 'x'));
+			this.#$.eventManager.addEvent(this.#inputY, 'keyup', this.#OnInputSize.bind(this, 'y'));
+			this.#$.eventManager.addEvent(this.#inputX, 'change', ratioChange);
+			this.#$.eventManager.addEvent(this.#inputY, 'change', ratioChange);
+			this.#$.eventManager.addEvent(this.#proportion, 'change', ratioChange);
+			this.#$.eventManager.addEvent(this.frameRatioOption, 'change', this.#SetRatio.bind(this));
+			this.#$.eventManager.addEvent(modalEl.revertBtn, 'click', this.#OnClickRevert.bind(this));
 		}
 	}
 

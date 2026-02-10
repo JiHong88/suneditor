@@ -4,11 +4,11 @@ export default Modal;
  * @class
  * @description Modal window module
  */
-declare class Modal extends CoreInjector {
+declare class Modal {
 	/**
 	 * @description Create a file input tag in the modal window.
-	 * @param {{icons: SunEditor.Core['icons'], lang: SunEditor.Core['lang']}} param0 - icons and language object
-	 * @param {{acceptedFormats: string, allowMultiple}} param1 - options
+	 * @param {{icons: SunEditor.Deps['icons'], lang: SunEditor.Deps['lang']}} param0 - icons and language object
+	 * @param {{acceptedFormats?: string, allowMultiple?: boolean}} param1 - options
 	 * - acceptedFormats: "image/*, video/*, audio/*", etc.
 	 * - allowMultiple: true or false
 	 * @returns {string} HTML string
@@ -18,15 +18,15 @@ declare class Modal extends CoreInjector {
 			icons,
 			lang,
 		}: {
-			icons: SunEditor.Core['icons'];
-			lang: SunEditor.Core['lang'];
+			icons: SunEditor.Deps['icons'];
+			lang: SunEditor.Deps['lang'];
 		},
 		{
 			acceptedFormats,
 			allowMultiple,
 		}: {
-			acceptedFormats: string;
-			allowMultiple: any;
+			acceptedFormats?: string;
+			allowMultiple?: boolean;
 		},
 	): string;
 	/**
@@ -37,15 +37,11 @@ declare class Modal extends CoreInjector {
 	static OnChangeFile(wrapper: Element, files: FileList | File[]): void;
 	/**
 	 * @description Modal window module
-	 * @param {* & {editor: SunEditor.Core}} inst The instance object that called the constructor.
+	 * @param {*} inst The instance object that called the constructor.
+	 * @param {SunEditor.Deps} $ Kernel dependencies
 	 * @param {Element} element Modal element
 	 */
-	constructor(
-		inst: any & {
-			editor: SunEditor.Core;
-		},
-		element: Element,
-	);
+	constructor(inst: any, $: SunEditor.Deps, element: Element);
 	inst: any;
 	kind: any;
 	form: HTMLElement;
@@ -64,4 +60,3 @@ declare class Modal extends CoreInjector {
 	close(): void;
 	#private;
 }
-import CoreInjector from '../../editorInjector/_core';

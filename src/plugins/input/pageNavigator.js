@@ -15,13 +15,13 @@ class PageNavigator extends PluginInput {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 */
 	constructor(editor) {
 		super(editor);
 
 		// create HTML
-		this.title = this.lang.pageNumber;
+		this.title = this.$.lang.pageNumber;
 		this.inner = CreateInner();
 		this.afterItem = dom.utils.createElement('span', { class: 'se-btn se-sub-btn' }, ``);
 
@@ -30,7 +30,7 @@ class PageNavigator extends PluginInput {
 		this.totalPages = 1;
 
 		// init
-		this.eventManager.addEvent(this.inner, 'change', this.#OnChangeInner.bind(this));
+		this.$.eventManager.addEvent(this.inner, 'change', this.#OnChangeInner.bind(this));
 	}
 
 	/**
@@ -53,16 +53,19 @@ class PageNavigator extends PluginInput {
 	 * @param {InputEvent} e - Event object
 	 */
 	#OnChangeInner(e) {
-		if (!this.frameContext.has('documentType_use_page')) return;
+		if (!this.$.frameContext.has('documentType_use_page')) return;
 
 		/** @type {HTMLInputElement} */
 		const eventTarget = dom.query.getEventTarget(e);
 
 		const value = Number(eventTarget.value) || 1;
-		this.frameContext.get('documentType').pageGo(value);
+		this.$.frameContext.get('documentType').pageGo(value);
 	}
 }
 
+/**
+ * @returns {HTMLInputElement}
+ */
 function CreateInner() {
 	return /** @type {HTMLInputElement} */ (dom.utils.createElement('input', { type: 'number', class: 'se-not-arrow-text', placeholder: '1', value: '1', min: '1' }, null));
 }

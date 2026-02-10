@@ -18,17 +18,17 @@ class LineHeight extends PluginDropdown {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.Kernel} editor - The core kernel
 	 * @param {LineHeightPluginOptions} pluginOptions - Plugin options
 	 */
 	constructor(editor, pluginOptions) {
 		// plugin bisic properties
 		super(editor);
-		this.title = this.lang.lineHeight;
+		this.title = this.$.lang.lineHeight;
 		this.icon = 'line_height';
 
 		// create HTML
-		const menu = CreateHTML(editor, pluginOptions.items);
+		const menu = CreateHTML(this.$, pluginOptions.items);
 
 		// members
 		this.sizeList = menu.querySelectorAll('li button');
@@ -37,7 +37,7 @@ class LineHeight extends PluginDropdown {
 		this.#defaultValue = /** @type {HTMLSpanElement} */ (menu.querySelector('.se-sub-list span'));
 
 		// init
-		this.menu.initDropdownTarget(LineHeight, menu);
+		this.$.menu.initDropdownTarget(LineHeight, menu);
 	}
 
 	/**
@@ -45,7 +45,7 @@ class LineHeight extends PluginDropdown {
 	 * @type {SunEditor.Hook.Event.Active}
 	 */
 	active(element, target) {
-		if (this.format.isLine(element) && element.style.lineHeight.length > 0) {
+		if (this.$.format.isLine(element) && element.style.lineHeight.length > 0) {
 			dom.utils.addClass(target, 'active');
 			return true;
 		}
@@ -59,7 +59,7 @@ class LineHeight extends PluginDropdown {
 	 * @type {PluginDropdown['on']}
 	 */
 	on() {
-		const format = this.format.getLine(this.selection.getNode());
+		const format = this.$.format.getLine(this.$.selection.getNode());
 		const currentSize = !format ? '' : format.style.lineHeight + '';
 
 		if (currentSize !== this.currentSize) {
@@ -91,19 +91,24 @@ class LineHeight extends PluginDropdown {
 	 */
 	action(target) {
 		const value = target.getAttribute('data-command') || '';
-		const formats = this.format.getLines();
+		const formats = this.$.format.getLines();
 
 		for (let i = 0, len = formats.length; i < len; i++) {
 			formats[i].style.lineHeight = value;
 		}
 
-		this.menu.dropdownOff();
+		this.$.menu.dropdownOff();
 
-		this.editor.effectNode = null;
-		this.history.push(false);
+		this.$.store.set('_lastSelectionNode', null);
+		this.$.history.push(false);
 	}
 }
 
+/**
+ * @param {SunEditor.Deps} $ - Kernel dependencies
+ * @param {Array<{text: string, value: string}>} [items] - Line height items
+ * @returns {HTMLElement}
+ */
 function CreateHTML({ lang }, items) {
 	const sizeList = items || [
 		{ text: '1', value: '1em' },
