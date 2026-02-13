@@ -43,6 +43,7 @@ export default {
 
 	/** @action documentTypeRefreshHeader */
 	'documentType.refreshHeader': ({ ctx }) => {
+		// Defer header recalculation — DOM structure changes from the triggering action must complete first
 		_w.setTimeout(() => {
 			ctx.fc.get('documentType').reHeader();
 		}, 0);

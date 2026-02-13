@@ -436,6 +436,7 @@ class Viewer {
 		}
 
 		this.#$.ui.showLoading();
+		// Defer print — allow loading overlay to render before blocking the main thread with print dialog
 		_w.setTimeout(() => {
 			try {
 				iframe.focus();

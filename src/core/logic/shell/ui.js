@@ -425,7 +425,7 @@ class UIManager {
 		this.toastMessage.textContent = message;
 		dom.utils.addClass(this.toastContainer, 'se-toast-show');
 
-		// remove after animation
+		// Auto-dismiss toast after display duration (cleared if toast is manually closed)
 		this.#toastToggle = _w.setTimeout(() => {
 			this.closeToast();
 		}, duration);
@@ -793,6 +793,7 @@ class UIManager {
 		const autoFrame = fc.get('_iframeAuto');
 
 		if (autoFrame) {
+			// Defer iframe height measurement — content must render/reflow before measuring offsetHeight
 			this.#kernel._w.setTimeout(() => {
 				const h = autoFrame.offsetHeight;
 				const wysiwygFrame = fc.get('wysiwygFrame');

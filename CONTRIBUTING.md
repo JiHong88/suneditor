@@ -62,7 +62,7 @@ SunEditor supports a modular plugin architecture where features can be enabled/d
     - Dropdown menu: [src/plugins/dropdown/align.js](src/plugins/dropdown/align.js)
 
 3. **Create your plugin**:
-    - Extend `EditorInjector` class
+    - Extend the appropriate plugin interface class (e.g., `PluginCommand`, `PluginModal`, `PluginDropdown`) from `src/interfaces/plugins.js`
     - Implement required methods (`action()`, `open()`, etc.)
     - Add static properties (`key`, `type`, `className`)
     - Export and register in options

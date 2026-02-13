@@ -61,6 +61,7 @@ export function ButtonsHandler(e) {
 					const value = eventTarget.value.trim();
 					if (typeof plugin.toolbarInputChange === 'function' && value !== this.__inputPlugin.value) plugin.toolbarInputChange({ target: eventTarget, value, event: ev });
 				} finally {
+					// Defer flag reset — wysiwyg focus event fires synchronously during blur and checks this flag
 					_w.setTimeout(() => (this._inputFocus = false), 0);
 					this.__removeInput();
 				}

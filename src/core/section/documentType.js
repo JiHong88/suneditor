@@ -150,6 +150,7 @@ class DocumentType {
 		if (!this.#page) return;
 		if (this.#rePageTimeout) _w.clearTimeout(this.#rePageTimeout);
 
+		// Debounced page re-render — waits for media to load and coalesces rapid calls (cleared on next rePage)
 		this.#rePageTimeout = _w.setTimeout(async () => {
 			await dom.utils.waitForMediaLoad(this.#mirror, 1500);
 

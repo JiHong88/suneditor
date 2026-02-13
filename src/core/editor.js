@@ -148,6 +148,7 @@ class Editor {
 		this.$.store._editorInitFinished = true;
 		this.$.pluginManager.checkFileInfo(true);
 
+		// Defer post-init tasks (observers, history reset, plugin init, onload) to allow DOM to settle after iframe/wysiwyg insertion
 		this.#kernel._w.setTimeout(() => {
 			// Check if instance was destroyed (e.g., in SSR with dynamic imports mistake)
 			if (!this.$.context?.size) {

@@ -91,6 +91,7 @@ class Char {
 	display(fc) {
 		const charCounter = (fc || this.#frameContext).get('charCounter');
 		if (charCounter) {
+			// Defer count update — DOM content may still be mutating from the current input/paste action
 			_w.setTimeout(() => {
 				charCounter.textContent = String(this.getLength());
 			}, 0);
@@ -149,6 +150,7 @@ class Char {
 function CounterBlink(charWrapper) {
 	if (charWrapper && !hasClass(charWrapper, 'se-blink')) {
 		addClass(charWrapper, 'se-blink');
+		// Remove blink CSS class after animation completes (600ms matches the CSS animation duration)
 		_w.setTimeout(() => {
 			removeClass(charWrapper, 'se-blink');
 		}, 600);

@@ -34,6 +34,7 @@ export async function OnMouseDown_wysiwyg(fc, e) {
 
 	this._setSelectionSync();
 
+	// Defer selection.init — browser finalizes selection/range after mousedown event returns
 	_w.setTimeout(this.$.selection.init.bind(this.$.selection), 0);
 
 	// user event
@@ -130,6 +131,7 @@ export async function OnClick_wysiwyg(fc, e) {
 	// copy format
 	this.$.commandDispatcher._copyFormat();
 
+	// Defer balloon toggle — selection range is finalized after mouseup event returns
 	if (this.$.store.mode.isBalloon || this.$.store.mode.isSubBalloon) _w.setTimeout(this._toggleToolbarBalloon.bind(this), 0);
 }
 

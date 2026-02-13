@@ -336,11 +336,13 @@ class EventOrchestrator extends KernelInjector {
 		/** observer */
 		if (env.isResizeObserverSupported) {
 			this._toolbarObserver = new ResizeObserver(() => {
+				// Defer to avoid ResizeObserver loop limit — layout must settle before recalculating responsive buttons
 				_w.setTimeout(() => {
 					this.#toolbar.resetResponsiveToolbar();
 				}, 0);
 			});
 			this._wwFrameObserver = new ResizeObserver((entries) => {
+				// Defer to avoid ResizeObserver loop limit — measure final height after reflow completes
 				_w.setTimeout(() => {
 					entries.forEach((e) => {
 						this.#ui._emitResizeEvent(this.$.frameRoots.get(e.target.getAttribute('data-root-key')), -1, e);
@@ -745,6 +747,7 @@ class EventOrchestrator extends KernelInjector {
 
 		if (this._inputFocus) {
 			if (this.#store.mode.isInline) {
+				// Defer inline toolbar show — browser focus event fires before selection is finalized
 				_w.setTimeout(() => {
 					this.#toolbar._showInline();
 				}, 0);
@@ -761,6 +764,7 @@ class EventOrchestrator extends KernelInjector {
 		this.$.facade.changeFrameContext(rootKey);
 		this.$.history.resetButtons(rootKey, null);
 
+		// Defer focus event emission — allow blur handler on the previous frame to complete first
 		_w.setTimeout(() => {
 			this.__postFocusEvent(frameContext, e);
 		}, 0);

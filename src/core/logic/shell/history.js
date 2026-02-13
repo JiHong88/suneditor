@@ -224,6 +224,7 @@ export default function History(kernel) {
 			rootKey = rootKey || rootKey === null ? rootKey : store.get('rootKey');
 			const range = store.get('_range');
 
+			// Defer frame sync (code view, page mirror) — DOM updates from the current action must complete first
 			_w.setTimeout($.ui._syncFrameState.bind($.ui, frameRoots.get(rootKey)), 0);
 			const time = typeof delay === 'number' ? (delay > 0 ? delay : 0) : !delay ? 0 : delayTime;
 
@@ -235,6 +236,7 @@ export default function History(kernel) {
 				}
 			}
 
+			// Debounced history save — coalesces rapid edits into a single snapshot (cleared on next push or immediate save)
 			pushDelay = _w.setTimeout(() => {
 				_w.clearTimeout(pushDelay);
 				pushDelay = null;
@@ -291,6 +293,7 @@ export default function History(kernel) {
 				_w.clearTimeout(waitingTime);
 				waitingTime = null;
 			}
+			// Safety auto-resume — prevents permanent history freeze if resume() is never called (cleared on resume)
 			waitingTime = _w.setTimeout(() => {
 				waiting = false;
 			}, 5000);

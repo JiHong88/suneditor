@@ -736,6 +736,7 @@ class Selection_ {
 				this.#frameContext.get('wysiwyg').focus();
 			}
 		} finally {
+			// Defer flag reset — iframe.focus() triggers synchronous focus/blur events that check this flag
 			_w.setTimeout(() => (this.__iframeFocus = false), 0);
 		}
 	}

@@ -700,6 +700,12 @@ Interface definitions: [`src/interfaces/contracts.js`](src/interfaces/contracts.
 | `hueSliderAction(color)`  | Required | Color selected in slider | `void` |
 | `hueSliderCancelAction()` | Optional | Hue slider cancelled     | `void` |
 
+###### Browser Module — Interface: `ModuleBrowser`
+
+| Hook            | Required | When Called    | Return |
+| --------------- | -------- | -------------- | ------ |
+| `browserInit()` | Optional | Browser opened | `void` |
+
 ---
 
 ##### 2. Component Hooks — Interface: `EditorComponent`
@@ -742,33 +748,57 @@ These hooks from `src/hooks/base.js` can be implemented by **any plugin type**.
 | `shortcut(params)`        | Shortcut key triggered               | `void`                 |
 | `setDir(dir)`             | RTL direction change                 | `void`                 |
 
+###### Toolbar Input Hooks (PluginInput only)
+
+| Hook                          | When Called                      | Return |
+| ----------------------------- | -------------------------------- | ------ |
+| `toolbarInputKeyDown(params)` | Keydown in toolbar input element | `void` |
+| `toolbarInputChange(params)`  | Input value changes (blur/click) | `void` |
+
 ###### Event Hooks
 
-> - Has async variant using same method name
-> - Interruptible event (returning boolean stops event loop and prevents default behavior)
+All event hooks have an **async variant** with the same name suffixed by `Async` (e.g., `onKeyDownAsync`). Async variants receive the same parameters and follow the same return value rules.
 
-| Hook                 | When Called          | Return            |
-| -------------------- | -------------------- | ----------------- |
-| `onKeyDown`          | Key down in editor   | `boolean \| void` |
-| `onKeyUp`            | Key up in editor     | `boolean \| void` |
-| `onMouseDown`        | Mouse down in editor | `boolean \| void` |
-| `onClick`            | Click in editor      | `boolean \| void` |
-| `onPaste`            | Paste event          | `boolean \| void` |
-| `onBeforeInput`      | Before input event   | `boolean \| void` |
-| `onInput`            | Editor content input | `boolean \| void` |
-| `onMouseUp`          | Mouse up in editor   | `boolean \| void` |
-| `onMouseLeave`       | Mouse leave editor   | `boolean \| void` |
-| `onMouseMove`        | Mouse move in editor | `void`            |
-| `onScroll`           | Editor scroll        | `void`            |
-| `onFocus`            | Editor focus         | `void`            |
-| `onBlur`             | Editor blur          | `void`            |
-| `onFilePasteAndDrop` | File paste/drop      | `boolean \| void` |
+> **Interruptible**: Returning a boolean stops the event hook loop and controls default behavior.
 
-**Event Hook Return Values:**
+| Hook                 | When Called          | Interruptible | Return            |
+| -------------------- | -------------------- | ------------- | ----------------- |
+| `onKeyDown`          | Key down in editor   | Yes           | `boolean \| void` |
+| `onKeyUp`            | Key up in editor     | Yes           | `boolean \| void` |
+| `onMouseDown`        | Mouse down in editor | Yes           | `boolean \| void` |
+| `onClick`            | Click in editor      | Yes           | `boolean \| void` |
+| `onPaste`            | Paste event          | Yes           | `boolean \| void` |
+| `onBeforeInput`      | Before input event   | No            | `void`            |
+| `onInput`            | Editor content input | No            | `void`            |
+| `onMouseUp`          | Mouse up in editor   | No            | `void`            |
+| `onMouseLeave`       | Mouse leave editor   | No            | `void`            |
+| `onMouseMove`        | Mouse move in editor | No            | `void`            |
+| `onScroll`           | Editor scroll        | No            | `void`            |
+| `onFocus`            | Editor focus         | No            | `void`            |
+| `onBlur`             | Editor blur          | No            | `void`            |
+| `onFilePasteAndDrop` | File paste/drop      | No            | `void`            |
 
-- `false` - Stops remaining plugins + prevents default editor behavior
-- `true` - Stops remaining plugins + allows default editor behavior
-- `void`/`undefined` - Continues to next plugin
+**Interruptible Event Return Values:**
+
+- `false` — Stops remaining plugins **and** prevents default editor behavior
+- `true` — Stops remaining plugins, **allows** default editor behavior
+- `void`/`undefined` — Continues to next plugin
+
+###### Event Hook Execution Order (`eventIndex`)
+
+When multiple plugins implement the same event hook, execution order is controlled by `eventIndex` in `static options`:
+
+```javascript
+class MyPlugin extends PluginField {
+	static options = {
+		eventIndex: 100, // Default priority for all events
+		eventIndex_onKeyDown: 50, // Per-event override (lower = earlier)
+		eventIndex_onInput: 200, // Higher = later execution
+	};
+}
+```
+
+Lower `eventIndex` values execute first. Per-event overrides (e.g., `eventIndex_onKeyDown`) take precedence over the default `eventIndex`.
 
 ---
 

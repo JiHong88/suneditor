@@ -190,6 +190,7 @@ export async function OnKeyUp_wysiwyg(fc, e) {
 					this.__retainTimer = _w.clearTimeout(this.__retainTimer);
 					this._clearRetainStyleNodes(formatEl);
 				} else {
+					// Timer as a "first press" flag — next keydown within the same tick clears and toggles to "remove" mode (repeat mode toggle)
 					this.__retainTimer = _w.setTimeout(() => {
 						this.__retainTimer = null;
 					}, 0);

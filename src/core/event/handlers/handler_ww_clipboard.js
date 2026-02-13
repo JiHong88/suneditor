@@ -51,6 +51,7 @@ export async function OnCut_wysiwyg(frameContext, e) {
 	const fcSelection = frameContext.get('_ww').getSelection();
 	this.__secopy = fcSelection.toString();
 
+	// Defer history snapshot — browser applies the cut to the DOM after the cut event returns
 	_w.setTimeout(() => {
 		this.$.history.push(false);
 	}, 0);

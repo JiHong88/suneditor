@@ -315,6 +315,7 @@ class Component {
 				this.#$.selection.setRange(info.container, 0, info.container, 0);
 			}
 			this.#$.focusManager.blur();
+			// Defer flag reset — blur event fires synchronously and checks __selectionSelected to distinguish component-initiated blur
 			_w.setTimeout(() => {
 				this.__selectionSelected = false;
 			});
@@ -337,6 +338,7 @@ class Component {
 		_DragHandle.set('__dragInst', this);
 
 		const __overInfo = _DragHandle.get('__overInfo');
+		// Defer drag handle setup — let the current click/mousedown event complete before attaching global listeners
 		_w.setTimeout(() => {
 			_DragHandle.set('__overInfo', __overInfo === ON_OVER_COMPONENT ? undefined : false);
 			if (__overInfo !== ON_OVER_COMPONENT) this.#addGlobalEvent();
@@ -397,6 +399,7 @@ class Component {
 	 * @description Deselects the selected component.
 	 */
 	deselect() {
+		// Defer controlActive reset — synchronous blur handlers during deselect still need to see it as active
 		_w.setTimeout(() => {
 			this.#store.set('controlActive', false);
 		}, 0);
