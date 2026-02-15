@@ -3,6 +3,7 @@
  */
 
 import Font from '../../../../src/plugins/dropdown/font.js';
+import { createMockEditor } from '../../../../test/__mocks__/editorMock.js';
 
 // Mock helper
 jest.mock('../../../../src/helper', () => ({
@@ -55,61 +56,23 @@ jest.mock('../../../../src/helper', () => ({
     }
 }));
 
-// Mock EditorInjector
-jest.mock('../../../../src/editorInjector', () => {
-    return jest.fn().mockImplementation(function(editor) {
-        this.editor = editor;
-        this.lang = editor.lang;
-        this.icons = editor.icons;
-        this.status = editor.status;
-        this.format = editor.format;
-        this.inline = editor.inline;
-        this.menu = editor.menu;
-        this.frameContext = editor.frameContext;
-        this.triggerEvent = editor.triggerEvent || jest.fn();
-    });
-});
-
 describe('Plugins - Dropdown - Font', () => {
-    let mockEditor;
+    let kernel;
     let font;
     let pluginOptions;
 
     beforeEach(() => {
         jest.clearAllMocks();
 
-        mockEditor = {
-            lang: {
-                font: 'Font',
-                default: 'Default'
-            },
-            icons: {
-                arrow_down: '▼'
-            },
-            status: {
-                hasFocus: true
-            },
-            format: {
-                isLine: jest.fn().mockReturnValue(false)
-            },
-            inline: {
-                apply: jest.fn()
-            },
-            menu: {
-                initDropdownTarget: jest.fn(),
-                dropdownOff: jest.fn()
-            },
-            frameContext: new Map([
-                ['wwComputedStyle', { fontFamily: 'Arial' }]
-            ]),
-            triggerEvent: jest.fn().mockResolvedValue(true)
-        };
+        kernel = createMockEditor();
+        kernel.$.lang.default = 'Default';
+        kernel.$.frameContext.set('wwComputedStyle', { fontFamily: 'Arial' });
 
         pluginOptions = {
             items: ['Arial', 'Georgia', 'Times New Roman']
         };
 
-        font = new Font(mockEditor, pluginOptions);
+        font = new Font(kernel, pluginOptions);
     });
 
 
@@ -125,7 +88,7 @@ describe('Plugins - Dropdown - Font', () => {
         });
 
         it('should initialize dropdown menu', () => {
-            expect(mockEditor.menu.initDropdownTarget).toHaveBeenCalledWith(Font, expect.any(Object));
+            expect(kernel.$.menu.initDropdownTarget).toHaveBeenCalledWith(Font, expect.any(Object));
         });
 
         it('should initialize font list from menu', () => {
@@ -133,7 +96,7 @@ describe('Plugins - Dropdown - Font', () => {
         });
 
         it('should use default fonts when none provided', () => {
-            const defaultFont = new Font(mockEditor, {});
+            const defaultFont = new Font(kernel, {});
             expect(defaultFont.fontArray).toEqual(['Arial', 'Comic Sans MS', 'Courier New', 'Impact', 'Georgia', 'tahoma', 'Trebuchet MS', 'Verdana']);
         });
     });
@@ -155,7 +118,8 @@ describe('Plugins - Dropdown - Font', () => {
         });
 
         it('should update text and tooltip when no element provided and has focus', () => {
-            mockEditor.status.hasFocus = true;
+            kernel.$.store.set('hasFocus', true);
+            kernel.$.frameContext.set('wwComputedStyle', { fontFamily: 'Arial' });
             const { dom } = require('../../../../src/helper');
 
             const result = font.active(null, mockTarget);
@@ -166,7 +130,7 @@ describe('Plugins - Dropdown - Font', () => {
         });
 
         it('should update text when no element provided and no focus', () => {
-            mockEditor.status.hasFocus = false;
+            kernel.$.store.set('hasFocus', false);
             const { dom } = require('../../../../src/helper');
 
             font.active(null, mockTarget);
@@ -177,7 +141,7 @@ describe('Plugins - Dropdown - Font', () => {
 
         it('should return undefined for line elements', () => {
             const mockElement = document.createElement('p');
-            mockEditor.format.isLine.mockReturnValue(true);
+            kernel.$.format.isLine.mockReturnValue(true);
 
             const result = font.active(mockElement, mockTarget);
 
@@ -187,6 +151,7 @@ describe('Plugins - Dropdown - Font', () => {
         it('should return true and update text when element has fontFamily', () => {
             const mockElement = document.createElement('span');
             const { dom } = require('../../../../src/helper');
+            kernel.$.format.isLine.mockReturnValue(false);
             dom.utils.getStyle.mockReturnValue('"Georgia", serif');
 
             const result = font.active(mockElement, mockTarget);
@@ -200,6 +165,7 @@ describe('Plugins - Dropdown - Font', () => {
         it('should return false when element has no fontFamily', () => {
             const mockElement = document.createElement('span');
             const { dom } = require('../../../../src/helper');
+            kernel.$.format.isLine.mockReturnValue(false);
             dom.utils.getStyle.mockReturnValue('');
 
             const result = font.active(mockElement, mockTarget);
@@ -210,6 +176,7 @@ describe('Plugins - Dropdown - Font', () => {
         it('should handle null fontFamily', () => {
             const mockElement = document.createElement('span');
             const { dom } = require('../../../../src/helper');
+            kernel.$.format.isLine.mockReturnValue(false);
             dom.utils.getStyle.mockReturnValue(null);
 
             const result = font.active(mockElement, mockTarget);
@@ -220,6 +187,7 @@ describe('Plugins - Dropdown - Font', () => {
         it('should strip quotes from fontFamily', () => {
             const mockElement = document.createElement('span');
             const { dom } = require('../../../../src/helper');
+            kernel.$.format.isLine.mockReturnValue(false);
             dom.utils.getStyle.mockReturnValue("'Times New Roman', serif");
 
             font.active(mockElement, mockTarget);
@@ -228,8 +196,8 @@ describe('Plugins - Dropdown - Font', () => {
         });
 
         it('should handle empty computed style', () => {
-            mockEditor.frameContext.set('wwComputedStyle', { fontFamily: '' });
-            mockEditor.status.hasFocus = true;
+            kernel.$.store.set('hasFocus', true);
+            kernel.$.frameContext.set('wwComputedStyle', { fontFamily: '' });
             const { dom } = require('../../../../src/helper');
 
             font.active(null, mockTarget);
@@ -330,19 +298,20 @@ describe('Plugins - Dropdown - Font', () => {
 
         it('should apply font family when value provided', async () => {
             mockTarget.getAttribute.mockReturnValue('Arial');
+            kernel.$.eventManager.triggerEvent.mockResolvedValue(undefined);
             const { dom } = require('../../../../src/helper');
 
             await font.action(mockTarget);
 
-            expect(mockEditor.triggerEvent).toHaveBeenCalledWith('onFontActionBefore', { value: 'Arial' });
+            expect(kernel.$.eventManager.triggerEvent).toHaveBeenCalledWith('onFontActionBefore', { value: 'Arial' });
             expect(dom.utils.createElement).toHaveBeenCalledWith('SPAN', {
                 style: 'font-family: Arial;'
             });
-            expect(mockEditor.inline.apply).toHaveBeenCalledWith(
+            expect(kernel.$.inline.apply).toHaveBeenCalledWith(
                 expect.any(Object),
                 { stylesToModify: ['font-family'], nodesToRemove: null, strictRemove: null }
             );
-            expect(mockEditor.menu.dropdownOff).toHaveBeenCalled();
+            expect(kernel.$.menu.dropdownOff).toHaveBeenCalled();
         });
 
         it('should wrap font name with quotes if contains spaces or special chars', async () => {
@@ -372,7 +341,7 @@ describe('Plugins - Dropdown - Font', () => {
 
             await font.action(mockTarget);
 
-            expect(mockEditor.inline.apply).toHaveBeenCalledWith(
+            expect(kernel.$.inline.apply).toHaveBeenCalledWith(
                 null,
                 { stylesToModify: ['font-family'], nodesToRemove: ['span'], strictRemove: true }
             );
@@ -380,7 +349,7 @@ describe('Plugins - Dropdown - Font', () => {
 
         it('should return early when onFontActionBefore returns false', async () => {
             mockTarget.getAttribute.mockReturnValue('Arial');
-            mockEditor.triggerEvent.mockResolvedValue(false);
+            kernel.$.eventManager.triggerEvent.mockResolvedValue(false);
             const { dom } = require('../../../../src/helper');
 
             // Clear previous createElement calls
@@ -389,8 +358,8 @@ describe('Plugins - Dropdown - Font', () => {
             await font.action(mockTarget);
 
             expect(dom.utils.createElement).not.toHaveBeenCalled();
-            expect(mockEditor.inline.apply).not.toHaveBeenCalled();
-            expect(mockEditor.menu.dropdownOff).not.toHaveBeenCalled();
+            expect(kernel.$.inline.apply).not.toHaveBeenCalled();
+            expect(kernel.$.menu.dropdownOff).not.toHaveBeenCalled();
         });
 
         it('should handle null data-command attribute', async () => {
@@ -398,7 +367,7 @@ describe('Plugins - Dropdown - Font', () => {
 
             await font.action(mockTarget);
 
-            expect(mockEditor.inline.apply).toHaveBeenCalledWith(
+            expect(kernel.$.inline.apply).toHaveBeenCalledWith(
                 null,
                 { stylesToModify: ['font-family'], nodesToRemove: ['span'], strictRemove: true }
             );
@@ -447,7 +416,7 @@ describe('Plugins - Dropdown - Font', () => {
             const { dom } = require('../../../../src/helper');
             dom.utils.createElement.mockClear();
 
-            const defaultFont = new Font(mockEditor, {});
+            const defaultFont = new Font(kernel, {});
 
             const createCallArgs = dom.utils.createElement.mock.calls.find(
                 call => call[1]?.class === 'se-dropdown se-list-layer se-list-font-family'
@@ -463,7 +432,7 @@ describe('Plugins - Dropdown - Font', () => {
             const { dom } = require('../../../../src/helper');
             dom.utils.createElement.mockClear();
 
-            new Font(mockEditor, {
+            new Font(kernel, {
                 items: ['Arial, sans-serif', 'Times New Roman, serif']
             });
 
@@ -485,21 +454,23 @@ describe('Plugins - Dropdown - Font', () => {
 
             await font.action(mockTarget);
 
-            expect(mockEditor.inline.apply).toHaveBeenCalled();
+            expect(kernel.$.inline.apply).toHaveBeenCalled();
         });
 
         it('should work with editor triggerEvent', async () => {
+            kernel.$.eventManager.triggerEvent.mockResolvedValue(undefined);
             const mockTarget = {
                 getAttribute: jest.fn().mockReturnValue('Arial')
             };
 
             await font.action(mockTarget);
 
-            expect(mockEditor.triggerEvent).toHaveBeenCalledWith('onFontActionBefore', { value: 'Arial' });
+            expect(kernel.$.eventManager.triggerEvent).toHaveBeenCalledWith('onFontActionBefore', { value: 'Arial' });
         });
 
         it('should work with frameContext for computed styles', () => {
-            mockEditor.frameContext.set('wwComputedStyle', { fontFamily: 'Georgia' });
+            kernel.$.store.set('hasFocus', true);
+            kernel.$.frameContext.set('wwComputedStyle', { fontFamily: 'Georgia' });
             const mockTarget = {
                 querySelector: jest.fn().mockReturnValue({ textContent: '' }),
                 parentNode: { querySelector: jest.fn().mockReturnValue({ textContent: '' }) }
@@ -514,10 +485,10 @@ describe('Plugins - Dropdown - Font', () => {
 
     describe('Error handling', () => {
         it('should handle missing editor modules gracefully', () => {
-            mockEditor.format = undefined;
+            kernel.$.format = undefined;
 
             expect(() => {
-                new Font(mockEditor, {});
+                new Font(kernel, {});
             }).not.toThrow();
         });
 
@@ -541,12 +512,12 @@ describe('Plugins - Dropdown - Font', () => {
 
         it('should handle missing plugin options', () => {
             expect(() => {
-                new Font(mockEditor, {});
+                new Font(kernel, {});
             }).not.toThrow();
         });
 
         it('should handle missing frameContext', () => {
-            mockEditor.frameContext = new Map();
+            kernel.$.frameContext = new Map();
             const mockTarget = {
                 querySelector: jest.fn().mockReturnValue({ textContent: '' }),
                 parentNode: { querySelector: jest.fn().mockReturnValue({ textContent: '' }) }

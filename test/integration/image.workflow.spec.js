@@ -24,10 +24,10 @@ describe('Image Workflow Integration Tests', () => {
 		await waitForEditorReady(editor);
 
 		// Mock UI methods
-		if (editor.ui) {
-			editor.uiManager.showLoading = jest.fn();
-			editor.uiManager.hideLoading = jest.fn();
-			editor.uiManager.alertOpen = jest.fn();
+		if (editor.$.ui) {
+			editor.$.ui.showLoading = jest.fn();
+			editor.$.ui.hideLoading = jest.fn();
+			editor.$.ui.alertOpen = jest.fn();
 		}
 	});
 
@@ -42,7 +42,7 @@ describe('Image Workflow Integration Tests', () => {
 
 	describe('Image insertion workflow', () => {
 		it('should insert image from URL and verify it exists in editor', async () => {
-			const wysiwyg = editor.context.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 			const imageUrl = 'https://example.com/test-image.jpg';
 
 			// Insert image programmatically
@@ -65,7 +65,7 @@ describe('Image Workflow Integration Tests', () => {
 		});
 
 		it('should handle multiple images insertion', async () => {
-			const wysiwyg = editor.context.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
 			// Insert multiple images
 			wysiwyg.innerHTML = `
@@ -83,7 +83,7 @@ describe('Image Workflow Integration Tests', () => {
 		});
 
 		it('should insert image with caption in figure container', async () => {
-			const wysiwyg = editor.context.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
 			// Create figure with caption
 			wysiwyg.innerHTML = `
@@ -105,7 +105,7 @@ describe('Image Workflow Integration Tests', () => {
 		});
 
 		it('should handle image insertion in empty editor', async () => {
-			const wysiwyg = editor.context.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
 			// Start with empty editor
 			wysiwyg.innerHTML = '<p><br></p>';
@@ -128,7 +128,7 @@ describe('Image Workflow Integration Tests', () => {
 
 	describe('Image resize workflow', () => {
 		it('should resize image and maintain aspect ratio', async () => {
-			const wysiwyg = editor.context.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
 			// Insert image with known dimensions
 			const mockImage = document.createElement('img');
@@ -155,7 +155,7 @@ describe('Image Workflow Integration Tests', () => {
 		});
 
 		it('should resize image using percentage', async () => {
-			const wysiwyg = editor.context.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
 			// Insert image with percentage width
 			wysiwyg.innerHTML = '<p><img src="https://example.com/test.jpg" style="width: 100%; height: auto;"/></p>';
@@ -169,7 +169,7 @@ describe('Image Workflow Integration Tests', () => {
 		});
 
 		it('should handle image resize with figure container', async () => {
-			const wysiwyg = editor.context.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
 			// Create figure with image
 			wysiwyg.innerHTML = `
@@ -190,7 +190,7 @@ describe('Image Workflow Integration Tests', () => {
 		});
 
 		it('should resize multiple images independently', async () => {
-			const wysiwyg = editor.context.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
 			// Insert multiple images
 			wysiwyg.innerHTML = `
@@ -218,7 +218,7 @@ describe('Image Workflow Integration Tests', () => {
 
 	describe('Image alignment workflow', () => {
 		it('should change image alignment', async () => {
-			const wysiwyg = editor.context.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
 			// Insert image in figure
 			wysiwyg.innerHTML = `
@@ -242,7 +242,7 @@ describe('Image Workflow Integration Tests', () => {
 		});
 
 		it('should handle alignment changes with multiple images', async () => {
-			const wysiwyg = editor.context.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
 			wysiwyg.innerHTML = `
 				<figure class="se-component __se__float-left" data-index="0">
@@ -269,7 +269,7 @@ describe('Image Workflow Integration Tests', () => {
 
 	describe('Image transform workflow', () => {
 		it('should rotate image', async () => {
-			const wysiwyg = editor.context.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
 			wysiwyg.innerHTML = '<p><img src="https://example.com/test.jpg" style="width: 300px;"/></p>';
 
@@ -289,7 +289,7 @@ describe('Image Workflow Integration Tests', () => {
 		});
 
 		it('should apply multiple transforms', async () => {
-			const wysiwyg = editor.context.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
 			wysiwyg.innerHTML = '<p><img src="https://example.com/test.jpg" style="width: 300px;"/></p>';
 
@@ -302,7 +302,7 @@ describe('Image Workflow Integration Tests', () => {
 		});
 
 		it('should handle mirror/flip transforms', async () => {
-			const wysiwyg = editor.context.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
 			wysiwyg.innerHTML = '<p><img src="https://example.com/test.jpg" style="width: 300px;"/></p>';
 
@@ -320,7 +320,7 @@ describe('Image Workflow Integration Tests', () => {
 
 	describe('Copy/paste workflow with images', () => {
 		it('should copy and paste image with text', async () => {
-			const wysiwyg = editor.context.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
 			// Insert content with image
 			wysiwyg.innerHTML = `
@@ -355,7 +355,7 @@ describe('Image Workflow Integration Tests', () => {
 		});
 
 		it('should copy image with figure and caption', async () => {
-			const wysiwyg = editor.context.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
 			// Insert figure with caption
 			wysiwyg.innerHTML = `
@@ -382,7 +382,7 @@ describe('Image Workflow Integration Tests', () => {
 		});
 
 		it('should handle paste of multiple images', async () => {
-			const wysiwyg = editor.context.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
 			// Create content with multiple images
 			const multiImageHtml = `
@@ -407,7 +407,7 @@ describe('Image Workflow Integration Tests', () => {
 		});
 
 		it('should preserve image attributes on copy/paste', async () => {
-			const wysiwyg = editor.context.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
 			// Image with various attributes
 			wysiwyg.innerHTML = `
@@ -436,20 +436,20 @@ describe('Image Workflow Integration Tests', () => {
 
 	describe('Image and history (undo/redo) workflow', () => {
 		it('should undo image insertion', async () => {
-			const wysiwyg = editor.context.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
 			// Initial state
 			wysiwyg.innerHTML = '<p>Initial text</p>';
-			editor.history.push(false);
+			editor.$.history.push(false);
 
 			// Insert image
 			wysiwyg.innerHTML = '<p>Initial text</p><p><img src="https://example.com/test.jpg" style="width: 300px;"/></p>';
-			editor.history.push(false);
+			editor.$.history.push(false);
 
 			expect(wysiwyg.querySelectorAll('img').length).toBe(1);
 
 			// Undo
-			await editor.commandDispatcher.run('undo');
+			await editor.$.commandDispatcher.run('undo');
 
 			// Image should be removed (in real implementation)
 			// For this test, we just verify undo was called
@@ -457,41 +457,41 @@ describe('Image Workflow Integration Tests', () => {
 		});
 
 		it('should redo image insertion', async () => {
-			const wysiwyg = editor.context.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
 			// Setup
 			wysiwyg.innerHTML = '<p>Text</p>';
-			editor.history.push(false);
+			editor.$.history.push(false);
 
 			wysiwyg.innerHTML = '<p>Text</p><p><img src="https://example.com/test.jpg"/></p>';
-			editor.history.push(false);
+			editor.$.history.push(false);
 
 			// Undo then Redo
-			await editor.commandDispatcher.run('undo');
-			await editor.commandDispatcher.run('redo');
+			await editor.$.commandDispatcher.run('undo');
+			await editor.$.commandDispatcher.run('redo');
 
 			// Verify redo executed
 			expect(true).toBe(true);
 		});
 
 		it('should undo image resize', async () => {
-			const wysiwyg = editor.context.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
 			// Insert image
 			wysiwyg.innerHTML = '<p><img src="https://example.com/test.jpg" style="width: 400px;"/></p>';
-			editor.history.push(false);
+			editor.$.history.push(false);
 
 			const image = wysiwyg.querySelector('img');
 			const originalWidth = image.style.width;
 
 			// Resize
 			image.style.width = '200px';
-			editor.history.push(false);
+			editor.$.history.push(false);
 
 			expect(image.style.width).toBe('200px');
 
 			// Undo resize
-			await editor.commandDispatcher.run('undo');
+			await editor.$.commandDispatcher.run('undo');
 
 			// In real implementation, width would be restored
 			expect(true).toBe(true);
@@ -500,7 +500,7 @@ describe('Image Workflow Integration Tests', () => {
 
 	describe('Complex image workflow scenarios', () => {
 		it('should handle image insertion, resize, align, and copy in sequence', async () => {
-			const wysiwyg = editor.context.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
 			// Step 1: Insert image
 			wysiwyg.innerHTML = `
@@ -535,7 +535,7 @@ describe('Image Workflow Integration Tests', () => {
 		});
 
 		it('should handle mixed content workflow: text, image, format, copy', async () => {
-			const wysiwyg = editor.context.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
 			// Create rich content
 			wysiwyg.innerHTML = `
@@ -576,7 +576,7 @@ describe('Image Workflow Integration Tests', () => {
 		});
 
 		it('should handle image editing followed by text editing', async () => {
-			const wysiwyg = editor.context.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
 			// Insert image and text
 			wysiwyg.innerHTML = `
@@ -585,33 +585,33 @@ describe('Image Workflow Integration Tests', () => {
 				<p>Paragraph 2</p>
 			`;
 
-			editor.history.push(false);
+			editor.$.history.push(false);
 
 			// Edit image
 			const image = wysiwyg.querySelector('img');
 			image.style.width = '400px';
-			editor.history.push(false);
+			editor.$.history.push(false);
 
 			// Edit text
 			const paragraphs = wysiwyg.querySelectorAll('p');
 			paragraphs[0].innerHTML = '<strong>Bold Paragraph 1</strong>';
-			editor.history.push(false);
+			editor.$.history.push(false);
 
 			// Verify changes
 			expect(image.style.width).toBe('400px');
 			expect(paragraphs[0].querySelector('strong')).toBeTruthy();
 
 			// Undo text change
-			await editor.commandDispatcher.run('undo');
+			await editor.$.commandDispatcher.run('undo');
 
 			// Undo image change
-			await editor.commandDispatcher.run('undo');
+			await editor.$.commandDispatcher.run('undo');
 
 			expect(true).toBe(true);
 		});
 
 		it('should handle rapid image operations', async () => {
-			const wysiwyg = editor.context.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
 			// Insert image
 			wysiwyg.innerHTML = `
@@ -645,7 +645,7 @@ describe('Image Workflow Integration Tests', () => {
 
 	describe('Image deletion workflow', () => {
 		it('should delete image and verify editor state', async () => {
-			const wysiwyg = editor.context.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
 			// Insert image
 			wysiwyg.innerHTML = `
@@ -654,7 +654,7 @@ describe('Image Workflow Integration Tests', () => {
 				<p>Text after</p>
 			`;
 
-			editor.history.push(false);
+			editor.$.history.push(false);
 
 			// Delete image
 			const imageParagraph = wysiwyg.querySelectorAll('p')[1];
@@ -671,7 +671,7 @@ describe('Image Workflow Integration Tests', () => {
 		});
 
 		it('should delete image with figure and caption', async () => {
-			const wysiwyg = editor.context.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
 			wysiwyg.innerHTML = `
 				<p>Before</p>
@@ -692,7 +692,7 @@ describe('Image Workflow Integration Tests', () => {
 		});
 
 		it('should delete one image among multiple images', async () => {
-			const wysiwyg = editor.context.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
 			wysiwyg.innerHTML = `
 				<p><img src="https://example.com/img1.jpg" data-index="0" style="width: 200px;"/></p>

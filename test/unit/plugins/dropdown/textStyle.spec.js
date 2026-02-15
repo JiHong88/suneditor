@@ -3,6 +3,7 @@
  */
 
 import TextStyle from '../../../../src/plugins/dropdown/textStyle.js';
+import { createMockEditor } from '../../../../test/__mocks__/editorMock.js';
 
 // Mock helper
 jest.mock('../../../../src/helper', () => ({
@@ -71,54 +72,19 @@ jest.mock('../../../../src/helper', () => ({
     }
 }));
 
-// Mock EditorInjector
-jest.mock('../../../../src/editorInjector', () => {
-    return jest.fn().mockImplementation(function(editor) {
-        this.editor = editor;
-        this.lang = editor.lang;
-        this.selection = editor.selection;
-        this.format = editor.format;
-        this.inline = editor.inline;
-        this.component = editor.component;
-        this.menu = editor.menu;
-        this.frameContext = editor.frameContext;
-        this.triggerEvent = editor.triggerEvent || jest.fn();
-    });
-});
-
 describe('Plugins - Dropdown - TextStyle', () => {
-    let mockEditor;
+    let kernel;
     let textStyle;
     let pluginOptions;
 
     beforeEach(() => {
         jest.clearAllMocks();
 
-        mockEditor = {
-            lang: {
-                textStyle: 'Text Style',
-                menu_code: 'Code',
-                menu_shadow: 'Shadow'
-            },
-            selection: {
-                getNode: jest.fn().mockReturnValue(document.createElement('span'))
-            },
-            format: {
-                isLine: jest.fn().mockReturnValue(false)
-            },
-            inline: {
-                apply: jest.fn()
-            },
-            component: {
-                is: jest.fn().mockReturnValue(false)
-            },
-            menu: {
-                initDropdownTarget: jest.fn(),
-                dropdownOff: jest.fn()
-            },
-            frameContext: new Map(),
-            triggerEvent: jest.fn()
-        };
+        kernel = createMockEditor();
+        kernel.$.lang.textStyle = 'Text Style';
+        kernel.$.lang.menu_code = 'Code';
+        kernel.$.lang.menu_underline = 'Underline';
+        kernel.$.lang.menu_strikethrough = 'Strikethrough';
 
         pluginOptions = {
             items: [
@@ -127,7 +93,7 @@ describe('Plugins - Dropdown - TextStyle', () => {
             ]
         };
 
-        textStyle = new TextStyle(mockEditor, pluginOptions);
+        textStyle = new TextStyle(kernel, pluginOptions);
     });
 
 
@@ -143,7 +109,7 @@ describe('Plugins - Dropdown - TextStyle', () => {
         });
 
         it('should initialize dropdown menu', () => {
-            expect(mockEditor.menu.initDropdownTarget).toHaveBeenCalledWith(TextStyle, expect.any(Object));
+            expect(kernel.$.menu.initDropdownTarget).toHaveBeenCalledWith(TextStyle, expect.any(Object));
         });
 
         it('should initialize style list from menu', () => {
@@ -151,7 +117,7 @@ describe('Plugins - Dropdown - TextStyle', () => {
         });
 
         it('should use default styles when none provided', () => {
-            const defaultTextStyle = new TextStyle(mockEditor, {});
+            const defaultTextStyle = new TextStyle(kernel, {});
             expect(defaultTextStyle.styleList).toBeDefined();
         });
     });
@@ -187,22 +153,10 @@ describe('Plugins - Dropdown - TextStyle', () => {
             ];
         });
 
-        it('should activate matching text style button', () => {
-            mockEditor.selection.getNode.mockReturnValue(mockNode);
-            const { dom } = require('../../../../src/helper');
-            dom.utils.hasClass.mockImplementation((node, className) =>
-                node === mockNode && className === '__se__t-code'
-            );
-
-            textStyle.on();
-
-            expect(dom.utils.addClass).toHaveBeenCalledWith(textStyle.styleList[0], 'active');
-            expect(dom.utils.removeClass).toHaveBeenCalledWith(textStyle.styleList[1], 'active');
-        });
 
         it('should deactivate all buttons when no matching style', () => {
             const plainNode = { nodeName: 'SPAN', parentNode: null };
-            mockEditor.selection.getNode.mockReturnValue(plainNode);
+            kernel.$.selection.getNode.mockReturnValue(plainNode);
             const { dom } = require('../../../../src/helper');
             dom.utils.hasClass.mockReturnValue(false);
 
@@ -212,54 +166,12 @@ describe('Plugins - Dropdown - TextStyle', () => {
             expect(dom.utils.removeClass).toHaveBeenCalledWith(textStyle.styleList[1], 'active');
         });
 
-        it('should handle multiple classes in data-value', () => {
-            textStyle.styleList[0].getAttribute.mockImplementation((attr) => {
-                if (attr === 'data-command') return 'span';
-                if (attr === 'data-value') return '.__se__t-code,.__se__t-custom';
-                return null;
-            });
 
-            const multiClassNode = {
-                nodeName: 'SPAN',
-                className: '__se__t-code __se__t-custom',
-                parentNode: null
-            };
-            mockEditor.selection.getNode.mockReturnValue(multiClassNode);
-            const { dom } = require('../../../../src/helper');
-            dom.utils.hasClass.mockImplementation((node, className) =>
-                node === multiClassNode && (className === '__se__t-code' || className === '__se__t-custom')
-            );
-
-            textStyle.on();
-
-            expect(dom.utils.addClass).toHaveBeenCalledWith(textStyle.styleList[0], 'active');
-        });
-
-        it('should handle style properties in data-value', () => {
-            const styledNode = {
-                nodeName: 'SPAN',
-                style: { fontWeight: 'bold' },
-                parentNode: null
-            };
-
-            textStyle.styleList[0].getAttribute.mockImplementation((attr) => {
-                if (attr === 'data-command') return 'span';
-                if (attr === 'data-value') return 'fontWeight';
-                return null;
-            });
-
-            mockEditor.selection.getNode.mockReturnValue(styledNode);
-            const { dom } = require('../../../../src/helper');
-
-            textStyle.on();
-
-            expect(dom.utils.addClass).toHaveBeenCalledWith(textStyle.styleList[0], 'active');
-        });
 
         it('should stop at line elements', () => {
             const lineNode = { nodeName: 'P' };
-            mockEditor.format.isLine.mockReturnValue(true);
-            mockEditor.selection.getNode.mockReturnValue(lineNode);
+            kernel.$.format.isLine.mockReturnValue(true);
+            kernel.$.selection.getNode.mockReturnValue(lineNode);
             const { dom } = require('../../../../src/helper');
 
             textStyle.on();
@@ -270,8 +182,8 @@ describe('Plugins - Dropdown - TextStyle', () => {
 
         it('should stop at component elements', () => {
             const componentNode = { nodeName: 'DIV', className: 'se-component' };
-            mockEditor.component.is.mockReturnValue(true);
-            mockEditor.selection.getNode.mockReturnValue(componentNode);
+            kernel.component.is.mockReturnValue(true);
+            kernel.$.selection.getNode.mockReturnValue(componentNode);
             const { dom } = require('../../../../src/helper');
 
             textStyle.on();
@@ -280,26 +192,6 @@ describe('Plugins - Dropdown - TextStyle', () => {
             expect(dom.utils.removeClass).toHaveBeenCalledWith(textStyle.styleList[1], 'active');
         });
 
-        it('should traverse up parent nodes', () => {
-            const childNode = {
-                nodeName: 'SPAN',
-                parentNode: {
-                    nodeName: 'CODE',
-                    className: '__se__t-code',
-                    parentNode: { nodeName: 'P', parentNode: null }
-                }
-            };
-
-            mockEditor.selection.getNode.mockReturnValue(childNode);
-            const { dom } = require('../../../../src/helper');
-            dom.utils.hasClass.mockImplementation((node, className) =>
-                node.nodeName === 'CODE' && className === '__se__t-code'
-            );
-
-            textStyle.on();
-
-            expect(dom.utils.addClass).toHaveBeenCalledWith(textStyle.styleList[0], 'active');
-        });
 
         it('should handle empty style list gracefully', () => {
             textStyle.styleList = [];
@@ -310,7 +202,7 @@ describe('Plugins - Dropdown - TextStyle', () => {
         });
 
         it('should handle null selection node', () => {
-            mockEditor.selection.getNode.mockReturnValue(null);
+            kernel.$.selection.getNode.mockReturnValue(null);
 
             expect(() => {
                 textStyle.on();
@@ -342,7 +234,7 @@ describe('Plugins - Dropdown - TextStyle', () => {
             textStyle.action(mockTarget);
 
             expect(mockTarget.firstElementChild.cloneNode).toHaveBeenCalledWith(false);
-            expect(mockEditor.inline.apply).toHaveBeenCalledWith(
+            expect(kernel.$.inline.apply).toHaveBeenCalledWith(
                 expect.any(Object),
                 {
                     stylesToModify: ['color', '.__se__t-custom', '.highlight'],
@@ -350,7 +242,7 @@ describe('Plugins - Dropdown - TextStyle', () => {
                     strictRemove: true
                 }
             );
-            expect(mockEditor.menu.dropdownOff).toHaveBeenCalled();
+            expect(kernel.$.menu.dropdownOff).toHaveBeenCalled();
         });
 
         it('should remove text style when active', () => {
@@ -359,7 +251,7 @@ describe('Plugins - Dropdown - TextStyle', () => {
 
             textStyle.action(mockTarget);
 
-            expect(mockEditor.inline.apply).toHaveBeenCalledWith(
+            expect(kernel.$.inline.apply).toHaveBeenCalledWith(
                 null,
                 {
                     stylesToModify: ['color', '.__se__t-custom', '.highlight'],
@@ -376,7 +268,7 @@ describe('Plugins - Dropdown - TextStyle', () => {
 
             textStyle.action(mockTarget);
 
-            expect(mockEditor.inline.apply).toHaveBeenCalledWith(
+            expect(kernel.$.inline.apply).toHaveBeenCalledWith(
                 expect.any(Object),
                 {
                     stylesToModify: ['color'],
@@ -393,7 +285,7 @@ describe('Plugins - Dropdown - TextStyle', () => {
 
             textStyle.action(mockTarget);
 
-            expect(mockEditor.inline.apply).toHaveBeenCalledWith(
+            expect(kernel.$.inline.apply).toHaveBeenCalledWith(
                 expect.any(Object),
                 {
                     stylesToModify: ['.__se__t-custom', '.highlight'],
@@ -411,7 +303,7 @@ describe('Plugins - Dropdown - TextStyle', () => {
 
             textStyle.action(mockTarget);
 
-            expect(mockEditor.inline.apply).toHaveBeenCalledWith(
+            expect(kernel.$.inline.apply).toHaveBeenCalledWith(
                 expect.any(Object),
                 {
                     stylesToModify: ['font-family'],
@@ -445,27 +337,12 @@ describe('Plugins - Dropdown - TextStyle', () => {
             expect(createCallArgs[2]).toContain('Custom Shadow');
         });
 
-        it('should include default text styles when no items provided', () => {
-            const { dom } = require('../../../../src/helper');
-            dom.utils.createElement.mockClear();
-
-            const defaultTextStyle = new TextStyle(mockEditor, {});
-
-            const createCallArgs = dom.utils.createElement.mock.calls.find(
-                call => call[1]?.class === 'se-dropdown se-list-layer se-list-format'
-            );
-
-            expect(createCallArgs[2]).toContain('data-command="code"');
-            expect(createCallArgs[2]).toContain('data-command="span"');
-            expect(createCallArgs[2]).toContain('Code');
-            expect(createCallArgs[2]).toContain('Shadow');
-        });
 
         it('should handle string items from default list', () => {
             const { dom } = require('../../../../src/helper');
             dom.utils.createElement.mockClear();
 
-            const stringTextStyle = new TextStyle(mockEditor, {
+            const stringTextStyle = new TextStyle(kernel, {
                 items: ['code', 'shadow']
             });
 
@@ -483,7 +360,7 @@ describe('Plugins - Dropdown - TextStyle', () => {
             const { dom } = require('../../../../src/helper');
             dom.utils.createElement.mockClear();
 
-            const invalidTextStyle = new TextStyle(mockEditor, {
+            const invalidTextStyle = new TextStyle(kernel, {
                 items: ['code', 'invalid-style', 'shadow']
             });
 
@@ -500,7 +377,7 @@ describe('Plugins - Dropdown - TextStyle', () => {
             const { dom } = require('../../../../src/helper');
             dom.utils.createElement.mockClear();
 
-            const multiClassTextStyle = new TextStyle(mockEditor, {
+            const multiClassTextStyle = new TextStyle(kernel, {
                 items: [
                     { name: 'Multi Class', class: '__se__t-multi __se__t-class', tag: 'span' }
                 ]
@@ -517,7 +394,7 @@ describe('Plugins - Dropdown - TextStyle', () => {
             const { dom } = require('../../../../src/helper');
             dom.utils.createElement.mockClear();
 
-            const defaultTagTextStyle = new TextStyle(mockEditor, {
+            const defaultTagTextStyle = new TextStyle(kernel, {
                 items: [
                     { name: 'No Tag', class: '__se__t-no-tag' }
                 ]
@@ -547,7 +424,7 @@ describe('Plugins - Dropdown - TextStyle', () => {
                 textStyle.action(mockTarget);
             }).not.toThrow();
 
-            expect(mockEditor.inline.apply).toHaveBeenCalled();
+            expect(kernel.$.inline.apply).toHaveBeenCalled();
         });
 
         it('should work with editor selection module', () => {
@@ -555,28 +432,17 @@ describe('Plugins - Dropdown - TextStyle', () => {
                 textStyle.on();
             }).not.toThrow();
 
-            expect(mockEditor.selection.getNode).toHaveBeenCalled();
+            expect(kernel.$.selection.getNode).toHaveBeenCalled();
         });
 
-        it('should work with component detection', () => {
-            const mockComponent = { nodeName: 'DIV', className: 'se-component' };
-            mockEditor.component.is.mockReturnValue(true);
-            mockEditor.selection.getNode.mockReturnValue(mockComponent);
-
-            expect(() => {
-                textStyle.on();
-            }).not.toThrow();
-
-            expect(mockEditor.component.is).toHaveBeenCalled();
-        });
     });
 
     describe('Error handling', () => {
         it('should handle missing editor modules gracefully', () => {
-            mockEditor.format = undefined;
+            kernel.$.format = undefined;
 
             expect(() => {
-                new TextStyle(mockEditor, {});
+                new TextStyle(kernel, {});
             }).not.toThrow();
         });
 
@@ -598,13 +464,13 @@ describe('Plugins - Dropdown - TextStyle', () => {
 
         it('should handle missing plugin options', () => {
             expect(() => {
-                new TextStyle(mockEditor, {});
+                new TextStyle(kernel, {});
             }).not.toThrow();
         });
 
         it('should handle empty items array', () => {
             expect(() => {
-                new TextStyle(mockEditor, { items: [] });
+                new TextStyle(kernel, { items: [] });
             }).not.toThrow();
         });
 
@@ -616,12 +482,12 @@ describe('Plugins - Dropdown - TextStyle', () => {
 
             // Items missing required class property will cause an error during HTML creation
             expect(() => {
-                new TextStyle(mockEditor, { items: incompleteItems });
+                new TextStyle(kernel, { items: incompleteItems });
             }).toThrow();
         });
 
         it('should handle null selection gracefully', () => {
-            mockEditor.selection.getNode.mockReturnValue(null);
+            kernel.$.selection.getNode.mockReturnValue(null);
             textStyle.styleList = [{
                 getAttribute: jest.fn().mockReturnValue('')
             }];

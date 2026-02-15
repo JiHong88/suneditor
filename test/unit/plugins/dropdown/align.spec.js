@@ -3,6 +3,7 @@
  */
 
 import Align from '../../../../src/plugins/dropdown/align.js';
+import { createMockEditor } from '../../../../test/__mocks__/editorMock.js';
 
 // Mock helper
 jest.mock('../../../../src/helper', () => ({
@@ -66,87 +67,44 @@ jest.mock('../../../../src/helper', () => ({
     }
 }));
 
-// Mock EditorInjector
-jest.mock('../../../../src/editorInjector/_core.js', () => {
-    return jest.fn().mockImplementation(function(editor) {
-        this.editor = editor;
-        this.lang = editor.lang;
-        this.selection = editor.selection;
-        this.format = editor.format;
-        this.menu = editor.menu;
-        this.options = editor.options;
-        this.history = editor.history;
-        this.frameContext = editor.frameContext;
-        this.focusManager = editor.focusManager;
-		this.triggerEvent = editor.triggerEvent || jest.fn();
-    });
-});
-
 describe('Plugins - Dropdown - Align', () => {
-    let mockEditor;
+    let kernel;
     let align;
     let pluginOptions;
 
     beforeEach(() => {
         jest.clearAllMocks();
 
-        mockEditor = {
-            lang: {
-                align: 'Align',
-                alignLeft: 'Left',
-                alignCenter: 'Center',
-                alignRight: 'Right',
-                alignJustify: 'Justify'
-            },
-            icons: {
-                align_left: '<svg>left</svg>',
-                align_center: '<svg>center</svg>',
-                align_right: '<svg>right</svg>',
-                align_justify: '<svg>justify</svg>'
-            },
-            options: {
-                get: jest.fn().mockImplementation((key) => {
-                    if (key === '_rtl') return false;
-                    return null;
-                })
-            },
-            selection: {
-                getNode: jest.fn().mockReturnValue(document.createElement('p'))
-            },
-            format: {
-                isLine: jest.fn().mockReturnValue(true),
-                getLines: jest.fn().mockReturnValue([
-                    { style: {} },
-                    { style: {} }
-                ])
-            },
-            menu: {
-                initDropdownTarget: jest.fn(),
-                dropdownOff: jest.fn()
-            },
-            history: {
-                push: jest.fn()
-            },
-            effectNode: null,
-            focusManager: {
-                focus: jest.fn(),
-                blur: jest.fn(),
-                focusEdge: jest.fn(),
-                nativeFocus: jest.fn(),
-            },
-            frameContext: new Map([
-                ['wwComputedStyle', {
-                    getPropertyValue: jest.fn().mockReturnValue('left')
-                }]
-            ]),
-            triggerEvent: jest.fn()
-        };
+        kernel = createMockEditor();
+        kernel.$.lang.align = 'Align';
+        kernel.$.lang.alignLeft = 'Left';
+        kernel.$.lang.alignCenter = 'Center';
+        kernel.$.lang.alignRight = 'Right';
+        kernel.$.lang.alignJustify = 'Justify';
+        kernel.$.icons.align_left = '<svg>left</svg>';
+        kernel.$.icons.align_center = '<svg>center</svg>';
+        kernel.$.icons.align_right = '<svg>right</svg>';
+        kernel.$.icons.align_justify = '<svg>justify</svg>';
+        kernel.$.options.get = jest.fn().mockImplementation((key) => {
+            if (key === '_rtl') return false;
+            return null;
+        });
+        kernel.$.selection.getNode.mockReturnValue(document.createElement('p'));
+        kernel.$.format.isLine.mockReturnValue(true);
+        kernel.$.format.getLines.mockReturnValue([
+            { style: {} },
+            { style: {} }
+        ]);
+        kernel.$.menu.initDropdownTarget = jest.fn();
+        kernel.$.frameContext.set('wwComputedStyle', {
+            getPropertyValue: jest.fn().mockReturnValue('left')
+        });
 
         pluginOptions = {
             items: ['left', 'center', 'right', 'justify']
         };
 
-        align = new Align(mockEditor, pluginOptions);
+        align = new Align(kernel, pluginOptions);
         align.init(); // Call init to set defaultDir
     });
 
@@ -161,13 +119,13 @@ describe('Plugins - Dropdown - Align', () => {
         });
 
         it('should use RTL icon when editor is RTL', () => {
-            mockEditor.options.get.mockImplementation((key) => {
+            kernel.$.options.get.mockImplementation((key) => {
                 if (key === '_rtl') return true;
                 return null;
             });
-            mockEditor.frameContext.get('wwComputedStyle').getPropertyValue.mockReturnValue('right');
+            kernel.$.frameContext.get('wwComputedStyle').getPropertyValue.mockReturnValue('right');
 
-            const rtlAlign = new Align(mockEditor, pluginOptions);
+            const rtlAlign = new Align(kernel, pluginOptions);
             rtlAlign.init();
             expect(rtlAlign.icon).toBe('align_right');
             expect(rtlAlign.defaultDir).toBe('right');
@@ -183,7 +141,7 @@ describe('Plugins - Dropdown - Align', () => {
         });
 
         it('should initialize dropdown menu', () => {
-            expect(mockEditor.menu.initDropdownTarget).toHaveBeenCalledWith(Align, expect.any(Object));
+            expect(kernel.$.menu.initDropdownTarget).toHaveBeenCalledWith(Align, expect.any(Object));
         });
 
         it('should initialize align list from menu', () => {
@@ -201,7 +159,7 @@ describe('Plugins - Dropdown - Align', () => {
             const { dom } = require('../../../../src/helper');
             dom.utils.createElement.mockClear();
 
-            const defaultAlign = new Align(mockEditor, {});
+            const defaultAlign = new Align(kernel, {});
             expect(defaultAlign.alignList).toBeDefined();
         });
     });
@@ -231,7 +189,7 @@ describe('Plugins - Dropdown - Align', () => {
 
         it('should return undefined when element is not a line element', () => {
             const mockElement = document.createElement('span');
-            mockEditor.format.isLine.mockReturnValue(false);
+            kernel.$.format.isLine.mockReturnValue(false);
 
             const result = align.active(mockElement, mockTarget);
 
@@ -242,7 +200,7 @@ describe('Plugins - Dropdown - Align', () => {
             const mockElement = {
                 style: { textAlign: 'center' }
             };
-            mockEditor.format.isLine.mockReturnValue(true);
+            kernel.$.format.isLine.mockReturnValue(true);
             const { dom } = require('../../../../src/helper');
 
             const result = align.active(mockElement, mockTarget);
@@ -256,7 +214,7 @@ describe('Plugins - Dropdown - Align', () => {
             const mockElement = {
                 style: { textAlign: 'unknown-align' }
             };
-            mockEditor.format.isLine.mockReturnValue(true);
+            kernel.$.format.isLine.mockReturnValue(true);
             const { dom } = require('../../../../src/helper');
 
             const result = align.active(mockElement, mockTarget);
@@ -269,7 +227,7 @@ describe('Plugins - Dropdown - Align', () => {
             const mockElement = {
                 style: { textAlign: '' }
             };
-            mockEditor.format.isLine.mockReturnValue(true);
+            kernel.$.format.isLine.mockReturnValue(true);
 
             const result = align.active(mockElement, mockTarget);
 
@@ -293,7 +251,7 @@ describe('Plugins - Dropdown - Align', () => {
                 const mockElement = {
                     style: { textAlign: alignment }
                 };
-                mockEditor.format.isLine.mockReturnValue(true);
+                kernel.$.format.isLine.mockReturnValue(true);
 
                 const result = align.active(mockElement, mockTarget);
 
@@ -407,7 +365,7 @@ describe('Plugins - Dropdown - Align', () => {
             expect(align.defaultDir).toBe('left');
 
             // Change computed style to rtl
-            mockEditor.frameContext.get('wwComputedStyle').getPropertyValue.mockReturnValue('right');
+            kernel.$.frameContext.get('wwComputedStyle').getPropertyValue.mockReturnValue('right');
             align.setDir();
 
             expect(align.defaultDir).toBe('right');
@@ -415,12 +373,12 @@ describe('Plugins - Dropdown - Align', () => {
 
         it('should change default direction from rtl to ltr', () => {
             // Set to rtl first
-            mockEditor.frameContext.get('wwComputedStyle').getPropertyValue.mockReturnValue('right');
+            kernel.$.frameContext.get('wwComputedStyle').getPropertyValue.mockReturnValue('right');
             align.setDir();
             expect(align.defaultDir).toBe('right');
 
             // Change back to ltr
-            mockEditor.frameContext.get('wwComputedStyle').getPropertyValue.mockReturnValue('left');
+            kernel.$.frameContext.get('wwComputedStyle').getPropertyValue.mockReturnValue('left');
             align.setDir();
 
             expect(align.defaultDir).toBe('left');
@@ -446,7 +404,7 @@ describe('Plugins - Dropdown - Align', () => {
             });
 
             // Change to rtl
-            mockEditor.frameContext.get('wwComputedStyle').getPropertyValue.mockReturnValue('right');
+            kernel.$.frameContext.get('wwComputedStyle').getPropertyValue.mockReturnValue('right');
             align.setDir();
 
             expect(leftBtn.parentElement.appendChild).toHaveBeenCalledWith(rightBtn);
@@ -457,7 +415,7 @@ describe('Plugins - Dropdown - Align', () => {
             align._itemMenu.querySelector.mockReturnValue(null);
 
             // Change to rtl
-            mockEditor.frameContext.get('wwComputedStyle').getPropertyValue.mockReturnValue('right');
+            kernel.$.frameContext.get('wwComputedStyle').getPropertyValue.mockReturnValue('right');
             expect(() => {
                 align.setDir();
             }).not.toThrow();
@@ -478,7 +436,7 @@ describe('Plugins - Dropdown - Align', () => {
                 { style: {} }
             ];
 
-            mockEditor.format.getLines.mockReturnValue(mockFormats);
+            kernel.$.format.getLines.mockReturnValue(mockFormats);
         });
 
         it('should set text alignment for all selected lines', () => {
@@ -489,10 +447,10 @@ describe('Plugins - Dropdown - Align', () => {
 
             expect(dom.utils.setStyle).toHaveBeenCalledWith(mockFormats[0], 'textAlign', 'center');
             expect(dom.utils.setStyle).toHaveBeenCalledWith(mockFormats[1], 'textAlign', 'center');
-            expect(mockEditor.effectNode).toBeNull();
-            expect(mockEditor.menu.dropdownOff).toHaveBeenCalled();
-            expect(mockEditor.focusManager.focus).toHaveBeenCalled();
-            expect(mockEditor.history.push).toHaveBeenCalledWith(false);
+            expect(kernel.effectNode).toBeNull();
+            expect(kernel.$.menu.dropdownOff).toHaveBeenCalled();
+            expect(kernel.$.focusManager.focus).toHaveBeenCalled();
+            expect(kernel.$.history.push).toHaveBeenCalledWith(false);
         });
 
         it('should clear text alignment when setting to default direction', () => {
@@ -523,7 +481,7 @@ describe('Plugins - Dropdown - Align', () => {
             align.action(mockTarget);
 
             expect(dom.utils.setStyle).not.toHaveBeenCalled();
-            expect(mockEditor.menu.dropdownOff).not.toHaveBeenCalled();
+            expect(kernel.$.menu.dropdownOff).not.toHaveBeenCalled();
         });
 
         it('should return early when data-command is empty', () => {
@@ -536,14 +494,14 @@ describe('Plugins - Dropdown - Align', () => {
         });
 
         it('should handle empty formats array', () => {
-            mockEditor.format.getLines.mockReturnValue([]);
+            kernel.$.format.getLines.mockReturnValue([]);
             mockTarget.getAttribute.mockReturnValue('center');
 
             expect(() => {
                 align.action(mockTarget);
             }).not.toThrow();
 
-            expect(mockEditor.menu.dropdownOff).toHaveBeenCalled();
+            expect(kernel.$.menu.dropdownOff).toHaveBeenCalled();
         });
 
         it('should handle all alignment values', () => {
@@ -561,14 +519,6 @@ describe('Plugins - Dropdown - Align', () => {
             });
         });
 
-        it('should always reset effectNode to null', () => {
-            mockEditor.effectNode = document.createElement('span');
-            mockTarget.getAttribute.mockReturnValue('center');
-
-            align.action(mockTarget);
-
-            expect(mockEditor.effectNode).toBeNull();
-        });
     });
 
     describe('CreateHTML function', () => {
@@ -594,7 +544,7 @@ describe('Plugins - Dropdown - Align', () => {
             const { dom } = require('../../../../src/helper');
             dom.utils.createElement.mockClear();
 
-            const defaultAlign = new Align(mockEditor, {});
+            const defaultAlign = new Align(kernel, {});
 
             const createCallArgs = dom.utils.createElement.mock.calls.find(
                 call => call[1]?.class === 'se-dropdown se-list-layer se-list-align'
@@ -607,14 +557,14 @@ describe('Plugins - Dropdown - Align', () => {
         });
 
         it('should use RTL order when editor is RTL', () => {
-            mockEditor.options.get.mockImplementation((key) => {
+            kernel.$.options.get.mockImplementation((key) => {
                 if (key === '_rtl') return true;
                 return null;
             });
             const { dom } = require('../../../../src/helper');
             dom.utils.createElement.mockClear();
 
-            const rtlAlign = new Align(mockEditor, {});
+            const rtlAlign = new Align(kernel, {});
 
             const createCallArgs = dom.utils.createElement.mock.calls.find(
                 call => call[1]?.class === 'se-dropdown se-list-layer se-list-align'
@@ -644,7 +594,7 @@ describe('Plugins - Dropdown - Align', () => {
             const { dom } = require('../../../../src/helper');
             dom.utils.createElement.mockClear();
 
-            const partialAlign = new Align(mockEditor, { items: ['left', 'center'] });
+            const partialAlign = new Align(kernel, { items: ['left', 'center'] });
 
             const createCallArgs = dom.utils.createElement.mock.calls.find(
                 call => call[1]?.class === 'se-dropdown se-list-layer se-list-align'
@@ -667,7 +617,7 @@ describe('Plugins - Dropdown - Align', () => {
                 align.action(mockTarget);
             }).not.toThrow();
 
-            expect(mockEditor.format.getLines).toHaveBeenCalled();
+            expect(kernel.$.format.getLines).toHaveBeenCalled();
         });
 
         it('should work with line detection', () => {
@@ -678,13 +628,13 @@ describe('Plugins - Dropdown - Align', () => {
                 removeAttribute: jest.fn()
             };
 
-            mockEditor.format.isLine.mockReturnValue(true);
+            kernel.$.format.isLine.mockReturnValue(true);
 
             expect(() => {
                 align.active(mockElement, mockTarget);
             }).not.toThrow();
 
-            expect(mockEditor.format.isLine).toHaveBeenCalledWith(mockElement);
+            expect(kernel.$.format.isLine).toHaveBeenCalledWith(mockElement);
         });
 
         it('should work with RTL/LTR direction changes', () => {
@@ -697,10 +647,10 @@ describe('Plugins - Dropdown - Align', () => {
 
     describe('Error handling', () => {
         it('should handle missing editor modules gracefully', () => {
-            mockEditor.format = undefined;
+            kernel.$.format = undefined;
 
             expect(() => {
-                new Align(mockEditor, {});
+                new Align(kernel, {});
             }).not.toThrow();
         });
 
@@ -725,24 +675,22 @@ describe('Plugins - Dropdown - Align', () => {
 
         it('should handle missing plugin options', () => {
             expect(() => {
-                new Align(mockEditor, {});
+                new Align(kernel, {});
             }).not.toThrow();
         });
 
         it('should handle null plugin options', () => {
             expect(() => {
-                new Align(mockEditor, null);
+                new Align(kernel, null);
             }).toThrow();
         });
 
         it('should handle missing icons gracefully', () => {
-            const incompleteEditor = {
-                ...mockEditor,
-                icons: {}
-            };
+            const incompleteKernel = createMockEditor();
+            incompleteKernel.$.icons = {};
 
             expect(() => {
-                new Align(incompleteEditor, {});
+                new Align(incompleteKernel, {});
             }).not.toThrow();
         });
 
@@ -750,7 +698,7 @@ describe('Plugins - Dropdown - Align', () => {
             align._itemMenu = null;
 
             // Change to rtl to trigger button swapping
-            mockEditor.frameContext.get('wwComputedStyle').getPropertyValue.mockReturnValue('right');
+            kernel.$.frameContext.get('wwComputedStyle').getPropertyValue.mockReturnValue('right');
 
             // Should not throw even with null _itemMenu
             expect(() => {

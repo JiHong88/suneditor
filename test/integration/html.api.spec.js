@@ -1,6 +1,6 @@
 /**
  * @fileoverview Integration tests for HTML API methods
- * Tests real-world usage of editor.html public API
+ * Tests real-world usage of editor.$.html public API
  */
 
 import { createTestEditor, destroyTestEditor, waitForEditorReady } from '../__mocks__/editorIntegration';
@@ -34,22 +34,22 @@ describe('HTML API integration tests', () => {
 
 	describe('html.get() - Get content', () => {
 		it('should get empty content initially', () => {
-			const content = editor.html.get();
+			const content = editor.$.html.get();
 			expect(typeof content).toBe('string');
 		});
 
 		it('should get content after setting HTML', () => {
 			const testHTML = '<p>Test content</p>';
-			editor.html.set(testHTML);
+			editor.$.html.set(testHTML);
 
-			const content = editor.html.get();
+			const content = editor.$.html.get();
 			expect(content).toContain('Test content');
 		});
 
 		it('should get content with frame when withFrame is true', () => {
-			editor.html.set('<p>Test</p>');
+			editor.$.html.set('<p>Test</p>');
 
-			const content = editor.html.get({ withFrame: true });
+			const content = editor.$.html.get({ withFrame: true });
 			expect(content).toContain('sun-editor-editable');
 			expect(content).toContain('Test');
 		});
@@ -58,17 +58,17 @@ describe('HTML API integration tests', () => {
 	describe('html.set() - Set content', () => {
 		it('should set HTML content', () => {
 			const testHTML = '<p>Setting HTML content</p>';
-			editor.html.set(testHTML);
+			editor.$.html.set(testHTML);
 
-			const content = editor.html.get();
+			const content = editor.$.html.get();
 			expect(content).toContain('Setting HTML content');
 		});
 
 		it('should clean and format HTML when setting', () => {
 			// Set HTML with inline text (should be wrapped in format tag)
-			editor.html.set('Plain text without tags');
+			editor.$.html.set('Plain text without tags');
 
-			const wysiwyg = editor.frameContext.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 			const firstChild = wysiwyg.firstElementChild;
 
 			// Should be wrapped in a format tag (p, div, etc.)
@@ -77,19 +77,19 @@ describe('HTML API integration tests', () => {
 		});
 
 		it('should clear previous content when setting new content', () => {
-			editor.html.set('<p>First content</p>');
-			editor.html.set('<p>Second content</p>');
+			editor.$.html.set('<p>First content</p>');
+			editor.$.html.set('<p>Second content</p>');
 
-			const content = editor.html.get();
+			const content = editor.$.html.get();
 			expect(content).toContain('Second content');
 			expect(content).not.toContain('First content');
 		});
 
 		it('should handle empty string', () => {
-			editor.html.set('<p>Content</p>');
-			editor.html.set('');
+			editor.$.html.set('<p>Content</p>');
+			editor.$.html.set('');
 
-			const wysiwyg = editor.frameContext.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 			// Even empty, should have at least one element
 			expect(wysiwyg.children.length).toBeGreaterThanOrEqual(0);
 		});
@@ -99,30 +99,30 @@ describe('HTML API integration tests', () => {
 
 	describe('html.insert() - Insert at selection', () => {
 		it('should insert HTML at selection point', () => {
-			const wysiwyg = editor.frameContext.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 			wysiwyg.innerHTML = '<p>Before After</p>';
 
 			// Set selection in the middle
 			const textNode = wysiwyg.querySelector('p').firstChild;
-			editor.selection.setRange(textNode, 6, textNode, 6);
+			editor.$.selection.setRange(textNode, 6, textNode, 6);
 
 			// Insert HTML
-			editor.html.insert('<strong>INSERTED</strong>');
+			editor.$.html.insert('<strong>INSERTED</strong>');
 
-			const content = editor.html.get();
+			const content = editor.$.html.get();
 			expect(content).toContain('Before');
 			expect(content).toContain('INSERTED');
 			expect(content).toContain('After');
 		});
 
 		it('should insert plain text at selection', () => {
-			const wysiwyg = editor.frameContext.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 			wysiwyg.innerHTML = '<p>Start End</p>';
 
 			const textNode = wysiwyg.querySelector('p').firstChild;
-			editor.selection.setRange(textNode, 5, textNode, 5);
+			editor.$.selection.setRange(textNode, 5, textNode, 5);
 
-			editor.html.insert(' MIDDLE ');
+			editor.$.html.insert(' MIDDLE ');
 
 			// Text should contain inserted content
 			const content = wysiwyg.textContent;
@@ -132,14 +132,14 @@ describe('HTML API integration tests', () => {
 		});
 
 		it('should replace selected content when inserting', () => {
-			const wysiwyg = editor.frameContext.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 			wysiwyg.innerHTML = '<p>Replace this text</p>';
 
 			// Select "this"
 			const textNode = wysiwyg.querySelector('p').firstChild;
-			editor.selection.setRange(textNode, 8, textNode, 12);
+			editor.$.selection.setRange(textNode, 8, textNode, 12);
 
-			editor.html.insert('THAT');
+			editor.$.html.insert('THAT');
 
 			const content = wysiwyg.textContent;
 			expect(content).toContain('Replace THAT text');
@@ -150,7 +150,7 @@ describe('HTML API integration tests', () => {
 	describe('html.filter() - Filter HTML', () => {
 		it('should filter out blacklisted tags', () => {
 			const html = '<p>Keep this</p><script>alert("bad")</script><p>And this</p>';
-			const filtered = editor.html.filter(html, {
+			const filtered = editor.$.html.filter(html, {
 				tagBlacklist: 'script'
 			});
 
@@ -162,7 +162,7 @@ describe('HTML API integration tests', () => {
 
 		it('should keep only whitelisted tags', () => {
 			const html = '<p>Paragraph</p><div>Div</div><span>Span</span>';
-			const filtered = editor.html.filter(html, {
+			const filtered = editor.$.html.filter(html, {
 				tagWhitelist: 'p|span'
 			});
 
@@ -175,7 +175,7 @@ describe('HTML API integration tests', () => {
 
 		it('should apply custom validation function', () => {
 			const html = '<p class="keep">Keep</p><p class="remove">Remove</p>';
-			const filtered = editor.html.filter(html, {
+			const filtered = editor.$.html.filter(html, {
 				validate: (node) => {
 					if (node.classList && node.classList.contains('remove')) {
 						return null; // Remove this node
@@ -194,7 +194,7 @@ describe('HTML API integration tests', () => {
 			const dirtyHTML = `
 				<p>   Content   with   extra   spaces   </p>
 			`;
-			const cleaned = editor.html.clean(dirtyHTML);
+			const cleaned = editor.$.html.clean(dirtyHTML);
 
 			expect(cleaned).toBeTruthy();
 			expect(cleaned).toContain('Content');
@@ -204,7 +204,7 @@ describe('HTML API integration tests', () => {
 
 		it('should force format on plain text', () => {
 			const plainText = 'Unformatted text';
-			const cleaned = editor.html.clean(plainText, { forceFormat: true });
+			const cleaned = editor.$.html.clean(plainText, { forceFormat: true });
 
 			// Should wrap in a format tag
 			expect(cleaned).toMatch(/<(p|div)/);
@@ -213,7 +213,7 @@ describe('HTML API integration tests', () => {
 
 		it('should remove disallowed tags', () => {
 			const html = '<p>Good</p><script>bad();</script><p>Also good</p>';
-			const cleaned = editor.html.clean(html);
+			const cleaned = editor.$.html.clean(html);
 
 			expect(cleaned).toContain('Good');
 			expect(cleaned).toContain('Also good');
@@ -231,7 +231,7 @@ describe('HTML API integration tests', () => {
 					Line 2
 				</p>
 			`;
-			const compressed = editor.html.compress(html);
+			const compressed = editor.$.html.compress(html);
 
 			// Should remove newlines and excessive spaces
 			expect(compressed).not.toContain('\n');
@@ -243,9 +243,9 @@ describe('HTML API integration tests', () => {
 
 	describe('html.getJson() and setJson() - JSON conversion', () => {
 		it('should get content as JSON', () => {
-			editor.html.set('<p>Test JSON</p>');
+			editor.$.html.set('<p>Test JSON</p>');
 
-			const json = editor.html.getJson();
+			const json = editor.$.html.getJson();
 			expect(typeof json).toBe('object');
 		});
 
@@ -254,21 +254,21 @@ describe('HTML API integration tests', () => {
 
 			// setJson should not throw
 			expect(() => {
-				editor.html.setJson(testJson);
+				editor.$.html.setJson(testJson);
 			}).not.toThrow();
 		});
 	});
 
 	describe('html.remove() - Remove selection', () => {
 		it('should remove selected content', () => {
-			const wysiwyg = editor.frameContext.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 			wysiwyg.innerHTML = '<p>Remove this content</p>';
 
 			// Select "this"
 			const textNode = wysiwyg.querySelector('p').firstChild;
-			editor.selection.setRange(textNode, 7, textNode, 11);
+			editor.$.selection.setRange(textNode, 7, textNode, 11);
 
-			const result = editor.html.remove();
+			const result = editor.$.html.remove();
 
 			expect(result).toBeTruthy();
 			expect(result.container).toBeTruthy();
@@ -280,15 +280,15 @@ describe('HTML API integration tests', () => {
 		});
 
 		it('should handle removing entire content', () => {
-			const wysiwyg = editor.frameContext.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 			wysiwyg.innerHTML = '<p>All selected</p>';
 
 			// Select all
 			const p = wysiwyg.querySelector('p');
 			const textNode = p.firstChild;
-			editor.selection.setRange(textNode, 0, textNode, textNode.textContent.length);
+			editor.$.selection.setRange(textNode, 0, textNode, textNode.textContent.length);
 
-			const result = editor.html.remove();
+			const result = editor.$.html.remove();
 
 			expect(result).toBeTruthy();
 			expect(result.container).toBeTruthy();
@@ -298,46 +298,46 @@ describe('HTML API integration tests', () => {
 	describe('Real-world workflows', () => {
 		it('should support get-modify-set workflow', () => {
 			// Set initial content
-			editor.html.set('<p>Original content</p>');
+			editor.$.html.set('<p>Original content</p>');
 
 			// Get content
-			let content = editor.html.get();
+			let content = editor.$.html.get();
 			expect(content).toContain('Original');
 
 			// Modify and set back
 			content = content.replace('Original', 'Modified');
-			editor.html.set(content);
+			editor.$.html.set(content);
 
 			// Verify
-			const finalContent = editor.html.get();
+			const finalContent = editor.$.html.get();
 			expect(finalContent).toContain('Modified');
 			expect(finalContent).not.toContain('Original');
 		});
 
 		it('should support multiple set operations', () => {
-			editor.html.set('<h1>Title</h1>');
+			editor.$.html.set('<h1>Title</h1>');
 
-			let content = editor.html.get();
+			let content = editor.$.html.get();
 			expect(content).toContain('Title');
 
 			// Set different content
-			editor.html.set('<h1>Title</h1><p>First paragraph</p>');
-			content = editor.html.get();
+			editor.$.html.set('<h1>Title</h1><p>First paragraph</p>');
+			content = editor.$.html.get();
 			expect(content).toContain('Title');
 			expect(content).toContain('First paragraph');
 		});
 
 		it('should support insert-at-position workflow', () => {
-			const wysiwyg = editor.frameContext.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 			wysiwyg.innerHTML = '<p>Paragraph 1</p><p>Paragraph 3</p>';
 
 			// Position between paragraphs
 			const firstP = wysiwyg.querySelector('p');
 			const textNode = firstP.firstChild;
-			editor.selection.setRange(textNode, textNode.textContent.length, textNode, textNode.textContent.length);
+			editor.$.selection.setRange(textNode, textNode.textContent.length, textNode, textNode.textContent.length);
 
 			// Insert new paragraph
-			editor.html.insert('<p>Paragraph 2</p>');
+			editor.$.html.insert('<p>Paragraph 2</p>');
 
 			const allP = wysiwyg.querySelectorAll('p');
 			expect(allP.length).toBeGreaterThanOrEqual(2);
@@ -354,11 +354,11 @@ describe('HTML API integration tests', () => {
 
 			// Set the complex HTML - this should not throw errors
 			expect(() => {
-				editor.html.insert(inputHTML);
+				editor.$.html.insert(inputHTML);
 			}).not.toThrow();
 
 			// Get the output
-			const outputHTML = editor.html.get();
+			const outputHTML = editor.$.html.get();
 
 			// Verify all structural elements are preserved
 			// 1. PRE element with content
@@ -392,7 +392,7 @@ describe('HTML API integration tests', () => {
 			expect(olCount).toBeGreaterThanOrEqual(2); // At least 2 nested lists
 
 			// 7. Verify editor is still functional after inserting complex HTML
-			const wysiwyg = editor.frameContext.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 			expect(wysiwyg).toBeTruthy();
 			expect(wysiwyg.children.length).toBeGreaterThan(0);
 
@@ -400,7 +400,7 @@ describe('HTML API integration tests', () => {
 			expect(() => {
 				const p = wysiwyg.querySelector('p');
 				if (p && p.firstChild) {
-					editor.selection.setRange(p.firstChild, 0, p.firstChild, 0);
+					editor.$.selection.setRange(p.firstChild, 0, p.firstChild, 0);
 				}
 			}).not.toThrow();
 
@@ -416,19 +416,19 @@ describe('HTML API integration tests', () => {
 
 		it('should handle inserting complex HTML at cursor position', () => {
 			// Start with simple content
-			const wysiwyg = editor.frameContext.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 			wysiwyg.innerHTML = '<p>Insert here: </p>';
 
 			// Position cursor at end
 			const p = wysiwyg.querySelector('p');
 			const textNode = p.firstChild;
-			editor.selection.setRange(textNode, textNode.textContent.length, textNode, textNode.textContent.length);
+			editor.$.selection.setRange(textNode, textNode.textContent.length, textNode, textNode.textContent.length);
 
 			// Insert complex structure
 			const complexHTML = '<table class="se-table-layout-auto"><tbody><tr><td>Cell 1</td><td>Cell 2</td></tr></tbody></table><ol><li>Item 1<ol><li>Nested</li></ol></li></ol>';
-			editor.html.insert(complexHTML);
+			editor.$.html.insert(complexHTML);
 
-			const output = editor.html.get();
+			const output = editor.$.html.get();
 
 			// Should contain the original text
 			expect(output).toContain('Insert here');

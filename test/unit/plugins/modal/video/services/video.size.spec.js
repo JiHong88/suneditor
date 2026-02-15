@@ -62,8 +62,8 @@ describe('VideoSizeService', () => {
 
         // Setup mock Main instance
         mockMain = {
-            state: { 
-                onlyPercentage: false, 
+            state: {
+                onlyPercentage: false,
                 sizeUnit: 'px',
                 defaultRatio: '56.25%'
             },
@@ -85,6 +85,9 @@ describe('VideoSizeService', () => {
                 autoRatio: { current: '56.25%' }
             }
         };
+
+        // Make mockMain act as its own kernel for dependency injection
+        mockMain.$ = mockMain;
 
         // Reset static mocks
         Figure.CalcRatio.mockReset();

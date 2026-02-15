@@ -6,41 +6,9 @@
  */
 
 import Controller from '../../../src/modules/contract/Controller.js';
+import { createMockEditor } from '../../../test/__mocks__/editorMock.js';
 
 // Mock dependencies
-jest.mock('../../../src/editorInjector/_core.js', () => {
-	return jest.fn().mockImplementation(function (editor) {
-		this.editor = editor;
-		this.frameContext =
-			editor.frameContext ||
-			new Map([
-				['lineBreaker_t', { style: { display: '' } }],
-				['lineBreaker_b', { style: { display: '' } }],
-				['topArea', { offsetHeight: 0 }],
-			]);
-		this.triggerEvent = editor.triggerEvent || jest.fn().mockResolvedValue(undefined);
-		this.carrierWrapper = {
-			appendChild: jest.fn(),
-			contains: jest.fn().mockReturnValue(true),
-		};
-		this.eventManager = {
-			addEvent: jest.fn(),
-			removeGlobalEvent: jest.fn(),
-			addGlobalEvent: jest.fn(),
-		};
-		this.component = {
-			__removeGlobalEvent: jest.fn(),
-			deselect: jest.fn(),
-		};
-		this.uiManager = editor.uiManager;
-		this.selection = editor.selection;
-		this.offset = editor.offset;
-		this.status = editor.status;
-		this.instanceCheck = {
-			isRange: jest.fn().mockReturnValue(false),
-		};
-	});
-});
 
 jest.mock('../../../src/helper', () => ({
 	dom: {
@@ -79,46 +47,19 @@ describe('Controller - Nested State Management (Essential Tests)', () => {
 	let mockInst;
 
 	const createMockElement = (id = 'test') => {
-		const element = {
-			id,
-			style: {
-				visibility: '',
-				display: '',
-				position: '',
-				left: '',
-				top: '',
-				zIndex: '',
-			},
-			appendChild: jest.fn(),
-			removeAttribute: jest.fn(),
-			setAttribute: jest.fn(),
-			hasAttribute: jest.fn(),
-			_attributes: new Set(),
-			classList: {
-				add: jest.fn(),
-				remove: jest.fn(),
-				contains: jest.fn(),
-			},
-			getBoundingClientRect: jest.fn().mockReturnValue({
-				width: 100,
-				height: 50,
-				top: 0,
-				left: 0,
-				right: 100,
-				bottom: 50,
-			}),
-			contains: jest.fn().mockReturnValue(false),
-		};
+		const element = document.createElement('div');
+		element.id = id;
+		element.style.visibility = '';
+		element.style.display = '';
+		element.style.position = '';
+		element.style.left = '';
+		element.style.top = '';
+		element.style.zIndex = '';
 
-		element.setAttribute = jest.fn((attr, value) => {
-			element._attributes.add(attr);
-		});
-		element.removeAttribute = jest.fn((attr) => {
-			element._attributes.delete(attr);
-		});
-		element.hasAttribute = jest.fn((attr) => {
-			return element._attributes.has(attr);
-		});
+		// Add jest mocks to real DOM element
+		element.setAttribute = jest.fn(element.setAttribute.bind(element));
+		element.removeAttribute = jest.fn(element.removeAttribute.bind(element));
+		element.hasAttribute = jest.fn(element.hasAttribute.bind(element));
 
 		return element;
 	};
@@ -126,8 +67,14 @@ describe('Controller - Nested State Management (Essential Tests)', () => {
 	beforeEach(() => {
 		jest.clearAllMocks();
 
-		mockEditor = {
-			uiManager: {
+		// Use createMockEditor for the $ deps bag pattern
+		const kernel = createMockEditor();
+		mockEditor = kernel;
+
+		// Override with custom mocks as needed
+		mockEditor.$ = {
+			...kernel.$,
+			ui: {
 				showController: jest.fn(),
 				hideController: jest.fn(),
 				setControllerOnDisabledButtons: jest.fn(),
@@ -139,29 +86,22 @@ describe('Controller - Nested State Management (Essential Tests)', () => {
 			selection: {
 				getRangeElement: jest.fn(),
 				isRange: jest.fn().mockReturnValue(false),
+				...kernel.$.selection
 			},
-			triggerEvent: jest.fn().mockResolvedValue(undefined),
 			offset: {
 				setRangePosition: jest.fn().mockReturnValue(true),
 				setAbsPosition: jest.fn().mockReturnValue({ position: 'bottom' }),
-			},
-			status: {
-				hasFocus: true,
+				...kernel.$.offset
 			},
 			component: {
 				__removeGlobalEvent: jest.fn(),
 				deselect: jest.fn(),
-			},
-			toolbar: {
-				hide: jest.fn(),
-			},
-			subToolbar: {
-				hide: jest.fn(),
-			},
-			isBalloon: false,
-			isSubBalloon: false,
-			opendControllers: [],
+				...kernel.$.component
+			}
 		};
+		mockEditor.isBalloon = false;
+		mockEditor.isSubBalloon = false;
+		mockEditor.opendControllers = [];
 
 		mockInst = {
 			editor: mockEditor,
@@ -175,10 +115,10 @@ describe('Controller - Nested State Management (Essential Tests)', () => {
 	describe('Parent-Child Relationship', () => {
 		it('should initialize parentsForm with Controller instance parent', () => {
 			const parentElement = createMockElement('parent');
-			const parentController = new Controller(mockInst, parentElement, {});
+			const parentController = new Controller(mockInst, mockEditor.$, parentElement, {});
 
 			const childElement = createMockElement('child');
-			const childController = new Controller(mockInst, childElement, {
+			const childController = new Controller(mockInst, mockEditor.$, childElement, {
 				parents: [parentController],
 			});
 
@@ -194,7 +134,7 @@ describe('Controller - Nested State Management (Essential Tests)', () => {
 			const parentElement = createMockElement('parent');
 
 			const childElement = createMockElement('child');
-			const childController = new Controller(mockInst, childElement, {
+			const childController = new Controller(mockInst, mockEditor.$, childElement, {
 				parents: [parentElement],
 			});
 
@@ -207,12 +147,12 @@ describe('Controller - Nested State Management (Essential Tests)', () => {
 
 		it('should support mixed parent types (Controller + HTMLElement)', () => {
 			const parentElement1 = createMockElement('parent1');
-			const parentController = new Controller(mockInst, parentElement1, {});
+			const parentController = new Controller(mockInst, mockEditor.$, parentElement1, {});
 
 			const parentElement2 = createMockElement('parent2');
 
 			const childElement = createMockElement('child');
-			const childController = new Controller(mockInst, childElement, {
+			const childController = new Controller(mockInst, mockEditor.$, childElement, {
 				parents: [parentController, parentElement2],
 			});
 
@@ -229,7 +169,7 @@ describe('Controller - Nested State Management (Essential Tests)', () => {
 	describe('Clean Up on Close', () => {
 		it('should clean up hidden state attributes on close', () => {
 			const element = createMockElement();
-			const controller = new Controller(mockInst, element, {});
+			const controller = new Controller(mockInst, mockEditor.$, element, {});
 			controller.isOpen = true;
 			element.setAttribute('data-se-hidden-by-parent', '1');
 			element.setAttribute('data-se-hidden-by-children', '1');
@@ -244,10 +184,10 @@ describe('Controller - Nested State Management (Essential Tests)', () => {
 	describe('Scroll Repositioning', () => {
 		it('should skip repositioning if hidden by parent attribute', () => {
 			const element = createMockElement();
-			element._attributes.add('data-se-hidden-by-parent');
-			const controller = new Controller(mockInst, element, {});
+			element.setAttribute('data-se-hidden-by-parent', '1');
+			const controller = new Controller(mockInst, mockEditor.$, element, {});
 
-			const setPositionSpy = jest.spyOn(mockEditor.offset, 'setAbsPosition');
+			const setPositionSpy = jest.spyOn(mockEditor.$.offset, 'setAbsPosition');
 
 			controller._scrollReposition(false);
 
@@ -257,10 +197,10 @@ describe('Controller - Nested State Management (Essential Tests)', () => {
 
 		it('should skip repositioning if hidden by children attribute', () => {
 			const element = createMockElement();
-			element._attributes.add('data-se-hidden-by-children');
-			const controller = new Controller(mockInst, element, {});
+			element.setAttribute('data-se-hidden-by-children', '1');
+			const controller = new Controller(mockInst, mockEditor.$, element, {});
 
-			const setPositionSpy = jest.spyOn(mockEditor.offset, 'setAbsPosition');
+			const setPositionSpy = jest.spyOn(mockEditor.$.offset, 'setAbsPosition');
 
 			controller._scrollReposition(false);
 
@@ -272,18 +212,21 @@ describe('Controller - Nested State Management (Essential Tests)', () => {
 		it('should hide parent forms when parentsHide controller opens', async () => {
 			const parent1Element = createMockElement('parent1');
 			parent1Element.style.display = 'block';
-			const parent1Controller = new Controller(mockInst, parent1Element, {});
+			const parent1Controller = new Controller(mockInst, mockEditor.$, parent1Element, {});
 
 			const parent2Element = createMockElement('parent2');
 			parent2Element.style.display = 'block';
 
 			const childElement = createMockElement('child');
-			const childController = new Controller(mockInst, childElement, {
+			const childController = new Controller(mockInst, mockEditor.$, childElement, {
 				parents: [parent1Controller, parent2Element],
 				parentsHide: true,
 			});
 
-			const target = { getBoundingClientRect: jest.fn().mockReturnValue({ top: 0, left: 0, right: 100, bottom: 50, width: 100, height: 50 }) };
+			const target = document.createElement('div');
+			Object.defineProperty(target, 'getBoundingClientRect', {
+				value: jest.fn().mockReturnValue({ top: 0, left: 0, right: 100, bottom: 50, width: 100, height: 50 })
+			});
 
 			await childController.open(target, target, {});
 
@@ -296,15 +239,18 @@ describe('Controller - Nested State Management (Essential Tests)', () => {
 		it('should show parent forms when parentsHide child closes normally', async () => {
 			const parent1Element = createMockElement('parent1');
 			parent1Element.style.display = 'block';
-			const parent1Controller = new Controller(mockInst, parent1Element, {});
+			const parent1Controller = new Controller(mockInst, mockEditor.$, parent1Element, {});
 
 			const childElement = createMockElement('child');
-			const childController = new Controller(mockInst, childElement, {
+			const childController = new Controller(mockInst, mockEditor.$, childElement, {
 				parents: [parent1Controller],
 				parentsHide: true,
 			});
 
-			const target = { getBoundingClientRect: jest.fn().mockReturnValue({ top: 0, left: 0, right: 100, bottom: 50, width: 100, height: 50 }) };
+			const target = document.createElement('div');
+			Object.defineProperty(target, 'getBoundingClientRect', {
+				value: jest.fn().mockReturnValue({ top: 0, left: 0, right: 100, bottom: 50, width: 100, height: 50 })
+			});
 			await childController.open(target, target, {});
 			childController.isOpen = true;
 
@@ -319,15 +265,18 @@ describe('Controller - Nested State Management (Essential Tests)', () => {
 		it('should not show parent if force closed', async () => {
 			const parent1Element = createMockElement('parent1');
 			parent1Element.style.display = 'block';
-			const parent1Controller = new Controller(mockInst, parent1Element, {});
+			const parent1Controller = new Controller(mockInst, mockEditor.$, parent1Element, {});
 
 			const childElement = createMockElement('child');
-			const childController = new Controller(mockInst, childElement, {
+			const childController = new Controller(mockInst, mockEditor.$, childElement, {
 				parents: [parent1Controller],
 				parentsHide: true,
 			});
 
-			const target = { getBoundingClientRect: jest.fn().mockReturnValue({ top: 0, left: 0, right: 100, bottom: 50, width: 100, height: 50 }) };
+			const target = document.createElement('div');
+			Object.defineProperty(target, 'getBoundingClientRect', {
+				value: jest.fn().mockReturnValue({ top: 0, left: 0, right: 100, bottom: 50, width: 100, height: 50 })
+			});
 			await childController.open(target, target, {});
 			childController.isOpen = true;
 
@@ -344,17 +293,20 @@ describe('Controller - Nested State Management (Essential Tests)', () => {
 		it('should manage z-index with isOutsideForm and parents', async () => {
 			const parent1Element = createMockElement('parent1');
 			parent1Element.style.zIndex = '2147483641';
-			const parent1Controller = new Controller(mockInst, parent1Element, {});
+			const parent1Controller = new Controller(mockInst, mockEditor.$, parent1Element, {});
 
 			const childElement = createMockElement('child');
-			const childController = new Controller(mockInst, childElement, {
+			const childController = new Controller(mockInst, mockEditor.$, childElement, {
 				isOutsideForm: true,
 				parents: [parent1Controller],
 			});
 
-			mockEditor.opendControllers = [{ form: parent1Element }];
+			mockEditor.$.ui.opendControllers = [{ form: parent1Element }];
 
-			const target = { getBoundingClientRect: jest.fn().mockReturnValue({ top: 0, left: 0, right: 100, bottom: 50, width: 100, height: 50 }) };
+			const target = document.createElement('div');
+			Object.defineProperty(target, 'getBoundingClientRect', {
+				value: jest.fn().mockReturnValue({ top: 0, left: 0, right: 100, bottom: 50, width: 100, height: 50 })
+			});
 			await childController.open(target, target, {});
 
 			// isOutsideForm logic should work with parentsForm

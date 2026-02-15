@@ -3,6 +3,7 @@
  */
 
 import ParagraphStyle from '../../../../src/plugins/dropdown/paragraphStyle.js';
+import { createMockEditor } from '../../../../test/__mocks__/editorMock.js';
 
 // Mock helper
 jest.mock('../../../../src/helper', () => ({
@@ -49,60 +50,19 @@ jest.mock('../../../../src/helper', () => ({
     }
 }));
 
-// Mock EditorInjector
-jest.mock('../../../../src/editorInjector/_core.js', () => {
-    return jest.fn().mockImplementation(function(editor) {
-        this.editor = editor;
-        this.lang = editor.lang;
-        this.selection = editor.selection;
-        this.format = editor.format;
-        this.history = editor.history;
-        this.menu = editor.menu;
-        this.frameContext = editor.frameContext;
-        this.focusManager = editor.focusManager;
-		this.triggerEvent = editor.triggerEvent || jest.fn();
-    });
-});
-
 describe('Plugins - Dropdown - ParagraphStyle', () => {
-    let mockEditor;
+    let kernel;
     let paragraphStyle;
     let pluginOptions;
 
     beforeEach(() => {
         jest.clearAllMocks();
 
-        mockEditor = {
-            lang: {
-                paragraphStyle: 'Paragraph Style',
-                menu_spaced: 'Spaced',
-                menu_bordered: 'Bordered',
-                menu_neon: 'Neon'
-            },
-            selection: {
-                getNode: jest.fn().mockReturnValue(document.createElement('p')),
-                getRange: jest.fn().mockReturnValue({ startContainer: {}, endContainer: {} }),
-                getRangeAndAddLine: jest.fn()
-            },
-            format: {
-                getLine: jest.fn().mockReturnValue({
-                    className: '__se__p-spaced'
-                }),
-                getLines: jest.fn().mockReturnValue([
-                    { className: '' },
-                    { className: '__se__p-bordered' }
-                ])
-            },
-            history: {
-                push: jest.fn()
-            },
-            menu: {
-                initDropdownTarget: jest.fn(),
-                dropdownOff: jest.fn()
-            },
-            frameContext: new Map(),
-            triggerEvent: jest.fn()
-        };
+        kernel = createMockEditor();
+        kernel.$.lang.paragraphStyle = 'Paragraph Style';
+        kernel.$.lang.menu_spaced = 'Spaced';
+        kernel.$.lang.menu_bordered = 'Bordered';
+        kernel.$.lang.menu_neon = 'Neon';
 
         pluginOptions = {
             items: [
@@ -111,7 +71,7 @@ describe('Plugins - Dropdown - ParagraphStyle', () => {
             ]
         };
 
-        paragraphStyle = new ParagraphStyle(mockEditor, pluginOptions);
+        paragraphStyle = new ParagraphStyle(kernel, pluginOptions);
     });
 
 
@@ -127,7 +87,7 @@ describe('Plugins - Dropdown - ParagraphStyle', () => {
         });
 
         it('should initialize dropdown menu', () => {
-            expect(mockEditor.menu.initDropdownTarget).toHaveBeenCalledWith(ParagraphStyle, expect.any(Object));
+            expect(kernel.$.menu.initDropdownTarget).toHaveBeenCalledWith(ParagraphStyle, expect.any(Object));
         });
 
         it('should initialize class list from menu', () => {
@@ -135,7 +95,7 @@ describe('Plugins - Dropdown - ParagraphStyle', () => {
         });
 
         it('should use default items when none provided', () => {
-            const defaultParagraphStyle = new ParagraphStyle(mockEditor, {});
+            const defaultParagraphStyle = new ParagraphStyle(kernel, {});
             expect(defaultParagraphStyle.classList).toBeDefined();
         });
     });
@@ -151,7 +111,7 @@ describe('Plugins - Dropdown - ParagraphStyle', () => {
 
         it('should activate matching paragraph style button', () => {
             const mockFormat = { className: '__se__p-spaced' };
-            mockEditor.format.getLine.mockReturnValue(mockFormat);
+            kernel.$.format.getLine.mockReturnValue(mockFormat);
             const { dom } = require('../../../../src/helper');
             dom.utils.hasClass.mockImplementation((el, className) =>
                 el === mockFormat && className === '__se__p-spaced'
@@ -166,7 +126,7 @@ describe('Plugins - Dropdown - ParagraphStyle', () => {
 
         it('should deactivate all buttons when no matching style', () => {
             const mockFormat = { className: '' };
-            mockEditor.format.getLine.mockReturnValue(mockFormat);
+            kernel.$.format.getLine.mockReturnValue(mockFormat);
             const { dom } = require('../../../../src/helper');
             dom.utils.hasClass.mockReturnValue(false);
 
@@ -179,7 +139,7 @@ describe('Plugins - Dropdown - ParagraphStyle', () => {
 
         it('should handle multiple matching classes', () => {
             const mockFormat = { className: '__se__p-bordered __se__p-neon' };
-            mockEditor.format.getLine.mockReturnValue(mockFormat);
+            kernel.$.format.getLine.mockReturnValue(mockFormat);
             const { dom } = require('../../../../src/helper');
             dom.utils.hasClass.mockImplementation((el, className) =>
                 el === mockFormat && (className === '__se__p-bordered' || className === '__se__p-neon')
@@ -193,7 +153,7 @@ describe('Plugins - Dropdown - ParagraphStyle', () => {
         });
 
         it('should handle null format element', () => {
-            mockEditor.format.getLine.mockReturnValue(null);
+            kernel.$.format.getLine.mockReturnValue(null);
             const { dom } = require('../../../../src/helper');
             dom.utils.hasClass.mockReturnValue(false);
 
@@ -219,7 +179,7 @@ describe('Plugins - Dropdown - ParagraphStyle', () => {
                 { className: '__se__p-bordered' }
             ];
 
-            mockEditor.format.getLines.mockReturnValue(mockFormats);
+            kernel.$.format.getLines.mockReturnValue(mockFormats);
         });
 
         it('should add class to selected formats when not active', () => {
@@ -230,8 +190,8 @@ describe('Plugins - Dropdown - ParagraphStyle', () => {
 
             expect(dom.utils.addClass).toHaveBeenCalledWith(mockFormats[0], '__se__p-spaced');
             expect(dom.utils.addClass).toHaveBeenCalledWith(mockFormats[1], '__se__p-spaced');
-            expect(mockEditor.menu.dropdownOff).toHaveBeenCalled();
-            expect(mockEditor.history.push).toHaveBeenCalledWith(false);
+            expect(kernel.$.menu.dropdownOff).toHaveBeenCalled();
+            expect(kernel.$.history.push).toHaveBeenCalledWith(false);
         });
 
         it('should remove class from selected formats when active', () => {
@@ -245,23 +205,23 @@ describe('Plugins - Dropdown - ParagraphStyle', () => {
         });
 
         it('should handle empty lines array by adding new line', () => {
-            mockEditor.format.getLines.mockReturnValueOnce([]).mockReturnValueOnce(mockFormats);
+            kernel.$.format.getLines.mockReturnValueOnce([]).mockReturnValueOnce(mockFormats);
             const { dom } = require('../../../../src/helper');
             dom.utils.hasClass.mockReturnValue(false);
 
             paragraphStyle.action(mockTarget);
 
-            expect(mockEditor.selection.getRangeAndAddLine).toHaveBeenCalled();
+            expect(kernel.$.selection.getRangeAndAddLine).toHaveBeenCalled();
             expect(dom.utils.addClass).toHaveBeenCalledWith(mockFormats[0], '__se__p-spaced');
         });
 
         it('should return early if no formats after adding line', () => {
-            mockEditor.format.getLines.mockReturnValue([]);
+            kernel.$.format.getLines.mockReturnValue([]);
 
             paragraphStyle.action(mockTarget);
 
-            expect(mockEditor.selection.getRangeAndAddLine).toHaveBeenCalled();
-            expect(mockEditor.menu.dropdownOff).not.toHaveBeenCalled();
+            expect(kernel.$.selection.getRangeAndAddLine).toHaveBeenCalled();
+            expect(kernel.$.menu.dropdownOff).not.toHaveBeenCalled();
         });
 
         it('should handle null data-command attribute', () => {
@@ -281,7 +241,7 @@ describe('Plugins - Dropdown - ParagraphStyle', () => {
                 { className: '' },
                 { className: '__se__p-bordered' }
             ];
-            mockEditor.format.getLines.mockReturnValue(manyFormats);
+            kernel.$.format.getLines.mockReturnValue(manyFormats);
             const { dom } = require('../../../../src/helper');
             dom.utils.hasClass.mockReturnValue(false);
 
@@ -312,7 +272,7 @@ describe('Plugins - Dropdown - ParagraphStyle', () => {
             const { dom } = require('../../../../src/helper');
             dom.utils.createElement.mockClear();
 
-            const defaultParagraphStyle = new ParagraphStyle(mockEditor, {});
+            const defaultParagraphStyle = new ParagraphStyle(kernel, {});
 
             const createCallArgs = dom.utils.createElement.mock.calls.find(
                 call => call[1]?.class === 'se-dropdown se-list-layer se-list-format'
@@ -330,7 +290,7 @@ describe('Plugins - Dropdown - ParagraphStyle', () => {
             const { dom } = require('../../../../src/helper');
             dom.utils.createElement.mockClear();
 
-            const stringParagraphStyle = new ParagraphStyle(mockEditor, {
+            const stringParagraphStyle = new ParagraphStyle(kernel, {
                 items: ['spaced', 'neon']
             });
 
@@ -347,7 +307,7 @@ describe('Plugins - Dropdown - ParagraphStyle', () => {
             const { dom } = require('../../../../src/helper');
             dom.utils.createElement.mockClear();
 
-            const invalidParagraphStyle = new ParagraphStyle(mockEditor, {
+            const invalidParagraphStyle = new ParagraphStyle(kernel, {
                 items: ['spaced', 'invalid-style', 'neon']
             });
 
@@ -371,7 +331,7 @@ describe('Plugins - Dropdown - ParagraphStyle', () => {
                 paragraphStyle.action(mockTarget);
             }).not.toThrow();
 
-            expect(mockEditor.format.getLines).toHaveBeenCalled();
+            expect(kernel.$.format.getLines).toHaveBeenCalled();
         });
 
         it('should work with editor selection module', () => {
@@ -379,12 +339,12 @@ describe('Plugins - Dropdown - ParagraphStyle', () => {
                 paragraphStyle.on();
             }).not.toThrow();
 
-            expect(mockEditor.selection.getNode).toHaveBeenCalled();
+            expect(kernel.$.selection.getNode).toHaveBeenCalled();
         });
 
         it('should work with class detection', () => {
             const mockFormat = { className: '__se__p-spaced' };
-            mockEditor.format.getLine.mockReturnValue(mockFormat);
+            kernel.$.format.getLine.mockReturnValue(mockFormat);
             const { dom } = require('../../../../src/helper');
 
             paragraphStyle.on();
@@ -395,10 +355,10 @@ describe('Plugins - Dropdown - ParagraphStyle', () => {
 
     describe('Error handling', () => {
         it('should handle missing editor modules gracefully', () => {
-            mockEditor.format = undefined;
+            kernel.$.format = undefined;
 
             expect(() => {
-                new ParagraphStyle(mockEditor, {});
+                new ParagraphStyle(kernel, {});
             }).not.toThrow();
         });
 
@@ -420,13 +380,13 @@ describe('Plugins - Dropdown - ParagraphStyle', () => {
 
         it('should handle missing plugin options', () => {
             expect(() => {
-                new ParagraphStyle(mockEditor, {});
+                new ParagraphStyle(kernel, {});
             }).not.toThrow();
         });
 
         it('should handle empty items array', () => {
             expect(() => {
-                new ParagraphStyle(mockEditor, { items: [] });
+                new ParagraphStyle(kernel, { items: [] });
             }).not.toThrow();
         });
 
@@ -437,7 +397,7 @@ describe('Plugins - Dropdown - ParagraphStyle', () => {
             ];
 
             expect(() => {
-                new ParagraphStyle(mockEditor, { items: incompleteItems });
+                new ParagraphStyle(kernel, { items: incompleteItems });
             }).not.toThrow();
         });
     });

@@ -3,6 +3,7 @@
  */
 
 import VideoGallery from '../../../../src/plugins/browser/videoGallery.js';
+import { createMockEditor } from '../../../../test/__mocks__/editorMock.js';
 
 // Mock Browser module
 const mockBrowser = {
@@ -14,49 +15,14 @@ jest.mock('../../../../src/modules/contract', () => ({
     Browser: jest.fn().mockImplementation(() => mockBrowser)
 }));
 
-// Mock EditorInjector
-jest.mock('../../../../src/editorInjector/_core.js', () => {
-    return jest.fn().mockImplementation(function(editor) {
-        this.editor = editor;
-        this.lang = editor.lang;
-        this.plugins = editor.plugins;
-        this.icons = editor.icons;
-        this.frameContext = editor.frameContext;
-        this.focusManager = editor.focusManager;
-		this.triggerEvent = editor.triggerEvent || jest.fn();
-    });
-});
-
 describe('Plugins - Browser - VideoGallery', () => {
-    let mockEditor;
+    let kernel;
     let videoGallery;
 
     beforeEach(() => {
         jest.clearAllMocks();
 
-        mockEditor = {
-            lang: {
-                videoGallery: 'Video Gallery'
-            },
-            icons: {
-                video_thumbnail: '🎥'
-            },
-            plugins: {
-                video: {
-                    pluginOptions: {
-                        defaultWidth: '560px',
-                        defaultHeight: '315px'
-                    },
-                    modalInit: jest.fn(),
-                    create: jest.fn(),
-                    findProcessUrl: jest.fn().mockReturnValue({ url: 'processed-url' }),
-                    createIframeTag: jest.fn().mockReturnValue('<iframe></iframe>'),
-                    createVideoTag: jest.fn().mockReturnValue('<video></video>')
-                }
-            },
-            frameContext: new Map(),
-            triggerEvent: jest.fn()
-        };
+        kernel = createMockEditor();
 
         const pluginOptions = {
             data: [
@@ -68,7 +34,7 @@ describe('Plugins - Browser - VideoGallery', () => {
             thumbnail: '/default-thumbnail.jpg'
         };
 
-        videoGallery = new VideoGallery(mockEditor, pluginOptions);
+        videoGallery = new VideoGallery(kernel, pluginOptions);
     });
 
     describe('Constructor', () => {
@@ -87,7 +53,7 @@ describe('Plugins - Browser - VideoGallery', () => {
                 headers: { 'Custom-Header': 'value' }
             };
 
-            const gallery = new VideoGallery(mockEditor, pluginOptions);
+            const gallery = new VideoGallery(kernel, pluginOptions);
             expect(gallery).toBeInstanceOf(VideoGallery);
         });
 
@@ -97,10 +63,10 @@ describe('Plugins - Browser - VideoGallery', () => {
         });
 
         it('should handle auto dimensions', () => {
-            mockEditor.plugins.video.pluginOptions.defaultWidth = 'auto';
-            mockEditor.plugins.video.pluginOptions.defaultHeight = 'auto';
+            kernel.plugins.video.pluginOptions.defaultWidth = 'auto';
+            kernel.plugins.video.pluginOptions.defaultHeight = 'auto';
 
-            const gallery = new VideoGallery(mockEditor, {});
+            const gallery = new VideoGallery(kernel, {});
             expect(gallery.width).toBe('');
             expect(gallery.height).toBe('');
         });
@@ -110,10 +76,10 @@ describe('Plugins - Browser - VideoGallery', () => {
                 thumbnail: '/custom-thumbnail.jpg'
             };
 
-            new VideoGallery(mockEditor, pluginOptions);
+            new VideoGallery(kernel, pluginOptions);
 
             const { Browser } = require('../../../../src/modules/contract');
-            const browserOptions = Browser.mock.calls[Browser.mock.calls.length - 1][1];
+            const browserOptions = Browser.mock.calls[Browser.mock.calls.length - 1][2];
 
             expect(browserOptions.thumbnail).toBeInstanceOf(Function);
             expect(browserOptions.thumbnail()).toBe('/custom-thumbnail.jpg');
@@ -125,19 +91,19 @@ describe('Plugins - Browser - VideoGallery', () => {
                 thumbnail: thumbnailFn
             };
 
-            new VideoGallery(mockEditor, pluginOptions);
+            new VideoGallery(kernel, pluginOptions);
 
             const { Browser } = require('../../../../src/modules/contract');
-            const browserOptions = Browser.mock.calls[Browser.mock.calls.length - 1][1];
+            const browserOptions = Browser.mock.calls[Browser.mock.calls.length - 1][2];
 
             expect(browserOptions.thumbnail).toBe(thumbnailFn);
         });
 
         it('should use default icon thumbnail when no thumbnail provided', () => {
-            new VideoGallery(mockEditor, {});
+            new VideoGallery(kernel, {});
 
             const { Browser } = require('../../../../src/modules/contract');
-            const browserOptions = Browser.mock.calls[Browser.mock.calls.length - 1][1];
+            const browserOptions = Browser.mock.calls[Browser.mock.calls.length - 1][2];
 
             expect(browserOptions.thumbnail()).toBe('🎥');
         });
@@ -189,13 +155,13 @@ describe('Plugins - Browser - VideoGallery', () => {
 
                 // Get the selectorHandler from Browser constructor
                 const browserConstructorCall = require('../../../../src/modules/contract').Browser.mock.calls[0];
-                const browserOptions = browserConstructorCall[1];
+                const browserOptions = browserConstructorCall[2];
                 const selectorHandler = browserOptions.selectorHandler;
 
                 selectorHandler(mockTarget);
 
                 expect(customHandler).toHaveBeenCalledWith(mockTarget);
-                expect(mockEditor.plugins.video.modalInit).not.toHaveBeenCalled();
+                expect(kernel.plugins.video.modalInit).not.toHaveBeenCalled();
             });
         });
 
@@ -215,15 +181,15 @@ describe('Plugins - Browser - VideoGallery', () => {
 
                 // Get the selectorHandler from Browser constructor
                 const browserConstructorCall = require('../../../../src/modules/contract').Browser.mock.calls[0];
-                const browserOptions = browserConstructorCall[1];
+                const browserOptions = browserConstructorCall[2];
                 const selectorHandler = browserOptions.selectorHandler;
 
                 selectorHandler(mockTarget);
 
-                expect(mockEditor.plugins.video.findProcessUrl).toHaveBeenCalledWith('/path/to/video.mp4');
-                expect(mockEditor.plugins.video.modalInit).toHaveBeenCalled();
-                expect(mockEditor.plugins.video.createVideoTag).toHaveBeenCalledWith({ poster: '/thumb.jpg' });
-                expect(mockEditor.plugins.video.create).toHaveBeenCalledWith(
+                expect(kernel.plugins.video.findProcessUrl).toHaveBeenCalledWith('/path/to/video.mp4');
+                expect(kernel.plugins.video.modalInit).toHaveBeenCalled();
+                expect(kernel.plugins.video.createVideoTag).toHaveBeenCalledWith({ poster: '/thumb.jpg' });
+                expect(kernel.plugins.video.create).toHaveBeenCalledWith(
                     '<video></video>',
                     'processed-url',
                     null,
@@ -249,13 +215,13 @@ describe('Plugins - Browser - VideoGallery', () => {
                 videoGallery.open();
 
                 const browserConstructorCall = require('../../../../src/modules/contract').Browser.mock.calls[0];
-                const browserOptions = browserConstructorCall[1];
+                const browserOptions = browserConstructorCall[2];
                 const selectorHandler = browserOptions.selectorHandler;
 
                 selectorHandler(mockTarget);
 
-                expect(mockEditor.plugins.video.createIframeTag).toHaveBeenCalledWith({ poster: '/thumb.jpg' });
-                expect(mockEditor.plugins.video.create).toHaveBeenCalledWith(
+                expect(kernel.plugins.video.createIframeTag).toHaveBeenCalledWith({ poster: '/thumb.jpg' });
+                expect(kernel.plugins.video.create).toHaveBeenCalledWith(
                     '<iframe></iframe>',
                     'processed-url',
                     null,
@@ -268,7 +234,7 @@ describe('Plugins - Browser - VideoGallery', () => {
             });
 
             it('should handle URL without processing when findProcessUrl returns null', () => {
-                mockEditor.plugins.video.findProcessUrl.mockReturnValue(null);
+                kernel.plugins.video.findProcessUrl.mockReturnValue(null);
 
                 const mockTarget = {
                     getAttribute: jest.fn((attr) => {
@@ -283,12 +249,12 @@ describe('Plugins - Browser - VideoGallery', () => {
                 videoGallery.open();
 
                 const browserConstructorCall = require('../../../../src/modules/contract').Browser.mock.calls[0];
-                const browserOptions = browserConstructorCall[1];
+                const browserOptions = browserConstructorCall[2];
                 const selectorHandler = browserOptions.selectorHandler;
 
                 selectorHandler(mockTarget);
 
-                expect(mockEditor.plugins.video.create).toHaveBeenCalledWith(
+                expect(kernel.plugins.video.create).toHaveBeenCalledWith(
                     '<video></video>',
                     '/original-url.mp4',
                     null,
@@ -308,14 +274,14 @@ describe('Plugins - Browser - VideoGallery', () => {
             const constructorCall = Browser.mock.calls[0];
 
             expect(constructorCall[0]).toBe(videoGallery); // instance
-            expect(constructorCall[1]).toMatchObject({
+            expect(constructorCall[2]).toMatchObject({
                 title: 'Video Gallery',
                 columnSize: 4,
                 className: 'se-video-gallery',
                 props: ['frame']
             });
-            expect(constructorCall[1].selectorHandler).toBeInstanceOf(Function);
-            expect(constructorCall[1].thumbnail).toBeInstanceOf(Function);
+            expect(constructorCall[2].selectorHandler).toBeInstanceOf(Function);
+            expect(constructorCall[2].thumbnail).toBeInstanceOf(Function);
         });
 
         it('should pass plugin options to Browser', () => {
@@ -325,11 +291,11 @@ describe('Plugins - Browser - VideoGallery', () => {
                 headers: { 'Test-Header': 'test' }
             };
 
-            new VideoGallery(mockEditor, pluginOptions);
+            new VideoGallery(kernel, pluginOptions);
 
             const { Browser } = require('../../../../src/modules/contract');
             const lastCall = Browser.mock.calls[Browser.mock.calls.length - 1];
-            const browserOptions = lastCall[1];
+            const browserOptions = lastCall[2];
 
             expect(browserOptions.data).toEqual(pluginOptions.data);
             expect(browserOptions.url).toBe(pluginOptions.url);
@@ -340,12 +306,12 @@ describe('Plugins - Browser - VideoGallery', () => {
     describe('Error handling', () => {
         it('should handle missing plugin options gracefully', () => {
             expect(() => {
-                new VideoGallery(mockEditor, {});
+                new VideoGallery(kernel, {});
             }).not.toThrow();
         });
 
         it('should handle missing video plugin gracefully', () => {
-            mockEditor.plugins.video = {
+            kernel.plugins.video = {
                 pluginOptions: {
                     defaultWidth: 'auto',
                     defaultHeight: 'auto'
@@ -353,7 +319,7 @@ describe('Plugins - Browser - VideoGallery', () => {
             };
 
             expect(() => {
-                new VideoGallery(mockEditor, {});
+                new VideoGallery(kernel, {});
             }).not.toThrow();
         });
 
@@ -365,7 +331,7 @@ describe('Plugins - Browser - VideoGallery', () => {
             videoGallery.open();
 
             const { Browser } = require('../../../../src/modules/contract');
-            const browserOptions = Browser.mock.calls[0][1];
+            const browserOptions = Browser.mock.calls[0][2];
             const selectorHandler = browserOptions.selectorHandler;
 
             expect(() => {

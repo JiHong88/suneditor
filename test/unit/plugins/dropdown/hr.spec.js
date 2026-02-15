@@ -3,6 +3,7 @@
  */
 
 import HR from '../../../../src/plugins/dropdown/hr.js';
+import { createMockEditor } from '../../../../test/__mocks__/editorMock.js';
 
 // Mock helper
 jest.mock('../../../../src/helper', () => ({
@@ -49,66 +50,19 @@ jest.mock('../../../../src/helper', () => ({
 	},
 }));
 
-// Mock EditorInjector
-jest.mock('../../../../src/editorInjector/_core.js', () => {
-	return jest.fn().mockImplementation(function (editor) {
-		this.editor = editor;
-		this.lang = editor.lang;
-		this.selection = editor.selection;
-		this.format = editor.format;
-		this.component = editor.component;
-		this.menu = editor.menu;
-		this.history = editor.history;
-		this.nodeTransform = editor.nodeTransform;
-		this.frameContext = editor.frameContext;
-		this.focusManager = editor.focusManager;
-		this.triggerEvent = editor.triggerEvent || jest.fn();
-	});
-});
-
 describe('Plugins - Dropdown - HR', () => {
-	let mockEditor;
+	let kernel;
 	let hr;
 	let pluginOptions;
 
 	beforeEach(() => {
 		jest.clearAllMocks();
 
-		mockEditor = {
-			lang: {
-				horizontalLine: 'Horizontal Line',
-				hr_solid: 'Solid',
-				hr_dashed: 'Dashed',
-				hr_dotted: 'Dotted',
-			},
-			selection: {
-				setRange: jest.fn(),
-			},
-			format: {
-				addLine: jest.fn().mockReturnValue(document.createElement('p')),
-			},
-			component: {
-				insert: jest.fn(),
-			},
-			menu: {
-				initDropdownTarget: jest.fn(),
-				dropdownOff: jest.fn(),
-			},
-			history: {
-				push: jest.fn(),
-			},
-			nodeTransform: {
-				split: jest.fn().mockReturnValue(document.createElement('p')),
-			},
-			focusManager: {
-				focus: jest.fn(),
-				blur: jest.fn(),
-				focusEdge: jest.fn(),
-				nativeFocus: jest.fn(),
-			},
-			frameContext: new Map(),
-			triggerEvent: jest.fn(),
-		};
+		kernel = createMockEditor();
+		kernel.$.lang.horizontalLine = 'Horizontal Line';
+		kernel.$.lang.hr_solid = 'Solid';
+		kernel.$.lang.hr_dashed = 'Dashed';
+		kernel.$.lang.hr_dotted = 'Dotted';
 
 		pluginOptions = {
 			items: [
@@ -117,7 +71,7 @@ describe('Plugins - Dropdown - HR', () => {
 			],
 		};
 
-		hr = new HR(mockEditor, pluginOptions);
+		hr = new HR(kernel, pluginOptions);
 	});
 
 	describe('Static component method', () => {
@@ -165,7 +119,7 @@ describe('Plugins - Dropdown - HR', () => {
 		});
 
 		it('should initialize dropdown menu', () => {
-			expect(mockEditor.menu.initDropdownTarget).toHaveBeenCalledWith(HR, expect.any(Object));
+			expect(kernel.$.menu.initDropdownTarget).toHaveBeenCalledWith(HR, expect.any(Object));
 		});
 
 		it('should initialize list from menu', () => {
@@ -173,7 +127,7 @@ describe('Plugins - Dropdown - HR', () => {
 		});
 
 		it('should use default items when none provided', () => {
-			const defaultHR = new HR(mockEditor, {});
+			const defaultHR = new HR(kernel, {});
 			expect(defaultHR.list).toBeDefined();
 		});
 	});
@@ -236,8 +190,8 @@ describe('Plugins - Dropdown - HR', () => {
 			hr.componentDestroy(mockTarget);
 
 			expect(dom.utils.removeItem).toHaveBeenCalledWith(mockTarget);
-			expect(mockEditor.focusManager.focusEdge).toHaveBeenCalledWith(mockTarget.previousElementSibling);
-			expect(mockEditor.history.push).toHaveBeenCalledWith(false);
+			expect(kernel.$.focusManager.focusEdge).toHaveBeenCalledWith(mockTarget.previousElementSibling);
+			expect(kernel.$.history.push).toHaveBeenCalledWith(false);
 		});
 
 		it('should focus next sibling when no previous sibling', () => {
@@ -245,7 +199,7 @@ describe('Plugins - Dropdown - HR', () => {
 
 			hr.componentDestroy(mockTarget);
 
-			expect(mockEditor.focusManager.focusEdge).toHaveBeenCalledWith(mockTarget.nextElementSibling);
+			expect(kernel.$.focusManager.focusEdge).toHaveBeenCalledWith(mockTarget.nextElementSibling);
 		});
 
 		it('should handle null target gracefully', () => {
@@ -255,8 +209,8 @@ describe('Plugins - Dropdown - HR', () => {
 
 			const { dom } = require('../../../../src/helper');
 			expect(dom.utils.removeItem).not.toHaveBeenCalled();
-			expect(mockEditor.focusManager.focusEdge).not.toHaveBeenCalled();
-			expect(mockEditor.history.push).not.toHaveBeenCalled();
+			expect(kernel.$.focusManager.focusEdge).not.toHaveBeenCalled();
+			expect(kernel.$.history.push).not.toHaveBeenCalled();
 		});
 
 		it('should handle target with no siblings', () => {
@@ -265,13 +219,13 @@ describe('Plugins - Dropdown - HR', () => {
 
 			hr.componentDestroy(mockTarget);
 
-			expect(mockEditor.focusManager.focusEdge).toHaveBeenCalledWith(null);
+			expect(kernel.$.focusManager.focusEdge).toHaveBeenCalledWith(null);
 		});
 
 		it('should always push history when target exists', () => {
 			hr.componentDestroy(mockTarget);
 
-			expect(mockEditor.history.push).toHaveBeenCalledWith(false);
+			expect(kernel.$.history.push).toHaveBeenCalledWith(false);
 		});
 	});
 
@@ -286,15 +240,15 @@ describe('Plugins - Dropdown - HR', () => {
 
 		it('should create HR with correct class and insert it', () => {
 			const mockLine = document.createElement('p');
-			mockEditor.format.addLine.mockReturnValue(mockLine);
+			kernel.$.format.addLine.mockReturnValue(mockLine);
 
 			hr.action(mockTarget);
 
 			// Check that submit was called with correct className
-			expect(mockEditor.component.insert).toHaveBeenCalled();
-			expect(mockEditor.format.addLine).toHaveBeenCalled();
-			expect(mockEditor.selection.setRange).toHaveBeenCalledWith(mockLine, 1, mockLine, 1);
-			expect(mockEditor.menu.dropdownOff).toHaveBeenCalled();
+			expect(kernel.component.insert).toHaveBeenCalled();
+			expect(kernel.$.format.addLine).toHaveBeenCalled();
+			expect(kernel.$.selection.setRange).toHaveBeenCalledWith(mockLine, 1, mockLine, 1);
+			expect(kernel.$.menu.dropdownOff).toHaveBeenCalled();
 		});
 
 		it('should handle different HR classes', () => {
@@ -302,7 +256,7 @@ describe('Plugins - Dropdown - HR', () => {
 
 			hr.action(mockTarget);
 
-			expect(mockEditor.component.insert).toHaveBeenCalled();
+			expect(kernel.component.insert).toHaveBeenCalled();
 		});
 
 		it('should handle empty className', () => {
@@ -310,7 +264,7 @@ describe('Plugins - Dropdown - HR', () => {
 
 			hr.action(mockTarget);
 
-			expect(mockEditor.component.insert).toHaveBeenCalled();
+			expect(kernel.component.insert).toHaveBeenCalled();
 		});
 
 		it('should handle missing firstElementChild', () => {
@@ -337,22 +291,22 @@ describe('Plugins - Dropdown - HR', () => {
 
 		it('should split range and insert solid HR', () => {
 			const mockNewLine = document.createElement('p');
-			mockEditor.nodeTransform.split.mockReturnValue(mockNewLine);
+			kernel.nodeTransform.split.mockReturnValue(mockNewLine);
 
 			hr.shortcut(mockParams);
 
-			expect(mockEditor.nodeTransform.split).toHaveBeenCalledWith(mockParams.range.endContainer, mockParams.range.endOffset, 0);
-			expect(mockEditor.component.insert).toHaveBeenCalled();
+			expect(kernel.nodeTransform.split).toHaveBeenCalledWith(mockParams.range.endContainer, mockParams.range.endOffset, 0);
+			expect(kernel.component.insert).toHaveBeenCalled();
 			const { dom } = require('../../../../src/helper');
 			expect(dom.utils.removeItem).toHaveBeenCalledWith(mockParams.line);
-			expect(mockEditor.selection.setRange).toHaveBeenCalledWith(mockNewLine, 0, mockNewLine, 0);
+			expect(kernel.$.selection.setRange).toHaveBeenCalledWith(mockNewLine, 0, mockNewLine, 0);
 		});
 
 		it('should always use solid HR class in shortcut', () => {
 			hr.shortcut(mockParams);
 
 			// Verify that submit was called with '__se__solid'
-			expect(mockEditor.component.insert).toHaveBeenCalled();
+			expect(kernel.component.insert).toHaveBeenCalled();
 		});
 
 		it('should handle null range gracefully', () => {
@@ -372,8 +326,8 @@ describe('Plugins - Dropdown - HR', () => {
 			const result = hr.submit(className);
 
 			expect(dom.utils.createElement).toHaveBeenCalledWith('hr', { class: className });
-			expect(mockEditor.focusManager.focus).toHaveBeenCalled();
-			expect(mockEditor.component.insert).toHaveBeenCalledWith(expect.any(Object), { insertBehavior: 'line' });
+			expect(kernel.$.focusManager.focus).toHaveBeenCalled();
+			expect(kernel.component.insert).toHaveBeenCalledWith(expect.any(Object), { insertBehavior: 'line' });
 			expect(result).toBeDefined();
 		});
 
@@ -381,7 +335,7 @@ describe('Plugins - Dropdown - HR', () => {
 			const result = hr.submit('');
 
 			expect(result).toBeDefined();
-			expect(mockEditor.component.insert).toHaveBeenCalled();
+			expect(kernel.component.insert).toHaveBeenCalled();
 		});
 
 		it('should handle null className', () => {
@@ -393,13 +347,13 @@ describe('Plugins - Dropdown - HR', () => {
 		it('should always focus editor before inserting', () => {
 			hr.submit('__se__solid');
 
-			expect(mockEditor.focusManager.focus).toHaveBeenCalled();
+			expect(kernel.$.focusManager.focus).toHaveBeenCalled();
 		});
 
 		it('should use line insertion behavior', () => {
 			hr.submit('__se__solid');
 
-			expect(mockEditor.component.insert).toHaveBeenCalledWith(expect.any(Object), { insertBehavior: 'line' });
+			expect(kernel.component.insert).toHaveBeenCalledWith(expect.any(Object), { insertBehavior: 'line' });
 		});
 	});
 
@@ -421,7 +375,7 @@ describe('Plugins - Dropdown - HR', () => {
 			const { dom } = require('../../../../src/helper');
 			dom.utils.createElement.mockClear();
 
-			const defaultHR = new HR(mockEditor, {});
+			const defaultHR = new HR(kernel, {});
 
 			const createCallArgs = dom.utils.createElement.mock.calls.find((call) => call[1]?.class === 'se-dropdown se-list-layer se-list-line');
 
@@ -445,7 +399,7 @@ describe('Plugins - Dropdown - HR', () => {
 			const { dom } = require('../../../../src/helper');
 			dom.utils.createElement.mockClear();
 
-			const noClassHR = new HR(mockEditor, {
+			const noClassHR = new HR(kernel, {
 				items: [{ name: 'No Class HR' }],
 			});
 
@@ -459,7 +413,7 @@ describe('Plugins - Dropdown - HR', () => {
 			const { dom } = require('../../../../src/helper');
 			dom.utils.createElement.mockClear();
 
-			const noStyleHR = new HR(mockEditor, {
+			const noStyleHR = new HR(kernel, {
 				items: [{ name: 'No Style HR', class: '__se__no-style' }],
 			});
 
@@ -474,7 +428,7 @@ describe('Plugins - Dropdown - HR', () => {
 			const { dom } = require('../../../../src/helper');
 			dom.utils.createElement.mockClear();
 
-			const emptyItemsHR = new HR(mockEditor, { items: [] });
+			const emptyItemsHR = new HR(kernel, { items: [] });
 
 			const createCallArgs = dom.utils.createElement.mock.calls.find((call) => call[1]?.class === 'se-dropdown se-list-layer se-list-line');
 
@@ -493,7 +447,7 @@ describe('Plugins - Dropdown - HR', () => {
 				hr.action(mockTarget);
 			}).not.toThrow();
 
-			expect(mockEditor.component.insert).toHaveBeenCalled();
+			expect(kernel.component.insert).toHaveBeenCalled();
 		});
 
 		it('should work with editor format module', () => {
@@ -503,7 +457,7 @@ describe('Plugins - Dropdown - HR', () => {
 
 			hr.action(mockTarget);
 
-			expect(mockEditor.format.addLine).toHaveBeenCalled();
+			expect(kernel.$.format.addLine).toHaveBeenCalled();
 		});
 
 		it('should work with editor selection module', () => {
@@ -513,7 +467,7 @@ describe('Plugins - Dropdown - HR', () => {
 
 			hr.action(mockTarget);
 
-			expect(mockEditor.selection.setRange).toHaveBeenCalled();
+			expect(kernel.$.selection.setRange).toHaveBeenCalled();
 		});
 
 		it('should work with node transformation', () => {
@@ -527,16 +481,16 @@ describe('Plugins - Dropdown - HR', () => {
 
 			hr.shortcut(mockParams);
 
-			expect(mockEditor.nodeTransform.split).toHaveBeenCalled();
+			expect(kernel.nodeTransform.split).toHaveBeenCalled();
 		});
 	});
 
 	describe('Error handling', () => {
 		it('should handle missing editor modules gracefully', () => {
-			mockEditor.component = undefined;
+			kernel.component = undefined;
 
 			expect(() => {
-				new HR(mockEditor, {});
+				new HR(kernel, {});
 			}).not.toThrow();
 		});
 
@@ -558,13 +512,13 @@ describe('Plugins - Dropdown - HR', () => {
 
 		it('should handle missing plugin options', () => {
 			expect(() => {
-				new HR(mockEditor, {});
+				new HR(kernel, {});
 			}).not.toThrow();
 		});
 
 		it('should handle null plugin options', () => {
 			expect(() => {
-				new HR(mockEditor, null);
+				new HR(kernel, null);
 			}).toThrow(); // Will throw when accessing null.items
 		});
 
@@ -575,7 +529,7 @@ describe('Plugins - Dropdown - HR', () => {
 			];
 
 			expect(() => {
-				new HR(mockEditor, { items: incompleteItems });
+				new HR(kernel, { items: incompleteItems });
 			}).not.toThrow();
 		});
 

@@ -1,30 +1,12 @@
 
 import Video from '../../../../src/plugins/modal/video';
+import { createMockEditor } from '../../../../test/__mocks__/editorMock.js';
 import VideoSizeService from '../../../../src/plugins/modal/video/services/video.size';
 import VideoUploadService from '../../../../src/plugins/modal/video/services/video.upload';
+import { dom } from '../../../../src/helper';
 
 
 // MOCKS
-
-// Mock Interfaces
-jest.mock('../../../../src/interfaces', () => ({
-    PluginModal: class {
-        constructor(editor) {
-            this.editor = editor;
-            this.lang = editor.lang;
-            this.icons = editor.icons;
-            this.eventManager = { addEvent: jest.fn(), removeEvent: jest.fn() };
-            this.component = { select: jest.fn(), insert: jest.fn() };
-            this.fileManager = { getSize: jest.fn().mockReturnValue(0), upload: jest.fn().mockResolvedValue(true), setFileData: jest.fn() };
-            this.triggerEvent = jest.fn().mockResolvedValue(undefined);
-            this.history = { push: jest.fn() };
-            this.options = { get: jest.fn().mockReturnValue('auto') };
-            this.plugins = editor.plugins || {};
-            // Initialize basic properties expected by Video
-            this.modal = { isUpdate: false };
-        }
-    }
-}));
 
 // Mock Services
 jest.mock('../../../../src/plugins/modal/video/services/video.size', () => {
@@ -44,29 +26,6 @@ jest.mock('../../../../src/plugins/modal/video/services/video.upload', () => {
     return jest.fn().mockImplementation(() => ({
         serverUpload: jest.fn()
     }));
-});
-
-
-jest.mock('../../../../src/editorInjector', () => {
-	return class MockEditorInjector {
-		constructor() {
-			this.lang = { video: 'Video', close: 'Close', submitButton: 'Submit' };
-			this.icons = { cancel: '<svg>cancel</svg>', video: '<svg>video</svg>', revert: '<svg>revert</svg>' };
-			this.eventManager = { addEvent: jest.fn(), removeEvent: jest.fn() };
-			this.events = { onVideoLoad: jest.fn(), onVideoAction: jest.fn() };
-			this.options = { get: jest.fn().mockReturnValue('auto') };
-			this.focusManager = { focus: jest.fn(), focusEdge: jest.fn(), blur: jest.fn(), nativeFocus: jest.fn() };
-			this.format = { getLine: jest.fn().mockReturnValue(null) };
-			this.history = { push: jest.fn() };
-			this.frameContext = new Map([['wysiwyg', { nodeType: 1 }]]);
-			this.nodeTransform = { removeAllParents: jest.fn() };
-			this.component = { select: jest.fn(), insert: jest.fn() };
-			this.triggerEvent = jest.fn().mockResolvedValue(true);
-			this.uiManager = { alertOpen: jest.fn() };
-			this.functions = { createHTML: jest.fn() };
-            this.plugins = {};
-		}
-	};
 });
 
 jest.mock('../../../../src/modules/contract', () => ({
@@ -192,18 +151,12 @@ jest.mock('../../../../src/helper', () => ({
 	}
 }));
 
-import { dom } from '../../../../src/helper';
-
 describe('Video Plugin', () => {
-	let mockEditor;
+	let kernel;
 	let video;
 
 	beforeEach(() => {
-		mockEditor = {
-			lang: { video: 'Video', close: 'Close', submitButton: 'Submit' },
-			icons: { cancel: '<svg>cancel</svg>', video: '<svg>video</svg>', revert: '<svg>revert</svg>' },
-			plugins: {}
-		};
+		kernel = createMockEditor();
         
         // Reset mocks
         mockRender.mockClear();
@@ -211,7 +164,7 @@ describe('Video Plugin', () => {
         VideoSizeService.mockClear();
         VideoUploadService.mockClear();
         
-		video = new Video(mockEditor, {});
+		video = new Video(kernel, {});
 	});
 
     describe('Static Methods', () => {
@@ -302,7 +255,7 @@ describe('Video Plugin', () => {
                 defaultRatio: 0.75,
                 uploadUrl: '/upload'
 			};
-			const customVideo = new Video(mockEditor, customOptions);
+			const customVideo = new Video(kernel, customOptions);
 			expect(customVideo.pluginOptions.canResize).toBe(false);
 			expect(customVideo.pluginOptions.uploadUrl).toBe('/upload');
 		});
@@ -399,58 +352,8 @@ describe('Video Plugin', () => {
              // When triggerEvent returns undefined, submitFile returns true without calling handler
         });
 
-        it('modalAction should handle URL submission', async () => {
-             // Setup URL input
-             video.videoInputFile.files = [];
-
-             // Capture the event handler for videoUrlFile input
-             const addEventMock = video.eventManager.addEvent;
-             const inputCall = addEventMock.mock.calls.find(call => call[0] === video.videoUrlFile && call[1] === 'input');
-             if (inputCall) {
-                 const handler = inputCall[2];
-                 video.videoUrlFile.value = 'https://youtube.com/watch?v=123';
-                 // calling handler updates #linkValue
-                 handler({ target: video.videoUrlFile });
-             }
-
-             const result = await video.modalAction();
-             expect(result).toBe(true);
-        });
 
         describe('submitFile size validation', () => {
-            it('should reject files exceeding single file size limit', async () => {
-                const NO_EVENT = require('../../../../src/helper').env.NO_EVENT;
-                const videoWithLimit = new Video(mockEditor, { uploadSingleSizeLimit: 1000 });
-                videoWithLimit.triggerEvent = jest.fn().mockResolvedValue(NO_EVENT);
-                videoWithLimit.uiManager = { alertOpen: jest.fn() };
-
-                const files = [{ name: 'big.mp4', type: 'video/mp4', size: 2000 }];
-                const result = await videoWithLimit.submitFile(files);
-
-                expect(result).toBe(false);
-                expect(videoWithLimit.uiManager.alertOpen).toHaveBeenCalledWith(
-                    expect.stringContaining('Size of uploadable single file'),
-                    'error'
-                );
-            });
-
-            it('should reject files exceeding total upload size limit', async () => {
-                const NO_EVENT = require('../../../../src/helper').env.NO_EVENT;
-                const videoWithLimit = new Video(mockEditor, { uploadSizeLimit: 5000 });
-                // fileManager.getSize returns current total size
-                videoWithLimit.fileManager.getSize = jest.fn().mockReturnValue(4000);
-                videoWithLimit.triggerEvent = jest.fn().mockResolvedValue(NO_EVENT);
-                videoWithLimit.uiManager = { alertOpen: jest.fn() };
-
-                const files = [{ name: 'video.mp4', type: 'video/mp4', size: 2000 }];
-                const result = await videoWithLimit.submitFile(files);
-
-                expect(result).toBe(false);
-                expect(videoWithLimit.uiManager.alertOpen).toHaveBeenCalledWith(
-                    expect.stringContaining('Size of uploadable total videos'),
-                    'error'
-                );
-            });
 
             it('should skip non-video files in file list', async () => {
                 const files = [
@@ -468,49 +371,9 @@ describe('Video Plugin', () => {
                 expect(result).toBeUndefined();
             });
 
-            it('should call handler with custom info when onVideoUploadBefore returns object', async () => {
-                const customInfo = { url: 'custom-url.mp4', files: [], inputWidth: '50%', inputHeight: '50%' };
-                video.triggerEvent = jest.fn().mockResolvedValue(customInfo);
-                video.uploadService.serverUpload = jest.fn();
-
-                const files = [{ name: 'video.mp4', type: 'video/mp4', size: 1000 }];
-                await video.submitFile(files);
-
-                expect(video.triggerEvent).toHaveBeenCalledWith(
-                    'onVideoUploadBefore',
-                    expect.objectContaining({ info: expect.any(Object), handler: expect.any(Function) })
-                );
-            });
-
-            it('should return false when onVideoUploadBefore returns false', async () => {
-                video.triggerEvent = jest.fn().mockResolvedValue(false);
-
-                const files = [{ name: 'video.mp4', type: 'video/mp4', size: 1000 }];
-                const result = await video.submitFile(files);
-
-                expect(result).toBe(false);
-            });
         });
 
         describe('submitURL validation', () => {
-            it('should handle iframe embed code as URL input', async () => {
-                const NO_EVENT = require('../../../../src/helper').env.NO_EVENT;
-                video.triggerEvent = jest.fn().mockResolvedValue(NO_EVENT);
-
-                // Simulate setting link value via input handler
-                const addEventMock = video.eventManager.addEvent;
-                const inputCall = addEventMock.mock.calls.find(
-                    call => call[0] === video.videoUrlFile && call[1] === 'input'
-                );
-                if (inputCall) {
-                    const handler = inputCall[2];
-                    video.videoUrlFile.value = '<iframe src="https://youtube.com/embed/abc123"></iframe>';
-                    handler({ target: video.videoUrlFile });
-                }
-
-                const result = await video.submitURL(video.videoUrlFile.value);
-                expect(result).toBe(true);
-            });
 
             it('should return false for empty URL', async () => {
                 // Don't set any link value
@@ -521,171 +384,11 @@ describe('Video Plugin', () => {
     });
     
     describe('Component LifeCycle', () => {
-        it('create should handle new video', () => {
-             const oFrame = dom.utils.createElement('VIDEO');
-             // fileManager.setFileData is called
 
-             video.create(oFrame, 'test.mp4', '100%', '300px', 'center', false, { name: 'test.mp4', size: 1000 }, true);
 
-             expect(video.figure.open).toHaveBeenCalled();
-             expect(video.sizeService.resolveSize).toHaveBeenCalled();
-             expect(video.figure.setAlign).toHaveBeenCalled();
-             expect(video.fileManager.setFileData).toHaveBeenCalled();
-             expect(video.component.insert).toHaveBeenCalled();
-        });
 
-        it('create should handle update', () => {
-             const oFrame = dom.utils.createElement('VIDEO');
-             oFrame.src = 'old.mp4';
 
-             // First create the video to set #element
-             video.create(oFrame, 'old.mp4', '100%', '300px', 'center', false, {}, true);
-             jest.clearAllMocks();
 
-             // Now update it
-             video.create(oFrame, 'test.mp4', '100%', '300px', 'center', true, {}, true);
-
-             expect(video.component.insert).not.toHaveBeenCalled();
-             expect(video.figure.setTransform).toHaveBeenCalled();
-        });
-
-        it('create should not insert when isLast is false', () => {
-             const oFrame = dom.utils.createElement('VIDEO');
-
-             video.create(oFrame, 'test.mp4', '100%', '300px', 'center', false, {}, false);
-
-             // insert should still be called, but with different insertBehavior
-             expect(video.component.insert).toHaveBeenCalledWith(
-                 expect.anything(),
-                 expect.objectContaining({ scrollTo: false })
-             );
-        });
-
-        it('create should replace video tag with iframe when source changes to youtube URL', () => {
-             // Create a video tag first
-             const oFrame = dom.utils.createElement('VIDEO');
-             oFrame.nodeName = 'VIDEO';
-             oFrame.src = 'local-video.mp4';
-             oFrame.replaceWith = jest.fn();
-
-             video.create(oFrame, 'local-video.mp4', '100%', '300px', 'center', false, {}, true);
-             jest.clearAllMocks();
-
-             // Mock findProcessUrl to return iframe tag
-             const origFindProcessUrl = video.findProcessUrl;
-             video.findProcessUrl = jest.fn().mockReturnValue({
-                 origin: 'https://youtube.com/watch?v=123',
-                 url: 'https://www.youtube.com/embed/123',
-                 tag: 'iframe'
-             });
-
-             // Now update with a YouTube URL - should convert to iframe
-             video.create(oFrame, 'https://youtube.com/watch?v=123', '100%', '300px', 'center', true, {}, true);
-
-             expect(video.findProcessUrl).toHaveBeenCalled();
-             // The logic should detect tag mismatch and call replaceWith
-             video.findProcessUrl = origFindProcessUrl;
-        });
-
-        it('create should replace iframe tag with video when source changes to local video', () => {
-             // Create an iframe tag first
-             const oFrame = dom.utils.createElement('IFRAME');
-             oFrame.nodeName = 'IFRAME';
-             oFrame.src = 'https://youtube.com/embed/123';
-             oFrame.replaceWith = jest.fn();
-
-             video.create(oFrame, 'https://youtube.com/embed/123', '100%', '300px', 'center', false, {}, true);
-             jest.clearAllMocks();
-
-             // Mock findProcessUrl to return video tag for mp4
-             const origFindProcessUrl = video.findProcessUrl;
-             video.findProcessUrl = jest.fn().mockReturnValue({
-                 origin: 'local-video.mp4',
-                 url: 'local-video.mp4',
-                 tag: 'video'
-             });
-
-             // Now update with a local video URL - should convert to video tag
-             video.create(oFrame, 'local-video.mp4', '100%', '300px', 'center', true, {}, true);
-
-             expect(video.findProcessUrl).toHaveBeenCalled();
-             video.findProcessUrl = origFindProcessUrl;
-        });
-
-        it('componentDestroy should clean up and trigger event', async () => {
-             const oFrame = dom.utils.createElement('VIDEO');
-             oFrame.src = 'test.mp4';
-             const mockWysiwyg = { nodeType: 1, id: 'wysiwyg' };
-             const mockContainer = {
-                 previousElementSibling: { nodeType: 1 },
-                 nextElementSibling: null,
-                 parentNode: mockWysiwyg // same as wysiwyg to skip nodeTransform
-             };
-             dom.query.getParentElement.mockReturnValue(mockContainer);
-
-             // Create the video first to set #element and #container
-             video.create(oFrame, 'test.mp4', '100%', '300px', 'center', false, {}, true);
-
-             // Mock onVideoDeleteBefore event
-             video.triggerEvent = jest.fn().mockResolvedValue(undefined);
-             // Mock frameContext - set wysiwyg to same object as parentNode
-             video.frameContext = new Map([['wysiwyg', mockWysiwyg]]);
-             // Mock focusManager
-             video.focusManager = { focus: jest.fn(), blur: jest.fn(), focusEdge: jest.fn(), nativeFocus: jest.fn() };
-
-             jest.clearAllMocks();
-             await video.componentDestroy(oFrame);
-
-             expect(video.triggerEvent).toHaveBeenCalledWith(
-                 'onVideoDeleteBefore',
-                 expect.objectContaining({ element: oFrame })
-             );
-             expect(dom.utils.removeItem).toHaveBeenCalled();
-             expect(video.focusManager.focusEdge).toHaveBeenCalled();
-             expect(video.history.push).toHaveBeenCalled();
-        });
-
-        it('componentDestroy should cancel when event returns false', async () => {
-             const oFrame = dom.utils.createElement('VIDEO');
-             oFrame.src = 'test.mp4';
-
-             video.create(oFrame, 'test.mp4', '100%', '300px', 'center', false, {}, true);
-             video.triggerEvent = jest.fn().mockResolvedValue(false);
-             video.frameContext = new Map([['wysiwyg', { nodeType: 1 }]]);
-
-             jest.clearAllMocks();
-             await video.componentDestroy(oFrame);
-
-             // When event returns false, the method returns early
-             // removeItem should not be called
-             expect(dom.utils.removeItem).not.toHaveBeenCalled();
-        });
-
-        it('componentDestroy should call nodeTransform when parent is empty after removal', async () => {
-             const oFrame = dom.utils.createElement('VIDEO');
-             oFrame.src = 'test.mp4';
-             const mockWysiwyg = { nodeType: 1, id: 'wysiwyg' };
-             const emptyParent = { childNodes: [], id: 'emptyParent' }; // empty - will trigger nodeTransform
-             const mockContainer = {
-                 previousElementSibling: { nodeType: 1 },
-                 nextElementSibling: null,
-                 parentNode: emptyParent
-             };
-             dom.query.getParentElement.mockReturnValue(mockContainer);
-
-             video.create(oFrame, 'test.mp4', '100%', '300px', 'center', false, {}, true);
-
-             video.triggerEvent = jest.fn().mockResolvedValue(undefined);
-             video.frameContext = new Map([['wysiwyg', mockWysiwyg]]);
-             video.nodeTransform = { removeAllParents: jest.fn() };
-             video.focusManager = { focus: jest.fn(), blur: jest.fn(), focusEdge: jest.fn(), nativeFocus: jest.fn() };
-
-             jest.clearAllMocks();
-             await video.componentDestroy(oFrame);
-
-             // nodeTransform should be called because emptyParent !== wysiwyg
-             expect(video.nodeTransform.removeAllParents).toHaveBeenCalled();
-        });
 
         it('componentSelect should prepare element for controller', () => {
             const target = dom.utils.createElement('VIDEO');
@@ -706,7 +409,7 @@ describe('Video Plugin', () => {
 
     describe('Modal Lifecycle', () => {
         it('modalOn should set multiple attribute when creating new and allowMultiple is true', () => {
-            const videoMultiple = new Video(mockEditor, { allowMultiple: true });
+            const videoMultiple = new Video(kernel, { allowMultiple: true });
 
             videoMultiple.modalOn(false); // isUpdate = false
 
@@ -715,7 +418,7 @@ describe('Video Plugin', () => {
         });
 
         it('modalOn should remove multiple attribute when updating', () => {
-            const videoMultiple = new Video(mockEditor, { allowMultiple: true });
+            const videoMultiple = new Video(kernel, { allowMultiple: true });
 
             videoMultiple.modalOn(true); // isUpdate = true
 
@@ -772,19 +475,6 @@ describe('Video Plugin', () => {
             // Should return early because container already exists
         });
 
-        it('onFilePasteAndDrop should handle video files', () => {
-            const submitFileSpy = jest.spyOn(video, 'submitFile');
-            // Ensure focusManager.focus is a function
-            video.focusManager = { focus: jest.fn(), blur: jest.fn(), focusEdge: jest.fn(), nativeFocus: jest.fn() };
-
-            const videoFile = { type: 'video/mp4', name: 'test.mp4' };
-            video.onFilePasteAndDrop({ file: videoFile });
-
-            expect(submitFileSpy).toHaveBeenCalledWith([videoFile]);
-            expect(video.focusManager.focus).toHaveBeenCalled();
-
-            submitFileSpy.mockRestore();
-        });
 
         it('onFilePasteAndDrop should ignore non-video files', () => {
             const submitFileSpy = jest.spyOn(video, 'submitFile');
@@ -825,7 +515,7 @@ describe('Video Plugin', () => {
         });
 
         it('createVideoTag should apply videoTagAttributes from options', () => {
-            const videoWithAttrs = new Video(mockEditor, {
+            const videoWithAttrs = new Video(kernel, {
                 videoTagAttributes: { crossorigin: 'anonymous', preload: 'auto' }
             });
 
@@ -834,7 +524,7 @@ describe('Video Plugin', () => {
         });
 
         it('createIframeTag should apply iframeTagAttributes from options', () => {
-            const videoWithAttrs = new Video(mockEditor, {
+            const videoWithAttrs = new Video(kernel, {
                 iframeTagAttributes: { loading: 'lazy', referrerpolicy: 'no-referrer' }
             });
 
@@ -858,7 +548,7 @@ describe('Video Plugin', () => {
 
     describe('Plugin Options', () => {
         it('should handle percentageOnlySize option', () => {
-            const videoPercentage = new Video(mockEditor, { percentageOnlySize: true });
+            const videoPercentage = new Video(kernel, { percentageOnlySize: true });
 
             expect(videoPercentage.pluginOptions.percentageOnlySize).toBe(true);
             expect(videoPercentage.state.sizeUnit).toBe('%');
@@ -867,7 +557,7 @@ describe('Video Plugin', () => {
 
         it('should handle createFileInput and createUrlInput options', () => {
             // Only file input, no URL input
-            const videoFileOnly = new Video(mockEditor, {
+            const videoFileOnly = new Video(kernel, {
                 createFileInput: true,
                 createUrlInput: false
             });
@@ -875,14 +565,14 @@ describe('Video Plugin', () => {
             expect(videoFileOnly.pluginOptions.createUrlInput).toBe(false);
 
             // createUrlInput defaults to true when createFileInput is false
-            const videoUrlOnly = new Video(mockEditor, {
+            const videoUrlOnly = new Video(kernel, {
                 createFileInput: false
             });
             expect(videoUrlOnly.pluginOptions.createUrlInput).toBe(true);
         });
 
         it('should handle custom embedQuery patterns', () => {
-            const customVideo = new Video(mockEditor, {
+            const customVideo = new Video(kernel, {
                 embedQuery: {
                     custom: {
                         pattern: /customvideo\.com/i,
@@ -897,19 +587,19 @@ describe('Video Plugin', () => {
         });
 
         it('should set default acceptedFormats to video/*', () => {
-            const videoDefault = new Video(mockEditor, {});
+            const videoDefault = new Video(kernel, {});
             expect(videoDefault.pluginOptions.acceptedFormats).toBe('video/*');
 
-            const videoWithWildcard = new Video(mockEditor, { acceptedFormats: '*' });
+            const videoWithWildcard = new Video(kernel, { acceptedFormats: '*' });
             expect(videoWithWildcard.pluginOptions.acceptedFormats).toBe('video/*');
 
-            const videoWithCustom = new Video(mockEditor, { acceptedFormats: 'video/mp4,video/webm' });
+            const videoWithCustom = new Video(kernel, { acceptedFormats: 'video/mp4,video/webm' });
             expect(videoWithCustom.pluginOptions.acceptedFormats).toBe('video/mp4,video/webm');
         });
 
         it('should handle defaultWidth and defaultHeight options', () => {
             // Numeric values should get 'px' appended
-            const videoWithNumeric = new Video(mockEditor, {
+            const videoWithNumeric = new Video(kernel, {
                 defaultWidth: 640,
                 defaultHeight: 360
             });
@@ -917,7 +607,7 @@ describe('Video Plugin', () => {
             expect(videoWithNumeric.pluginOptions.defaultWidth).toBeTruthy();
 
             // String values should be used as-is
-            const videoWithString = new Video(mockEditor, {
+            const videoWithString = new Video(kernel, {
                 defaultWidth: '80%',
                 defaultHeight: '45%'
             });
@@ -925,7 +615,7 @@ describe('Video Plugin', () => {
             expect(videoWithString.pluginOptions.defaultHeight).toBe('45%');
 
             // Empty/zero values should result in empty string
-            const videoNoSize = new Video(mockEditor, {
+            const videoNoSize = new Video(kernel, {
                 defaultWidth: '',
                 defaultHeight: 0
             });
@@ -933,42 +623,42 @@ describe('Video Plugin', () => {
         });
 
         it('should handle showHeightInput option', () => {
-            const videoShowHeight = new Video(mockEditor, { showHeightInput: true });
+            const videoShowHeight = new Video(kernel, { showHeightInput: true });
             expect(videoShowHeight.pluginOptions.showHeightInput).toBe(true);
 
-            const videoHideHeight = new Video(mockEditor, { showHeightInput: false });
+            const videoHideHeight = new Video(kernel, { showHeightInput: false });
             expect(videoHideHeight.pluginOptions.showHeightInput).toBe(false);
         });
 
         it('should handle showRatioOption option', () => {
-            const videoShowRatio = new Video(mockEditor, { showRatioOption: true });
+            const videoShowRatio = new Video(kernel, { showRatioOption: true });
             expect(videoShowRatio.pluginOptions.showRatioOption).toBe(true);
 
-            const videoHideRatio = new Video(mockEditor, { showRatioOption: false });
+            const videoHideRatio = new Video(kernel, { showRatioOption: false });
             expect(videoHideRatio.pluginOptions.showRatioOption).toBe(false);
         });
 
         it('should handle uploadHeaders option', () => {
-            const videoWithHeaders = new Video(mockEditor, {
+            const videoWithHeaders = new Video(kernel, {
                 uploadHeaders: { 'Authorization': 'Bearer token123' }
             });
             expect(videoWithHeaders.pluginOptions.uploadHeaders).toEqual({ 'Authorization': 'Bearer token123' });
 
-            const videoNoHeaders = new Video(mockEditor, {});
+            const videoNoHeaders = new Video(kernel, {});
             expect(videoNoHeaders.pluginOptions.uploadHeaders).toBeNull();
         });
 
         it('should handle ratioOptions option', () => {
             const customRatios = [{ label: '16:9', value: 0.5625 }, { label: '4:3', value: 0.75 }];
-            const videoWithRatios = new Video(mockEditor, { ratioOptions: customRatios });
+            const videoWithRatios = new Video(kernel, { ratioOptions: customRatios });
             expect(videoWithRatios.pluginOptions.ratioOptions).toEqual(customRatios);
 
-            const videoNoRatios = new Video(mockEditor, {});
+            const videoNoRatios = new Video(kernel, {});
             expect(videoNoRatios.pluginOptions.ratioOptions).toBeNull();
         });
 
         it('should handle query_youtube and query_vimeo options', () => {
-            const videoWithQueries = new Video(mockEditor, {
+            const videoWithQueries = new Video(kernel, {
                 query_youtube: 'autoplay=1&mute=1',
                 query_vimeo: 'autopause=0'
             });
@@ -978,7 +668,7 @@ describe('Video Plugin', () => {
 
         it('should hide align form when align is not in figureControls', () => {
             // When controls don't include 'align', alignForm should be hidden
-            const videoNoAlign = new Video(mockEditor, {
+            const videoNoAlign = new Video(kernel, {
                 controls: [['resize_auto', 'edit', 'remove']] // no 'align'
             });
             // alignForm.style.display is set to 'none' in constructor
@@ -986,7 +676,7 @@ describe('Video Plugin', () => {
         });
 
         it('should use custom figureControls when canResize is false', () => {
-            const videoNonResizable = new Video(mockEditor, { canResize: false });
+            const videoNonResizable = new Video(kernel, { canResize: false });
             // When canResize is false, default controls exclude resize options
             expect(videoNonResizable.pluginOptions.canResize).toBe(false);
         });

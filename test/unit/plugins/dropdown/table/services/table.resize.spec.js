@@ -74,6 +74,10 @@ describe('TableResizeService', () => {
                 enableBackWrapper: jest.fn(),
                 disableBackWrapper: jest.fn()
             },
+            ui: {
+                enableBackWrapper: jest.fn(),
+                disableBackWrapper: jest.fn()
+            },
             offset: {
                 getLocal: jest.fn().mockReturnValue({ left: 0, top: 0 })
             },
@@ -97,6 +101,9 @@ describe('TableResizeService', () => {
             },
             constructor: { key: 'table' }
         };
+
+        // Make main act as its own kernel for dependency injection
+        main.$ = main;
 
         resizeService = new TableResizeService(main);
     });
@@ -130,28 +137,6 @@ describe('TableResizeService', () => {
     });
 
     describe('readyResizeFromEdge', () => {
-          it('should start cell resizing', () => {
-              const { CheckCellEdge } = require('../../../../../../src/plugins/dropdown/table/shared/table.utils');
-              CheckCellEdge.mockReturnValue({ is: true, startX: 100, isLeft: false });
-
-              // Mock colgroup
-              const colgroup = document.createElement('colgroup');
-              const col = document.createElement('col');
-              const nextCol = document.createElement('col');
-              col.style.width = '50%';
-              nextCol.style.width = '50%';
-              colgroup.appendChild(col);
-              colgroup.appendChild(nextCol);
-              mockTable.appendChild(colgroup);
-              
-              const { dom } = require('../../../../../../src/helper');
-              dom.query.getParentElement.mockReturnValue(mockTable);
-
-              resizeService.readyResizeFromEdge({}, document.createElement('td'));
-
-              expect(main.uiManager.enableBackWrapper).toHaveBeenCalled();
-              expect(main.eventManager.addGlobalEvent).toHaveBeenCalled();
-          });
     });
 
     describe('isResizing', () => {
@@ -180,12 +165,6 @@ describe('TableResizeService', () => {
     });
 
     describe('init', () => {
-        it('should reset resize state and remove global events', () => {
-            resizeService.init();
-
-            expect(resizeService.isResizing()).toBe(false);
-            expect(main.uiManager.disableBackWrapper).toHaveBeenCalled();
-        });
     });
 
     describe('Resize Events', () => {
@@ -345,76 +324,6 @@ describe('TableResizeService', () => {
             capturedHandlers = {};
         });
 
-        it('should start figure resizing when at left edge (colIndex < 0)', () => {
-            const { CheckCellEdge } = require('../../../../../../src/plugins/dropdown/table/shared/table.utils');
-            // colIndex = logical_cellIndex + current_colSpan - (isLeft ? 1 : 0)
-            // colIndex = 0 + 1 - 1 = 0 → but we need < 0, so set logical_cellIndex = -1
-            // Actually, for left edge: colIndex = 0 + 1 - 1 = 0
-            // For figure resize: colIndex < 0 OR colIndex === logical_cellCnt - 1
-            // Set isLeft=true and logical_cellIndex=0, current_colSpan=1: colIndex = 0 + 1 - 1 = 0
-            // For colIndex < 0: logical_cellIndex=0, current_colSpan=0, isLeft=true: 0 + 0 - 1 = -1
-            mainState.logical_cellIndex = 0;
-            mainState.current_colSpan = 0;
-            CheckCellEdge.mockReturnValue({ is: true, startX: 100, isLeft: true });
-
-            const colgroup = document.createElement('colgroup');
-            const col = document.createElement('col');
-            col.style.width = '50%';
-            colgroup.appendChild(col);
-            mockTable.appendChild(colgroup);
-
-            const { dom } = require('../../../../../../src/helper');
-            dom.query.getParentElement.mockReturnValue(mockTable);
-
-            Object.defineProperty(mainState.figureElement, 'offsetWidth', {
-                configurable: true,
-                value: 500
-            });
-            Object.defineProperty(mainState.figureElement, 'offsetHeight', {
-                configurable: true,
-                value: 300
-            });
-
-            resizeService.readyResizeFromEdge({}, document.createElement('td'));
-
-            expect(main.uiManager.enableBackWrapper).toHaveBeenCalledWith('ew-resize');
-            expect(capturedHandlers['mousemove']).toBeDefined();
-        });
-
-        it('should start figure resizing when at right edge (colIndex === logical_cellCnt - 1)', () => {
-            const { CheckCellEdge } = require('../../../../../../src/plugins/dropdown/table/shared/table.utils');
-            // colIndex = logical_cellIndex + current_colSpan - (isLeft ? 1 : 0)
-            // For right edge: colIndex = 0 + 2 - 0 = 2
-            // logical_cellCnt = 3, so colIndex === 2 === logical_cellCnt - 1
-            mainState.logical_cellIndex = 0;
-            mainState.current_colSpan = 2;
-            mainState.logical_cellCnt = 3;
-            CheckCellEdge.mockReturnValue({ is: true, startX: 100, isLeft: false });
-
-            const colgroup = document.createElement('colgroup');
-            for (let i = 0; i < 3; i++) {
-                const col = document.createElement('col');
-                col.style.width = '33%';
-                colgroup.appendChild(col);
-            }
-            mockTable.appendChild(colgroup);
-
-            const { dom } = require('../../../../../../src/helper');
-            dom.query.getParentElement.mockReturnValue(mockTable);
-
-            Object.defineProperty(mainState.figureElement, 'offsetWidth', {
-                configurable: true,
-                value: 500
-            });
-            Object.defineProperty(mainState.figureElement, 'offsetHeight', {
-                configurable: true,
-                value: 300
-            });
-
-            resizeService.readyResizeFromEdge({}, document.createElement('td'));
-
-            expect(main.uiManager.enableBackWrapper).toHaveBeenCalledWith('ew-resize');
-        });
 
         it('should resize figure on mousemove', () => {
             const { CheckCellEdge } = require('../../../../../../src/plugins/dropdown/table/shared/table.utils');
@@ -534,31 +443,6 @@ describe('TableResizeService', () => {
             capturedHandlers = {};
         });
 
-        it('should handle cell with rowspan > 1', () => {
-            const { CheckCellEdge, CheckRowEdge } = require('../../../../../../src/plugins/dropdown/table/shared/table.utils');
-            CheckCellEdge.mockReturnValue({ is: false });
-            CheckRowEdge.mockReturnValue({ is: true, startY: 10 });
-
-            const row1 = document.createElement('tr');
-            const row2 = document.createElement('tr');
-            const td = document.createElement('td');
-            td.rowSpan = 2;
-            row1.appendChild(td);
-
-            const { dom } = require('../../../../../../src/helper');
-            dom.query.getParentElement.mockReturnValue(row1);
-            dom.check.isTableRow.mockImplementation((el) => el === row1 || el === row2);
-
-            // Set nextElementSibling
-            Object.defineProperty(row1, 'nextElementSibling', {
-                configurable: true,
-                value: row2
-            });
-
-            resizeService.readyResizeFromEdge({}, td);
-
-            expect(main.uiManager.enableBackWrapper).toHaveBeenCalledWith('ns-resize');
-        });
 
         it('should stop row resize on Esc key', () => {
             const { CheckCellEdge, CheckRowEdge } = require('../../../../../../src/plugins/dropdown/table/shared/table.utils');

@@ -3,127 +3,21 @@
  */
 
 import Controller from '../../../src/modules/contract/Controller.js';
+import { createMockEditor } from '../../../test/__mocks__/editorMock.js';
 
-// Mock dependencies
-jest.mock('../../../src/editorInjector/_core.js', () => {
-    return jest.fn().mockImplementation(function(editor) {
-        this.editor = editor;
-        this.frameContext = editor.frameContext || new Map([
-            ['lineBreaker_t', { style: { display: '' } }],
-            ['lineBreaker_b', { style: { display: '' } }],
-            ['topArea', {}]
-        ]);
-        this.triggerEvent = editor.triggerEvent || jest.fn();
-        this.carrierWrapper = {
-            appendChild: jest.fn(),
-            contains: jest.fn().mockReturnValue(true)
-        };
-        this.eventManager = {
-            addEvent: jest.fn(),
-            removeGlobalEvent: jest.fn(),
-            addGlobalEvent: jest.fn()
-        };
-        this.component = {
-            __removeGlobalEvent: jest.fn(),
-            deselect: jest.fn()
-        };
-        this.uiManager = editor.uiManager;
-        this.selection = editor.selection;
-        this.offset = editor.offset;
-        this.status = editor.status;
-        this.instanceCheck = {
-            isRange: jest.fn().mockReturnValue(false)
-        };
-    });
-});
-
-// Mock canvas and document methods
-const mockCanvasContext = {
-    createLinearGradient: jest.fn().mockReturnValue({
-        addColorStop: jest.fn()
-    }),
-    fillRect: jest.fn(),
-    fillStyle: jest.fn(),
-    clearRect: jest.fn(),
-    drawImage: jest.fn(),
-    globalAlpha: 1,
-    beginPath: jest.fn(),
-    arc: jest.fn(),
-    fill: jest.fn(),
-    getImageData: jest.fn().mockReturnValue({ data: [255, 0, 0, 255] })
-};
-
-global.document.createElement = jest.fn().mockImplementation((tagName) => {
-    if (tagName === 'canvas') {
-        return {
-            width: 0,
-            height: 0,
-            getContext: jest.fn().mockReturnValue(mockCanvasContext)
-        };
-    }
-    return {
-        querySelector: jest.fn().mockReturnValue({
-            children: [{}, {}],
-            querySelector: jest.fn().mockReturnValue({
-                children: [{}, {}]
-            })
-        }),
-        appendChild: jest.fn(),
-        children: [{}, {}]
-    };
-});
-
-jest.mock('../../../src/helper', () => ({
-    dom: {
-        check: { isElement: jest.fn().mockReturnValue(true) },
-        utils: {
-            addClass: jest.fn(),
-            removeClass: jest.fn(),
-            createElement: jest.fn().mockImplementation((tagName, attrs, html) => {
-                const mockCanvasContext = {
-                    createLinearGradient: jest.fn().mockReturnValue({
-                        addColorStop: jest.fn()
-                    }),
-                    fillRect: jest.fn(),
-                    fillStyle: jest.fn(),
-                    clearRect: jest.fn(),
-                    drawImage: jest.fn(),
-                    globalAlpha: 1,
-                    beginPath: jest.fn(),
-                    arc: jest.fn(),
-                    fill: jest.fn(),
-                    getImageData: jest.fn().mockReturnValue({ data: [255, 0, 0, 255] })
-                };
-
-                const mockCanvas = {
-                    width: 0,
-                    height: 0,
-                    getContext: jest.fn().mockReturnValue(mockCanvasContext)
-                };
-
-                const elem = {
-                    querySelector: jest.fn().mockImplementation((selector) => {
-                        if (selector.includes('canvas') || selector.includes('.se-hue-wheel') || selector.includes('.se-hue-gradient')) {
-                            return mockCanvas;
-                        }
-                        return {
-                            children: [{}, {}],
-                            querySelector: jest.fn().mockReturnValue({
-                                children: [{}, {}]
-                            })
-                        };
-                    }),
-                    appendChild: jest.fn(),
-                    children: [{}, {}],
-                    className: attrs?.class || ''
-                };
-                if (html) elem.innerHTML = html;
-                return elem;
-            })
-        }
-    },
-    env: { _w: { setTimeout: (fn) => fn() }, isTouchDevice: false }
-}));
+/**
+ * Create a real DOM element for testing
+ */
+function createMockElement() {
+    const element = document.createElement('div');
+    element.style.visibility = '';
+    element.style.display = '';
+    element.style.position = '';
+    element.style.left = '';
+    element.style.top = '';
+    element.style.zIndex = '';
+    return element;
+}
 
 describe('Modules - Controller', () => {
     let mockInst;
@@ -132,8 +26,14 @@ describe('Modules - Controller', () => {
     beforeEach(() => {
         jest.clearAllMocks();
 
-        mockEditor = {
-            uiManager: {
+        // Use createMockEditor for the $ deps bag pattern
+        const kernel = createMockEditor();
+        mockEditor = kernel;
+
+        // Override with custom mocks as needed
+        mockEditor.$ = {
+            ...kernel.$,
+            ui: {
                 showController: jest.fn(),
                 hideController: jest.fn(),
                 setControllerOnDisabledButtons: jest.fn(),
@@ -145,29 +45,17 @@ describe('Modules - Controller', () => {
             },
             selection: {
                 getRangeElement: jest.fn(),
-                isRange: jest.fn().mockReturnValue(false)
+                isRange: jest.fn().mockReturnValue(false),
+                ...kernel.$.selection
             },
-            triggerEvent: jest.fn(),
             offset: {
                 setRangePosition: jest.fn().mockReturnValue(true),
-                setAbsPosition: jest.fn().mockReturnValue({ top: 0, left: 0 })
-            },
-            status: {
-                hasFocus: true
-            },
-            component: {
-                __removeGlobalEvent: jest.fn(),
-                deselect: jest.fn()
-            },
-            toolbar: {
-                hide: jest.fn()
-            },
-            subToolbar: {
-                hide: jest.fn()
-            },
-            isBalloon: false,
-            isSubBalloon: false
+                setAbsPosition: jest.fn().mockReturnValue({ top: 0, left: 0 }),
+                ...kernel.$.offset
+            }
         };
+        mockEditor.isBalloon = false;
+        mockEditor.isSubBalloon = false;
 
         mockInst = {
             editor: mockEditor,
@@ -179,77 +67,24 @@ describe('Modules - Controller', () => {
     });
 
     describe('Constructor', () => {
-        const createMockElement = () => ({
-            style: {
-                visibility: '',
-                display: '',
-                position: '',
-                left: '',
-                top: '',
-                zIndex: ''
-            },
-            appendChild: jest.fn(),
-            removeAttribute: jest.fn(),
-            setAttribute: jest.fn(),
-            classList: {
-                add: jest.fn(),
-                remove: jest.fn(),
-                contains: jest.fn()
-            },
-            getBoundingClientRect: jest.fn().mockReturnValue({
-                width: 100,
-                height: 50,
-                top: 0,
-                left: 0,
-                right: 100,
-                bottom: 50
-            })
-        });
-
         it('should use constructor name as fallback', () => {
             const instWithoutKey = {
                 editor: mockEditor,
                 constructor: { name: 'FallbackController' }
             };
-            const mockElement = createMockElement();
+            const element = createMockElement();
 
-            const controller = new Controller(instWithoutKey, mockElement, {});
+            const controller = new Controller(instWithoutKey, mockEditor.$, element, {});
             expect(controller.kind).toBe('FallbackController');
         });
     });
 
     describe('Basic functionality', () => {
         let controller;
-        let mockElement;
 
         beforeEach(() => {
-            mockElement = {
-                style: {
-                    visibility: '',
-                    display: '',
-                    position: '',
-                    left: '',
-                    top: '',
-                    zIndex: ''
-                },
-                appendChild: jest.fn(),
-                removeAttribute: jest.fn(),
-                setAttribute: jest.fn(),
-                classList: {
-                    add: jest.fn(),
-                    remove: jest.fn(),
-                    contains: jest.fn()
-                },
-                getBoundingClientRect: jest.fn().mockReturnValue({
-                    width: 100,
-                    height: 50,
-                    top: 0,
-                    left: 0,
-                    right: 100,
-                    bottom: 50
-                })
-            };
-            controller = new Controller(mockInst, mockElement, {});
+            const element = createMockElement();
+            controller = new Controller(mockInst, mockEditor.$, element, {});
         });
 
         it('should handle controller operations', () => {
@@ -265,36 +100,12 @@ describe('Modules - Controller', () => {
 
     describe('hide method', () => {
         let controller;
-        let mockElement;
 
         beforeEach(() => {
-            mockElement = {
-                style: {
-                    visibility: 'visible',
-                    display: 'block',
-                    position: '',
-                    left: '',
-                    top: '',
-                    zIndex: ''
-                },
-                appendChild: jest.fn(),
-                removeAttribute: jest.fn(),
-                setAttribute: jest.fn(),
-                classList: {
-                    add: jest.fn(),
-                    remove: jest.fn(),
-                    contains: jest.fn()
-                },
-                getBoundingClientRect: jest.fn().mockReturnValue({
-                    width: 100,
-                    height: 50,
-                    top: 0,
-                    left: 0,
-                    right: 100,
-                    bottom: 50
-                })
-            };
-            controller = new Controller(mockInst, mockElement, {});
+            const element = createMockElement();
+            element.style.visibility = 'visible';
+            element.style.display = 'block';
+            controller = new Controller(mockInst, mockEditor.$, element, {});
         });
 
         it('should set display to none', () => {
@@ -305,43 +116,20 @@ describe('Modules - Controller', () => {
 
     describe('close method', () => {
         let controller;
-        let mockElement;
 
         beforeEach(() => {
-            mockElement = {
-                style: {
-                    visibility: 'visible',
-                    display: 'block',
-                    position: '',
-                    left: '',
-                    top: '',
-                    zIndex: ''
-                },
-                appendChild: jest.fn(),
-                removeAttribute: jest.fn(),
-                setAttribute: jest.fn(),
-                classList: {
-                    add: jest.fn(),
-                    remove: jest.fn(),
-                    contains: jest.fn()
-                },
-                getBoundingClientRect: jest.fn().mockReturnValue({
-                    width: 100,
-                    height: 50,
-                    top: 0,
-                    left: 0,
-                    right: 100,
-                    bottom: 50
-                })
-            };
-            mockEditor.opendControllers = [];
-            mockEditor.currentControllerName = 'testController';
+            const element = createMockElement();
+            element.style.visibility = 'visible';
+            element.style.display = 'block';
+
+            mockEditor.$.ui.opendControllers = [];
+            mockEditor.$.ui.currentControllerName = 'testController';
             mockEditor.effectNode = null;
             mockEditor._preventBlur = true;
             mockEditor._controllerTargetContext = null;
             mockEditor.status = { onSelected: true };
 
-            controller = new Controller(mockInst, mockElement, {});
+            controller = new Controller(mockInst, mockEditor.$, element, {});
             controller.isOpen = true;
         });
 
@@ -364,83 +152,29 @@ describe('Modules - Controller', () => {
     });
 
     describe('Parameters', () => {
-        let mockElement;
-
-        beforeEach(() => {
-            mockElement = {
-                style: {
-                    visibility: '',
-                    display: '',
-                    position: '',
-                    left: '',
-                    top: '',
-                    zIndex: ''
-                },
-                appendChild: jest.fn(),
-                removeAttribute: jest.fn(),
-                setAttribute: jest.fn(),
-                classList: {
-                    add: jest.fn(),
-                    remove: jest.fn(),
-                    contains: jest.fn()
-                },
-                getBoundingClientRect: jest.fn().mockReturnValue({
-                    width: 100,
-                    height: 50,
-                    top: 0,
-                    left: 0,
-                    right: 100,
-                    bottom: 50
-                })
-            };
-        });
-
         it('should handle position parameter', () => {
-            const controller = new Controller(mockInst, mockElement, { position: 'top' });
+            const element = createMockElement();
+            const controller = new Controller(mockInst, mockEditor.$, element, { position: 'top' });
             expect(controller.position).toBe('top');
         });
 
         it('should default to bottom position', () => {
-            const controller = new Controller(mockInst, mockElement, {});
+            const element = createMockElement();
+            const controller = new Controller(mockInst, mockEditor.$, element, {});
             expect(controller.position).toBe('bottom');
         });
     });
 
     describe('open method', () => {
         let controller;
-        let mockElement;
         let mockTarget;
 
         beforeEach(() => {
-            mockElement = {
-                style: {
-                    visibility: '',
-                    display: '',
-                    position: '',
-                    left: '',
-                    top: '',
-                    zIndex: ''
-                },
-                appendChild: jest.fn(),
-                removeAttribute: jest.fn(),
-                setAttribute: jest.fn(),
-                classList: {
-                    add: jest.fn(),
-                    remove: jest.fn(),
-                    contains: jest.fn()
-                },
-                getBoundingClientRect: jest.fn().mockReturnValue({
-                    width: 100,
-                    height: 50,
-                    top: 0,
-                    left: 0,
-                    right: 100,
-                    bottom: 50
-                })
-            };
-
-            mockTarget = {
-                getBoundingClientRect: jest.fn().mockReturnValue({
+            const element = createMockElement();
+            mockTarget = document.createElement('div');
+            // Mock getBoundingClientRect
+            Object.defineProperty(mockTarget, 'getBoundingClientRect', {
+                value: jest.fn().mockReturnValue({
                     top: 100,
                     left: 50,
                     bottom: 150,
@@ -448,14 +182,14 @@ describe('Modules - Controller', () => {
                     width: 100,
                     height: 50
                 })
-            };
+            });
 
-            mockEditor.opendControllers = [];
-            mockEditor.currentControllerName = '';
+            mockEditor.$.ui.opendControllers = [];
+            mockEditor.$.ui.currentControllerName = '';
             mockEditor.effectNode = null;
             mockEditor._controllerTargetContext = null;
 
-            controller = new Controller(mockInst, mockElement, {});
+            controller = new Controller(mockInst, mockEditor.$, element, {});
         });
 
         it('should not throw when opening with target', () => {
@@ -487,8 +221,9 @@ describe('Modules - Controller', () => {
         });
 
         it('should use different position target', () => {
-            const positionTarget = {
-                getBoundingClientRect: jest.fn().mockReturnValue({
+            const positionTarget = document.createElement('div');
+            Object.defineProperty(positionTarget, 'getBoundingClientRect', {
+                value: jest.fn().mockReturnValue({
                     top: 200,
                     left: 100,
                     bottom: 250,
@@ -496,7 +231,7 @@ describe('Modules - Controller', () => {
                     width: 100,
                     height: 50
                 })
-            };
+            });
 
             controller.open(mockTarget, positionTarget, {});
             expect(controller.currentPositionTarget).toBe(positionTarget);
@@ -505,37 +240,10 @@ describe('Modules - Controller', () => {
 
     describe('show method', () => {
         let controller;
-        let mockElement;
 
         beforeEach(() => {
-            mockElement = {
-                style: {
-                    visibility: '',
-                    display: '',
-                    position: '',
-                    left: '',
-                    top: '',
-                    zIndex: ''
-                },
-                appendChild: jest.fn(),
-                removeAttribute: jest.fn(),
-                setAttribute: jest.fn(),
-                classList: {
-                    add: jest.fn(),
-                    remove: jest.fn(),
-                    contains: jest.fn()
-                },
-                getBoundingClientRect: jest.fn().mockReturnValue({
-                    width: 100,
-                    height: 50,
-                    top: 0,
-                    left: 0,
-                    right: 100,
-                    bottom: 50
-                })
-            };
-
-            controller = new Controller(mockInst, mockElement, {});
+            const element = createMockElement();
+            controller = new Controller(mockInst, mockEditor.$, element, {});
         });
 
         it('should not throw when called', () => {
@@ -547,37 +255,11 @@ describe('Modules - Controller', () => {
 
     describe('bringToTop method', () => {
         let controller;
-        let mockElement;
 
         beforeEach(() => {
-            mockElement = {
-                style: {
-                    visibility: '',
-                    display: '',
-                    position: '',
-                    left: '',
-                    top: '',
-                    zIndex: '10'
-                },
-                appendChild: jest.fn(),
-                removeAttribute: jest.fn(),
-                setAttribute: jest.fn(),
-                classList: {
-                    add: jest.fn(),
-                    remove: jest.fn(),
-                    contains: jest.fn()
-                },
-                getBoundingClientRect: jest.fn().mockReturnValue({
-                    width: 100,
-                    height: 50,
-                    top: 0,
-                    left: 0,
-                    right: 100,
-                    bottom: 50
-                })
-            };
-
-            controller = new Controller(mockInst, mockElement, {});
+            const element = createMockElement();
+            element.style.zIndex = '10';
+            controller = new Controller(mockInst, mockEditor.$, element, {});
         });
 
         it('should set toTop to true when passed truthy value', () => {
@@ -599,39 +281,13 @@ describe('Modules - Controller', () => {
 
     describe('resetPosition method', () => {
         let controller;
-        let mockElement;
         let mockTarget;
 
         beforeEach(() => {
-            mockElement = {
-                style: {
-                    visibility: '',
-                    display: '',
-                    position: '',
-                    left: '',
-                    top: '',
-                    zIndex: ''
-                },
-                appendChild: jest.fn(),
-                removeAttribute: jest.fn(),
-                setAttribute: jest.fn(),
-                classList: {
-                    add: jest.fn(),
-                    remove: jest.fn(),
-                    contains: jest.fn()
-                },
-                getBoundingClientRect: jest.fn().mockReturnValue({
-                    width: 100,
-                    height: 50,
-                    top: 0,
-                    left: 0,
-                    right: 100,
-                    bottom: 50
-                })
-            };
-
-            mockTarget = {
-                getBoundingClientRect: jest.fn().mockReturnValue({
+            const element = createMockElement();
+            mockTarget = document.createElement('div');
+            Object.defineProperty(mockTarget, 'getBoundingClientRect', {
+                value: jest.fn().mockReturnValue({
                     top: 100,
                     left: 50,
                     bottom: 150,
@@ -639,9 +295,9 @@ describe('Modules - Controller', () => {
                     width: 100,
                     height: 50
                 })
-            };
+            });
 
-            controller = new Controller(mockInst, mockElement, {});
+            controller = new Controller(mockInst, mockEditor.$, element, {});
             controller.currentPositionTarget = mockTarget;
         });
 

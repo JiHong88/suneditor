@@ -146,6 +146,9 @@ describe('TableStyleService', () => {
 			},
 		};
 
+		// Make main act as its own kernel for dependency injection
+		main.$ = main;
+
 		// Override mock implementation
 		const { dom } = require('../../../../../../src/helper');
 		dom.utils.createElement.mockImplementation((tag) => document.createElement(tag));

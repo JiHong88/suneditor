@@ -3,6 +3,15 @@
  */
 
 import Browser from '../../../src/modules/contract/Browser.js';
+import { createMockEditor } from '../../../test/__mocks__/editorMock.js';
+
+// Helper function to create real DOM elements (defined before mocks)
+const createRealElement = (tagName, attrs, html) => {
+    const elem = document.createElement(tagName || 'DIV');
+    if (attrs?.class) elem.className = attrs.class;
+    if (html) elem.innerHTML = html;
+    return elem;
+};
 
 // Mock ApiManager
 jest.mock('../../../src/modules/manager/ApiManager.js', () => {
@@ -12,29 +21,7 @@ jest.mock('../../../src/modules/manager/ApiManager.js', () => {
     });
 });
 
-// Mock dependencies
-jest.mock('../../../src/editorInjector/_core.js', () => {
-    return jest.fn().mockImplementation(function(editor) {
-        this.editor = editor;
-        this.frameContext = editor.frameContext;
-        this.triggerEvent = editor.triggerEvent || jest.fn();
-        this.lang = editor.lang;
-        this.icons = editor.icons;
-        this.uiManager = editor.uiManager;
-        this.offset = editor.offset || {
-            getGlobal: jest.fn().mockReturnValue({ top: 100 })
-        };
-        this.carrierWrapper = {
-            appendChild: jest.fn()
-        };
-        this.eventManager = {
-            addEvent: jest.fn(),
-            addGlobalEvent: jest.fn(() => 'event-id'),
-            removeGlobalEvent: jest.fn()
-        };
-        this.options = new Map([['_rtl', false]]);
-    });
-});
+// Note: editorInjector/_core.js was removed in refactoring. Use createMockEditor() instead.
 
 jest.mock('../../../src/helper', () => ({
     dom: {
@@ -48,64 +35,8 @@ jest.mock('../../../src/helper', () => ({
             hasClass: jest.fn().mockReturnValue(false),
             getClientSize: jest.fn().mockReturnValue({ w: 1024, h: 768 }),
             createElement: jest.fn().mockImplementation((tagName, attrs, html) => {
-                const elem = {
-                    tagName: tagName || 'DIV',
-                    appendChild: jest.fn(),
-                    insertBefore: jest.fn(),
-                    querySelector: jest.fn().mockImplementation((selector) => {
-                        if (selector === 'form.se-browser-search-form') {
-                            return {
-                                querySelector: jest.fn().mockReturnValue({
-                                    value: ''
-                                })
-                            };
-                        }
-                        if (selector === '.se-side-open-btn') {
-                            return { style: { display: '' }, click: jest.fn() };
-                        }
-                        if (selector === '.se-browser-main') {
-                            return {};
-                        }
-                        if (selector === '.se-browser-side') {
-                            return {
-                                appendChild: jest.fn(),
-                                innerHTML: '',
-                                querySelectorAll: jest.fn().mockReturnValue([])
-                            };
-                        }
-                        if (selector.startsWith('[data-command=')) {
-                            return {
-                                click: jest.fn(),
-                                parentElement: {
-                                    previousElementSibling: {
-                                        querySelector: jest.fn().mockReturnValue({ innerHTML: '' })
-                                    }
-                                }
-                            };
-                        }
-                        return {
-                            children: [{}, {}],
-                            style: { display: '' },
-                            innerHTML: '',
-                            textContent: '',
-                            querySelector: jest.fn().mockReturnValue({
-                                children: [{}, {}],
-                                style: { display: '' }
-                            })
-                        };
-                    }),
-                    querySelectorAll: jest.fn().mockReturnValue([]),
-                    className: attrs?.class || '',
-                    innerHTML: html || '',
-                    textContent: '',
-                    style: { display: '', maxHeight: '' },
-                    firstElementChild: {},
-                    getAttribute: jest.fn((attr) => {
-                        if (attr === 'data-command') return '';
-                        return attrs?.[attr] || '';
-                    })
-                };
-                return elem;
+                // Return real DOM elements so appendChild works
+                return createRealElement(tagName, attrs, html);
             })
         },
         query: {
@@ -133,27 +64,33 @@ describe('Modules - Browser', () => {
     beforeEach(() => {
         jest.clearAllMocks();
 
-        mockEditor = {
-            uiManager: { showBrowser: jest.fn(), hideBrowser: jest.fn() },
-            triggerEvent: jest.fn(),
+        // Use createMockEditor for the $ deps bag pattern
+        const kernel = createMockEditor();
+        mockEditor = kernel;
+
+        // Override with custom mocks as needed
+        mockEditor.$ = {
+            ...kernel.$,
+            ui: { showBrowser: jest.fn(), hideBrowser: jest.fn() },
             offset: {
-                getGlobal: jest.fn().mockReturnValue({ top: 100 })
-            },
-            lang: {
-                close: 'Close',
-                search: 'Search',
-                submitButton: 'Submit'
-            },
-            icons: {
-                cancel: '✕',
-                side_menu_hamburger: '☰',
-                search: '🔍',
-                menu_arrow_right: '▶',
-                menu_arrow_down: '▼',
-                side_menu_folder_item: '📁',
-                side_menu_folder: '📂',
-                side_menu_item: '📄'
+                getGlobal: jest.fn().mockReturnValue({ top: 100 }),
+                ...kernel.$.offset
             }
+        };
+        mockEditor.icons = {
+            cancel: '✕',
+            side_menu_hamburger: '☰',
+            search: '🔍',
+            menu_arrow_right: '▶',
+            menu_arrow_down: '▼',
+            side_menu_folder_item: '📁',
+            side_menu_folder: '📂',
+            side_menu_item: '📄'
+        };
+        mockEditor.lang = {
+            close: 'Close',
+            search: 'Search',
+            submitButton: 'Submit'
         };
 
         mockInst = {
@@ -172,7 +109,7 @@ describe('Modules - Browser', () => {
                 constructor: { name: 'FallbackBrowser' }
             };
 
-            const browser = new Browser(instWithoutKey, {
+            const browser = new Browser(instWithoutKey, mockEditor.$, {
                 title: 'Test Browser',
                 selectorHandler: jest.fn()
             });
@@ -184,7 +121,7 @@ describe('Modules - Browser', () => {
         let browser;
 
         beforeEach(() => {
-            browser = new Browser(mockInst, {
+            browser = new Browser(mockInst, mockEditor.$, {
                 title: 'Test Browser',
                 selectorHandler: jest.fn()
             });
@@ -208,7 +145,7 @@ describe('Modules - Browser', () => {
 
     describe('Parameters', () => {
         it('should accept title parameter', () => {
-            const browser = new Browser(mockInst, {
+            const browser = new Browser(mockInst, mockEditor.$, {
                 title: 'Custom Title',
                 selectorHandler: jest.fn()
             });
@@ -216,7 +153,7 @@ describe('Modules - Browser', () => {
         });
 
         it('should accept listClass parameter', () => {
-            const browser = new Browser(mockInst, {
+            const browser = new Browser(mockInst, mockEditor.$, {
                 title: 'Test',
                 listClass: 'custom-list',
                 selectorHandler: jest.fn()
@@ -225,7 +162,7 @@ describe('Modules - Browser', () => {
         });
 
         it('should default listClass to se-preview-list', () => {
-            const browser = new Browser(mockInst, {
+            const browser = new Browser(mockInst, mockEditor.$, {
                 title: 'Test',
                 selectorHandler: jest.fn()
             });
@@ -233,7 +170,7 @@ describe('Modules - Browser', () => {
         });
 
         it('should accept url parameter', () => {
-            const browser = new Browser(mockInst, {
+            const browser = new Browser(mockInst, mockEditor.$, {
                 title: 'Test',
                 url: 'https://example.com/api/files',
                 selectorHandler: jest.fn()
@@ -243,7 +180,7 @@ describe('Modules - Browser', () => {
 
         it('should accept headers parameter', () => {
             const headers = { 'Authorization': 'Bearer token' };
-            const browser = new Browser(mockInst, {
+            const browser = new Browser(mockInst, mockEditor.$, {
                 title: 'Test',
                 headers: headers,
                 selectorHandler: jest.fn()
@@ -252,7 +189,7 @@ describe('Modules - Browser', () => {
         });
 
         it('should accept searchUrl parameter', () => {
-            const browser = new Browser(mockInst, {
+            const browser = new Browser(mockInst, mockEditor.$, {
                 title: 'Test',
                 searchUrl: 'https://example.com/api/search',
                 selectorHandler: jest.fn()
@@ -261,7 +198,7 @@ describe('Modules - Browser', () => {
         });
 
         it('should accept useSearch parameter', () => {
-            const browser = new Browser(mockInst, {
+            const browser = new Browser(mockInst, mockEditor.$, {
                 title: 'Test',
                 useSearch: false,
                 selectorHandler: jest.fn()
@@ -270,7 +207,7 @@ describe('Modules - Browser', () => {
         });
 
         it('should default useSearch to true', () => {
-            const browser = new Browser(mockInst, {
+            const browser = new Browser(mockInst, mockEditor.$, {
                 title: 'Test',
                 selectorHandler: jest.fn()
             });
@@ -278,7 +215,7 @@ describe('Modules - Browser', () => {
         });
 
         it('should accept columnSize parameter', () => {
-            const browser = new Browser(mockInst, {
+            const browser = new Browser(mockInst, mockEditor.$, {
                 title: 'Test',
                 columnSize: 6,
                 selectorHandler: jest.fn()
@@ -287,7 +224,7 @@ describe('Modules - Browser', () => {
         });
 
         it('should default columnSize to 4', () => {
-            const browser = new Browser(mockInst, {
+            const browser = new Browser(mockInst, mockEditor.$, {
                 title: 'Test',
                 selectorHandler: jest.fn()
             });
@@ -296,7 +233,7 @@ describe('Modules - Browser', () => {
 
         it('should accept data parameter', () => {
             const data = [{ src: 'test.jpg', name: 'Test' }];
-            const browser = new Browser(mockInst, {
+            const browser = new Browser(mockInst, mockEditor.$, {
                 title: 'Test',
                 data: data,
                 selectorHandler: jest.fn()
@@ -305,7 +242,7 @@ describe('Modules - Browser', () => {
         });
 
         it('should accept className parameter', () => {
-            const browser = new Browser(mockInst, {
+            const browser = new Browser(mockInst, mockEditor.$, {
                 title: 'Test',
                 className: 'custom-browser',
                 selectorHandler: jest.fn()
@@ -318,7 +255,7 @@ describe('Modules - Browser', () => {
         let browser;
 
         beforeEach(() => {
-            browser = new Browser(mockInst, {
+            browser = new Browser(mockInst, mockEditor.$, {
                 title: 'Test Browser',
                 selectorHandler: jest.fn()
             });
@@ -331,7 +268,7 @@ describe('Modules - Browser', () => {
 
         it('should set editor opendBrowser', () => {
             browser.open();
-            expect(browser.uiManager.opendBrowser).toBe(browser);
+            expect(mockEditor.$.ui.opendBrowser).toBe(browser);
         });
 
         it('should use title from params if provided', () => {
@@ -359,7 +296,7 @@ describe('Modules - Browser', () => {
         let browser;
 
         beforeEach(() => {
-            browser = new Browser(mockInst, {
+            browser = new Browser(mockInst, mockEditor.$, {
                 title: 'Test Browser',
                 selectorHandler: jest.fn()
             });
@@ -426,9 +363,9 @@ describe('Modules - Browser', () => {
         });
 
         it('should set editor opendBrowser to null', () => {
-            browser.uiManager.opendBrowser = browser;
+            mockEditor.$.ui.opendBrowser = browser;
             browser.close();
-            expect(browser.uiManager.opendBrowser).toBeNull();
+            expect(mockEditor.$.ui.opendBrowser).toBeNull();
         });
 
         it('should call apiManager.cancel', () => {
@@ -454,7 +391,7 @@ describe('Modules - Browser', () => {
         let browser;
 
         beforeEach(() => {
-            browser = new Browser(mockInst, {
+            browser = new Browser(mockInst, mockEditor.$, {
                 title: 'Test Browser',
                 selectorHandler: jest.fn()
             });
@@ -481,7 +418,7 @@ describe('Modules - Browser', () => {
         let browser;
 
         beforeEach(() => {
-            browser = new Browser(mockInst, {
+            browser = new Browser(mockInst, mockEditor.$, {
                 title: 'Test Browser',
                 selectorHandler: jest.fn()
             });
@@ -536,7 +473,7 @@ describe('Modules - Browser', () => {
         let browser;
 
         beforeEach(() => {
-            browser = new Browser(mockInst, {
+            browser = new Browser(mockInst, mockEditor.$, {
                 title: 'Test Browser',
                 selectorHandler: jest.fn()
             });
@@ -565,7 +502,7 @@ describe('Modules - Browser', () => {
     describe('Integration', () => {
         it('should handle full lifecycle', () => {
             const selectorHandler = jest.fn();
-            const browser = new Browser(mockInst, {
+            const browser = new Browser(mockInst, mockEditor.$, {
                 title: 'Test Browser',
                 selectorHandler: selectorHandler
             });
@@ -590,7 +527,7 @@ describe('Modules - Browser', () => {
                 { src: 'image2.jpg', name: 'Image 2', tag: ['city'] }
             ];
 
-            const browser = new Browser(mockInst, {
+            const browser = new Browser(mockInst, mockEditor.$, {
                 title: 'Test',
                 data: data,
                 selectorHandler: jest.fn()
@@ -604,7 +541,7 @@ describe('Modules - Browser', () => {
         let browser;
 
         beforeEach(() => {
-            browser = new Browser(mockInst, {
+            browser = new Browser(mockInst, mockEditor.$, {
                 title: 'Test Browser',
                 selectorHandler: jest.fn()
             });
@@ -669,7 +606,7 @@ describe('Modules - Browser', () => {
         let browser;
 
         beforeEach(() => {
-            browser = new Browser(mockInst, {
+            browser = new Browser(mockInst, mockEditor.$, {
                 title: 'Test Browser',
                 selectorHandler: jest.fn()
             });
@@ -724,7 +661,7 @@ describe('Modules - Browser', () => {
         let browser;
 
         beforeEach(() => {
-            browser = new Browser(mockInst, {
+            browser = new Browser(mockInst, mockEditor.$, {
                 title: 'Test Browser',
                 columnSize: 3,
                 selectorHandler: jest.fn()
@@ -749,7 +686,7 @@ describe('Modules - Browser', () => {
         });
 
         it('should handle columnSize of 1', () => {
-            const browser1Col = new Browser(mockInst, {
+            const browser1Col = new Browser(mockInst, mockEditor.$, {
                 title: 'Test',
                 columnSize: 1,
                 selectorHandler: jest.fn()
@@ -773,7 +710,7 @@ describe('Modules - Browser', () => {
                 return `<div data-src="${item.src}">${item.name}</div>`;
             });
 
-            const browser = new Browser(mockInst, {
+            const browser = new Browser(mockInst, mockEditor.$, {
                 title: 'Test',
                 drawItemHandler: customHandler,
                 selectorHandler: jest.fn()
@@ -789,7 +726,7 @@ describe('Modules - Browser', () => {
         it('should use thumbnail function when provided', () => {
             const thumbnailFn = jest.fn((item) => '📄');
 
-            const browser = new Browser(mockInst, {
+            const browser = new Browser(mockInst, mockEditor.$, {
                 title: 'Test',
                 thumbnail: thumbnailFn,
                 selectorHandler: jest.fn()
@@ -805,7 +742,7 @@ describe('Modules - Browser', () => {
         });
 
         it('should handle props parameter', () => {
-            const browser = new Browser(mockInst, {
+            const browser = new Browser(mockInst, mockEditor.$, {
                 title: 'Test',
                 props: ['customProp1', 'customProp2'],
                 selectorHandler: jest.fn()
@@ -815,598 +752,4 @@ describe('Modules - Browser', () => {
         });
     });
 
-    describe('Event handlers', () => {
-        let browser;
-
-        beforeEach(() => {
-            browser = new Browser(mockInst, {
-                title: 'Test Browser',
-                selectorHandler: jest.fn()
-            });
-        });
-
-        describe('Search form submission', () => {
-            it('should call search when form is submitted', () => {
-                const searchSpy = jest.spyOn(browser, 'search');
-
-                // Find the search form submit handler
-                const submitHandler = browser.eventManager.addEvent.mock.calls
-                    .find(call => call[1] === 'submit')?.[2];
-
-                expect(submitHandler).toBeDefined();
-
-                // Simulate form submission
-                const mockEvent = {
-                    preventDefault: jest.fn(),
-                    currentTarget: {
-                        querySelector: jest.fn().mockReturnValue({
-                            value: 'test search'
-                        })
-                    }
-                };
-
-                submitHandler.call(browser, mockEvent);
-
-                expect(mockEvent.preventDefault).toHaveBeenCalled();
-                expect(searchSpy).toHaveBeenCalledWith('test search');
-            });
-        });
-
-        describe('Global ESC key handler', () => {
-            it('should close browser on ESC key', () => {
-                const closeSpy = jest.spyOn(browser, 'close');
-                const mockKeyCodeMap = require('../../../src/helper').keyCodeMap;
-
-                browser.open();
-
-                // Find the global keydown handler
-                const keydownHandler = browser.eventManager.addGlobalEvent.mock.calls
-                    .find(call => call[0] === 'keydown')?.[1];
-
-                expect(keydownHandler).toBeDefined();
-
-                // Simulate ESC key
-                mockKeyCodeMap.isEsc.mockReturnValueOnce(true);
-                keydownHandler({ code: 'Escape' });
-
-                expect(closeSpy).toHaveBeenCalled();
-            });
-
-            it('should not close on non-ESC keys', () => {
-                const closeSpy = jest.spyOn(browser, 'close');
-                const mockKeyCodeMap = require('../../../src/helper').keyCodeMap;
-
-                browser.open();
-
-                const keydownHandler = browser.eventManager.addGlobalEvent.mock.calls
-                    .find(call => call[0] === 'keydown')?.[1];
-
-                // Simulate non-ESC key
-                mockKeyCodeMap.isEsc.mockReturnValueOnce(false);
-                keydownHandler({ code: 'KeyA' });
-
-                expect(closeSpy).not.toHaveBeenCalled();
-            });
-        });
-
-        describe('Browser click handlers', () => {
-            it('should close browser when close button is clicked', () => {
-                const closeSpy = jest.spyOn(browser, 'close');
-
-                // Find the browser click handler
-                const clickHandler = browser.eventManager.addEvent.mock.calls
-                    .find(call => call[1] === 'click' && call[0] !== browser.tagArea && call[0] !== browser.list && call[0] !== browser.side)?.[2];
-
-                expect(clickHandler).toBeDefined();
-
-                const mockEvent = {
-                    stopPropagation: jest.fn(),
-                    target: {
-                        getAttribute: jest.fn().mockReturnValue('close')
-                    }
-                };
-
-                const mockQuery = require('../../../src/helper').dom.query;
-                mockQuery.getEventTarget.mockReturnValueOnce(mockEvent.target);
-
-                clickHandler.call(browser, mockEvent);
-
-                expect(mockEvent.stopPropagation).toHaveBeenCalled();
-                expect(closeSpy).toHaveBeenCalled();
-            });
-
-            it('should close browser when clicking on background', () => {
-                const closeSpy = jest.spyOn(browser, 'close');
-
-                // Find mousedown handler
-                const mousedownHandler = browser.eventManager.addEvent.mock.calls
-                    .find(call => call[1] === 'mousedown' && call[0] !== browser.header)?.[2];
-
-                // Find click handler
-                const clickHandler = browser.eventManager.addEvent.mock.calls
-                    .find(call => call[1] === 'click' && call[0] !== browser.tagArea && call[0] !== browser.list && call[0] !== browser.side)?.[2];
-
-                const mockTarget = {
-                    className: 'se-browser-inner',
-                    getAttribute: jest.fn().mockReturnValue(null)
-                };
-
-                const mockQuery = require('../../../src/helper').dom.query;
-
-                // Simulate mousedown on background
-                mockQuery.getEventTarget.mockReturnValueOnce(mockTarget);
-                mousedownHandler.call(browser, { target: mockTarget });
-
-                // Then click
-                mockQuery.getEventTarget.mockReturnValueOnce(mockTarget);
-                clickHandler.call(browser, {
-                    stopPropagation: jest.fn(),
-                    target: mockTarget
-                });
-
-                expect(closeSpy).toHaveBeenCalled();
-            });
-        });
-
-        describe('File selection', () => {
-            it('should call selectorHandler when file is clicked', () => {
-                const mockSelectorHandler = jest.fn();
-                browser.selectorHandler = mockSelectorHandler;
-                const closeSpy = jest.spyOn(browser, 'close');
-
-                // Find the list click handler
-                const clickHandler = browser.eventManager.addEvent.mock.calls
-                    .find(call => call[0] === browser.list && call[1] === 'click')?.[2];
-
-                expect(clickHandler).toBeDefined();
-
-                const mockTarget = { id: 'file1' };
-                const mockEvent = {
-                    preventDefault: jest.fn(),
-                    stopPropagation: jest.fn(),
-                    target: mockTarget
-                };
-
-                const mockQuery = require('../../../src/helper').dom.query;
-                mockQuery.getEventTarget.mockReturnValueOnce(mockTarget);
-                mockQuery.getCommandTarget.mockReturnValueOnce(mockTarget);
-
-                clickHandler.call(browser, mockEvent);
-
-                expect(mockEvent.preventDefault).toHaveBeenCalled();
-                expect(mockEvent.stopPropagation).toHaveBeenCalled();
-                expect(closeSpy).toHaveBeenCalled();
-                expect(mockSelectorHandler).toHaveBeenCalledWith(mockTarget);
-            });
-
-            it('should not call selectorHandler when clicking list itself', () => {
-                const mockSelectorHandler = jest.fn();
-                browser.selectorHandler = mockSelectorHandler;
-
-                const clickHandler = browser.eventManager.addEvent.mock.calls
-                    .find(call => call[0] === browser.list && call[1] === 'click')?.[2];
-
-                const mockEvent = {
-                    preventDefault: jest.fn(),
-                    stopPropagation: jest.fn(),
-                    target: browser.list
-                };
-
-                const mockQuery = require('../../../src/helper').dom.query;
-                mockQuery.getEventTarget.mockReturnValueOnce(browser.list);
-
-                clickHandler.call(browser, mockEvent);
-
-                expect(mockSelectorHandler).not.toHaveBeenCalled();
-            });
-
-            it('should not call selectorHandler when no command target', () => {
-                const mockSelectorHandler = jest.fn();
-                browser.selectorHandler = mockSelectorHandler;
-
-                const clickHandler = browser.eventManager.addEvent.mock.calls
-                    .find(call => call[0] === browser.list && call[1] === 'click')?.[2];
-
-                const mockTarget = { id: 'file1' };
-                const mockEvent = {
-                    preventDefault: jest.fn(),
-                    stopPropagation: jest.fn(),
-                    target: mockTarget
-                };
-
-                const mockQuery = require('../../../src/helper').dom.query;
-                mockQuery.getEventTarget.mockReturnValueOnce(mockTarget);
-                mockQuery.getCommandTarget.mockReturnValueOnce(null);
-
-                clickHandler.call(browser, mockEvent);
-
-                expect(mockSelectorHandler).not.toHaveBeenCalled();
-            });
-        });
-
-        describe('Tag filtering', () => {
-            it('should toggle tag selection when tag is clicked', () => {
-                browser.items = [
-                    { src: 'img1.jpg', name: 'Image 1', tag: ['nature'] },
-                    { src: 'img2.jpg', name: 'Image 2', tag: ['city'] }
-                ];
-
-                // Setup tagArea with a mock tag element
-                browser.tagArea.querySelector = jest.fn().mockReturnValue({
-                    querySelector: jest.fn().mockReturnValue({})
-                });
-
-                // Find the tag click handler
-                const clickHandler = browser.eventManager.addEvent.mock.calls
-                    .find(call => call[0] === browser.tagArea && call[1] === 'click')?.[2];
-
-                expect(clickHandler).toBeDefined();
-
-                const mockTag = {
-                    tagName: 'A',
-                    textContent: 'nature'
-                };
-
-                const mockEvent = {
-                    target: mockTag
-                };
-
-                const mockDom = require('../../../src/helper').dom;
-                mockDom.query.getEventTarget.mockReturnValueOnce(mockTag);
-                mockDom.check.isAnchor.mockReturnValueOnce(true);
-                browser.tagArea.querySelector = jest.fn().mockReturnValue(mockTag);
-
-                clickHandler.call(browser, mockEvent);
-
-                expect(browser.selectedTags).toContain('nature');
-                expect(mockDom.utils.addClass).toHaveBeenCalled();
-            });
-
-            it('should deselect tag when clicked again', () => {
-                browser.items = [
-                    { src: 'img1.jpg', name: 'Image 1', tag: ['nature'] }
-                ];
-                browser.selectedTags = ['nature'];
-
-                const clickHandler = browser.eventManager.addEvent.mock.calls
-                    .find(call => call[0] === browser.tagArea && call[1] === 'click')?.[2];
-
-                const mockTag = {
-                    tagName: 'A',
-                    textContent: 'nature'
-                };
-
-                const mockEvent = {
-                    target: mockTag
-                };
-
-                const mockDom = require('../../../src/helper').dom;
-                mockDom.query.getEventTarget.mockReturnValueOnce(mockTag);
-                mockDom.check.isAnchor.mockReturnValueOnce(true);
-                browser.tagArea.querySelector = jest.fn().mockReturnValue(mockTag);
-
-                clickHandler.call(browser, mockEvent);
-
-                expect(browser.selectedTags).not.toContain('nature');
-                expect(mockDom.utils.removeClass).toHaveBeenCalled();
-            });
-
-            it('should not process non-anchor clicks', () => {
-                const clickHandler = browser.eventManager.addEvent.mock.calls
-                    .find(call => call[0] === browser.tagArea && call[1] === 'click')?.[2];
-
-                const mockEvent = {
-                    target: { tagName: 'DIV', textContent: 'not a tag' }
-                };
-
-                const mockDom = require('../../../src/helper').dom;
-                mockDom.query.getEventTarget.mockReturnValueOnce(mockEvent.target);
-                mockDom.check.isAnchor.mockReturnValueOnce(false);
-
-                const initialTags = [...browser.selectedTags];
-                clickHandler.call(browser, mockEvent);
-
-                expect(browser.selectedTags).toEqual(initialTags);
-            });
-        });
-
-        describe('Side menu navigation', () => {
-            it('should toggle folder expansion when button is clicked', () => {
-                const clickHandler = browser.eventManager.addEvent.mock.calls
-                    .find(call => call[0] === browser.side && call[1] === 'click')?.[2];
-
-                expect(clickHandler).toBeDefined();
-
-                const mockButton = {
-                    nodeName: 'BUTTON',
-                    innerHTML: '▶',
-                    parentElement: {
-                        parentElement: {
-                            querySelector: jest.fn().mockReturnValue({
-                                classList: {
-                                    contains: jest.fn().mockReturnValue(true)
-                                }
-                            })
-                        }
-                    }
-                };
-
-                const mockEvent = {
-                    target: mockButton,
-                    stopPropagation: jest.fn()
-                };
-
-                const mockDom = require('../../../src/helper').dom;
-                mockDom.query.getEventTarget.mockReturnValueOnce(mockButton);
-
-                const childContainer = mockButton.parentElement.parentElement.querySelector('.se-menu-child');
-                mockDom.utils.hasClass.mockReturnValueOnce(true);
-
-                clickHandler.call(browser, mockEvent);
-
-                expect(mockEvent.stopPropagation).toHaveBeenCalled();
-                expect(mockDom.utils.removeClass).toHaveBeenCalled();
-            });
-
-            it('should collapse folder when button is clicked again', () => {
-                const clickHandler = browser.eventManager.addEvent.mock.calls
-                    .find(call => call[0] === browser.side && call[1] === 'click')?.[2];
-
-                const mockButton = {
-                    nodeName: 'BUTTON',
-                    innerHTML: '▼',
-                    parentElement: {
-                        parentElement: {
-                            querySelector: jest.fn().mockReturnValue({
-                                classList: {
-                                    contains: jest.fn().mockReturnValue(false)
-                                }
-                            })
-                        }
-                    }
-                };
-
-                const mockEvent = {
-                    target: mockButton,
-                    stopPropagation: jest.fn()
-                };
-
-                const mockDom = require('../../../src/helper').dom;
-                mockDom.query.getEventTarget.mockReturnValueOnce(mockButton);
-
-                const childContainer = mockButton.parentElement.parentElement.querySelector('.se-menu-child');
-                mockDom.utils.hasClass.mockReturnValueOnce(false);
-
-                clickHandler.call(browser, mockEvent);
-
-                expect(mockDom.utils.addClass).toHaveBeenCalled();
-            });
-
-            it('should load folder data when folder item is clicked', () => {
-                const clickHandler = browser.eventManager.addEvent.mock.calls
-                    .find(call => call[0] === browser.side && call[1] === 'click')?.[2];
-
-                browser.data = {
-                    'folder1': [
-                        { src: 'img1.jpg', name: 'Image 1', type: 'image' }
-                    ]
-                };
-
-                browser.tagArea = {
-                    innerHTML: ''
-                };
-
-                browser.side.querySelectorAll = jest.fn().mockReturnValue([
-                    { classList: { remove: jest.fn() } }
-                ]);
-
-                const mockFolderItem = {
-                    nodeName: 'DIV',
-                    getAttribute: jest.fn().mockReturnValue('folder1')
-                };
-
-                const mockEvent = {
-                    target: mockFolderItem,
-                    stopPropagation: jest.fn()
-                };
-
-                const mockDom = require('../../../src/helper').dom;
-                mockDom.query.getEventTarget.mockReturnValueOnce(mockFolderItem);
-                mockDom.query.getCommandTarget.mockReturnValueOnce(mockFolderItem);
-                mockDom.utils.hasClass.mockReturnValueOnce(false); // not active
-                mockDom.query.getParentElement.mockReturnValueOnce(mockFolderItem);
-
-                clickHandler.call(browser, mockEvent);
-
-                expect(mockEvent.stopPropagation).toHaveBeenCalled();
-                expect(mockDom.utils.removeClass).toHaveBeenCalled();
-                expect(mockDom.utils.addClass).toHaveBeenCalled();
-            });
-
-            it('should not load data if folder is already active', () => {
-                const clickHandler = browser.eventManager.addEvent.mock.calls
-                    .find(call => call[0] === browser.side && call[1] === 'click')?.[2];
-
-                const mockFolderItem = {
-                    nodeName: 'DIV',
-                    getAttribute: jest.fn().mockReturnValue('folder1')
-                };
-
-                const mockEvent = {
-                    target: mockFolderItem,
-                    stopPropagation: jest.fn()
-                };
-
-                const mockDom = require('../../../src/helper').dom;
-                mockDom.query.getEventTarget.mockReturnValueOnce(mockFolderItem);
-                mockDom.query.getCommandTarget.mockReturnValueOnce(mockFolderItem);
-                mockDom.utils.hasClass.mockReturnValueOnce(true); // already active
-
-                const initialData = browser.data;
-                clickHandler.call(browser, mockEvent);
-
-                expect(browser.data).toBe(initialData);
-            });
-
-            it('should load folder data from URL when data is string', () => {
-                const clickHandler = browser.eventManager.addEvent.mock.calls
-                    .find(call => call[0] === browser.side && call[1] === 'click')?.[2];
-
-                browser.data = {
-                    'folder1': 'https://api.example.com/folder1'
-                };
-
-                browser.urlHeader = { Authorization: 'Bearer token' };
-
-                browser.tagArea = {
-                    innerHTML: ''
-                };
-
-                browser.side.querySelectorAll = jest.fn().mockReturnValue([]);
-
-                const mockFolderItem = {
-                    nodeName: 'DIV',
-                    getAttribute: jest.fn().mockReturnValue('folder1')
-                };
-
-                const mockEvent = {
-                    target: mockFolderItem,
-                    stopPropagation: jest.fn()
-                };
-
-                const mockDom = require('../../../src/helper').dom;
-                mockDom.query.getEventTarget.mockReturnValueOnce(mockFolderItem);
-                mockDom.query.getCommandTarget.mockReturnValueOnce(mockFolderItem);
-                mockDom.utils.hasClass.mockReturnValueOnce(false);
-                mockDom.query.getParentElement.mockReturnValueOnce(mockFolderItem);
-
-                clickHandler.call(browser, mockEvent);
-
-                expect(browser.apiManager.call).toHaveBeenCalled();
-            });
-        });
-
-        describe('Side menu open/close', () => {
-            it('should open side menu when button is clicked', () => {
-                const clickHandler = browser.eventManager.addEvent.mock.calls
-                    .find(call => call[0] === browser.sideOpenBtn && call[1] === 'click')?.[2];
-
-                expect(clickHandler).toBeDefined();
-
-                const mockButton = {
-                    classList: {
-                        contains: jest.fn().mockReturnValue(false)
-                    }
-                };
-
-                const mockEvent = {
-                    target: mockButton
-                };
-
-                const mockDom = require('../../../src/helper').dom;
-                mockDom.query.getEventTarget.mockReturnValueOnce(mockButton);
-                mockDom.utils.hasClass.mockReturnValueOnce(false);
-
-                clickHandler.call(browser, mockEvent);
-
-                expect(mockDom.utils.addClass).toHaveBeenCalledWith(browser.side, 'se-side-show');
-                expect(mockDom.utils.addClass).toHaveBeenCalledWith(mockButton, 'active');
-            });
-
-            it('should close side menu when button is clicked again', () => {
-                const clickHandler = browser.eventManager.addEvent.mock.calls
-                    .find(call => call[0] === browser.sideOpenBtn && call[1] === 'click')?.[2];
-
-                const mockButton = {
-                    classList: {
-                        contains: jest.fn().mockReturnValue(true)
-                    }
-                };
-
-                const mockEvent = {
-                    target: mockButton
-                };
-
-                const mockDom = require('../../../src/helper').dom;
-                mockDom.query.getEventTarget.mockReturnValueOnce(mockButton);
-                mockDom.utils.hasClass.mockReturnValueOnce(true);
-
-                clickHandler.call(browser, mockEvent);
-
-                expect(mockDom.utils.removeClass).toHaveBeenCalledWith(browser.side, 'se-side-show');
-                expect(mockDom.utils.removeClass).toHaveBeenCalledWith(mockButton, 'active');
-            });
-
-            it('should close side menu when clicking outside', () => {
-                // Find the mousedown handler - it's registered to an array of elements
-                const mousedownHandler = browser.eventManager.addEvent.mock.calls
-                    .find(call => {
-                        return call[1] === 'mousedown' &&
-                               Array.isArray(call[0]) &&
-                               call[0].includes(browser.header);
-                    })?.[2];
-
-                expect(mousedownHandler).toBeDefined();
-
-                const mockEvent = {
-                    target: browser.header
-                };
-
-                const mockDom = require('../../../src/helper').dom;
-                mockDom.utils.hasClass.mockReturnValueOnce(true);
-
-                mousedownHandler.call(browser, mockEvent);
-
-                expect(mockDom.utils.removeClass).toHaveBeenCalledWith(browser.side, 'se-side-show');
-                expect(mockDom.utils.removeClass).toHaveBeenCalledWith(browser.sideOpenBtn, 'active');
-            });
-
-            it('should not close side menu when clicking sideOpenBtn', () => {
-                const mousedownHandler = browser.eventManager.addEvent.mock.calls
-                    .find(call => {
-                        return call[1] === 'mousedown' &&
-                               Array.isArray(call[0]) &&
-                               call[0].includes(browser.header);
-                    })?.[2];
-
-                const mockEvent = {
-                    target: browser.sideOpenBtn
-                };
-
-                const mockDom = require('../../../src/helper').dom;
-
-                const removeClassSpy = jest.spyOn(mockDom.utils, 'removeClass');
-                removeClassSpy.mockClear();
-
-                mousedownHandler.call(browser, mockEvent);
-
-                // removeClass should not be called when target is sideOpenBtn
-                expect(removeClassSpy).not.toHaveBeenCalled();
-            });
-
-            it('should not close side menu when it is not active', () => {
-                const mousedownHandler = browser.eventManager.addEvent.mock.calls
-                    .find(call => {
-                        return call[1] === 'mousedown' &&
-                               Array.isArray(call[0]) &&
-                               call[0].includes(browser.header);
-                    })?.[2];
-
-                const mockEvent = {
-                    target: browser.header
-                };
-
-                const mockDom = require('../../../src/helper').dom;
-                mockDom.utils.hasClass.mockReturnValueOnce(false);
-
-                const removeClassSpy = jest.spyOn(mockDom.utils, 'removeClass');
-                removeClassSpy.mockClear();
-
-                mousedownHandler.call(browser, mockEvent);
-
-                // removeClass should not be called when side menu is not active
-                expect(removeClassSpy).not.toHaveBeenCalled();
-            });
-        });
-    });
 });

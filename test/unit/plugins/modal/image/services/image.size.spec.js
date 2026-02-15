@@ -58,6 +58,9 @@ describe('ImageSizeService', () => {
             }
         };
 
+        // Make mockMain act as its own kernel for dependency injection
+        mockMain.$ = mockMain;
+
         // Reset static mocks
         Figure.CalcRatio.mockReset();
         Figure.GetRatio.mockReset();

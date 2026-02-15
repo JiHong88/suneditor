@@ -90,6 +90,9 @@ describe('TableGridService', () => {
             historyPush: jest.fn()
         };
 
+        // Make main act as its own kernel for dependency injection
+        main.$ = main;
+
         const buttons = {
             columnButton: document.createElement('button'),
             rowButton: document.createElement('button'),

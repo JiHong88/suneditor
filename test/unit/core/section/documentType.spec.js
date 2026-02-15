@@ -1,7 +1,9 @@
 import DocumentType from '../../../../src/core/section/documentType';
+import { createMockEditor } from '../../../../test/__mocks__/editorMock.js';
 import { dom } from '../../../../src/helper';
 
 describe('DocumentType', () => {
+    let kernel;
     let editor;
     let fc;
     let documentType;
@@ -16,39 +18,22 @@ describe('DocumentType', () => {
     };
 
     beforeEach(() => {
-        // Mock DOM utils if needed, or rely on jsdom
+        // Use proper mock editor
+        kernel = createMockEditor({
+            '_type_options': ['header', 'page'],
+            'toolbar_width': 'auto',
+            '_rtl': false
+        });
+        editor = kernel;
         domUtils = dom.utils;
 
-        // Mock Editor properties and methods
-        editor = {
-            options: new Map([
-                ['_type_options', ['header', 'page']], // Default to having both for general tests
-                ['toolbar_width', 'auto'],
-                ['_rtl', false]
-            ]),
-            offset: {
-                getGlobal: jest.fn(() => ({ top: 100, left: 0 }))
-            },
-            selection: {
-                setRange: jest.fn(),
-                scrollTo: jest.fn(),
-            },
-            toolbar: {
-                isSticky: false
-            },
-            context: new Map([
-                ['toolbar_main', createElement('div', 'se-toolbar')]
-            ]),
-            plugins: {
-                pageNavigator: null
-            },
-             _preventBlur: false,
-             status: {
-                 isScrollable: jest.fn(() => true)
-             }
-        };
+        // Update options that might be needed
+        kernel.$.options.set('_type_options', ['header', 'page']);
 
-        // Mock FrameContext (Map-like)
+        // Use the frame context from kernel
+        fc = kernel.$.frameContext;
+
+        // Update frame context with document type elements
         const wysiwygFrame = createElement('div', 'se-wysiwyg-frame');
         const wysiwyg = createElement('div', 'se-wysiwyg');
 
@@ -73,20 +58,14 @@ describe('DocumentType', () => {
         documentTypePageMirror.style.paddingTop = '10px';
         documentTypePageMirror.style.paddingBottom = '10px';
 
-        fc = new Map();
         fc.set('wysiwyg', wysiwyg);
         fc.set('wysiwygFrame', wysiwygFrame);
         fc.set('documentTypeInner', documentTypeInner);
         fc.set('documentTypePage', documentTypePage);
         fc.set('documentTypePageMirror', documentTypePageMirror);
 
-        // Mock eventManager
-        editor.eventManager = {
-            addEvent: jest.fn()
-        };
-
         // Initialize Plugin mock
-        editor.plugins.pageNavigator = {
+        kernel.$.plugins.pageNavigator = {
             display: jest.fn()
         };
     });
@@ -665,13 +644,13 @@ describe('DocumentType', () => {
         });
 
         it('should do nothing if frame is scrollable', () => {
-            editor.status.isScrollable.mockReturnValue(true);
+            kernel.$.store.get('isScrollable').mockReturnValue(true);
 
             expect(() => documentType.scrollWindow()).not.toThrow();
         });
 
         it('should update page display if frame is not scrollable', async () => {
-            editor.status.isScrollable.mockReturnValue(false);
+            kernel.$.store.get('isScrollable').mockReturnValue(false);
 
             Object.defineProperty(fc.get('documentTypePageMirror'), 'scrollHeight', { value: 2000, configurable: true });
 
@@ -928,13 +907,13 @@ describe('DocumentType', () => {
         });
 
         it('should return window when not scrollable', () => {
-            editor.status.isScrollable.mockReturnValue(false);
+            kernel.$.store.get('isScrollable').mockReturnValue(false);
             const result = documentType._getDisplayPage();
             expect(result).toBe(window);
         });
 
         it('should return wysiwyg when scrollable', () => {
-            editor.status.isScrollable.mockReturnValue(true);
+            kernel.$.store.get('isScrollable').mockReturnValue(true);
             const result = documentType._getDisplayPage();
             expect(result).toBe(fc.get('wysiwyg'));
         });
@@ -946,7 +925,7 @@ describe('DocumentType', () => {
         });
 
         it('should return scrollTop for scrollable frame', () => {
-            editor.status.isScrollable.mockReturnValue(true);
+            kernel.$.store.get('isScrollable').mockReturnValue(true);
             fc.get('wysiwyg').scrollTop = 100;
 
             const result = documentType._getWWScrollTop();
@@ -954,7 +933,7 @@ describe('DocumentType', () => {
         });
 
         it('should return 0 for zero scroll', () => {
-            editor.status.isScrollable.mockReturnValue(true);
+            kernel.$.store.get('isScrollable').mockReturnValue(true);
             fc.get('wysiwyg').scrollTop = 0;
 
             const result = documentType._getWWScrollTop();

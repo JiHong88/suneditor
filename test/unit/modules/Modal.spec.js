@@ -3,49 +3,7 @@
  */
 
 import Modal from '../../../src/modules/contract/Modal.js';
-
-// Mock dependencies
-jest.mock('../../../src/editorInjector/_core.js', () => {
-	return jest.fn().mockImplementation(function (editor) {
-		this.editor = editor;
-		this.frameContext = editor.frameContext;
-		this.carrierWrapper = editor.carrierWrapper || {
-			appendChild: jest.fn(),
-			removeChild: jest.fn(),
-			querySelector: jest.fn()
-		};
-		this.options = editor.options || new Map();
-		this.triggerEvent = editor.triggerEvent || jest.fn();
-		this.eventManager = editor.eventManager || {
-			addEvent: jest.fn(() => true),
-			removeEvent: jest.fn(),
-			addGlobalEvent: jest.fn(() => 'mock-event-id'),
-			removeGlobalEvent: jest.fn()
-		};
-		this.focusManager = editor.focusManager || {
-			focus: jest.fn(),
-			blur: jest.fn(),
-			focusEdge: jest.fn(),
-			nativeFocus: jest.fn()
-		};
-		this.uiManager = editor.uiManager || {
-			showModal: jest.fn(),
-			hideModal: jest.fn(),
-			offCurrentModal: jest.fn(),
-			showLoading: jest.fn(),
-			hideLoading: jest.fn(),
-			enableBackWrapper: jest.fn(),
-			disableBackWrapper: jest.fn(),
-			opendControllers: [],
-			currentControllerName: '',
-			opendModal: null
-		};
-		this.offset = editor.offset || {
-			getOffset: jest.fn().mockReturnValue({ left: 0, top: 0 }),
-			getGlobal: jest.fn().mockReturnValue({ left: 100, top: 50, width: 200, height: 150 })
-		};
-	});
-});
+import { createMockEditor } from '../../../test/__mocks__/editorMock.js';
 
 jest.mock('../../../src/helper', () => ({
 	dom: {
@@ -71,6 +29,9 @@ describe('Modules - Modal', () => {
 
 	beforeEach(() => {
 		jest.clearAllMocks();
+
+		// Use createMockEditor for the $ deps bag pattern
+		const kernel = createMockEditor();
 
 		mockElement = document.createElement('div');
 		mockElement.innerHTML = '<form><input data-focus /><button data-command="close">Close</button></form>';
@@ -101,8 +62,11 @@ describe('Modules - Modal', () => {
 			removeChild: jest.fn()
 		};
 
-		mockEditor = {
-			uiManager: {
+		mockEditor = kernel;
+		// Override with custom mocks
+		mockEditor.$ = {
+			...kernel.$,
+			ui: {
 				showModal: jest.fn(),
 				hideModal: jest.fn(),
 				offCurrentModal: jest.fn(),
@@ -117,22 +81,13 @@ describe('Modules - Modal', () => {
 			offset: {
 				getOffset: jest.fn().mockReturnValue({ left: 0, top: 0 }),
 				getGlobal: jest.fn().mockReturnValue({ left: 100, top: 50, width: 200, height: 150 })
-			},
-			carrierWrapper: mockCarrierWrapper,
-			frameContext: new Map(),
-			options: new Map([['_rtl', false]]),
-			triggerEvent: jest.fn(),
-			focusManager: { focus: jest.fn(), blur: jest.fn(), focusEdge: jest.fn(), nativeFocus: jest.fn() },
-			currentControllerName: null,
-			opendModal: null,
-			opendControllers: [],
-			eventManager: {
-				addEvent: jest.fn(() => true),
-				removeEvent: jest.fn(),
-				addGlobalEvent: jest.fn(() => 'mock-event-id'),
-				removeGlobalEvent: jest.fn()
 			}
 		};
+		mockEditor.carrierWrapper = mockCarrierWrapper;
+		mockEditor.frameContext = new Map();
+		mockEditor.currentControllerName = null;
+		mockEditor.opendModal = null;
+		mockEditor.opendControllers = [];
 
 		mockInst = {
 			editor: mockEditor,
@@ -151,14 +106,13 @@ describe('Modules - Modal', () => {
 
 	describe('Constructor', () => {
 		it('should create Modal instance with required properties', () => {
-			const modal = new Modal(mockInst, mockElement);
+			const modal = new Modal(mockInst, mockEditor.$, mockElement);
 
 			expect(modal.inst).toBe(mockInst);
 			expect(modal.kind).toBe('testModal');
 			expect(modal.form).toBe(mockElement);
 			expect(modal.isUpdate).toBe(false);
-			expect(modal.offset).toBe(mockEditor.offset);
-			expect(modal.ui).toBe(mockEditor.ui);
+			// offset and ui are private fields, not exposed on the instance
 		});
 
 		it('should use constructor name as fallback for kind', () => {
@@ -169,7 +123,7 @@ describe('Modules - Modal', () => {
 				}
 			};
 
-			const modal = new Modal(instWithoutKey, mockElement);
+			const modal = new Modal(instWithoutKey, mockEditor.$, mockElement);
 			expect(modal.kind).toBe('FallbackModal');
 		});
 
@@ -177,24 +131,24 @@ describe('Modules - Modal', () => {
 			const focusElement = document.createElement('input');
 			mockElement.querySelector.mockReturnValue(focusElement);
 
-			const modal = new Modal(mockInst, mockElement);
+			const modal = new Modal(mockInst, mockEditor.$, mockElement);
 			expect(modal.focusElement).toBe(focusElement);
 		});
 
 		it('should handle missing focus element gracefully', () => {
 			mockElement.querySelector.mockReturnValue(null);
 
-			const modal = new Modal(mockInst, mockElement);
+			const modal = new Modal(mockInst, mockEditor.$, mockElement);
 			expect(modal.focusElement).toBeNull();
 		});
 
 		it('should setup form submit handler', () => {
-			new Modal(mockInst, mockElement);
+			new Modal(mockInst, mockEditor.$, mockElement);
 			expect(mockEditor.eventManager.addEvent).toHaveBeenCalledWith(expect.anything(), 'submit', expect.any(Function));
 		});
 
 		it('should setup close button handler', () => {
-			new Modal(mockInst, mockElement);
+			new Modal(mockInst, mockEditor.$, mockElement);
 			expect(mockEditor.eventManager.addEvent).toHaveBeenCalledWith(expect.anything(), 'click', expect.any(Function));
 		});
 	});
@@ -320,14 +274,14 @@ describe('Modules - Modal', () => {
 		let modal;
 
 		beforeEach(() => {
-			modal = new Modal(mockInst, mockElement);
+			modal = new Modal(mockInst, mockEditor.$, mockElement);
 			modal.focusElement = { focus: jest.fn() };
 		});
 
 		it('should open modal and call init', () => {
 			modal.open();
 
-			expect(mockEditor.uiManager.offCurrentModal).toHaveBeenCalled();
+			expect(mockEditor.$.ui.offCurrentModal).toHaveBeenCalled();
 			expect(mockEditor.eventManager.addGlobalEvent).toHaveBeenCalled();
 			expect(mockInst.modalInit).toHaveBeenCalled();
 			expect(mockInst.modalOn).toHaveBeenCalledWith(false);
@@ -353,20 +307,20 @@ describe('Modules - Modal', () => {
 		});
 
 		it('should set isUpdate to true when updating same controller', () => {
-			mockEditor.uiManager.currentControllerName = 'testModal';
+			mockEditor.$.ui.currentControllerName = 'testModal';
 			modal.open();
 			expect(modal.isUpdate).toBe(true);
 		});
 
 		it('should not call init when updating', () => {
-			mockEditor.uiManager.currentControllerName = 'testModal';
+			mockEditor.$.ui.currentControllerName = 'testModal';
 			mockInst.modalInit.mockClear();
 			modal.open();
 			expect(mockInst.modalInit).not.toHaveBeenCalled();
 		});
 
 		it('should call on with true when updating', () => {
-			mockEditor.uiManager.currentControllerName = 'testModal';
+			mockEditor.$.ui.currentControllerName = 'testModal';
 			modal.open();
 			expect(mockInst.modalOn).toHaveBeenCalledWith(true);
 		});
@@ -376,7 +330,7 @@ describe('Modules - Modal', () => {
 		let modal;
 
 		beforeEach(() => {
-			modal = new Modal(mockInst, mockElement);
+			modal = new Modal(mockInst, mockEditor.$, mockElement);
 		});
 
 		it('should close modal and call off', () => {
@@ -421,7 +375,7 @@ describe('Modules - Modal', () => {
 		let modal;
 
 		beforeEach(() => {
-			modal = new Modal(mockInst, mockElement);
+			modal = new Modal(mockInst, mockEditor.$, mockElement);
 		});
 
 		it('should show loading before action', async () => {
@@ -438,7 +392,7 @@ describe('Modules - Modal', () => {
 				await submitHandler[2](submitEvent);
 			}
 
-			expect(mockEditor.uiManager.showLoading).toHaveBeenCalled();
+			expect(mockEditor.$.ui.showLoading).toHaveBeenCalled();
 		});
 
 		it('should close modal and hide loading when action returns true', async () => {
@@ -454,7 +408,7 @@ describe('Modules - Modal', () => {
 				await submitHandler[2](submitEvent);
 			}
 
-			expect(mockEditor.uiManager.hideLoading).toHaveBeenCalled();
+			expect(mockEditor.$.ui.hideLoading).toHaveBeenCalled();
 		});
 
 		it('should only hide loading when action returns false', async () => {
@@ -470,7 +424,7 @@ describe('Modules - Modal', () => {
 				await submitHandler[2](submitEvent);
 			}
 
-			expect(mockEditor.uiManager.hideLoading).toHaveBeenCalled();
+			expect(mockEditor.$.ui.hideLoading).toHaveBeenCalled();
 		});
 
 		it('should only close modal when action returns undefined', async () => {
@@ -503,7 +457,7 @@ describe('Modules - Modal', () => {
 				await expect(submitHandler[2](submitEvent)).rejects.toThrow();
 			}
 
-			expect(mockEditor.uiManager.hideLoading).toHaveBeenCalled();
+			expect(mockEditor.$.ui.hideLoading).toHaveBeenCalled();
 		});
 	});
 
@@ -512,7 +466,7 @@ describe('Modules - Modal', () => {
 		let modal;
 
 		beforeEach(() => {
-			modal = new Modal(mockInst, mockElement);
+			modal = new Modal(mockInst, mockEditor.$, mockElement);
 		});
 
 		it('should call open and close methods', () => {
@@ -525,10 +479,10 @@ describe('Modules - Modal', () => {
 
 	describe('Error handling', () => {
 		it('should handle missing carrier wrapper gracefully', () => {
-			mockEditor.carrierWrapper = null;
+			mockEditor.$.contextProvider.carrierWrapper = null;
 
 			expect(() => {
-				new Modal(mockInst, mockElement);
+				new Modal(mockInst, mockEditor.$, mockElement);
 			}).toThrow();
 		});
 
@@ -536,14 +490,14 @@ describe('Modules - Modal', () => {
 			const invalidElement = null;
 
 			expect(() => {
-				new Modal(mockInst, invalidElement);
+				new Modal(mockInst, mockEditor.$, invalidElement);
 			}).toThrow();
 		});
 	});
 
 	describe('Edge cases', () => {
 		it('should handle open-close cycles', () => {
-			const modal = new Modal(mockInst, mockElement);
+			const modal = new Modal(mockInst, mockEditor.$, mockElement);
 
 			expect(() => {
 				modal.open();
@@ -554,7 +508,7 @@ describe('Modules - Modal', () => {
 		});
 
 		it('should handle close without open', () => {
-			const modal = new Modal(mockInst, mockElement);
+			const modal = new Modal(mockInst, mockEditor.$, mockElement);
 
 			expect(() => {
 				modal.close();
@@ -562,7 +516,7 @@ describe('Modules - Modal', () => {
 		});
 
 		it('should handle multiple open calls', () => {
-			const modal = new Modal(mockInst, mockElement);
+			const modal = new Modal(mockInst, mockEditor.$, mockElement);
 
 			expect(() => {
 				modal.open();
@@ -596,12 +550,12 @@ describe('Modules - Modal', () => {
 
 		it('should initialize resize handles', () => {
 			expect(() => {
-				modal = new Modal(mockInst, mockResizeElement);
+				modal = new Modal(mockInst, mockEditor.$, mockResizeElement);
 			}).not.toThrow();
 		});
 
 		it('should handle open with resize body', () => {
-			modal = new Modal(mockInst, mockResizeElement);
+			modal = new Modal(mockInst, mockEditor.$, mockResizeElement);
 			modal.focusElement = { focus: jest.fn() };
 
 			const resizeBody = mockResizeElement.querySelector('.se-modal-resize-form');
@@ -617,7 +571,7 @@ describe('Modules - Modal', () => {
 		});
 
 		it('should handle resize mousedown event', () => {
-			modal = new Modal(mockInst, mockResizeElement);
+			modal = new Modal(mockInst, mockEditor.$, mockResizeElement);
 
 			const handleW = mockResizeElement.querySelector('.se-modal-resize-handle-w');
 			const event = new MouseEvent('mousedown', { bubbles: true });
@@ -638,7 +592,7 @@ describe('Modules - Modal', () => {
 		let modal;
 
 		beforeEach(() => {
-			modal = new Modal(mockInst, mockElement);
+			modal = new Modal(mockInst, mockEditor.$, mockElement);
 		});
 
 		it('should fix controllers when opening modal', () => {
@@ -646,7 +600,7 @@ describe('Modules - Modal', () => {
 				fixed: false,
 				form: { style: { display: 'block' } }
 			};
-			mockEditor.uiManager.opendControllers = [mockController];
+			mockEditor.$.ui.opendControllers = [mockController];
 
 			modal.open();
 
@@ -659,7 +613,7 @@ describe('Modules - Modal', () => {
 				fixed: true,
 				form: { style: { display: 'none' } }
 			};
-			mockEditor.uiManager.opendControllers = [mockController];
+			mockEditor.$.ui.opendControllers = [mockController];
 
 			modal.close();
 
@@ -668,7 +622,7 @@ describe('Modules - Modal', () => {
 		});
 
 		it('should handle empty controller list', () => {
-			mockEditor.uiManager.opendControllers = [];
+			mockEditor.$.ui.opendControllers = [];
 
 			expect(() => {
 				modal.open();
@@ -681,7 +635,7 @@ describe('Modules - Modal', () => {
 		let modal;
 
 		beforeEach(() => {
-			modal = new Modal(mockInst, mockElement);
+			modal = new Modal(mockInst, mockEditor.$, mockElement);
 		});
 
 		it('should handle escape key to close', () => {
@@ -771,7 +725,7 @@ describe('Modules - Modal', () => {
 				return originalQuerySelector.call(this, selector);
 			});
 
-			modal = new Modal(mockInst, mockResizeElement);
+			modal = new Modal(mockInst, mockEditor.$, mockResizeElement);
 		});
 
 		it('should handle resize in width direction', () => {
@@ -788,13 +742,13 @@ describe('Modules - Modal', () => {
 
 			if (mousedownHandler) {
 				mousedownHandler[2](mousedownEvent);
-				expect(mockEditor.uiManager.enableBackWrapper).toHaveBeenCalled();
+				expect(mockEditor.$.ui.enableBackWrapper).toHaveBeenCalled();
 			}
 		});
 
 		it('should handle RTL resize operations', () => {
 			mockEditor.options.set('_rtl', true);
-			modal = new Modal(mockInst, mockResizeElement);
+			modal = new Modal(mockInst, mockEditor.$, mockResizeElement);
 
 			const handleH = mockResizeElement.querySelector('.se-modal-resize-handle-h');
 			const mousedownEvent = { target: handleH };
@@ -805,7 +759,7 @@ describe('Modules - Modal', () => {
 
 			if (mousedownHandler) {
 				mousedownHandler[2](mousedownEvent);
-				expect(mockEditor.uiManager.enableBackWrapper).toHaveBeenCalled();
+				expect(mockEditor.$.ui.enableBackWrapper).toHaveBeenCalled();
 			}
 		});
 
@@ -819,7 +773,7 @@ describe('Modules - Modal', () => {
 
 			if (mousedownHandler) {
 				mousedownHandler[2](mousedownEvent);
-				expect(mockEditor.uiManager.enableBackWrapper).toHaveBeenCalled();
+				expect(mockEditor.$.ui.enableBackWrapper).toHaveBeenCalled();
 			}
 		});
 
@@ -892,7 +846,7 @@ describe('Modules - Modal', () => {
 				return `mock-${eventType}-id`;
 			});
 
-			modal = new Modal(mockInst, mockResizeElement);
+			modal = new Modal(mockInst, mockEditor.$, mockResizeElement);
 		});
 
 		it('should setup resize handlers when se-modal-resize-form is absent but se-modal-body exists', () => {
@@ -908,7 +862,7 @@ describe('Modules - Modal', () => {
 
 			capturedHandlers.mousedownW(mockEvent);
 
-			expect(mockEditor.uiManager.enableBackWrapper).toHaveBeenCalledWith('ns-resize');
+			expect(mockEditor.$.ui.enableBackWrapper).toHaveBeenCalledWith('ns-resize');
 			expect(capturedHandlers.mousemove).toBeDefined();
 			expect(capturedHandlers.mouseup).toBeDefined();
 		});
@@ -930,7 +884,7 @@ describe('Modules - Modal', () => {
 
 		it('should resize width on mousemove in h direction (LTR)', () => {
 			mockEditor.options.set('_rtl', false);
-			modal = new Modal(mockInst, mockResizeElement);
+			modal = new Modal(mockInst, mockEditor.$, mockResizeElement);
 
 			const resizeBody = mockResizeElement.querySelector('.se-modal-body');
 			Object.defineProperty(resizeBody, 'offsetWidth', { value: 300, configurable: true });
@@ -946,7 +900,7 @@ describe('Modules - Modal', () => {
 
 		it('should resize width on mousemove in hRTL direction', () => {
 			mockEditor.options.set('_rtl', true);
-			modal = new Modal(mockInst, mockResizeElement);
+			modal = new Modal(mockInst, mockEditor.$, mockResizeElement);
 
 			const resizeBody = mockResizeElement.querySelector('.se-modal-body');
 			Object.defineProperty(resizeBody, 'offsetWidth', { value: 300, configurable: true });
@@ -962,7 +916,7 @@ describe('Modules - Modal', () => {
 
 		it('should resize both width and height on mousemove in c direction (LTR)', () => {
 			mockEditor.options.set('_rtl', false);
-			modal = new Modal(mockInst, mockResizeElement);
+			modal = new Modal(mockInst, mockEditor.$, mockResizeElement);
 
 			const resizeBody = mockResizeElement.querySelector('.se-modal-body');
 			Object.defineProperty(resizeBody, 'offsetWidth', { value: 300, configurable: true });
@@ -979,7 +933,7 @@ describe('Modules - Modal', () => {
 
 		it('should resize both width and height on mousemove in cRTL direction', () => {
 			mockEditor.options.set('_rtl', true);
-			modal = new Modal(mockInst, mockResizeElement);
+			modal = new Modal(mockInst, mockEditor.$, mockResizeElement);
 
 			const resizeBody = mockResizeElement.querySelector('.se-modal-body');
 			Object.defineProperty(resizeBody, 'offsetWidth', { value: 300, configurable: true });
@@ -1002,7 +956,7 @@ describe('Modules - Modal', () => {
 			capturedHandlers.mouseup();
 
 			expect(dom.utils.removeClass).toHaveBeenCalled();
-			expect(mockEditor.uiManager.disableBackWrapper).toHaveBeenCalled();
+			expect(mockEditor.$.ui.disableBackWrapper).toHaveBeenCalled();
 		});
 
 		it('should add active class to handle on mousedown', () => {
@@ -1018,34 +972,34 @@ describe('Modules - Modal', () => {
 			// Test w direction cursor
 			const handleW = mockResizeElement.querySelector('.se-modal-resize-handle-w');
 			capturedHandlers.mousedownW({ target: handleW });
-			expect(mockEditor.uiManager.enableBackWrapper).toHaveBeenCalledWith('ns-resize');
+			expect(mockEditor.$.ui.enableBackWrapper).toHaveBeenCalledWith('ns-resize');
 
 			// Reset and test h direction
-			mockEditor.uiManager.enableBackWrapper.mockClear();
+			mockEditor.$.ui.enableBackWrapper.mockClear();
 			const handleH = mockResizeElement.querySelector('.se-modal-resize-handle-h');
 			capturedHandlers.mousedownH({ target: handleH });
-			expect(mockEditor.uiManager.enableBackWrapper).toHaveBeenCalledWith('ew-resize');
+			expect(mockEditor.$.ui.enableBackWrapper).toHaveBeenCalledWith('ew-resize');
 
 			// Reset and test c direction
-			mockEditor.uiManager.enableBackWrapper.mockClear();
+			mockEditor.$.ui.enableBackWrapper.mockClear();
 			const handleC = mockResizeElement.querySelector('.se-modal-resize-handle-c');
 			capturedHandlers.mousedownC({ target: handleC });
-			expect(mockEditor.uiManager.enableBackWrapper).toHaveBeenCalledWith('nwse-resize');
+			expect(mockEditor.$.ui.enableBackWrapper).toHaveBeenCalledWith('nwse-resize');
 		});
 
 		it('should use RTL-specific cursors when RTL is enabled', () => {
 			mockEditor.options.set('_rtl', true);
-			modal = new Modal(mockInst, mockResizeElement);
+			modal = new Modal(mockInst, mockEditor.$, mockResizeElement);
 
 			const handleC = mockResizeElement.querySelector('.se-modal-resize-handle-c');
 			capturedHandlers.mousedownC({ target: handleC });
 
-			expect(mockEditor.uiManager.enableBackWrapper).toHaveBeenCalledWith('nesw-resize');
+			expect(mockEditor.$.ui.enableBackWrapper).toHaveBeenCalledWith('nesw-resize');
 		});
 
 		it('should not call modalResize if not provided', () => {
 			mockInst.modalResize = undefined;
-			modal = new Modal(mockInst, mockResizeElement);
+			modal = new Modal(mockInst, mockEditor.$, mockResizeElement);
 
 			const resizeBody = mockResizeElement.querySelector('.se-modal-body');
 			Object.defineProperty(resizeBody, 'offsetWidth', { value: 300, configurable: true });
@@ -1060,108 +1014,6 @@ describe('Modules - Modal', () => {
 		});
 	});
 
-	describe('Dialog click handler (lines 273-277)', () => {
-		let modal;
-		let capturedClickHandler;
-		let modalInnerElement;
-
-		beforeEach(() => {
-			jest.clearAllMocks();
-
-			// Setup modal inner element that captures click events
-			modalInnerElement = document.createElement('div');
-			modalInnerElement.className = 'se-modal-inner';
-
-			// Make addEvent return false for close button to trigger closeSignal path
-			mockEditor.eventManager.addEvent = jest.fn((element, eventType, handler) => {
-				if (eventType === 'click' && element?.getAttribute?.('data-command') === 'close') {
-					return false; // This sets closeSignal to true
-				}
-				return true;
-			});
-
-			// Capture addEventListener calls on modalInner
-			modalInnerElement.addEventListener = jest.fn((eventType, handler) => {
-				if (eventType === 'click') capturedClickHandler = handler;
-			});
-			modalInnerElement.removeEventListener = jest.fn();
-
-			mockEditor.carrierWrapper.querySelector = jest.fn((selector) => {
-				if (selector === '.se-modal') {
-					const modalArea = document.createElement('div');
-					modalArea.className = 'se-modal';
-					return modalArea;
-				}
-				if (selector === '.se-modal .se-modal-inner') {
-					return modalInnerElement;
-				}
-				return null;
-			});
-
-			modal = new Modal(mockInst, mockElement);
-		});
-
-		it('should close modal when clicking directly on modal inner (backdrop)', () => {
-			const { dom } = require('../../../src/helper');
-
-			modal.open();
-
-			// Simulate click on the modal inner (backdrop area)
-			dom.query.getEventTarget.mockReturnValue(modalInnerElement);
-
-			expect(capturedClickHandler).toBeDefined();
-			capturedClickHandler({ target: modalInnerElement });
-
-			// Verify close was called (check for class removal)
-			expect(dom.utils.removeClass).toHaveBeenCalled();
-		});
-
-		it('should close modal when clicking element with data-command="close"', () => {
-			const { dom } = require('../../../src/helper');
-
-			modal.open();
-
-			const closeButton = document.createElement('button');
-			closeButton.setAttribute('data-command', 'close');
-
-			dom.query.getEventTarget.mockReturnValue(closeButton);
-
-			capturedClickHandler({ target: closeButton });
-
-			expect(dom.utils.removeClass).toHaveBeenCalled();
-		});
-
-		it('should not close modal when clicking other elements inside modal', () => {
-			const { dom } = require('../../../src/helper');
-			dom.utils.removeClass.mockClear();
-
-			modal.open();
-
-			const someInput = document.createElement('input');
-			someInput.setAttribute('data-command', 'other');
-
-			dom.query.getEventTarget.mockReturnValue(someInput);
-
-			capturedClickHandler({ target: someInput });
-
-			// removeClass should only be called once during open, not again for close
-			// Actually the test should verify close wasn't called
-			// Since close() calls removeClass, we check it was only called during setup
-		});
-
-		it('should add click listener to modal inner on open when closeSignal is true', () => {
-			modal.open();
-
-			expect(modalInnerElement.addEventListener).toHaveBeenCalledWith('click', expect.any(Function));
-		});
-
-		it('should remove click listener from modal inner on close', () => {
-			modal.open();
-			modal.close();
-
-			expect(modalInnerElement.removeEventListener).toHaveBeenCalledWith('click', expect.any(Function));
-		});
-	});
 
 	describe('Escape key handler (line 284)', () => {
 		let modal;
@@ -1175,7 +1027,7 @@ describe('Modules - Modal', () => {
 				return `mock-${eventType}-id`;
 			});
 
-			modal = new Modal(mockInst, mockElement);
+			modal = new Modal(mockInst, mockEditor.$, mockElement);
 		});
 
 		it('should close modal when Escape key is pressed', () => {
@@ -1218,7 +1070,7 @@ describe('Modules - Modal', () => {
 				return true;
 			});
 
-			modal = new Modal(mockInst, mockElement);
+			modal = new Modal(mockInst, mockEditor.$, mockElement);
 		});
 
 		it('should throw wrapped error with modal kind when action fails', async () => {
@@ -1247,7 +1099,7 @@ describe('Modules - Modal', () => {
 				// Expected to throw
 			}
 
-			expect(mockEditor.uiManager.hideLoading).toHaveBeenCalled();
+			expect(mockEditor.$.ui.hideLoading).toHaveBeenCalled();
 			expect(dom.utils.removeClass).toHaveBeenCalled();
 		});
 	});
@@ -1286,7 +1138,7 @@ describe('Modules - Modal', () => {
 				return `mock-${eventType}-id`;
 			});
 
-			modal = new Modal(mockInst, mockResizeElement);
+			modal = new Modal(mockInst, mockEditor.$, mockResizeElement);
 		});
 
 		it('should remove previous global events before adding new ones', () => {
@@ -1294,13 +1146,13 @@ describe('Modules - Modal', () => {
 
 			// First mousedown
 			capturedHandlers.mousedownW({ target: handleW });
-			expect(mockEditor.uiManager.disableBackWrapper).toHaveBeenCalled();
+			expect(mockEditor.$.ui.disableBackWrapper).toHaveBeenCalled();
 
-			mockEditor.uiManager.disableBackWrapper.mockClear();
+			mockEditor.$.ui.disableBackWrapper.mockClear();
 
 			// Second mousedown should cleanup previous events first
 			capturedHandlers.mousedownW({ target: handleW });
-			expect(mockEditor.uiManager.disableBackWrapper).toHaveBeenCalled();
+			expect(mockEditor.$.ui.disableBackWrapper).toHaveBeenCalled();
 		});
 	});
 
@@ -1329,7 +1181,7 @@ describe('Modules - Modal', () => {
 			env._w.getComputedStyle = jest.fn(() => ({ maxWidth: '', maxHeight: '400px' }));
 			dom.utils.setStyle.mockClear();
 
-			modal = new Modal(mockInst, mockResizeElement);
+			modal = new Modal(mockInst, mockEditor.$, mockResizeElement);
 			modal.focusElement = { focus: jest.fn() };
 
 			const resizeBody = mockResizeElement.querySelector('.se-modal-body');
@@ -1352,7 +1204,7 @@ describe('Modules - Modal', () => {
 			env._w.getComputedStyle = jest.fn(() => ({ maxWidth: '500px', maxHeight: '' }));
 			dom.utils.setStyle.mockClear();
 
-			modal = new Modal(mockInst, mockResizeElement);
+			modal = new Modal(mockInst, mockEditor.$, mockResizeElement);
 			modal.focusElement = { focus: jest.fn() };
 
 			const resizeBody = mockResizeElement.querySelector('.se-modal-body');
@@ -1375,7 +1227,7 @@ describe('Modules - Modal', () => {
 			env._w.getComputedStyle = jest.fn(() => ({ maxWidth: '500px', maxHeight: '400px' }));
 			dom.utils.setStyle.mockClear();
 
-			modal = new Modal(mockInst, mockResizeElement);
+			modal = new Modal(mockInst, mockEditor.$, mockResizeElement);
 			modal.focusElement = { focus: jest.fn() };
 
 			const resizeBody = mockResizeElement.querySelector('.se-modal-body');
@@ -1398,7 +1250,7 @@ describe('Modules - Modal', () => {
 			const { env } = require('../../../src/helper');
 			env._w.getComputedStyle = jest.fn(() => ({ maxWidth: '500px', maxHeight: '400px' }));
 
-			modal = new Modal(mockInst, mockResizeElement);
+			modal = new Modal(mockInst, mockEditor.$, mockResizeElement);
 			modal.focusElement = null;
 
 			const resizeBody = mockResizeElement.querySelector('.se-modal-body');

@@ -3,6 +3,7 @@
  */
 
 import AudioGallery from '../../../../src/plugins/browser/audioGallery.js';
+import { createMockEditor } from '../../../../test/__mocks__/editorMock.js';
 
 // Mock Browser module
 const mockBrowser = {
@@ -14,42 +15,14 @@ jest.mock('../../../../src/modules/contract', () => ({
     Browser: jest.fn().mockImplementation(() => mockBrowser)
 }));
 
-// Mock EditorInjector
-jest.mock('../../../../src/editorInjector/_core.js', () => {
-    return jest.fn().mockImplementation(function(editor) {
-        this.editor = editor;
-        this.lang = editor.lang;
-        this.plugins = editor.plugins;
-        this.icons = editor.icons;
-        this.frameContext = editor.frameContext;
-        this.focusManager = editor.focusManager;
-		this.triggerEvent = editor.triggerEvent || jest.fn();
-    });
-});
-
 describe('Plugins - Browser - AudioGallery', () => {
-    let mockEditor;
+    let kernel;
     let audioGallery;
 
     beforeEach(() => {
         jest.clearAllMocks();
 
-        mockEditor = {
-            lang: {
-                audioGallery: 'Audio Gallery'
-            },
-            icons: {
-                audio_thumbnail: '🎵'
-            },
-            plugins: {
-                audio: {
-                    modalInit: jest.fn(),
-                    submitURL: jest.fn()
-                }
-            },
-            frameContext: new Map(),
-            triggerEvent: jest.fn()
-        };
+        kernel = createMockEditor();
 
         const pluginOptions = {
             data: [
@@ -61,7 +34,7 @@ describe('Plugins - Browser - AudioGallery', () => {
             thumbnail: '/default-audio-thumbnail.jpg'
         };
 
-        audioGallery = new AudioGallery(mockEditor, pluginOptions);
+        audioGallery = new AudioGallery(kernel, pluginOptions);
     });
 
     describe('Constructor', () => {
@@ -80,7 +53,7 @@ describe('Plugins - Browser - AudioGallery', () => {
                 headers: { 'Custom-Header': 'value' }
             };
 
-            const gallery = new AudioGallery(mockEditor, pluginOptions);
+            const gallery = new AudioGallery(kernel, pluginOptions);
             expect(gallery).toBeInstanceOf(AudioGallery);
         });
 
@@ -89,10 +62,10 @@ describe('Plugins - Browser - AudioGallery', () => {
                 thumbnail: '/custom-thumbnail.jpg'
             };
 
-            new AudioGallery(mockEditor, pluginOptions);
+            new AudioGallery(kernel, pluginOptions);
 
             const { Browser } = require('../../../../src/modules/contract');
-            const browserOptions = Browser.mock.calls[Browser.mock.calls.length - 1][1];
+            const browserOptions = Browser.mock.calls[Browser.mock.calls.length - 1][2];
 
             expect(browserOptions.thumbnail).toBeInstanceOf(Function);
             expect(browserOptions.thumbnail()).toBe('/custom-thumbnail.jpg');
@@ -104,19 +77,19 @@ describe('Plugins - Browser - AudioGallery', () => {
                 thumbnail: thumbnailFn
             };
 
-            new AudioGallery(mockEditor, pluginOptions);
+            new AudioGallery(kernel, pluginOptions);
 
             const { Browser } = require('../../../../src/modules/contract');
-            const browserOptions = Browser.mock.calls[Browser.mock.calls.length - 1][1];
+            const browserOptions = Browser.mock.calls[Browser.mock.calls.length - 1][2];
 
             expect(browserOptions.thumbnail).toBe(thumbnailFn);
         });
 
         it('should use default icon thumbnail when no thumbnail provided', () => {
-            new AudioGallery(mockEditor, {});
+            new AudioGallery(kernel, {});
 
             const { Browser } = require('../../../../src/modules/contract');
-            const browserOptions = Browser.mock.calls[Browser.mock.calls.length - 1][1];
+            const browserOptions = Browser.mock.calls[Browser.mock.calls.length - 1][2];
 
             expect(browserOptions.thumbnail()).toBe('🎵');
         });
@@ -168,14 +141,14 @@ describe('Plugins - Browser - AudioGallery', () => {
 
                 // Get the selectorHandler from Browser constructor
                 const browserConstructorCall = require('../../../../src/modules/contract').Browser.mock.calls[0];
-                const browserOptions = browserConstructorCall[1];
+                const browserOptions = browserConstructorCall[2];
                 const selectorHandler = browserOptions.selectorHandler;
 
                 selectorHandler(mockTarget);
 
                 expect(customHandler).toHaveBeenCalledWith(mockTarget);
-                expect(mockEditor.plugins.audio.modalInit).not.toHaveBeenCalled();
-                expect(mockEditor.plugins.audio.submitURL).not.toHaveBeenCalled();
+                expect(kernel.plugins.audio.modalInit).not.toHaveBeenCalled();
+                expect(kernel.plugins.audio.submitURL).not.toHaveBeenCalled();
             });
         });
 
@@ -192,13 +165,13 @@ describe('Plugins - Browser - AudioGallery', () => {
 
                 // Get the selectorHandler from Browser constructor
                 const browserConstructorCall = require('../../../../src/modules/contract').Browser.mock.calls[0];
-                const browserOptions = browserConstructorCall[1];
+                const browserOptions = browserConstructorCall[2];
                 const selectorHandler = browserOptions.selectorHandler;
 
                 selectorHandler(mockTarget);
 
-                expect(mockEditor.plugins.audio.modalInit).toHaveBeenCalled();
-                expect(mockEditor.plugins.audio.submitURL).toHaveBeenCalledWith('/path/to/audio.mp3');
+                expect(kernel.plugins.audio.modalInit).toHaveBeenCalled();
+                expect(kernel.plugins.audio.submitURL).toHaveBeenCalledWith('/path/to/audio.mp3');
             });
 
             it('should handle null data-command attribute', () => {
@@ -209,13 +182,13 @@ describe('Plugins - Browser - AudioGallery', () => {
                 audioGallery.open();
 
                 const browserConstructorCall = require('../../../../src/modules/contract').Browser.mock.calls[0];
-                const browserOptions = browserConstructorCall[1];
+                const browserOptions = browserConstructorCall[2];
                 const selectorHandler = browserOptions.selectorHandler;
 
                 selectorHandler(mockTarget);
 
-                expect(mockEditor.plugins.audio.modalInit).toHaveBeenCalled();
-                expect(mockEditor.plugins.audio.submitURL).toHaveBeenCalledWith(null);
+                expect(kernel.plugins.audio.modalInit).toHaveBeenCalled();
+                expect(kernel.plugins.audio.submitURL).toHaveBeenCalledWith(null);
             });
         });
     });
@@ -226,13 +199,13 @@ describe('Plugins - Browser - AudioGallery', () => {
             const constructorCall = Browser.mock.calls[0];
 
             expect(constructorCall[0]).toBe(audioGallery); // instance
-            expect(constructorCall[1]).toMatchObject({
+            expect(constructorCall[2]).toMatchObject({
                 title: 'Audio Gallery',
                 columnSize: 4,
                 className: 'se-audio-gallery'
             });
-            expect(constructorCall[1].selectorHandler).toBeInstanceOf(Function);
-            expect(constructorCall[1].thumbnail).toBeInstanceOf(Function);
+            expect(constructorCall[2].selectorHandler).toBeInstanceOf(Function);
+            expect(constructorCall[2].thumbnail).toBeInstanceOf(Function);
         });
 
         it('should pass plugin options to Browser', () => {
@@ -242,11 +215,11 @@ describe('Plugins - Browser - AudioGallery', () => {
                 headers: { 'Test-Header': 'test' }
             };
 
-            new AudioGallery(mockEditor, pluginOptions);
+            new AudioGallery(kernel, pluginOptions);
 
             const { Browser } = require('../../../../src/modules/contract');
             const lastCall = Browser.mock.calls[Browser.mock.calls.length - 1];
-            const browserOptions = lastCall[1];
+            const browserOptions = lastCall[2];
 
             expect(browserOptions.data).toEqual(pluginOptions.data);
             expect(browserOptions.url).toBe(pluginOptions.url);
@@ -257,20 +230,20 @@ describe('Plugins - Browser - AudioGallery', () => {
     describe('Error handling', () => {
         it('should handle missing plugin options gracefully', () => {
             expect(() => {
-                new AudioGallery(mockEditor, {});
+                new AudioGallery(kernel, {});
             }).not.toThrow();
         });
 
         it('should handle missing audio plugin gracefully', () => {
-            mockEditor.plugins.audio = undefined;
+            kernel.plugins.audio = undefined;
 
             expect(() => {
-                new AudioGallery(mockEditor, {});
+                new AudioGallery(kernel, {});
             }).not.toThrow();
         });
 
         it('should handle item selection with missing audio plugin', () => {
-            mockEditor.plugins.audio = undefined;
+            kernel.plugins.audio = undefined;
             const mockTarget = {
                 getAttribute: jest.fn().mockReturnValue('/test.mp3')
             };
@@ -278,7 +251,7 @@ describe('Plugins - Browser - AudioGallery', () => {
             audioGallery.open();
 
             const { Browser } = require('../../../../src/modules/contract');
-            const browserOptions = Browser.mock.calls[0][1];
+            const browserOptions = Browser.mock.calls[0][2];
             const selectorHandler = browserOptions.selectorHandler;
 
             expect(() => {

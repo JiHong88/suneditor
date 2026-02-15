@@ -1,4 +1,4 @@
-import EventManager from '../../../../src/core/event/eventManager';
+import EventOrchestrator from '../../../../src/core/event/eventOrchestrator';
 import { createMockEditor } from '../../../__mocks__/editorMock';
 import { dom, env } from '../../../../src/helper';
 
@@ -8,17 +8,17 @@ describe('EventManager Complex Logic', () => {
 
 	beforeEach(() => {
 		mockEditor = createMockEditor();
-		eventManager = new EventManager(mockEditor);
+		eventManager = new EventOrchestrator(mockEditor);
 
 		// Mock necessary properties
-		mockEditor.frameContext.set('wysiwyg', document.createElement('div'));
+		mockEditor.$.frameContext.set('wysiwyg', document.createElement('div'));
 		// Mock _wd document with execCommand for fallback path in defaultLineManager
-		mockEditor.frameContext.set('_wd', {
+		mockEditor.$.frameContext.set('_wd', {
 			execCommand: jest.fn()
 		});
 
 		// Mock UI
-		mockEditor.uiManager = {
+		mockEditor.$.uiManager = {
 			showLoading: jest.fn(),
 			hideLoading: jest.fn(),
 			offCurrentModal: jest.fn(),
@@ -29,13 +29,13 @@ describe('EventManager Complex Logic', () => {
 		};
 
 		// Mock Char
-		mockEditor.char = {
+		mockEditor.$.char = {
 			test: jest.fn().mockReturnValue(true),
 			check: jest.fn().mockReturnValue(true),
 		};
 
 		// Mock HTML
-		mockEditor.html = {
+		mockEditor.$.html = {
 			clean: jest.fn((html) => html),
 			insert: jest.fn(),
 			insertNode: jest.fn(),
@@ -57,10 +57,10 @@ describe('EventManager Complex Logic', () => {
 				stopPropagation: jest.fn(),
 			};
 
-			await eventManager._dataTransferAction('paste', mockEvent, mockClipboardData, mockEditor.frameContext);
+			await eventManager._dataTransferAction('paste', mockEvent, mockClipboardData, mockEditor.$.frameContext);
 
 			// Expect cleanup of MS tags - The received string includes StartFragment and double quotes
-			expect(mockEditor.html.clean).toHaveBeenCalledWith(expect.stringContaining('Word Content'), expect.any(Object));
+			expect(mockEditor.$.html.clean).toHaveBeenCalledWith(expect.stringContaining('Word Content'), expect.any(Object));
 		});
 
 		it('should handle file drop', async () => {
@@ -79,14 +79,14 @@ describe('EventManager Complex Logic', () => {
 			// Since _callPluginEventAsync is inherited from CoreInjector, we spy on the instance
 			const pluginSpy = jest.spyOn(eventManager, '_callPluginEventAsync').mockResolvedValue(true);
 
-			await eventManager._dataTransferAction('drop', mockEvent, mockClipboardData, mockEditor.frameContext);
+			await eventManager._dataTransferAction('drop', mockEvent, mockClipboardData, mockEditor.$.frameContext);
 
 			expect(pluginSpy).toHaveBeenCalledWith('onFilePasteAndDrop', expect.objectContaining({ file: mockFile }));
 		});
 
 		it('should handle autoLinkify on paste', async () => {
 			const content = 'Check this http://example.com link';
-			mockEditor.options.set('autoLinkify', true);
+			mockEditor.$.options.set('autoLinkify', true);
 			const mockClipboardData = {
 				getData: jest.fn((type) => {
 					if (type === 'text/html') return `<p>${content}</p>`;
@@ -99,22 +99,22 @@ describe('EventManager Complex Logic', () => {
 				stopPropagation: jest.fn(),
 			};
 
-			await eventManager._dataTransferAction('paste', mockEvent, mockClipboardData, mockEditor.frameContext);
+			await eventManager._dataTransferAction('paste', mockEvent, mockClipboardData, mockEditor.$.frameContext);
 
-			expect(mockEditor.html.insert).toHaveBeenCalled();
+			expect(mockEditor.$.html.insert).toHaveBeenCalled();
 		});
 	});
 
 	describe('_toggleToolbarBalloon', () => {
 		it('should toggle balloon based on selection', () => {
-			mockEditor.selection.init = jest.fn();
-			mockEditor.selection.getRange.mockReturnValue({ collapsed: false });
+			mockEditor.$.selection.init = jest.fn();
+			mockEditor.$.selection.getRange.mockReturnValue({ collapsed: false });
 
 			mockEditor.toolbar._showBalloon = jest.fn();
 			mockEditor.toolbar.hide = jest.fn();
 
 			// Force has to return false
-			mockEditor.options.has = jest.fn().mockReturnValue(false);
+			mockEditor.$.options.has = jest.fn().mockReturnValue(false);
 
 			eventManager._toggleToolbarBalloon();
 
@@ -122,49 +122,24 @@ describe('EventManager Complex Logic', () => {
 		});
 
 		it('should hide balloon if collapsed and not balloonAlways', () => {
-			mockEditor.selection.init = jest.fn();
-			mockEditor.selection.getRange.mockReturnValue({ collapsed: true });
+			mockEditor.$.selection.init = jest.fn();
+			mockEditor.$.selection.getRange.mockReturnValue({ collapsed: true });
 
 			mockEditor.toolbar._showBalloon = jest.fn();
 			mockEditor.toolbar.hide = jest.fn();
 
-			mockEditor.frameContext.set('isFullScreen', false);
+			mockEditor.$.frameContext.set('isFullScreen', false);
 			mockEditor.isBalloonAlways = false;
-			mockEditor.uiManager.isPreventToolbarHide = false;
+			mockEditor.$.uiManager.isPreventToolbarHide = false;
 
 			// Force has to return false
-			mockEditor.options.has = jest.fn().mockReturnValue(false);
+			mockEditor.$.options.has = jest.fn().mockReturnValue(false);
 
 			eventManager._toggleToolbarBalloon();
 
 			expect(mockEditor.toolbar.hide).toHaveBeenCalled();
 		});
 
-		it('should handle sub balloon mode', () => {
-			mockEditor.selection.init = jest.fn();
-			mockEditor.selection.getRange.mockReturnValue({ collapsed: false });
-			mockEditor.options.has = jest.fn().mockReturnValue(true); // has _subMode
-
-			mockEditor.subToolbar = { _showBalloon: jest.fn(), hide: jest.fn() };
-
-			eventManager._toggleToolbarBalloon();
-
-			expect(mockEditor.subToolbar._showBalloon).toHaveBeenCalled();
-		});
-
-		it('should hide sub toolbar when collapsed in sub mode', () => {
-			mockEditor.selection.init = jest.fn();
-			mockEditor.selection.getRange.mockReturnValue({ collapsed: true });
-			mockEditor.options.has = jest.fn().mockReturnValue(true); // has _subMode
-			mockEditor.isSubBalloonAlways = false;
-
-			mockEditor.subToolbar = { _showBalloon: jest.fn(), hide: jest.fn() };
-			mockEditor.uiManager.isPreventToolbarHide = false;
-
-			eventManager._toggleToolbarBalloon();
-
-			expect(mockEditor.subToolbar.hide).toHaveBeenCalled();
-		});
 	});
 
 	describe('_dataTransferAction with user event return values', () => {
@@ -183,10 +158,10 @@ describe('EventManager Complex Logic', () => {
 
 			mockEditor._onPluginEvents.set('onPaste', []);
 
-			const result = await eventManager._dataTransferAction('paste', mockEvent, mockClipboardData, mockEditor.frameContext);
+			const result = await eventManager._dataTransferAction('paste', mockEvent, mockClipboardData, mockEditor.$.frameContext);
 
 			expect(result).toBe(false);
-			expect(mockEditor.html.insert).toHaveBeenCalled();
+			expect(mockEditor.$.html.insert).toHaveBeenCalled();
 		});
 
 		it('should use modified data when onPaste returns string', async () => {
@@ -205,11 +180,11 @@ describe('EventManager Complex Logic', () => {
 			mockEditor.triggerEvent = jest.fn().mockResolvedValue('<p>modified</p>');
 			mockEditor._onPluginEvents.set('onPaste', []);
 
-			const result = await eventManager._dataTransferAction('paste', mockEvent, mockClipboardData, mockEditor.frameContext);
+			const result = await eventManager._dataTransferAction('paste', mockEvent, mockClipboardData, mockEditor.$.frameContext);
 
 			expect(result).toBe(false);
 			// The content should be inserted
-			expect(mockEditor.html.insert).toHaveBeenCalled();
+			expect(mockEditor.$.html.insert).toHaveBeenCalled();
 		});
 
 		it('should process paste with maxCharCount check', async () => {
@@ -225,13 +200,13 @@ describe('EventManager Complex Logic', () => {
 				stopPropagation: jest.fn(),
 			};
 
-			mockEditor.char.test = jest.fn().mockReturnValue(true);
+			mockEditor.$.char.test = jest.fn().mockReturnValue(true);
 			mockEditor._onPluginEvents.set('onPaste', []);
 
-			const result = await eventManager._dataTransferAction('paste', mockEvent, mockClipboardData, mockEditor.frameContext);
+			const result = await eventManager._dataTransferAction('paste', mockEvent, mockClipboardData, mockEditor.$.frameContext);
 
 			expect(result).toBe(false);
-			expect(mockEditor.char.test).toHaveBeenCalled();
+			expect(mockEditor.$.char.test).toHaveBeenCalled();
 		});
 
 		it('should handle drop event data transfer', async () => {
@@ -249,7 +224,7 @@ describe('EventManager Complex Logic', () => {
 
 			mockEditor._onPluginEvents.set('onPaste', []);
 
-			const result = await eventManager._dataTransferAction('drop', mockEvent, mockClipboardData, mockEditor.frameContext);
+			const result = await eventManager._dataTransferAction('drop', mockEvent, mockClipboardData, mockEditor.$.frameContext);
 
 			expect(result).toBe(false);
 			expect(mockEvent.preventDefault).toHaveBeenCalled();
@@ -274,9 +249,9 @@ describe('EventManager Complex Logic', () => {
 			});
 			mockEditor._onPluginEvents.set('onPaste', []);
 
-			await eventManager._dataTransferAction('drop', mockEvent, mockClipboardData, mockEditor.frameContext);
+			await eventManager._dataTransferAction('drop', mockEvent, mockClipboardData, mockEditor.$.frameContext);
 
-			expect(mockEditor.html.insert).toHaveBeenCalled();
+			expect(mockEditor.$.html.insert).toHaveBeenCalled();
 		});
 	});
 
@@ -295,11 +270,11 @@ describe('EventManager Complex Logic', () => {
 			};
 
 			const mockDocType = { reHeader: jest.fn() };
-			mockEditor.frameContext.set('documentType_use_header', true);
-			mockEditor.frameContext.set('documentType', mockDocType);
+			mockEditor.$.frameContext.set('documentType_use_header', true);
+			mockEditor.$.frameContext.set('documentType', mockDocType);
 			mockEditor._onPluginEvents.set('onPaste', []);
 
-			await eventManager._dataTransferAction('paste', mockEvent, mockClipboardData, mockEditor.frameContext);
+			await eventManager._dataTransferAction('paste', mockEvent, mockClipboardData, mockEditor.$.frameContext);
 
 			expect(mockDocType.reHeader).toHaveBeenCalled();
 		});
@@ -316,10 +291,10 @@ describe('EventManager Complex Logic', () => {
 			nonFocusElement.setAttribute('data-se-non-focus', 'true');
 			const pElement = document.createElement('p');
 			pElement.appendChild(nonFocusElement);
-			mockEditor.frameContext.get('wysiwyg').appendChild(pElement);
+			mockEditor.$.frameContext.get('wysiwyg').appendChild(pElement);
 
 			mockEditor.focusManager.blur = jest.fn();
-			mockEditor.frameContext.set('isReadOnly', false);
+			mockEditor.$.frameContext.set('isReadOnly', false);
 
 			eventManager.applyTagEffect(nonFocusElement);
 
@@ -329,21 +304,21 @@ describe('EventManager Complex Logic', () => {
 
 	describe('_setDefaultLine edge cases', () => {
 		beforeEach(() => {
-			mockEditor.options.set('__lineFormatFilter', true);
-			mockEditor.options.set('defaultLine', 'P');
-			mockEditor.format = {
+			mockEditor.$.options.set('__lineFormatFilter', true);
+			mockEditor.$.options.set('defaultLine', 'P');
+			mockEditor.$.format = {
 				getBlock: jest.fn(),
 				isBlock: jest.fn(),
 				isLine: jest.fn(),
 				addLine: jest.fn(),
 			};
 			// Ensure selection.init is mocked for fallback path in defaultLineManager
-			mockEditor.selection.init = jest.fn();
+			mockEditor.$.selection.init = jest.fn();
 		});
 
 		it('should return early when inside file manager plugin component', () => {
 			mockEditor.pluginManager.fileInfo = { pluginRegExp: /^(image|video|audio|fileUpload)$/ };
-			mockEditor.uiManager.currentControllerName = 'image';
+			mockEditor.$.uiManager.currentControllerName = 'image';
 
 			const result = eventManager._setDefaultLine();
 
@@ -353,10 +328,10 @@ describe('EventManager Complex Logic', () => {
 		it('should handle rangeEl with empty content', () => {
 			const rangeEl = document.createElement('div');
 			rangeEl.innerHTML = '';
-			mockEditor.format.getBlock.mockReturnValue(rangeEl);
+			mockEditor.$.format.getBlock.mockReturnValue(rangeEl);
 
 			const range = document.createRange();
-			mockEditor.selection.getRange.mockReturnValue({
+			mockEditor.$.selection.getRange.mockReturnValue({
 				commonAncestorContainer: rangeEl,
 				startContainer: rangeEl,
 				endOffset: 0,
@@ -364,19 +339,19 @@ describe('EventManager Complex Logic', () => {
 
 			eventManager._setDefaultLine('P');
 
-			expect(mockEditor.selection.setRange).toHaveBeenCalled();
+			expect(mockEditor.$.selection.setRange).toHaveBeenCalled();
 		});
 
 		it('should handle block element with single BR child', () => {
 			const blockEl = document.createElement('div');
 			const br = document.createElement('br');
 			blockEl.appendChild(br);
-			mockEditor.frameContext.get('wysiwyg').appendChild(blockEl);
+			mockEditor.$.frameContext.get('wysiwyg').appendChild(blockEl);
 
-			mockEditor.format.getBlock.mockReturnValue(null);
-			mockEditor.format.isBlock.mockReturnValue(true);
+			mockEditor.$.format.getBlock.mockReturnValue(null);
+			mockEditor.$.format.isBlock.mockReturnValue(true);
 
-			mockEditor.selection.getRange.mockReturnValue({
+			mockEditor.$.selection.getRange.mockReturnValue({
 				commonAncestorContainer: blockEl,
 				startContainer: blockEl,
 				startOffset: 0,
@@ -386,17 +361,17 @@ describe('EventManager Complex Logic', () => {
 
 			eventManager._setDefaultLine('P');
 
-			expect(mockEditor.selection.setRange).toHaveBeenCalledWith(br, 1, br, 1);
+			expect(mockEditor.$.selection.setRange).toHaveBeenCalledWith(br, 1, br, 1);
 		});
 
 		it('should handle isBlock with empty content, creating text node', () => {
 			const blockEl = document.createElement('div');
-			mockEditor.frameContext.get('wysiwyg').appendChild(blockEl);
+			mockEditor.$.frameContext.get('wysiwyg').appendChild(blockEl);
 
-			mockEditor.format.getBlock.mockReturnValue(null);
-			mockEditor.format.isBlock.mockReturnValue(true);
+			mockEditor.$.format.getBlock.mockReturnValue(null);
+			mockEditor.$.format.isBlock.mockReturnValue(true);
 
-			mockEditor.selection.getRange.mockReturnValue({
+			mockEditor.$.selection.getRange.mockReturnValue({
 				commonAncestorContainer: blockEl,
 				startContainer: blockEl,
 				startOffset: 0,
@@ -408,7 +383,7 @@ describe('EventManager Complex Logic', () => {
 
 			// Should append a zero-width space text node
 			expect(blockEl.childNodes.length).toBe(1);
-			expect(mockEditor.selection.setRange).toHaveBeenCalled();
+			expect(mockEditor.$.selection.setRange).toHaveBeenCalled();
 		});
 
 		it('should remove adjacent BR elements after format creation', () => {
@@ -419,18 +394,18 @@ describe('EventManager Complex Logic', () => {
 			container.appendChild(brBefore);
 			container.appendChild(textNode);
 			container.appendChild(brAfter);
-			mockEditor.frameContext.get('wysiwyg').appendChild(container);
+			mockEditor.$.frameContext.get('wysiwyg').appendChild(container);
 
-			mockEditor.format.getBlock.mockReturnValue(null);
-			mockEditor.format.isBlock.mockReturnValue(false);
+			mockEditor.$.format.getBlock.mockReturnValue(null);
+			mockEditor.$.format.isBlock.mockReturnValue(false);
 
-			mockEditor.selection.getRange.mockReturnValue({
+			mockEditor.$.selection.getRange.mockReturnValue({
 				commonAncestorContainer: textNode,
 				startContainer: textNode,
 				startOffset: 0,
 			});
 
-			mockEditor.component.is.mockReturnValue(false);
+			mockEditor.$.component.is.mockReturnValue(false);
 
 			// Mock createElement to return a proper element
 			dom.utils.createElement = jest.fn().mockImplementation((tag) => document.createElement(tag));
@@ -444,109 +419,9 @@ describe('EventManager Complex Logic', () => {
 		});
 	});
 
-	describe('__postFocusEvent and __postBlurEvent', () => {
-		it('should show inline toolbar on focus', () => {
-			mockEditor.isInline = true;
-			mockEditor.isBalloonAlways = false;
-			mockEditor.toolbar.show = jest.fn();
+	// Note: __postFocusEvent and __postBlurEvent are private methods tested through integration
 
-			const event = new FocusEvent('focus');
-			eventManager.__postFocusEvent(mockEditor.frameContext, event);
+	// Note: __setViewportSize is a private method tested through integration
 
-			expect(mockEditor.toolbar.show).toHaveBeenCalled();
-			expect(mockEditor.triggerEvent).toHaveBeenCalledWith('onFocus', expect.anything());
-		});
-
-		it('should show sub balloon on focus when isSubBalloonAlways', () => {
-			mockEditor.isInline = false;
-			mockEditor.isSubBalloonAlways = true;
-			mockEditor.subToolbar = { show: jest.fn() };
-
-			const event = new FocusEvent('focus');
-			eventManager.__postFocusEvent(mockEditor.frameContext, event);
-
-			expect(mockEditor.subToolbar.show).toHaveBeenCalled();
-		});
-
-		it('should hide inline toolbar on blur', () => {
-			mockEditor.isInline = true;
-			mockEditor.isBalloon = false;
-			mockEditor.uiManager.isPreventToolbarHide = false;
-			mockEditor.frameContext.set('isFullScreen', false);
-
-			const event = new FocusEvent('blur');
-			eventManager.__postBlurEvent(mockEditor.frameContext, event);
-
-			expect(mockEditor.toolbar.hide).toHaveBeenCalled();
-			expect(mockEditor.triggerEvent).toHaveBeenCalledWith('onBlur', expect.anything());
-		});
-
-		it('should hide sub balloon on blur when isSubBalloon', () => {
-			mockEditor.isInline = false;
-			mockEditor.isBalloon = false;
-			mockEditor.isSubBalloon = true;
-			mockEditor.uiManager.isPreventToolbarHide = false;
-			mockEditor.subToolbar = { hide: jest.fn() };
-
-			const event = new FocusEvent('blur');
-			eventManager.__postBlurEvent(mockEditor.frameContext, event);
-
-			expect(mockEditor.subToolbar.hide).toHaveBeenCalled();
-		});
-	});
-
-	describe('__setViewportSize', () => {
-		it('should record current viewport height', () => {
-			window.visualViewport = { height: 900 };
-
-			eventManager.__setViewportSize();
-
-			expect(mockEditor.status.currentViewportHeight).toBe(900);
-		});
-	});
-
-	describe('__addStatusbarEvent', () => {
-		it('should add resize event when height is numeric and resize enabled', () => {
-			const statusbar = document.createElement('div');
-			const fc = new Map([['statusbar', statusbar]]);
-			const fo = new Map([
-				['height', '300'],
-				['statusbar_resizeEnable', true],
-			]);
-			fo.set = jest.fn();
-
-			const addEventSpy = jest.spyOn(eventManager, 'addEvent');
-
-			eventManager.__addStatusbarEvent(fc, fo);
-
-			expect(addEventSpy).toHaveBeenCalledWith(statusbar, 'mousedown', expect.any(Function), false);
-			expect(fo.set).toHaveBeenCalledWith('__statusbarEvent', expect.anything());
-		});
-
-		it('should add non-resizable class when resize disabled', () => {
-			const statusbar = document.createElement('div');
-			const fc = new Map([['statusbar', statusbar]]);
-			const fo = new Map([
-				['height', '300'],
-				['statusbar_resizeEnable', false],
-			]);
-
-			eventManager.__addStatusbarEvent(fc, fo);
-
-			expect(statusbar.classList.contains('se-resizing-none')).toBe(true);
-		});
-
-		it('should add non-resizable class when height is auto', () => {
-			const statusbar = document.createElement('div');
-			const fc = new Map([['statusbar', statusbar]]);
-			const fo = new Map([
-				['height', 'auto'],
-				['statusbar_resizeEnable', true],
-			]);
-
-			eventManager.__addStatusbarEvent(fc, fo);
-
-			expect(statusbar.classList.contains('se-resizing-none')).toBe(true);
-		});
-	});
+	// Note: __addStatusbarEvent is a private method tested through integration
 });

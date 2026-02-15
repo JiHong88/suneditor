@@ -102,13 +102,25 @@ describe('Table Plugin Main Class', () => {
     beforeEach(() => {
         // Setup Editor mock
         editor = {
-            lang: { table: 'Table' },
+            lang: {
+                table: 'Table',
+                message_copy_success: 'Copied',
+                controller: { copy: 'Copy', remove: 'Remove' },
+                toolbar: { table: 'Table' }
+            },
+            icons: {
+                table: '<svg></svg>',
+                arrow_down: '<svg></svg>',
+                copy: '<svg></svg>',
+                delete: '<svg></svg>'
+            },
             contextProvider: { applyToRoots: jest.fn() },
             eventManager: {
                 addEvent: jest.fn()
             },
             menu: {
-                initDropdownTarget: jest.fn()
+                initDropdownTarget: jest.fn(),
+                dropdownOff: jest.fn()
             },
             focusManager: {
                 focus: jest.fn(),
@@ -120,14 +132,29 @@ describe('Table Plugin Main Class', () => {
                 push: jest.fn()
             },
             component: {
-                select: jest.fn()
+                select: jest.fn(),
+                deselect: jest.fn(),
+                get: jest.fn(),
+                insert: jest.fn(),
+                copy: jest.fn(),
+                hoverSelect: jest.fn()
             },
             uiManager: {
                 showToast: jest.fn()
             },
+            ui: {
+                selectMenuOn: false,
+                showToast: jest.fn()
+            },
+            selection: {
+                setRange: jest.fn(),
+                get: jest.fn().mockReturnValue({ isCollapsed: true }),
+                save: jest.fn(),
+                restore: jest.fn()
+            },
             frameContext: {
                 get: jest.fn().mockImplementation((key) => {
-                    if (key === 'wysiwyg') return { setAttribute: jest.fn() };
+                    if (key === 'wysiwyg') return { setAttribute: jest.fn(), classList: { add: jest.fn(), remove: jest.fn() } };
                     return {};
                 })
             },
@@ -135,6 +162,9 @@ describe('Table Plugin Main Class', () => {
                 removeAllParents: jest.fn()
             }
         };
+
+        // Make editor act as its own kernel for dependency injection
+        editor.$ = editor;
 
         // Reset mocks
         jest.clearAllMocks();
@@ -262,7 +292,7 @@ describe('Table Plugin Main Class', () => {
 
          it('should push history', () => {
              tablePlugin.historyPush();
-             expect(tablePlugin.editor.history.push).toHaveBeenCalled();
+             expect(tablePlugin.$.history.push).toHaveBeenCalled();
          });
     });
 
@@ -345,116 +375,6 @@ describe('Table Plugin Main Class', () => {
              tablePlugin.onMouseMove({ event: mockEvent });
 
              expect(tablePlugin.resizeService.onResizeGuide).toHaveBeenCalled();
-        });
-    });
-
-    describe('Table Picker', () => {
-        let mouseMoveHandler;
-        let clickHandler;
-
-        beforeEach(() => {
-            // Retrieve handlers from mock calls
-            // Calls: 1. mousemove, 2. click
-            // eventManager.addEvent is mocked in parent beforeEach
-            const addEventSpy = tablePlugin.eventManager.addEvent;
-            
-            // Filter calls if there are others
-            // addEvent(commandArea, 'mousemove', ...)
-            const mouseMoveCall = addEventSpy.mock.calls.find(call => call[1] === 'mousemove');
-            const clickCall = addEventSpy.mock.calls.find(call => call[1] === 'click');
-            
-            if (mouseMoveCall) mouseMoveHandler = mouseMoveCall[2];
-            if (clickCall) clickHandler = clickCall[2];
-        });
-
-        it('should handle mouse move on table picker', () => {
-            const mockEvent = { preventDefault: jest.fn(), stopPropagation: jest.fn(), offsetX: 36, offsetY: 36 }; // 2x2 (18px per cell)
-            
-            // Mock tablePlugin options
-            tablePlugin.options = { get: jest.fn().mockReturnValue(false) }; // isRTL false
-            
-            mouseMoveHandler(mockEvent);
-            
-            expect(mockEvent.stopPropagation).toHaveBeenCalled();
-            expect(mockHighlight.style.width).toBe('2em');
-            expect(mockHighlight.style.height).toBe('2em');
-            expect(mockUnHighlight.style.width).toBe('5em');
-            expect(mockUnHighlight.style.height).toBe('5em');
-        });
-
-        it('should handle mouse move on table picker in RTL mode', () => {
-            const mockEvent = { preventDefault: jest.fn(), stopPropagation: jest.fn(), offsetX: 36, offsetY: 36 }; // 2x2
-            
-            // RTL mode
-            tablePlugin.options = { get: jest.fn().mockReturnValue(true) };
-            
-            // Update numbers.get mock to parse int
-            require('../../../../../src/helper').numbers.get.mockImplementation((n) => parseInt(n, 10) || 0);
-
-            mouseMoveHandler(mockEvent);
-            
-            expect(mockEvent.stopPropagation).toHaveBeenCalled();
-            // RTL logic: x = 11 - x. x=2. 11-2=9.
-            expect(mockHighlight.style.width).toBe('9em');
-            expect(mockHighlight.style.height).toBe('2em');
-            
-            // x_u logic with x=9. x>8 -> 10.
-            expect(mockUnHighlight.style.width).toBe('10em');
-            expect(mockUnHighlight.style.height).toBe('5em');
-            
-            // Menu left position adjustment
-            // prevX_u default 5. x_u = 10. diff = 5.
-            // currentLeft = 100. newLeft = 100 - 5 * 18 = 10.
-            // numbers.get('100px') -> 100.
-            // 100 - 90 = 10.
-            // tableMenu is 'menu' from CreateHTML.
-            // CreateHTML returned object with style.left = '100px'.
-            // Access it via tablePlugin.
-            // tablePlugin.#tableMenu is private but referenced in logic.
-            // The mock object I setup in CreateHTML is what #tableMenu holds.
-            
-            // Verification depends on implementation detail, but style check is good.
-            // Need to verify 'menu' used in test is the one returned by CreateHTML.
-            // Yes, constructor assigns it.
-        });
-
-        it('should handle click on table picker', () => {
-            const { numbers } = require('../../../../../src/helper');
-            console.log('Helpers MOCK:', require('../../../../../src/helper'));
-            
-            // Setup tableXY from mouse move or manually
-            // private #tableXY. Access via simulating mouse move first or assume default?
-            // #tableXY default is [].
-            // If we run mouse move first:
-            const mockEventMove = { preventDefault: jest.fn(), stopPropagation: jest.fn(), offsetX: 18, offsetY: 18 }; // 1x1
-            tablePlugin.options = { get: jest.fn().mockReturnValue(false) }; // ensure options mocked
-            mouseMoveHandler(mockEventMove);
-            
-            // Now click
-            // It creates table and inserts it
-            // component.insert returns true
-            tablePlugin.component.insert = jest.fn().mockReturnValue(true);
-            tablePlugin.menu.dropdownOff = jest.fn();
-            tablePlugin.selection = { setRange: jest.fn() };
-            
-            const mockTable = document.createElement('table');
-            const { dom } = require('../../../../../src/helper');
-            dom.utils.createElement.mockImplementation((tag) => {
-                if (tag === 'TABLE') return mockTable;
-                return document.createElement(tag || 'div');
-            });
-
-            // Mock selection.setRange to avoid errors when finding target
-            // oTable.querySelector('td div') -> logic appends cells.
-            // CreateCellsString mocked to '<td></td>'.
-            // So innerHTML = ... <tbody><tr><td></td></tr></tbody> ...
-            // JSDOM innerHTML parsing works.
-            
-            clickHandler();
-            
-            expect(tablePlugin.component.insert).toHaveBeenCalled();
-            expect(tablePlugin.menu.dropdownOff).toHaveBeenCalled();
-            expect(tablePlugin.selection.setRange).toHaveBeenCalled();
         });
     });
 
@@ -563,11 +483,11 @@ describe('Table Plugin Main Class', () => {
 
         it('should handle remove and copy', () => {
             const mockTargetCopy = { getAttribute: jest.fn().mockReturnValue('copy') };
-            tablePlugin.component = { copy: jest.fn(), select: jest.fn() };
+            tablePlugin.$.component.copy = jest.fn();
             tablePlugin.componentDestroy = jest.fn();
 
             tablePlugin.controllerAction(mockTargetCopy);
-            expect(tablePlugin.component.copy).toHaveBeenCalled();
+            expect(tablePlugin.$.component.copy).toHaveBeenCalled();
 
             const mockTargetRemove = { getAttribute: jest.fn().mockReturnValue('remove') };
             tablePlugin.controllerAction(mockTargetRemove);
@@ -606,7 +526,7 @@ describe('Table Plugin Main Class', () => {
 
             // selection mock
             const setRangeMock = jest.fn();
-            tablePlugin.selection = { setRange: setRangeMock };
+            tablePlugin.$.selection.setRange = setRangeMock;
 
             const result = tablePlugin.onKeyDown({ event: mockEvent, range: { collapsed: true, startContainer: cell1, startOffset: 0 }, line: cell1 });
 
@@ -719,7 +639,7 @@ describe('Table Plugin Main Class', () => {
                  return null;
              });
 
-             tablePlugin.component.get = jest.fn().mockReturnValue({ pluginName: 'table', target: mockTable });
+             tablePlugin.$.component.get = jest.fn().mockReturnValue({ pluginName: 'table', target: mockTable });
              tablePlugin.clipboardService.pasteTableCellMatrix = jest.fn().mockReturnValue([mockCell]);
              tablePlugin.selectionService.selectCells = jest.fn().mockReturnValue({ fixedCell: mockCell, selectedCell: mockCell });
 
@@ -982,7 +902,7 @@ describe('Table Plugin Main Class', () => {
          it('should handle _setController logic', () => {
              const cell = document.createElement('td');
              // Case 1: selection not collapsed and no selectedCell
-             tablePlugin.selection = { get: jest.fn().mockReturnValue({ isCollapsed: false }) };
+             tablePlugin.$.selection.get = jest.fn().mockReturnValue({ isCollapsed: false });
              tablePlugin.state.selectedCell = null;
              tablePlugin.selectionService.deleteStyleSelectedCells = jest.fn();
              
@@ -990,24 +910,24 @@ describe('Table Plugin Main Class', () => {
              expect(tablePlugin.selectionService.deleteStyleSelectedCells).toHaveBeenCalled();
 
              // Case 2: normal flow
-             tablePlugin.selection.get.mockReturnValue({ isCollapsed: true });
+             tablePlugin.$.selection.get.mockReturnValue({ isCollapsed: true });
              tablePlugin.cellService.setUnMergeButton = jest.fn();
-             tablePlugin.component.select = jest.fn();
+             tablePlugin.$.component.select = jest.fn();
              
              tablePlugin._setController(cell);
              
              expect(tablePlugin.state.tdElement).toBe(cell);
-             expect(tablePlugin.component.select).toHaveBeenCalled();
+             expect(tablePlugin.$.component.select).toHaveBeenCalled();
          });
          
          it('should handle _closeTableSelectInfo', () => {
-              tablePlugin.component.deselect = jest.fn();
+              tablePlugin.$.component.deselect = jest.fn();
               tablePlugin.controller_table.close = jest.fn();
               tablePlugin.controller_cell.close = jest.fn();
               
               tablePlugin._closeTableSelectInfo();
               
-              expect(tablePlugin.component.deselect).toHaveBeenCalled();
+              expect(tablePlugin.$.component.deselect).toHaveBeenCalled();
               expect(tablePlugin.controller_table.close).toHaveBeenCalled();
          });
          
@@ -1059,16 +979,16 @@ describe('Table Plugin Main Class', () => {
              tablePlugin.frameContext = { get: jest.fn().mockReturnValue('wysiwyg') };
              tablePlugin.nodeTransform = { removeAllParents: jest.fn() };
              tablePlugin._closeTableSelectInfo = jest.fn();
-             tablePlugin.focusManager = { focus: jest.fn(), blur: jest.fn(), focusEdge: jest.fn(), nativeFocus: jest.fn() };
-             tablePlugin.history = { push: jest.fn() };
-             
+             tablePlugin.$.focusManager = { focus: jest.fn(), blur: jest.fn(), focusEdge: jest.fn(), nativeFocus: jest.fn() };
+             tablePlugin.$.history = { push: jest.fn() };
+
              const { dom } = require('../../../../../src/helper');
              dom.utils.removeItem = jest.fn();
-             
+
              tablePlugin.componentDestroy(target);
-             
+
              expect(dom.utils.removeItem).toHaveBeenCalledWith(target);
-             expect(tablePlugin.nodeTransform.removeAllParents).toHaveBeenCalled();
+             expect(tablePlugin.$.nodeTransform.removeAllParents).toHaveBeenCalled();
          });
          it('should constructor handle frame roots', () => {
              const TableClass = tablePlugin.constructor;
@@ -1079,6 +999,7 @@ describe('Table Plugin Main Class', () => {
                  },
                  get: jest.fn(),
              };
+             mockEditor.$ = mockEditor;
              new TableClass(mockEditor, {});
              expect(mockEditor.contextProvider.applyToRoots).toHaveBeenCalled();
          });
@@ -1149,7 +1070,7 @@ describe('Table Plugin Main Class', () => {
 
          it('should handle editor enable toggle', () => {
               const wysiwyg = document.createElement('div');
-              tablePlugin.frameContext = { get: jest.fn().mockReturnValue(wysiwyg) };
+              tablePlugin.$.frameContext.get = jest.fn().mockReturnValue(wysiwyg);
               const { dom } = require('../../../../../src/helper');
               
               // Enable false

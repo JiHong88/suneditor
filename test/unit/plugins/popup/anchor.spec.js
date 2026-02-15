@@ -1,30 +1,8 @@
 import Anchor from '../../../../src/plugins/popup/anchor';
+import { createMockEditor } from '../../../../test/__mocks__/editorMock.js';
 import { createMockThis } from '../../../__mocks__/editorMock';
 
 // Mock dependencies
-jest.mock('../../../../src/editorInjector', () => {
-	return class MockEditorInjector {
-		constructor(editor) {
-			this.editor = editor;
-			this.lang = {
-				anchor: 'Anchor',
-				id: 'ID',
-				save: 'Save',
-				cancel: 'Cancel',
-				edit: 'Edit',
-				remove: 'Remove'
-			};
-			this.icons = {
-				bookmark_anchor: '<svg>bookmark</svg>',
-				checked: '<svg>check</svg>',
-				cancel: '<svg>cancel</svg>',
-				edit: '<svg>edit</svg>',
-				delete: '<svg>delete</svg>'
-			};
-		}
-	};
-});
-
 jest.mock('../../../../src/modules/contract', () => ({
 	Controller: jest.fn().mockImplementation((plugin, element, options, key) => ({
 		open: jest.fn(),
@@ -75,13 +53,13 @@ global.DOMParser = jest.fn().mockImplementation(() => ({
 describe('Anchor Plugin', () => {
 	let mockThis;
 	let anchor;
-	let mockEditor;
+	let kernel;
 
 	beforeEach(() => {
 		jest.clearAllMocks();
 
 		mockThis = createMockThis();
-		mockEditor = mockThis.editor;
+		kernel = mockThis.editor;
 
 		// Mock selection methods
 		mockThis.selection = {
@@ -102,7 +80,7 @@ describe('Anchor Plugin', () => {
 			select: jest.fn()
 		};
 
-		anchor = new Anchor(mockEditor);
+		anchor = new Anchor(kernel);
 
 		// Override methods that need mockThis context
 		const originalComponentSelect = anchor.componentSelect.bind(anchor);
@@ -173,7 +151,7 @@ describe('Anchor Plugin', () => {
 	describe('show method', () => {
 		it('should open controller and focus input', () => {
 			const mockRange = { startContainer: { textContent: 'test' }, startOffset: 0 };
-			mockThis.selection.getRange.mockReturnValue(mockRange);
+			kernel.$.selection.getRange.mockReturnValue(mockRange);
 
 			anchor.show();
 
@@ -239,7 +217,7 @@ describe('Anchor Plugin', () => {
 				anchor.controllerAction(mockTarget);
 
 				expect(anchor.controller.close).toHaveBeenCalled();
-				expect(mockThis.component.insert).toHaveBeenCalled();
+				expect(kernel.$.component.insert).toHaveBeenCalled();
 			});
 
 			it('should focus input if no ID provided', () => {
@@ -264,7 +242,7 @@ describe('Anchor Plugin', () => {
 				anchor.controllerAction(mockTarget);
 
 				expect(mockElement.id).toBe('updated-anchor');
-				expect(mockThis.component.select).toHaveBeenCalledWith(mockElement, 'anchor');
+				expect(kernel.$.component.select).toHaveBeenCalledWith(mockElement, 'anchor');
 			});
 		});
 
@@ -276,13 +254,13 @@ describe('Anchor Plugin', () => {
 			it('should close controller and restore selection', () => {
 				// Use show() to set #range properly
 				const mockRange = { startContainer: { textContent: 'test' }, startOffset: 0 };
-				mockThis.selection.getRange.mockReturnValue(mockRange);
+				kernel.$.selection.getRange.mockReturnValue(mockRange);
 				anchor.show();
 
 				anchor.controllerAction(mockTarget);
 
 				expect(anchor.controller.close).toHaveBeenCalled();
-				expect(mockThis.selection.setRange).toHaveBeenCalled();
+				expect(kernel.$.selection.setRange).toHaveBeenCalled();
 			});
 
 			it('should reselect element if it exists', () => {
@@ -346,11 +324,11 @@ describe('Anchor Plugin', () => {
 				// Use select() to properly set #element
 				anchor.componentSelect(mockElement);
 				const mockRange = { container: { textContent: 'test', nodeType: 3 }, offset: 0 };
-				mockThis.selection.getNearRange.mockReturnValue(mockRange);
+				kernel.$.selection.getNearRange.mockReturnValue(mockRange);
 
 				anchor.controllerAction(mockTarget);
 
-				expect(mockThis.selection.setRange).toHaveBeenCalledWith(
+				expect(kernel.$.selection.setRange).toHaveBeenCalledWith(
 					mockRange.container,
 					mockRange.offset,
 					mockRange.container,
@@ -392,7 +370,7 @@ describe('Anchor Plugin', () => {
 			};
 			anchor.controllerAction(submitButton);
 
-			expect(mockThis.component.insert).toHaveBeenCalled();
+			expect(kernel.$.component.insert).toHaveBeenCalled();
 			expect(anchor.controller.close).toHaveBeenCalled();
 		});
 

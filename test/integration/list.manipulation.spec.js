@@ -34,7 +34,7 @@ describe('List Manipulation integration tests', () => {
 
     describe('Applying list format', () => {
         it('should convert paragraphs to unordered list', () => {
-            const wysiwyg = editor.context.get('wysiwyg');
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
             wysiwyg.innerHTML = `
                 <p>Line 1</p>
@@ -67,7 +67,7 @@ describe('List Manipulation integration tests', () => {
         });
 
         it('should convert paragraphs to ordered list', () => {
-            const wysiwyg = editor.context.get('wysiwyg');
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
             wysiwyg.innerHTML = `
                 <p>Step 1</p>
@@ -93,7 +93,7 @@ describe('List Manipulation integration tests', () => {
         });
 
         it('should apply list style types', () => {
-            const wysiwyg = editor.context.get('wysiwyg');
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
             wysiwyg.innerHTML = `<p>Item 1</p>`;
 
@@ -112,7 +112,7 @@ describe('List Manipulation integration tests', () => {
         });
 
         it('should handle mixed content when applying list', () => {
-            const wysiwyg = editor.context.get('wysiwyg');
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
             wysiwyg.innerHTML = `
                 <p>Normal text</p>
@@ -141,7 +141,7 @@ describe('List Manipulation integration tests', () => {
 
     describe('Removing list format', () => {
         it('should convert list items back to paragraphs', () => {
-            const wysiwyg = editor.context.get('wysiwyg');
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
             wysiwyg.innerHTML = `
                 <ul>
@@ -174,7 +174,7 @@ describe('List Manipulation integration tests', () => {
         });
 
         it('should remove partial list items', () => {
-            const wysiwyg = editor.context.get('wysiwyg');
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
             wysiwyg.innerHTML = `
                 <ul>
@@ -189,7 +189,7 @@ describe('List Manipulation integration tests', () => {
             const middleItems = [allItems[1], allItems[2]];
 
             // Remove middle items
-            const listFormat = editor.listFormat;
+            const listFormat = editor.$.listFormat;
             listFormat.remove(middleItems, false);
 
             // List should still exist
@@ -203,7 +203,7 @@ describe('List Manipulation integration tests', () => {
         });
 
         it('should delete list items with shouldDelete option', () => {
-            const wysiwyg = editor.context.get('wysiwyg');
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
             wysiwyg.innerHTML = `
                 <ul>
@@ -216,7 +216,7 @@ describe('List Manipulation integration tests', () => {
             const allItems = Array.from(wysiwyg.querySelectorAll('li'));
 
             // Delete middle item
-            const listFormat = editor.listFormat;
+            const listFormat = editor.$.listFormat;
             listFormat.remove([allItems[1]], true);
 
             // Verify item is deleted
@@ -229,7 +229,7 @@ describe('List Manipulation integration tests', () => {
 
     describe('Nested list operations', () => {
         it('should create nested list by applying list to list items', () => {
-            const wysiwyg = editor.context.get('wysiwyg');
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
             wysiwyg.innerHTML = `
                 <ul>
@@ -242,7 +242,7 @@ describe('List Manipulation integration tests', () => {
             const listItems = wysiwyg.querySelectorAll('li');
 
             // Apply nested list to middle item
-            const listFormat = editor.listFormat;
+            const listFormat = editor.$.listFormat;
             listFormat.apply('ul:', [listItems[1]], true);
 
             // Verify nested structure exists
@@ -251,7 +251,7 @@ describe('List Manipulation integration tests', () => {
         });
 
         it('should handle applyNested for indenting list items', () => {
-            const wysiwyg = editor.context.get('wysiwyg');
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
             wysiwyg.innerHTML = `
                 <ul>
@@ -264,7 +264,7 @@ describe('List Manipulation integration tests', () => {
             const listItems = Array.from(wysiwyg.querySelectorAll('li'));
 
             // Indent item 2
-            const listFormat = editor.listFormat;
+            const listFormat = editor.$.listFormat;
             listFormat.applyNested([listItems[1]], true);
 
             // Verify nested structure
@@ -273,7 +273,7 @@ describe('List Manipulation integration tests', () => {
         });
 
         it('should handle applyNested for outdenting list items', () => {
-            const wysiwyg = editor.context.get('wysiwyg');
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
             wysiwyg.innerHTML = `
                 <ul>
@@ -289,7 +289,7 @@ describe('List Manipulation integration tests', () => {
             const nestedLi = wysiwyg.querySelector('ul ul li');
 
             // Outdent nested item
-            const listFormat = editor.listFormat;
+            const listFormat = editor.$.listFormat;
             listFormat.applyNested([nestedLi], false);
 
             // Verify structure is flattened
@@ -298,7 +298,7 @@ describe('List Manipulation integration tests', () => {
         });
 
         it('should remove nested lists with removeNested', () => {
-            const wysiwyg = editor.context.get('wysiwyg');
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
             wysiwyg.innerHTML = `
                 <ul>
@@ -314,7 +314,7 @@ describe('List Manipulation integration tests', () => {
             const parentLi = wysiwyg.querySelector('li');
 
             // Remove nested structure
-            const listFormat = editor.listFormat;
+            const listFormat = editor.$.listFormat;
             listFormat.removeNested(parentLi, false);
 
             // Content should be preserved
@@ -324,7 +324,7 @@ describe('List Manipulation integration tests', () => {
         });
 
         it('should remove all nested lists with removeNested all option', () => {
-            const wysiwyg = editor.context.get('wysiwyg');
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
             wysiwyg.innerHTML = `
                 <ul>
@@ -343,7 +343,7 @@ describe('List Manipulation integration tests', () => {
             const topLi = wysiwyg.querySelector('li');
 
             // Remove all nested lists
-            const listFormat = editor.listFormat;
+            const listFormat = editor.$.listFormat;
             listFormat.removeNested(topLi, true);
 
             // All content should be flattened
@@ -356,7 +356,7 @@ describe('List Manipulation integration tests', () => {
 
     describe('Converting between list types', () => {
         it('should convert unordered list to ordered list', () => {
-            const wysiwyg = editor.context.get('wysiwyg');
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
             wysiwyg.innerHTML = `
                 <ul>
@@ -386,7 +386,7 @@ describe('List Manipulation integration tests', () => {
         });
 
         it('should convert ordered list to unordered list', () => {
-            const wysiwyg = editor.context.get('wysiwyg');
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
             wysiwyg.innerHTML = `
                 <ol>
@@ -417,7 +417,7 @@ describe('List Manipulation integration tests', () => {
 
     describe('Complex list scenarios', () => {
         it('should handle list with inline formatting', () => {
-            const wysiwyg = editor.context.get('wysiwyg');
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
             wysiwyg.innerHTML = `
                 <ul>
@@ -429,7 +429,7 @@ describe('List Manipulation integration tests', () => {
             const listItems = Array.from(wysiwyg.querySelectorAll('li'));
 
             // Remove list
-            const listFormat = editor.listFormat;
+            const listFormat = editor.$.listFormat;
             listFormat.remove(listItems, false);
 
             // Verify inline formatting is preserved
@@ -438,7 +438,7 @@ describe('List Manipulation integration tests', () => {
         });
 
         it('should handle empty list items', () => {
-            const wysiwyg = editor.context.get('wysiwyg');
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
             wysiwyg.innerHTML = `
                 <ul>
@@ -451,7 +451,7 @@ describe('List Manipulation integration tests', () => {
             const listItems = Array.from(wysiwyg.querySelectorAll('li'));
 
             // Remove list
-            const listFormat = editor.listFormat;
+            const listFormat = editor.$.listFormat;
             listFormat.remove(listItems, false);
 
             // Content should be preserved
@@ -461,7 +461,7 @@ describe('List Manipulation integration tests', () => {
         });
 
         it('should handle list items with multiple paragraphs', () => {
-            const wysiwyg = editor.context.get('wysiwyg');
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
             wysiwyg.innerHTML = `
                 <ul>
@@ -487,7 +487,7 @@ describe('List Manipulation integration tests', () => {
         });
 
         it('should handle merging adjacent lists', () => {
-            const wysiwyg = editor.context.get('wysiwyg');
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
             wysiwyg.innerHTML = `
                 <ul>
@@ -530,7 +530,7 @@ describe('List Manipulation integration tests', () => {
 
     describe('Edge cases', () => {
         it('should handle single item list', () => {
-            const wysiwyg = editor.context.get('wysiwyg');
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
             wysiwyg.innerHTML = `
                 <ul>
@@ -541,7 +541,7 @@ describe('List Manipulation integration tests', () => {
             const listItems = Array.from(wysiwyg.querySelectorAll('li'));
 
             // Remove list
-            const listFormat = editor.listFormat;
+            const listFormat = editor.$.listFormat;
             listFormat.remove(listItems, false);
 
             // Content should remain
@@ -549,7 +549,7 @@ describe('List Manipulation integration tests', () => {
         });
 
         it('should handle applyNested with no previous sibling', () => {
-            const wysiwyg = editor.context.get('wysiwyg');
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
             wysiwyg.innerHTML = `
                 <ul>
@@ -560,7 +560,7 @@ describe('List Manipulation integration tests', () => {
             const firstLi = wysiwyg.querySelector('li');
 
             // Try to indent first item (should handle gracefully)
-            const listFormat = editor.listFormat;
+            const listFormat = editor.$.listFormat;
             const result = listFormat.applyNested([firstLi], true);
 
             // Should return range info
@@ -568,7 +568,7 @@ describe('List Manipulation integration tests', () => {
         });
 
         it('should handle list with zero-width spaces', () => {
-            const wysiwyg = editor.context.get('wysiwyg');
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
             wysiwyg.innerHTML = `
                 <ul>
@@ -580,7 +580,7 @@ describe('List Manipulation integration tests', () => {
             const listItems = Array.from(wysiwyg.querySelectorAll('li'));
 
             // Remove list
-            const listFormat = editor.listFormat;
+            const listFormat = editor.$.listFormat;
             listFormat.remove(listItems, false);
 
             // Should handle gracefully

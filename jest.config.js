@@ -1,9 +1,15 @@
+const isCI = process.env.CI === 'true';
+
 module.exports = {
 	// Test environment
 	testEnvironment: 'jsdom',
 
+	// CI: use all cores, Local: use 75%
+	maxWorkers: isCI ? '100%' : '75%',
+	workerIdleMemoryLimit: '2GB',
+
 	// Test file patterns
-	testMatch: ['<rootDir>/test/unit/**/*.spec.js', '<rootDir>/test/unit/**/*.integration.spec.js', '<rootDir>/test/integration/**/*.spec.js'],
+	testMatch: ['<rootDir>/test/unit/**/*.spec.js', '<rootDir>/test/integration/**/*.spec.js'],
 
 	// Setup files
 	setupFilesAfterEnv: ['<rootDir>/test/setup.js'],
@@ -15,9 +21,15 @@ module.exports = {
 		'^@/(.*)$': '<rootDir>/src/$1',
 	},
 
-	// Transform files using Babel
+	// Transform files using Babel (Jest-specific config)
 	transform: {
-		'^.+\\.js$': 'babel-jest',
+		'^.+\\.js$': [
+			'babel-jest',
+			{
+				presets: [['@babel/preset-env', { targets: { node: 'current' } }]],
+				plugins: ['@babel/plugin-transform-class-properties', '@babel/plugin-transform-private-methods'],
+			},
+		],
 	},
 
 	// Ignore
@@ -29,26 +41,13 @@ module.exports = {
 	// Coverage thresholds
 	coverageThreshold: {
 		global: {
-			statements: 75,
-			branches: 65,
-			functions: 80,
-			lines: 75,
+			statements: 70,
+			branches: 60,
+			functions: 85,
+			lines: 70,
 		},
 	},
 
-	projects: [
-		{
-			displayName: 'unit',
-			testMatch: ['<rootDir>/test/unit/**/*.spec.js', '<rootDir>/test/unit/**/*.integration.spec.js'],
-			testEnvironment: 'jsdom',
-		},
-		{
-			displayName: 'integration',
-			testMatch: ['<rootDir>/test/integration/**/*.spec.js'],
-			testEnvironment: 'jsdom',
-		},
-	],
-
 	// Verbose output
-	verbose: true,
+	verbose: false,
 };

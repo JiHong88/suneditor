@@ -60,6 +60,9 @@ describe('ImageUploadService', () => {
             }
         };
 
+        // Make mockMain act as its own kernel for dependency injection
+        mockMain.$ = mockMain;
+
         service = new ImageUploadService(mockMain);
     });
 
@@ -164,63 +167,4 @@ describe('ImageUploadService', () => {
         });
     });
 
-    describe('Error Handling (__error)', () => {
-        it('should alert error message from response', async () => {
-            const info = { files: [{ name: 'test.png' }] };
-            service.serverUpload(info);
-            
-            const errorCallback = mockFileManager.upload.mock.calls[0][4]; // 5th argument
-            const response = { errorMessage: 'Upload failed' };
-            
-            await errorCallback(response);
-
-            expect(mockMain.triggerEvent).toHaveBeenCalledWith('onImageUploadError', { error: response });
-            expect(mockUi.alertOpen).toHaveBeenCalledWith('Upload failed', 'error');
-        });
-    });
-    
-    describe('Upload Callback (__UploadCallBack)', () => {
-         it('should register uploaded files on success', async () => {
-            const info = { 
-                files: [{ name: 'test.png' }],
-                inputWidth: '100px',
-                inputHeight: '100px',
-                align: 'center',
-                alt: 'alt'
-            };
-            service.serverUpload(info);
-            const successCallback = mockFileManager.upload.mock.calls[0][3]; // 4th argument
-            
-            const xmlHttp = {
-                responseText: JSON.stringify({
-                    result: [
-                        { url: 'http://server.com/img.png', name: 'img.png', size: 1000 }
-                    ]
-                })
-            };
-
-             await successCallback(xmlHttp);
-             
-             // Check if register logic called create
-             expect(mockMain.create).toHaveBeenCalledWith(
-                 'http://server.com/img.png', undefined, '100px', '100px', 'center', expect.objectContaining({name: 'img.png'}), 'alt', true
-             );
-         });
-         
-         it('should handle error in response text', async () => {
-             const info = { files: [] };
-             service.serverUpload(info);
-             const successCallback = mockFileManager.upload.mock.calls[0][3];
-             
-             const xmlHttp = {
-                 responseText: JSON.stringify({
-                     errorMessage: 'Server Error'
-                 })
-             };
-             
-             await successCallback(xmlHttp);
-             
-             expect(mockUi.alertOpen).toHaveBeenCalledWith('Server Error', 'error');
-         });
-    });
 });

@@ -1,53 +1,7 @@
 import Link from '../../../../src/plugins/modal/link';
+import { createMockEditor } from '../../../../test/__mocks__/editorMock.js';
 
 // Mock dependencies
-jest.mock('../../../../src/editorInjector', () => {
-	return class MockEditorInjector {
-		constructor(editor) {
-			this.editor = editor;
-			this.lang = editor.lang || {
-				link: 'Link',
-				link_modal_title: 'Insert Link',
-				close: 'Close',
-				submitButton: 'Submit',
-				copy: 'Copy',
-				edit: 'Edit',
-				unlink: 'Unlink',
-				remove: 'Remove'
-			};
-			this.icons = editor.icons || {
-				cancel: '<svg>cancel</svg>',
-				link: '<svg>link</svg>',
-				copy: '<svg>copy</svg>',
-				edit: '<svg>edit</svg>',
-				unlink: '<svg>unlink</svg>',
-				delete: '<svg>delete</svg>'
-			};
-			this.selection = editor.selection || {
-				setRange: jest.fn()
-			};
-			this.html = editor.html || {
-				insertNode: jest.fn().mockReturnValue(true),
-				copy: jest.fn()
-			};
-			this.format = editor.format || {
-				getLines: jest.fn().mockReturnValue([{ nodeName: 'P' }])
-			};
-			this.history = editor.history || {
-				push: jest.fn()
-			};
-			this.inline = editor.inline || {
-				apply: jest.fn()
-			};
-			this.focusManager = editor.focusManager || {
-				focus: jest.fn(),
-				blur: jest.fn(),
-				focusEdge: jest.fn(),
-				nativeFocus: jest.fn()
-			};
-		}
-	};
-});
 
 jest.mock('../../../../src/modules/contract', () => ({
 	Modal: jest.fn().mockImplementation(() => ({
@@ -122,58 +76,22 @@ jest.mock('../../../../src/helper', () => ({
 }));
 
 describe('Link Plugin', () => {
-	let mockEditor;
+	let kernel;
 	let link;
 
 	beforeEach(() => {
 		jest.clearAllMocks();
 
-		mockEditor = {
-			lang: {
-				link: 'Link',
-				link_modal_title: 'Insert Link',
-				close: 'Close',
-				submitButton: 'Submit',
-				copy: 'Copy',
-				edit: 'Edit',
-				unlink: 'Unlink',
-				remove: 'Remove'
-			},
-			icons: {
-				cancel: '<svg>cancel</svg>',
-				link: '<svg>link</svg>',
-				copy: '<svg>copy</svg>',
-				edit: '<svg>edit</svg>',
-				unlink: '<svg>unlink</svg>',
-				delete: '<svg>delete</svg>'
-			},
-			selection: {
-				setRange: jest.fn()
-			},
-			html: {
-				insertNode: jest.fn().mockReturnValue(true),
-				copy: jest.fn()
-			},
-			format: {
-				getLines: jest.fn().mockReturnValue([{ nodeName: 'P' }])
-			},
-			history: {
-				push: jest.fn()
-			},
-			inline: {
-				apply: jest.fn()
-			},
-			focusManager: { focus: jest.fn(), blur: jest.fn(), focusEdge: jest.fn(), nativeFocus: jest.fn() }
-		};
+		kernel = createMockEditor();
 
-		link = new Link(mockEditor, {});
+		link = new Link(kernel, {});
 	});
 
 
 	describe('Constructor', () => {
 
 		it('should initialize with upload options', async () => {
-			const linkWithUpload = new Link(mockEditor, {
+			const linkWithUpload = new Link(kernel, {
 				uploadUrl: 'http://example.com/upload',
 				uploadHeaders: { 'X-Custom': 'header' },
 				uploadSizeLimit: 5000000,
@@ -187,7 +105,7 @@ describe('Link Plugin', () => {
 		});
 
 		it('should handle missing upload options', async () => {
-			const linkNoUpload = new Link(mockEditor, {});
+			const linkNoUpload = new Link(kernel, {});
 			expect(linkNoUpload.pluginOptions.uploadUrl).toBeNull();
 			expect(linkNoUpload.pluginOptions.enableFileUpload).toBe(false);
 		});
@@ -308,18 +226,20 @@ describe('Link Plugin', () => {
 				childNodes: [{ textContent: 'Test' }]
 			};
 			link.anchor.create = jest.fn().mockReturnValue(mockAnchor);
+			kernel.$.html.insertNode.mockReturnValue(true);
+			kernel.$.format.getLines.mockReturnValue([{ nodeName: 'P' }]);
 
 			const result = await await link.modalAction();
 
 			expect(result).toBe(true);
-			expect(mockEditor.html.insertNode).toHaveBeenCalled();
-			expect(mockEditor.selection.setRange).toHaveBeenCalled();
-			expect(mockEditor.history.push).toHaveBeenCalledWith(false);
+			expect(kernel.$.html.insertNode).toHaveBeenCalled();
+			expect(kernel.$.selection.setRange).toHaveBeenCalled();
+			expect(kernel.$.history.push).toHaveBeenCalledWith(false);
 		});
 
 		it('should handle multiple selected lines', async () => {
 			link.isUpdateState = false;
-			mockEditor.format.getLines.mockReturnValue([
+			kernel.$.format.getLines.mockReturnValue([
 				{ nodeName: 'P' },
 				{ nodeName: 'P' }
 			]);
@@ -333,7 +253,7 @@ describe('Link Plugin', () => {
 
 			await link.modalAction();
 
-			expect(mockEditor.html.insertNode).toHaveBeenCalled();
+			expect(kernel.$.html.insertNode).toHaveBeenCalled();
 		});
 
 		it('should update existing link', async () => {
@@ -352,13 +272,13 @@ describe('Link Plugin', () => {
 			const result = await await link.modalAction();
 
 			expect(result).toBe(true);
-			expect(mockEditor.selection.setRange).toHaveBeenCalled();
-			expect(mockEditor.history.push).toHaveBeenCalledWith(false);
+			expect(kernel.$.selection.setRange).toHaveBeenCalled();
+			expect(kernel.$.history.push).toHaveBeenCalledWith(false);
 		});
 
 		it('should return true if insertNode fails', async () => {
 			link.isUpdateState = false;
-			mockEditor.html.insertNode.mockReturnValue(false);
+			kernel.$.html.insertNode.mockReturnValue(false);
 
 			const mockAnchor = {
 				tagName: 'A',
@@ -398,7 +318,7 @@ describe('Link Plugin', () => {
 
 			link.controllerAction(mockTarget);
 
-			expect(mockEditor.html.copy).toHaveBeenCalledWith(link.target);
+			expect(kernel.$.html.copy).toHaveBeenCalledWith(link.target);
 		});
 
 		it('should open modal for update', async () => {
@@ -414,8 +334,8 @@ describe('Link Plugin', () => {
 
 			link.controllerAction(mockTarget);
 
-			expect(mockEditor.selection.setRange).toHaveBeenCalled();
-			expect(mockEditor.inline.apply).toHaveBeenCalledWith(
+			expect(kernel.$.selection.setRange).toHaveBeenCalled();
+			expect(kernel.$.inline.apply).toHaveBeenCalledWith(
 				null,
 				{ stylesToModify: null, nodesToRemove: ['A'], strictRemove: false }
 			);
@@ -432,8 +352,8 @@ describe('Link Plugin', () => {
 
 			expect(dom.utils.removeItem).toHaveBeenCalledWith(targetBeforeDeletion);
 			expect(link.controller.currentTarget).toBeNull();
-			expect(mockEditor.focusManager.focus).toHaveBeenCalled();
-			expect(mockEditor.history.push).toHaveBeenCalledWith(false);
+			expect(kernel.$.focusManager.focus).toHaveBeenCalled();
+			expect(kernel.$.history.push).toHaveBeenCalledWith(false);
 		});
 	});
 
@@ -448,10 +368,21 @@ describe('Link Plugin', () => {
 			link.modalOn(false);
 			expect(link.isUpdateState).toBe(false);
 
+			// Setup mocks for modalAction
+			const mockAnchor = {
+				tagName: 'A',
+				href: 'http://test.com',
+				textContent: 'Test',
+				childNodes: [{ textContent: 'Test' }]
+			};
+			link.anchor.create = jest.fn().mockReturnValue(mockAnchor);
+			kernel.$.html.insertNode.mockReturnValue(true);
+			kernel.$.format.getLines.mockReturnValue([{ nodeName: 'P' }]);
+
 			// Submit modal
 			const result = await await link.modalAction();
 			expect(result).toBe(true);
-			expect(mockEditor.history.push).toHaveBeenCalled();
+			expect(kernel.$.history.push).toHaveBeenCalled();
 
 			// Close/init
 			link.modalInit();
@@ -483,7 +414,7 @@ describe('Link Plugin', () => {
 				childNodes: [{ textContent: 'Old Link' }]
 			};
 			await link.modalAction();
-			expect(mockEditor.history.push).toHaveBeenCalled();
+			expect(kernel.$.history.push).toHaveBeenCalled();
 		});
 	});
 });

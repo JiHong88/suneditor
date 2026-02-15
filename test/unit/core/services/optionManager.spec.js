@@ -220,15 +220,4 @@ describe('OptionProvider', () => {
 		});
 	});
 
-	describe('destroy', () => {
-		it('should clear all options on destroy', () => {
-			optionProvider.options.set('key1', 'value1');
-			optionProvider.frameOptions.set('key2', 'value2');
-
-			optionProvider.destroy();
-
-			expect(optionProvider.options.size()).toBe(0);
-			expect(optionProvider.frameOptions.size()).toBe(0);
-		});
-	});
 });

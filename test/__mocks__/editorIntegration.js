@@ -199,256 +199,48 @@ export function createTestEditor(customOptions = {}) {
 		if (target && target.parentNode) {
 			target.parentNode.removeChild(target);
 		}
-		throw new Error(`Failed to create test editor: ${error.message}`);
+		throw new Error(`Failed to create test editor: ${error.message}\n${error.stack}`);
 	}
 }
 
 /**
- * Waits for the editor to be fully initialized
+ * Waits for the editor to be fully initialized.
+ * In the new architecture, Editor exposes deps via editor.$ (the KernelInjector $ deps bag).
  */
-export function waitForEditorReady(editor, timeout = 5000) {
+export function waitForEditorReady(editor, timeout = 15000) {
 	return new Promise((resolve, reject) => {
 		const start = Date.now();
 
 		function check() {
 			try {
-				// Check for core editor components and proper initialization
-				const hasContext = editor && editor.context && typeof editor.context.get === 'function';
-				let hasWysiwyg = hasContext && editor.context.get('wysiwyg');
-				const hasEventManager = editor && editor.eventManager;
-				const hasBasicMethods = editor &&
-					typeof editor.getContents === 'function' &&
-					typeof editor.setContents === 'function';
+				// In the new architecture, Editor stores everything under editor.$
+				const has$ = editor && editor.$;
+				const hasContext = has$ && editor.$.context && typeof editor.$.context.get === 'function';
+				const hasFrameContext = has$ && editor.$.frameContext;
+				const hasWysiwyg = hasFrameContext && editor.$.frameContext.get('wysiwyg');
+				const hasStore = has$ && editor.$.store;
+				const isInitFinished = hasStore && editor.$.store._editorInitFinished;
 
-				// For test environment, be more lenient about initialization
-				if (hasContext) {
-					// Ensure eventManager has scrollparents to prevent runtime errors
-					if (hasEventManager && !hasEventManager.scrollparents) {
-						hasEventManager.scrollparents = [];
-					}
-
-					// If wysiwyg doesn't exist, try to get it or create a mock
-					if (!hasWysiwyg && hasContext) {
-						const mockWysiwyg = document.createElement('div');
-						mockWysiwyg.setAttribute('contenteditable', 'true');
-						mockWysiwyg.innerHTML = 'Test content to select';
-						document.body.appendChild(mockWysiwyg); // Add to DOM
-						editor.context.set('wysiwyg', mockWysiwyg);
-						hasWysiwyg = mockWysiwyg; // Update for later use
-					}
-
-					// Add mock wysiwygFrame to fix offsetHeight errors for all contexts
-					if (hasContext) {
-						const createMockFrame = () => {
-							const mockWysiwygFrame = document.createElement('div');
-							mockWysiwygFrame.style.height = '200px';
-							mockWysiwygFrame.style.width = '100%';
-							// Set offsetHeight property to prevent errors
-							Object.defineProperty(mockWysiwygFrame, 'offsetHeight', {
-								get: () => 200,
-								configurable: true
-							});
-							Object.defineProperty(mockWysiwygFrame, 'offsetWidth', {
-								get: () => 400,
-								configurable: true
-							});
-							document.body.appendChild(mockWysiwygFrame);
-							return mockWysiwygFrame;
-						};
-
-						// Add to main context
-						if (!editor.context.get('wysiwygFrame')) {
-							editor.context.set('wysiwygFrame', createMockFrame());
-						}
-
-						// Add to all frame contexts if they exist
-						if (editor.multiTargets) {
-							editor.multiTargets.forEach(target => {
-								if (target.context && !target.context.get('wysiwygFrame')) {
-									target.context.set('wysiwygFrame', createMockFrame());
-								}
-							});
-						}
-
-						// Also add to currentFrame if it exists and is different
-						if (editor.currentFrame && editor.currentFrame !== editor.context && !editor.currentFrame.get('wysiwygFrame')) {
-							editor.currentFrame.set('wysiwygFrame', createMockFrame());
-						}
-
-						// Add mock toolbar_main to prevent errors in editor initialization
-						if (!editor.context.get('toolbar_main')) {
-							const mockToolbar = document.createElement('div');
-							mockToolbar.style.visibility = 'hidden';
-							document.body.appendChild(mockToolbar);
-							editor.context.set('toolbar_main', mockToolbar);
-						}
-					}
-
-					// Ensure core object exists with essential properties
-					if (editor && !editor.core) {
-						const initialContent = hasWysiwyg ? hasWysiwyg.innerHTML : '';
-						const historyStack = [initialContent];  // Start with wysiwyg initial content
-						let currentIndex = 0;
-						let isPaused = false;
-
-						editor.core = {
-							eventManager: hasEventManager,
-							history: {
-								push: jest.fn((immediate) => {
-									if (!isPaused) {
-										const wysiwyg = editor.context.get('wysiwyg');
-										if (wysiwyg) {
-											// Remove any future history when pushing new state
-											historyStack.splice(currentIndex + 1);
-											historyStack.push(wysiwyg.innerHTML);
-											currentIndex++;
-										}
-									}
-								}),
-								undo: jest.fn(() => {
-									if (currentIndex > 0) {
-										currentIndex--;
-										const wysiwyg = editor.context.get('wysiwyg');
-										if (wysiwyg) {
-											wysiwyg.innerHTML = historyStack[currentIndex];
-										}
-									}
-								}),
-								redo: jest.fn(() => {
-									if (currentIndex < historyStack.length - 1) {
-										currentIndex++;
-										const wysiwyg = editor.context.get('wysiwyg');
-										if (wysiwyg) {
-											wysiwyg.innerHTML = historyStack[currentIndex];
-										}
-									}
-								}),
-								reset: jest.fn(() => {
-									historyStack.length = 0;
-									historyStack.push(initialContent);
-									currentIndex = 0;
-								}),
-								overwrite: jest.fn(() => {
-									const wysiwyg = editor.context.get('wysiwyg');
-									if (wysiwyg && currentIndex >= 0) {
-										// Based on test: after overwrite, undo should return the overwritten content
-										// This means overwrite should push current content as new history
-										// but also replace what undo would return to
-										historyStack[currentIndex] = wysiwyg.innerHTML;
-										// Set the previous state to also be the current content
-										// so undo will return to current content instead of original
-										if (currentIndex > 0) {
-											historyStack[currentIndex - 1] = wysiwyg.innerHTML;
-										}
-									}
-								}),
-								pause: jest.fn(() => {
-									isPaused = true;
-								}),
-								resume: jest.fn(() => {
-									isPaused = false;
-								}),
-								destroy: jest.fn(() => {
-									historyStack.length = 0;
-									historyStack.push(initialContent);
-									currentIndex = 0;
-								})
-							}
-						};
-					}
-
-					// Ensure basic methods exist
-					if (editor && typeof editor.getContents !== 'function') {
-						editor.getContents = jest.fn(() => '<p></p>');
-					}
-					if (editor && typeof editor.setContents !== 'function') {
-						editor.setContents = jest.fn();
-					}
-					if (editor && typeof editor.readOnly !== 'function') {
-						editor.readOnly = jest.fn((value) => {
-							if (hasContext) {
-								editor.context.set('isReadOnly', value);
-							}
-						});
-					}
-
-					// Add currentFrame property
-					if (editor && !editor.currentFrame) {
-						editor.currentFrame = editor.context;
-					}
-
-					// Add onChange event support
-					if (editor && !editor.onChanged) {
-						editor.onChanged = null;
-					}
-
-					// Add plugin event support
-					if (editor && !editor.plugins) {
-						editor.plugins = {};
-					}
-
-					// Mock eventManager for plugin integration
-					if (editor && hasEventManager && !hasEventManager._callPluginEvent) {
-						hasEventManager._callPluginEvent = jest.fn();
-					}
-
-					// Mock triggerEvent method
-					if (editor && !editor.triggerEvent) {
-						editor.triggerEvent = jest.fn(async (eventName, data) => {
-							// Simulate triggering various event callbacks
-							if (eventName === 'onKeyDown' && editor.onKeyDown) {
-								editor.onKeyDown(data);
-							}
-							if (eventName === 'onMouseUp' && editor.onMouseUp) {
-								editor.onMouseUp(data);
-							}
-							if (eventName === 'onClick' && editor.onClick) {
-								editor.onClick(data);
-							}
-							return true;
-						});
-					}
-
-					// Mock iframe auto height functionality to prevent DOM errors
-					if (editor && typeof editor._iframeAutoHeight === 'function') {
-						editor._iframeAutoHeight = jest.fn();
-					}
-					if (editor && typeof editor._resourcesStateChange === 'function') {
-						const originalResourcesStateChange = editor._resourcesStateChange;
-						editor._resourcesStateChange = jest.fn((fc) => {
-							try {
-								// Skip iframe operations, just do placeholder check
-								if (typeof editor._checkPlaceholder === 'function') {
-									editor._checkPlaceholder(fc);
-								}
-							} catch (e) {
-								// Silently ignore any errors in resource state change
-							}
-						});
-					}
-
-					// Trigger onChange when history operations occur
-					const originalPush = editor.core.history.push;
-					editor.core.history.push = jest.fn((immediate) => {
-						originalPush.call(editor.core.history, immediate);
-						if (editor.onChanged) editor.onChanged();
-					});
-
-					setTimeout(() => resolve(editor), 50);
+				if (has$ && hasContext && isInitFinished) {
+					// Editor is initialized. Wait a tick for setTimeout(0) callbacks in #editorInit
+					setTimeout(() => resolve(editor), 100);
 					return;
 				}
 
 				if (Date.now() - start > timeout) {
-					reject(new Error(`Editor initialization timeout after ${timeout}ms. Editor state: hasContext=${hasContext}, hasWysiwyg=${!!hasWysiwyg}, wysiwygNodeType=${hasWysiwyg?.nodeType}, wysiwygInDOM=${hasWysiwyg?.parentNode ? true : false}, hasEventManager=${!!hasEventManager}, hasScrollparents=${!!editor?.eventManager?.scrollparents}, hasBasicMethods=${hasBasicMethods}`));
+					reject(new Error(
+						`Editor initialization timeout after ${timeout}ms. State: has$=${!!has$}, ` +
+						`hasContext=${!!hasContext}, hasFrameContext=${!!hasFrameContext}, ` +
+						`hasWysiwyg=${!!hasWysiwyg}, isInitFinished=${!!isInitFinished}`
+					));
 				} else {
-					setTimeout(check, 25);
+					setTimeout(check, 50);
 				}
 			} catch (error) {
 				reject(new Error(`Error checking editor readiness: ${error?.message || 'Unknown error'}`));
 			}
 		}
 
-		// Start checking immediately
 		check();
 	});
 }

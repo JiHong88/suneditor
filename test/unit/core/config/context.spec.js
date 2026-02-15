@@ -2,7 +2,7 @@
  * @fileoverview Unit tests for core/config/context.js
  */
 
-import { CreateContext } from '../../../../src/core/config/context';
+import { CreateContext } from '../../../../src/core/schema/context';
 // ContextUtil moved to contextProvider service
 
 describe('Core Config - Context', () => {

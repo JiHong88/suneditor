@@ -3,6 +3,7 @@
  */
 
 import BackgroundColor from '../../../../src/plugins/dropdown/backgroundColor.js';
+import { createMockEditor } from '../../../../test/__mocks__/editorMock.js';
 
 // Mock HueSlider module to prevent canvas initialization errors
 jest.mock('../../../../src/modules/contract/HueSlider.js', () => {
@@ -20,8 +21,9 @@ const mockColorPicker = {
 };
 
 jest.mock('../../../../src/modules/contract/ColorPicker.js', () => {
-    return jest.fn().mockImplementation((plugin, type, options) => {
+    return jest.fn().mockImplementation((plugin, $, type, options) => {
         mockColorPicker.plugin = plugin;
+        mockColorPicker.$ = $;
         mockColorPicker.type = type;
         mockColorPicker.options = options;
         return mockColorPicker;
@@ -64,48 +66,15 @@ jest.mock('../../../../src/helper', () => ({
     }
 }));
 
-// Mock EditorInjector
-jest.mock('../../../../src/editorInjector', () => {
-    return jest.fn().mockImplementation(function(editor) {
-        this.editor = editor;
-        this.lang = editor.lang;
-        this.selection = editor.selection;
-        this.format = editor.format;
-        this.inline = editor.inline;
-        this.menu = editor.menu;
-        this.frameContext = editor.frameContext;
-        this.triggerEvent = editor.triggerEvent || jest.fn();
-    });
-});
-
 describe('Plugins - Dropdown - BackgroundColor', () => {
-    let mockEditor;
+    let kernel;
     let backgroundColor;
     let pluginOptions;
 
     beforeEach(() => {
         jest.clearAllMocks();
 
-        mockEditor = {
-            lang: {
-                backgroundColor: 'Background Color'
-            },
-            selection: {
-                getNode: jest.fn().mockReturnValue(document.createElement('span'))
-            },
-            format: {
-                isLine: jest.fn().mockReturnValue(false)
-            },
-            inline: {
-                apply: jest.fn()
-            },
-            menu: {
-                initDropdownTarget: jest.fn(),
-                dropdownOff: jest.fn()
-            },
-            frameContext: new Map(),
-            triggerEvent: jest.fn()
-        };
+        kernel = createMockEditor();
 
         pluginOptions = {
             items: ['#ff0000', '#00ff00', '#0000ff'],
@@ -113,7 +82,7 @@ describe('Plugins - Dropdown - BackgroundColor', () => {
             disableHEXInput: false
         };
 
-        backgroundColor = new BackgroundColor(mockEditor, pluginOptions);
+        backgroundColor = new BackgroundColor(kernel, pluginOptions);
     });
 
 
@@ -122,8 +91,8 @@ describe('Plugins - Dropdown - BackgroundColor', () => {
         it('should initialize ColorPicker with correct options', () => {
             const MockColorPicker = require('../../../../src/modules/contract/ColorPicker.js');
 
-            expect(MockColorPicker).toHaveBeenCalledWith(backgroundColor, 'backgroundColor', {
-                form: expect.any(Object), // Added in commit 9f43ca04
+            expect(MockColorPicker).toHaveBeenCalledWith(backgroundColor, expect.any(Object), 'backgroundColor', {
+                form: expect.any(Object),
                 colorList: pluginOptions.items,
                 splitNum: pluginOptions.splitNum,
                 disableHEXInput: pluginOptions.disableHEXInput,
@@ -137,14 +106,14 @@ describe('Plugins - Dropdown - BackgroundColor', () => {
         });
 
         it('should initialize dropdown menu', () => {
-            expect(mockEditor.menu.initDropdownTarget).toHaveBeenCalledWith(BackgroundColor, expect.any(Object));
+            expect(kernel.$.menu.initDropdownTarget).toHaveBeenCalledWith(BackgroundColor, expect.any(Object));
         });
 
         it('should pass menu as form to ColorPicker', () => {
             const MockColorPicker = require('../../../../src/modules/contract/ColorPicker.js');
 
             const callArgs = MockColorPicker.mock.calls[MockColorPicker.mock.calls.length - 1];
-            const passedOptions = callArgs[2];
+            const passedOptions = callArgs[3];
 
             // form should be the menu element created
             expect(passedOptions.form).toBeDefined();
@@ -180,7 +149,7 @@ describe('Plugins - Dropdown - BackgroundColor', () => {
 
         it('should return undefined for line elements', () => {
             const mockElement = document.createElement('div');
-            mockEditor.format.isLine.mockReturnValue(true);
+            kernel.$.format.isLine.mockReturnValue(true);
 
             const result = backgroundColor.active(mockElement, mockTarget);
 
@@ -190,6 +159,7 @@ describe('Plugins - Dropdown - BackgroundColor', () => {
         it('should return true and set color when element has background color', () => {
             const mockElement = document.createElement('span');
             const { dom } = require('../../../../src/helper');
+            kernel.$.format.isLine.mockReturnValue(false);
             dom.utils.getStyle.mockReturnValue('#ff0000');
 
             const result = backgroundColor.active(mockElement, mockTarget);
@@ -202,6 +172,7 @@ describe('Plugins - Dropdown - BackgroundColor', () => {
         it('should return false when element has no background color', () => {
             const mockElement = document.createElement('span');
             const { dom } = require('../../../../src/helper');
+            kernel.$.format.isLine.mockReturnValue(false);
             dom.utils.getStyle.mockReturnValue('');
 
             const result = backgroundColor.active(mockElement, mockTarget);
@@ -212,6 +183,7 @@ describe('Plugins - Dropdown - BackgroundColor', () => {
         it('should handle elements without background color style gracefully', () => {
             const mockElement = document.createElement('span');
             const { dom } = require('../../../../src/helper');
+            kernel.$.format.isLine.mockReturnValue(false);
             dom.utils.getStyle.mockReturnValue(null);
 
             const result = backgroundColor.active(mockElement, mockTarget);
@@ -224,7 +196,7 @@ describe('Plugins - Dropdown - BackgroundColor', () => {
         it('should initialize color picker with current node', () => {
             const mockTarget = document.createElement('div');
             const mockNode = document.createElement('span');
-            mockEditor.selection.getNode.mockReturnValue(mockNode);
+            kernel.$.selection.getNode.mockReturnValue(mockNode);
 
             backgroundColor.on(mockTarget);
 
@@ -243,9 +215,9 @@ describe('Plugins - Dropdown - BackgroundColor', () => {
             const isLineChecker = backgroundColor.colorPicker.init.mock.calls[0][2];
             const mockElement = document.createElement('p');
 
-            mockEditor.format.isLine.mockReturnValue(true);
+            kernel.$.format.isLine.mockReturnValue(true);
             expect(isLineChecker(mockElement)).toBe(true);
-            expect(mockEditor.format.isLine).toHaveBeenCalledWith(mockElement);
+            expect(kernel.$.format.isLine).toHaveBeenCalledWith(mockElement);
         });
     });
 
@@ -272,27 +244,27 @@ describe('Plugins - Dropdown - BackgroundColor', () => {
             expect(dom.utils.createElement).toHaveBeenCalledWith('SPAN', {
                 style: 'background-color: #ff0000;'
             });
-            expect(mockEditor.inline.apply).toHaveBeenCalledWith(
+            expect(kernel.$.inline.apply).toHaveBeenCalledWith(
                 expect.any(Object),
                 { stylesToModify: ['background-color'], nodesToRemove: null, strictRemove: null }
             );
-            expect(mockEditor.menu.dropdownOff).toHaveBeenCalled();
+            expect(kernel.$.menu.dropdownOff).toHaveBeenCalled();
         });
 
         it('should remove background color when no color provided', () => {
             backgroundColor.colorPickerAction('');
 
-            expect(mockEditor.inline.apply).toHaveBeenCalledWith(
+            expect(kernel.$.inline.apply).toHaveBeenCalledWith(
                 null,
                 { stylesToModify: ['background-color'], nodesToRemove: ['span'], strictRemove: true }
             );
-            expect(mockEditor.menu.dropdownOff).toHaveBeenCalled();
+            expect(kernel.$.menu.dropdownOff).toHaveBeenCalled();
         });
 
         it('should remove background color when null color provided', () => {
             backgroundColor.colorPickerAction(null);
 
-            expect(mockEditor.inline.apply).toHaveBeenCalledWith(
+            expect(kernel.$.inline.apply).toHaveBeenCalledWith(
                 null,
                 { stylesToModify: ['background-color'], nodesToRemove: ['span'], strictRemove: true }
             );
@@ -325,7 +297,7 @@ describe('Plugins - Dropdown - BackgroundColor', () => {
                 disableHEXInput: true
             };
 
-            const customBackgroundColor = new BackgroundColor(mockEditor, customOptions);
+            const customBackgroundColor = new BackgroundColor(kernel, customOptions);
 
             expect(customBackgroundColor.colorPicker.options.colorList).toEqual(customOptions.items);
             expect(customBackgroundColor.colorPicker.options.splitNum).toBe(8);
@@ -338,7 +310,7 @@ describe('Plugins - Dropdown - BackgroundColor', () => {
                 querySelector: jest.fn().mockReturnValue({ style: {} })
             };
 
-            mockEditor.format.isLine.mockReturnValue(false);
+            kernel.$.format.isLine.mockReturnValue(false);
 
             expect(() => {
                 backgroundColor.active(mockElement, mockTarget);
@@ -356,16 +328,16 @@ describe('Plugins - Dropdown - BackgroundColor', () => {
         });
 
         it('should handle missing editor format module', () => {
-            mockEditor.format = undefined;
+            kernel.$.format = undefined;
 
             expect(() => {
-                new BackgroundColor(mockEditor, {});
+                new BackgroundColor(kernel, {});
             }).not.toThrow();
         });
 
         it('should handle empty plugin options', () => {
             expect(() => {
-                new BackgroundColor(mockEditor, {});
+                new BackgroundColor(kernel, {});
             }).not.toThrow();
         });
 

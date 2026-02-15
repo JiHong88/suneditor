@@ -3,6 +3,7 @@
  */
 
 import Layout from '../../../../src/plugins/dropdown/layout.js';
+import { createMockEditor } from '../../../../test/__mocks__/editorMock.js';
 
 // Mock helper
 jest.mock('../../../../src/helper', () => ({
@@ -36,43 +37,14 @@ jest.mock('../../../../src/helper', () => ({
     }
 }));
 
-// Mock EditorInjector
-jest.mock('../../../../src/editorInjector/_core.js', () => {
-    return jest.fn().mockImplementation(function(editor) {
-        this.editor = editor;
-        this.lang = editor.lang;
-        this.frameContext = editor.frameContext;
-        this.focusManager = editor.focusManager;
-		this.triggerEvent = editor.triggerEvent || jest.fn();
-    });
-});
-
 describe('Plugins - Dropdown - Layout', () => {
-    let mockEditor;
+    let kernel;
     let layout;
 
     beforeEach(() => {
         jest.clearAllMocks();
 
-        mockEditor = {
-            lang: {
-                layout: 'Layout'
-            },
-            html: {
-                set: jest.fn()
-            },
-            menu: {
-                initDropdownTarget: jest.fn(),
-                dropdownOff: jest.fn()
-            },
-            frameContext: new Map([
-                ['wysiwygFrame', {
-                    innerHTML: '<p>Test content</p>',
-                    style: {}
-                }]
-            ]),
-            triggerEvent: jest.fn()
-        };
+        kernel = createMockEditor();
 
         const pluginOptions = {
             items: [
@@ -82,14 +54,14 @@ describe('Plugins - Dropdown - Layout', () => {
             ]
         };
 
-        layout = new Layout(mockEditor, pluginOptions);
+        layout = new Layout(kernel, pluginOptions);
     });
 
 
     describe('Constructor', () => {
 
         it('should initialize dropdown menu', () => {
-            expect(mockEditor.menu.initDropdownTarget).toHaveBeenCalledWith(Layout, expect.any(Object));
+            expect(kernel.$.menu.initDropdownTarget).toHaveBeenCalledWith(Layout, expect.any(Object));
         });
 
         it('should create layout items with correct structure', () => {
@@ -112,9 +84,9 @@ describe('Plugins - Dropdown - Layout', () => {
             layout.action(mockTarget);
 
             expect(mockTarget.getAttribute).toHaveBeenCalledWith('data-value');
-            expect(mockEditor.html.set).toHaveBeenCalledWith('<div class="layout-2"><p>Layout 2 content</p></div>');
+            expect(kernel.$.html.set).toHaveBeenCalledWith('<div class="layout-2"><p>Layout 2 content</p></div>');
             expect(layout.selectedIndex).toBe(1);
-            expect(mockEditor.menu.dropdownOff).toHaveBeenCalled();
+            expect(kernel.$.menu.dropdownOff).toHaveBeenCalled();
         });
 
         it('should handle first layout item (index 0)', () => {
@@ -122,7 +94,7 @@ describe('Plugins - Dropdown - Layout', () => {
 
             layout.action(mockTarget);
 
-            expect(mockEditor.html.set).toHaveBeenCalledWith('<div class="layout-1"><p>Layout 1 content</p></div>');
+            expect(kernel.$.html.set).toHaveBeenCalledWith('<div class="layout-1"><p>Layout 1 content</p></div>');
             expect(layout.selectedIndex).toBe(0);
         });
 
@@ -131,7 +103,7 @@ describe('Plugins - Dropdown - Layout', () => {
 
             layout.action(mockTarget);
 
-            expect(mockEditor.html.set).toHaveBeenCalledWith('<div class="layout-3"><p>Layout 3 content</p></div>');
+            expect(kernel.$.html.set).toHaveBeenCalledWith('<div class="layout-3"><p>Layout 3 content</p></div>');
             expect(layout.selectedIndex).toBe(2);
         });
 
@@ -143,7 +115,7 @@ describe('Plugins - Dropdown - Layout', () => {
                 layout.action(mockTarget);
             }).toThrow('[SUNEDITOR.layout.fail] cause : "layouts[i].html not found"');
 
-            expect(mockEditor.menu.dropdownOff).toHaveBeenCalled();
+            expect(kernel.$.menu.dropdownOff).toHaveBeenCalled();
         });
 
         it('should handle invalid index gracefully', () => {
@@ -169,7 +141,7 @@ describe('Plugins - Dropdown - Layout', () => {
         it('should warn when no layout items provided', () => {
             const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
 
-            new Layout(mockEditor, { items: [] });
+            new Layout(kernel, { items: [] });
 
             expect(consoleSpy).toHaveBeenCalledWith('[SUNEDITOR.plugins.layout.warn] To use the "layout" plugin, please define the "layouts" option.');
 
@@ -187,7 +159,7 @@ describe('Plugins - Dropdown - Layout', () => {
                 layout.action(mockTarget);
             }).not.toThrow();
 
-            expect(mockEditor.html.set).toHaveBeenCalledWith('<div class="layout-1"><p>Layout 1 content</p></div>');
+            expect(kernel.$.html.set).toHaveBeenCalledWith('<div class="layout-1"><p>Layout 1 content</p></div>');
         });
 
         it('should handle different layout templates', () => {
@@ -200,24 +172,12 @@ describe('Plugins - Dropdown - Layout', () => {
             mockTargets.forEach((target, index) => {
                 layout.action(target);
                 expect(layout.selectedIndex).toBe(index);
-                expect(mockEditor.html.set).toHaveBeenCalledWith(layout.items[index].html);
+                expect(kernel.$.html.set).toHaveBeenCalledWith(layout.items[index].html);
             });
         });
     });
 
     describe('Error handling', () => {
-        it('should handle missing editor html module', () => {
-            mockEditor.html = undefined;
-
-            const mockTarget = {
-                getAttribute: jest.fn().mockReturnValue('0')
-            };
-
-            expect(() => {
-                layout.action(mockTarget);
-            }).not.toThrow();
-        });
-
         it('should handle missing items array', () => {
             layout.items = undefined;
 

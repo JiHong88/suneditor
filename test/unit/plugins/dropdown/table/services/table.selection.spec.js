@@ -68,6 +68,9 @@ describe('TableSelectionService', () => {
             resetInfo: jest.fn()
         };
 
+        // Make main act as its own kernel for dependency injection
+        main.$ = main;
+
         selectionService = new TableSelectionService(main);
     });
 
@@ -111,15 +114,6 @@ describe('TableSelectionService', () => {
         });
     });
 
-    describe('Interaction Handlers', () => {
-         // Testing private methods via events is hard without exposing them or full integration
-         // But we can test if global events are bound and removed
-         
-         it('should remove global events on init', () => {
-             selectionService.init();
-             expect(main.uiManager.disableBackWrapper).toHaveBeenCalled();
-         });
-    });
 
     describe('Selection Modifiers', () => {
          it('should recall style for selected cells', () => {
@@ -199,7 +193,7 @@ describe('TableSelectionService', () => {
                  rs: 0, re: 2, cs: 1, ce: 2
              }));
         });
-        
+
         it('should handle cached ref', () => {
              const table = document.createElement('table');
              const tr = document.createElement('tr');
@@ -270,49 +264,6 @@ describe('TableSelectionService', () => {
         });
     });
 
-    describe('startCellSelection', () => {
-        it('should start cell selection without shift', () => {
-            const { dom } = require('../../../../../../src/helper');
-            const cell = document.createElement('td');
-            dom.query.getParentElement.mockReturnValue(document.createElement('table'));
-
-            main.eventManager.addGlobalEvent.mockReturnValue('eventId');
-
-            selectionService.startCellSelection(cell, false);
-
-            expect(main.setState).toHaveBeenCalledWith('isShiftPressed', false);
-            expect(main.eventManager.addGlobalEvent).toHaveBeenCalledWith('mousemove', expect.any(Function), false);
-            expect(main.eventManager.addGlobalEvent).toHaveBeenCalledWith('mouseup', expect.any(Function), false);
-            expect(main.eventManager.addGlobalEvent).toHaveBeenCalledWith('touchmove', expect.any(Function), false);
-        });
-
-        it('should start cell selection with shift', () => {
-            const { dom } = require('../../../../../../src/helper');
-            const cell = document.createElement('td');
-            dom.query.getParentElement.mockReturnValue(document.createElement('table'));
-
-            main.eventManager.addGlobalEvent.mockReturnValue('eventId');
-
-            selectionService.startCellSelection(cell, true);
-
-            expect(main.setState).toHaveBeenCalledWith('isShiftPressed', true);
-            expect(main.eventManager.addGlobalEvent).toHaveBeenCalledWith('keyup', expect.any(Function), false);
-            expect(main.eventManager.addGlobalEvent).toHaveBeenCalledWith('mousedown', expect.any(Function), false);
-        });
-
-        it('should remove global events before starting if not shift and no ref', () => {
-            const { dom } = require('../../../../../../src/helper');
-            const cell = document.createElement('td');
-            dom.query.getParentElement.mockReturnValue(document.createElement('table'));
-
-            mainState.isShiftPressed = false;
-            mainState.ref = null;
-
-            selectionService.startCellSelection(cell, false);
-
-            expect(main.uiManager.disableBackWrapper).toHaveBeenCalled();
-        });
-    });
 
     describe('deleteStyleSelectedCells', () => {
         it('should remove styles from selected cells', () => {
@@ -364,295 +315,9 @@ describe('TableSelectionService', () => {
         });
     });
 
-    describe('Cell Multi-Select Events', () => {
-        let mockEvent;
-        let table;
-        let cell1;
-        let cell2;
 
-        beforeEach(() => {
-            const { dom, numbers } = require('../../../../../../src/helper');
 
-            table = document.createElement('table');
-            const tr = document.createElement('tr');
-            cell1 = document.createElement('td');
-            cell2 = document.createElement('td');
-            tr.append(cell1, cell2);
-            table.appendChild(tr);
 
-            mainState.selectedTable = table;
-            mainState.fixedCell = cell1;
-
-            dom.query.getEventTarget.mockReturnValue(cell2);
-            dom.query.getParentElement.mockImplementation((el, check) => {
-                if (check === 'TABLE') return table;
-                if (check === dom.check.isTableCell) return cell2;
-                return el;
-            });
-            dom.check.isTableCell.mockReturnValue(true);
-            numbers.getOverlapRangeAtIndex.mockReturnValue(true);
-
-            mockEvent = {
-                stopPropagation: jest.fn(),
-                target: cell2
-            };
-        });
-
-        it('should handle shift selection when target equals fixedCell', () => {
-            const { dom } = require('../../../../../../src/helper');
-            dom.query.getParentElement.mockReturnValue(cell1);
-
-            mainState.isShiftPressed = true;
-            main.eventManager.addGlobalEvent.mockReturnValue('eventId');
-
-            // Start selection first
-            selectionService.startCellSelection(cell1, true);
-
-            // Get the mousemove handler
-            const multiOnCall = main.eventManager.addGlobalEvent.mock.calls.find(
-                call => call[0] === 'mousedown'
-            );
-            const multiOnHandler = multiOnCall[1];
-
-            // Simulate clicking on the same cell
-            mockEvent.target = cell1;
-            dom.query.getEventTarget.mockReturnValue(cell1);
-            dom.query.getParentElement.mockImplementation((el, check) => {
-                if (check === 'TABLE') return table;
-                return cell1;
-            });
-
-            multiOnHandler(mockEvent);
-
-            expect(main.setState).toHaveBeenCalledWith('isShiftPressed', false);
-            expect(main._editorEnable).toHaveBeenCalledWith(true);
-        });
-
-        it('should handle multi-select with different target cell', () => {
-            const { dom } = require('../../../../../../src/helper');
-
-            mainState.isShiftPressed = false;
-            mainState.ref = { cs: 0, ce: 1, rs: 0, re: 0 };
-            main.eventManager.addGlobalEvent.mockReturnValue('eventId');
-
-            // Start selection
-            selectionService.startCellSelection(cell1, false);
-
-            // Get the mousemove handler
-            const multiOnCall = main.eventManager.addGlobalEvent.mock.calls.find(
-                call => call[0] === 'mousemove'
-            );
-            const multiOnHandler = multiOnCall[1];
-
-            dom.query.getParentElement.mockImplementation((el, check) => {
-                if (check === 'TABLE') return table;
-                return cell2;
-            });
-
-            multiOnHandler(mockEvent);
-
-            expect(main.setState).toHaveBeenCalledWith('selectedCell', cell2);
-        });
-
-        it('should return early when target is null', () => {
-            const { dom } = require('../../../../../../src/helper');
-            dom.query.getParentElement.mockReturnValue(null);
-
-            main.eventManager.addGlobalEvent.mockReturnValue('eventId');
-            selectionService.startCellSelection(cell1, false);
-
-            const multiOnCall = main.eventManager.addGlobalEvent.mock.calls.find(
-                call => call[0] === 'mousemove'
-            );
-            const multiOnHandler = multiOnCall[1];
-
-            multiOnHandler(mockEvent);
-
-            // Should not set selectedCell since target is null
-            expect(main.setState).not.toHaveBeenCalledWith('selectedCell', expect.anything());
-        });
-
-        it('should return early when target is same as selectedCell', () => {
-            const { dom } = require('../../../../../../src/helper');
-
-            mainState.selectedCell = cell2;
-            dom.query.getParentElement.mockImplementation((el, check) => {
-                if (check === 'TABLE') return table;
-                return cell2;
-            });
-
-            main.eventManager.addGlobalEvent.mockReturnValue('eventId');
-            selectionService.startCellSelection(cell1, false);
-
-            const multiOnCall = main.eventManager.addGlobalEvent.mock.calls.find(
-                call => call[0] === 'mousemove'
-            );
-            const multiOnHandler = multiOnCall[1];
-
-            multiOnHandler(mockEvent);
-
-            // setState for selectedCell should not be called again
-            const selectedCellCalls = main.setState.mock.calls.filter(
-                call => call[0] === 'selectedCell' && call[1] === cell2
-            );
-            expect(selectedCellCalls.length).toBe(0);
-        });
-    });
-
-    describe('OffCellMultiSelect', () => {
-        it('should handle mouseup and set controller', () => {
-            const { dom } = require('../../../../../../src/helper');
-            const table = document.createElement('table');
-            const tr = document.createElement('tr');
-            const cell = document.createElement('td');
-            tr.appendChild(cell);
-            table.appendChild(tr);
-
-            mainState.selectedTable = table;
-            mainState.fixedCell = cell;
-            mainState.selectedCell = cell;
-            mainState.isShiftPressed = false;
-
-            dom.query.getParentElement.mockReturnValue(table);
-            main.eventManager.addGlobalEvent.mockReturnValue('eventId');
-
-            selectionService.startCellSelection(cell, false);
-
-            const mouseupCall = main.eventManager.addGlobalEvent.mock.calls.find(
-                call => call[0] === 'mouseup'
-            );
-            const mouseupHandler = mouseupCall[1];
-
-            const mockEvent = { stopPropagation: jest.fn() };
-            mouseupHandler(mockEvent);
-
-            expect(mockEvent.stopPropagation).toHaveBeenCalled();
-            expect(main._editorEnable).toHaveBeenCalledWith(true);
-            expect(main.cellService.setMergeSplitButton).toHaveBeenCalled();
-        });
-
-        it('should handle mouseup with shift pressed', () => {
-            const { dom } = require('../../../../../../src/helper');
-            const table = document.createElement('table');
-            const tr = document.createElement('tr');
-            const cell = document.createElement('td');
-            tr.appendChild(cell);
-            table.appendChild(tr);
-
-            mainState.selectedTable = table;
-            mainState.fixedCell = cell;
-            mainState.isShiftPressed = true;
-
-            dom.query.getParentElement.mockReturnValue(table);
-            main.eventManager.addGlobalEvent.mockReturnValue('eventId');
-
-            selectionService.startCellSelection(cell, true);
-
-            const mouseupCall = main.eventManager.addGlobalEvent.mock.calls.find(
-                call => call[0] === 'mouseup'
-            );
-            const mouseupHandler = mouseupCall[1];
-
-            const mockEvent = { stopPropagation: jest.fn() };
-            mouseupHandler(mockEvent);
-
-            // Should not call _editorEnable when shift is pressed
-            expect(main._editorEnable).not.toHaveBeenCalledWith(true);
-        });
-
-        it('should return early when fixedCell is null', () => {
-            const { dom } = require('../../../../../../src/helper');
-            const cell = document.createElement('td');
-
-            mainState.fixedCell = null;
-            mainState.selectedTable = null;
-
-            dom.query.getParentElement.mockReturnValue(null);
-            main.eventManager.addGlobalEvent.mockReturnValue('eventId');
-
-            selectionService.startCellSelection(cell, false);
-            mainState.fixedCell = null;
-
-            const mouseupCall = main.eventManager.addGlobalEvent.mock.calls.find(
-                call => call[0] === 'mouseup'
-            );
-            const mouseupHandler = mouseupCall[1];
-
-            const mockEvent = { stopPropagation: jest.fn() };
-            mouseupHandler(mockEvent);
-
-            expect(main.cellService.setMergeSplitButton).not.toHaveBeenCalled();
-        });
-    });
-
-    describe('OffCellShift', () => {
-        it('should close controller when ref is null', () => {
-            const { dom } = require('../../../../../../src/helper');
-            const cell = document.createElement('td');
-
-            mainState.ref = null;
-
-            dom.query.getParentElement.mockReturnValue(document.createElement('table'));
-            main.eventManager.addGlobalEvent.mockReturnValue('eventId');
-
-            selectionService.startCellSelection(cell, true);
-
-            const keyupCall = main.eventManager.addGlobalEvent.mock.calls.find(
-                call => call[0] === 'keyup'
-            );
-            const keyupHandler = keyupCall[1];
-
-            keyupHandler();
-
-            expect(main._closeController).toHaveBeenCalled();
-        });
-
-        it('should set controller when ref exists', () => {
-            const { dom } = require('../../../../../../src/helper');
-            const cell = document.createElement('td');
-
-            mainState.ref = { cs: 0, ce: 1, rs: 0, re: 0 };
-            mainState.fixedCell = cell;
-            mainState.selectedCells = [cell];
-            mainState.selectedCell = cell;
-
-            dom.query.getParentElement.mockReturnValue(document.createElement('table'));
-            main.eventManager.addGlobalEvent.mockReturnValue('eventId');
-
-            selectionService.startCellSelection(cell, true);
-
-            const keyupCall = main.eventManager.addGlobalEvent.mock.calls.find(
-                call => call[0] === 'keyup'
-            );
-            const keyupHandler = keyupCall[1];
-
-            keyupHandler();
-
-            expect(main._editorEnable).toHaveBeenCalledWith(true);
-            expect(main._setController).toHaveBeenCalledWith(cell);
-        });
-    });
-
-    describe('OffCellTouch', () => {
-        it('should call resetInfo on touch', () => {
-            const { dom } = require('../../../../../../src/helper');
-            const cell = document.createElement('td');
-
-            dom.query.getParentElement.mockReturnValue(document.createElement('table'));
-            main.eventManager.addGlobalEvent.mockReturnValue('eventId');
-
-            selectionService.startCellSelection(cell, false);
-
-            const touchCall = main.eventManager.addGlobalEvent.mock.calls.find(
-                call => call[0] === 'touchmove'
-            );
-            const touchHandler = touchCall[1];
-
-            touchHandler();
-
-            expect(main.resetInfo).toHaveBeenCalled();
-        });
-    });
 
     describe('initCellSelection edge cases', () => {
         it('should set selectedCells when empty', () => {

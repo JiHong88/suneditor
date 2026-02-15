@@ -3,6 +3,7 @@
  */
 
 import FontColor from '../../../../src/plugins/dropdown/fontColor.js';
+import { createMockEditor } from '../../../../test/__mocks__/editorMock.js';
 
 // Mock HueSlider module to prevent canvas initialization errors
 jest.mock('../../../../src/modules/contract/HueSlider.js', () => {
@@ -20,8 +21,9 @@ const mockColorPicker = {
 };
 
 jest.mock('../../../../src/modules/contract/ColorPicker.js', () => {
-    return jest.fn().mockImplementation((plugin, type, options) => {
+    return jest.fn().mockImplementation((plugin, $, type, options) => {
         mockColorPicker.plugin = plugin;
+        mockColorPicker.$ = $;
         mockColorPicker.type = type;
         mockColorPicker.options = options;
         return mockColorPicker;
@@ -64,48 +66,15 @@ jest.mock('../../../../src/helper', () => ({
     }
 }));
 
-// Mock EditorInjector
-jest.mock('../../../../src/editorInjector', () => {
-    return jest.fn().mockImplementation(function(editor) {
-        this.editor = editor;
-        this.lang = editor.lang;
-        this.selection = editor.selection;
-        this.format = editor.format;
-        this.inline = editor.inline;
-        this.menu = editor.menu;
-        this.frameContext = editor.frameContext;
-        this.triggerEvent = editor.triggerEvent || jest.fn();
-    });
-});
-
 describe('Plugins - Dropdown - FontColor', () => {
-    let mockEditor;
+    let kernel;
     let fontColor;
     let pluginOptions;
 
     beforeEach(() => {
         jest.clearAllMocks();
 
-        mockEditor = {
-            lang: {
-                fontColor: 'Font Color'
-            },
-            selection: {
-                getNode: jest.fn().mockReturnValue(document.createElement('span'))
-            },
-            format: {
-                isLine: jest.fn().mockReturnValue(false)
-            },
-            inline: {
-                apply: jest.fn()
-            },
-            menu: {
-                initDropdownTarget: jest.fn(),
-                dropdownOff: jest.fn()
-            },
-            frameContext: new Map(),
-            triggerEvent: jest.fn()
-        };
+        kernel = createMockEditor();
 
         pluginOptions = {
             items: ['#ff0000', '#00ff00', '#0000ff'],
@@ -113,7 +82,7 @@ describe('Plugins - Dropdown - FontColor', () => {
             disableHEXInput: false
         };
 
-        fontColor = new FontColor(mockEditor, pluginOptions);
+        fontColor = new FontColor(kernel, pluginOptions);
     });
 
 
@@ -122,8 +91,8 @@ describe('Plugins - Dropdown - FontColor', () => {
         it('should initialize ColorPicker with correct options', () => {
             const MockColorPicker = require('../../../../src/modules/contract/ColorPicker.js');
 
-            expect(MockColorPicker).toHaveBeenCalledWith(fontColor, 'color', {
-                form: expect.any(Object), // Added in commit 9f43ca04
+            expect(MockColorPicker).toHaveBeenCalledWith(fontColor, expect.any(Object), 'color', {
+                form: expect.any(Object),
                 colorList: pluginOptions.items,
                 splitNum: pluginOptions.splitNum,
                 disableHEXInput: pluginOptions.disableHEXInput,
@@ -137,7 +106,7 @@ describe('Plugins - Dropdown - FontColor', () => {
         });
 
         it('should initialize dropdown menu', () => {
-            expect(mockEditor.menu.initDropdownTarget).toHaveBeenCalledWith(FontColor, expect.any(Object));
+            expect(kernel.$.menu.initDropdownTarget).toHaveBeenCalledWith(FontColor, expect.any(Object));
         });
 
         it('should pass menu as form to ColorPicker', () => {
@@ -145,7 +114,7 @@ describe('Plugins - Dropdown - FontColor', () => {
             const { dom } = require('../../../../src/helper');
 
             const callArgs = MockColorPicker.mock.calls[MockColorPicker.mock.calls.length - 1];
-            const passedOptions = callArgs[2];
+            const passedOptions = callArgs[3];
 
             // form should be the menu element created
             expect(passedOptions.form).toBeDefined();
@@ -181,7 +150,7 @@ describe('Plugins - Dropdown - FontColor', () => {
 
         it('should return undefined for line elements', () => {
             const mockElement = document.createElement('div');
-            mockEditor.format.isLine.mockReturnValue(true);
+            kernel.$.format.isLine.mockReturnValue(true);
 
             const result = fontColor.active(mockElement, mockTarget);
 
@@ -191,6 +160,7 @@ describe('Plugins - Dropdown - FontColor', () => {
         it('should return true and set color when element has font color', () => {
             const mockElement = document.createElement('span');
             const { dom } = require('../../../../src/helper');
+            kernel.$.format.isLine.mockReturnValue(false);
             dom.utils.getStyle.mockReturnValue('#00ff00');
 
             const result = fontColor.active(mockElement, mockTarget);
@@ -203,6 +173,7 @@ describe('Plugins - Dropdown - FontColor', () => {
         it('should return false when element has no font color', () => {
             const mockElement = document.createElement('span');
             const { dom } = require('../../../../src/helper');
+            kernel.$.format.isLine.mockReturnValue(false);
             dom.utils.getStyle.mockReturnValue('');
 
             const result = fontColor.active(mockElement, mockTarget);
@@ -213,6 +184,7 @@ describe('Plugins - Dropdown - FontColor', () => {
         it('should handle elements without color style gracefully', () => {
             const mockElement = document.createElement('span');
             const { dom } = require('../../../../src/helper');
+            kernel.$.format.isLine.mockReturnValue(false);
             dom.utils.getStyle.mockReturnValue(null);
 
             const result = fontColor.active(mockElement, mockTarget);
@@ -222,6 +194,9 @@ describe('Plugins - Dropdown - FontColor', () => {
 
         it('should query for correct color helper selector', () => {
             const mockElement = document.createElement('span');
+            kernel.$.format.isLine.mockReturnValue(false);
+            const { dom } = require('../../../../src/helper');
+            dom.utils.getStyle.mockReturnValue('#000000');
 
             fontColor.active(mockElement, mockTarget);
 
@@ -233,7 +208,7 @@ describe('Plugins - Dropdown - FontColor', () => {
         it('should initialize color picker with current node', () => {
             const mockTarget = document.createElement('div');
             const mockNode = document.createElement('span');
-            mockEditor.selection.getNode.mockReturnValue(mockNode);
+            kernel.$.selection.getNode.mockReturnValue(mockNode);
 
             fontColor.on(mockTarget);
 
@@ -252,9 +227,9 @@ describe('Plugins - Dropdown - FontColor', () => {
             const isLineChecker = fontColor.colorPicker.init.mock.calls[0][2];
             const mockElement = document.createElement('p');
 
-            mockEditor.format.isLine.mockReturnValue(true);
+            kernel.$.format.isLine.mockReturnValue(true);
             expect(isLineChecker(mockElement)).toBe(true);
-            expect(mockEditor.format.isLine).toHaveBeenCalledWith(mockElement);
+            expect(kernel.$.format.isLine).toHaveBeenCalledWith(mockElement);
         });
     });
 
@@ -281,27 +256,27 @@ describe('Plugins - Dropdown - FontColor', () => {
             expect(dom.utils.createElement).toHaveBeenCalledWith('SPAN', {
                 style: 'color: #00ff00;'
             });
-            expect(mockEditor.inline.apply).toHaveBeenCalledWith(
+            expect(kernel.$.inline.apply).toHaveBeenCalledWith(
                 expect.any(Object),
                 { stylesToModify: ['color'], nodesToRemove: null, strictRemove: null }
             );
-            expect(mockEditor.menu.dropdownOff).toHaveBeenCalled();
+            expect(kernel.$.menu.dropdownOff).toHaveBeenCalled();
         });
 
         it('should remove font color when no color provided', () => {
             fontColor.colorPickerAction('');
 
-            expect(mockEditor.inline.apply).toHaveBeenCalledWith(
+            expect(kernel.$.inline.apply).toHaveBeenCalledWith(
                 null,
                 { stylesToModify: ['color'], nodesToRemove: ['span'], strictRemove: true }
             );
-            expect(mockEditor.menu.dropdownOff).toHaveBeenCalled();
+            expect(kernel.$.menu.dropdownOff).toHaveBeenCalled();
         });
 
         it('should remove font color when null color provided', () => {
             fontColor.colorPickerAction(null);
 
-            expect(mockEditor.inline.apply).toHaveBeenCalledWith(
+            expect(kernel.$.inline.apply).toHaveBeenCalledWith(
                 null,
                 { stylesToModify: ['color'], nodesToRemove: ['span'], strictRemove: true }
             );
@@ -334,7 +309,7 @@ describe('Plugins - Dropdown - FontColor', () => {
                 disableHEXInput: true
             };
 
-            const customFontColor = new FontColor(mockEditor, customOptions);
+            const customFontColor = new FontColor(kernel, customOptions);
 
             expect(customFontColor.colorPicker.options.colorList).toEqual(customOptions.items);
             expect(customFontColor.colorPicker.options.splitNum).toBe(10);
@@ -347,7 +322,7 @@ describe('Plugins - Dropdown - FontColor', () => {
                 querySelector: jest.fn().mockReturnValue({ style: {} })
             };
 
-            mockEditor.format.isLine.mockReturnValue(false);
+            kernel.$.format.isLine.mockReturnValue(false);
 
             expect(() => {
                 fontColor.active(mockElement, mockTarget);
@@ -365,16 +340,16 @@ describe('Plugins - Dropdown - FontColor', () => {
         });
 
         it('should handle missing editor format module', () => {
-            mockEditor.format = undefined;
+            kernel.$.format = undefined;
 
             expect(() => {
-                new FontColor(mockEditor, {});
+                new FontColor(kernel, {});
             }).not.toThrow();
         });
 
         it('should handle empty plugin options', () => {
             expect(() => {
-                new FontColor(mockEditor, {});
+                new FontColor(kernel, {});
             }).not.toThrow();
         });
 

@@ -3,16 +3,17 @@
  */
 
 import Figure from '../../../src/modules/contract/Figure.js';
+import { createMockEditor } from '../../../test/__mocks__/editorMock.js';
 
 // Mock Controller directly since Figure imports it from './Controller'
 jest.mock('../../../src/modules/contract/Controller.js', () => {
-    return jest.fn().mockImplementation(function(inst, form, options) {
+    return jest.fn().mockImplementation(function(inst, $, element, params) {
         this.open = jest.fn();
         this.close = jest.fn();
         this.hide = jest.fn();
         this.show = jest.fn();
-        this.form = form;
-        this.position = options?.position || 'bottom';
+        this.form = element;
+        this.position = params?.position || 'bottom';
         // Add eventManager with addGlobalEvent
         this.eventManager = {
             addGlobalEvent: jest.fn(() => 'event-id'),
@@ -37,36 +38,6 @@ jest.mock('../../../src/modules/ui/_DragHandle.js', () => ({
         set: jest.fn()
     }
 }));
-
-jest.mock('../../../src/editorInjector/_core.js', () => {
-    return jest.fn().mockImplementation(function(editor) {
-        this.editor = editor;
-        this.contextProvider = editor.contextProvider;
-        this.frameContext = editor.frameContext;
-        this.triggerEvent = editor.triggerEvent || jest.fn();
-        this.icons = editor.icons;
-        this.lang = editor.lang;
-        this.carrierWrapper = {
-            appendChild: jest.fn(),
-            contains: jest.fn().mockReturnValue(true)
-        };
-        this.eventManager = (editor && editor.eventManager) || {
-            addEvent: jest.fn(),
-            addGlobalEvent: jest.fn(() => 'event-id'),
-            removeGlobalEvent: jest.fn()
-        };
-        this.instanceCheck = {
-            isRange: jest.fn().mockReturnValue(false)
-        };
-        this.status = editor.status;
-        this.uiManager = editor.uiManager;
-        this.selection = editor.selection;
-        this.offset = editor.offset;
-        this.component = editor.component;
-        this.toolbar = editor.toolbar;
-        this.subToolbar = editor.subToolbar;
-    });
-});
 
 jest.mock('../../../src/helper', () => ({
     dom: {
@@ -158,8 +129,41 @@ describe('Modules - Figure', () => {
     beforeEach(() => {
         jest.clearAllMocks();
 
-        mockEditor = {
-            uiManager: {
+        // Use createMockEditor for the $ deps bag pattern
+        const kernel = createMockEditor();
+        mockEditor = kernel;
+
+        // Setup frameContext first with proper mocks
+        const wrapperElement = document.createElement('div');
+        // Mock appendChild to handle both real and mock DOM nodes
+        const originalAppendChild = wrapperElement.appendChild;
+        wrapperElement.appendChild = jest.fn((child) => {
+            if (child && child.nodeType) {
+                return originalAppendChild.call(wrapperElement, child);
+            }
+            // Handle mock objects that aren't real DOM nodes
+            return child;
+        });
+
+        const frameContext = new Map([
+            ['_ww', { focus: jest.fn() }],
+            ['wrapper', wrapperElement],
+            ['_figure', {
+                main: document.createElement('div'),
+                border: document.createElement('div'),
+                display: document.createElement('div'),
+                handles: [document.createElement('div'), document.createElement('div')]
+            }],
+            ['wysiwygFrame', { clientWidth: 800 }],
+            ['wwComputedStyle', {
+                getPropertyValue: jest.fn().mockReturnValue('0px')
+            }]
+        ]);
+
+        // Override with custom mocks as needed
+        mockEditor.$ = {
+            ...kernel.$,
+            ui: {
                 showFigure: jest.fn(),
                 hideFigure: jest.fn(),
                 _visibleControllers: jest.fn(),
@@ -170,7 +174,8 @@ describe('Modules - Figure', () => {
             selection: {
                 getRangeElement: jest.fn(),
                 isRange: jest.fn().mockReturnValue(false),
-                setRange: jest.fn()
+                setRange: jest.fn(),
+                ...kernel.$.selection
             },
             component: {
                 resetComponentInfo: jest.fn(),
@@ -179,117 +184,51 @@ describe('Modules - Figure', () => {
                 copy: jest.fn(),
                 deselect: jest.fn(),
                 isInline: jest.fn().mockReturnValue(false),
-                __removeGlobalEvent: jest.fn()
+                __removeGlobalEvent: jest.fn(),
+                ...kernel.$.component
             },
-            eventManager: {
-                addEvent: jest.fn(),
-                addGlobalEvent: jest.fn(() => 'event-id'),
-                removeGlobalEvent: jest.fn()
-            },
-            triggerEvent: jest.fn(),
             contextProvider: {
+                frameContext: frameContext,
                 applyToRoots: jest.fn((callback) => {
-                    const mockContext = new Map();
-                    mockContext.set('wrapper', {
-                        querySelector: jest.fn().mockReturnValue(null),
-                        appendChild: jest.fn()
-                    });
-                    mockContext.set('_figure', {
-                        main: { style: {}, appendChild: jest.fn() },
-                        border: { style: {} },
-                        display: { style: {} },
-                        handles: [{ style: {} }, { style: {} }]
-                    });
-                    callback(mockContext);
-                })
-            },
-            frameContext: new Map([
-                ['_ww', { focus: jest.fn() }],
-                ['wrapper', {
-                    querySelector: jest.fn().mockReturnValue({ style: {} }),
-                    appendChild: jest.fn()
-                }],
-                ['_figure', {
-                    main: {
-                        style: {},
-                        offsetLeft: 100,
-                        offsetTop: 50,
-                        offsetWidth: 200,
-                        offsetHeight: 100
-                    },
-                    border: { style: {} },
-                    display: { style: {} },
-                    handles: [{ style: {} }, { style: {} }]
-                }],
-                ['wysiwygFrame', { clientWidth: 800 }],
-                ['wwComputedStyle', {
-                    getPropertyValue: jest.fn().mockReturnValue('0px')
-                }]
-            ]),
-            icons: {
-                format_float_none: '🚫',
-                format_float_left: '⬅',
-                format_float_right: '➡',
-                format_float_center: '⬇'
-            },
-            lang: {
-                basic: 'None',
-                left: 'Left',
-                center: 'Center',
-                right: 'Right',
-                autoSize: 'Auto',
-                caption: 'Caption'
-            },
-            opendControllers: [],
-            _preventBlur: false,
-            _figureContainer: null,
-            options: {
-                get: jest.fn((key) => {
-                    if (key === 'strictMode') return { formatFilter: true };
-                    if (key === 'defaultLine') return 'P';
-                    if (key === '_rtl') return false;
-                    return {};
-                })
-            },
-            offset: {
-                getLocal: jest.fn().mockReturnValue({
-                    top: 100,
-                    left: 200,
-                    scrollX: 0,
-                    scrollY: 0
+                    // Make sure we pass our custom frameContext
+                    callback(frameContext);
                 }),
-                setAbsPosition: jest.fn().mockReturnValue(true),
-                setRangePosition: jest.fn().mockReturnValue(true)
+                frameRoots: new Map([['test-frame', frameContext]])
             },
-            status: {
-                hasFocus: true
-            },
-            toolbar: {
-                hide: jest.fn()
-            },
-            subToolbar: {
-                hide: jest.fn()
-            },
-            isBalloon: false,
-            isSubBalloon: false,
-            format: {
-                isBlock: jest.fn().mockReturnValue(true),
-                isLine: jest.fn().mockReturnValue(false)
-            },
-            html: {
-                remove: jest.fn().mockReturnValue({
-                    container: { parentElement: { insertBefore: jest.fn() } },
-                    offset: 0
-                })
-            },
-            nodeTransform: {
-                split: jest.fn().mockReturnValue({ parentElement: { insertBefore: jest.fn() } }),
-                removeEmptyNode: jest.fn()
-            },
-            history: {
-                push: jest.fn()
-            }
+            frameContext: frameContext
         };
+
+        mockEditor.frameContext = frameContext;
+
+        // Patch format module
+        mockEditor.$.format = {
+            isBlock: jest.fn().mockReturnValue(true),
+            isLine: jest.fn().mockReturnValue(false),
+            ...kernel.$.format
+        };
+
+        // Patch html module
+        mockEditor.$.html = {
+            remove: jest.fn().mockReturnValue({
+                container: { parentElement: { insertBefore: jest.fn() } },
+                offset: 0
+            }),
+            ...kernel.$.html
+        };
+
+        // Patch nodeTransform module
+        mockEditor.$.nodeTransform = {
+            split: jest.fn().mockReturnValue({ parentElement: { insertBefore: jest.fn() } }),
+            removeEmptyNode: jest.fn(),
+            ...kernel.$.nodeTransform
+        };
+
+        // Convenience accessors
+        mockEditor.icons = mockEditor.$.icons;
+        mockEditor.lang = mockEditor.$.lang;
+        mockEditor.status = mockEditor.status || { hasFocus: true };
+        mockEditor.isBalloon = false;
+        mockEditor.isSubBalloon = false;
 
         mockInst = {
             editor: mockEditor,
@@ -314,7 +253,7 @@ describe('Modules - Figure', () => {
             mockControls.setAttribute = jest.fn();
             mockControls.hasAttribute = jest.fn().mockReturnValue(false);
 
-            const figure = new Figure(instWithoutKey, mockControls, {});
+            const figure = new Figure(instWithoutKey, mockEditor.$, mockControls, {});
             expect(figure.kind).toBe('FallbackFigure');
         });
     });
@@ -328,7 +267,7 @@ describe('Modules - Figure', () => {
             mockControls.removeAttribute = jest.fn();
             mockControls.setAttribute = jest.fn();
             mockControls.hasAttribute = jest.fn().mockReturnValue(false);
-            figure = new Figure(mockInst, mockControls, {});
+            figure = new Figure(mockInst, mockEditor.$, mockControls, {});
         });
 
         it('should handle figure operations', () => {
@@ -487,7 +426,7 @@ describe('Modules - Figure', () => {
             mockControls.removeAttribute = jest.fn();
             mockControls.setAttribute = jest.fn();
             mockControls.hasAttribute = jest.fn().mockReturnValue(false);
-            figure = new Figure(mockInst, mockControls, {});
+            figure = new Figure(mockInst, mockEditor.$, mockControls, {});
             mockElement = {
                 tagName: 'IMG',
                 style: { width: '100px', height: '50px', transform: '' },
@@ -507,7 +446,7 @@ describe('Modules - Figure', () => {
                 // Create figure with controls array to have a controller
                 // controls should be an array of button groups, e.g., [['edit', 'remove']]
                 const controlsWithButtons = [['edit', 'remove']];
-                const figureWithController = new Figure(mockInst, controlsWithButtons, {});
+                const figureWithController = new Figure(mockInst, mockEditor.$, controlsWithButtons, {});
                 figureWithController._cover = { className: 'se-figure-selected' };
 
                 const closeSpy = jest.spyOn(figureWithController.controller, 'close');
@@ -641,7 +580,7 @@ describe('Modules - Figure', () => {
                 };
 
                 figure.controllerAction(button);
-                expect(figure.component.copy).toHaveBeenCalledWith(figure._container);
+                expect(mockEditor.$.component.copy).toHaveBeenCalledWith(figure._container);
             });
         });
 
@@ -728,7 +667,7 @@ describe('Modules - Figure', () => {
             it('should set element and open controller when controller exists', () => {
                 // Create figure with controls array to have a controller
                 const controlsWithButtons = [['edit', 'remove']];
-                const figureWithController = new Figure(mockInst, controlsWithButtons, {});
+                const figureWithController = new Figure(mockInst, mockEditor.$, controlsWithButtons, {});
 
                 const openSpy = jest.spyOn(figureWithController.controller, 'open');
 
@@ -741,7 +680,7 @@ describe('Modules - Figure', () => {
             it('should handle params when controller exists', () => {
                 // Create figure with controls array to have a controller
                 const controlsWithButtons = [['edit', 'remove']];
-                const figureWithController = new Figure(mockInst, controlsWithButtons, {});
+                const figureWithController = new Figure(mockInst, mockEditor.$, controlsWithButtons, {});
 
                 const params = { disabled: true };
                 const openSpy = jest.spyOn(figureWithController.controller, 'open');
@@ -804,7 +743,7 @@ describe('Modules - Figure', () => {
                 figure.controllerAction(button);
 
                 expect(figure._setRevert).toHaveBeenCalled();
-                expect(figure.history.push).toHaveBeenCalledWith(false);
+                expect(mockEditor.$.history.push).toHaveBeenCalledWith(false);
             });
 
             it('should handle selectMenu type', () => {

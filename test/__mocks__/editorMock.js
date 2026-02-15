@@ -9,7 +9,7 @@ import { dom, env } from '../../src/helper';
  * Creates a mock DOM structure for testing
  */
 function createMockDOM() {
-	// Create wysiwyg content area
+	// Create wysiwyg content area - use jsdom to get real DOM elements
 	const wysiwyg = document.createElement('div');
 	wysiwyg.contentEditable = 'true';
 	wysiwyg.innerHTML = '<p>Mock content</p>';
@@ -160,6 +160,27 @@ function createMockOptions() {
 	return new Map([
 		['historyStackDelayTime', 400],
 		['defaultLine', 'P'],
+		['defaultLineBreakFormat', 'line'],
+		['elementBlacklist', ''],
+		['__defaultAttributeWhitelist', 'id|class|style|data-.*'],
+		['_editorElementWhitelist', 'p|div|br|span|strong|em|i|b|u|s|a|blockquote|pre|hr|table|thead|tbody|tr|th|td|ul|ol|li|dl|dt|dd|h1|h2|h3|h4|h5|h6|figcaption|figure|caption'],
+		['_allowedExtraTag', ''],
+		['_disallowedExtraTag', 'script|iframe|style'],
+		['attributeWhitelist', null],
+		['attributeBlacklist', null],
+		['tagStyles', {}],
+		['_lineStylesRegExp', /^(margin|padding|text-align|text-indent|line-height|letter-spacing|word-spacing|white-space):/i],
+		['_textStylesRegExp', /^(color|background-color|font-size|font-family|font-weight|font-style|text-decoration|letter-spacing):/i],
+		['autoStyleify', []],
+		['v2Migration', false],
+		['strictMode', {
+			tagFilter: true,
+			formatFilter: true,
+			classFilter: true,
+			textStyleTagFilter: true,
+			attrFilter: true,
+			styleFilter: true
+		}],
 		[
 			'_defaultStyleTagMap',
 			{
@@ -185,7 +206,10 @@ function createMockOptions() {
 				s: 'strikethrough'
 			}
 		],
-		['_textStyleTags', ['strong', 'em', 'b', 'i', 'u', 's', 'sub', 'sup']],
+		['_textStyleTags', ['strong', 'em', 'b', 'i', 'u', 's', 'sub', 'sup', 'span', 'font', 'var', 'ins', 'strike', 'del', 'mark', 'a', 'label', 'code', 'summary']],
+		['textStyleTags', 'strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary'],
+		['__listCommonStyle', ['color', 'backgroundColor', 'fontSize', 'fontName']],
+		['fontSizeUnits', ['px', 'pt', '%', 'em']],
 		['statusbar_showPathLabel', true],
 		['iframe', false],
 		['closeModalOutsideClick', true],
@@ -194,7 +218,88 @@ function createMockOptions() {
 		['toolbar_container', null],
 		['autoLinkify', true],
 		['__lineFormatFilter', true],
-		['charCounter_type', 'char']
+		['charCounter_type', 'char'],
+		// Format-related options
+		[
+			'formatLine',
+			{
+				reg: /^(p|div|h[1-6]|li|dt|dd|pre)$/i,
+				str: 'p|div|h1|h2|h3|h4|h5|h6|li|dt|dd|pre'
+			}
+		],
+		[
+			'formatBrLine',
+			{
+				reg: /^(pre)$/i,
+				str: 'pre'
+			}
+		],
+		[
+			'formatBlock',
+			{
+				reg: /^(blockquote|ol|ul|dl|figcaption|details)$/i,
+				str: 'blockquote|ol|ul|dl|figcaption|details'
+			}
+		],
+		[
+			'formatClosureBlock',
+			{
+				reg: /^(table|thead|tbody|tfoot|tr|th|td)$/i,
+				str: 'table|thead|tbody|tfoot|tr|th|td'
+			}
+		],
+		[
+			'formatClosureBrLine',
+			{
+				reg: /^()$/i,
+				str: ''
+			}
+		],
+		// Browser/modal/plugin common options
+		['useSearch', true],
+		['defaultWidth', '100%'],
+		['defaultHeight', 'auto'],
+		['maxWidth', ''],
+		['minWidth', ''],
+		['maxHeight', ''],
+		['minHeight', ''],
+		['imageWidth', '100%'],
+		['imageHeight', 'auto'],
+		['videoWidth', 640],
+		['videoHeight', 360],
+		['audioWidth', 300],
+		['audioHeight', 54],
+		['_imageAccept', 'image/*'],
+		['_videoAccept', 'video/*'],
+		['_audioAccept', 'audio/*'],
+		['imageFileInput', true],
+		['imageUrlInput', true],
+		['imageMultipleFile', true],
+		['videoFileInput', true],
+		['videoUrlInput', true],
+		['audioFileInput', true],
+		['audioUrlInput', true],
+		['linkProtocol', 'https://'],
+		['linkTargetNewWindow', false],
+		['linkNoPrefix', false],
+		['linkRel', []],
+		['linkRelDefault', {}],
+		['mathFontSize', []],
+		['tableCellControllerPosition', 'cell'],
+		['figureControls', null],
+		['figureAlign', 'center'],
+		['mode', 'classic'],
+		['toolbar_sticky', 0],
+		['toolbar_container', null],
+		['popupDisplay', 'full'],
+		['charCounter_type', 'char'],
+		['charCounter_max', -1],
+		['_defaultTagName', 'P'],
+		['_defaultAttr', ''],
+		['_lineAttr', null],
+		['iframe', false],
+		['closeModalOutsideClick', true],
+		['_subMode', false]
 	]);
 }
 
@@ -276,15 +381,86 @@ function createMockPlugins() {
 		},
 		image: {
 			action: mockPluginAction,
-			active: mockPluginActive
+			active: mockPluginActive,
+			pluginOptions: {
+				defaultWidth: '100%',
+				defaultHeight: 'auto'
+			},
+			modalInit: jest.fn(),
+			create: jest.fn(),
+			submitURL: jest.fn()
 		},
 		video: {
 			action: mockPluginAction,
-			active: mockPluginAction
+			active: mockPluginActive,
+			pluginOptions: {
+				defaultWidth: '560px',
+				defaultHeight: '315px'
+			},
+			modalInit: jest.fn(),
+			create: jest.fn(),
+			submitURL: jest.fn(),
+			findProcessUrl: jest.fn().mockReturnValue({ url: 'processed-url' }),
+			createVideoTag: jest.fn().mockReturnValue('<video></video>'),
+			createIframeTag: jest.fn().mockReturnValue('<iframe></iframe>')
 		},
 		audio: {
 			action: mockPluginAction,
-			active: mockPluginActive
+			active: mockPluginActive,
+			pluginOptions: {
+				defaultWidth: '300px',
+				defaultHeight: '54px'
+			},
+			modalInit: jest.fn(),
+			create: jest.fn(),
+			submitURL: jest.fn()
+		},
+		fileUpload: {
+			action: mockPluginAction,
+			active: mockPluginActive,
+			pluginOptions: {
+				defaultWidth: '100%',
+				defaultHeight: 'auto'
+			},
+			create: jest.fn(),
+			submitURL: jest.fn(),
+			modalInit: jest.fn()
+		},
+		imageGallery: {
+			action: mockPluginAction,
+			active: mockPluginActive,
+			browser: {
+				selectorHandler: jest.fn(),
+				open: jest.fn(),
+				close: jest.fn()
+			}
+		},
+		videoGallery: {
+			action: mockPluginAction,
+			active: mockPluginActive,
+			browser: {
+				selectorHandler: jest.fn(),
+				open: jest.fn(),
+				close: jest.fn()
+			}
+		},
+		audioGallery: {
+			action: mockPluginAction,
+			active: mockPluginActive,
+			browser: {
+				selectorHandler: jest.fn(),
+				open: jest.fn(),
+				close: jest.fn()
+			}
+		},
+		fileGallery: {
+			action: mockPluginAction,
+			active: mockPluginActive,
+			browser: {
+				selectorHandler: jest.fn(),
+				open: jest.fn(),
+				close: jest.fn()
+			}
 		},
 		codeView: {
 			action: mockPluginAction,
@@ -353,7 +529,7 @@ function createMockCommandTargets() {
 }
 
 /**
- * Creates a complete mock editor instance
+ * Creates a complete mock editor instance with layered DI pattern ($deps bag)
  */
 export function createMockEditor(customOptions = {}) {
 	const elements = createMockDOM();
@@ -368,22 +544,581 @@ export function createMockEditor(customOptions = {}) {
 		options.set(key, value);
 	});
 
-	const mockEditor = {
-		// Core properties
-		frameRoots,
-		frameContext,
-		frameOptions: {
-			get: (key) => frameContext.get('options').get(key) || options.get(key),
-			has: (key) => frameContext.get('options').has(key) || options.has(key),
-			set: (key, value) => frameContext.get('options').set(key, value)
+	// Create icons and lang (L2 config layer)
+	const icons = {
+		bold: '<svg/>', italic: '<svg/>', underline: '<svg/>', strikethrough: '<svg/>',
+		subscript: '<svg/>', superscript: '<svg/>', fontSize: '<svg/>', fontColor: '<svg/>',
+		hiliteColor: '<svg/>', indent: '<svg/>', outdent: '<svg/>', align: '<svg/>',
+		align_left: '<svg/>', align_center: '<svg/>', align_right: '<svg/>', align_justify: '<svg/>',
+		list_bulleted: '<svg>bulleted</svg>', list_numbered: '<svg>numbered</svg>', list_bullets: '<svg/>', list_number: '<svg/>', blockStyle: '<svg/>', lineHeight: '<svg/>',
+		table: '<svg/>', link: '<svg/>', image: '<svg/>', video: '<svg/>', audio: '<svg/>',
+		codeView: '<svg/>', undo: '<svg/>', redo: '<svg/>', save: '<svg/>', print: '<svg/>',
+		preview: '<svg/>', fullScreen: '<svg/>', arrow_down: '<svg/>', check: '<svg/>',
+		cancel: '<svg/>', close: '<svg/>', expansion: '<svg/>', reduction: '<svg/>',
+		format_float_none: '<svg/>', format_float_left: '<svg/>', format_float_right: '<svg/>',
+		format_float_inline: '<svg/>', caption: '<svg/>',
+		resize100: '<svg/>', resize75: '<svg/>', resize50: '<svg/>', resize25: '<svg/>',
+		mirror_horizontal: '<svg/>', mirror_vertical: '<svg/>',
+		rotate_left: '<svg/>', rotate_right: '<svg/>',
+		copy: '<svg/>', cut: '<svg/>', delete: '<svg/>',
+		math: '<svg/>', drawing: '<svg/>', embed: '<svg/>', mention: '<svg/>',
+		paragraphStyle: '<svg/>', textStyle: '<svg/>', horizontalRule: '<svg/>',
+		template: '<svg/>', layout: '<svg/>', fileUpload: '<svg/>', exportPDF: '<svg/>',
+		// Add missing thumbnail icons
+		video_thumbnail: '🎥', audio_thumbnail: '🎵', file_thumbnail: '📁',
+		image_gallery: '<svg/>', video_gallery: '<svg/>', audio_gallery: '<svg/>',
+		file_gallery: '<svg/>', file_browser: '<svg/>',
+		selection: '<svg class="se-icon-selection"/>'
+	};
+
+	// Initialize contextProvider now that icons is defined
+	const contextProvider = {
+		frameRoots: frameRoots,
+		context: {
+			get: jest.fn((key) => {
+				const contextMap = {
+					menuTray: elements.menuTray,
+					toolbar_main: elements.toolbarMain,
+					toolbar_sub_main: elements.toolbarSub,
+					topArea: elements.topArea,
+					wrapper: elements.wrapper,
+					wysiwyg: elements.wysiwyg,
+					code: elements.codeArea,
+					statusbar: elements.statusbar,
+					codeWrapper: elements.wrapper || document.createElement('div'),
+					wysiwygFrame: elements.wysiwygFrame || document.createElement('div'),
+					toolbar_arrow: document.createElement('div')
+				};
+				return contextMap[key] || document.createElement('div');
+			}),
+			set: jest.fn(),
+			has: jest.fn(),
+			delete: jest.fn(),
+			clear: jest.fn()
 		},
-		options: {
-			get: (key) => options.get(key),
-			has: (key) => options.has(key),
-			set: (key, value) => options.set(key, value)
-		},
+		frameContext: frameContext,
+		icons: icons,
+		applyToRoots: jest.fn((callback) => {
+			frameRoots.forEach((root) => callback(root));
+		}),
 		carrierWrapper: elements.carrierWrapper,
-		rootKeys: ['test-frame'],
+		reset: jest.fn(),
+		init: jest.fn(),
+		destroy: jest.fn()
+	};
+
+	const lang = { close: 'Close',
+		toolbar: {
+			bold: 'Bold', italic: 'Italic', underline: 'Underline', strikethrough: 'Strikethrough',
+			subscript: 'Subscript', superscript: 'Superscript', indent: 'Indent', outdent: 'Outdent',
+			undo: 'Undo', redo: 'Redo', save: 'Save', print: 'Print', preview: 'Preview',
+			fullScreen: 'Full Screen', codeView: 'Code View', removeFormat: 'Remove Format',
+			font: 'Font', fontSize: 'Font Size', fontColor: 'Font Color', backgroundColor: 'Background Color',
+			align: 'Align', list: 'List', lineHeight: 'Line Height', table: 'Table', link: 'Link',
+			image: 'Image', video: 'Video', audio: 'Audio', math: 'Math', blockquote: 'Blockquote',
+			paragraphStyle: 'Paragraph Style', textStyle: 'Text Style', horizontalRule: 'Horizontal Rule',
+			template: 'Template', layout: 'Layout', mention: 'Mention', embed: 'Embed',
+			drawing: 'Drawing', pageNavigator: 'Page Navigator', exportPDF: 'Export PDF',
+			fileUpload: 'File Upload', imageGallery: 'Image Gallery', videoGallery: 'Video Gallery',
+			audioGallery: 'Audio Gallery', fileBrowser: 'File Browser', fileGallery: 'File Gallery'
+		},
+		dialogBox: {
+			title: 'Title', url: 'URL', text: 'Text', close: 'Close', submitButton: 'Submit',
+			caption: 'Caption', altText: 'Alt Text', width: 'Width', height: 'Height',
+			basic: 'Basic', left: 'Left', center: 'Center', right: 'Right',
+			ratio: 'Ratio', percentage: 'Percentage', pixels: 'Pixels',
+			linkBox: { title: 'Link', url: 'URL', text: 'Text', newWindowCheck: 'Open in new window' }
+		},
+		controller: {
+			edit: 'Edit', remove: 'Remove', tableHeader: 'Table Header',
+			mergeCells: 'Merge Cells', splitCells: 'Split Cells', copy: 'Copy',
+			cut: 'Cut', delete: 'Delete', fixedColumnWidth: 'Fixed Column Width',
+			resize100: '100%', resize75: '75%', resize50: '50%', resize25: '25%',
+			autoSize: 'Auto Size', mirrorHorizontal: 'Mirror Horizontal',
+			mirrorVertical: 'Mirror Vertical', rotateLeft: 'Rotate Left',
+			rotateRight: 'Rotate Right', maxSize: 'Max Size', minSize: 'Min Size',
+			caption: 'Caption'
+		},
+		font: 'Font', fontSize: 'Size', image: 'Image', video: 'Video', audio: 'Audio',
+		link: 'Link', math: 'Math', drawing: 'Drawing', embed: 'Embed',
+		align: { left: 'Left', center: 'Center', right: 'Right', justify: 'Justify' },
+		list: 'List', numberedList: 'Numbered List', bulletedList: 'Bulleted List',
+		anchor: { bookmark: 'Bookmark', url: 'URL', newWindow: 'New Window' },
+		imageGallery: 'Image Gallery',
+		videoGallery: 'Video Gallery',
+		audioGallery: 'Audio Gallery',
+		fileBrowser: 'File Browser',
+		fileGallery: 'File Gallery',
+		plugins: {}
+	};
+
+	// Create Store for state management
+	const storeState = {
+		_editorInitFinished: true,
+		_destroy: false,
+		isScrollable: jest.fn().mockReturnValue(true)
+	};
+
+	const store = {
+		get: jest.fn((key) => storeState[key]),
+		set: jest.fn((key, value) => { storeState[key] = value; }),
+		subscribe: jest.fn().mockReturnValue(jest.fn()),
+		mode: {
+			isClassic: true,
+			isInline: false,
+			isBalloon: false,
+			isBalloonAlways: false,
+			isSubBalloon: false,
+			isSubBalloonAlways: false
+		},
+		_editorInitFinished: true,
+		_destroy: jest.fn()
+	};
+
+	// L2 Config layer
+	const instanceCheck = {
+		isWysiwygMode: jest.fn().mockReturnValue(true),
+		isCodeViewMode: jest.fn().mockReturnValue(false),
+		isRange: jest.fn((r) => r instanceof Range || Object.prototype.toString.call(r) === '[object Range]'),
+		isSelection: jest.fn((s) => s instanceof Selection || Object.prototype.toString.call(s) === '[object Selection]'),
+		isNode: jest.fn((n) => n?.nodeType !== undefined),
+		isText: jest.fn((n) => n?.nodeType === 3),
+		isElement: jest.fn((n) => n?.nodeType === 1)
+	};
+
+	const optionsMap = {
+		get: (key) => options.get(key),
+		has: (key) => options.has(key),
+		set: (key, value) => options.set(key, value)
+	};
+
+	const optionProvider = {
+		options: optionsMap,
+		frameOptions: {
+			get: (key) => frameContext.get('options')?.get(key) ?? options.get(key),
+			has: (key) => frameContext.get('options')?.has(key) || options.has(key),
+			set: (key, value) => frameContext.get('options')?.set(key, value)
+		},
+		reset: jest.fn(),
+		_destroy: jest.fn()
+	};
+
+	const eventManager = {
+		applyTagEffect: jest.fn(),
+		addEvent: jest.fn().mockReturnValue({ target: null, type: '', listener: null }),
+		removeEvent: jest.fn(),
+		addGlobalEvent: jest.fn().mockReturnValue({ target: null, type: '', listener: null }),
+		removeGlobalEvent: jest.fn(),
+		triggerEvent: jest.fn().mockResolvedValue(undefined),
+		events: {},
+		scrollparents: [],
+		_init: jest.fn(),
+		_destroy: jest.fn()
+	};
+
+	// L3 Logic layer (core modules)
+	const offset = {
+		getOffset: jest.fn().mockReturnValue({ top: 0, left: 0 }),
+		getCoordinate: jest.fn().mockReturnValue({ x: 0, y: 0 }),
+		getLocal: jest.fn().mockReturnValue({ top: 0, left: 0, scrollX: 0, scrollY: 0 }),
+		getGlobal: jest.fn().mockReturnValue({ top: 0, left: 0 }),
+		getGlobalScroll: jest.fn().mockReturnValue({
+			top: 0,
+			left: 0,
+			width: 0,
+			height: 0,
+			x: 0,
+			y: 0,
+			ohOffsetEl: null,
+			owOffsetEl: null,
+			oh: 0,
+			ow: 0,
+			heightEditorRefer: false,
+			widthEditorRefer: false,
+			ts: 0,
+			ls: 0
+		})
+	};
+
+	const selection = {
+		getNode: jest.fn().mockReturnValue(elements.wysiwyg.firstChild),
+		setRange: jest.fn(),
+		getRange: jest.fn().mockReturnValue(document.createRange()),
+		getNearRange: jest.fn().mockReturnValue({ container: elements.wysiwyg.firstChild, offset: 0 }),
+		getRangeAndLine: jest.fn().mockReturnValue({ range: document.createRange(), line: null }),
+		getRangeAndAddLine: jest.fn().mockReturnValue({ range: document.createRange(), line: null }),
+		getDragEventLocationRange: jest.fn().mockReturnValue({
+			sc: elements.wysiwyg.firstChild,
+			so: 0,
+			ec: elements.wysiwyg.firstChild,
+			eo: 0
+		}),
+		getRects: jest.fn().mockReturnValue({
+			rects: [],
+			position: 'start',
+			left: 0,
+			top: 0,
+			right: 0,
+			bottom: 0,
+			width: 0,
+			height: 0,
+			noText: false
+		}),
+		get: jest.fn().mockReturnValue(null),
+		save: jest.fn(),
+		restore: jest.fn(),
+		removeRange: jest.fn(),
+		resetRangeToTextNode: jest.fn(),
+		_init: jest.fn(),
+		scrollTo: jest.fn(),
+		isWWTarget: jest.fn().mockReturnValue(true),
+		__iframeFocus: false,
+		range: null,
+		selectionNode: null
+	};
+
+	const format = {
+		isLine: jest.fn().mockReturnValue(true),
+		isBlock: jest.fn().mockReturnValue(false),
+		isBrLine: jest.fn().mockReturnValue(false),
+		isNormalLine: jest.fn().mockReturnValue(true),
+		isClosureBlock: jest.fn().mockReturnValue(false),
+		isClosureBrLine: jest.fn().mockReturnValue(false),
+		isTextStyleNode: jest.fn().mockReturnValue(false),
+		getBlock: jest.fn().mockReturnValue(null),
+		getLine: jest.fn().mockReturnValue(null),
+		getBrLine: jest.fn().mockReturnValue(null),
+		getLines: jest.fn().mockReturnValue([]),
+		getNormalLines: jest.fn().mockReturnValue([]),
+		addLine: jest.fn(),
+		setLine: jest.fn(),
+		setBrLine: jest.fn(),
+		applyBlock: jest.fn(),
+		removeBlock: jest.fn(),
+		isEdgeLine: jest.fn().mockReturnValue(false),
+		startsWith: jest.fn().mockReturnValue(false),
+		_isExcludeSelectionElement: jest.fn().mockReturnValue(false),
+		_isNotTextNode: jest.fn().mockReturnValue(false)
+	};
+
+	const inline = {
+		apply: jest.fn().mockReturnValue(document.createElement('span')),
+		remove: jest.fn(),
+		is: jest.fn().mockReturnValue(false),
+		_isNonSplitNode: jest.fn().mockReturnValue(false)
+	};
+
+	const listFormat = {
+		createList: jest.fn(),
+		removeList: jest.fn(),
+		getList: jest.fn().mockReturnValue(null),
+		apply: jest.fn().mockReturnValue({ sc: elements.wysiwyg.firstChild, so: 0, ec: elements.wysiwyg.firstChild, eo: 1 })
+	};
+
+	const html = {
+		clean: jest.fn().mockReturnValue('cleaned html'),
+		insert: jest.fn(),
+		set: jest.fn(),
+		remove: jest.fn(),
+		insertNode: jest.fn(),
+		copy: jest.fn().mockReturnValue(''),
+		_convertToCode: jest.fn().mockReturnValue('<p>converted</p>')
+	};
+
+	const nodeTransform = {
+		createNestedNode: jest.fn().mockReturnValue({
+			parent: document.createElement('div'),
+			inner: document.createElement('span')
+		}),
+		removeAllParents: jest.fn(),
+		split: jest.fn().mockReturnValue({ before: null, after: null })
+	};
+
+	const char = {
+		test: jest.fn().mockReturnValue(true),
+		check: jest.fn().mockReturnValue(true),
+		display: jest.fn()
+	};
+
+	const component = {
+		is: jest.fn().mockReturnValue(false),
+		get: jest.fn().mockReturnValue(null),
+		select: jest.fn(),
+		deselect: jest.fn(),
+		hoverSelect: jest.fn(),
+		copy: jest.fn(),
+		cut: jest.fn(),
+		delete: jest.fn(),
+		insert: jest.fn(),
+		isInline: jest.fn().mockReturnValue(false),
+		__deselect: jest.fn(),
+		__removeGlobalEvent: jest.fn(),
+		__selectionSelected: false
+	};
+
+	const focusManager = {
+		focus: jest.fn(),
+		blur: jest.fn(),
+		nativeFocus: jest.fn(),
+		focusEdge: jest.fn(),
+		_preventBlur: false
+	};
+
+	const pluginManager = {
+		fileInfo: {
+			tags: [],
+			regExp: /^(img|video|audio|object)$/i,
+			pluginRegExp: /^(image|video|audio|fileUpload)$/,
+			tagAttrs: {},
+			pluginMap: {}
+		},
+		componentCheckers: [],
+		retainFormatCheckers: new Map(),
+		checkFileInfo: jest.fn(),
+		resetFileInfo: jest.fn(),
+		findComponentInfo: jest.fn().mockReturnValue(null),
+		applyRetainFormat: jest.fn(),
+		emitEvent: jest.fn(),
+		emitEventAsync: jest.fn(),
+		register: jest.fn(),
+		destroy: jest.fn()
+	};
+
+	const ui = {
+		setEditorStyle: jest.fn(),
+		setTheme: jest.fn(),
+		setDir: jest.fn(),
+		readOnly: jest.fn(),
+		disable: jest.fn(),
+		enable: jest.fn(),
+		show: jest.fn(),
+		hide: jest.fn(),
+		showLoading: jest.fn(),
+		hideLoading: jest.fn(),
+		alertOpen: jest.fn(),
+		alertClose: jest.fn(),
+		showToast: jest.fn(),
+		closeToast: jest.fn(),
+		setControllerOnDisabledButtons: jest.fn().mockReturnValue(true),
+		onControllerContext: jest.fn(),
+		offControllerContext: jest.fn(),
+		enableBackWrapper: jest.fn(),
+		disableBackWrapper: jest.fn(),
+		offCurrentController: jest.fn(),
+		offCurrentModal: jest.fn(),
+		getVisibleFigure: jest.fn().mockReturnValue(null),
+		setFigureContainer: jest.fn(),
+		preventToolbarHide: jest.fn(),
+		reset: jest.fn(),
+		_offControllers: jest.fn(),
+		_syncScrollPosition: jest.fn(),
+		_repositionControllers: jest.fn(),
+		_visibleControllers: jest.fn(),
+		_initToggleButtons: jest.fn(),
+		_toggleCodeViewButtons: jest.fn(),
+		_toggleControllerButtons: jest.fn(),
+		isButtonDisabled: jest.fn().mockReturnValue(false),
+		_updatePlaceholder: jest.fn(),
+		_syncFrameState: jest.fn(),
+		_iframeAutoHeight: jest.fn(),
+		_emitResizeEvent: jest.fn(),
+		init: jest.fn(),
+		destroy: jest.fn(),
+		opendControllers: [],
+		currentControllerName: '',
+		opendModal: null,
+		opendBrowser: null,
+		selectMenuOn: false,
+		_controllerOnDisabledButtons: [],
+		_codeViewDisabledButtons: [],
+		_notHideToolbar: false,
+		_figureContainer: null
+	};
+
+	const commandDispatcher = {
+		run: jest.fn(),
+		runFromTarget: jest.fn(),
+		targets: commandTargets,
+		activeCommands: ['bold', 'italic', 'underline', 'strikethrough', 'subscript', 'superscript', 'indent', 'outdent'],
+		applyTargets: jest.fn((command, callback) => {
+			const targets = commandTargets.get(command);
+			if (targets) {
+				targets.forEach(callback);
+			}
+		}),
+		registerTargets: jest.fn(),
+		resetTargets: jest.fn(),
+		_copyFormat: jest.fn(),
+		_pasteFormat: jest.fn(),
+		destroy: jest.fn()
+	};
+
+	const history = {
+		push: jest.fn(),
+		check: jest.fn(),
+		undo: jest.fn(),
+		redo: jest.fn(),
+		pause: jest.fn(),
+		resume: jest.fn(),
+		reset: jest.fn(),
+		resetButtons: jest.fn(),
+		getRootStack: jest.fn().mockReturnValue({
+			'test-frame': { value: [], index: -1 },
+			'second-frame': { value: [], index: -1 }
+		}),
+		resetDelayTime: jest.fn(),
+		overwrite: jest.fn(),
+		destroy: jest.fn()
+	};
+
+	const shortcuts = {
+		command: jest.fn().mockReturnValue(false),
+		enable: jest.fn(),
+		disable: jest.fn(),
+		_registerCustomShortcuts: jest.fn(),
+		keyMap: new Map(),
+		reverseKeys: []
+	};
+
+	const toolbar = {
+		_setResponsive: jest.fn(),
+		resetResponsiveToolbar: jest.fn(),
+		_showBalloon: jest.fn(),
+		hide: jest.fn(),
+		show: jest.fn(),
+		_balloonOffset: { top: 0, left: 0, position: 'top' },
+		_resetSticky: jest.fn(),
+		_sticky: false,
+		_showInline: jest.fn(),
+		_inlineToolbarAttr: { isShow: false }
+	};
+
+	const subToolbar = {
+		resetResponsiveToolbar: jest.fn(),
+		_showBalloon: jest.fn(),
+		hide: jest.fn(),
+		show: jest.fn(),
+		_balloonOffset: { top: 0, left: 0, position: 'top' },
+		_setBalloonOffset: jest.fn()
+	};
+
+	const menu = {
+		currentDropdownActiveButton: null,
+		currentDropdown: null,
+		currentDropdownName: null,
+		dropdownOff: jest.fn(),
+		containerOff: jest.fn(),
+		initDropdownTarget: jest.fn(),
+		querySelector: jest.fn().mockReturnValue(null),
+		querySelectorAll: jest.fn().mockReturnValue([]),
+		__resetMenuPosition: jest.fn(),
+		__restoreMenuPosition: jest.fn(),
+		_hideAllSubMenu: jest.fn(),
+		_getMenuButtonElement: jest.fn().mockReturnValue(null)
+	};
+
+	const viewer = {
+		_codeViewAutoHeight: jest.fn(),
+		_scrollLineNumbers: jest.fn(),
+		_resetFullScreenHeight: jest.fn().mockReturnValue(false)
+	};
+
+	// Build the $ deps bag (KernelInjector deps)
+	const $ = {
+		// L2 config
+		contextProvider,
+		optionProvider,
+		instanceCheck,
+		eventManager,
+		// Convenience accessors
+		frameRoots,
+		context: contextProvider.context,
+		options: optionsMap,
+		frameOptions: optionProvider.frameOptions,
+		frameContext,
+		icons,
+		lang,
+		store,
+		// L3 logic
+		offset,
+		selection,
+		format,
+		inline,
+		listFormat,
+		html,
+		nodeTransform,
+		char,
+		component,
+		focusManager,
+		pluginManager,
+		plugins,
+		ui,
+		commandDispatcher,
+		history,
+		shortcuts,
+		toolbar,
+		subToolbar,
+		menu,
+		viewer,
+		// Window/Document references
+		_w: window,
+		_d: document,
+		// Facade (public API)
+		facade: {
+			changeFrameContext: jest.fn()
+		}
+	};
+
+	// Create the kernel object (the mock editor instance)
+	const kernel = {
+		$,
+		store,
+		facade: $.facade,
+		_w: window,
+		_d: document,
+
+		// Backward-compatible flat accessors (for tests that use mockEditor.options instead of mockEditor.$.options)
+		options: optionsMap,
+		frameContext,
+		frameRoots,
+		context: contextProvider.context,
+		frameOptions: optionProvider.frameOptions,
+		icons,
+		lang,
+		selection,
+		format,
+		inline,
+		html,
+		char,
+		nodeTransform,
+		offset,
+		listFormat,
+		component,
+		focusManager,
+		pluginManager,
+		plugins,
+		ui,
+		commandDispatcher,
+		history,
+		shortcuts,
+		toolbar,
+		subToolbar,
+		menu,
+		viewer,
+		instanceCheck,
+		eventManager,
+		contextProvider,
+		optionProvider,
+		uiManager: ui, // Alias for backward compatibility
+		_eventOrchestrator: {
+			applyTagEffect: jest.fn(),
+			_addCommonEvents: jest.fn(),
+			addEvent: jest.fn(),
+			removeEvent: jest.fn(),
+			selectionState: {
+				reset: jest.fn()
+			}
+		},
 
 		// Status
 		status: {
@@ -400,141 +1135,8 @@ export function createMockEditor(customOptions = {}) {
 		effectNode: null,
 		activeCommands: ['bold', 'italic', 'underline', 'strikethrough', 'subscript', 'superscript', 'indent', 'outdent'],
 		commandTargets,
-		plugins,
-
-		// Context
-		context: {
-			get: jest.fn((key) => {
-				const contextMap = {
-					menuTray: elements.menuTray,
-					toolbar_main: elements.toolbarMain,
-					toolbar_sub_main: elements.toolbarSub,
-					topArea: elements.topArea,
-					wrapper: elements.wrapper,
-					wysiwyg: elements.wysiwyg,
-					code: elements.codeArea,
-					statusbar: elements.statusbar
-				};
-				return contextMap[key] || document.createElement('div');
-			})
-		},
-
-		format: {
-			isLine: jest.fn().mockReturnValue(true),
-			isBlock: jest.fn().mockReturnValue(false),
-			getBlock: jest.fn().mockReturnValue(null),
-			getLine: jest.fn().mockReturnValue(null),
-			addLine: jest.fn(),
-			_isExcludeSelectionElement: jest.fn().mockReturnValue(false)
-		},
-
-		html: {
-			clean: jest.fn().mockReturnValue('cleaned html'),
-			insert: jest.fn(),
-			remove: jest.fn(),
-			insertNode: jest.fn()
-		},
-
-		char: {
-			test: jest.fn().mockReturnValue(true),
-			check: jest.fn().mockReturnValue(true),
-			display: jest.fn()
-		},
-
-		history: {
-			push: jest.fn(),
-			check: jest.fn(),
-			undo: jest.fn(),
-			redo: jest.fn(),
-			pause: jest.fn(),
-			resume: jest.fn(),
-			reset: jest.fn(),
-			resetButtons: jest.fn(),
-			getRootStack: jest.fn().mockReturnValue({
-				'test-frame': { value: [], index: -1 },
-				'second-frame': { value: [], index: -1 }
-			}),
-			resetDelayTime: jest.fn(),
-			overwrite: jest.fn(),
-			destroy: jest.fn()
-		},
-
-		toolbar: {
-			_setResponsive: jest.fn(),
-			resetResponsiveToolbar: jest.fn(),
-			_showBalloon: jest.fn(),
-			hide: jest.fn(),
-			show: jest.fn(),
-			_balloonOffset: { top: 0, left: 0, position: 'top' },
-			_resetSticky: jest.fn(),
-			_sticky: false,
-			_showInline: jest.fn(),
-			_inlineToolbarAttr: { isShow: false }
-		},
-
-		subToolbar: {
-			resetResponsiveToolbar: jest.fn(),
-			_showBalloon: jest.fn(),
-			hide: jest.fn(),
-			show: jest.fn(),
-			_balloonOffset: { top: 0, left: 0, position: 'top' },
-			_setBalloonOffset: jest.fn()
-		},
-
-		menu: {
-			currentDropdownActiveButton: null,
-			currentDropdown: null,
-			currentDropdownName: null,
-			dropdownOff: jest.fn(),
-			__resetMenuPosition: jest.fn(),
-			__restoreMenuPosition: jest.fn(),
-			_hideAllSubMenu: jest.fn(),
-			_getMenuButtonElement: jest.fn().mockReturnValue(null)
-		},
-
-		viewer: {
-			_codeViewAutoHeight: jest.fn(),
-			_scrollLineNumbers: jest.fn(),
-			_resetFullScreenHeight: jest.fn().mockReturnValue(false)
-		},
-
-		nodeTransform: {
-			createNestedNode: jest.fn().mockReturnValue({
-				parent: document.createElement('div'),
-				inner: document.createElement('span')
-			})
-		},
-
-		inline: {
-			apply: jest.fn().mockReturnValue(document.createElement('span')),
-			remove: jest.fn(),
-			is: jest.fn().mockReturnValue(false),
-			_isNonSplitNode: jest.fn().mockReturnValue(false)
-		},
-
-		shortcuts: {
-			command: jest.fn().mockReturnValue(false),
-			enable: jest.fn(),
-			disable: jest.fn(),
-			_registerCustomShortcuts: jest.fn(),
-			keyMap: new Map(),
-			reverseKeys: []
-		},
-
-		// Event system
-		eventManager: null, // Will be set after mockEditor is complete
-
-		// Additional properties needed by EventManager
-		scrollparents: [],
-		triggerEvent: jest.fn(),
-		_callPluginEvent: jest.fn().mockReturnValue(undefined),
-		_callPluginEventAsync: jest.fn().mockResolvedValue(undefined),
-		_dataTransferAction: jest.fn().mockReturnValue(undefined),
-		applyTagEffect: jest.fn(),
-		_handledInBefore: false,
-		isComposing: false,
-		_onShortcutKey: false,
-		_setDefaultLine: jest.fn(),
+		rootKeys: ['test-frame'],
+		carrierWrapper: elements.carrierWrapper,
 
 		// Editor object
 		editor: {
@@ -542,6 +1144,8 @@ export function createMockEditor(customOptions = {}) {
 			isBalloon: false,
 			isSubBalloon: false
 		},
+
+		// Plugin event handlers
 		_onPluginEvents: new Map([
 			['onPaste', []],
 			['onFocus', []],
@@ -561,125 +1165,16 @@ export function createMockEditor(customOptions = {}) {
 			['onFilePasteAndDrop', []]
 		]),
 
-		// Make core modules available at editor level for CoreInjector
-		component: {
-			is: jest.fn().mockReturnValue(false),
-			get: jest.fn().mockReturnValue(null),
-			select: jest.fn(),
-			deselect: jest.fn(),
-			hoverSelect: jest.fn(),
-			__deselect: jest.fn(),
-			__selectionSelected: false
-		},
-
-		selection: {
-			getNode: jest.fn().mockReturnValue(elements.wysiwyg.firstChild),
-			setRange: jest.fn(),
-			getRange: jest.fn().mockReturnValue(document.createRange()),
-			getDragEventLocationRange: jest.fn().mockReturnValue({
-				sc: elements.wysiwyg.firstChild,
-				so: 0,
-				ec: elements.wysiwyg.firstChild,
-				eo: 0
-			}),
-			_init: jest.fn(),
-			scrollTo: jest.fn(),
-			__iframeFocus: false
-		},
-
-		uiManager: {
-			// Public methods
-			setEditorStyle: jest.fn(),
-			setTheme: jest.fn(),
-			setDir: jest.fn(),
-			readOnly: jest.fn(),
-			disable: jest.fn(),
-			enable: jest.fn(),
-			show: jest.fn(),
-			hide: jest.fn(),
-			showLoading: jest.fn(),
-			hideLoading: jest.fn(),
-			alertOpen: jest.fn(),
-			alertClose: jest.fn(),
-			showToast: jest.fn(),
-			closeToast: jest.fn(),
-			setControllerOnDisabledButtons: jest.fn().mockReturnValue(true),
-			onControllerContext: jest.fn(),
-			offControllerContext: jest.fn(),
-			enableBackWrapper: jest.fn(),
-			disableBackWrapper: jest.fn(),
-			offCurrentController: jest.fn(),
-			offCurrentModal: jest.fn(),
-			getVisibleFigure: jest.fn().mockReturnValue(null),
-			setFigureContainer: jest.fn(),
-			preventToolbarHide: jest.fn(),
-			reset: jest.fn(),
-			// Internal methods
-			_offControllers: jest.fn(),
-			_syncScrollPosition: jest.fn(),
-			_repositionControllers: jest.fn(),
-			_visibleControllers: jest.fn(),
-			_initToggleButtons: jest.fn(),
-			_toggleCodeViewButtons: jest.fn(),
-			_toggleControllerButtons: jest.fn(),
-			isButtonDisabled: jest.fn().mockReturnValue(false),
-			_updatePlaceholder: jest.fn(),
-			_syncFrameState: jest.fn(),
-			_iframeAutoHeight: jest.fn(),
-			_emitResizeEvent: jest.fn(),
-			init: jest.fn(),
-			destroy: jest.fn(),
-			// State properties
-			opendControllers: [],
-			currentControllerName: '',
-			opendModal: null,
-			opendBrowser: null,
-			selectMenuOn: false,
-			_controllerOnDisabledButtons: [],
-			_codeViewDisabledButtons: [],
-			_notHideToolbar: false,
-			_figureContainer: null
-		},
-
-		// Focus manager
-		focusManager: {
-			focus: jest.fn(),
-			blur: jest.fn(),
-			nativeFocus: jest.fn(),
-			focusEdge: jest.fn(),
-			_preventBlur: false
-		},
-
-		// Context Manager
-		contextProvider: {
-			frameRoots: frameRoots,
-			context: {
-				get: jest.fn((key) => {
-					const contextMap = {
-						menuTray: elements.menuTray,
-						toolbar_main: elements.toolbarMain,
-						toolbar_sub_main: elements.toolbarSub,
-						topArea: elements.topArea,
-						wrapper: elements.wrapper,
-						wysiwyg: elements.wysiwyg,
-						code: elements.codeArea,
-						statusbar: elements.statusbar
-					};
-					return contextMap[key] || document.createElement('div');
-				}),
-				set: jest.fn(),
-				has: jest.fn(),
-				delete: jest.fn(),
-				clear: jest.fn()
-			},
-			frameContext: frameContext,
-			applyToRoots: jest.fn((callback) => {
-				frameRoots.forEach((root) => callback(root));
-			}),
-			reset: jest.fn(),
-			init: jest.fn(),
-			destroy: jest.fn()
-		},
+		// Additional properties for event/command dispatching
+		scrollparents: [],
+		triggerEvent: jest.fn(),
+		_callPluginEvent: jest.fn().mockReturnValue(undefined),
+		_callPluginEventAsync: jest.fn().mockResolvedValue(undefined),
+		_dataTransferAction: jest.fn().mockReturnValue(undefined),
+		_handledInBefore: false,
+		isComposing: false,
+		_onShortcutKey: false,
+		_setDefaultLine: jest.fn(),
 
 		// Editor actions
 		changeFrameContext: jest.fn(),
@@ -696,43 +1191,6 @@ export function createMockEditor(customOptions = {}) {
 		_iframeAutoHeight: jest.fn(),
 		__callResizeFunction: jest.fn(),
 
-		// Command Dispatcher
-		commandDispatcher: {
-			run: jest.fn(),
-			runFromTarget: jest.fn(),
-			targets: commandTargets,
-			applyTargets: jest.fn((command, callback) => {
-				const targets = commandTargets.get(command);
-				if (targets) {
-					targets.forEach(callback);
-				}
-			}),
-			registerTargets: jest.fn(),
-			resetTargets: jest.fn(),
-			destroy: jest.fn()
-		},
-
-		// Plugin Manager
-		pluginManager: {
-			fileInfo: {
-				tags: [],
-				regExp: null,
-				pluginRegExp: /^(image|video|audio|fileUpload)$/,
-				tagAttrs: {},
-				pluginMap: {}
-			},
-			componentCheckers: [],
-			retainFormatCheckers: new Map(),
-			checkFileInfo: jest.fn(),
-			resetFileInfo: jest.fn(),
-			findComponentInfo: jest.fn().mockReturnValue(null),
-			applyRetainFormat: jest.fn(),
-			emitEvent: jest.fn(),
-			emitEventAsync: jest.fn(),
-			register: jest.fn(),
-			destroy: jest.fn()
-		},
-
 		// Editor modes
 		isBalloon: false,
 		isSubBalloon: false,
@@ -746,100 +1204,75 @@ export function createMockEditor(customOptions = {}) {
 		_preventSelection: false
 	};
 
-	// Create eventManager with both CoreInjector and ClassInjector properties
-	mockEditor.eventManager = {
-		// Basic eventManager methods
-		applyTagEffect: jest.fn(),
-		addEvent: jest.fn(),
-		removeEvent: jest.fn(),
-
-		// EventManager specific properties
-		scrollparents: [],
-
-		// Simulate CoreInjector properties
-		editor: mockEditor,
-		instanceCheck: mockEditor.instanceCheck,
-		history: mockEditor.history,
-		events: mockEditor.events,
-		triggerEvent: mockEditor.triggerEvent,
-		carrierWrapper: mockEditor.carrierWrapper,
-		plugins: mockEditor.plugins,
-		status: mockEditor.status,
-		frameContext: mockEditor.frameContext,
-		frameOptions: mockEditor.frameOptions,
-		context: mockEditor.context,
-		options: mockEditor.options,
-		icons: mockEditor.icons,
-		lang: mockEditor.lang,
-		frameRoots: mockEditor.frameRoots,
-		_w: mockEditor._w,
-		_d: mockEditor._d,
-
-		// Simulate ClassInjector properties - these are the critical missing ones!
-		toolbar: mockEditor.toolbar,
-		subToolbar: mockEditor.subToolbar,
-		char: mockEditor.char,
-		component: mockEditor.component,
-		format: mockEditor.format,
-		html: mockEditor.html,
-		menu: mockEditor.menu,
-		nodeTransform: mockEditor.nodeTransform,
-		offset: mockEditor.offset,
-		selection: mockEditor.selection,
-		shortcuts: mockEditor.shortcuts,
-		uiManager: mockEditor.uiManager,
-		viewer: mockEditor.viewer,
-		inline: mockEditor.inline,
-
-		// EventManager specific properties
-		scrollparents: []
-	};
-
-	return mockEditor;
+	return kernel;
 }
 
 /**
  * Creates a mock 'this' context for event handlers and other methods
+ * Returns a $-based context that works with EventOrchestrator and other DI consumers
  */
 export function createMockThis(editor = null, customProps = {}) {
-	const mockEditor = editor || createMockEditor();
+	const mockKernel = editor || createMockEditor();
 
-	return {
-		editor: mockEditor,
-		frameContext: mockEditor.frameContext,
-		frameRoots: mockEditor.frameRoots,
-		frameOptions: mockEditor.frameOptions,
-		options: mockEditor.options,
-		carrierWrapper: mockEditor.carrierWrapper,
+	// Create the $ deps bag for this context
+	const $ = {
+		...mockKernel.$,
+		// Override with this-specific event methods
+		applyTagEffect: jest.fn(),
+		addEvent: jest.fn(),
+		removeEvent: jest.fn(),
+		addGlobalEvent: jest.fn(),
+		removeGlobalEvent: jest.fn()
+	};
+
+	// Return the context object with $ property
+	const context = {
+		$,
+
+		// Reference to kernel
+		kernel: mockKernel,
+
+		// Convenience direct accessors (for backward compatibility)
+		editor: mockKernel,
+		frameContext: $.frameContext,
+		frameRoots: $.frameRoots,
+		frameOptions: $.frameOptions,
+		options: $.options,
+		context: $.context,
+		carrierWrapper: mockKernel.carrierWrapper,
 		_w: window,
 
-		// Direct access to modules
-		selection: mockEditor.selection,
-		component: mockEditor.component,
-		format: mockEditor.format,
-		html: mockEditor.html,
-		char: mockEditor.char,
-		history: mockEditor.history,
-		uiManager: mockEditor.uiManager,
-		toolbar: mockEditor.toolbar,
-		subToolbar: mockEditor.subToolbar,
-		menu: mockEditor.menu,
-		viewer: mockEditor.viewer,
-		nodeTransform: mockEditor.nodeTransform,
-		inline: mockEditor.inline,
-		context: mockEditor.context,
-		status: mockEditor.status,
-		plugins: mockEditor.plugins,
-		focusManager: mockEditor.focusManager,
-		commandDispatcher: mockEditor.commandDispatcher,
-		pluginManager: mockEditor.pluginManager,
-		contextProvider: mockEditor.contextProvider,
+		// L3 logic layer modules (for direct test access)
+		selection: $.selection,
+		format: $.format,
+		inline: $.inline,
+		html: $.html,
+		char: $.char,
+		nodeTransform: $.nodeTransform,
+		offset: $.offset,
+		listFormat: $.listFormat,
+		component: $.component,
+		focusManager: $.focusManager,
+		pluginManager: $.pluginManager,
+		plugins: $.plugins,
+		ui: $.ui,
+		uiManager: $.ui, // Alias for backward compatibility
+		commandDispatcher: $.commandDispatcher,
+		history: $.history,
+		shortcuts: $.shortcuts,
+		toolbar: $.toolbar,
+		subToolbar: $.subToolbar,
+		menu: $.menu,
+		viewer: $.viewer,
+
+		// Status
+		status: mockKernel.status,
+		isComposing: false,
 
 		// Event manager specific properties
-		isComposing: false,
 		scrollparents: [],
 		_events: [],
-		_onButtonsCheck: new RegExp(`^(${Object.keys(mockEditor.options.get('_defaultStyleTagMap')).join('|')})$`, 'i'),
+		_onButtonsCheck: new RegExp(`^(${Object.keys($.options.get('_defaultStyleTagMap')).join('|')})$`, 'i'),
 		_onShortcutKey: false,
 		_handledInBefore: false,
 		_balloonDelay: null,
@@ -856,7 +1289,7 @@ export function createMockThis(editor = null, customProps = {}) {
 		__inputPlugin: null,
 		__inputBlurEvent: null,
 		__inputKeyEvent: null,
-		__focusTemp: mockEditor.carrierWrapper.querySelector('.__se__focus__temp__'),
+		__focusTemp: mockKernel.carrierWrapper.querySelector('.__se__focus__temp__'),
 		__retainTimer: null,
 		__eventDoc: null,
 		__secopy: null,
@@ -867,7 +1300,7 @@ export function createMockThis(editor = null, customProps = {}) {
 		addGlobalEvent: jest.fn(),
 		removeGlobalEvent: jest.fn(),
 		applyTagEffect: jest.fn(),
-		triggerEvent: mockEditor.triggerEvent,
+		triggerEvent: mockKernel.triggerEvent,
 		_dataTransferAction: jest.fn().mockResolvedValue(false),
 		_setDefaultLine: jest.fn(),
 		_toggleToolbarBalloon: jest.fn(),
@@ -893,6 +1326,8 @@ export function createMockThis(editor = null, customProps = {}) {
 		// Allow custom properties to override defaults
 		...customProps
 	};
+
+	return context;
 }
 
 /**
@@ -1006,82 +1441,6 @@ export function createMockDragEvent(type = 'dragover', customProps = {}) {
 	});
 }
 
-/**
- * Creates a hybrid editor context that can work with both mocks and real instances
- */
-export function createHybridEditor(realEditor = null, mockOverrides = {}) {
-	if (realEditor) {
-		// If we have a real editor, enhance it with mock capabilities for testing
-		const mockThis = createMockThis(null, mockOverrides);
-
-		// Merge real editor properties with mock enhancements
-		return {
-			...realEditor,
-			// Add mock methods for testing while preserving real functionality
-			_testMocks: mockThis,
-			// Helper to get either real or mock version of properties
-			getMock: (property) => mockThis[property],
-			getRealOrMock: (property) => realEditor[property] || mockThis[property]
-		};
-	} else {
-		// Fall back to pure mock
-		return createMockEditor(mockOverrides);
-	}
-}
-
-/**
- * Bridge function to create test context that works with real Editor instances
- */
-export function createTestContext(editor) {
-	const frameContext = editor.currentFrame || editor.frameContext;
-	const elements = {
-		wysiwyg: frameContext?.get('wysiwyg') || editor.context?.get('wysiwyg'),
-		codeArea: frameContext?.get('code') || editor.context?.get('code'),
-		wrapper: frameContext?.get('wrapper') || editor.context?.get('wrapper'),
-		topArea: frameContext?.get('topArea') || editor.context?.get('topArea'),
-		statusbar: frameContext?.get('statusbar') || editor.context?.get('statusbar')
-	};
-
-	return {
-		editor,
-		frameContext,
-		elements,
-		// Utility to trigger real events on real DOM elements
-		dispatchRealEvent: (element, event) => {
-			if (element && typeof element.dispatchEvent === 'function') {
-				return element.dispatchEvent(event);
-			}
-			return false;
-		},
-		// Utility to create real DOM events
-		createRealEvent: (type, options = {}) => {
-			switch (type) {
-				case 'keydown':
-				case 'keyup':
-					return new KeyboardEvent(type, options);
-				case 'input':
-				case 'beforeinput':
-					return new InputEvent(type, options);
-				case 'click':
-				case 'mousedown':
-				case 'mouseup':
-				case 'mousemove':
-				case 'mouseleave':
-					return new MouseEvent(type, options);
-				case 'dragover':
-				case 'dragend':
-				case 'drop':
-					return new DragEvent(type, options);
-				case 'paste':
-				case 'copy':
-				case 'cut':
-					return new ClipboardEvent(type, options);
-				default:
-					return new Event(type, options);
-			}
-		}
-	};
-}
 
 /**
  * Helper to wait for editor operations to complete
@@ -1117,7 +1476,5 @@ export default {
 	createMockInputEvent,
 	createMockMouseEvent,
 	createMockDragEvent,
-	createHybridEditor,
-	createTestContext,
 	waitForEditor
 };

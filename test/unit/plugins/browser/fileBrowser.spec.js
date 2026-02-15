@@ -3,6 +3,7 @@
  */
 
 import FileBrowser from '../../../../src/plugins/browser/fileBrowser.js';
+import { createMockEditor } from '../../../../test/__mocks__/editorMock.js';
 
 // Mock Browser module
 const mockBrowser = {
@@ -14,60 +15,14 @@ jest.mock('../../../../src/modules/contract', () => ({
     Browser: jest.fn().mockImplementation(() => mockBrowser)
 }));
 
-// Mock EditorInjector
-jest.mock('../../../../src/editorInjector/_core.js', () => {
-    return jest.fn().mockImplementation(function(editor) {
-        this.editor = editor;
-        this.lang = editor.lang;
-        this.plugins = editor.plugins;
-        this.icons = editor.icons;
-        this.frameContext = editor.frameContext;
-        this.focusManager = editor.focusManager;
-		this.triggerEvent = editor.triggerEvent || jest.fn();
-    });
-});
-
 describe('Plugins - Browser - FileBrowser', () => {
-    let mockEditor;
+    let kernel;
     let fileBrowser;
 
     beforeEach(() => {
         jest.clearAllMocks();
 
-        mockEditor = {
-            lang: {
-                fileBrowser: 'File Browser'
-            },
-            icons: {
-                video_thumbnail: '🎥',
-                audio_thumbnail: '🎵',
-                file_thumbnail: '📁'
-            },
-            plugins: {
-                imageGallery: {
-                    browser: {
-                        selectorHandler: jest.fn()
-                    }
-                },
-                videoGallery: {
-                    browser: {
-                        selectorHandler: jest.fn()
-                    }
-                },
-                audioGallery: {
-                    browser: {
-                        selectorHandler: jest.fn()
-                    }
-                },
-                fileGallery: {
-                    browser: {
-                        selectorHandler: jest.fn()
-                    }
-                }
-            },
-            frameContext: new Map(),
-            triggerEvent: jest.fn()
-        };
+        kernel = createMockEditor();
 
         const pluginOptions = {
             data: [
@@ -79,7 +34,7 @@ describe('Plugins - Browser - FileBrowser', () => {
             props: ['custom-prop']
         };
 
-        fileBrowser = new FileBrowser(mockEditor, pluginOptions);
+        fileBrowser = new FileBrowser(kernel, pluginOptions);
     });
 
     describe('Constructor', () => {
@@ -98,7 +53,7 @@ describe('Plugins - Browser - FileBrowser', () => {
                 headers: { 'Custom-Header': 'value' }
             };
 
-            const browser = new FileBrowser(mockEditor, pluginOptions);
+            const browser = new FileBrowser(kernel, pluginOptions);
             expect(browser).toBeInstanceOf(FileBrowser);
         });
 
@@ -108,19 +63,19 @@ describe('Plugins - Browser - FileBrowser', () => {
                 thumbnail: thumbnailFn
             };
 
-            new FileBrowser(mockEditor, pluginOptions);
+            new FileBrowser(kernel, pluginOptions);
 
             const { Browser } = require('../../../../src/modules/contract');
-            const browserOptions = Browser.mock.calls[Browser.mock.calls.length - 1][1];
+            const browserOptions = Browser.mock.calls[Browser.mock.calls.length - 1][2];
 
             expect(browserOptions.thumbnail).toBe(thumbnailFn);
         });
 
         it('should use default thumbnail mapping when no thumbnail function provided', () => {
-            new FileBrowser(mockEditor, {});
+            new FileBrowser(kernel, {});
 
             const { Browser } = require('../../../../src/modules/contract');
-            const browserOptions = Browser.mock.calls[Browser.mock.calls.length - 1][1];
+            const browserOptions = Browser.mock.calls[Browser.mock.calls.length - 1][2];
 
             // Test thumbnail mapping
             expect(browserOptions.thumbnail({ type: 'video' })).toBe('🎥');
@@ -134,19 +89,19 @@ describe('Plugins - Browser - FileBrowser', () => {
                 props: ['custom1', 'custom2']
             };
 
-            new FileBrowser(mockEditor, pluginOptions);
+            new FileBrowser(kernel, pluginOptions);
 
             const { Browser } = require('../../../../src/modules/contract');
-            const browserOptions = Browser.mock.calls[Browser.mock.calls.length - 1][1];
+            const browserOptions = Browser.mock.calls[Browser.mock.calls.length - 1][2];
 
             expect(browserOptions.props).toEqual(expect.arrayContaining(['custom1', 'custom2', 'frame']));
         });
 
         it('should handle empty props', () => {
-            new FileBrowser(mockEditor, {});
+            new FileBrowser(kernel, {});
 
             const { Browser } = require('../../../../src/modules/contract');
-            const browserOptions = Browser.mock.calls[Browser.mock.calls.length - 1][1];
+            const browserOptions = Browser.mock.calls[Browser.mock.calls.length - 1][2];
 
             expect(browserOptions.props).toEqual(['frame']);
         });
@@ -197,13 +152,13 @@ describe('Plugins - Browser - FileBrowser', () => {
 
                 // Get the selectorHandler from Browser constructor
                 const browserConstructorCall = require('../../../../src/modules/contract').Browser.mock.calls[0];
-                const browserOptions = browserConstructorCall[1];
+                const browserOptions = browserConstructorCall[2];
                 const selectorHandler = browserOptions.selectorHandler;
 
                 selectorHandler(mockTarget);
 
                 expect(customHandler).toHaveBeenCalledWith(mockTarget);
-                expect(mockEditor.plugins.imageGallery.browser.selectorHandler).not.toHaveBeenCalled();
+                expect(kernel.plugins.imageGallery.browser.selectorHandler).not.toHaveBeenCalled();
             });
         });
 
@@ -213,7 +168,7 @@ describe('Plugins - Browser - FileBrowser', () => {
             beforeEach(() => {
                 fileBrowser.open();
                 const browserConstructorCall = require('../../../../src/modules/contract').Browser.mock.calls[0];
-                const browserOptions = browserConstructorCall[1];
+                const browserOptions = browserConstructorCall[2];
                 selectorHandler = browserOptions.selectorHandler;
             });
 
@@ -224,7 +179,7 @@ describe('Plugins - Browser - FileBrowser', () => {
 
                 selectorHandler(mockTarget);
 
-                expect(mockEditor.plugins.imageGallery.browser.selectorHandler).toHaveBeenCalledWith(mockTarget);
+                expect(kernel.plugins.imageGallery.browser.selectorHandler).toHaveBeenCalledWith(mockTarget);
             });
 
             it('should delegate to videoGallery for video type', () => {
@@ -234,7 +189,7 @@ describe('Plugins - Browser - FileBrowser', () => {
 
                 selectorHandler(mockTarget);
 
-                expect(mockEditor.plugins.videoGallery.browser.selectorHandler).toHaveBeenCalledWith(mockTarget);
+                expect(kernel.plugins.videoGallery.browser.selectorHandler).toHaveBeenCalledWith(mockTarget);
             });
 
             it('should delegate to audioGallery for audio type', () => {
@@ -244,7 +199,7 @@ describe('Plugins - Browser - FileBrowser', () => {
 
                 selectorHandler(mockTarget);
 
-                expect(mockEditor.plugins.audioGallery.browser.selectorHandler).toHaveBeenCalledWith(mockTarget);
+                expect(kernel.plugins.audioGallery.browser.selectorHandler).toHaveBeenCalledWith(mockTarget);
             });
 
             it('should delegate to fileGallery for file type', () => {
@@ -254,7 +209,7 @@ describe('Plugins - Browser - FileBrowser', () => {
 
                 selectorHandler(mockTarget);
 
-                expect(mockEditor.plugins.fileGallery.browser.selectorHandler).toHaveBeenCalledWith(mockTarget);
+                expect(kernel.plugins.fileGallery.browser.selectorHandler).toHaveBeenCalledWith(mockTarget);
             });
 
             it('should handle unknown type gracefully', () => {
@@ -267,10 +222,10 @@ describe('Plugins - Browser - FileBrowser', () => {
                 }).not.toThrow();
 
                 // No handler should be called for unknown types
-                expect(mockEditor.plugins.imageGallery.browser.selectorHandler).not.toHaveBeenCalled();
-                expect(mockEditor.plugins.videoGallery.browser.selectorHandler).not.toHaveBeenCalled();
-                expect(mockEditor.plugins.audioGallery.browser.selectorHandler).not.toHaveBeenCalled();
-                expect(mockEditor.plugins.fileGallery.browser.selectorHandler).not.toHaveBeenCalled();
+                expect(kernel.plugins.imageGallery.browser.selectorHandler).not.toHaveBeenCalled();
+                expect(kernel.plugins.videoGallery.browser.selectorHandler).not.toHaveBeenCalled();
+                expect(kernel.plugins.audioGallery.browser.selectorHandler).not.toHaveBeenCalled();
+                expect(kernel.plugins.fileGallery.browser.selectorHandler).not.toHaveBeenCalled();
             });
 
             it('should handle null type', () => {
@@ -291,14 +246,14 @@ describe('Plugins - Browser - FileBrowser', () => {
             const constructorCall = Browser.mock.calls[0];
 
             expect(constructorCall[0]).toBe(fileBrowser); // instance
-            expect(constructorCall[1]).toMatchObject({
+            expect(constructorCall[2]).toMatchObject({
                 title: 'File Browser',
                 columnSize: 4,
                 className: 'se-file-browser'
             });
-            expect(constructorCall[1].selectorHandler).toBeInstanceOf(Function);
-            expect(constructorCall[1].thumbnail).toBeInstanceOf(Function);
-            expect(constructorCall[1].props).toEqual(expect.arrayContaining(['frame']));
+            expect(constructorCall[2].selectorHandler).toBeInstanceOf(Function);
+            expect(constructorCall[2].thumbnail).toBeInstanceOf(Function);
+            expect(constructorCall[2].props).toEqual(expect.arrayContaining(['frame']));
         });
 
         it('should pass plugin options to Browser', () => {
@@ -308,11 +263,11 @@ describe('Plugins - Browser - FileBrowser', () => {
                 headers: { 'Test-Header': 'test' }
             };
 
-            new FileBrowser(mockEditor, pluginOptions);
+            new FileBrowser(kernel, pluginOptions);
 
             const { Browser } = require('../../../../src/modules/contract');
             const lastCall = Browser.mock.calls[Browser.mock.calls.length - 1];
-            const browserOptions = lastCall[1];
+            const browserOptions = lastCall[2];
 
             expect(browserOptions.data).toEqual(pluginOptions.data);
             expect(browserOptions.url).toBe(pluginOptions.url);
@@ -323,20 +278,20 @@ describe('Plugins - Browser - FileBrowser', () => {
     describe('Error handling', () => {
         it('should handle missing plugin options gracefully', () => {
             expect(() => {
-                new FileBrowser(mockEditor, {});
+                new FileBrowser(kernel, {});
             }).not.toThrow();
         });
 
         it('should handle missing gallery plugins gracefully', () => {
-            mockEditor.plugins = {};
+            kernel.plugins = {};
 
             expect(() => {
-                new FileBrowser(mockEditor, {});
+                new FileBrowser(kernel, {});
             }).not.toThrow();
         });
 
         it('should handle item selection with missing gallery plugins', () => {
-            mockEditor.plugins = {};
+            kernel.plugins = {};
             const mockTarget = {
                 getAttribute: jest.fn().mockReturnValue('image')
             };
@@ -344,7 +299,7 @@ describe('Plugins - Browser - FileBrowser', () => {
             fileBrowser.open();
 
             const { Browser } = require('../../../../src/modules/contract');
-            const browserOptions = Browser.mock.calls[0][1];
+            const browserOptions = Browser.mock.calls[0][2];
             const selectorHandler = browserOptions.selectorHandler;
 
             // Missing plugins should not cause errors, just do nothing

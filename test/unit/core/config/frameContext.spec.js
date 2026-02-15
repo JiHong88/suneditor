@@ -6,7 +6,7 @@ import {
     CreateFrameContext,
     UpdateStatusbarContext
     // FrameContextUtil moved to contextProvider service
-} from '../../../../src/core/config/frameContext';
+} from '../../../../src/core/schema/frameContext';
 
 // Mock the helper numbers module
 jest.mock('../../../../src/helper/numbers', () => ({

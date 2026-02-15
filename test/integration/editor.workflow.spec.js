@@ -19,14 +19,14 @@ describe('Core - Editor workflow Tests', () => {
 		await waitForEditorReady(editor);
 
 		// Mock UI methods to prevent side effects
-		if (editor.uiManager) {
-			editor.uiManager.showLoading = jest.fn();
-			editor.uiManager.hideLoading = jest.fn();
-			editor.uiManager.showToast = jest.fn();
-			editor.uiManager.closeToast = jest.fn();
+		if (editor.$.ui) {
+			editor.$.ui.showLoading = jest.fn();
+			editor.$.ui.hideLoading = jest.fn();
+			editor.$.ui.showToast = jest.fn();
+			editor.$.ui.closeToast = jest.fn();
 		}
-		if (editor.viewer) {
-			editor.viewer.print = jest.fn();
+		if (editor.$.viewer) {
+			editor.$.viewer.print = jest.fn();
 		}
 	});
 
@@ -41,42 +41,42 @@ describe('Core - Editor workflow Tests', () => {
 
 	describe('User typing workflow', () => {
 		it('should handle basic text input', async () => {
-			const wysiwyg = editor.frameContext.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
 			// Simulate user typing
 			wysiwyg.innerHTML = '<p>Hello World</p>';
-			editor.history.push(false);
+			editor.$.history.push(false);
 
 			expect(wysiwyg.textContent).toContain('Hello World');
 			expect(editor.isEmpty()).toBe(false);
 		});
 
 		it('should handle text selection and formatting', async () => {
-			const wysiwyg = editor.frameContext.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 			wysiwyg.innerHTML = '<p>Format this text</p>';
 
 			// Select text
 			const textNode = wysiwyg.firstChild.firstChild;
-			editor.selection.setRange(textNode, 0, textNode, 6);
+			editor.$.selection.setRange(textNode, 0, textNode, 6);
 
 			// Apply bold
-			await editor.commandDispatcher.run('bold');
+			await editor.$.commandDispatcher.run('bold');
 
 			// Should have formatting applied
 			expect(true).toBe(true);
 		});
 
 		it('should handle text deletion with backspace', async () => {
-			const wysiwyg = editor.frameContext.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 			wysiwyg.innerHTML = '<p>Delete me</p>';
-			editor.history.push(false);
+			editor.$.history.push(false);
 
 			// Simulate deletion
 			wysiwyg.innerHTML = '<p>Delete </p>';
-			editor.history.push(false);
+			editor.$.history.push(false);
 
 			// Undo should restore
-			await editor.commandDispatcher.run('undo');
+			await editor.$.commandDispatcher.run('undo');
 
 			expect(wysiwyg.textContent).toContain('Delete me');
 		});
@@ -84,29 +84,29 @@ describe('Core - Editor workflow Tests', () => {
 
 	describe('Copy/Cut/Paste workflow', () => {
 		it('should handle copy operation', async () => {
-			const wysiwyg = editor.frameContext.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 			wysiwyg.innerHTML = '<p><strong>Bold text</strong></p>';
 
 			// Select content
 			const textNode = wysiwyg.querySelector('strong').firstChild;
-			editor.selection.setRange(textNode, 0, textNode, 9);
+			editor.$.selection.setRange(textNode, 0, textNode, 9);
 
 			// Execute copy
-			await editor.commandDispatcher.run('copy');
+			await editor.$.commandDispatcher.run('copy');
 
 			// Should not throw
 			expect(true).toBe(true);
 		});
 
 		it('should handle selectAll followed by copy', async () => {
-			const wysiwyg = editor.frameContext.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 			wysiwyg.innerHTML = '<p>First paragraph</p><p>Second paragraph</p>';
 
 			// Select all
-			await editor.commandDispatcher.run('selectAll');
+			await editor.$.commandDispatcher.run('selectAll');
 
 			// Copy
-			await editor.commandDispatcher.run('copy');
+			await editor.$.commandDispatcher.run('copy');
 
 			// Should not throw
 			expect(true).toBe(true);
@@ -115,48 +115,48 @@ describe('Core - Editor workflow Tests', () => {
 
 	describe('Formatting workflow', () => {
 		it('should apply multiple inline formats', async () => {
-			const wysiwyg = editor.frameContext.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 			wysiwyg.innerHTML = '<p>Format me</p>';
 
 			const textNode = wysiwyg.firstChild.firstChild;
-			editor.selection.setRange(textNode, 0, textNode, 9);
+			editor.$.selection.setRange(textNode, 0, textNode, 9);
 
 			// Apply multiple formats
-			await editor.commandDispatcher.run('bold');
-			await editor.commandDispatcher.run('italic');
-			await editor.commandDispatcher.run('underline');
+			await editor.$.commandDispatcher.run('bold');
+			await editor.$.commandDispatcher.run('italic');
+			await editor.$.commandDispatcher.run('underline');
 
 			// Should not throw
 			expect(true).toBe(true);
 		});
 
 		it('should remove format', async () => {
-			const wysiwyg = editor.frameContext.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 			wysiwyg.innerHTML = '<p><strong><em>Formatted</em></strong></p>';
 
 			// Select all
-			await editor.commandDispatcher.run('selectAll');
+			await editor.$.commandDispatcher.run('selectAll');
 
 			// Remove format
-			await editor.commandDispatcher.run('removeFormat');
+			await editor.$.commandDispatcher.run('removeFormat');
 
 			// Should not throw
 			expect(true).toBe(true);
 		});
 
 		it('should handle indent and outdent', async () => {
-			const wysiwyg = editor.frameContext.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 			wysiwyg.innerHTML = '<p>Indent me</p>';
 
 			// Focus
-			editor.focusManager.focus();
+			editor.$.focusManager.focus();
 
 			// Indent
-			await editor.commandDispatcher.run('indent');
-			await editor.commandDispatcher.run('indent');
+			await editor.$.commandDispatcher.run('indent');
+			await editor.$.commandDispatcher.run('indent');
 
 			// Outdent
-			await editor.commandDispatcher.run('outdent');
+			await editor.$.commandDispatcher.run('outdent');
 
 			// Should not throw
 			expect(true).toBe(true);
@@ -165,30 +165,30 @@ describe('Core - Editor workflow Tests', () => {
 
 	describe('Direction change workflow', () => {
 		it('should switch between LTR and RTL', async () => {
-			const wysiwyg = editor.frameContext.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 			wysiwyg.innerHTML = '<p>مرحبا بالعالم</p>';
 
 			// Change to RTL
-			await editor.commandDispatcher.run('dir_rtl');
+			await editor.$.commandDispatcher.run('dir_rtl');
 
-			expect(editor.options.get('_rtl')).toBe(true);
+			expect(editor.$.options.get('_rtl')).toBe(true);
 			expect(wysiwyg.classList.contains('se-rtl')).toBe(true);
 
 			// Change back to LTR
-			await editor.commandDispatcher.run('dir_ltr');
+			await editor.$.commandDispatcher.run('dir_ltr');
 
-			expect(editor.options.get('_rtl')).toBe(false);
+			expect(editor.$.options.get('_rtl')).toBe(false);
 			expect(wysiwyg.classList.contains('se-rtl')).toBe(false);
 		});
 
 		it('should preserve content when changing direction', async () => {
-			const wysiwyg = editor.frameContext.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 			wysiwyg.innerHTML = '<p>Hello World</p>';
 
 			const originalContent = wysiwyg.textContent;
 
-			editor.uiManager.setDir('rtl');
-			editor.uiManager.setDir('ltr');
+			editor.$.ui.setDir('rtl');
+			editor.$.ui.setDir('ltr');
 
 			expect(wysiwyg.textContent).toBe(originalContent);
 		});
@@ -196,99 +196,99 @@ describe('Core - Editor workflow Tests', () => {
 
 	describe('View mode switching workflow', () => {
 		it('should toggle code view', async () => {
-			const wysiwyg = editor.frameContext.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 			wysiwyg.innerHTML = '<p>Code view test</p>';
 
 			// Enter code view
-			await editor.commandDispatcher.run('codeView');
-			expect(editor.frameContext.get('isCodeView')).toBe(true);
+			await editor.$.commandDispatcher.run('codeView');
+			expect(editor.$.frameContext.get('isCodeView')).toBe(true);
 
 			// Exit code view
-			await editor.commandDispatcher.run('codeView');
-			expect(editor.frameContext.get('isCodeView')).toBe(false);
+			await editor.$.commandDispatcher.run('codeView');
+			expect(editor.$.frameContext.get('isCodeView')).toBe(false);
 		});
 
 		it('should toggle full screen', async () => {
 			// Enter full screen
-			await editor.commandDispatcher.run('fullScreen');
-			expect(editor.frameContext.get('isFullScreen')).toBe(true);
+			await editor.$.commandDispatcher.run('fullScreen');
+			expect(editor.$.frameContext.get('isFullScreen')).toBe(true);
 
 			// Exit full screen
-			await editor.commandDispatcher.run('fullScreen');
-			expect(editor.frameContext.get('isFullScreen')).toBe(false);
+			await editor.$.commandDispatcher.run('fullScreen');
+			expect(editor.$.frameContext.get('isFullScreen')).toBe(false);
 		});
 
 		it('should toggle show blocks', async () => {
 			// Show blocks
-			await editor.commandDispatcher.run('showBlocks');
-			expect(editor.frameContext.get('isShowBlocks')).toBe(true);
+			await editor.$.commandDispatcher.run('showBlocks');
+			expect(editor.$.frameContext.get('isShowBlocks')).toBe(true);
 
 			// Hide blocks
-			await editor.commandDispatcher.run('showBlocks');
-			expect(editor.frameContext.get('isShowBlocks')).toBe(false);
+			await editor.$.commandDispatcher.run('showBlocks');
+			expect(editor.$.frameContext.get('isShowBlocks')).toBe(false);
 		});
 	});
 
 	describe('History workflow', () => {
 		it('should handle multiple undo/redo operations', async () => {
-			const wysiwyg = editor.frameContext.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
 			// Initial state
 			wysiwyg.innerHTML = '<p>Step 1</p>';
-			editor.history.push(false);
+			editor.$.history.push(false);
 
 			// Step 2
 			wysiwyg.innerHTML = '<p>Step 2</p>';
-			editor.history.push(false);
+			editor.$.history.push(false);
 
 			// Step 3
 			wysiwyg.innerHTML = '<p>Step 3</p>';
-			editor.history.push(false);
+			editor.$.history.push(false);
 
 			// Undo twice
-			await editor.commandDispatcher.run('undo');
-			await editor.commandDispatcher.run('undo');
+			await editor.$.commandDispatcher.run('undo');
+			await editor.$.commandDispatcher.run('undo');
 
 			// Redo once
-			await editor.commandDispatcher.run('redo');
+			await editor.$.commandDispatcher.run('redo');
 
 			// Should not throw
 			expect(true).toBe(true);
 		});
 
 		it('should handle newDocument command', async () => {
-			const wysiwyg = editor.frameContext.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 			wysiwyg.innerHTML = '<p>Content to clear</p>';
 
-			await editor.commandDispatcher.run('newDocument');
+			await editor.$.commandDispatcher.run('newDocument');
 
 			// Should have empty default line
-			const defaultLine = editor.options.get('defaultLine');
+			const defaultLine = editor.$.options.get('defaultLine');
 			expect(wysiwyg.querySelector(defaultLine)).toBeTruthy();
 		});
 	});
 
 	describe('Focus management workflow', () => {
 		it('should handle focus and blur cycles', () => {
-			editor.focusManager.focus();
-			expect(editor.focusManager._preventBlur).toBe(false);
+			editor.$.focusManager.focus();
+			expect(editor.$.store.get('_preventBlur')).toBe(false);
 
-			editor.focusManager.blur();
+			editor.$.focusManager.blur();
 
-			editor.focusManager.focus();
-			expect(editor.focusManager._preventBlur).toBe(false);
+			editor.$.focusManager.focus();
+			expect(editor.$.store.get('_preventBlur')).toBe(false);
 		});
 
 		it('should handle focusEdge with different content', () => {
-			const wysiwyg = editor.frameContext.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
 			// With text content
 			wysiwyg.innerHTML = '<p>Test</p>';
-			editor.focusManager.focusEdge();
+			editor.$.focusManager.focusEdge();
 
 			// With nested content
 			wysiwyg.innerHTML = '<p><strong>Nested</strong> content</p>';
-			editor.focusManager.focusEdge();
+			editor.$.focusManager.focusEdge();
 
 			// Should not throw
 			expect(true).toBe(true);
@@ -303,8 +303,8 @@ describe('Core - Editor workflow Tests', () => {
 			});
 			MockPlugin.key = 'wPlugin';
 
-			editor.plugins['wPlugin'] = MockPlugin;
-			editor.pluginManager.register('wPlugin', null, {});
+			editor.$.plugins['wPlugin'] = MockPlugin;
+			editor.$.pluginManager.register('wPlugin', null, {});
 
 			expect(MockPlugin).toHaveBeenCalled();
 		});
@@ -313,13 +313,13 @@ describe('Core - Editor workflow Tests', () => {
 			const mockPlugin = {
 				action: jest.fn()
 			};
-			editor.plugins['testAction'] = mockPlugin;
+			editor.$.plugins['testAction'] = mockPlugin;
 
 			const button = document.createElement('button');
 			button.setAttribute('data-command', 'testAction');
 			button.setAttribute('data-type', 'command');
 
-			editor.commandDispatcher.run('testAction', 'command', button);
+			editor.$.commandDispatcher.run('testAction', 'command', button);
 
 			expect(mockPlugin.action).toHaveBeenCalled();
 		});
@@ -327,57 +327,57 @@ describe('Core - Editor workflow Tests', () => {
 
 	describe('Options update workflow', () => {
 		it('should handle live options update', () => {
-			const originalHeight = editor.frameContext.get('wysiwygFrame').style.height;
+			const originalHeight = editor.$.frameContext.get('wysiwygFrame').style.height;
 
 			editor.resetOptions({
 				height: '450px',
 				toolbar_hide: false
 			});
 
-			const newHeight = editor.frameContext.get('wysiwygFrame').style.height;
+			const newHeight = editor.$.frameContext.get('wysiwygFrame').style.height;
 			expect(newHeight).toBe('450px');
 		});
 
 		it('should handle theme change', () => {
-			jest.spyOn(editor.uiManager, 'setTheme');
+			jest.spyOn(editor.$.ui, 'setTheme');
 
 			editor.resetOptions({ theme: 'custom-theme' });
 
-			expect(editor.uiManager.setTheme).toHaveBeenCalledWith('custom-theme');
+			expect(editor.$.ui.setTheme).toHaveBeenCalledWith('custom-theme');
 		});
 	});
 
 	describe('Error recovery workflow', () => {
 		it('should recover from invalid selection', () => {
-			const wysiwyg = editor.frameContext.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 			wysiwyg.innerHTML = '<p>Test</p>';
 
 			// Create invalid state
-			jest.spyOn(editor.selection, 'setRange').mockImplementationOnce(() => {
+			jest.spyOn(editor.$.selection, 'setRange').mockImplementationOnce(() => {
 				throw new Error('Invalid range');
 			});
 
 			// Should fall back gracefully
 			expect(() => {
-				editor.focusManager.focus();
+				editor.$.focusManager.focus();
 			}).not.toThrow();
 		});
 
 		it('should recover from command execution errors', async () => {
 			// Editor should still be functional after errors
-			const wysiwyg = editor.frameContext.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 			expect(wysiwyg).toBeDefined();
 
 			// Test that editor can handle operations after potential errors
-			editor.focusManager.focus();
-			expect(editor.status.hasFocus).toBe(true);
+			editor.$.focusManager.focus();
+			expect(editor.$.store.get('hasFocus')).toBe(true);
 		});
 	});
 
 	describe('Placeholder workflow', () => {
 		it('should show/hide placeholder based on content', () => {
-			const wysiwyg = editor.frameContext.get('wysiwyg');
-			const placeholder = editor.frameContext.get('placeholder');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
+			const placeholder = editor.$.frameContext.get('placeholder');
 
 			if (!placeholder) {
 				expect(true).toBe(true);
@@ -391,47 +391,47 @@ describe('Core - Editor workflow Tests', () => {
 				writable: true,
 				configurable: true
 			});
-			editor.uiManager._updatePlaceholder();
+			editor.$.ui._updatePlaceholder(editor.$.frameContext);
 			expect(placeholder.style.display).toBe('block');
 
 			// With content - hide placeholder
 			wysiwyg.innerHTML = '<p>Content</p>';
-			editor.uiManager._updatePlaceholder();
+			editor.$.ui._updatePlaceholder(editor.$.frameContext);
 			expect(placeholder.style.display).toBe('none');
 		});
 	});
 
 	describe('Multi-operation workflow', () => {
 		it('should handle complex editing sequence', async () => {
-			const wysiwyg = editor.frameContext.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
 			// Type content
 			wysiwyg.innerHTML = '<p>Start</p>';
-			editor.history.push(false);
+			editor.$.history.push(false);
 
 			// Format
-			await editor.commandDispatcher.run('bold');
+			await editor.$.commandDispatcher.run('bold');
 
 			// More typing
 			wysiwyg.innerHTML = '<p><strong>Start typing</strong></p>';
-			editor.history.push(false);
+			editor.$.history.push(false);
 
 			// Indent
-			await editor.commandDispatcher.run('indent');
+			await editor.$.commandDispatcher.run('indent');
 
 			// Undo
-			await editor.commandDispatcher.run('undo');
+			await editor.$.commandDispatcher.run('undo');
 
 			// Should not throw
 			expect(true).toBe(true);
 		});
 
 		it('should handle rapid command execution', async () => {
-			const wysiwyg = editor.frameContext.get('wysiwyg');
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 			wysiwyg.innerHTML = '<p>Test</p>';
 
 			// Rapid commands
-			await Promise.all([editor.commandDispatcher.run('bold'), editor.commandDispatcher.run('italic'), editor.commandDispatcher.run('underline')]);
+			await Promise.all([editor.$.commandDispatcher.run('bold'), editor.$.commandDispatcher.run('italic'), editor.$.commandDispatcher.run('underline')]);
 
 			// Should complete without errors
 			expect(true).toBe(true);
@@ -446,9 +446,9 @@ describe('Core - Editor workflow Tests', () => {
 
 			// Verify editor is initialized
 			expect(testEditor).toBeDefined();
-			expect(testEditor.history).toBeDefined();
-			expect(testEditor.eventManager).toBeDefined();
-			expect(testEditor.plugins).toBeDefined();
+			expect(testEditor.$.history).toBeDefined();
+			expect(testEditor.$.eventManager).toBeDefined();
+			expect(testEditor.$.plugins).toBeDefined();
 
 			const result = testEditor.destroy();
 

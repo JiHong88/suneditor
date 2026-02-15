@@ -3,6 +3,7 @@
  */
 
 import LineHeight from '../../../../src/plugins/dropdown/lineHeight.js';
+import { createMockEditor } from '../../../../test/__mocks__/editorMock.js';
 
 // Mock helper
 jest.mock('../../../../src/helper', () => ({
@@ -58,58 +59,18 @@ jest.mock('../../../../src/helper', () => ({
     }
 }));
 
-// Mock EditorInjector
-jest.mock('../../../../src/editorInjector/_core.js', () => {
-    return jest.fn().mockImplementation(function(editor) {
-        this.editor = editor;
-        this.lang = editor.lang;
-        this.selection = editor.selection;
-        this.format = editor.format;
-        this.history = editor.history;
-        this.menu = editor.menu;
-        this.frameContext = editor.frameContext;
-        this.focusManager = editor.focusManager;
-		this.triggerEvent = editor.triggerEvent || jest.fn();
-    });
-});
-
 describe('Plugins - Dropdown - LineHeight', () => {
-    let mockEditor;
+    let kernel;
     let lineHeight;
     let pluginOptions;
 
     beforeEach(() => {
         jest.clearAllMocks();
 
-        mockEditor = {
-            lang: {
-                lineHeight: 'Line Height',
-                default: 'Default'
-            },
-            selection: {
-                getNode: jest.fn().mockReturnValue(document.createElement('p'))
-            },
-            format: {
-                isLine: jest.fn().mockReturnValue(true),
-                getLine: jest.fn().mockReturnValue({
-                    style: { lineHeight: '1.2em' }
-                }),
-                getLines: jest.fn().mockReturnValue([
-                    { style: { lineHeight: '' } },
-                    { style: { lineHeight: '' } }
-                ])
-            },
-            history: {
-                push: jest.fn()
-            },
-            menu: {
-                initDropdownTarget: jest.fn(),
-                dropdownOff: jest.fn()
-            },
-            effectNode: null,
-            frameContext: new Map(),
-            triggerEvent: jest.fn()
-        };
+        kernel = createMockEditor();
+        kernel.$.menu.initDropdownTarget = jest.fn();
+        kernel.$.lang.lineHeight = 'Line Height';
+        kernel.$.lang.default = 'Default';
 
         pluginOptions = {
             items: [
@@ -119,7 +80,7 @@ describe('Plugins - Dropdown - LineHeight', () => {
             ]
         };
 
-        lineHeight = new LineHeight(mockEditor, pluginOptions);
+        lineHeight = new LineHeight(kernel, pluginOptions);
     });
 
 
@@ -135,7 +96,7 @@ describe('Plugins - Dropdown - LineHeight', () => {
         });
 
         it('should initialize dropdown menu', () => {
-            expect(mockEditor.menu.initDropdownTarget).toHaveBeenCalledWith(LineHeight, expect.any(Object));
+            expect(kernel.$.menu.initDropdownTarget).toHaveBeenCalledWith(LineHeight, expect.any(Object));
         });
 
         it('should initialize size list from menu', () => {
@@ -143,7 +104,7 @@ describe('Plugins - Dropdown - LineHeight', () => {
         });
 
         it('should use default items when none provided', () => {
-            const defaultLineHeight = new LineHeight(mockEditor, {});
+            const defaultLineHeight = new LineHeight(kernel, {});
             expect(defaultLineHeight.sizeList).toBeDefined();
         });
     });
@@ -159,7 +120,7 @@ describe('Plugins - Dropdown - LineHeight', () => {
             const mockElement = {
                 style: { lineHeight: '1.5em' }
             };
-            mockEditor.format.isLine.mockReturnValue(true);
+            kernel.$.format.isLine.mockReturnValue(true);
 
             const result = lineHeight.active(mockElement, mockTarget);
 
@@ -173,7 +134,7 @@ describe('Plugins - Dropdown - LineHeight', () => {
             const mockElement = {
                 style: { lineHeight: '' }
             };
-            mockEditor.format.isLine.mockReturnValue(true);
+            kernel.$.format.isLine.mockReturnValue(true);
 
             const result = lineHeight.active(mockElement, mockTarget);
 
@@ -187,7 +148,7 @@ describe('Plugins - Dropdown - LineHeight', () => {
             const mockElement = {
                 style: { lineHeight: '2em' }
             };
-            mockEditor.format.isLine.mockReturnValue(false);
+            kernel.$.format.isLine.mockReturnValue(false);
 
             const result = lineHeight.active(mockElement, mockTarget);
 
@@ -197,7 +158,7 @@ describe('Plugins - Dropdown - LineHeight', () => {
         });
 
         it('should handle null element', () => {
-            mockEditor.format.isLine.mockReturnValue(false);
+            kernel.$.format.isLine.mockReturnValue(false);
 
             const result = lineHeight.active(null, mockTarget);
 
@@ -210,7 +171,7 @@ describe('Plugins - Dropdown - LineHeight', () => {
             const mockElement = {
                 style: { lineHeight: '0' }
             };
-            mockEditor.format.isLine.mockReturnValue(true);
+            kernel.$.format.isLine.mockReturnValue(true);
 
             const result = lineHeight.active(mockElement, mockTarget);
 
@@ -229,7 +190,7 @@ describe('Plugins - Dropdown - LineHeight', () => {
         });
 
         it('should activate matching line height button', () => {
-            mockEditor.format.getLine.mockReturnValue({
+            kernel.$.format.getLine.mockReturnValue({
                 style: { lineHeight: '1.5em' }
             });
 
@@ -244,7 +205,7 @@ describe('Plugins - Dropdown - LineHeight', () => {
         });
 
         it('should activate default button when no line height', () => {
-            mockEditor.format.getLine.mockReturnValue({
+            kernel.$.format.getLine.mockReturnValue({
                 style: { lineHeight: '' }
             });
 
@@ -256,7 +217,7 @@ describe('Plugins - Dropdown - LineHeight', () => {
         });
 
         it('should handle null format element', () => {
-            mockEditor.format.getLine.mockReturnValue(null);
+            kernel.$.format.getLine.mockReturnValue(null);
 
             lineHeight.on();
 
@@ -267,7 +228,7 @@ describe('Plugins - Dropdown - LineHeight', () => {
 
         it('should not update if current size is same', () => {
             lineHeight.currentSize = '1.5em';
-            mockEditor.format.getLine.mockReturnValue({
+            kernel.$.format.getLine.mockReturnValue({
                 style: { lineHeight: '1.5em' }
             });
 
@@ -279,7 +240,7 @@ describe('Plugins - Dropdown - LineHeight', () => {
         });
 
         it('should convert numeric lineHeight to string', () => {
-            mockEditor.format.getLine.mockReturnValue({
+            kernel.$.format.getLine.mockReturnValue({
                 style: { lineHeight: 1.5 }
             });
 
@@ -289,7 +250,7 @@ describe('Plugins - Dropdown - LineHeight', () => {
         });
 
         it('should handle custom value not in list', () => {
-            mockEditor.format.getLine.mockReturnValue({
+            kernel.$.format.getLine.mockReturnValue({
                 style: { lineHeight: '3.5em' }
             });
 
@@ -302,7 +263,7 @@ describe('Plugins - Dropdown - LineHeight', () => {
         });
 
         it('should handle numeric custom values', () => {
-            mockEditor.format.getLine.mockReturnValue({
+            kernel.$.format.getLine.mockReturnValue({
                 style: { lineHeight: 2.5 }
             });
 
@@ -326,7 +287,7 @@ describe('Plugins - Dropdown - LineHeight', () => {
                 { style: { lineHeight: '1em' } }
             ];
 
-            mockEditor.format.getLines.mockReturnValue(mockFormats);
+            kernel.$.format.getLines.mockReturnValue(mockFormats);
         });
 
         it('should set line height for all selected lines', () => {
@@ -336,9 +297,9 @@ describe('Plugins - Dropdown - LineHeight', () => {
 
             expect(mockFormats[0].style.lineHeight).toBe('1.5em');
             expect(mockFormats[1].style.lineHeight).toBe('1.5em');
-            expect(mockEditor.menu.dropdownOff).toHaveBeenCalled();
-            expect(mockEditor.effectNode).toBeNull();
-            expect(mockEditor.history.push).toHaveBeenCalledWith(false);
+            expect(kernel.$.menu.dropdownOff).toHaveBeenCalled();
+            expect(kernel.effectNode).toBeNull();
+            expect(kernel.$.history.push).toHaveBeenCalledWith(false);
         });
 
         it('should set empty line height for default', () => {
@@ -360,14 +321,14 @@ describe('Plugins - Dropdown - LineHeight', () => {
         });
 
         it('should handle empty lines array', () => {
-            mockEditor.format.getLines.mockReturnValue([]);
+            kernel.$.format.getLines.mockReturnValue([]);
 
             expect(() => {
                 lineHeight.action(mockTarget);
             }).not.toThrow();
 
-            expect(mockEditor.menu.dropdownOff).toHaveBeenCalled();
-            expect(mockEditor.history.push).toHaveBeenCalledWith(false);
+            expect(kernel.$.menu.dropdownOff).toHaveBeenCalled();
+            expect(kernel.$.history.push).toHaveBeenCalledWith(false);
         });
 
         it('should apply to multiple line formats', () => {
@@ -376,7 +337,7 @@ describe('Plugins - Dropdown - LineHeight', () => {
                 { style: { lineHeight: '' } },
                 { style: { lineHeight: '' } }
             ];
-            mockEditor.format.getLines.mockReturnValue(manyFormats);
+            kernel.$.format.getLines.mockReturnValue(manyFormats);
             mockTarget.getAttribute.mockReturnValue('2em');
 
             lineHeight.action(mockTarget);
@@ -408,7 +369,7 @@ describe('Plugins - Dropdown - LineHeight', () => {
             const { dom } = require('../../../../src/helper');
             dom.utils.createElement.mockClear();
 
-            const defaultLineHeight = new LineHeight(mockEditor, {});
+            const defaultLineHeight = new LineHeight(kernel, {});
 
             const createCallArgs = dom.utils.createElement.mock.calls.find(
                 call => call[1]?.class === 'se-dropdown se-list-layer'
@@ -431,7 +392,7 @@ describe('Plugins - Dropdown - LineHeight', () => {
                 lineHeight.action(mockTarget);
             }).not.toThrow();
 
-            expect(mockEditor.format.getLines).toHaveBeenCalled();
+            expect(kernel.$.format.getLines).toHaveBeenCalled();
         });
 
         it('should work with editor selection module', () => {
@@ -439,7 +400,7 @@ describe('Plugins - Dropdown - LineHeight', () => {
                 lineHeight.on();
             }).not.toThrow();
 
-            expect(mockEditor.selection.getNode).toHaveBeenCalled();
+            expect(kernel.$.selection.getNode).toHaveBeenCalled();
         });
 
         it('should work with line detection', () => {
@@ -452,16 +413,16 @@ describe('Plugins - Dropdown - LineHeight', () => {
                 lineHeight.active(mockElement, mockTarget);
             }).not.toThrow();
 
-            expect(mockEditor.format.isLine).toHaveBeenCalledWith(mockElement);
+            expect(kernel.$.format.isLine).toHaveBeenCalledWith(mockElement);
         });
     });
 
     describe('Error handling', () => {
         it('should handle missing editor modules gracefully', () => {
-            mockEditor.format = undefined;
+            kernel.$.format = undefined;
 
             expect(() => {
-                new LineHeight(mockEditor, {});
+                new LineHeight(kernel, {});
             }).not.toThrow();
         });
 
@@ -483,13 +444,13 @@ describe('Plugins - Dropdown - LineHeight', () => {
 
         it('should handle missing plugin options', () => {
             expect(() => {
-                new LineHeight(mockEditor, {});
+                new LineHeight(kernel, {});
             }).not.toThrow();
         });
 
         it('should handle null items in options', () => {
             expect(() => {
-                new LineHeight(mockEditor, { items: null });
+                new LineHeight(kernel, { items: null });
             }).not.toThrow();
         });
     });

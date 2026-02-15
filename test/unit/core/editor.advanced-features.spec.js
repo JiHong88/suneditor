@@ -23,17 +23,17 @@ describe('Core - Editor Advanced Features', () => {
 			await waitForEditorReady(editor);
 
 			// Mock UI
-			if (editor.ui) {
-				editor.uiManager.showLoading = jest.fn();
-				editor.uiManager.hideLoading = jest.fn();
+			if (editor.$.ui) {
+				editor.$.ui.showLoading = jest.fn();
+				editor.$.ui.hideLoading = jest.fn();
 			}
-			if (editor.viewer) {
-				editor.viewer.print = jest.fn();
+			if (editor.$.viewer) {
+				editor.$.viewer.print = jest.fn();
 			}
 
-			if (editor.frameOptions.get('iframe')) {
-				expect(editor.frameContext.get('_wd')).toBeDefined();
-				expect(editor.frameContext.get('_ww')).toBeDefined();
+			if (editor.$.frameOptions.get('iframe')) {
+				expect(editor.$.frameContext.get('_wd')).toBeDefined();
+				expect(editor.$.frameContext.get('_ww')).toBeDefined();
 			}
 		});
 
@@ -46,79 +46,17 @@ describe('Core - Editor Advanced Features', () => {
 			await waitForEditorReady(editor);
 
 			// Mock UI
-			if (editor.ui) {
-				editor.uiManager.showLoading = jest.fn();
-				editor.uiManager.hideLoading = jest.fn();
+			if (editor.$.ui) {
+				editor.$.ui.showLoading = jest.fn();
+				editor.$.ui.hideLoading = jest.fn();
 			}
-			if (editor.viewer) {
-				editor.viewer.print = jest.fn();
+			if (editor.$.viewer) {
+				editor.$.viewer.print = jest.fn();
 			}
 
-			const fc = editor.frameContext;
+			const fc = editor.$.frameContext;
 			if (fc.get('_iframeAuto')) {
 				expect(fc.get('_iframeAuto')).toBeDefined();
-			}
-		});
-	});
-
-	describe('ShadowRoot detection', () => {
-		it('should detect shadow root if present', async () => {
-			editor = createTestEditor();
-			await waitForEditorReady(editor);
-
-			// Mock UI
-			if (editor.ui) {
-				editor.uiManager.showLoading = jest.fn();
-				editor.uiManager.hideLoading = jest.fn();
-			}
-			if (editor.viewer) {
-				editor.viewer.print = jest.fn();
-			}
-
-			// Shadow root detection
-			expect(typeof editor.shadowRoot === 'object' || editor.shadowRoot === null).toBe(true);
-		});
-	});
-
-	describe('ResizeObserver integration', () => {
-		it('should handle ResizeObserver when supported', async () => {
-			editor = createTestEditor();
-			await waitForEditorReady(editor);
-
-			// Mock UI
-			if (editor.ui) {
-				editor.uiManager.showLoading = jest.fn();
-				editor.uiManager.hideLoading = jest.fn();
-			}
-			if (editor.viewer) {
-				editor.viewer.print = jest.fn();
-			}
-
-			const env = require('../../../src/helper/env').default;
-			if (env.isResizeObserverSupported) {
-				// Should have observer
-				expect(editor.eventManager._wwFrameObserver).toBeDefined();
-			}
-		});
-	});
-
-	describe('Toolbar observers', () => {
-		it('should setup toolbar observer', async () => {
-			editor = createTestEditor();
-			await waitForEditorReady(editor);
-
-			// Mock UI
-			if (editor.ui) {
-				editor.uiManager.showLoading = jest.fn();
-				editor.uiManager.hideLoading = jest.fn();
-			}
-			if (editor.viewer) {
-				editor.viewer.print = jest.fn();
-			}
-
-			const env = require('../../../src/helper/env').default;
-			if (env.isResizeObserverSupported) {
-				expect(editor.eventManager._toolbarObserver).toBeDefined();
 			}
 		});
 	});
@@ -129,36 +67,16 @@ describe('Core - Editor Advanced Features', () => {
 			await waitForEditorReady(editor);
 
 			// Mock UI
-			if (editor.ui) {
-				editor.uiManager.showLoading = jest.fn();
-				editor.uiManager.hideLoading = jest.fn();
+			if (editor.$.ui) {
+				editor.$.ui.showLoading = jest.fn();
+				editor.$.ui.hideLoading = jest.fn();
 			}
-			if (editor.viewer) {
-				editor.viewer.print = jest.fn();
+			if (editor.$.viewer) {
+				editor.$.viewer.print = jest.fn();
 			}
 
 			// Events should be attached
-			expect(editor.eventManager).toBeDefined();
-		});
-	});
-
-	describe('Component info initialization', () => {
-		it('should initialize component info flags', async () => {
-			editor = createTestEditor();
-			await waitForEditorReady(editor);
-
-			// Mock UI
-			if (editor.ui) {
-				editor.uiManager.showLoading = jest.fn();
-				editor.uiManager.hideLoading = jest.fn();
-			}
-			if (editor.viewer) {
-				editor.viewer.print = jest.fn();
-			}
-
-			// Check flags
-			expect(editor._componentsInfoInit).toBe(false);
-			expect(editor._componentsInfoReset).toBe(false);
+			expect(editor.$.eventManager).toBeDefined();
 		});
 	});
 
@@ -168,16 +86,16 @@ describe('Core - Editor Advanced Features', () => {
 			await waitForEditorReady(editor);
 
 			// Mock UI
-			if (editor.ui) {
-				editor.uiManager.showLoading = jest.fn();
-				editor.uiManager.hideLoading = jest.fn();
+			if (editor.$.ui) {
+				editor.$.ui.showLoading = jest.fn();
+				editor.$.ui.hideLoading = jest.fn();
 			}
-			if (editor.viewer) {
-				editor.viewer.print = jest.fn();
+			if (editor.$.viewer) {
+				editor.$.viewer.print = jest.fn();
 			}
 
 			// History should be ready
-			expect(editor.history).toBeDefined();
+			expect(editor.$.history).toBeDefined();
 		});
 	});
 
@@ -187,19 +105,19 @@ describe('Core - Editor Advanced Features', () => {
 			await waitForEditorReady(editor);
 
 			// Mock UI
-			if (editor.ui) {
-				editor.uiManager.showLoading = jest.fn();
-				editor.uiManager.hideLoading = jest.fn();
+			if (editor.$.ui) {
+				editor.$.ui.showLoading = jest.fn();
+				editor.$.ui.hideLoading = jest.fn();
 			}
-			if (editor.viewer) {
-				editor.viewer.print = jest.fn();
+			if (editor.$.viewer) {
+				editor.$.viewer.print = jest.fn();
 			}
 
 			// Wait for async initialization
 			await new Promise((resolve) => setTimeout(resolve, 100));
 
 			// Toolbar should be visible
-			const toolbar = editor.context.get('toolbar_main');
+			const toolbar = editor.$.context.get('toolbar_main');
 			expect(toolbar.style.visibility).not.toBe('hidden');
 		});
 
@@ -214,12 +132,12 @@ describe('Core - Editor Advanced Features', () => {
 			await waitForEditorReady(editor);
 
 			// Mock UI
-			if (editor.ui) {
-				editor.uiManager.showLoading = jest.fn();
-				editor.uiManager.hideLoading = jest.fn();
+			if (editor.$.ui) {
+				editor.$.ui.showLoading = jest.fn();
+				editor.$.ui.hideLoading = jest.fn();
 			}
-			if (editor.viewer) {
-				editor.viewer.print = jest.fn();
+			if (editor.$.viewer) {
+				editor.$.viewer.print = jest.fn();
 			}
 
 			// Wait for onload

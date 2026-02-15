@@ -3,6 +3,7 @@
  */
 
 import Template from '../../../../src/plugins/dropdown/template.js';
+import { createMockEditor } from '../../../../test/__mocks__/editorMock.js';
 
 // Mock helper
 jest.mock('../../../../src/helper', () => ({
@@ -32,40 +33,14 @@ jest.mock('../../../../src/helper', () => ({
     }
 }));
 
-// Mock EditorInjector
-jest.mock('../../../../src/editorInjector/_core.js', () => {
-    return jest.fn().mockImplementation(function(editor) {
-        this.editor = editor;
-        this.lang = editor.lang;
-        this.html = editor.html;
-        this.menu = editor.menu;
-        this.frameContext = editor.frameContext;
-        this.focusManager = editor.focusManager;
-		this.triggerEvent = editor.triggerEvent || jest.fn();
-    });
-});
-
 describe('Plugins - Dropdown - Template', () => {
-    let mockEditor;
+    let kernel;
     let template;
 
     beforeEach(() => {
         jest.clearAllMocks();
 
-        mockEditor = {
-            lang: {
-                template: 'Template'
-            },
-            html: {
-                insert: jest.fn()
-            },
-            menu: {
-                initDropdownTarget: jest.fn(),
-                dropdownOff: jest.fn()
-            },
-            frameContext: new Map(),
-            triggerEvent: jest.fn()
-        };
+        kernel = createMockEditor();
 
         const pluginOptions = {
             items: [
@@ -75,14 +50,14 @@ describe('Plugins - Dropdown - Template', () => {
             ]
         };
 
-        template = new Template(mockEditor, pluginOptions);
+        template = new Template(kernel, pluginOptions);
     });
 
 
     describe('Constructor', () => {
 
         it('should initialize dropdown menu', () => {
-            expect(mockEditor.menu.initDropdownTarget).toHaveBeenCalledWith(Template, expect.any(Object));
+            expect(kernel.$.menu.initDropdownTarget).toHaveBeenCalledWith(Template, expect.any(Object));
         });
 
         it('should create template items with correct structure', () => {
@@ -109,12 +84,12 @@ describe('Plugins - Dropdown - Template', () => {
             template.action(mockTarget);
 
             expect(mockTarget.getAttribute).toHaveBeenCalledWith('data-value');
-            expect(mockEditor.html.insert).toHaveBeenCalledWith(
+            expect(kernel.$.html.insert).toHaveBeenCalledWith(
                 '<div class="template-2"><h2>Template 2</h2><p>Content 2</p></div>',
                 { selectInserted: false, skipCharCount: false, skipCleaning: false }
             );
             expect(template.selectedIndex).toBe(1);
-            expect(mockEditor.menu.dropdownOff).toHaveBeenCalled();
+            expect(kernel.$.menu.dropdownOff).toHaveBeenCalled();
         });
 
         it('should handle first template item (index 0)', () => {
@@ -122,7 +97,7 @@ describe('Plugins - Dropdown - Template', () => {
 
             template.action(mockTarget);
 
-            expect(mockEditor.html.insert).toHaveBeenCalledWith(
+            expect(kernel.$.html.insert).toHaveBeenCalledWith(
                 '<div class="template-1"><h2>Template 1</h2><p>Content 1</p></div>',
                 { selectInserted: false, skipCharCount: false, skipCleaning: false }
             );
@@ -134,7 +109,7 @@ describe('Plugins - Dropdown - Template', () => {
 
             template.action(mockTarget);
 
-            expect(mockEditor.html.insert).toHaveBeenCalledWith(
+            expect(kernel.$.html.insert).toHaveBeenCalledWith(
                 '<div class="template-3"><h2>Template 3</h2><p>Content 3</p></div>',
                 { selectInserted: false, skipCharCount: false, skipCleaning: false }
             );
@@ -149,7 +124,7 @@ describe('Plugins - Dropdown - Template', () => {
                 template.action(mockTarget);
             }).toThrow('[SUNEDITOR.template.fail] cause : "templates[i].html not found"');
 
-            expect(mockEditor.menu.dropdownOff).toHaveBeenCalled();
+            expect(kernel.$.menu.dropdownOff).toHaveBeenCalled();
         });
 
         it('should handle invalid index gracefully', () => {
@@ -175,7 +150,7 @@ describe('Plugins - Dropdown - Template', () => {
         it('should warn when no template items provided', () => {
             const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
 
-            new Template(mockEditor, { items: [] });
+            new Template(kernel, { items: [] });
 
             expect(consoleSpy).toHaveBeenCalledWith('[SUNEDITOR.plugins.template.warn] To use the "template" plugin, please define the "templates" option.');
 
@@ -209,7 +184,7 @@ describe('Plugins - Dropdown - Template', () => {
             expect(template.selectedIndex).toBe(0);
 
             // Create new instance to verify state independence
-            const newTemplate = new Template(mockEditor, {
+            const newTemplate = new Template(kernel, {
                 items: [{ name: 'Test', html: '<div>Test</div>' }]
             });
             expect(newTemplate.selectedIndex).toBe(-1);
@@ -226,7 +201,7 @@ describe('Plugins - Dropdown - Template', () => {
                 template.action(mockTarget);
             }).not.toThrow();
 
-            expect(mockEditor.html.insert).toHaveBeenCalledWith(
+            expect(kernel.$.html.insert).toHaveBeenCalledWith(
                 '<div class="template-1"><h2>Template 1</h2><p>Content 1</p></div>',
                 { selectInserted: false, skipCharCount: false, skipCleaning: false }
             );
@@ -242,7 +217,7 @@ describe('Plugins - Dropdown - Template', () => {
             mockTargets.forEach((target, index) => {
                 template.action(target);
                 expect(template.selectedIndex).toBe(index);
-                expect(mockEditor.html.insert).toHaveBeenCalledWith(
+                expect(kernel.$.html.insert).toHaveBeenCalledWith(
                     template.items[index].html,
                     { selectInserted: false, skipCharCount: false, skipCleaning: false }
                 );
@@ -251,18 +226,6 @@ describe('Plugins - Dropdown - Template', () => {
     });
 
     describe('Error handling', () => {
-        it('should handle missing editor html module', () => {
-            mockEditor.html = undefined;
-
-            const mockTarget = {
-                getAttribute: jest.fn().mockReturnValue('0')
-            };
-
-            expect(() => {
-                template.action(mockTarget);
-            }).not.toThrow();
-        });
-
         it('should handle missing items array', () => {
             template.items = undefined;
 

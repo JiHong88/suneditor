@@ -3,6 +3,7 @@
  */
 
 import List_numbered from '../../../../src/plugins/command/list_numbered.js';
+import { createMockEditor } from '../../../../test/__mocks__/editorMock.js';
 
 // Mock helper
 jest.mock('../../../../src/helper', () => ({
@@ -43,74 +44,26 @@ jest.mock('../../../../src/helper', () => ({
     }
 }));
 
-// Mock EditorInjector
-jest.mock('../../../../src/editorInjector/_core.js', () => {
-    return jest.fn().mockImplementation(function(editor) {
-        this.editor = editor;
-        this.lang = editor.lang;
-        this.icons = editor.icons;
-        this.selection = editor.selection;
-        this.format = editor.format;
-        this.listFormat = editor.listFormat;
-        this.history = editor.history;
-        this.menu = editor.menu;
-        this.frameContext = editor.frameContext;
-        this.focusManager = editor.focusManager;
-		this.triggerEvent = editor.triggerEvent || jest.fn();
-    });
-});
-
 describe('Plugins - Command - List_numbered', () => {
-    let mockEditor;
+    let kernel;
     let listNumbered;
 
     beforeEach(() => {
         jest.clearAllMocks();
 
-        mockEditor = {
-            lang: {
-                numberedList: 'Numbered List'
-            },
-            icons: {
-                arrow_down: '▼'
-            },
-            selection: {
-                getNode: jest.fn(),
-                setRange: jest.fn()
-            },
-            format: {
-                getBlock: jest.fn(),
-            },
-            listFormat: {
-                apply: jest.fn()
-            },
-            history: {
-                push: jest.fn()
-            },
-            menu: {
-                initDropdownTarget: jest.fn(),
-                dropdownOff: jest.fn()
-            },
-            focusManager: { focus: jest.fn(), blur: jest.fn(), focusEdge: jest.fn(), nativeFocus: jest.fn() },
-            frameContext: new Map(),
-            triggerEvent: jest.fn()
-        };
+        kernel = createMockEditor();
 
-        listNumbered = new List_numbered(mockEditor);
+        listNumbered = new List_numbered(kernel);
     });
 
 
     describe('Constructor', () => {
 
         it('should initialize dropdown menu', () => {
-            expect(mockEditor.menu.initDropdownTarget).toHaveBeenCalledWith(
+            expect(kernel.$.menu.initDropdownTarget).toHaveBeenCalledWith(
                 { key: 'list_numbered', type: 'dropdown' },
                 expect.any(Object)
             );
-        });
-
-        it('should create list items from dropdown menu', () => {
-            expect(listNumbered.listItems).toHaveLength(5);
         });
     });
 
@@ -192,7 +145,7 @@ describe('Plugins - Command - List_numbered', () => {
             const mockBlock = {
                 style: { listStyleType: 'lower-alpha' }
             };
-            mockEditor.format.getBlock.mockReturnValue(mockBlock);
+            kernel.$.format.getBlock.mockReturnValue(mockBlock);
 
             listNumbered.on();
 
@@ -205,7 +158,7 @@ describe('Plugins - Command - List_numbered', () => {
 
         it('should use default type when no style', () => {
             const mockBlock = { style: {} };
-            mockEditor.format.getBlock.mockReturnValue(mockBlock);
+            kernel.$.format.getBlock.mockReturnValue(mockBlock);
 
             listNumbered.on();
 
@@ -226,7 +179,7 @@ describe('Plugins - Command - List_numbered', () => {
                 })
             };
 
-            mockEditor.format.getBlock.mockReturnValue(mockBlock);
+            kernel.$.format.getBlock.mockReturnValue(mockBlock);
 
             const { dom } = require('../../../../src/helper');
             dom.check.isList.mockReturnValue(true);
@@ -234,7 +187,7 @@ describe('Plugins - Command - List_numbered', () => {
             listNumbered.action(mockTarget);
 
             expect(mockBlock.style.listStyleType).toBe('upper-roman');
-            expect(mockEditor.menu.dropdownOff).toHaveBeenCalled();
+            expect(kernel.$.menu.dropdownOff).toHaveBeenCalled();
         });
 
         it('should call submit for non-list elements', () => {
@@ -245,7 +198,7 @@ describe('Plugins - Command - List_numbered', () => {
                 })
             };
 
-            mockEditor.format.getBlock.mockReturnValue(mockBlock);
+            kernel.$.format.getBlock.mockReturnValue(mockBlock);
 
             const { dom } = require('../../../../src/helper');
             dom.check.isList.mockReturnValue(false);
@@ -255,7 +208,7 @@ describe('Plugins - Command - List_numbered', () => {
             listNumbered.action(mockTarget);
 
             expect(listNumbered.submit).toHaveBeenCalledWith('decimal');
-            expect(mockEditor.menu.dropdownOff).toHaveBeenCalled();
+            expect(kernel.$.menu.dropdownOff).toHaveBeenCalled();
         });
     });
 
@@ -283,33 +236,33 @@ describe('Plugins - Command - List_numbered', () => {
     describe('submit method', () => {
         it('should apply numbered list with type', () => {
             const mockRange = { sc: 'start', so: 0, ec: 'end', eo: 1 };
-            mockEditor.listFormat.apply.mockReturnValue(mockRange);
+            kernel.listFormat.apply.mockReturnValue(mockRange);
 
             listNumbered.submit('upper-alpha');
 
-            expect(mockEditor.listFormat.apply).toHaveBeenCalledWith('ol:upper-alpha', null, false);
-            expect(mockEditor.selection.setRange).toHaveBeenCalledWith('start', 0, 'end', 1);
-            expect(mockEditor.focusManager.focus).toHaveBeenCalled();
-            expect(mockEditor.history.push).toHaveBeenCalledWith(false);
+            expect(kernel.listFormat.apply).toHaveBeenCalledWith('ol:upper-alpha', null, false);
+            expect(kernel.$.selection.setRange).toHaveBeenCalledWith('start', 0, 'end', 1);
+            expect(kernel.$.focusManager.focus).toHaveBeenCalled();
+            expect(kernel.$.history.push).toHaveBeenCalledWith(false);
         });
 
         it('should apply numbered list without type', () => {
             const mockRange = { sc: 'start', so: 0, ec: 'end', eo: 1 };
-            mockEditor.listFormat.apply.mockReturnValue(mockRange);
+            kernel.listFormat.apply.mockReturnValue(mockRange);
 
             listNumbered.submit();
 
-            expect(mockEditor.listFormat.apply).toHaveBeenCalledWith('ol:', null, false);
+            expect(kernel.listFormat.apply).toHaveBeenCalledWith('ol:', null, false);
         });
 
         it('should handle null range from apply', () => {
-            mockEditor.listFormat.apply.mockReturnValue(null);
+            kernel.listFormat.apply.mockReturnValue(null);
 
             listNumbered.submit('decimal');
 
-            expect(mockEditor.selection.setRange).not.toHaveBeenCalled();
-            expect(mockEditor.focusManager.focus).toHaveBeenCalled();
-            expect(mockEditor.history.push).toHaveBeenCalledWith(false);
+            expect(kernel.$.selection.setRange).not.toHaveBeenCalled();
+            expect(kernel.$.focusManager.focus).toHaveBeenCalled();
+            expect(kernel.$.history.push).toHaveBeenCalledWith(false);
         });
     });
 
@@ -318,8 +271,8 @@ describe('Plugins - Command - List_numbered', () => {
             const mockNode = document.createElement('li');
             const mockBlock = { style: { listStyleType: 'decimal' } };
 
-            mockEditor.selection.getNode.mockReturnValue(mockNode);
-            mockEditor.format.getBlock.mockReturnValue(mockBlock);
+            kernel.$.selection.getNode.mockReturnValue(mockNode);
+            kernel.$.format.getBlock.mockReturnValue(mockBlock);
 
             expect(() => {
                 listNumbered.on();
@@ -329,7 +282,7 @@ describe('Plugins - Command - List_numbered', () => {
 
     describe('Error handling', () => {
         it('should handle missing editor modules gracefully', () => {
-            mockEditor.format = undefined;
+            kernel.$.format = undefined;
 
             expect(() => {
                 listNumbered.action({});

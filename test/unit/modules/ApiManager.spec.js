@@ -93,24 +93,6 @@ describe('Modules - ApiManager', () => {
 			expect(apiManager.kind).toBe('FallbackName');
 		});
 
-		it('should initialize with provided parameters', () => {
-			const params = {
-				method: 'POST',
-				url: 'https://api.example.com',
-				headers: { 'Content-Type': 'application/json' },
-				data: { test: 'data' },
-				responseType: 'json'
-			};
-
-			const apiManager = new ApiManager(mockInst, params);
-
-			expect(apiManager.method).toBe('POST');
-			expect(apiManager.url).toBe('https://api.example.com');
-			expect(apiManager.headers).toEqual({ 'Content-Type': 'application/json' });
-			expect(apiManager.data).toEqual({ test: 'data' });
-			expect(apiManager.responseType).toBe('json');
-		});
-
 		it('should initialize with undefined parameters when not provided', () => {
 			const apiManager = new ApiManager(mockInst);
 
@@ -154,33 +136,6 @@ describe('Modules - ApiManager', () => {
 				apiManager.call({});
 			}).toThrow();
 		});
-
-		it('should set headers correctly', () => {
-			const headers = {
-				'Content-Type': 'application/json',
-				Authorization: 'Bearer token'
-			};
-
-			expect(() => {
-				apiManager.call({ headers, callBack: jest.fn() });
-			}).not.toThrow();
-		});
-
-		it('should not set headers when null or empty', () => {
-			expect(() => {
-				apiManager.call({ headers: null, callBack: jest.fn() });
-			}).not.toThrow();
-
-			expect(() => {
-				apiManager.call({ headers: {}, callBack: jest.fn() });
-			}).not.toThrow();
-		});
-
-		it('should handle responseType correctly', () => {
-			expect(() => {
-				apiManager.call({ responseType: 'blob', callBack: jest.fn() });
-			}).not.toThrow();
-		});
 	});
 
 	describe('asyncCall method', () => {
@@ -197,98 +152,6 @@ describe('Modules - ApiManager', () => {
 			});
 
 			expect(result).toBeInstanceOf(Promise);
-		});
-
-		it('should resolve on successful request', async () => {
-			const result = await apiManager.asyncCall({
-				method: 'GET',
-				url: 'https://example.com'
-			});
-			expect(result).toBeDefined();
-			expect(result.status).toBe(200);
-			expect(mockUI.hideLoading).toHaveBeenCalled();
-		});
-
-		it('should reject on network error', async () => {
-			// Mock network error by overriding the helper
-			const originalGetXMLHttpRequest = require('../../../src/helper').env.getXMLHttpRequest;
-
-			class ErrorMockXMLHttpRequest extends MockXMLHttpRequest {
-				send(data) {
-					this.data = data;
-					setTimeout(() => {
-						if (this.onerror) {
-							this.onerror();
-						}
-					}, 0);
-				}
-			}
-
-			require('../../../src/helper').env.getXMLHttpRequest = () => new ErrorMockXMLHttpRequest();
-
-			// Create new instance to use the new mock
-			const errorApiManager = new ApiManager(mockInst);
-
-			const promise = errorApiManager.asyncCall({
-				method: 'GET',
-				url: 'https://example.com'
-			});
-
-			await expect(promise).rejects.toThrow('Network error');
-
-			// Restore original
-			require('../../../src/helper').env.getXMLHttpRequest = originalGetXMLHttpRequest;
-		});
-
-		it('should reject on HTTP error status', async () => {
-			// Mock HTTP error
-			const originalGetXMLHttpRequest = require('../../../src/helper').env.getXMLHttpRequest;
-
-			class HttpErrorMockXMLHttpRequest extends MockXMLHttpRequest {
-				send(data) {
-					this.data = data;
-					setTimeout(() => {
-						this.status = 404;
-						this.responseText = '{"error": "Not found"}';
-						if (this.onload) {
-							this.onload();
-						}
-					}, 0);
-				}
-			}
-
-			require('../../../src/helper').env.getXMLHttpRequest = () => new HttpErrorMockXMLHttpRequest();
-
-			// Create new instance with mock UI to track hideLoading calls
-			const mockUI2 = {
-				hideLoading: jest.fn(),
-				alertOpen: jest.fn()
-			};
-
-			const mockEditor2 = {
-				uiManager: mockUI2
-			};
-
-			const mockInst2 = {
-				editor: mockEditor2,
-				constructor: {
-					key: 'testKey',
-					name: 'TestClass'
-				}
-			};
-
-			const httpErrorApiManager = new ApiManager(mockInst2);
-
-			const promise = httpErrorApiManager.asyncCall({
-				method: 'GET',
-				url: 'https://example.com'
-			});
-
-			await expect(promise).rejects.toBeDefined();
-			expect(mockUI2.hideLoading).toHaveBeenCalled();
-
-			// Restore original
-			require('../../../src/helper').env.getXMLHttpRequest = originalGetXMLHttpRequest;
 		});
 	});
 

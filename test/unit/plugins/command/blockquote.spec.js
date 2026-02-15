@@ -3,6 +3,7 @@
  */
 
 import Blockquote from '../../../../src/plugins/command/blockquote.js';
+import { createMockEditor } from '../../../../test/__mocks__/editorMock.js';
 
 // Mock helper
 jest.mock('../../../../src/helper', () => ({
@@ -20,42 +21,17 @@ jest.mock('../../../../src/helper', () => ({
     }
 }));
 
-// Mock EditorInjector
-jest.mock('../../../../src/editorInjector/_core.js', () => {
-    return jest.fn().mockImplementation(function(editor) {
-        this.editor = editor;
-        this.lang = editor.lang;
-        this.selection = editor.selection;
-        this.format = editor.format;
-        this.frameContext = editor.frameContext;
-        this.focusManager = editor.focusManager;
-		this.triggerEvent = editor.triggerEvent || jest.fn();
-    });
-});
-
 describe('Plugins - Command - Blockquote', () => {
-    let mockEditor;
+    let kernel;
     let blockquote;
 
     beforeEach(() => {
         jest.clearAllMocks();
 
-        mockEditor = {
-            lang: {
-                tag_blockquote: 'Blockquote'
-            },
-            selection: {
-                getNode: jest.fn()
-            },
-            format: {
-                removeBlock: jest.fn(),
-                applyBlock: jest.fn()
-            },
-            frameContext: new Map(),
-            triggerEvent: jest.fn()
-        };
+        kernel = createMockEditor();
+        kernel.$.lang.tag_blockquote = 'Blockquote';
 
-        blockquote = new Blockquote(mockEditor);
+        blockquote = new Blockquote(kernel);
     });
 
     describe('Constructor', () => {
@@ -152,7 +128,7 @@ describe('Plugins - Command - Blockquote', () => {
 
     describe('action method', () => {
         beforeEach(() => {
-            mockEditor.selection.getNode.mockReturnValue(document.createElement('p'));
+            kernel.$.selection.getNode.mockReturnValue(document.createElement('p'));
         });
 
         it('should remove blockquote when currently inside blockquote', () => {
@@ -164,10 +140,10 @@ describe('Plugins - Command - Blockquote', () => {
             blockquote.action();
 
             expect(dom.query.getParentElement).toHaveBeenCalledWith(
-                mockEditor.selection.getNode(),
+                kernel.$.selection.getNode(),
                 'blockquote'
             );
-            expect(mockEditor.format.removeBlock).toHaveBeenCalledWith(
+            expect(kernel.$.format.removeBlock).toHaveBeenCalledWith(
                 mockBlockquote,
                 {
                     selectedFormats: null,
@@ -176,7 +152,7 @@ describe('Plugins - Command - Blockquote', () => {
                     skipHistory: false
                 }
             );
-            expect(mockEditor.format.applyBlock).not.toHaveBeenCalled();
+            expect(kernel.$.format.applyBlock).not.toHaveBeenCalled();
         });
 
         it('should apply blockquote when not currently inside blockquote', () => {
@@ -186,14 +162,14 @@ describe('Plugins - Command - Blockquote', () => {
             blockquote.action();
 
             expect(dom.query.getParentElement).toHaveBeenCalledWith(
-                mockEditor.selection.getNode(),
+                kernel.$.selection.getNode(),
                 'blockquote'
             );
-            expect(mockEditor.format.removeBlock).not.toHaveBeenCalled();
-            expect(mockEditor.format.applyBlock).toHaveBeenCalled();
+            expect(kernel.$.format.removeBlock).not.toHaveBeenCalled();
+            expect(kernel.$.format.applyBlock).toHaveBeenCalled();
 
             // Check that cloned blockquote element is used
-            const appliedElement = mockEditor.format.applyBlock.mock.calls[0][0];
+            const appliedElement = kernel.$.format.applyBlock.mock.calls[0][0];
             expect(appliedElement).toBeDefined();
         });
 
@@ -207,14 +183,14 @@ describe('Plugins - Command - Blockquote', () => {
             blockquote.action();
 
             expect(blockquote.quoteTag.cloneNode).toHaveBeenCalledWith(false);
-            expect(mockEditor.format.applyBlock).toHaveBeenCalledWith(mockClonedElement);
+            expect(kernel.$.format.applyBlock).toHaveBeenCalledWith(mockClonedElement);
         });
     });
 
     describe('Integration', () => {
         it('should work with editor selection and format modules', () => {
             const mockNode = document.createElement('p');
-            mockEditor.selection.getNode.mockReturnValue(mockNode);
+            kernel.$.selection.getNode.mockReturnValue(mockNode);
 
             const { dom } = require('../../../../src/helper');
             dom.query.getParentElement.mockReturnValue(null);
@@ -223,15 +199,15 @@ describe('Plugins - Command - Blockquote', () => {
                 blockquote.action();
             }).not.toThrow();
 
-            expect(mockEditor.selection.getNode).toHaveBeenCalled();
+            expect(kernel.$.selection.getNode).toHaveBeenCalled();
             expect(dom.query.getParentElement).toHaveBeenCalledWith(mockNode, 'blockquote');
-            expect(mockEditor.format.applyBlock).toHaveBeenCalled();
+            expect(kernel.$.format.applyBlock).toHaveBeenCalled();
         });
     });
 
     describe('Error handling', () => {
         it('should handle missing selection gracefully', () => {
-            mockEditor.selection.getNode.mockReturnValue(null);
+            kernel.$.selection.getNode.mockReturnValue(null);
 
             const { dom } = require('../../../../src/helper');
             dom.query.getParentElement.mockReturnValue(null);
@@ -242,13 +218,13 @@ describe('Plugins - Command - Blockquote', () => {
         });
 
         it('should handle missing editor dependencies', () => {
-            mockEditor.format = undefined;
-            mockEditor.selection = undefined;
+            kernel.$.format = undefined;
+            kernel.$.selection = undefined;
 
             // The actual implementation doesn't validate dependencies, so this won't throw
             // This test verifies the current behavior rather than enforcing strict validation
             expect(() => {
-                new Blockquote(mockEditor);
+                new Blockquote(kernel);
             }).not.toThrow();
         });
     });

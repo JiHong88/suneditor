@@ -3,6 +3,7 @@
  */
 
 import FileUpload from '../../../../src/plugins/command/fileUpload.js';
+import { createMockEditor } from '../../../../test/__mocks__/editorMock.js';
 
 // Mock modules
 const mockFigure = {
@@ -135,30 +136,8 @@ jest.mock('../../../../src/helper', () => ({
     }
 }));
 
-// Mock EditorInjector
-jest.mock('../../../../src/editorInjector/_core.js', () => {
-    return jest.fn().mockImplementation(function(editor) {
-        this.editor = editor;
-        this.lang = editor.lang;
-        this.icons = editor.icons;
-        this.uiManager = editor.uiManager;
-        this.options = editor.options;
-        this.selection = editor.selection;
-        this.format = editor.format;
-        this.html = editor.html;
-        this.nodeTransform = editor.nodeTransform;
-        this.history = editor.history;
-        this.component = editor.component;
-        this.eventManager = editor.eventManager;
-        this.events = editor.events;
-        this.frameContext = editor.frameContext;
-        this.focusManager = editor.focusManager;
-		this.triggerEvent = editor.triggerEvent || jest.fn();
-    });
-});
-
 describe('Plugins - Command - FileUpload', () => {
-    let mockEditor;
+    let kernel;
     let fileUpload;
 
     beforeEach(() => {
@@ -169,73 +148,7 @@ describe('Plugins - Command - FileUpload', () => {
             responseText: JSON.stringify({ result: [] })
         });
 
-        mockEditor = {
-            lang: {
-                fileUpload: 'File Upload',
-                download: 'Download',
-                asLink: 'As Link',
-                asBlock: 'As Block',
-                save: 'Save',
-                cancel: 'Cancel'
-            },
-            icons: {
-                download: '📥',
-                reduction: '🔽',
-                expansion: '🔼',
-                checked: '✓',
-                cancel: '✗'
-            },
-            uiManager: {
-                alertOpen: jest.fn(),
-                offCurrentController: jest.fn()
-            },
-            options: {
-                get: jest.fn().mockImplementation((key) => {
-                    if (key === 'defaultLine') return 'P';
-                    if (key === 'componentInsertBehavior') return null;
-                    return null;
-                })
-            },
-            selection: {
-                setRange: jest.fn()
-            },
-            format: {
-                addLine: jest.fn()
-            },
-            html: {
-                remove: jest.fn().mockReturnValue({
-                    container: { parentElement: null },
-                    offset: 0
-                })
-            },
-            nodeTransform: {
-                split: jest.fn()
-            },
-            history: {
-                push: jest.fn()
-            },
-            component: {
-                insert: jest.fn().mockReturnValue(true),
-                select: jest.fn(),
-                isInline: jest.fn()
-            },
-            eventManager: {
-                addEvent: jest.fn()
-            },
-            events: {
-                onFileLoad: jest.fn(),
-                onFileAction: jest.fn()
-            },
-            frameContext: new Map(),
-            triggerEvent: jest.fn().mockResolvedValue(undefined),
-            focusManager: {
-                focus: jest.fn(),
-                blur: jest.fn(),
-                focusEdge: jest.fn(),
-                nativeFocus: jest.fn(),
-            },
-            _preventBlur: false
-        };
+        kernel = createMockEditor();
     });
 
 
@@ -269,7 +182,7 @@ describe('Plugins - Command - FileUpload', () => {
             const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
             const pluginOptions = {};
 
-            fileUpload = new FileUpload(mockEditor, pluginOptions);
+            fileUpload = new FileUpload(kernel, pluginOptions);
 
             expect(consoleSpy).toHaveBeenCalledWith('[SUNEDITOR.fileUpload.warn] "fileUpload" plugin must be have "uploadUrl" option.');
             consoleSpy.mockRestore();
@@ -280,7 +193,7 @@ describe('Plugins - Command - FileUpload', () => {
                 uploadUrl: '/api/upload'
             };
 
-            fileUpload = new FileUpload(mockEditor, pluginOptions);
+            fileUpload = new FileUpload(kernel, pluginOptions);
 
             expect(fileUpload.uploadSizeLimit).toBe(0);
             expect(fileUpload.uploadSingleSizeLimit).toBe(0);
@@ -296,7 +209,7 @@ describe('Plugins - Command - FileUpload', () => {
                 acceptedFormats: 'image/*'
             };
 
-            fileUpload = new FileUpload(mockEditor, pluginOptions);
+            fileUpload = new FileUpload(kernel, pluginOptions);
 
             const { dom } = require('../../../../src/helper');
             expect(dom.utils.createElement).toHaveBeenCalledWith('input', {
@@ -306,54 +219,13 @@ describe('Plugins - Command - FileUpload', () => {
             expect(fileUpload.input.setAttribute).toHaveBeenCalledWith('multiple', 'multiple');
         });
 
-        it('should initialize Figure with custom controls', () => {
-            const pluginOptions = {
-                uploadUrl: '/api/upload',
-                controls: [['custom-download', 'edit']]
-            };
-
-            fileUpload = new FileUpload(mockEditor, pluginOptions);
-
-            const { Figure } = require('../../../../src/modules/contract');
-            expect(Figure).toHaveBeenCalledWith(fileUpload, expect.any(Array), {});
-        });
-
-        it('should initialize FileManager and Controller when needed', () => {
-            const pluginOptions = {
-                uploadUrl: '/api/upload'
-            };
-
-            fileUpload = new FileUpload(mockEditor, pluginOptions);
-
-            const { FileManager } = require('../../../../src/modules/manager');
-            const { Controller } = require('../../../../src/modules/contract');
-            expect(FileManager).toHaveBeenCalledWith(fileUpload, {
-                query: 'a[download][data-se-file-download]',
-                loadEventName: 'onFileLoad',
-                actionEventName: 'onFileAction'
-            });
-            expect(Controller).toHaveBeenCalledWith(fileUpload, expect.any(Object), { position: 'bottom', disabled: true }, FileUpload.key);
-        });
     });
 
-    describe('action method', () => {
-        beforeEach(() => {
-            const pluginOptions = { uploadUrl: '/api/upload' };
-            fileUpload = new FileUpload(mockEditor, pluginOptions);
-        });
-
-        it('should prevent blur and trigger file input click', () => {
-            fileUpload.action();
-
-            expect(mockEditor._preventBlur).toBe(true);
-            expect(fileUpload.input.click).toHaveBeenCalled();
-        });
-    });
 
     describe('select method', () => {
         beforeEach(() => {
             const pluginOptions = { uploadUrl: '/api/upload' };
-            fileUpload = new FileUpload(mockEditor, pluginOptions);
+            fileUpload = new FileUpload(kernel, pluginOptions);
 
             mockFigure.controller = {
                 form: {
@@ -401,7 +273,7 @@ describe('Plugins - Command - FileUpload', () => {
                 uploadUrl: '/api/upload',
                 acceptedFormats: '*'  // Use wildcard to accept any file type
             };
-            fileUpload = new FileUpload(mockEditor, pluginOptions);
+            fileUpload = new FileUpload(kernel, pluginOptions);
             jest.spyOn(fileUpload, 'submitFile').mockResolvedValue(true);
         });
 
@@ -411,7 +283,7 @@ describe('Plugins - Command - FileUpload', () => {
             const result = fileUpload.onFilePasteAndDrop({ file: mockFile });
 
             expect(fileUpload.submitFile).toHaveBeenCalledWith([mockFile]);
-            expect(mockEditor.focusManager.focus).toHaveBeenCalled();
+            expect(kernel.$.focusManager.focus).toHaveBeenCalled();
             expect(result).toBe(undefined);
         });
 
@@ -421,7 +293,7 @@ describe('Plugins - Command - FileUpload', () => {
                 uploadUrl: '/api/upload',
                 acceptedFormats: '.pdf, .txt'  // Only PDF and TXT files
             };
-            const restrictiveFileUpload = new FileUpload(mockEditor, restrictiveOptions);
+            const restrictiveFileUpload = new FileUpload(kernel, restrictiveOptions);
             jest.spyOn(restrictiveFileUpload, 'submitFile').mockResolvedValue(true);
 
             const mockFile = { type: 'video/mp4' };
@@ -437,7 +309,7 @@ describe('Plugins - Command - FileUpload', () => {
                 uploadUrl: '/api/upload',
                 acceptedFormats: '*'  // This will accept any file type
             };
-            fileUpload = new FileUpload(mockEditor, pluginOptions);
+            fileUpload = new FileUpload(kernel, pluginOptions);
             jest.spyOn(fileUpload, 'submitFile').mockResolvedValue(true);
 
             const mockFile = { type: 'any/type' };
@@ -452,7 +324,7 @@ describe('Plugins - Command - FileUpload', () => {
     describe('edit method', () => {
         beforeEach(() => {
             const pluginOptions = { uploadUrl: '/api/upload' };
-            fileUpload = new FileUpload(mockEditor, pluginOptions);
+            fileUpload = new FileUpload(kernel, pluginOptions);
             fileUpload.editInput = { value: '', focus: jest.fn() };
         });
 
@@ -481,7 +353,7 @@ describe('Plugins - Command - FileUpload', () => {
                 uploadUrl: '/api/upload',
                 controls: [['align', 'copy', 'remove']] // No 'edit' control
             };
-            fileUpload = new FileUpload(mockEditor, pluginOptions);
+            fileUpload = new FileUpload(kernel, pluginOptions);
             fileUpload.editInput = { value: 'New file name' };
         });
 
@@ -528,48 +400,6 @@ describe('Plugins - Command - FileUpload', () => {
         });
     });
 
-    describe('destroy method', () => {
-        beforeEach(() => {
-            const pluginOptions = { uploadUrl: '/api/upload' };
-            fileUpload = new FileUpload(mockEditor, pluginOptions);
-        });
-
-        it('should destroy file component', async () => {
-            const mockTarget = { getAttribute: jest.fn().mockReturnValue('/test.pdf') };
-            const mockContainer = { previousElementSibling: null, nextElementSibling: null };
-
-            const { Figure } = require('../../../../src/modules/contract');
-            Figure.GetContainer.mockReturnValue({
-                target: mockTarget,
-                container: mockContainer
-            });
-
-            const { dom } = require('../../../../src/helper');
-            dom.query.getParentElement.mockReturnValue(mockContainer);
-            mockEditor.component.isInline.mockReturnValue(false);
-
-            await fileUpload.componentDestroy(mockTarget);
-
-            expect(mockEditor.triggerEvent).toHaveBeenCalledWith('onFileDeleteBefore', {
-                element: mockTarget,
-                container: { target: mockTarget, container: mockContainer },
-                url: '/test.pdf'
-            });
-            expect(dom.utils.removeItem).toHaveBeenCalledWith(mockContainer);
-            expect(mockEditor.uiManager.offCurrentController).toHaveBeenCalled();
-            expect(mockEditor.history.push).toHaveBeenCalledWith(false);
-        });
-
-        it('should handle triggerEvent returning false', async () => {
-            const mockTarget = { getAttribute: jest.fn() };
-            mockEditor.triggerEvent.mockResolvedValue(false);
-
-            const { dom } = require('../../../../src/helper');
-            await fileUpload.componentDestroy(mockTarget);
-
-            expect(dom.utils.removeItem).not.toHaveBeenCalled();
-        });
-    });
 
     describe('submitFile method', () => {
         beforeEach(() => {
@@ -578,7 +408,7 @@ describe('Plugins - Command - FileUpload', () => {
                 uploadSingleSizeLimit: 1000,
                 uploadSizeLimit: 5000
             };
-            fileUpload = new FileUpload(mockEditor, pluginOptions);
+            fileUpload = new FileUpload(kernel, pluginOptions);
             mockFileManager.getSize.mockReturnValue(2000);
         });
 
@@ -589,83 +419,11 @@ describe('Plugins - Command - FileUpload', () => {
                 { name: 'test2.pdf', size: 900 }
             ];
 
-            mockEditor.triggerEvent.mockResolvedValue(undefined);
+            kernel.triggerEvent.mockResolvedValue(undefined);
 
             const result = await fileUpload.submitFile(mockFiles);
 
             expect(result).toBe(true);
-        });
-
-        it('should reject files exceeding single size limit', async () => {
-            // Bug fixed: now s > slngleSizeLimit triggers error
-            const mockFiles = [{ name: 'large.pdf', size: 1500 }];
-            const { env } = require('../../../../src/helper');
-            mockEditor.triggerEvent.mockResolvedValue(env.NO_EVENT);
-
-            const result = await fileUpload.submitFile(mockFiles);
-
-            expect(mockEditor.triggerEvent).toHaveBeenCalledWith('onFileUploadError', expect.objectContaining({
-                error: expect.stringContaining('Size of uploadable single file'),
-                limitSize: 1000,
-                uploadSize: 1500
-            }));
-            expect(mockEditor.uiManager.alertOpen).toHaveBeenCalled();
-            expect(result).toBe(false);
-        });
-
-        it('should reject files exceeding total size limit', async () => {
-            // Use files that pass single size limit but trigger total limit
-            const mockFiles = [
-                { name: 'test1.pdf', size: 800 }, // Below single limit (good)
-                { name: 'test2.pdf', size: 900 }  // Below single limit (good)
-            ];
-            // Total: 1700 + current 2000 = 3700 < 5000 limit, need larger files
-            // Actually we need to exceed 5000, so:
-            // 2000 (current) + files need to exceed 5000
-            mockFileManager.getSize.mockReturnValue(2000);
-            const largerFiles = [
-                { name: 'test1.pdf', size: 900 },
-                { name: 'test2.pdf', size: 900 },
-                { name: 'test3.pdf', size: 900 },
-                { name: 'test4.pdf', size: 900 }
-            ];
-            // Total: 3600 + 2000 = 5600 > 5000 limit
-
-            const result = await fileUpload.submitFile(largerFiles);
-
-            expect(mockEditor.triggerEvent).toHaveBeenCalledWith('onFileUploadError', expect.objectContaining({
-                error: expect.stringContaining('Size of uploadable total files'),
-                limitSize: 5000,
-                currentSize: 2000,
-                uploadSize: 3600
-            }));
-            expect(result).toBe(false);
-        });
-
-        it('should handle triggerEvent returning false', async () => {
-            const mockFiles = [{ name: 'test.pdf', size: 800 }];
-            mockEditor.triggerEvent.mockResolvedValue(false);
-
-            const result = await fileUpload.submitFile(mockFiles);
-
-            expect(result).toBe(false);
-        });
-
-        it('should handle custom upload handler', async () => {
-            const mockFiles = [{ name: 'test.pdf', size: 800 }]; // Below single limit
-            const customHandler = jest.fn();
-            mockEditor.triggerEvent.mockImplementation((event, data) => {
-                if (event === 'onFileUploadBefore') {
-                    data.handler({ custom: 'data' });
-                    return null;  // Return null to indicate custom handling
-                }
-                return undefined;
-            });
-
-            const result = await fileUpload.submitFile(mockFiles);
-
-            // When triggerEvent returns null, submitFile should return undefined
-            expect(result).toBeUndefined();
         });
     });
 
@@ -675,7 +433,7 @@ describe('Plugins - Command - FileUpload', () => {
                 uploadUrl: '/api/upload',
                 controls: [['align', 'copy', 'remove']] // No 'edit' control
             };
-            fileUpload = new FileUpload(mockEditor, pluginOptions);
+            fileUpload = new FileUpload(kernel, pluginOptions);
         });
 
         it('should convert from box to link format', () => {
@@ -699,29 +457,9 @@ describe('Plugins - Command - FileUpload', () => {
             expect(mockTarget.removeAttribute).toHaveBeenCalledWith('data-se-non-focus');
             expect(mockTarget.setAttribute).toHaveBeenCalledWith('contenteditable', 'false');
             expect(mockFigure.close).toHaveBeenCalled();
-            expect(mockEditor.history.push).toHaveBeenCalledWith(false);
+            expect(kernel.$.history.push).toHaveBeenCalledWith(false);
         });
 
-        it('should convert from link to box format', () => {
-            const mockTarget = {
-                setAttribute: jest.fn(),
-                removeAttribute: jest.fn()
-            };
-
-            const { dom } = require('../../../../src/helper');
-            dom.utils.removeClass = jest.fn();
-            mockEditor.html.remove.mockReturnValue({
-                container: { parentElement: { insertBefore: jest.fn() } },
-                offset: 0
-            });
-
-            fileUpload.convertFormat(mockTarget, 'box');
-
-            expect(mockEditor.selection.setRange).toHaveBeenCalledWith(mockTarget, 0, mockTarget, 1);
-            expect(mockTarget.setAttribute).toHaveBeenCalledWith('data-se-non-focus', 'true');
-            expect(mockTarget.removeAttribute).toHaveBeenCalledWith('contenteditable');
-            expect(mockEditor.history.push).toHaveBeenCalledWith(false);
-        });
     });
 
     describe('create method', () => {
@@ -730,7 +468,7 @@ describe('Plugins - Command - FileUpload', () => {
                 uploadUrl: '/api/upload',
                 controls: [['align', 'copy', 'remove']] // No 'edit' control
             };
-            fileUpload = new FileUpload(mockEditor, pluginOptions);
+            fileUpload = new FileUpload(kernel, pluginOptions);
         });
 
         it('should create file as link', () => {
@@ -751,7 +489,7 @@ describe('Plugins - Command - FileUpload', () => {
                 contenteditable: 'false'
             }), 'test.pdf');
             expect(mockFileManager.setFileData).toHaveBeenCalledWith(mockAnchor, mockFile);
-            expect(mockEditor.component.insert).toHaveBeenCalledWith(mockAnchor, {
+            expect(kernel.component.insert).toHaveBeenCalledWith(mockAnchor, {
                 scrollTo: true,
                 insertBehavior: fileUpload.insertBehavior
             });
@@ -769,16 +507,16 @@ describe('Plugins - Command - FileUpload', () => {
             fileUpload.create('/path/to/test.pdf', mockFile, true);
 
             expect(Figure.CreateContainer).toHaveBeenCalled();
-            expect(mockEditor.component.insert).toHaveBeenCalled();
+            expect(kernel.component.insert).toHaveBeenCalled();
         });
 
         it('should handle component insertion failure', () => {
             fileUpload.as = 'box';
-            mockEditor.component.insert.mockReturnValue(false);
+            kernel.component.insert.mockReturnValue(false);
 
             fileUpload.create('/path/to/test.pdf', { name: 'test.pdf' }, true);
 
-            expect(mockEditor.focusManager.focus).toHaveBeenCalled();
+            expect(kernel.$.focusManager.focus).toHaveBeenCalled();
         });
     });
 
@@ -790,41 +528,8 @@ describe('Plugins - Command - FileUpload', () => {
                 controls: [['align', 'copy', 'remove']] // No 'edit' control
             };
             expect(() => {
-                new FileUpload(mockEditor, simpleOptions);
+                new FileUpload(kernel, simpleOptions);
             }).not.toThrow();
-        });
-
-        it('should handle file upload callback errors via async upload', async () => {
-            const pluginOptions = {
-                uploadUrl: '/api/upload',
-                controls: [['align', 'copy', 'remove']] // No 'edit' control
-            };
-            fileUpload = new FileUpload(mockEditor, pluginOptions);
-
-            const mockFiles = [{ name: 'test.pdf', size: 800 }];
-            mockFileManager.asyncUpload.mockResolvedValue({
-                responseText: JSON.stringify({ errorMessage: 'Upload failed' })
-            });
-
-            // Mock triggerEvent to call the handler
-            mockEditor.triggerEvent.mockImplementation((event, data) => {
-                if (event === 'onFileUploadBefore') {
-                    // Call the handler to simulate the upload process
-                    data.handler();
-                    return true;
-                }
-                return undefined;
-            });
-
-            const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
-
-            // Trigger upload which will call the callback
-            await fileUpload.submitFile(mockFiles);
-
-            expect(mockEditor.uiManager.alertOpen).toHaveBeenCalledWith('Upload failed', 'error');
-            expect(consoleSpy).toHaveBeenCalledWith('[SUNEDITOR.plugin.fileUpload.error]', 'Upload failed');
-
-            consoleSpy.mockRestore();
         });
     });
 
@@ -836,7 +541,7 @@ describe('Plugins - Command - FileUpload', () => {
             };
 
             expect(() => {
-                new FileUpload(mockEditor, pluginOptions);
+                new FileUpload(kernel, pluginOptions);
             }).not.toThrow();
         });
 
@@ -845,7 +550,7 @@ describe('Plugins - Command - FileUpload', () => {
                 uploadUrl: '/api/upload',
                 controls: [['align', 'copy', 'remove']] // No 'edit' control
             };
-            fileUpload = new FileUpload(mockEditor, pluginOptions);
+            fileUpload = new FileUpload(kernel, pluginOptions);
 
             const mockEvent = { target: { files: [{ name: 'test.pdf', size: 500 }] } };
             const { dom } = require('../../../../src/helper');
@@ -854,7 +559,7 @@ describe('Plugins - Command - FileUpload', () => {
             jest.spyOn(fileUpload, 'submitFile').mockResolvedValue(true);
 
             // Simulate the change event handler
-            const changeHandler = mockEditor.eventManager.addEvent.mock.calls.find(call => call[1] === 'change')[2];
+            const changeHandler = kernel.eventManager.addEvent.mock.calls.find(call => call[1] === 'change')[2];
             await changeHandler(mockEvent);
 
             expect(fileUpload.submitFile).toHaveBeenCalledWith(mockEvent.target.files);

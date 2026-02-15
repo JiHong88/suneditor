@@ -34,7 +34,7 @@ describe('Format - removeBlock integration tests', () => {
 
     describe('Removing blockquote elements', () => {
         it('should handle blockquote to paragraph conversion workflow', () => {
-            const wysiwyg = editor.context.get('wysiwyg');
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
             // Start with blockquote
             wysiwyg.innerHTML = `
@@ -67,7 +67,7 @@ describe('Format - removeBlock integration tests', () => {
         });
 
         it('should handle nested blockquotes', () => {
-            const wysiwyg = editor.context.get('wysiwyg');
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
             wysiwyg.innerHTML = `
                 <blockquote>
@@ -98,7 +98,7 @@ describe('Format - removeBlock integration tests', () => {
 
     describe('Removing list elements', () => {
         it('should convert list items to paragraphs when removing list', () => {
-            const wysiwyg = editor.context.get('wysiwyg');
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
             wysiwyg.innerHTML = `
                 <ul>
@@ -131,7 +131,7 @@ describe('Format - removeBlock integration tests', () => {
         });
 
         it('should handle removing partial list items', () => {
-            const wysiwyg = editor.context.get('wysiwyg');
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
             wysiwyg.innerHTML = `
                 <ul>
@@ -144,7 +144,7 @@ describe('Format - removeBlock integration tests', () => {
 
             const ul = wysiwyg.querySelector('ul');
             const allLis = wysiwyg.querySelectorAll('li');
-            const format = editor.format;
+            const format = editor.$.format;
 
             // Select middle items
             const range = document.createRange();
@@ -169,7 +169,7 @@ describe('Format - removeBlock integration tests', () => {
 
     describe('Nested list removal', () => {
         it('should handle nested unordered lists', () => {
-            const wysiwyg = editor.context.get('wysiwyg');
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
             wysiwyg.innerHTML = `
                 <ul>
@@ -186,7 +186,7 @@ describe('Format - removeBlock integration tests', () => {
 
             const outerUl = wysiwyg.querySelector('ul');
             const innerUl = outerUl.querySelector('ul');
-            const format = editor.format;
+            const format = editor.$.format;
 
             // Remove inner list
             format.removeBlock(innerUl);
@@ -196,7 +196,7 @@ describe('Format - removeBlock integration tests', () => {
         });
 
         it('should handle nested ordered lists', () => {
-            const wysiwyg = editor.context.get('wysiwyg');
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
             wysiwyg.innerHTML = `
                 <ol>
@@ -213,7 +213,7 @@ describe('Format - removeBlock integration tests', () => {
 
             const outerOl = wysiwyg.querySelector('ol');
             const innerOl = outerOl.querySelector('ol');
-            const format = editor.format;
+            const format = editor.$.format;
 
             // Remove inner list
             format.removeBlock(innerOl);
@@ -223,7 +223,7 @@ describe('Format - removeBlock integration tests', () => {
         });
 
         it('should handle mixed nested lists (ol inside ul)', () => {
-            const wysiwyg = editor.context.get('wysiwyg');
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
             wysiwyg.innerHTML = `
                 <ul>
@@ -239,7 +239,7 @@ describe('Format - removeBlock integration tests', () => {
 
             const ul = wysiwyg.querySelector('ul');
             const ol = wysiwyg.querySelector('ol');
-            const format = editor.format;
+            const format = editor.$.format;
 
             // Remove the ordered list
             format.removeBlock(ol);
@@ -252,7 +252,7 @@ describe('Format - removeBlock integration tests', () => {
 
     describe('Complex block removal scenarios', () => {
         it('should handle removing blocks with mixed content', () => {
-            const wysiwyg = editor.context.get('wysiwyg');
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
             wysiwyg.innerHTML = `
                 <blockquote>
@@ -283,7 +283,7 @@ describe('Format - removeBlock integration tests', () => {
         });
 
         it('should handle empty block removal', () => {
-            const wysiwyg = editor.context.get('wysiwyg');
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
             wysiwyg.innerHTML = `
                 <blockquote>
@@ -306,7 +306,7 @@ describe('Format - removeBlock integration tests', () => {
         });
 
         it('should handle block removal with inline styles', () => {
-            const wysiwyg = editor.context.get('wysiwyg');
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
             wysiwyg.innerHTML = `
                 <blockquote>
@@ -330,7 +330,7 @@ describe('Format - removeBlock integration tests', () => {
 
     describe('removeBlock with options', () => {
         it('should replace list type (ul to ol conversion)', () => {
-            const wysiwyg = editor.context.get('wysiwyg');
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
             wysiwyg.innerHTML = `
                 <ul>
@@ -359,7 +359,7 @@ describe('Format - removeBlock integration tests', () => {
         });
 
         it('should handle shouldDelete option', () => {
-            const wysiwyg = editor.context.get('wysiwyg');
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
             wysiwyg.innerHTML = `
                 <ul>
@@ -371,7 +371,7 @@ describe('Format - removeBlock integration tests', () => {
 
             const ul = wysiwyg.querySelector('ul');
             const lis = wysiwyg.querySelectorAll('li');
-            const format = editor.format;
+            const format = editor.$.format;
 
             // Delete middle item
             format.removeBlock(ul, {
@@ -387,7 +387,7 @@ describe('Format - removeBlock integration tests', () => {
 
     describe('Edge cases', () => {
         it('should handle single paragraph in blockquote', () => {
-            const wysiwyg = editor.context.get('wysiwyg');
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
             wysiwyg.innerHTML = `
                 <blockquote>
@@ -407,7 +407,7 @@ describe('Format - removeBlock integration tests', () => {
         });
 
         it('should handle list with single item', () => {
-            const wysiwyg = editor.context.get('wysiwyg');
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
             wysiwyg.innerHTML = `
                 <ul>
@@ -429,7 +429,7 @@ describe('Format - removeBlock integration tests', () => {
         });
 
         it('should handle deeply nested structures', () => {
-            const wysiwyg = editor.context.get('wysiwyg');
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
 
             wysiwyg.innerHTML = `
                 <ul>
@@ -446,7 +446,7 @@ describe('Format - removeBlock integration tests', () => {
             `;
 
             const uls = wysiwyg.querySelectorAll('ul');
-            const format = editor.format;
+            const format = editor.$.format;
 
             // Remove innermost list
             const innermostUl = uls[uls.length - 1];

@@ -1,49 +1,7 @@
 import Embed from '../../../../src/plugins/modal/embed';
+import { createMockEditor } from '../../../../test/__mocks__/editorMock.js';
 
 // Mock dependencies
-jest.mock('../../../../src/editorInjector', () => {
-	return class MockEditorInjector {
-		constructor() {
-			this.lang = {
-				embed: 'Embed',
-				embed_modal_title: 'Embed',
-				embed_modal_source: 'Source',
-				close: 'Close',
-				submitButton: 'Submit',
-				width: 'Width',
-				height: 'Height',
-				ratio: 'Ratio',
-				proportion: 'Proportion',
-				revert: 'Revert',
-				basic: 'Basic',
-				left: 'Left',
-				center: 'Center',
-				right: 'Right',
-			};
-			this.icons = { cancel: '<svg>cancel</svg>', revert: '<svg>revert</svg>', embed: '<svg>embed</svg>' };
-			this.eventManager = { addEvent: jest.fn() };
-			this.focusManager = { focus: jest.fn(), focusEdge: jest.fn(), blur: jest.fn(), nativeFocus: jest.fn() };
-			this.format = {
-				getLine: jest.fn().mockReturnValue(null),
-				addLine: jest.fn().mockReturnValue({ nodeType: 1 }),
-			};
-			this.history = { push: jest.fn(), pause: jest.fn(), resume: jest.fn() };
-			this.frameContext = new Map([['wysiwyg', { nodeType: 1 }]]);
-			this.nodeTransform = { removeAllParents: jest.fn() };
-			this.component = { select: jest.fn(), insert: jest.fn() };
-			this.selection = { setRange: jest.fn() };
-			this.triggerEvent = jest.fn().mockResolvedValue(true);
-			this.options = {
-				get: jest.fn((key) => {
-					if (key === 'defaultUrlProtocol') return 'https://';
-					if (key === 'componentInsertBehavior') return null;
-					return null;
-				}),
-			};
-			this.plugins = {};
-		}
-	};
-});
 
 jest.mock('../../../../src/modules/contract', () => ({
 	Modal: jest.fn().mockImplementation(() => ({
@@ -171,7 +129,7 @@ jest.mock('../../../../src/helper', () => ({
 }));
 
 describe('Embed Plugin', () => {
-	let mockEditor;
+	let kernel;
 	let embed;
 
 	afterEach(() => {
@@ -180,50 +138,8 @@ describe('Embed Plugin', () => {
 	});
 
 	beforeEach(() => {
-		mockEditor = {
-			lang: {
-				embed: 'Embed',
-				embed_modal_title: 'Embed',
-				embed_modal_source: 'Source',
-				close: 'Close',
-				submitButton: 'Submit',
-				width: 'Width',
-				height: 'Height',
-				ratio: 'Ratio',
-				proportion: 'Proportion',
-				revert: 'Revert',
-				basic: 'Basic',
-				left: 'Left',
-				center: 'Center',
-				right: 'Right',
-			},
-			icons: { cancel: '<svg>cancel</svg>', revert: '<svg>revert</svg>', embed: '<svg>embed</svg>' },
-			plugins: {},
-			eventManager: { addEvent: jest.fn() },
-			// Restore missing mocks
-			component: { select: jest.fn(), insert: jest.fn() },
-			history: { push: jest.fn(), pause: jest.fn(), resume: jest.fn() },
-			focusManager: { focus: jest.fn(), blur: jest.fn(), focusEdge: jest.fn(), nativeFocus: jest.fn() },
-			format: {
-				getLine: jest.fn().mockReturnValue(null),
-				addLine: jest.fn().mockReturnValue({ nodeType: 1 }),
-			},
-			context: {
-				element: { origin: { create: jest.fn() } },
-			},
-			frameContext: new Map([['wysiwyg', { nodeType: 1 }]]),
-			nodeTransform: { removeAllParents: jest.fn() },
-			selection: { setRange: jest.fn() },
-			triggerEvent: jest.fn().mockResolvedValue(true),
-			options: {
-				get: jest.fn((key) => {
-					if (key === 'defaultUrlProtocol') return 'https://';
-					if (key === 'componentInsertBehavior') return null;
-					return null;
-				}),
-			},
-		};
-		embed = new Embed(mockEditor, { canResize: true });
+		kernel = createMockEditor();
+		embed = new Embed(kernel, { canResize: true });
 		// Mock DOM elements that would be created by CreateHTML_modal
 		// Use Object.assign to preserve references set in constructor
 		if (embed.embedInput) Object.assign(embed.embedInput, { addEventListener: jest.fn(), dispatchEvent: jest.fn() });
@@ -236,7 +152,7 @@ describe('Embed Plugin', () => {
 
 	describe('Constructor', () => {
 		it('should create Embed instance', () => {
-			expect(() => new Embed(mockEditor, {})).not.toThrow();
+			expect(() => new Embed(kernel, {})).not.toThrow();
 		});
 
 		it('should create instance with default options', () => {
@@ -245,7 +161,7 @@ describe('Embed Plugin', () => {
 		});
 
 		it('should create instance with custom options', () => {
-			const customEmbed = new Embed(mockEditor, {
+			const customEmbed = new Embed(kernel, {
 				canResize: false,
 				showHeightInput: false,
 				defaultWidth: '600px',
@@ -504,12 +420,19 @@ describe('Embed Plugin', () => {
 		describe('submitSRC', () => {
 			it('should process iframe embed code', async () => {
 				const iframeCode = '<iframe src="https://example.com/embed"></iframe>';
+				// Mock triggerEvent to call the handler (simulating event listener that approves)
+				embed.$.eventManager.triggerEvent = jest.fn().mockImplementation(async (eventName, data) => {
+					if (eventName === 'onEmbedInputBefore' && data.handler) {
+						data.handler(null);
+					}
+					return undefined;
+				});
 				const result = await embed.submitSRC(iframeCode);
 				expect(result).toBe(true);
 				// Verify #create flow
 				expect(mockFigure.CreateContainer).toHaveBeenCalled();
 				expect(embed.figure.open).toHaveBeenCalled();
-				expect(embed.component.insert).toHaveBeenCalled();
+				expect(embed.$.component.insert).toHaveBeenCalled();
 			});
 
 			it('should process blockquote embed code', async () => {
@@ -547,24 +470,24 @@ describe('Embed Plugin', () => {
 			it('should remove element and trigger event', async () => {
 				const iframe = { nodeName: 'IFRAME', src: 'test', style: {} };
 				const container = { nodeType: 1, parentNode: { nodeType: 1 }, previousElementSibling: { nodeType: 1 } };
-				embed.triggerEvent = jest.fn().mockResolvedValue(undefined);
+				embed.$.eventManager.triggerEvent = jest.fn().mockResolvedValue(undefined);
 
 				embed.componentSelect(iframe);
 				await embed.componentDestroy(iframe);
 
-				expect(embed.triggerEvent).toHaveBeenCalledWith('onEmbedDeleteBefore', expect.any(Object));
+				expect(embed.$.eventManager.triggerEvent).toHaveBeenCalledWith('onEmbedDeleteBefore', expect.any(Object));
 			});
 
 			it('should not remove when event returns false', async () => {
 				const iframe = { nodeName: 'IFRAME', src: 'test', style: {} };
-				embed.triggerEvent = jest.fn().mockResolvedValue(false);
+				embed.$.eventManager.triggerEvent = jest.fn().mockResolvedValue(false);
 				const { dom } = require('../../../../src/helper');
 				dom.utils.removeItem.mockClear();
 
 				embed.componentSelect(iframe);
 				await embed.componentDestroy(iframe);
 
-				expect(embed.triggerEvent).toHaveBeenCalledWith('onEmbedDeleteBefore', expect.any(Object));
+				expect(embed.$.eventManager.triggerEvent).toHaveBeenCalledWith('onEmbedDeleteBefore', expect.any(Object));
 				expect(dom.utils.removeItem).not.toHaveBeenCalled();
 			});
 		});
@@ -591,7 +514,7 @@ describe('Embed Plugin', () => {
 
 	describe('Plugin options', () => {
 		it('should handle percentageOnlySize option', () => {
-			const percentEmbed = new Embed(mockEditor, {
+			const percentEmbed = new Embed(kernel, {
 				percentageOnlySize: true,
 				canResize: true,
 			});
@@ -600,7 +523,7 @@ describe('Embed Plugin', () => {
 		});
 
 		it('should handle upload options', () => {
-			const uploadEmbed = new Embed(mockEditor, {
+			const uploadEmbed = new Embed(kernel, {
 				uploadUrl: 'https://example.com/upload',
 				uploadHeaders: { Authorization: 'Bearer token' },
 				uploadSizeLimit: 10000000,
@@ -613,7 +536,7 @@ describe('Embed Plugin', () => {
 		});
 
 		it('should handle iframe tag attributes', () => {
-			const attrEmbed = new Embed(mockEditor, {
+			const attrEmbed = new Embed(kernel, {
 				iframeTagAttributes: {
 					sandbox: 'allow-scripts',
 					loading: 'lazy',
@@ -626,7 +549,7 @@ describe('Embed Plugin', () => {
 		});
 
 		it('should handle custom embed query', () => {
-			const customEmbed = new Embed(mockEditor, {
+			const customEmbed = new Embed(kernel, {
 				embedQuery: {
 					customService: {
 						pattern: /https:\/\/custom\.com\/(.+)/i,

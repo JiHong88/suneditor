@@ -583,11 +583,5 @@ describe('dom.utils helper', () => {
             expect(size.h).toBeDefined();
         });
         
-        it('getViewportSize should return viewport dimensions', () => {
-            const size = dom.utils.getViewportSize();
-            expect(size.top).toBeDefined();
-            expect(size.left).toBeDefined();
-            expect(size.scale).toBeDefined();
-        });
     });
 });

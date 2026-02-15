@@ -7,7 +7,7 @@ import {
     OPTION_FRAME_FIXED_FLAG,
     OPTION_FIXED_FLAG
     // FrameOptionsMap, BaseOptionsMap moved to optionProvider service
-} from '../../../../src/core/config/options';
+} from '../../../../src/core/schema/options';
 
 describe('Core Config - Options', () => {
     describe('DEFAULTS constant', () => {

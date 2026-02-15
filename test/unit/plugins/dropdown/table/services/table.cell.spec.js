@@ -91,6 +91,9 @@ describe('TableCellService', () => {
             }
         };
 
+        // Make main act as its own kernel for dependency injection
+        main.$ = main;
+
         const buttons = {
             mergeButton: document.createElement('button'),
             unmergeButton: document.createElement('button'),

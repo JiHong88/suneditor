@@ -3,6 +3,7 @@
  */
 
 import ImageGallery from '../../../../src/plugins/browser/imageGallery.js';
+import { createMockEditor } from '../../../../test/__mocks__/editorMock.js';
 
 // Mock Browser module
 const mockBrowser = {
@@ -14,42 +15,14 @@ jest.mock('../../../../src/modules/contract', () => ({
     Browser: jest.fn().mockImplementation(() => mockBrowser)
 }));
 
-// Mock EditorInjector
-jest.mock('../../../../src/editorInjector/_core.js', () => {
-    return jest.fn().mockImplementation(function(editor) {
-        this.editor = editor;
-        this.lang = editor.lang;
-        this.plugins = editor.plugins;
-        this.frameContext = editor.frameContext;
-        this.focusManager = editor.focusManager;
-		this.triggerEvent = editor.triggerEvent || jest.fn();
-    });
-});
-
 describe('Plugins - Browser - ImageGallery', () => {
-    let mockEditor;
+    let kernel;
     let imageGallery;
 
     beforeEach(() => {
         jest.clearAllMocks();
 
-        mockEditor = {
-            lang: {
-                imageGallery: 'Image Gallery'
-            },
-            plugins: {
-                image: {
-                    pluginOptions: {
-                        defaultWidth: '100%',
-                        defaultHeight: 'auto'
-                    },
-                    modalInit: jest.fn(),
-                    create: jest.fn()
-                }
-            },
-            frameContext: new Map(),
-            triggerEvent: jest.fn()
-        };
+        kernel = createMockEditor();
 
         const pluginOptions = {
             data: [
@@ -60,7 +33,7 @@ describe('Plugins - Browser - ImageGallery', () => {
             headers: { 'Authorization': 'Bearer token' }
         };
 
-        imageGallery = new ImageGallery(mockEditor, pluginOptions);
+        imageGallery = new ImageGallery(kernel, pluginOptions);
     });
 
     describe('Constructor', () => {
@@ -79,7 +52,7 @@ describe('Plugins - Browser - ImageGallery', () => {
                 headers: { 'Custom-Header': 'value' }
             };
 
-            const gallery = new ImageGallery(mockEditor, pluginOptions);
+            const gallery = new ImageGallery(kernel, pluginOptions);
             expect(gallery).toBeInstanceOf(ImageGallery);
         });
 
@@ -89,10 +62,10 @@ describe('Plugins - Browser - ImageGallery', () => {
         });
 
         it('should handle auto dimensions', () => {
-            mockEditor.plugins.image.pluginOptions.defaultWidth = 'auto';
-            mockEditor.plugins.image.pluginOptions.defaultHeight = 'auto';
+            kernel.plugins.image.pluginOptions.defaultWidth = 'auto';
+            kernel.plugins.image.pluginOptions.defaultHeight = 'auto';
 
-            const gallery = new ImageGallery(mockEditor, {});
+            const gallery = new ImageGallery(kernel, {});
             expect(gallery.width).toBe('');
             expect(gallery.height).toBe('');
         });
@@ -145,13 +118,13 @@ describe('Plugins - Browser - ImageGallery', () => {
                 // Simulate item selection by calling the internal handler
                 // We need to access the private method indirectly
                 const browserConstructorCall = require('../../../../src/modules/contract').Browser.mock.calls[0];
-                const browserOptions = browserConstructorCall[1];
+                const browserOptions = browserConstructorCall[2];
                 const selectorHandler = browserOptions.selectorHandler;
 
                 selectorHandler(mockTarget);
 
                 expect(customHandler).toHaveBeenCalledWith(mockTarget);
-                expect(mockEditor.plugins.image.modalInit).not.toHaveBeenCalled();
+                expect(kernel.plugins.image.modalInit).not.toHaveBeenCalled();
             });
         });
 
@@ -170,13 +143,13 @@ describe('Plugins - Browser - ImageGallery', () => {
 
                 // Get the selectorHandler from Browser constructor
                 const browserConstructorCall = require('../../../../src/modules/contract').Browser.mock.calls[0];
-                const browserOptions = browserConstructorCall[1];
+                const browserOptions = browserConstructorCall[2];
                 const selectorHandler = browserOptions.selectorHandler;
 
                 selectorHandler(mockTarget);
 
-                expect(mockEditor.plugins.image.modalInit).toHaveBeenCalled();
-                expect(mockEditor.plugins.image.create).toHaveBeenCalledWith(
+                expect(kernel.plugins.image.modalInit).toHaveBeenCalled();
+                expect(kernel.plugins.image.create).toHaveBeenCalledWith(
                     '/path/to/image.jpg',
                     null,
                     '100%',
@@ -196,12 +169,12 @@ describe('Plugins - Browser - ImageGallery', () => {
             const constructorCall = Browser.mock.calls[0];
 
             expect(constructorCall[0]).toBe(imageGallery); // instance
-            expect(constructorCall[1]).toMatchObject({
+            expect(constructorCall[2]).toMatchObject({
                 title: 'Image Gallery',
                 columnSize: 4,
                 className: 'se-image-gallery'
             });
-            expect(constructorCall[1].selectorHandler).toBeInstanceOf(Function);
+            expect(constructorCall[2].selectorHandler).toBeInstanceOf(Function);
         });
 
         it('should pass plugin options to Browser', () => {
@@ -211,11 +184,11 @@ describe('Plugins - Browser - ImageGallery', () => {
                 headers: { 'Test-Header': 'test' }
             };
 
-            new ImageGallery(mockEditor, pluginOptions);
+            new ImageGallery(kernel, pluginOptions);
 
             const { Browser } = require('../../../../src/modules/contract');
             const lastCall = Browser.mock.calls[Browser.mock.calls.length - 1];
-            const browserOptions = lastCall[1];
+            const browserOptions = lastCall[2];
 
             expect(browserOptions.data).toEqual(pluginOptions.data);
             expect(browserOptions.url).toBe(pluginOptions.url);
@@ -226,12 +199,12 @@ describe('Plugins - Browser - ImageGallery', () => {
     describe('Error handling', () => {
         it('should handle missing plugin options gracefully', () => {
             expect(() => {
-                new ImageGallery(mockEditor, {});
+                new ImageGallery(kernel, {});
             }).not.toThrow();
         });
 
         it('should handle missing image plugin gracefully', () => {
-            mockEditor.plugins.image = {
+            kernel.plugins.image = {
                 pluginOptions: {
                     defaultWidth: 'auto',
                     defaultHeight: 'auto'
@@ -239,7 +212,7 @@ describe('Plugins - Browser - ImageGallery', () => {
             };
 
             expect(() => {
-                new ImageGallery(mockEditor, {});
+                new ImageGallery(kernel, {});
             }).not.toThrow();
         });
 
@@ -252,14 +225,14 @@ describe('Plugins - Browser - ImageGallery', () => {
             imageGallery.open();
 
             const { Browser } = require('../../../../src/modules/contract');
-            const browserOptions = Browser.mock.calls[0][1];
+            const browserOptions = Browser.mock.calls[0][2];
             const selectorHandler = browserOptions.selectorHandler;
 
             expect(() => {
                 selectorHandler(mockTarget);
             }).not.toThrow();
 
-            expect(mockEditor.plugins.image.create).toHaveBeenCalledWith(
+            expect(kernel.plugins.image.create).toHaveBeenCalledWith(
                 null, null, '100%', '', 'none',
                 { name: null, size: 0 }, 'Test image', true
             );

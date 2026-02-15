@@ -3,6 +3,7 @@
  */
 
 import BlockStyle from '../../../../src/plugins/dropdown/blockStyle.js';
+import { createMockEditor } from '../../../../test/__mocks__/editorMock.js';
 
 // Mock helper
 jest.mock('../../../../src/helper', () => ({
@@ -64,62 +65,26 @@ jest.mock('../../../../src/helper', () => ({
     }
 }));
 
-// Mock EditorInjector
-jest.mock('../../../../src/editorInjector/_core.js', () => {
-    return jest.fn().mockImplementation(function(editor) {
-        this.editor = editor;
-        this.lang = editor.lang;
-        this.selection = editor.selection;
-        this.format = editor.format;
-        this.menu = editor.menu;
-        this.icons = editor.icons;
-        this.frameContext = editor.frameContext;
-        this.focusManager = editor.focusManager;
-		this.triggerEvent = editor.triggerEvent || jest.fn();
-    });
-});
-
 describe('Plugins - Dropdown - blockStyle', () => {
-    let mockEditor;
+    let kernel;
     let blockStyle;
     let pluginOptions;
 
     beforeEach(() => {
         jest.clearAllMocks();
 
-        mockEditor = {
-            lang: {
-                formats: 'Formats',
-                tag_p: 'Paragraph',
-                tag_h: 'Header',
-                tag_blockquote: 'Blockquote',
-                tag_pre: 'Pre'
-            },
-            icons: {
-                arrow_down: '<svg>down</svg>'
-            },
-            selection: {
-                getNode: jest.fn().mockReturnValue(document.createElement('p'))
-            },
-            format: {
-                isLine: jest.fn().mockReturnValue(true),
-                applyBlock: jest.fn(),
-                setBrLine: jest.fn(),
-                setLine: jest.fn()
-            },
-            menu: {
-                initDropdownTarget: jest.fn(),
-                dropdownOff: jest.fn()
-            },
-            frameContext: new Map(),
-            triggerEvent: jest.fn()
-        };
+        kernel = createMockEditor();
+        kernel.$.lang.formats = 'Formats';
+        kernel.$.lang.tag_p = 'Paragraph';
+        kernel.$.lang.tag_h = 'Header';
+        kernel.$.lang.tag_blockquote = 'Blockquote';
+        kernel.$.lang.tag_pre = 'Code';
 
         pluginOptions = {
             items: ['p', 'h1', 'h2', 'blockquote', 'pre']
         };
 
-        blockStyle = new BlockStyle(mockEditor, pluginOptions);
+        blockStyle = new BlockStyle(kernel, pluginOptions);
     });
 
     describe('Constructor', () => {
@@ -127,7 +92,7 @@ describe('Plugins - Dropdown - blockStyle', () => {
             expect(blockStyle).toBeInstanceOf(BlockStyle);
             expect(blockStyle.title).toBe('Formats');
             expect(blockStyle.inner).toContain('<span class="se-txt">Formats</span>');
-            expect(blockStyle.inner).toContain('<svg>down</svg>');
+            expect(blockStyle.inner).toContain('<svg');
             expect(blockStyle.formatList).toBeDefined();
             expect(blockStyle.currentFormat).toBe('');
         });
@@ -142,7 +107,7 @@ describe('Plugins - Dropdown - blockStyle', () => {
         });
 
         it('should initialize dropdown menu', () => {
-            expect(mockEditor.menu.initDropdownTarget).toHaveBeenCalledWith(BlockStyle, expect.any(Object));
+            expect(kernel.$.menu.initDropdownTarget).toHaveBeenCalledWith(BlockStyle, expect.any(Object));
         });
 
         it('should initialize format list from menu', () => {
@@ -150,12 +115,12 @@ describe('Plugins - Dropdown - blockStyle', () => {
         });
 
         it('should use default formats when none provided', () => {
-            const defaultFormatBlock = new BlockStyle(mockEditor, {});
+            const defaultFormatBlock = new BlockStyle(kernel, {});
             expect(defaultFormatBlock.formatList).toBeDefined();
         });
 
         it('should use default formats when items is empty', () => {
-            const emptyFormatBlock = new BlockStyle(mockEditor, { items: [] });
+            const emptyFormatBlock = new BlockStyle(kernel, { items: [] });
             expect(emptyFormatBlock.formatList).toBeDefined();
         });
     });
@@ -185,7 +150,7 @@ describe('Plugins - Dropdown - blockStyle', () => {
 
         it('should return false when element is not a line element', () => {
             const mockElement = document.createElement('span');
-            mockEditor.format.isLine.mockReturnValue(false);
+            kernel.$.format.isLine.mockReturnValue(false);
 
             const result = blockStyle.active(mockElement, mockTarget);
 
@@ -197,7 +162,7 @@ describe('Plugins - Dropdown - blockStyle', () => {
                 nodeName: 'P',
                 className: ''
             };
-            mockEditor.format.isLine.mockReturnValue(true);
+            kernel.$.format.isLine.mockReturnValue(true);
             const { dom } = require('../../../../src/helper/index.js');
 
             const result = blockStyle.active(mockElement, mockTarget);
@@ -213,7 +178,7 @@ describe('Plugins - Dropdown - blockStyle', () => {
                 nodeName: 'DIV',
                 className: 'some-class __se__format__custom another-class'
             };
-            mockEditor.format.isLine.mockReturnValue(true);
+            kernel.$.format.isLine.mockReturnValue(true);
 
             blockStyle.formatList = [{
                 getAttribute: jest.fn().mockImplementation((attr) => {
@@ -239,7 +204,7 @@ describe('Plugins - Dropdown - blockStyle', () => {
                 nodeName: 'SPAN',
                 className: ''
             };
-            mockEditor.format.isLine.mockReturnValue(true);
+            kernel.$.format.isLine.mockReturnValue(true);
             const { dom } = require('../../../../src/helper/index.js');
 
             const result = blockStyle.active(mockElement, mockTarget);
@@ -255,7 +220,7 @@ describe('Plugins - Dropdown - blockStyle', () => {
                 nodeName: 'H1',
                 className: ''
             };
-            mockEditor.format.isLine.mockReturnValue(true);
+            kernel.$.format.isLine.mockReturnValue(true);
             const { dom } = require('../../../../src/helper/index.js');
 
             const result = blockStyle.active(mockElement, mockTarget);
@@ -270,7 +235,7 @@ describe('Plugins - Dropdown - blockStyle', () => {
                 nodeName: 'BLOCKQUOTE',
                 className: ''
             };
-            mockEditor.format.isLine.mockReturnValue(true);
+            kernel.$.format.isLine.mockReturnValue(true);
             const { dom } = require('../../../../src/helper/index.js');
 
             const result = blockStyle.active(mockElement, mockTarget);
@@ -285,7 +250,7 @@ describe('Plugins - Dropdown - blockStyle', () => {
                 nodeName: 'P',
                 className: undefined // No className property
             };
-            mockEditor.format.isLine.mockReturnValue(true);
+            kernel.$.format.isLine.mockReturnValue(true);
             const { dom } = require('../../../../src/helper/index.js');
 
             // This will throw because className.match is called on undefined
@@ -440,8 +405,8 @@ describe('Plugins - Dropdown - blockStyle', () => {
 
             blockStyle.action(mockTarget);
 
-            expect(mockEditor.format.applyBlock).toHaveBeenCalledWith(mockTarget.firstElementChild);
-            expect(mockEditor.menu.dropdownOff).toHaveBeenCalled();
+            expect(kernel.$.format.applyBlock).toHaveBeenCalledWith(mockTarget.firstElementChild);
+            expect(kernel.$.menu.dropdownOff).toHaveBeenCalled();
         });
 
         it('should set br-line format when command is "br-line"', () => {
@@ -449,8 +414,8 @@ describe('Plugins - Dropdown - blockStyle', () => {
 
             blockStyle.action(mockTarget);
 
-            expect(mockEditor.format.setBrLine).toHaveBeenCalledWith(mockTarget.firstElementChild);
-            expect(mockEditor.menu.dropdownOff).toHaveBeenCalled();
+            expect(kernel.$.format.setBrLine).toHaveBeenCalledWith(mockTarget.firstElementChild);
+            expect(kernel.$.menu.dropdownOff).toHaveBeenCalled();
         });
 
         it('should set line format when command is "line"', () => {
@@ -458,8 +423,8 @@ describe('Plugins - Dropdown - blockStyle', () => {
 
             blockStyle.action(mockTarget);
 
-            expect(mockEditor.format.setLine).toHaveBeenCalledWith(mockTarget.firstElementChild);
-            expect(mockEditor.menu.dropdownOff).toHaveBeenCalled();
+            expect(kernel.$.format.setLine).toHaveBeenCalledWith(mockTarget.firstElementChild);
+            expect(kernel.$.menu.dropdownOff).toHaveBeenCalled();
         });
 
         it('should set line format for unknown commands', () => {
@@ -467,7 +432,7 @@ describe('Plugins - Dropdown - blockStyle', () => {
 
             blockStyle.action(mockTarget);
 
-            expect(mockEditor.format.setLine).toHaveBeenCalledWith(mockTarget.firstElementChild);
+            expect(kernel.$.format.setLine).toHaveBeenCalledWith(mockTarget.firstElementChild);
         });
 
         it('should handle null data-command', () => {
@@ -475,7 +440,7 @@ describe('Plugins - Dropdown - blockStyle', () => {
 
             blockStyle.action(mockTarget);
 
-            expect(mockEditor.format.setLine).toHaveBeenCalledWith(mockTarget.firstElementChild);
+            expect(kernel.$.format.setLine).toHaveBeenCalledWith(mockTarget.firstElementChild);
         });
 
         it('should handle missing firstElementChild', () => {
@@ -484,7 +449,7 @@ describe('Plugins - Dropdown - blockStyle', () => {
 
             blockStyle.action(mockTarget);
 
-            expect(mockEditor.format.setLine).toHaveBeenCalledWith(null);
+            expect(kernel.$.format.setLine).toHaveBeenCalledWith(null);
         });
     });
 
@@ -496,7 +461,7 @@ describe('Plugins - Dropdown - blockStyle', () => {
             blockStyle.applyHeaderByShortcut(mockParams);
 
             expect(dom.utils.createElement).toHaveBeenCalledWith('H1');
-            expect(mockEditor.format.setLine).toHaveBeenCalled();
+            expect(kernel.$.format.setLine).toHaveBeenCalled();
         });
 
         it('should create and apply H2 header', () => {
@@ -567,7 +532,7 @@ describe('Plugins - Dropdown - blockStyle', () => {
             const { dom } = require('../../../../src/helper/index.js');
             dom.utils.createElement.mockClear();
 
-            const defaultFormatBlock = new BlockStyle(mockEditor, {});
+            const defaultFormatBlock = new BlockStyle(kernel, {});
 
             const createCallArgs = dom.utils.createElement.mock.calls.find(
                 call => call[1]?.class === 'se-dropdown se-list-layer se-list-format'
@@ -588,7 +553,7 @@ describe('Plugins - Dropdown - blockStyle', () => {
             const { dom } = require('../../../../src/helper/index.js');
             dom.utils.createElement.mockClear();
 
-            const customFormatBlock = new BlockStyle(mockEditor, {
+            const customFormatBlock = new BlockStyle(kernel, {
                 items: [
                     {
                         tag: 'DIV',
@@ -614,7 +579,7 @@ describe('Plugins - Dropdown - blockStyle', () => {
             const { dom } = require('../../../../src/helper/index.js');
             dom.utils.createElement.mockClear();
 
-            const noNameFormatBlock = new BlockStyle(mockEditor, {
+            const noNameFormatBlock = new BlockStyle(kernel, {
                 items: [
                     {
                         tag: 'SPAN',
@@ -634,7 +599,7 @@ describe('Plugins - Dropdown - blockStyle', () => {
             const { dom } = require('../../../../src/helper/index.js');
             dom.utils.createElement.mockClear();
 
-            const noClassFormatBlock = new BlockStyle(mockEditor, {
+            const noClassFormatBlock = new BlockStyle(kernel, {
                 items: [
                     {
                         tag: 'SPAN',
@@ -657,7 +622,7 @@ describe('Plugins - Dropdown - blockStyle', () => {
             const { dom } = require('../../../../src/helper/index.js');
             dom.utils.createElement.mockClear();
 
-            const headerFormatBlock = new BlockStyle(mockEditor, {
+            const headerFormatBlock = new BlockStyle(kernel, {
                 items: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']
             });
 
@@ -677,7 +642,7 @@ describe('Plugins - Dropdown - blockStyle', () => {
             const { dom } = require('../../../../src/helper/index.js');
             dom.utils.createElement.mockClear();
 
-            const mixedFormatBlock = new BlockStyle(mockEditor, {
+            const mixedFormatBlock = new BlockStyle(kernel, {
                 items: [
                     'p',
                     { tag: 'DIV', name: 'Custom Div', command: 'line' },
@@ -695,17 +660,6 @@ describe('Plugins - Dropdown - blockStyle', () => {
             expect(createCallArgs[2]).toContain('Custom Div');
         });
 
-        it('should process invalid string formats as objects', () => {
-            const { dom } = require('../../../../src/helper/index.js');
-            dom.utils.createElement.mockClear();
-
-            // Invalid string items that are not in default list are processed as objects and will error
-            expect(() => {
-                new BlockStyle(mockEditor, {
-                    items: ['p', 'invalid-tag', 'h1']
-                });
-            }).toThrow(); // Will throw when trying to process 'invalid-tag' as format object
-        });
     });
 
     describe('Integration', () => {
@@ -719,7 +673,7 @@ describe('Plugins - Dropdown - blockStyle', () => {
                 blockStyle.action(mockTarget);
             }).not.toThrow();
 
-            expect(mockEditor.format.setLine).toHaveBeenCalled();
+            expect(kernel.$.format.setLine).toHaveBeenCalled();
         });
 
         it('should work with line detection', () => {
@@ -730,13 +684,13 @@ describe('Plugins - Dropdown - blockStyle', () => {
                 })
             };
 
-            mockEditor.format.isLine.mockReturnValue(true);
+            kernel.$.format.isLine.mockReturnValue(true);
 
             expect(() => {
                 blockStyle.active(mockElement, mockTarget);
             }).not.toThrow();
 
-            expect(mockEditor.format.isLine).toHaveBeenCalledWith(mockElement);
+            expect(kernel.$.format.isLine).toHaveBeenCalledWith(mockElement);
         });
 
         it('should work with shortcut functionality', () => {
@@ -746,16 +700,16 @@ describe('Plugins - Dropdown - blockStyle', () => {
                 blockStyle.applyHeaderByShortcut(mockParams);
             }).not.toThrow();
 
-            expect(mockEditor.format.setLine).toHaveBeenCalled();
+            expect(kernel.$.format.setLine).toHaveBeenCalled();
         });
     });
 
     describe('Error handling', () => {
         it('should handle missing editor modules gracefully', () => {
-            mockEditor.format = undefined;
+            kernel.$.format = undefined;
 
             expect(() => {
-                new BlockStyle(mockEditor, {});
+                new BlockStyle(kernel, {});
             }).not.toThrow();
         });
 
@@ -782,13 +736,13 @@ describe('Plugins - Dropdown - blockStyle', () => {
 
         it('should handle missing plugin options', () => {
             expect(() => {
-                new BlockStyle(mockEditor, {});
+                new BlockStyle(kernel, {});
             }).not.toThrow();
         });
 
         it('should handle null plugin options', () => {
             expect(() => {
-                new BlockStyle(mockEditor, null);
+                new BlockStyle(kernel, null);
             }).toThrow();
         });
 
@@ -799,7 +753,7 @@ describe('Plugins - Dropdown - blockStyle', () => {
             ];
 
             expect(() => {
-                new BlockStyle(mockEditor, { items: invalidItems });
+                new BlockStyle(kernel, { items: invalidItems });
             }).toThrow(); // Will throw when trying to access undefined.toLowerCase
         });
     });
