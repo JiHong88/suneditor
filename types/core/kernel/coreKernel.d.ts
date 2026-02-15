@@ -217,9 +217,6 @@ declare class CoreKernel {
 	);
 	/** @type {Deps} */
 	$: Deps;
-	facade: import('../editor').default;
-	_w: SunEditor.GlobalWindow;
-	_d: Document;
 	store: Store;
 	_eventOrchestrator: EventOrchestrator;
 	/**
@@ -227,6 +224,7 @@ declare class CoreKernel {
 	 * Teardown order (reverse of init): plugins -> logic -> event -> config -> store
 	 */
 	_destroy(): void;
+	facade: any;
 	#private;
 }
 import EventOrchestrator from '../event/eventOrchestrator';

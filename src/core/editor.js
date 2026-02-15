@@ -127,7 +127,7 @@ class Editor {
 	 * @param {SunEditor.InitOptions} options Options
 	 */
 	#editorInit(options) {
-		this.$.store.set('initViewportHeight', this.#kernel._w.visualViewport.height);
+		this.$.store.set('initViewportHeight', this.$._w.visualViewport.height);
 		this.#kernel._eventOrchestrator.__setViewportSize();
 
 		this.$.contextProvider.init();
@@ -149,7 +149,7 @@ class Editor {
 		this.$.pluginManager.checkFileInfo(true);
 
 		// Defer post-init tasks (observers, history reset, plugin init, onload) to allow DOM to settle after iframe/wysiwyg insertion
-		this.#kernel._w.setTimeout(() => {
+		this.$._w.setTimeout(() => {
 			// Check if instance was destroyed (e.g., in SSR with dynamic imports mistake)
 			if (!this.$.context?.size) {
 				console.warn('[SUNEDITOR:E_INIT_FAIL] Editor instance was destroyed before initialization completed. Check if destroy() was called.');

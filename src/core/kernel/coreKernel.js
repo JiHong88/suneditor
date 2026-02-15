@@ -104,18 +104,13 @@ class CoreKernel {
 	 * @param {SunEditor.InitOptions} config.options  - The initial options.
 	 */
 	constructor(facade, config) {
-		this.facade = facade;
-
 		const { _w, _d, product, options } = config;
-
-		this._w = _w;
-		this._d = _d;
 
 		// L1: Store
 		this.store = new Store(product);
 
 		/** @type {Deps} */
-		this.$ = /** @type {*} */ ({ facade: this.facade, store: this.store, _w, _d });
+		this.$ = /** @type {*} */ ({ facade, store: this.store, _w, _d });
 
 		// L2: Config
 		this.#registerConfig(product, options);
@@ -301,8 +296,6 @@ class CoreKernel {
 		this.$ = null;
 		this.store._destroy();
 		this.store = null;
-		this._d = null;
-		this._w = null;
 		this.facade = null;
 	}
 }

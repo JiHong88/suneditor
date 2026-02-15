@@ -794,7 +794,7 @@ class UIManager {
 
 		if (autoFrame) {
 			// Defer iframe height measurement — content must render/reflow before measuring offsetHeight
-			this.#kernel._w.setTimeout(() => {
+			this.#$._w.setTimeout(() => {
 				const h = autoFrame.offsetHeight;
 				const wysiwygFrame = fc.get('wysiwygFrame');
 				if (!wysiwygFrame) return;
