@@ -77,7 +77,7 @@ export default function History(kernel) {
 			}
 		}
 
-		kernel.facade.changeFrameContext(focusKey);
+		$.facade.changeFrameContext(focusKey);
 		$.selection.setRange(getNodeFromPath(focusItem.s.path, focusItem.frame), focusItem.s.offset, getNodeFromPath(focusItem.e.path, focusItem.frame), focusItem.e.offset);
 		$.focusManager.focus();
 

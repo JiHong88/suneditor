@@ -757,7 +757,7 @@ class UIManager {
 				return;
 			}
 
-			if (this.#kernel.facade.isEmpty(fc)) {
+			if (this.#$.facade.isEmpty(fc)) {
 				placeholder.style.display = 'block';
 			} else {
 				placeholder.style.display = 'none';
