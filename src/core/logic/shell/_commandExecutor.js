@@ -289,7 +289,7 @@ export default class CommandExecutor {
 
 		const ww = this.#frameContext.get('wysiwyg');
 		this.#onCopyFormatInfo = [...this.#kernel._eventOrchestrator.__cacheStyleNodes];
-		this.#onCopyFormatInitMethod = this.#removeCopyformt.bind(null, this.#eventManager, ww, button);
+		this.#onCopyFormatInitMethod = this.#removeCopyformt.bind(this, this.#eventManager, ww, button);
 		dom.utils.addClass(ww, 'se-copy-format-cursor');
 		dom.utils.addClass(button, 'on');
 

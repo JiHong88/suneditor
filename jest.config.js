@@ -1,7 +1,9 @@
 module.exports = {
 	// Test environment
 	testEnvironment: 'jsdom',
-	workerIdleMemoryLimit: '2GB',
+
+	// maxWorkers: 2,
+	// workerIdleMemoryLimit: '2GB',
 
 	// Test file patterns
 	testMatch: ['<rootDir>/test/unit/**/*.spec.js', '<rootDir>/test/integration/**/*.spec.js'],
