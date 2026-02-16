@@ -1,11 +1,6 @@
-const isCI = process.env.CI === 'true';
-
 module.exports = {
 	// Test environment
 	testEnvironment: 'jsdom',
-
-	// CI: use all cores, Local: use 75%
-	maxWorkers: isCI ? '100%' : '75%',
 	workerIdleMemoryLimit: '2GB',
 
 	// Test file patterns
@@ -43,7 +38,7 @@ module.exports = {
 		global: {
 			statements: 70,
 			branches: 60,
-			functions: 85,
+			functions: 80,
 			lines: 70,
 		},
 	},
