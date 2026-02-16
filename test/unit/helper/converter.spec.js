@@ -147,8 +147,8 @@ describe('converter helper', () => {
 		it('should convert HTML entities back to characters', () => {
 			const testCases = [
 				{ input: '&amp;', expected: '&' },
-				{ input: '&lt;', expected: '&lt;' }, // Note: this stays as entity based on the regex
-				{ input: '&gt;', expected: '&gt;' }, // Note: this stays as entity based on the regex
+				{ input: '&lt;', expected: '<' },
+				{ input: '&gt;', expected: '>' },
 				{ input: '&quot;', expected: '"' },
 				{ input: '&apos;', expected: "'" },
 				{ input: '&nbsp;', expected: '\u00A0' }

@@ -247,7 +247,6 @@ $ = {
     // L1: Core
     facade,              // Editor instance (public API)
     store,               // Store instance
-    _w, _d,              // Window, Document
 
     // L2: Config (Phase 1 - available to L3 constructors)
     contextProvider,     // Context/FrameContext management
@@ -278,12 +277,12 @@ $ = {
 
 **Dependency Access Patterns:**
 
-| Consumer                   | Constructor                 | Access Pattern                                          |
-| -------------------------- | --------------------------- | ------------------------------------------------------- |
-| **Plugin**                 | `constructor(kernel)`       | `this.$` via KernelInjector                             |
-| **Core Logic** (L3)        | `constructor(kernel)`       | `#kernel`, `#$` (= kernel.$), `#store` (= kernel.store) |
-| **Module**                 | `constructor(inst, $, ...)` | `#$` (Deps passed directly)                             |
-| **EventOrchestrator** (L4) | `constructor(kernel)`       | `this.$` via KernelInjector                             |
+| Consumer                   | Constructor                           | Access Pattern                                          |
+| -------------------------- | ------------------------------------- | ------------------------------------------------------- |
+| **Plugin**                 | `constructor(kernel, pluginOptions?)` | `this.$` via KernelInjector                             |
+| **Core Logic** (L3)        | `constructor(kernel)`                 | `#kernel`, `#$` (= kernel.$), `#store` (= kernel.store) |
+| **Module**                 | `constructor(inst, $, ...)`           | `#$` (Deps passed directly)                             |
+| **EventOrchestrator** (L4) | `constructor(kernel)`                 | `this.$` via KernelInjector                             |
 
 **Example - Plugin:**
 
@@ -293,8 +292,8 @@ import { PluginCommand } from '../../interfaces';
 class Blockquote extends PluginCommand {
 	static key = 'blockquote';
 
-	constructor(kernel) {
-		super(kernel); // KernelInjector → this.$ = kernel.$
+	constructor(editor) {
+		super(editor); // KernelInjector → this.$ = kernel.$
 		this.title = this.$.lang.tag_blockquote;
 	}
 
@@ -644,7 +643,7 @@ class MyPlugin extends PluginModal {
 - **Shell Logic**: `component`, `focusManager`, `pluginManager`, `plugins`, `ui`, `commandDispatcher`, `history`, `shortcuts`
 - **Panel Logic**: `toolbar`, `subToolbar`, `menu`, `viewer`
 - **Services**: `eventManager`, `contextProvider`, `optionProvider`, `instanceCheck`, `store`
-- **Environment**: `facade` (editor instance), `_w` (Window), `_d` (Document)
+- **Environment**: `facade` (editor instance)
 
 ---
 
@@ -905,8 +904,6 @@ Options use Map-based storage. Some are marked `'fixed'` (immutable) or resettab
 
 ---
 
----
-
 ## Essential Commands
 
 ### Development
@@ -1106,7 +1103,7 @@ plugins: [new MyPlugin()];
 - Jest with jsdom environment
 - Test individual functions and components in isolation
 - Module path alias: `@/` maps to `src/`
-- Coverage thresholds: 62% statements, 53% branches, 75% functions, 63% lines
+- Coverage thresholds: 70% statements, 60% branches, 80% functions, 70% lines
 
 ### Integration Tests (`test/integration/`)
 

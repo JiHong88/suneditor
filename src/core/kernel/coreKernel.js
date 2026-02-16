@@ -42,8 +42,6 @@ import EventOrchestrator from '../event/eventOrchestrator';
  * @typedef {Object} Deps
  * @property {SunEditor.Instance} facade - Editor facade (public API)
  * @property {SunEditor.Store} store - L1: Central state store
- * @property {Window} _w - Window object
- * @property {Document} _d - Document object
  *
  * @property {import('../config/contextProvider').default} contextProvider - L2: Context provider
  * @property {import('../config/optionProvider').default} optionProvider - L2: Option provider
@@ -98,19 +96,17 @@ class CoreKernel {
 	/**
 	 * @param {SunEditor.Instance} facade - Editor instance (Public API)
 	 * @param {Object} config - Initial configuration
-	 * @param {SunEditor.GlobalWindow} config._w
-	 * @param {Document} config._d
 	 * @param {ProductType} config.product  - The initial product object.
 	 * @param {SunEditor.InitOptions} config.options  - The initial options.
 	 */
 	constructor(facade, config) {
-		const { _w, _d, product, options } = config;
+		const { product, options } = config;
 
 		// L1: Store
 		this.store = new Store(product);
 
 		/** @type {Deps} */
-		this.$ = /** @type {*} */ ({ facade, store: this.store, _w, _d });
+		this.$ = /** @type {*} */ ({ facade, store: this.store });
 
 		// L2: Config
 		this.#registerConfig(product, options);

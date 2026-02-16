@@ -466,20 +466,17 @@ class Inline {
 			parentCon = parentCon.parentNode;
 		}
 
-		if (!isRemoveNode && parentCon === endCon.parentNode && parentCon.nodeName === newInnerNode.nodeName) {
+		if (!isRemoveNode && !isRemoveFormat && parentCon === endCon.parentNode && parentCon.nodeName === newInnerNode.nodeName) {
 			if (dom.check.isZeroWidth(startCon.textContent.slice(0, startOff)) && dom.check.isZeroWidth(endCon.textContent.slice(endOff))) {
 				const children = parentCon.childNodes;
-				let sameTag = false;
+				let sameTag = true;
 
 				for (let i = 0, len = children.length, c, s, e, z; i < len; i++) {
 					c = children[i];
 					z = !dom.check.isZeroWidth(c);
-					if (c === startCon) {
-						s = true;
-						continue;
-					}
-					if (c === endCon) {
-						e = true;
+					if (c === startCon || c === endCon) {
+						if (c === startCon) s = true;
+						if (c === endCon) e = true;
 						continue;
 					}
 					if ((!s && z) || (s && e && z)) {
@@ -936,8 +933,8 @@ class Inline {
 			parentCon = parentCon.parentNode;
 		}
 
-		if (!isRemoveNode && parentCon.nodeName === newInnerNode.nodeName && !this.#$.format.isLine(parentCon) && !parentCon.nextSibling && dom.check.isZeroWidth(startCon.textContent.slice(0, startOff))) {
-			let sameTag = false;
+		if (!isRemoveNode && !isRemoveFormat && parentCon.nodeName === newInnerNode.nodeName && !this.#$.format.isLine(parentCon) && !parentCon.nextSibling && dom.check.isZeroWidth(startCon.textContent.slice(0, startOff))) {
+			let sameTag = true;
 			let s = startCon.previousSibling;
 			while (s) {
 				if (!dom.check.isZeroWidth(s)) {
@@ -1380,8 +1377,8 @@ class Inline {
 			parentCon = parentCon.parentNode;
 		}
 
-		if (!isRemoveNode && parentCon.nodeName === newInnerNode.nodeName && !this.#$.format.isLine(parentCon) && !parentCon.previousSibling && dom.check.isZeroWidth(endCon.textContent.slice(endOff))) {
-			let sameTag = false;
+		if (!isRemoveNode && !isRemoveFormat && parentCon.nodeName === newInnerNode.nodeName && !this.#$.format.isLine(parentCon) && !parentCon.previousSibling && dom.check.isZeroWidth(endCon.textContent.slice(endOff))) {
+			let sameTag = true;
 			let e = endCon.nextSibling;
 			while (e) {
 				if (!dom.check.isZeroWidth(e)) {
@@ -1810,7 +1807,7 @@ class Inline {
 					return !s.includes(k);
 				}) &&
 					s.some(function (k) {
-						ec.includes(k);
+						return ec.includes(k);
 					}))
 			) {
 				r = c.nextSibling;

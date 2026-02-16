@@ -16,8 +16,6 @@ describe('KernelInjector', () => {
 		mockDeps = {
 			facade: { html: { get: jest.fn() } },
 			store: { get: jest.fn() },
-			_w: window,
-			_d: document,
 			contextProvider: {},
 			optionProvider: {},
 			instanceCheck: {},
@@ -82,11 +80,6 @@ describe('KernelInjector', () => {
 		it('should provide access to store', () => {
 			expect(kernelInjector.$.store).toBeDefined();
 			expect(kernelInjector.$.store).toBe(mockDeps.store);
-		});
-
-		it('should provide access to window and document', () => {
-			expect(kernelInjector.$._w).toBe(window);
-			expect(kernelInjector.$._d).toBe(document);
 		});
 
 		it('should provide access to config providers', () => {

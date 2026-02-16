@@ -145,7 +145,7 @@ describe('CommandDispatcher', () => {
 			mockEditor.$.commandDispatcher.applyTargets('bold', callback);
 
 			// Verify callback was prepared for use
-			expect(typeof callback).toBe('function');
+
 		});
 	});
 

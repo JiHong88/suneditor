@@ -2,8 +2,9 @@
  * @fileoverview Char class
  */
 
-import { dom, converter, numbers, unicode, clipboard } from '../../../helper';
+import { dom, converter, numbers, unicode, clipboard, env } from '../../../helper';
 
+const { _d } = env;
 const REQUIRED_DATA_ATTRS = 'data-se-[^\\s]+';
 const V2_MIG_DATA_ATTRS = '|data-index|data-file-size|data-file-name|data-exp|data-font-size';
 
@@ -214,24 +215,7 @@ class HTML {
 		if (validate) {
 			const parseDocument = new DOMParser().parseFromString(html, 'text/html');
 			parseDocument.body.querySelectorAll('*').forEach((node) => {
-				if (!node.closest('.se-component') && !node.closest('.se-flex-component')) {
-					const result = validate(node);
-					if (result === null) {
-						node.remove();
-					} else if (this.#instanceCheck.isNode(result)) {
-						node.replaceWith(result);
-					} else if (typeof result === 'string') {
-						node.outerHTML = result;
-					}
-				}
-			});
-			html = parseDocument.body.innerHTML;
-		} else if (validateAll) {
-			const parseDocument = new DOMParser().parseFromString(html, 'text/html');
-			const compClass = ['.se-component', '.se-flex-component'];
-			const closestAny = (element) => compClass.some((selector) => element.closest(selector));
-			parseDocument.body.querySelectorAll('*').forEach((node) => {
-				if (!closestAny(node)) {
+				if (validateAll || (!node.closest('.se-component') && !node.closest('.se-flex-component'))) {
 					const result = validate(node);
 					if (result === null) {
 						node.remove();
@@ -293,7 +277,7 @@ class HTML {
 		}
 
 		// get dom tree
-		const domParser = this.#$._d.createRange().createContextualFragment(html);
+		const domParser = _d.createRange().createContextualFragment(html);
 
 		if (tagFilter) {
 			try {
@@ -380,12 +364,12 @@ class HTML {
 			if (!skipCleaning) html = this.clean(html, { forceFormat: false, whitelist: null, blacklist: null });
 			try {
 				if (dom.check.isListCell(this.#$.format.getLine(this.#$.selection.getNode(), null))) {
-					const domParser = this.#$._d.createRange().createContextualFragment(html);
+					const domParser = _d.createRange().createContextualFragment(html);
 					const domTree = domParser.childNodes;
 					if (this.#isFormatData(domTree)) html = this.#convertListCell(domTree);
 				}
 
-				const domParser = this.#$._d.createRange().createContextualFragment(html);
+				const domParser = _d.createRange().createContextualFragment(html);
 				const domTree = domParser.childNodes;
 
 				if (!skipCharCount) {
@@ -1228,14 +1212,12 @@ class HTML {
 
 			if (!this.#frameContext.get('isCodeView')) {
 				const temp = dom.utils.createElement('DIV', null, convertValue);
-				const children = temp.children;
-				const len = children.length;
-				for (let j = 0; j < len; j++) {
-					if (!children[j]) continue;
+				const children = Array.from(temp.children);
+				for (let j = 0, jLen = children.length; j < jLen; j++) {
 					this.#frameContext.get('wysiwyg').appendChild(children[j]);
 				}
 				this.#$.history.push(false, rootKey[i]);
-				this.#$.selection.scrollTo(children[len - 1]);
+				this.#$.selection.scrollTo(children.at(-1));
 			} else {
 				this.#$.viewer._setCodeView(this.#$.viewer._getCodeView() + '\n' + this._convertToCode(convertValue, false));
 			}
@@ -1325,7 +1307,7 @@ class HTML {
 		let returnHTML = '';
 		const wRegExp = RegExp;
 		const brReg = new wRegExp('^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR|BR|CANVAS|SELECT)$', 'i');
-		const wDoc = typeof html === 'string' ? this.#$._d.createRange().createContextualFragment(html) : html;
+		const wDoc = typeof html === 'string' ? _d.createRange().createContextualFragment(html) : html;
 		const isFormat = (current) => {
 			return this.#$.format.isLine(current) || this.#$.component.is(current);
 		};
@@ -1560,7 +1542,7 @@ class HTML {
 				// class filter
 				if (classFilter) {
 					if (nrtag && current.className) {
-						const className = new Array(current.classList).map(this.#isAllowedClassName).join(' ').trim();
+						const className = Array.from(current.classList).map(this.#isAllowedClassName).join(' ').trim();
 						if (className) current.className = className;
 						else current.removeAttribute('class');
 					}
@@ -1595,8 +1577,8 @@ class HTML {
 
 			if (dom.query.getParentElement(t, dom.check.isListCell)) {
 				const cellChildren = t.childNodes;
-				for (let j = cellChildren.length - 1; len >= 0; j--) {
-					p.insertBefore(t, cellChildren[j]);
+				for (let j = cellChildren.length - 1; j >= 0; j--) {
+					p.insertBefore(cellChildren[j], t);
 				}
 				checkTags.push(t);
 			} else {
@@ -1698,7 +1680,7 @@ class HTML {
 
 		if (f) value += f.outerHTML;
 
-		return this.#$._d.createRange().createContextualFragment(value);
+		return _d.createRange().createContextualFragment(value);
 	}
 
 	/**

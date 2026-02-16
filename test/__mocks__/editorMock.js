@@ -601,6 +601,7 @@ export function createMockEditor(customOptions = {}) {
 		applyToRoots: jest.fn((callback) => {
 			frameRoots.forEach((root) => callback(root));
 		}),
+		rootKeys: Array.from(frameRoots.keys()),
 		carrierWrapper: elements.carrierWrapper,
 		reset: jest.fn(),
 		init: jest.fn(),

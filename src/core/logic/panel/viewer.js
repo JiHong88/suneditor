@@ -662,7 +662,7 @@ class Viewer {
 			if (!dom.utils.hasClass(wDoc.body, 'sun-editor-editable')) {
 				const editableClasses = this.#options.get('_editableClass').split(' ');
 				for (let i = 0; i < editableClasses.length; i++) {
-					dom.utils.addClass(wDoc.body, this.#options.get('_editableClass')[i]);
+					dom.utils.addClass(wDoc.body, editableClasses[i]);
 				}
 			}
 		} else {
@@ -737,7 +737,7 @@ function CreateLineNumbers(fc) {
 		n += `${i}\n`;
 	}
 
-	const { padding, margin } = env._w.getComputedStyle(fc.get('code'));
+	const { padding, margin } = _w.getComputedStyle(fc.get('code'));
 	codeNumbers.value = n;
 	codeNumbers.style.padding = padding || '';
 	codeNumbers.style.margin = margin || '';
@@ -749,11 +749,11 @@ function CreateLineNumbers(fc) {
  * @returns {number}
  */
 function GetLineHeight(textarea) {
-	const lineHeight = env._w.getComputedStyle(textarea).lineHeight;
+	const lineHeight = _w.getComputedStyle(textarea).lineHeight;
 	let lineHeightMatch;
 
 	if (!numbers.is(lineHeight)) {
-		const fontSize = env._w.getComputedStyle(textarea).fontSize;
+		const fontSize = _w.getComputedStyle(textarea).fontSize;
 		lineHeightMatch = numbers.get(fontSize) * 1.2;
 	} else {
 		lineHeightMatch = numbers.get(lineHeight);

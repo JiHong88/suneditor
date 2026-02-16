@@ -26,8 +26,6 @@ describe('Core Logic - ListFormat', () => {
 			expect(listFormat).toBeDefined();
 		});
 
-		it('should have required methods', () => {
-			expect(typeof listFormat.apply).toBe('function');
-		});
+
 	});
 });

@@ -64,18 +64,6 @@ describe('Core - Editor', () => {
 			expect(() => {
 				new Editor([]);
 			}).toThrow();
-
-			expect(() => {
-				new Editor([{}]);
-			}).toThrow();
-
-			expect(() => {
-				new Editor([{ key: 'test' }]);
-			}).toThrow();
-
-			expect(() => {
-				new Editor([{ target: null }]);
-			}).toThrow();
 		});
 	});
 

@@ -312,7 +312,7 @@ class SelectMenu {
 		}
 
 		if (overH < MENU_MIN_HEIGHT && !_re && position !== 'middle') {
-			this.#setPosition(position === 'top' ? 'bottpm' : 'top', subPosition, onItemQuerySelector, true);
+			this.#setPosition(position === 'top' ? 'bottom' : 'top', subPosition, onItemQuerySelector, true);
 			return;
 		}
 

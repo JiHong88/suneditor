@@ -1,5 +1,7 @@
-import { dom } from '../../../helper';
+import { dom, env } from '../../../helper';
 import { _DragHandle } from '../../../modules/ui';
+
+const { _w } = env;
 
 /**
  * @typedef {import('../eventOrchestrator').default} EventManagerThis_handler_ww_dragDrop
@@ -27,8 +29,8 @@ export function OnDragOver_wysiwyg(fc, dragCursor, _iframeTopArea, _innerToolbar
 	if (_iframeTopArea) {
 		const iframeOffset = this.$.offset.getGlobal(_iframeTopArea);
 		const toolbarH = _innerToolbar ? this.$.context.get('toolbar_main').offsetHeight : 0;
-		_offset.y = iframeOffset.top + toolbarH - this.$._w.scrollY;
-		_offset.x = iframeOffset.left - this.$._w.scrollX;
+		_offset.y = iframeOffset.top + toolbarH - _w.scrollY;
+		_offset.x = iframeOffset.left - _w.scrollX;
 	}
 
 	const rect = cursorRange.getBoundingClientRect();
@@ -40,8 +42,8 @@ export function OnDragOver_wysiwyg(fc, dragCursor, _iframeTopArea, _innerToolbar
 			frameX = wwFrame.offsetLeft;
 			frameY = wwFrame.offsetTop;
 		}
-		dragCursor.style.left = `${rect.right + this.$._w.scrollX + _offset.x + frameX}px`;
-		dragCursor.style.top = `${rect.top + this.$._w.scrollY + _offset.y - 5 + frameY}px`;
+		dragCursor.style.left = `${rect.right + _w.scrollX + _offset.x + frameX}px`;
+		dragCursor.style.top = `${rect.top + _w.scrollY + _offset.y - 5 + frameY}px`;
 		dragCursor.style.height = `${rect.height + 10}px`;
 		dragCursor.style.display = 'block';
 	} else {

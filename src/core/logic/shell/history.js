@@ -56,6 +56,15 @@ export default function History(kernel) {
 		root.index += increase;
 
 		const item = root.value[root.index];
+
+		if (!item) {
+			console.warn('[SunEditor.history.setContent.fail] History state desynchronized. Aborting undo/redo operation.');
+			// Rollback to prevent stuck state
+			root.index -= increase;
+			stackIndex -= increase;
+			return;
+		}
+
 		frameRoots.get(rootKey).get('wysiwyg').innerHTML = item.content;
 
 		if (prevKey !== rootKey && increase < 0 && stackIndex === 1) {
@@ -172,7 +181,7 @@ export default function History(kernel) {
 		}
 
 		stack = stack.slice(0, stackIndex + 1);
-		root.value.splice(stackIndex + 1);
+		root.value.splice(root.index + 1);
 		$.commandDispatcher.applyTargets('redo', (e) => {
 			e.disabled = true;
 		});
@@ -393,6 +402,7 @@ export default function History(kernel) {
 		 */
 		_destroy() {
 			if (pushDelay) _w.clearTimeout(pushDelay);
+			if (waitingTime) _w.clearTimeout(waitingTime);
 			stackIndex = stack = rootStack = rootInitContents = null;
 		},
 	};

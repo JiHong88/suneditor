@@ -335,7 +335,7 @@ class ListFormat {
 		let range = null;
 
 		if (nested) {
-			if (originList !== lastCell.parentElement && dom.check.isList(lastCell.parentElement.parentElement) && lastCell.nextElementSibling) {
+			if (originList !== lastCell.parentElement && dom.check.isList(lastCell.parentElement?.parentElement) && lastCell.nextElementSibling) {
 				lastCell = /** @type {HTMLElement} */ (lastCell.nextElementSibling);
 				while (lastCell) {
 					selectedCells.push(lastCell);

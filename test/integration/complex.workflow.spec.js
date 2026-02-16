@@ -49,7 +49,7 @@ describe('Complex workflow integration tests', () => {
 			// Make it H1
 			let p = wysiwyg.querySelector('p');
 			editor.$.selection.setRange(p.firstChild, 0, p.firstChild, p.firstChild.textContent.length);
-			const h1 = editor.$._d.createElement('H1');
+			const h1 = document.createElement('H1');
 			editor.$.format.setLine(h1);
 
 			// Add subtitle
@@ -63,7 +63,7 @@ describe('Complex workflow integration tests', () => {
 
 			// Add quote
 			editor.$.selection.setRange(para.firstChild, 0, para.firstChild, para.firstChild.textContent.length);
-			const blockquote = editor.$._d.createElement('BLOCKQUOTE');
+			const blockquote = document.createElement('BLOCKQUOTE');
 			editor.$.format.applyBlock(blockquote);
 
 			// Verify structure
@@ -187,7 +187,7 @@ describe('Complex workflow integration tests', () => {
 			editor.$.selection.setRange(firstP.firstChild, 0, lastP.firstChild, lastP.firstChild.textContent.length);
 
 			// Apply blockquote
-			const blockquote = editor.$._d.createElement('BLOCKQUOTE');
+			const blockquote = document.createElement('BLOCKQUOTE');
 			editor.$.format.applyBlock(blockquote);
 
 			// All lines should be in blockquote
@@ -214,7 +214,7 @@ describe('Complex workflow integration tests', () => {
 			editor.$.format.indent();
 
 			// Change to H3
-			const h3 = editor.$._d.createElement('H3');
+			const h3 = document.createElement('H3');
 			editor.$.format.setLine(h3);
 
 			// Should have H3
@@ -244,7 +244,7 @@ describe('Complex workflow integration tests', () => {
 			editor.$.format.indent();
 
 			// Apply blockquote
-			const blockquote = editor.$._d.createElement('BLOCKQUOTE');
+			const blockquote = document.createElement('BLOCKQUOTE');
 			editor.$.format.applyBlock(blockquote);
 
 			// Should have blockquote
@@ -392,7 +392,7 @@ describe('Complex workflow integration tests', () => {
 			const newP = wysiwyg.querySelector('p');
 			if (newP && newP.firstChild) {
 				editor.$.selection.setRange(newP.firstChild, 0, newP.lastChild, newP.lastChild.textContent.length);
-				const h2 = editor.$._d.createElement('H2');
+				const h2 = document.createElement('H2');
 				editor.$.format.setLine(h2);
 			}
 
@@ -418,7 +418,7 @@ describe('Complex workflow integration tests', () => {
 
 			// Format shouldn't be blocked
 			expect(() => {
-				const h1 = editor.$._d.createElement('H1');
+				const h1 = document.createElement('H1');
 				editor.$.format.setLine(h1);
 			}).not.toThrow();
 		});
@@ -443,7 +443,7 @@ describe('Complex workflow integration tests', () => {
 				editor.$.selection.setRange(firstP.firstChild, 0, lastP.firstChild, lastP.firstChild.textContent.length);
 
 				// Apply blockquote (should skip component)
-				const blockquote = editor.$._d.createElement('BLOCKQUOTE');
+				const blockquote = document.createElement('BLOCKQUOTE');
 				editor.$.format.applyBlock(blockquote);
 			}
 
@@ -472,7 +472,7 @@ describe('Complex workflow integration tests', () => {
 			editor.$.format.indent();
 			editor.$.format.outdent();
 
-			const h1 = editor.$._d.createElement('H1');
+			const h1 = document.createElement('H1');
 			editor.$.format.setLine(h1);
 
 			// Text should be preserved
@@ -489,7 +489,7 @@ describe('Complex workflow integration tests', () => {
 				const br = p.querySelector('br');
 				editor.$.selection.setRange(br, 0, br, 0);
 
-				const h1 = editor.$._d.createElement('H1');
+				const h1 = document.createElement('H1');
 				editor.$.format.setLine(h1);
 				editor.$.format.indent();
 			}).not.toThrow();
@@ -505,7 +505,7 @@ describe('Complex workflow integration tests', () => {
 
 			// Operations should work
 			expect(() => {
-				const h2 = editor.$._d.createElement('H2');
+				const h2 = document.createElement('H2');
 				editor.$.format.setLine(h2);
 			}).not.toThrow();
 
@@ -531,7 +531,7 @@ describe('Complex workflow integration tests', () => {
 				textNode = p.firstChild.nodeType === 3 ? p.firstChild : p.firstChild.firstChild || p.firstChild;
 				if (textNode) {
 					editor.$.selection.setRange(textNode, 0, textNode, textNode.textContent.length);
-					const h2 = editor.$._d.createElement('H2');
+					const h2 = document.createElement('H2');
 					editor.$.format.setLine(h2);
 				}
 			}
@@ -547,7 +547,7 @@ describe('Complex workflow integration tests', () => {
 			const h2El2 = wysiwyg.querySelector('h2');
 			if (h2El2 && h2El2.firstChild) {
 				editor.$.selection.setRange(h2El2.firstChild, 0, h2El2.firstChild, h2El2.firstChild.textContent.length);
-				const blockquote = editor.$._d.createElement('BLOCKQUOTE');
+				const blockquote = document.createElement('BLOCKQUOTE');
 				editor.$.format.applyBlock(blockquote);
 			}
 

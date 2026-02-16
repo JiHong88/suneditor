@@ -11,14 +11,6 @@ export type Deps = {
 	 */
 	store: SunEditor.Store;
 	/**
-	 * - Window object
-	 */
-	_w: Window;
-	/**
-	 * - Document object
-	 */
-	_d: Document;
-	/**
 	 * - L2: Context provider
 	 */
 	contextProvider: import('../config/contextProvider').default;
@@ -152,8 +144,6 @@ export type Deps = {
  * @typedef {Object} Deps
  * @property {SunEditor.Instance} facade - Editor facade (public API)
  * @property {SunEditor.Store} store - L1: Central state store
- * @property {Window} _w - Window object
- * @property {Document} _d - Document object
  *
  * @property {import('../config/contextProvider').default} contextProvider - L2: Context provider
  * @property {import('../config/optionProvider').default} optionProvider - L2: Option provider
@@ -201,16 +191,12 @@ declare class CoreKernel {
 	/**
 	 * @param {SunEditor.Instance} facade - Editor instance (Public API)
 	 * @param {Object} config - Initial configuration
-	 * @param {SunEditor.GlobalWindow} config._w
-	 * @param {Document} config._d
 	 * @param {ProductType} config.product  - The initial product object.
 	 * @param {SunEditor.InitOptions} config.options  - The initial options.
 	 */
 	constructor(
 		facade: SunEditor.Instance,
 		config: {
-			_w: SunEditor.GlobalWindow;
-			_d: Document;
 			product: ProductType;
 			options: SunEditor.InitOptions;
 		},

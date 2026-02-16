@@ -1,4 +1,4 @@
-import { dom, converter } from '../../helper';
+import { dom, converter, env } from '../../helper';
 import { isElement } from '../../helper/dom/domCheck';
 import HueSlider from './HueSlider';
 
@@ -229,8 +229,8 @@ class ColorPicker {
 	#colorName2hex(colorName) {
 		if (!colorName || /^#/.test(colorName)) return colorName;
 		const temp = dom.utils.createElement('div', { style: 'display: none; color: ' + colorName });
-		const colors = this.#$._w
-			.getComputedStyle(this.#$._d.body.appendChild(temp))
+		const colors = env._w
+			.getComputedStyle(env._d.body.appendChild(temp))
 			.color.match(/\d+/g)
 			.map(function (a) {
 				return parseInt(a, 10);

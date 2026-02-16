@@ -43,7 +43,7 @@ describe('Core Logic Integration Tests', () => {
 			editor.$.selection.setRange(textNode, 0, textNode, 4);
 
 			// Test setLine with H1
-			const h1 = editor.$._d.createElement('H1');
+			const h1 = document.createElement('H1');
 			try {
 				editor.$.format.setLine(h1);
 			} catch (e) {
@@ -99,7 +99,7 @@ describe('Core Logic Integration Tests', () => {
 			const textNode = p.firstChild;
 			editor.$.selection.setRange(textNode, 0, textNode, 4);
 
-			const pre = editor.$._d.createElement('PRE');
+			const pre = document.createElement('PRE');
 			try {
 				editor.$.format.setBrLine(pre);
 			} catch (e) {
@@ -116,7 +116,7 @@ describe('Core Logic Integration Tests', () => {
 			const textNode = p.firstChild;
 			editor.$.selection.setRange(textNode, 0, textNode, 5);
 
-			const blockquote = editor.$._d.createElement('BLOCKQUOTE');
+			const blockquote = document.createElement('BLOCKQUOTE');
 			try {
 				editor.$.format.applyBlock(blockquote);
 			} catch (e) {
@@ -153,7 +153,7 @@ describe('Core Logic Integration Tests', () => {
 			editor.$.selection.setRange(firstText, 0, lastText, 6);
 
 			// _lineWork is called internally by most format operations
-			const h1 = editor.$._d.createElement('H1');
+			const h1 = document.createElement('H1');
 			try {
 				editor.$.format.setLine(h1);
 			} catch (e) {

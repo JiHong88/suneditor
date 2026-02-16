@@ -33,9 +33,12 @@ describe('Deep Coverage - Shell, Panel, Events', () => {
 		jest.setTimeout(30000);
 	});
 
-	afterEach(() => {
-		// Don't destroy - let Jest clean up to avoid race conditions
-		// with setTimeout callbacks in component.deselect()
+	afterEach(async () => {
+		// Wait for pending setTimeout(0) callbacks (e.g., component.deselect) to flush
+		await new Promise((r) => setTimeout(r, 100));
+		try {
+			if (editor) destroyTestEditor(editor);
+		} catch (e) {}
 		editor = null;
 	});
 

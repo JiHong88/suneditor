@@ -26,9 +26,6 @@ describe('Core Logic - NodeTransform', () => {
 			expect(nodeTransform).toBeDefined();
 		});
 
-		it('should have required methods', () => {
-			expect(typeof nodeTransform.split).toBe('function');
-			expect(typeof nodeTransform.createNestedNode).toBe('function');
-		});
+
 	});
 });

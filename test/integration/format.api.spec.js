@@ -43,7 +43,7 @@ describe('Format API integration tests', () => {
 			editor.$.selection.setRange(textNode, 0, textNode, textNode.textContent.length);
 
 			// Change to H1
-			const h1 = editor.$._d.createElement('H1');
+			const h1 = document.createElement('H1');
 			editor.$.format.setLine(h1);
 
 			// Should now be H1
@@ -64,7 +64,7 @@ describe('Format API integration tests', () => {
 			editor.$.selection.setRange(firstText, 0, lastText, lastText.textContent.length);
 
 			// Change to H2
-			const h2 = editor.$._d.createElement('H2');
+			const h2 = document.createElement('H2');
 			editor.$.format.setLine(h2);
 
 			// All should be H2
@@ -84,7 +84,7 @@ describe('Format API integration tests', () => {
 			editor.$.selection.setRange(textNode, 0, textNode, textNode.textContent.length);
 
 			// Change back to P
-			const p = editor.$._d.createElement('P');
+			const p = document.createElement('P');
 			editor.$.format.setLine(p);
 
 			// Should be P now
@@ -103,7 +103,7 @@ describe('Format API integration tests', () => {
 			editor.$.selection.setRange(firstText, 0, lastText, lastText.textContent.length);
 
 			// Change to H3
-			const h3 = editor.$._d.createElement('H3');
+			const h3 = document.createElement('H3');
 			editor.$.format.setLine(h3);
 
 			// Should preserve inline formatting
@@ -124,7 +124,7 @@ describe('Format API integration tests', () => {
 			editor.$.selection.setRange(textNode, 0, textNode, textNode.textContent.length);
 
 			// Apply blockquote
-			const blockquote = editor.$._d.createElement('BLOCKQUOTE');
+			const blockquote = document.createElement('BLOCKQUOTE');
 			editor.$.format.applyBlock(blockquote);
 
 			// Should be wrapped in blockquote
@@ -143,7 +143,7 @@ describe('Format API integration tests', () => {
 			editor.$.selection.setRange(firstP.firstChild, 0, lastP.firstChild, lastP.firstChild.textContent.length);
 
 			// Apply blockquote
-			const blockquote = editor.$._d.createElement('BLOCKQUOTE');
+			const blockquote = document.createElement('BLOCKQUOTE');
 			editor.$.format.applyBlock(blockquote);
 
 			// Should have one blockquote with all paragraphs
@@ -165,7 +165,7 @@ describe('Format API integration tests', () => {
 			editor.$.selection.setRange(textNode, 0, textNode, textNode.textContent.length);
 
 			// Apply first blockquote
-			const blockquote1 = editor.$._d.createElement('BLOCKQUOTE');
+			const blockquote1 = document.createElement('BLOCKQUOTE');
 			editor.$.format.applyBlock(blockquote1);
 
 			// Should have blockquote
@@ -415,14 +415,14 @@ describe('Format API integration tests', () => {
 			// Make title H1
 			const title = wysiwyg.querySelector('p:nth-child(1)');
 			editor.$.selection.setRange(title.firstChild, 0, title.firstChild, title.firstChild.textContent.length);
-			const h1 = editor.$._d.createElement('H1');
+			const h1 = document.createElement('H1');
 			editor.$.format.setLine(h1);
 
 			// Make subtitle H2
 			const subtitle = wysiwyg.querySelector('p:nth-child(1)');
 			if (subtitle) {
 				editor.$.selection.setRange(subtitle.firstChild, 0, subtitle.firstChild, subtitle.firstChild.textContent.length);
-				const h2 = editor.$._d.createElement('H2');
+				const h2 = document.createElement('H2');
 				editor.$.format.setLine(h2);
 			}
 
@@ -441,7 +441,7 @@ describe('Format API integration tests', () => {
 			editor.$.selection.setRange(textNode, 0, textNode, textNode.textContent.length);
 
 			// Apply blockquote
-			const blockquote = editor.$._d.createElement('BLOCKQUOTE');
+			const blockquote = document.createElement('BLOCKQUOTE');
 			editor.$.format.applyBlock(blockquote);
 
 			// Then indent the content inside
@@ -466,7 +466,7 @@ describe('Format API integration tests', () => {
 			editor.$.selection.setRange(firstText, 0, lastText, lastText.textContent.length);
 
 			// Change to H3
-			const h3 = editor.$._d.createElement('H3');
+			const h3 = document.createElement('H3');
 			editor.$.format.setLine(h3);
 
 			// Should preserve all inline formatting
@@ -488,7 +488,7 @@ describe('Format API integration tests', () => {
 			editor.$.selection.setRange(textNode, 0, textNode, textNode.textContent.length);
 
 			// Change line format inside blockquote
-			const h4 = editor.$._d.createElement('H4');
+			const h4 = document.createElement('H4');
 			editor.$.format.setLine(h4);
 
 			// Should still have blockquote with new line format
@@ -507,7 +507,7 @@ describe('Format API integration tests', () => {
 
 			// Change to H1 - should not throw
 			expect(() => {
-				const h1 = editor.$._d.createElement('H1');
+				const h1 = document.createElement('H1');
 				editor.$.format.setLine(h1);
 			}).not.toThrow();
 		});
@@ -537,7 +537,7 @@ describe('Format API integration tests', () => {
 
 			// Rapid format changes
 			['H1', 'H2', 'H3', 'P', 'DIV'].forEach((tagName) => {
-				const el = editor.$._d.createElement(tagName);
+				const el = document.createElement(tagName);
 				editor.$.format.setLine(el);
 			});
 

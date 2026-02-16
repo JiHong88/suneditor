@@ -178,7 +178,7 @@ describe('Char API integration tests', () => {
 			wysiwyg.innerHTML = '<p>Current</p>'; // 7 chars
 
 			// Create a node to check
-			const testNode = editor.$._d.createElement('SPAN');
+			const testNode = document.createElement('SPAN');
 			testNode.textContent = 'Test node'; // 9 chars, total 16
 
 			const canAdd = editor.$.char.check(testNode);

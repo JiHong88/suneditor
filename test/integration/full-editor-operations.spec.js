@@ -71,7 +71,7 @@ describe('Full Editor Operations Integration Tests', () => {
 			const textNode = p.firstChild;
 			editor.$.selection.setRange(textNode, 0, textNode, textNode.textContent.length);
 
-			const h1 = editor.$._d.createElement('H1');
+			const h1 = document.createElement('H1');
 			editor.$.format.setLine(h1);
 
 			const content = wysiwyg.innerHTML.toLowerCase();
@@ -87,7 +87,7 @@ describe('Full Editor Operations Integration Tests', () => {
 			const textNode = p.firstChild;
 			editor.$.selection.setRange(textNode, 0, textNode, textNode.textContent.length);
 
-			const h2 = editor.$._d.createElement('H2');
+			const h2 = document.createElement('H2');
 			editor.$.format.setLine(h2);
 
 			const content = wysiwyg.innerHTML.toLowerCase();
@@ -103,7 +103,7 @@ describe('Full Editor Operations Integration Tests', () => {
 			const textNode = p.firstChild;
 			editor.$.selection.setRange(textNode, 0, textNode, textNode.textContent.length);
 
-			const h3 = editor.$._d.createElement('H3');
+			const h3 = document.createElement('H3');
 			editor.$.format.setLine(h3);
 
 			const content = wysiwyg.innerHTML.toLowerCase();
@@ -119,7 +119,7 @@ describe('Full Editor Operations Integration Tests', () => {
 			editor.$.selection.setRange(textNode, 0, textNode, textNode.textContent.length);
 
 			try {
-				const blockquote = editor.$._d.createElement('BLOCKQUOTE');
+				const blockquote = document.createElement('BLOCKQUOTE');
 				if (editor.$.format.setBlock) {
 					editor.$.format.setBlock(blockquote);
 				} else {
@@ -142,7 +142,7 @@ describe('Full Editor Operations Integration Tests', () => {
 			editor.$.selection.setRange(textNode, 0, textNode, textNode.textContent.length);
 
 			try {
-				const pre = editor.$._d.createElement('PRE');
+				const pre = document.createElement('PRE');
 				if (editor.$.format.setBlock) {
 					editor.$.format.setBlock(pre);
 				} else {
@@ -505,10 +505,10 @@ describe('Full Editor Operations Integration Tests', () => {
 			wysiwyg.innerHTML = '<p>Item 1</p><p>Item 2</p>';
 
 			const items = Array.from(wysiwyg.querySelectorAll('p'));
-			const ol = editor.$._d.createElement('OL');
+			const ol = document.createElement('OL');
 
 			items.forEach(item => {
-				const li = editor.$._d.createElement('LI');
+				const li = document.createElement('LI');
 				li.textContent = item.textContent;
 				ol.appendChild(li);
 			});
@@ -526,10 +526,10 @@ describe('Full Editor Operations Integration Tests', () => {
 			wysiwyg.innerHTML = '<p>Item A</p><p>Item B</p>';
 
 			const items = Array.from(wysiwyg.querySelectorAll('p'));
-			const ul = editor.$._d.createElement('UL');
+			const ul = document.createElement('UL');
 
 			items.forEach(item => {
-				const li = editor.$._d.createElement('LI');
+				const li = document.createElement('LI');
 				li.textContent = item.textContent;
 				ul.appendChild(li);
 			});
@@ -575,18 +575,18 @@ describe('Full Editor Operations Integration Tests', () => {
 
 		it('should support nested lists', () => {
 			const wysiwyg = editor.$.frameContext.get('wysiwyg');
-			const ul = editor.$._d.createElement('UL');
+			const ul = document.createElement('UL');
 
-			const li1 = editor.$._d.createElement('LI');
+			const li1 = document.createElement('LI');
 			li1.textContent = 'Item 1';
 			ul.appendChild(li1);
 
-			const li2 = editor.$._d.createElement('LI');
+			const li2 = document.createElement('LI');
 			li2.textContent = 'Item 2';
 			ul.appendChild(li2);
 
-			const nested = editor.$._d.createElement('UL');
-			const nestedLi = editor.$._d.createElement('LI');
+			const nested = document.createElement('UL');
+			const nestedLi = document.createElement('LI');
 			nestedLi.textContent = 'Nested';
 			nested.appendChild(nestedLi);
 			li2.appendChild(nested);
@@ -937,7 +937,7 @@ describe('Full Editor Operations Integration Tests', () => {
 			await editor.$.commandDispatcher.run('bold');
 
 			// Change to H2
-			const h2 = editor.$._d.createElement('H2');
+			const h2 = document.createElement('H2');
 			editor.$.format.setLine(h2);
 
 			const content = wysiwyg.innerHTML.toLowerCase();
@@ -948,11 +948,11 @@ describe('Full Editor Operations Integration Tests', () => {
 			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 			wysiwyg.innerHTML = '';
 
-			const ul = editor.$._d.createElement('UL');
+			const ul = document.createElement('UL');
 
 			const items = ['First item', 'Second item', 'Third item'];
 			items.forEach(text => {
-				const li = editor.$._d.createElement('LI');
+				const li = document.createElement('LI');
 				li.textContent = text;
 				ul.appendChild(li);
 			});

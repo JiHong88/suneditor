@@ -246,7 +246,7 @@ export default class OptionProvider {
 					break;
 				}
 				case 'textDirection': {
-					ui.setDir(options.get('_rtl') ? 'ltr' : 'rtl');
+					ui.setDir(options.get('_rtl') ? 'rtl' : 'ltr');
 					break;
 				}
 				case 'historyStackDelayTime': {

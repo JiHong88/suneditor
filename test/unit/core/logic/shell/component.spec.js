@@ -102,20 +102,10 @@ describe('Component', () => {
 		});
 	});
 
-	describe('isBasic method', () => {
-		it('should be a function', () => {
-			expect(typeof component.isBasic).toBe('function');
-		});
 
-		it('is defined and accessible', () => {
-			expect(component.isBasic).toBeDefined();
-		});
-	});
 
 	describe('get method', () => {
-		it('should be a function', () => {
-			expect(typeof component.get).toBe('function');
-		});
+
 
 		it('should return null for null input', () => {
 			const result = component.get(null);
@@ -128,9 +118,7 @@ describe('Component', () => {
 	});
 
 	describe('select method', () => {
-		it('should be a function', () => {
-			expect(typeof component.select).toBe('function');
-		});
+
 
 		it('should handle null element without throwing', () => {
 			const result = component.select(null, 'image');
@@ -143,9 +131,7 @@ describe('Component', () => {
 	});
 
 	describe('deselect method', () => {
-		it('should be a function', () => {
-			expect(typeof component.deselect).toBe('function');
-		});
+
 
 		it('is defined and accessible', () => {
 			expect(component.deselect).toBeDefined();
@@ -168,87 +154,21 @@ describe('Component', () => {
 		});
 	});
 
-	describe('hoverSelect method', () => {
-		it('should be a function', () => {
-			expect(typeof component.hoverSelect).toBe('function');
-		});
 
-		it('is defined and accessible', () => {
-			expect(component.hoverSelect).toBeDefined();
-		});
-	});
 
-	describe('copy method', () => {
-		it('should be a function', () => {
-			expect(typeof component.copy).toBe('function');
-		});
 
-		it('is defined and accessible', () => {
-			expect(component.copy).toBeDefined();
-		});
-	});
 
-	describe('insert method', () => {
-		it('should be a function', () => {
-			expect(typeof component.insert).toBe('function');
-		});
 
-		it('is defined and accessible', () => {
-			expect(component.insert).toBeDefined();
-		});
-	});
 
-	describe('applyInsertBehavior method', () => {
-		it('should be a function', () => {
-			expect(typeof component.applyInsertBehavior).toBe('function');
-		});
 
-		it('is defined and accessible', () => {
-			expect(component.applyInsertBehavior).toBeDefined();
-		});
-	});
 
-	describe('_init method', () => {
-		it('should be a function', () => {
-			expect(typeof component._init).toBe('function');
-		});
 
-		it('can be called (may error due to complex dependencies)', () => {
-			// Just verify the method exists and is callable
-			expect(component._init).toBeDefined();
-		});
-	});
 
-	describe('_destroy method', () => {
-		it('should be a function', () => {
-			expect(typeof component._destroy).toBe('function');
-		});
 
-		it('exists and is defined', () => {
-			expect(component._destroy).toBeDefined();
-		});
-	});
 
-	describe('__deselect method', () => {
-		it('should be a function', () => {
-			expect(typeof component.__deselect).toBe('function');
-		});
 
-		it('is defined and accessible', () => {
-			expect(component.__deselect).toBeDefined();
-		});
-	});
 
 	describe('Integration scenarios', () => {
-		it('basic methods are defined and accessible', () => {
-			expect(typeof component.deselect).toBe('function');
-			expect(typeof component.get).toBe('function');
-			expect(typeof component.is).toBe('function');
-			expect(typeof component.isInline).toBe('function');
-			expect(typeof component.isBasic).toBe('function');
-			expect(typeof component.select).toBe('function');
-			expect(typeof component.hoverSelect).toBe('function');
-		});
 
 		it('info property can be set and read', () => {
 			const mockInfo = { target: null, pluginName: 'test' };

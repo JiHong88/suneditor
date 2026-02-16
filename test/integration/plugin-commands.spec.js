@@ -321,7 +321,7 @@ describe('Plugin Commands Integration Tests', () => {
 
 			// Change format
 			editor.$.selection.setRange(textNode, 0, textNode, 6);
-			const h1 = editor.$._d.createElement('H1');
+			const h1 = document.createElement('H1');
 			try {
 				editor.$.format.setLine(h1);
 			} catch (e) {

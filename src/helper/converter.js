@@ -125,7 +125,7 @@ export function entityToHTML(content) {
 		'&lt;': '<',
 		'&gt;': '>',
 	};
-	return content.replace(/&amp;|&nbsp;|&apos;|&quot;|\$lt;|\$gt;/g, (m) => {
+	return content.replace(/&amp;|&nbsp;|&apos;|&quot;|&lt;|&gt;/g, (m) => {
 		return typeof ec[m] === 'string' ? ec[m] : m;
 	});
 }
@@ -340,7 +340,7 @@ export function rgb2hex(rgba) {
 
 		let a = '';
 		if (rgba.includes('rgba')) {
-			const alphaMatch = rgba.match(/[\s+]?([\d]+\.?[\d]*)[\s+]?/i);
+			const alphaMatch = rgba.match(/,\s*([\d]+\.?[\d]*)\s*\)/);
 			if (alphaMatch) {
 				a = ('0' + Math.round(parseFloat(alphaMatch[1]) * 255).toString(16)).slice(-2);
 			}
@@ -383,8 +383,8 @@ export function textToAnchor(node) {
 
 		let lastIndex = 0;
 		textContent.replace(URLPattern, (match, offset) => {
-			if (offset > 0) {
-				fragment.appendChild(_d.createTextNode(textContent.slice(0, offset)));
+			if (offset > lastIndex) {
+				fragment.appendChild(_d.createTextNode(textContent.slice(lastIndex, offset)));
 			}
 			const anchor = _d.createElement('a');
 			anchor.href = match;
@@ -392,11 +392,12 @@ export function textToAnchor(node) {
 			anchor.textContent = match;
 			fragment.appendChild(anchor);
 			lastIndex = offset + match.length;
-			if (lastIndex < textContent.length) {
-				fragment.appendChild(_d.createTextNode(textContent.slice(lastIndex)));
-			}
 			return match;
 		});
+
+		if (lastIndex < textContent.length) {
+			fragment.appendChild(_d.createTextNode(textContent.slice(lastIndex)));
+		}
 
 		node.parentNode.replaceChild(fragment, node);
 		return true;
@@ -549,7 +550,7 @@ export function _setIframeStyleLinks(linkNames) {
 			}
 
 			if (!path || path.length === 0) {
-				throw '[SUNEDITOR.constructor.iframe.fail] The suneditor CSS files installation path could not be automatically detected. Please set the option property "iframe_cssFileName" before creating editor instances.';
+				throw new Error('[SUNEDITOR.constructor.iframe.fail] The suneditor CSS files installation path could not be automatically detected. Please set the option property "iframe_cssFileName" before creating editor instances.');
 			}
 
 			for (let i = 0, pLen = path.length; i < pLen; i++) {

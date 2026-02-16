@@ -21,14 +21,6 @@ describe('History', () => {
 	describe('Constructor/Initialization', () => {
 		it('should initialize History function and return object with methods', () => {
 			expect(history).toBeDefined();
-			expect(typeof history.push).toBe('function');
-			expect(typeof history.undo).toBe('function');
-			expect(typeof history.redo).toBe('function');
-			expect(typeof history.pause).toBe('function');
-			expect(typeof history.resume).toBe('function');
-			expect(typeof history.reset).toBe('function');
-			expect(typeof history.resetButtons).toBe('function');
-			expect(typeof history.getRootStack).toBe('function');
 		});
 	});
 
@@ -82,9 +74,7 @@ describe('History', () => {
 	});
 
 	describe('redo method', () => {
-		it('should be defined in History object', () => {
-			expect(typeof history.redo).toBe('function');
-		});
+
 
 		it('should be callable through mockEditor', () => {
 			mockEditor.$.history.redo();
@@ -108,9 +98,7 @@ describe('History', () => {
 	});
 
 	describe('resume method', () => {
-		it('should be defined in History object', () => {
-			expect(typeof history.resume).toBe('function');
-		});
+
 
 		it('should be callable through mockEditor', () => {
 			mockEditor.$.history.resume();
@@ -119,9 +107,7 @@ describe('History', () => {
 	});
 
 	describe('reset method', () => {
-		it('should be defined in History object', () => {
-			expect(typeof history.reset).toBe('function');
-		});
+
 
 		it('should be callable through mockEditor', () => {
 			mockEditor.$.history.reset();
@@ -130,9 +116,7 @@ describe('History', () => {
 	});
 
 	describe('resetButtons method', () => {
-		it('should be defined in History object', () => {
-			expect(typeof history.resetButtons).toBe('function');
-		});
+
 
 		it('should be callable with rootKey and index', () => {
 			mockEditor.$.history.resetButtons('test-frame', 0);
@@ -146,9 +130,7 @@ describe('History', () => {
 	});
 
 	describe('overwrite method', () => {
-		it('should be defined in History object', () => {
-			expect(typeof history.overwrite).toBe('function');
-		});
+
 
 		it('should be callable with rootKey parameter', () => {
 			mockEditor.$.history.overwrite('test-frame');
@@ -157,9 +139,7 @@ describe('History', () => {
 	});
 
 	describe('getRootStack method', () => {
-		it('should be defined in History object', () => {
-			expect(typeof history.getRootStack).toBe('function');
-		});
+
 
 		it('should return root stack through mockEditor', () => {
 			const rootStack = mockEditor.$.history.getRootStack();
@@ -195,9 +175,7 @@ describe('History', () => {
 	});
 
 	describe('_destroy method', () => {
-		it('should be defined in History object', () => {
-			expect(typeof history._destroy).toBe('function');
-		});
+
 
 		it('should be callable directly', () => {
 			expect(() => {
@@ -224,6 +202,30 @@ describe('History', () => {
 			mockEditor.$.history.reset();
 			mockEditor.$.history.resetButtons('test-frame', 0);
 			expect(mockEditor.$.history.reset).toHaveBeenCalled();
+		});
+
+		it('should not crash when history state is desynchronized', () => {
+			// Initialize roots
+			history.reset();
+
+			// Setup: push some history
+			history.push(false, 'test-frame');
+			
+			const rootStack = history.getRootStack();
+			const root = rootStack['test-frame'];
+			
+			// Simulate corruption: set index out of bounds
+			root.index = 999; 
+
+			// Action: attempt undo (which calls setContentFromStack)
+			const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+			
+			expect(() => {
+				history.undo();
+			}).not.toThrow();
+			
+			expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('History state desynchronized'));
+			consoleSpy.mockRestore();
 		});
 	});
 });

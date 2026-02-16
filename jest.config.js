@@ -47,4 +47,9 @@ module.exports = {
 
 	// Verbose output
 	verbose: false,
+
+	// Force exit after all tests complete.
+	// The editor uses many setTimeout(fn, 0) callbacks internally (component.deselect, editorInit, history sync, etc.)
+	// that may still be pending when Jest workers try to exit. These are harmless post-test callbacks.
+	forceExit: true,
 };

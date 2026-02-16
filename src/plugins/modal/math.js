@@ -560,7 +560,7 @@ function getType(element) {
 	if (seAttr) return seAttr;
 
 	// v2-migration
-	const v2SeAttr = element.getAttribute(`data-exp`);
+	const v2SeAttr = element.getAttribute(`data-font-size`);
 	if (!v2SeAttr) return null;
 	element.removeAttribute(`data-font-size`);
 	element.setAttribute(`data-se-type`, v2SeAttr);

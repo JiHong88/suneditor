@@ -309,8 +309,8 @@ export default class CommandExecutor {
 	 * @param {Node} button Button element
 	 */
 	#removeCopyformt(eventManager, ww, button) {
-		this.#globalEventKeydown = eventManager.removeGlobalEvent('keydown', this.#globalEventKeydown);
-		this.#globalEventMousedown = eventManager.removeGlobalEvent('mousedown', this.#globalEventMousedown);
+		this.#globalEventKeydown = eventManager.removeGlobalEvent(this.#globalEventKeydown);
+		this.#globalEventMousedown = eventManager.removeGlobalEvent(this.#globalEventMousedown);
 		this.#onCopyFormatInfo = null;
 		this.#onCopyFormatInitMethod = null;
 		dom.utils.removeClass(ww, 'se-copy-format-cursor');

@@ -92,7 +92,7 @@ export function getIncludePath(nameArray, extension) {
 	}
 
 	if (!path) {
-		throw '[SUNEDITOR.helper.env.getIncludePath.fail] The SUNEDITOR installation path could not be automatically detected. (path: +' + path + ', extension: ' + extension + ')';
+		throw new Error('[SUNEDITOR.helper.env.getIncludePath.fail] The SUNEDITOR installation path could not be automatically detected. (path: +' + path + ', extension: ' + extension + ')');
 	}
 
 	if (path === '') path = pathList.length > 0 ? pathList[0][src] : '';
