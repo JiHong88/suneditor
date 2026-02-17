@@ -1,7 +1,7 @@
 # GUIDE.md
 
 > **Purpose:**
-> Unified technical reference for developers and AI agents.
+> Technical reference for developers and AI agents.
 > Defines architecture, conventions, and development workflow.
 
 ---
@@ -11,11 +11,8 @@
 - [Project Overview](#project-overview)
 - [Directory Structure](#directory-structure)
 - [Technical Requirements](#technical-requirements)
-- [Overall Architecture](#overall-architecture)
-- [Content Structure Design](#content-structure-design)
-- [Multi-Root Architecture](#multi-root-architecture)
+- [Architecture](#architecture) (overview) | [ARCHITECTURE.md](./ARCHITECTURE.md) (deep dive)
 - [Plugin System](#plugin-system-srcplugins)
-- [Core Components](#core-components-srccore)
 - [Modules](#modules-srcmodules)
 - [Essential Commands](#essential-commands)
 - [Testing Strategy](#testing-strategy)
@@ -26,8 +23,8 @@
 
 ## Project Overview
 
-SunEditor is a lightweight, fast WYSIWYG editor written in pure vanilla JavaScript (ES2022+) with no dependencies.
-It uses JSDoc for type definitions and TypeScript for type checking.
+SunEditor is a WYSIWYG editor written in pure vanilla JavaScript (ES2022+) with no runtime dependencies.\
+It uses JSDoc for type definitions and TypeScript for type checking.\
 The editor supports a modular plugin architecture where features can be enabled/disabled as needed.
 
 **Architecture Components:**
@@ -84,10 +81,13 @@ suneditor/
 │   │   │       └── viewer.js        # View modes (code view, fullscreen, preview)
 │   │   ├── event/           # L4: Event orchestration (Redux-like)
 │   │   │   ├── eventOrchestrator.js # Internal DOM event processing, handler binding
+│   │   │   ├── executor.js          # Action dispatcher → maps actions to effects
 │   │   │   ├── ports.js             # Event type definitions and constants
+│   │   │   ├── actions/             # Action type definitions and creators
 │   │   │   ├── handlers/            # DOM event listeners
 │   │   │   ├── reducers/            # Event analyzers → return action lists
-│   │   │   ├── effects/             # Effect registries (side effects)
+│   │   │   ├── rules/               # Granular key rules (enter, backspace, delete, arrow, tab)
+│   │   │   ├── effects/             # Effect registries (common, keydown, ruleHelpers)
 │   │   │   └── support/             # Support classes (selectionState, defaultLineManager)
 │   │   ├── schema/          # Data definitions
 │   │   │   ├── context.js       # Global context schema
@@ -97,10 +97,10 @@ suneditor/
 │   │       ├── constructor.js   # Editor DOM structure builder
 │   │       └── documentType.js  # Document type handler (pagination)
 │   ├── plugins/             # Modular features
-│   │   ├── command/         # Direct actions (blockquote, list, exportPDF)
-│   │   ├── dropdown/        # Dropdown menus (align, font, blockStyle, table)
-│   │   ├── modal/           # Dialog plugins (image, video, link, math)
-│   │   ├── browser/         # Gallery plugins (imageGallery, videoGallery)
+│   │   ├── command/         # Direct actions (blockquote, list_bulleted, list_numbered, exportPDF, fileUpload)
+│   │   ├── dropdown/        # Dropdown menus (align, font, fontColor, backgroundColor, blockStyle, textStyle, paragraphStyle, lineHeight, hr, layout, list, table/, template)
+│   │   ├── modal/           # Dialog plugins (image/, video/, link, math, audio, drawing, embed)
+│   │   ├── browser/         # Gallery plugins (imageGallery, videoGallery, audioGallery, fileGallery, fileBrowser)
 │   │   ├── field/           # Autocomplete (mention)
 │   │   ├── input/           # Toolbar inputs (fontSize, pageNavigator)
 │   │   └── popup/           # Inline controllers (anchor)
@@ -144,7 +144,7 @@ suneditor/
 
 **Development Environment:**
 
-- **Node.js**: 22 recommended, minimum 14+
+- **Node.js**: 14+
 - **Build tools**: Webpack 5, Babel, ESLint, Prettier
 
 **Type System:**
@@ -163,60 +163,16 @@ suneditor/
 
 ## Architecture
 
-### Overall Architecture
-
-```
-┌──────────────────────────────────────────────────────────────┐
-│                        suneditor.js                          │
-│                    (Factory Entry Point)                      │
-│  • create(target, options) → new Editor()                    │
-│  • init(options) → { create() }                              │
-└────────────────────────────┬─────────────────────────────────┘
-                             │ creates
-                             ▼
-┌──────────────────────────────────────────────────────────────┐
-│                         editor.js                            │
-│                  (Main Editor Class - Facade)                │
-│                                                              │
-│  Public API: focus/blur, html.get/set, run, registerPlugin  │
-│  Internal: Plugin lifecycle, multi-root, resetOptions       │
-│                                                              │
-│  ┌────────────────────────────────────────────────────────┐  │
-│  │                    CoreKernel (L1)                      │  │
-│  │          Dependency Container & Orchestrator            │  │
-│  │                                                        │  │
-│  │  ┌─────────┐  ┌──────────────────────────────────┐     │  │
-│  │  │  Store   │  │  $ (Deps bag)                    │     │  │
-│  │  │ #state   │  │  All dependencies in one object  │     │  │
-│  │  │ mode     │  │  Shared with all consumers       │     │  │
-│  │  └─────────┘  └──────────────────────────────────┘     │  │
-│  │                                                        │  │
-│  │  L2: Config ─────────────────────────────────────────  │  │
-│  │  │ contextProvider  │ optionProvider                   │  │
-│  │  │ instanceCheck    │ eventManager                     │  │
-│  │                                                        │  │
-│  │  L3: Logic ──────────────────────────────────────────  │  │
-│  │  │ dom/: selection, format, inline, html, listFormat  │  │
-│  │  │       nodeTransform, char, offset                   │  │
-│  │  │ shell/: component, focusManager, pluginManager     │  │
-│  │  │         ui, commandDispatcher, history, shortcuts    │  │
-│  │  │ panel/: toolbar, subToolbar, menu, viewer           │  │
-│  │                                                        │  │
-│  │  L4: Event ──────────────────────────────────────────  │  │
-│  │  │ EventOrchestrator (handlers, reducers, effects)     │  │
-│  │  └─────────────────────────────────────────────────    │  │
-│  └────────────────────────────────────────────────────────┘  │
-└──────────────────────────────────────────────────────────────┘
-```
+> **For detailed internal engineering, see [ARCHITECTURE.md](./ARCHITECTURE.md).**
 
 **Layer Architecture:**
 
-| Layer  | Directory | Responsibility                             | Examples                                       |
-| ------ | --------- | ------------------------------------------ | ---------------------------------------------- |
-| **L1** | `kernel/` | Dependency container, state store          | CoreKernel, Store, KernelInjector              |
-| **L2** | `config/` | Configuration, context, options, event API | ContextProvider, OptionProvider, EventManager  |
-| **L3** | `logic/`  | Business logic, DOM operations, UI         | Selection, Format, Component, Toolbar, History |
-| **L4** | `event/`  | Internal DOM event processing              | EventOrchestrator, handlers, reducers, effects |
+| Layer  | Directory | Responsibility                             | Examples                                                        |
+| ------ | --------- | ------------------------------------------ | --------------------------------------------------------------- |
+| **L1** | `kernel/` | Dependency container, state store          | CoreKernel, Store, KernelInjector                               |
+| **L2** | `config/` | Configuration, context, options, event API | ContextProvider, OptionProvider, InstanceCheck, EventManager    |
+| **L3** | `logic/`  | Business logic, DOM operations, UI         | Selection, Format, Component, Toolbar, History                  |
+| **L4** | `event/`  | Internal DOM event processing              | EventOrchestrator, handlers, reducers, rules, executor, effects |
 
 **Initialization Order:**
 
@@ -229,358 +185,13 @@ suneditor/
    b. $ Phase 1: Config deps (L2)
    c. L3: Logic (dom, shell, panel)
    d. $ Phase 2: Logic deps added to $
-   e. L4: EventOrchestrator
+   e. L3 Init Pass: _init() called on L3 instances that need post-Phase 2 setup
+   f. L4: EventOrchestrator
 5. editor.#Create() → Plugin registration, event setup
 6. editor.#editorInit() → Frame init, triggers onload event
 ```
 
-### CoreKernel & Dependency Injection
-
-CoreKernel is the central dependency container. It creates all internal instances in a defined order and assembles the `$` (Deps) object that is shared across the entire system.
-
-**`$` (Deps) Object:**
-
-The `$` object is a flat bag of all dependencies, built in two phases:
-
-```
-$ = {
-    // L1: Core
-    facade,              // Editor instance (public API)
-    store,               // Store instance
-
-    // L2: Config (Phase 1 - available to L3 constructors)
-    contextProvider,     // Context/FrameContext management
-    optionProvider,      // Options/FrameOptions management
-    instanceCheck,       // Iframe-safe type checks
-    eventManager,        // Public event API
-
-    // L2: Convenience accessors
-    frameRoots,          // Map<rootKey, FrameContext>
-    context,             // Global context (toolbar, statusbar, etc.)
-    options,             // Base options Map
-    icons,               // Icon set
-    lang,                // Language strings
-    frameContext,         // Current frame context (pointer)
-    frameOptions,         // Current frame options (pointer)
-
-    // L3: Logic (Phase 2 - added after all L3 instances created)
-    // dom/
-    offset, selection, format, inline,
-    listFormat, html, nodeTransform, char,
-    // shell/
-    component, focusManager, pluginManager, plugins,
-    ui, commandDispatcher, history, shortcuts,
-    // panel/
-    toolbar, subToolbar, menu, viewer
-}
-```
-
-**Dependency Access Patterns:**
-
-| Consumer                   | Constructor                           | Access Pattern                                          |
-| -------------------------- | ------------------------------------- | ------------------------------------------------------- |
-| **Plugin**                 | `constructor(kernel, pluginOptions?)` | `this.$` via KernelInjector                             |
-| **Core Logic** (L3)        | `constructor(kernel)`                 | `#kernel`, `#$` (= kernel.$), `#store` (= kernel.store) |
-| **Module**                 | `constructor(inst, $, ...)`           | `#$` (Deps passed directly)                             |
-| **EventOrchestrator** (L4) | `constructor(kernel)`                 | `this.$` via KernelInjector                             |
-
-**Example - Plugin:**
-
-```javascript
-import { PluginCommand } from '../../interfaces';
-
-class Blockquote extends PluginCommand {
-	static key = 'blockquote';
-
-	constructor(editor) {
-		super(editor); // KernelInjector → this.$ = kernel.$
-		this.title = this.$.lang.tag_blockquote;
-	}
-
-	action() {
-		const node = this.$.selection.getNode();
-		this.$.format.applyBlock(this.quoteTag.cloneNode(false));
-	}
-}
-```
-
-**Example - Core Logic Class:**
-
-```javascript
-class Component {
-	#kernel;
-	#$;
-	#store;
-
-	constructor(kernel) {
-		this.#kernel = kernel;
-		this.#$ = kernel.$;
-		this.#store = kernel.store;
-		// Cache frequently used deps
-		this.#options = this.#$.options;
-		this.#frameContext = this.#$.frameContext;
-		this.#eventManager = this.#$.eventManager;
-	}
-}
-```
-
-**Example - Module:**
-
-```javascript
-class Modal {
-    #$;
-
-    constructor(inst, $, element) {
-        this.#$ = $;  // Deps passed directly, no inheritance
-        this.inst = inst;
-        this.#$.eventManager.addEvent(element, 'submit', ...);
-    }
-}
-```
-
-### Store
-
-Store manages the editor's runtime state. It uses a private `#state` object accessed via `get(key)` / `set(key, value)` methods, with a subscribe/notify system for state change observation.
-
-**State Keys (flat, no prefix):**
-
-| Key                     | Type       | Default          | Description                    |
-| ----------------------- | ---------- | ---------------- | ------------------------------ |
-| `rootKey`               | `*`        | `product.rootId` | Current root frame key         |
-| `hasFocus`              | `boolean`  | `false`          | Whether the editor has focus   |
-| `tabSize`               | `number`   | `4`              | Tab character space count      |
-| `indentSize`            | `number`   | `25`             | Block indent margin (px)       |
-| `codeIndentSize`        | `number`   | `2`              | Code view indent space count   |
-| `currentNodes`          | `string[]` | `[]`             | Selection path tag names       |
-| `currentNodesMap`       | `string[]` | `[]`             | Active command/style names     |
-| `initViewportHeight`    | `number`   | `0`              | Viewport height at init        |
-| `currentViewportHeight` | `number`   | `0`              | Current visual viewport height |
-| `controlActive`         | `boolean`  | `false`          | Controller/component active    |
-| `isScrollable`          | `function` | `(fc) => ...`    | Frame content scrollability    |
-| `_lastSelectionNode`    | `?Node`    | `null`           | Last selection node (cache)    |
-| `_range`                | `?Range`   | `null`           | Cached selection range         |
-| `_mousedown`            | `boolean`  | `false`          | Mouse button pressed           |
-| `_preventBlur`          | `boolean`  | `false`          | Suppress blur handling         |
-| `_preventFocus`         | `boolean`  | `false`          | Suppress focus handling        |
-
-**Direct Properties (not in #state):**
-
-- `store.mode` - Immutable toolbar mode flags (`isClassic`, `isInline`, `isBalloon`, `isBalloonAlways`, `isSubBalloon`, `isSubBalloonAlways`)
-- `store._editorInitFinished` - Editor initialization complete flag
-
-**Usage:**
-
-```javascript
-// Read
-const rootKey = store.get('rootKey');
-const hasFocus = store.get('hasFocus');
-
-// Write (notifies subscribers)
-store.set('hasFocus', true);
-store.set('_preventBlur', false);
-
-// Subscribe
-const unsubscribe = store.subscribe('hasFocus', (newVal, oldVal) => { ... });
-unsubscribe(); // cleanup
-```
-
-### Type System
-
-**Key Type Names:**
-
-| JSDoc Type               | Meaning            | Used For                              |
-| ------------------------ | ------------------ | ------------------------------------- |
-| `SunEditor.Kernel`       | CoreKernel class   | Constructor `@param` in L3/L4 classes |
-| `SunEditor.Deps`         | `$` dependency bag | `this.$` type, event callback params  |
-| `SunEditor.Store`        | Store class        | `kernel.store`, `this.#store`         |
-| `SunEditor.Instance`     | Editor class       | Public API facade                     |
-| `SunEditor.Context`      | ContextMap         | Global context (toolbar, statusbar)   |
-| `SunEditor.FrameContext` | FrameContextMap    | Per-frame context                     |
-| `SunEditor.Options`      | BaseOptionsMap     | Shared options                        |
-| `SunEditor.FrameOptions` | FrameOptionsMap    | Per-frame options                     |
-
-**Rule:** `SunEditor.Kernel` is used ONLY for constructor parameter types. For everything else (event params, plugin `this.$`, module deps), use `SunEditor.Deps`.
-
-**Data Flow:**
-
-```
-1. Wysiwyg User Action (typing, paste, etc.):
-   User Action → EventOrchestrator → Handler → Reducer → Actions → Effects → Logic Classes
-                                                                                    ↓
-                                                                              [Plugin action]
-                                                                                    ↓
-                                                                               DOM Update
-                                                                                    ↓
-                                                                             History Push
-                                                                                    ↓
-                                                                        Trigger onChange Event
-```
-
-### EventManager vs EventOrchestrator
-
-The event system is split into two distinct classes:
-
-|              | EventManager (L2)                                                                | EventOrchestrator (L4)                                                      |
-| ------------ | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| **Location** | `config/eventManager.js`                                                         | `event/eventOrchestrator.js`                                                |
-| **Role**     | Public event registration API                                                    | Internal DOM event processing                                               |
-| **Methods**  | `addEvent`, `removeEvent`, `addGlobalEvent`, `removeGlobalEvent`, `triggerEvent` | `_addCommonEvents`, `_addFrameEvents`, `applyTagEffect`, `_callPluginEvent` |
-| **Used by**  | Plugins, modules, core logic                                                     | CoreKernel only (internal)                                                  |
-| **Extends**  | None                                                                             | KernelInjector                                                              |
-
-**EventManager** is available as `this.$.eventManager` throughout the system. **EventOrchestrator** is created by CoreKernel and manages the internal event pipeline.
-
 ---
-
-### Content Structure Design
-
-SunEditor's content is organized into **three fundamental units** with exactly **one state being mandatory** at any position:
-
-> All formatting is option-based. You can customize by defining `block`, `line`, and `component` types to match this format.
-
-#### **1. Line** (Format Line)
-
-- **Definition**: Basic text container elements that hold inline content and text
-- **Purpose**: Contains inline content, text, and inline formatting (bold, italic, etc.)
-- **Validation**: `format.isLine(element)` - checks against `formatLine` regex
-- **Default Tags**: `P`, `H[1-6]`, `LI`, `TH`, `TD`, `DETAILS`, `PRE`
-- **Subtypes**:
-    - **Normal Line** (`format.isNormalLine()`): Standard text containers - `P`, `DIV`, `H1-H6`, `LI`, `DETAILS`
-        - Line breaks: Use Enter key to create new line elements
-        - Example: `<p>Line 1</p><p>Line 2</p>`
-    - **BR Line** (`format.isBrLine()`): Line breaks use `<BR>` tags - `PRE`
-        - Line breaks: Enter creates `<BR>` within same element
-        - Example: `<pre>Line 1<br>Line 2</pre>`
-    - **Closure BR Line** (`format.isClosureBrLine()`): BR lines that cannot be exited with Enter/Backspace
-        - Used for special constrained editing contexts (e.g., table cells with BR mode)
-
-#### **2. Block** (Format Block)
-
-- **Definition**: Structural container elements that wrap lines
-- **Purpose**: Provides structural hierarchy - **blocks contain lines and components**
-- **Validation**: `format.isBlock(element)` - checks against `formatBlock` regex
-- **Default Tags**: `BLOCKQUOTE`, `OL`, `UL`, `FIGCAPTION`, `TABLE`, `THEAD`, `TBODY`, `TR`, `CAPTION`, `DETAILS`
-- **Relationship**: Blocks structurally contain lines (e.g., `<blockquote><p>quoted text</p></blockquote>`)
-- **Subtypes**:
-    - **Normal Block** (`format.isBlock()` but not closure): Standard structural containers
-        - Can be exited: Pressing Enter/Backspace at edges exits the block
-    - **Closure Block** (`format.isClosureBlock()`): Constrained blocks that trap cursor
-        - Tags: `TH`, `TD` (table cells)
-        - Cannot be exited: Enter/Backspace always stays within the block
-
-**Special Case: Lists (OL/UL/LI)**
-
-Lists are a special Block-Line combination where:
-
-- **List Container** (`OL`, `UL`): Block-level elements
-- **List Item** (`LI`): Line-level elements that can ONLY exist inside list containers
-- **Dedicated Class**: `listFormat.js` handles list-specific operations (nesting, indentation, merging)
-- **Common Checks**: `dom.check.isList()`, `dom.check.isListCell()`
-
-#### **3. Component**
-
-- **Definition**: Self-contained interactive elements (images, videos, tables, embedded content)
-- **Purpose**: Rich media and special features - **same level as line** (not contained in line)
-- **Validation**: `component.is(element)` - checks for component plugins
-- **Container**: Components **must** have `se-component` or `se-flex-component` class at the top level
-    - **Images, Videos**: `<div class="se-component"><figure><img|iframe|video></figure></div>`
-    - **Tables**: `<figure class="se-flex-component"><table>...</table></figure>`
-    - **Audio, File uploads**: `<div class="se-component se-flex-component"><figure><audio|a></figure></div>`
-- **Examples**: Images, videos, audio, tables, drawings
-
-#### **3.1. Inline Component** (Special Case)
-
-- **Definition**: Components that exist **inside** lines (exception to the component-line sibling rule)
-- **Validation**: `component.isInline(element)` - checks for `se-inline-component` class
-- **Container**: Uses `<span class="se-component se-inline-component">` wrapper
-- **Examples**: Math formulas, inline anchors
-
-**Key Design Rules:**
-
-1. **Mandatory State**: Every position must be in exactly one of: `line`, `block`, `component`, or `inline-component`
-2. **Hierarchy**: `block` → contains → `line` (structural containment)
-3. **Siblings**: **Block components** and `line` exist at the same hierarchy level
-4. **Inline Exception**: **Inline components** can exist inside a `line`
-5. **Block Wrapping**: Blocks provide structure by wrapping multiple lines
-
-**Example Structure:**
-
-```html
-<div class="se-wrapper-wysiwyg">
-	<p>
-		Line 1: text with <span class="se-component se-inline-component"><katex>E=mc^2</katex></span> formula
-	</p>
-	<blockquote>
-		<p>Line 2: quoted text</p>
-	</blockquote>
-	<div class="se-component">
-		<figure><img src="..." /></figure>
-	</div>
-	<ul>
-		<li>Line 3: list item</li>
-		<li>Line 4: list item</li>
-	</ul>
-</div>
-```
-
-#### Content Filtering: strictMode
-
-The `strictMode` option controls how strictly SunEditor validates and cleans HTML content.
-
-**Configuration:**
-
-```javascript
-SUNEDITOR.create('editor', {
-	// Enable all filters (default)
-	strictMode: true,
-
-	// Granular control
-	strictMode: {
-		tagFilter: true,
-		formatFilter: true,
-		classFilter: true,
-		textStyleTagFilter: true,
-		attrFilter: true,
-		styleFilter: true,
-	},
-});
-```
-
-| Filter                   | Purpose                                         | When Disabled                    |
-| ------------------------ | ----------------------------------------------- | -------------------------------- |
-| **`tagFilter`**          | Removes disallowed HTML tags                    | Allows any tags (security risk)  |
-| **`formatFilter`**       | Enforces line/block/component structure         | Components may not wrap properly |
-| **`classFilter`**        | Validates CSS classes                           | Allows any CSS classes           |
-| **`textStyleTagFilter`** | Converts `<B>`, `<I>`, `<U>` to styled `<SPAN>` | Keeps original tags              |
-| **`attrFilter`**         | Filters attributes                              | Allows any attributes (XSS risk) |
-| **`styleFilter`**        | Filters inline styles                           | Allows any inline styles         |
-
-### Multi-Root Architecture
-
-SunEditor uses a unified frame architecture for both single and multi-root editing.
-
-**Data Storage Structure:**
-
-```
-editor
-├── $.frameRoots (Map<rootKey, FrameContext>)  ← Actual data storage
-│   ├── null → FrameContext              [Single-root: rootKey is null]
-│   ├── rootKey1 → FrameContext1         [Multi-root]
-│   └── rootKey2 → FrameContext2
-│
-├── $.context (ContextMap)               ← Global shared UI
-├── $.frameContext (FrameContextMap)      ← Current frame pointer
-├── $.frameOptions (FrameOptionsMap)     ← Current frame options pointer
-└── $.options (BaseOptionsMap)           ← Shared config
-```
-
-**Key Concepts:**
-
-1. **Unified Structure**: Single-root (`store.get('rootKey') === null`) and multi-root use the same architecture
-2. **frameRoots Map**: Actual storage of all frame contexts
-3. **Global Context** (`$.context`): Shared UI elements (toolbar, statusbar, modal overlay)
-4. **Current Frame References**: `$.frameContext` and `$.frameOptions` are pointers, updated by `changeFrameContext(rootKey)`
-5. **Frame switching**: `editor.changeFrameContext(rootKey)` updates `store.rootKey` and resets pointers
 
 ### Plugin System (`src/plugins/`)
 
@@ -598,16 +209,16 @@ KernelInjector → Base → PluginCommand/PluginModal/PluginDropdown/...
 
 **Plugin Type Base Classes:**
 
-| Base Class               | Type            | Required Methods    | Examples                    |
-| ------------------------ | --------------- | ------------------- | --------------------------- |
-| **`PluginCommand`**      | `command`       | `action()`          | blockquote, list, exportPDF |
-| **`PluginDropdown`**     | `dropdown`      | `action()`          | align, font, blockStyle     |
-| **`PluginDropdownFree`** | `dropdown-free` | (none)              | table                       |
-| **`PluginModal`**        | `modal`         | `open()`            | image, video, link, math    |
-| **`PluginBrowser`**      | `browser`       | `open()`, `close()` | imageGallery, videoGallery  |
-| **`PluginField`**        | `field`         | (none)              | mention                     |
-| **`PluginInput`**        | `input`         | (none)              | fontSize, pageNavigator     |
-| **`PluginPopup`**        | `popup`         | `show()`            | anchor                      |
+| Base Class               | Type            | Required Methods    | Examples                                              |
+| ------------------------ | --------------- | ------------------- | ----------------------------------------------------- |
+| **`PluginCommand`**      | `command`       | `action()`          | blockquote, list_bulleted, list_numbered, exportPDF   |
+| **`PluginDropdown`**     | `dropdown`      | `action()`          | align, font, fontColor, blockStyle, lineHeight        |
+| **`PluginDropdownFree`** | `dropdown-free` | (none)              | table, fontColor, backgroundColor                     |
+| **`PluginModal`**        | `modal`         | `open()`            | image, video, link, math, audio, drawing, embed       |
+| **`PluginBrowser`**      | `browser`       | `open()`, `close()` | imageGallery, videoGallery, audioGallery, fileGallery |
+| **`PluginField`**        | `field`         | (none)              | mention                                               |
+| **`PluginInput`**        | `input`         | (none)              | fontSize, pageNavigator                               |
+| **`PluginPopup`**        | `popup`         | `show()`            | anchor                                                |
 
 **Plugin Access Pattern:**
 
@@ -636,12 +247,60 @@ class MyPlugin extends PluginModal {
 }
 ```
 
+**Multi-Interface Pattern (TypeScript):**
+
+A single plugin can implement multiple interfaces — combining a base plugin type with module contracts and component hooks. In TypeScript, use `implements` to compose these:
+
+```typescript
+import { interfaces } from 'suneditor';
+import type { SunEditor } from 'suneditor/types';
+
+class MyPlugin extends interfaces.PluginModal
+	implements interfaces.ModuleModal, interfaces.EditorComponent
+{
+	static key = 'myPlugin';
+
+	_element: HTMLElement | null = null;
+
+	constructor(kernel: SunEditor.Kernel) {
+		super(kernel);
+	}
+
+	// PluginModal base
+	open(target?: HTMLElement) { ... }
+
+	// ModuleModal interface
+	async modalAction() { return true; }
+	modalOff(isUpdate: boolean) { ... }
+
+	// EditorComponent interface
+	static component(node: Node) {
+		return /^IMG$/i.test(node?.nodeName) ? node : null;
+	}
+	componentSelect(target: HTMLElement) { ... }
+}
+```
+
+**Available Contracts and Base Types (`interfaces.*`):**
+
+| Type                    | Purpose               | Key Methods                                |
+| ----------------------- | --------------------- | ------------------------------------------ |
+| **`ModuleModal`**       | Modal dialog behavior | `modalAction()`, `modalOn()`, `modalOff()` |
+| **`ModuleController`**  | Floating controller   | `controllerAction()`, `controllerOn()`     |
+| **`ModuleColorPicker`** | Color picker behavior | `colorPickerAction()`                      |
+| **`ModuleHueSlider`**   | Hue slider behavior   | `hueSliderAction()`                        |
+| **`ModuleBrowser`**     | Gallery browser       | `browserInit()`                            |
+| **`EditorComponent`**   | Component lifecycle   | `componentSelect()`, `componentDestroy()`  |
+| **`PluginDropdown`**    | Plugin base class     | `on()`, `action()`                         |
+
+Contracts can be combined with a base plugin class via `implements`.
+
 **Available via `this.$`:**
 
 - **Config**: `options`, `frameOptions`, `context`, `frameContext`, `frameRoots`, `lang`, `icons`
 - **DOM Logic**: `selection`, `html`, `format`, `inline`, `listFormat`, `nodeTransform`, `char`, `offset`
 - **Shell Logic**: `component`, `focusManager`, `pluginManager`, `plugins`, `ui`, `commandDispatcher`, `history`, `shortcuts`
-- **Panel Logic**: `toolbar`, `subToolbar`, `menu`, `viewer`
+- **Panel Logic**: `toolbar`, `subToolbar` (second `Toolbar` instance, only with `_subMode`), `menu`, `viewer`
 - **Services**: `eventManager`, `contextProvider`, `optionProvider`, `instanceCheck`, `store`
 - **Environment**: `facade` (editor instance)
 
@@ -756,26 +415,27 @@ These hooks from `src/hooks/base.js` can be implemented by **any plugin type**.
 
 ###### Event Hooks
 
-All event hooks have an **async variant** with the same name suffixed by `Async` (e.g., `onKeyDownAsync`). Async variants receive the same parameters and follow the same return value rules.
+Event hooks are dispatched by the runtime using the `on*` names below (`onKeyDown`, `onInput`, ...).  
+If asynchronous behavior is needed, implement the same hook as `async` (e.g., `async onKeyDown(params) { ... }`).
 
 > **Interruptible**: Returning a boolean stops the event hook loop and controls default behavior.
 
-| Hook                 | When Called          | Interruptible | Return            |
-| -------------------- | -------------------- | ------------- | ----------------- |
-| `onKeyDown`          | Key down in editor   | Yes           | `boolean \| void` |
-| `onKeyUp`            | Key up in editor     | Yes           | `boolean \| void` |
-| `onMouseDown`        | Mouse down in editor | Yes           | `boolean \| void` |
-| `onClick`            | Click in editor      | Yes           | `boolean \| void` |
-| `onPaste`            | Paste event          | Yes           | `boolean \| void` |
-| `onBeforeInput`      | Before input event   | No            | `void`            |
-| `onInput`            | Editor content input | No            | `void`            |
-| `onMouseUp`          | Mouse up in editor   | No            | `void`            |
-| `onMouseLeave`       | Mouse leave editor   | No            | `void`            |
-| `onMouseMove`        | Mouse move in editor | No            | `void`            |
-| `onScroll`           | Editor scroll        | No            | `void`            |
-| `onFocus`            | Editor focus         | No            | `void`            |
-| `onBlur`             | Editor blur          | No            | `void`            |
-| `onFilePasteAndDrop` | File paste/drop      | No            | `void`            |
+| Hook                 | When Called          | Interruptible | Return                                        |
+| -------------------- | -------------------- | ------------- | --------------------------------------------- |
+| `onKeyDown`          | Key down in editor   | Yes           | `boolean \| void \| Promise<boolean \| void>` |
+| `onKeyUp`            | Key up in editor     | Yes           | `boolean \| void \| Promise<boolean \| void>` |
+| `onMouseDown`        | Mouse down in editor | Yes           | `boolean \| void \| Promise<boolean \| void>` |
+| `onClick`            | Click in editor      | Yes           | `boolean \| void \| Promise<boolean \| void>` |
+| `onPaste`            | Paste event          | Yes           | `boolean \| void \| Promise<boolean \| void>` |
+| `onBeforeInput`      | Before input event   | No            | `void \| Promise<void>`                       |
+| `onInput`            | Editor content input | No            | `void \| Promise<void>`                       |
+| `onMouseUp`          | Mouse up in editor   | No            | `void \| Promise<void>`                       |
+| `onMouseLeave`       | Mouse leave editor   | No            | `void \| Promise<void>`                       |
+| `onMouseMove`        | Mouse move in editor | No            | `void \| Promise<void>`                       |
+| `onScroll`           | Editor scroll        | No            | `void \| Promise<void>`                       |
+| `onFocus`            | Editor focus         | No            | `void \| Promise<void>`                       |
+| `onBlur`             | Editor blur          | No            | `void \| Promise<void>`                       |
+| `onFilePasteAndDrop` | File paste/drop      | No            | `void \| Promise<void>`                       |
 
 **Interruptible Event Return Values:**
 
@@ -842,7 +502,7 @@ Many hook methods receive standardized parameter objects defined in [`src/hooks/
 | **`HueSlider`**         | `contract/` | HSL color wheel      | `new HueSlider(inst, $, ...)`      |
 | **`Browser`**           | `contract/` | Gallery UI           | `new Browser(inst, $, ...)`        |
 | **`FileManager`**       | `manager/`  | File uploads         | Instance + async                   |
-| **`ApiManager`**        | `manager/`  | XHR requests         | Static only                        |
+| **`ApiManager`**        | `manager/`  | XHR requests         | `new ApiManager(inst, $, ...)`     |
 | **`SelectMenu`**        | `ui/`       | Custom dropdowns     | Instance + items                   |
 | **`ModalAnchorEditor`** | `ui/`       | Link form            | Instance + form                    |
 | **`_DragHandle`**       | `ui/`       | Drag state           | Map (not class)                    |
@@ -926,7 +586,7 @@ npm run build:prod      # Build for production (minified)
 npm test                # Run Jest unit tests (silent mode)
 npm run test:watch      # Run Jest in watch mode
 npm run test:coverage   # Run tests with coverage report
-npm run test:e2e        # Run Playwright E2E tests (requires dev server)
+npm run test:e2e        # Run Playwright E2E tests (webServer starts/reuses localhost:8088)
 npm run test:e2e:ui     # Run E2E tests with Playwright UI
 npm run test:e2e:headed # Run E2E tests in headed mode
 npm run test:all        # Run all tests (Jest + Playwright)
@@ -1008,7 +668,7 @@ npm run check:inject    # Inject plugin JSDoc types into options.js
 ## Plugin Registration Flow
 
 ```
-options.plugins: [ImagePlugin, VideoPlugin, ...]
+options.plugins: [ImagePlugin, VideoPlugin, ...]  // or { image: ImagePlugin, video: VideoPlugin, ... }
          ↓
 Constructor.js: stores as class references in product.plugins
          ↓
@@ -1074,7 +734,11 @@ plugins: [new MyPlugin()];
 
 - `src/core/event/handlers/handler_ww_key.js` - Wysiwyg keyboard handlers
 - `src/core/event/reducers/keydown.reducer.js` - Keydown event analysis
+- `src/core/event/rules/keydown.rule.enter.js` - Enter key rule logic
+- `src/core/event/actions/index.js` - Action type definitions and creators
+- `src/core/event/executor.js` - Action dispatcher
 - `src/core/event/effects/keydown.registry.js` - Keydown effect handlers
+- `src/core/event/effects/common.registry.js` - Common effect handlers
 
 **Example Event Flow (Enter Key):**
 
@@ -1085,13 +749,17 @@ plugins: [new MyPlugin()];
    ↓
 3. keydown.reducer.js analyzes the event with current editor state
    ↓
-4. Returns action list: [{t: 'enter.line.addDefault', p: {...}}, {t: 'history.push', p: {...}}]
+4. Reducer delegates to keydown.rule.enter.js for Enter-specific logic
    ↓
-5. Effects from keydown.registry.js execute:
+5. Returns action list: [{t: 'enter.line.addDefault', p: {...}}, {t: 'history.push', p: {...}}]
+   ↓
+6. executor.js dispatches actions through effect registries (common + keydown)
+   ↓
+7. Effects execute:
    - 'enter.line.addDefault' → calls format.addLine()
    - 'history.push' → calls history.push()
    ↓
-6. DOM updated, selection adjusted, onChange event triggered
+8. DOM updated, selection adjusted, onChange event triggered
 ```
 
 ---
@@ -1118,15 +786,15 @@ plugins: [new MyPlugin()];
 
 ## Initialization: `onload` Event
 
-Editor initialization completes **asynchronously**. Always use `onload` for post-init operations:
+Editor initialization completes **asynchronously**. Use `onload` for operations that depend on fully initialized UI/state:
 
 ```javascript
 // Wrong - may fail
-const editor = SUNEDITOR.create('editor');
+const editor = SUNEDITOR.create('#editor');
 editor.focusManager.focus();
 
 // Correct
-SUNEDITOR.create('editor', {
+SUNEDITOR.create('#editor', {
 	events: {
 		onload: ({ $ }) => {
 			$.focusManager.focus();
@@ -1145,7 +813,7 @@ SUNEDITOR.create('editor', {
 SunEditor supports **DIV mode** (default) and **iframe mode** (`iframe: true`).
 
 ```javascript
-SUNEDITOR.create('editor', {
+SUNEDITOR.create('#editor', {
 	iframe: true,
 	iframe_attributes: {
 		sandbox: 'allow-downloads', // allow-same-origin is auto-added
@@ -1160,7 +828,7 @@ SUNEDITOR.create('editor', {
 ## Build System
 
 - **Webpack** for bundling (config in `webpack/`)
-- **Babel** for transpilation to ES2022 baseline
+- **Babel** (`@babel/preset-env`) with Browserslist targets
 - **ESLint** with Prettier for code quality
 - **Output**: `dist/suneditor.min.js` and `dist/suneditor.min.css`
 
