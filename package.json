@@ -62,8 +62,9 @@
 		"test:e2e:ui": "playwright test --ui",
 		"test:e2e:headed": "playwright test --headed",
 		"test:all": "jest --silent && playwright test",
-		"check": "npm run check:arch && npm run check:inject && npm run check:langs",
+		"check": "npm run check:arch && npm run check:exports && npm run check:inject && npm run check:langs",
 		"check:arch": "dependency-cruiser --config .dependency-cruiser.js src",
+		"check:exports": "node scripts/check/check-exports-sync.cjs",
 		"check:inject": "node scripts/check/gen-button-types.cjs && node scripts/check/inject-plugin-jsdoc.cjs",
 		"check:langs": "cross-env GOOGLE_APPLICATION_CREDENTIALS=./.env/google-api-service-account.json node scripts/check/langs-sync.cjs --auto-translate && npx eslint \"src/langs/*.js\" --fix && npx eslint \"types/langs/_Lang.d.ts\" --fix",
 		"update-browserslist": "npx browserslist@latest --update-db"

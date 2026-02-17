@@ -40,7 +40,7 @@ It's easy to integrate, highly customizable, and built for modern web applicatio
 
 SunEditor is optimized for **structured content** (articles, documentation, emails) rather than arbitrary HTML editing. Content is validated and auto-corrected to maintain consistency.
 
-> For raw HTML editing needs, see [`strictMode` configuration](./GUIDE.md#design-philosophy-structured-content) in the Developer Guide.
+> For raw HTML editing needs, see [`strictMode` configuration](./ARCHITECTURE.md#content-filtering-strictmode) in the Architecture Guide.
 
 🌤 **[Try all plugins in Playground](https://suneditor.com/playground)**
 
@@ -159,7 +159,7 @@ suneditor.create('#editor', {
 📘 [Learn how to build your own plugin →](https://suneditor.com/plugin-guide)
 
 🤖 Want to build plugins? Get real-time help from [SunEditor Devs AI](https://chatgpt.com/g/g-JViNPCrkD-suneditor-devs).\
-See [Contribution Guide](./CONTRIBUTING.md#ai-plugin-helper) for tips and examples.
+See [Contribution Guide](./CONTRIBUTING.md#-ai-plugin-helper) for tips and examples.
 
 ---
 
@@ -179,4 +179,4 @@ See [Contribution Guide](./CONTRIBUTING.md#ai-plugin-helper) for tips and exampl
 
 ## 📄 License
 
-SunEditor is an open-source project available under the [MIT License](./LICENSE).
+SunEditor is an open-source project available under the [MIT License](./LICENSE.txt).

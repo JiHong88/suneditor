@@ -7,7 +7,6 @@ import '../src/assets/suneditor-contents.css';
 
 import suneditor from '../src/suneditor';
 import plugins from '../src/plugins';
-import editorInjector from '../src/editorInjector';
 import * as moduleContract from '../src/modules/contract';
 import * as moduleManager from '../src/modules/manager';
 import * as moduleUI from '../src/modules/ui';
@@ -27,7 +26,6 @@ Object.defineProperty(window, 'SUNEDITOR', {
 	value: {
 		...suneditor, // create(), init()
 		plugins,
-		editorInjector,
 		modules,
 		helper,
 		interfaces,

@@ -21,8 +21,6 @@ jest.mock('../../../src/modules/manager/ApiManager.js', () => {
     });
 });
 
-// Note: editorInjector/_core.js was removed in refactoring. Use createMockEditor() instead.
-
 jest.mock('../../../src/helper', () => ({
     dom: {
         check: {

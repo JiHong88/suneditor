@@ -144,7 +144,7 @@ suneditor/
 
 **Development Environment:**
 
-- **Node.js**: 14+
+- **Node.js**: **v22** recommended, minimum v14+
 - **Build tools**: Webpack 5, Babel, ESLint, Prettier
 
 **Type System:**

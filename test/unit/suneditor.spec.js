@@ -1,4 +1,4 @@
-import suneditor, { editorInjector, plugins, modules, langs, helper } from '../../src/suneditor';
+import suneditor from '../../src/suneditor';
 
 // Mock Editor constructor
 jest.mock('../../src/core/editor', () => {

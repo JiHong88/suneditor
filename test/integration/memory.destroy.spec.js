@@ -4,8 +4,6 @@
  */
 
 import { createTestEditor, destroyTestEditor, waitForEditorReady } from '../__mocks__/editorIntegration';
-// NOTE: _getClassInjectorKeys function does not exist - tests that rely on it are skipped
-// import { _getClassInjectorKeys } from '../../src/editorInjector/_classes';
 
 describe('Editor destroy() memory management', () => {
 	let container;

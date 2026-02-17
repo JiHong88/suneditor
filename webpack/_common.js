@@ -4,19 +4,19 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 module.exports = {
 	// plugins: [new BundleAnalyzerPlugin()],
 	performance: {
-		maxAssetSize: 716800, // (700 * 1024 = 716800)
-		maxEntrypointSize: 819200 // (800 * 1024 = 819200)
+		maxAssetSize: 768000, // (750 * 1024 = 768000)
+		maxEntrypointSize: 921600, // (900 * 1024 = 921600)
 	},
 	module: {
 		rules: [
 			{
 				test: /\.js$/,
 				loader: 'babel-loader',
-				exclude: ['/node_modules']
+				exclude: ['/node_modules'],
 			},
 			{
 				test: /\.css$/,
-				use: [MiniCssExtractPlugin.loader, 'css-loader']
+				use: [MiniCssExtractPlugin.loader, 'css-loader'],
 			},
 			{
 				test: /\.(jpg|gif|png|ico)$/,
@@ -26,10 +26,10 @@ module.exports = {
 						options: {
 							publicPath: '../',
 							name: 'img/[hash].[ext]',
-							limit: 10000
-						}
-					}
-				]
+							limit: 10000,
+						},
+					},
+				],
 			},
 			{
 				test: /\.(eot|svg|ttf|woff|woff2)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
@@ -40,11 +40,11 @@ module.exports = {
 							publicPath: '../',
 							name: 'fonts/[hash].[ext]',
 							limit: 5000,
-							mimetype: 'application/font-woff'
-						}
-					}
-				]
-			}
-		]
-	}
+							mimetype: 'application/font-woff',
+						},
+					},
+				],
+			},
+		],
+	},
 };

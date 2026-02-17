@@ -9,6 +9,7 @@ SunEditor의 빌드 및 검증 자동화 스크립트 가이드입니다.
 ```
 scripts/
 ├── check/              # 코드 검증 및 동기화 스크립트
+│   ├── check-exports-sync.cjs
 │   ├── inject-plugin-jsdoc.cjs
 │   └── langs-sync.cjs
 ├── ts-build/           # TypeScript 타입 정의 빌드 스크립트
@@ -27,6 +28,26 @@ scripts/
 ---
 
 ## 🔍 check/ - 코드 검증 스크립트
+
+### check-exports-sync.cjs
+
+3개의 내보내기 파일 동기화를 검증하는 스크립트입니다.
+
+**실행**: `npm run check:exports`
+
+**기능**:
+
+- `src/suneditor.js`를 기준(source of truth)으로 `webpack/cdn-builder.js`, `scripts/ts-build/format-index.cjs`의 export 동기화 검증
+- 누락된 export 또는 불필요한 extra export 탐지
+- `cdn-builder.js`에서 `langs` 제외는 의도적 (CDN 크기 최적화)
+
+**사용 시점**:
+
+- 새 모듈 export 추가/제거 시
+- `suneditor.js`, `cdn-builder.js`, `format-index.cjs` 중 하나를 수정한 후
+- `npm run check` 실행 시 자동으로 포함됨
+
+---
 
 ### inject-plugin-jsdoc.cjs
 
@@ -282,8 +303,9 @@ TypeScript 빌드 파이프라인 전체 흐름 상세 설명입니다.
 ```bash
 npm run ts-build        # TypeScript 타입 정의 빌드
 npm run check:inject    # 플러그인 옵션 타입 주입
+npm run check:exports   # 3대 내보내기 파일 동기화 검증
 npm run check:langs     # 언어 파일 동기화 (Google API 필요)
-npm run check           # check:inject + check:arch 실행
+npm run check           # check:arch + check:exports + check:inject + check:langs 실행
 ```
 
 ### 타입 검증

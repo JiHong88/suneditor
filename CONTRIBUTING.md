@@ -109,14 +109,15 @@ Check out **[SunEditor Devs AI](https://chatgpt.com/g/g-JViNPCrkD-suneditor-devs
 
 ## 🗂️ Architecture Guide
 
-For detailed architecture documentation, see **[GUIDE.md](./GUIDE.md)**.
+- **[ARCHITECTURE.md](./ARCHITECTURE.md)** — Internal engineering deep dive (CoreKernel, Store, Content Model, Event System, Multi-Root)
+- **[GUIDE.md](./GUIDE.md)** — Developer reference (Plugin System, Modules, Commands, Testing)
 
 Key sections:
 
-- [Overall Architecture](./GUIDE.md#overall-architecture)
+- [Architecture Overview](./GUIDE.md#architecture)
 - [Plugin System](./GUIDE.md#plugin-system-srcplugins)
-- [Core Components](./GUIDE.md#core-components-srccore)
-- [Common Development Patterns](./GUIDE.md#common-development-patterns)
+- [Modules](./GUIDE.md#modules-srcmodules)
+- [Common Pitfalls](./GUIDE.md#common-pitfalls)
 - [Testing Strategy](./GUIDE.md#testing-strategy)
 
 ---

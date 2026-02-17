@@ -9,8 +9,9 @@ import * as moduleContract from './modules/contract';
 import * as moduleManager from './modules/manager';
 import * as moduleUI from './modules/ui';
 import helper from './helper';
-import langs from './langs';
 import * as interfaces from './interfaces';
+
+import langs from './langs';
 
 const modules = {
 	contract: moduleContract,
