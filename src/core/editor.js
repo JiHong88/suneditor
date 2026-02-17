@@ -213,8 +213,8 @@ class Editor {
 	 */
 	#init(options) {
 		this.$.pluginManager.init(options);
-		this.$.commandDispatcher._initCommandButtons();
 		this.$.shortcuts._registerCustomShortcuts();
+		this.$.commandDispatcher._initCommandButtons();
 		this.$.ui.init();
 	}
 

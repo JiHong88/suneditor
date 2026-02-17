@@ -233,10 +233,9 @@ class Toolbar {
 	 * @description Reset the common buttons info.
 	 */
 	#resetButtonInfo() {
+		this.#$.shortcuts._registerCustomShortcuts();
 		this.#$.commandDispatcher.resetTargets();
 		this.#$.ui._initToggleButtons();
-
-		this.#$.shortcuts._registerCustomShortcuts();
 
 		this.#$.history.resetButtons(this.#frameContext.get('key'), null);
 		this._resetSticky();
