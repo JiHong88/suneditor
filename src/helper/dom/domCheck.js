@@ -4,6 +4,8 @@
 
 import { onlyZeroWidthRegExp } from '../unicode';
 
+const _RE_EXCLUDE_FORMAT = /(\s|^)(katex|MathJax|se-exclude-format)(\s|$)/;
+
 /**
  * @description A method that checks If the text is blank or to see if it contains 'ZERO WIDTH SPACE' or empty (unicode.zeroWidthSpace)
  * @param {string|Node} text String value or Node
@@ -277,7 +279,7 @@ export function isSameAttributes(a, b) {
  * @returns {node is HTMLElement}
  */
 export function isExcludeFormat(node) {
-	return /(\s|^)(katex|MathJax|se-exclude-format)(\s|$)/.test(/** @type {HTMLElement} */ (node)?.className);
+	return _RE_EXCLUDE_FORMAT.test(/** @type {HTMLElement} */ (node)?.className);
 }
 
 /**

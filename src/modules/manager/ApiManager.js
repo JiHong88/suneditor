@@ -140,7 +140,12 @@ class ApiManager {
 	 * @description Cancel API (xhr.abort())
 	 */
 	cancel() {
-		if (this.#xhr) this.#xhr.abort();
+		if (this.#xhr) {
+			this.#xhr.onreadystatechange = null;
+			this.#xhr.onload = null;
+			this.#xhr.onerror = null;
+			this.#xhr.abort();
+		}
 	}
 
 	/**

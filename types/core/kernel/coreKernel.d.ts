@@ -208,6 +208,7 @@ declare class CoreKernel {
 	/**
 	 * @description Destroy the kernel and release all resources.
 	 * Teardown order (reverse of init): plugins -> logic -> event -> config -> store
+	 * Uses error aggregation to ensure all modules are cleaned up even if some fail.
 	 */
 	_destroy(): void;
 	facade: any;

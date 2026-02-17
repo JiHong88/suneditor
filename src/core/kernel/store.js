@@ -147,8 +147,16 @@ class Store {
 	 * @param {*} oldValue
 	 */
 	#notify(path, newValue, oldValue) {
-		// Notify exact match subscribers
-		this.#subscribers.get(path)?.forEach((/** @type {Function} */ cb) => cb(newValue, oldValue));
+		const subscribers = this.#subscribers.get(path);
+		if (!subscribers) return;
+
+		for (const cb of subscribers) {
+			try {
+				cb(newValue, oldValue);
+			} catch (e) {
+				console.error(`[Store] Subscriber error for "${path}":`, e);
+			}
+		}
 	}
 
 	// Internal API

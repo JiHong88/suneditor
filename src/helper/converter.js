@@ -1,5 +1,12 @@
 import { _d, _w } from './env';
 
+const _RE_HTML_CHARS = /&|\u00A0|'|"|<|>/g;
+const _RE_HTML_ENTITIES = /&amp;|&nbsp;|&apos;|&quot;|&lt;|&gt;/g;
+const _HTML_TO_ENTITY = { '&': '&amp;', '\u00A0': '&nbsp;', "'": '&apos;', '"': '&quot;', '<': '&lt;', '>': '&gt;' };
+const _ENTITY_TO_HTML = { '&amp;': '&', '&nbsp;': '\u00A0', '&apos;': "'", '&quot;': '"', '&lt;': '<', '&gt;': '>' };
+const _RE_UPPER_CASE = /[A-Z]/g;
+const _RE_KEBAB_CHAR = /-[a-zA-Z]/g;
+
 const FONT_VALUES_MAP = {
 	'xx-small': 0.5625,
 	'x-small': 0.625,
@@ -98,16 +105,8 @@ export function jsonToHtml(jsonData) {
  * @returns {string} Content string
  */
 export function htmlToEntity(content) {
-	const ec = {
-		'&': '&amp;',
-		'\u00A0': '&nbsp;',
-		"'": '&apos;',
-		'"': '&quot;',
-		'<': '&lt;',
-		'>': '&gt;',
-	};
-	return content.replace(/&|\u00A0|'|"|<|>/g, (m) => {
-		return typeof ec[m] === 'string' ? ec[m] : m;
+	return content.replace(_RE_HTML_CHARS, (m) => {
+		return _HTML_TO_ENTITY[m] || m;
 	});
 }
 
@@ -117,16 +116,8 @@ export function htmlToEntity(content) {
  * @returns {string}
  */
 export function entityToHTML(content) {
-	const ec = {
-		'&amp;': '&',
-		'&nbsp;': '\u00A0',
-		'&apos;': "'",
-		'&quot;': '"',
-		'&lt;': '<',
-		'&gt;': '>',
-	};
-	return content.replace(/&amp;|&nbsp;|&apos;|&quot;|&lt;|&gt;/g, (m) => {
-		return typeof ec[m] === 'string' ? ec[m] : m;
+	return content.replace(_RE_HTML_ENTITIES, (m) => {
+		return _ENTITY_TO_HTML[m] || m;
 	});
 }
 
@@ -207,7 +198,7 @@ export function getValues(obj) {
  */
 export function camelToKebabCase(param) {
 	if (typeof param === 'string') {
-		return param.replace(/[A-Z]/g, (letter) => '-' + letter.toLowerCase());
+		return param.replace(_RE_UPPER_CASE, (letter) => '-' + letter.toLowerCase());
 	} else {
 		return param.map(function (str) {
 			return camelToKebabCase(str);
@@ -227,7 +218,7 @@ export function camelToKebabCase(param) {
  */
 export function kebabToCamelCase(param) {
 	if (typeof param === 'string') {
-		return param.replace(/-[a-zA-Z]/g, (letter) => letter.replace('-', '').toUpperCase());
+		return param.replace(_RE_KEBAB_CHAR, (letter) => letter.replace('-', '').toUpperCase());
 	} else {
 		return param.map(function (str) {
 			return kebabToCamelCase(str);

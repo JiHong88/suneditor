@@ -45,10 +45,17 @@ class EventManager {
 		this.triggerEvent = async (eventName, eventData) => {
 			// [iframe] wysiwyg is disabled, the event is not called.
 			if (dom.check.isNonEditable(eventData?.frameContext?.get('wysiwyg'))) return false;
+
 			const eventHandler = this.events[eventName];
 			if (typeof eventHandler === 'function') {
-				return await eventHandler({ $: this.#$, ...eventData });
+				try {
+					return await eventHandler({ $: this.#$, ...eventData });
+				} catch (error) {
+					console.error(`[SUNEDITOR.triggerEvent.${eventName}]`, error);
+					return false;
+				}
 			}
+
 			return NO_EVENT;
 		};
 

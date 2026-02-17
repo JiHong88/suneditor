@@ -1,5 +1,6 @@
 import { _d, _w } from '../env';
 import { isImportantDisabled } from './domCheck';
+import { htmlToEntity } from '../converter';
 
 // ----- iframe-safe type check [START] -----
 /**
@@ -104,7 +105,7 @@ export function getAttributesToString(element, exceptAttrs) {
 	let attrString = '';
 	for (let i = 0, len = attrs.length; i < len; i++) {
 		if (exceptAttrs?.includes(attrs[i].name)) continue;
-		attrString += attrs[i].name + '="' + attrs[i].value + '" ';
+		attrString += attrs[i].name + '="' + htmlToEntity(attrs[i].value) + '" ';
 	}
 
 	return attrString;
@@ -347,8 +348,7 @@ export function setDisabled(buttonList, disabled, important) {
  */
 export function hasClass(element, className) {
 	if (!element || element.nodeType !== 1) return;
-	const valid = new RegExp(`(\\s|^)${className}(\\s|$)`);
-	return valid.test(/** @type {HTMLElement} */ (element).className);
+	return /** @type {HTMLElement} */ (element).classList.contains(className);
 }
 
 /**

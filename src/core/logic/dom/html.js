@@ -295,6 +295,9 @@ class HTML {
 
 			const attrs = JSON.parse(iframePlaceholders[i].getAttribute('data-se-iframe-holder-attrs'));
 			for (const [key, value] of Object.entries(attrs)) {
+				// Block event handler attributes and validate src protocol
+				if (/^on/i.test(key)) continue;
+				if (key === 'src' && !_SAFE_URL_PROTOCOL.test(String(value).replace(/[\s\r\n\t]+/g, ''))) continue;
 				iframe.setAttribute(key, value);
 			}
 
@@ -1743,11 +1746,11 @@ class HTML {
 	 * @returns {Array} The updated list of allowed attributes including cleaned styles.
 	 */
 	#cleanStyle(m, v, name) {
-		let sv = (m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/) || [])[0];
-		if (this.#textStyleTags.includes(name) && !sv && (m.match(/<[^\s]+\s(.+)/) || [])[1]) {
-			const size = (m.match(/\ssize="([^"]+)"/i) || [])[1];
-			const face = (m.match(/\sface="([^"]+)"/i) || [])[1];
-			const color = (m.match(/\scolor="([^"]+)"/i) || [])[1];
+		let sv = (m.match(_RE_STYLE_ATTR) || [])[0];
+		if (this.#textStyleTags.includes(name) && !sv && (m.match(_RE_TAG_ATTRS) || [])[1]) {
+			const size = (m.match(_RE_SIZE_ATTR) || [])[1];
+			const face = (m.match(_RE_FACE_ATTR) || [])[1];
+			const color = (m.match(_RE_COLOR_ATTR) || [])[1];
 			if (size || face || color) {
 				sv = 'style="' + (size ? 'font-size:' + numbers.get(Number(size) / 3.333, 1) + 'rem;' : '') + (face ? 'font-family:' + face + ';' : '') + (color ? 'color:' + color + ';' : '') + '"';
 			}
@@ -1765,15 +1768,15 @@ class HTML {
 			}
 			if (!mv) return v;
 
-			const style = sv.replace(/&quot;/g, '').match(mv);
+			const style = sv.replace(_RE_AMP_QUOT, '').match(mv);
 			if (!style) return v;
 
 			const allowedStyle = [];
 			for (let i = 0, len = style.length, r; i < len; i++) {
-				r = style[i].match(/([a-zA-Z0-9-]+)(:)([^"']+)/);
-				if (r && !/inherit|initial|revert|unset/i.test(r[3])) {
+				r = style[i].match(_RE_CSS_PROP);
+				if (r && !_RE_CSS_GLOBAL.test(r[3])) {
 					const k = converter.kebabToCamelCase(r[1].trim());
-					const cs = this.#frameContext.get('wwComputedStyle')[k]?.replace(/"/g, '');
+					const cs = this.#frameContext.get('wwComputedStyle')[k]?.replace(_RE_DQUOTE, '');
 					const c = r[3].trim();
 					switch (k) {
 						case 'fontFamily':
@@ -1782,14 +1785,14 @@ class HTML {
 						case 'fontSize':
 							if (!this.#$.plugins.fontSize) continue;
 							if (!this.#fontSizeUnitRegExp.test(r[0])) {
-								r[0] = r[0].replace((r[0].match(/:\s*([^;]+)/) || [])[1], converter.toFontUnit.bind(null, this.#options.get('fontSizeUnits')[0]));
+								r[0] = r[0].replace((r[0].match(_RE_CSS_VALUE) || [])[1], converter.toFontUnit.bind(null, this.#options.get('fontSizeUnits')[0]));
 							}
 							break;
 						case 'color':
-							if (!this.#$.plugins.fontColor || /rgba\(([0-9]+\s*,\s*){3}0\)|windowtext/i.test(c)) continue;
+							if (!this.#$.plugins.fontColor || _RE_TRANSPARENT_COLOR.test(c)) continue;
 							break;
 						case 'backgroundColor':
-							if (!this.#$.plugins.backgroundColor || /rgba\(([0-9]+\s*,\s*){3}0\)|windowtext/i.test(c)) continue;
+							if (!this.#$.plugins.backgroundColor || _RE_TRANSPARENT_COLOR.test(c)) continue;
 							break;
 					}
 
@@ -1843,11 +1846,11 @@ class HTML {
 	#dupleCheck(oNode, parentNode) {
 		if (!this.#$.format.isTextStyleNode(oNode)) return;
 
-		const oStyles = (oNode.style.cssText.match(/[^;]+;/g) || []).map(function (v) {
+		const oStyles = (oNode.style.cssText.match(_RE_CSS_PARTS) || []).map(function (v) {
 			return v.trim();
 		});
 		const nodeName = oNode.nodeName;
-		if (/^span$/i.test(nodeName) && oStyles.length === 0) return oNode;
+		if (_RE_SPAN.test(nodeName) && oStyles.length === 0) return oNode;
 
 		const inst = this.#$.format;
 		let duple = false;
@@ -1855,7 +1858,7 @@ class HTML {
 			if (dom.check.isWysiwygFrame(ancestor) || !inst.isTextStyleNode(ancestor)) return;
 			if (ancestor.nodeName === nodeName) {
 				duple = true;
-				const styles = ancestor.style.cssText.match(/[^;]+;/g) || [];
+				const styles = ancestor.style.cssText.match(_RE_CSS_PARTS) || [];
 				for (let i = 0, len = styles.length, j; i < len; i++) {
 					if ((j = oStyles.indexOf(styles[i].trim())) > -1) {
 						oStyles.splice(j, 1);
@@ -1889,15 +1892,15 @@ class HTML {
 	 * @returns {string}
 	 */
 	#CleanElements(attrFilter, styleFilter, m, t) {
-		if (/^<[a-z0-9]+:[a-z0-9]+/i.test(m)) return m;
+		if (_RE_XML_NS_TAG.test(m)) return m;
 
 		let v = null;
-		const tagName = t.match(/(?!<)[a-zA-Z0-9-]+/)[0].toLowerCase();
+		const tagName = t.match(_RE_TAG_NAME)[0].toLowerCase();
 
 		if (attrFilter) {
 			// blacklist
 			const bAttr = this.#attributeBlacklist[tagName];
-			m = m.replace(/\s(?:on[a-z]+)\s*=\s*(")[^"]*\1/gi, '');
+			m = m.replace(_RE_ON_HANDLER, '');
 			if (bAttr) m = m.replace(bAttr, '');
 			else m = m.replace(this.#attributeBlacklistRegExp, '');
 
@@ -1916,7 +1919,7 @@ class HTML {
 				v ||= [];
 				v.push(sv[0]);
 			}
-		} else if (!v || !/style=/i.test(v.toString())) {
+		} else if (!v || !_RE_STYLE_EQ.test(v.toString())) {
 			if (this.#textStyleTags.includes(tagName)) {
 				v = this.#cleanStyle(m, v, tagName);
 			} else if (this.#$.format.isLine(tagName)) {
@@ -1928,15 +1931,15 @@ class HTML {
 
 		// figure
 		if (dom.check.isMedia(tagName) || dom.check.isFigure(tagName)) {
-			const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
+			const sv = m.match(_RE_STYLE_ATTR);
 			v ||= [];
 			if (sv) v.push(sv[0]);
 		}
 
 		if (v) {
 			for (let i = 0, len = v.length, a; i < len; i++) {
-				a = /^(?:href|src)\s*=\s*('|"|\s)*javascript\s*:/i.test(v[i].trim()) ? '' : v[i];
-				t += (/^\s/.test(a) ? '' : ' ') + a;
+				a = _isSafeAttribute(v[i].trim()) ? v[i] : '';
+				t += (_RE_LEADING_SPACE.test(a) ? '' : ' ') + a;
 			}
 		}
 
@@ -1985,6 +1988,49 @@ class HTML {
 			this.#cleanStyleRegExpMap.clear();
 		}
 	}
+}
+
+/** Module-level regex constants */
+// #CleanElements
+const _RE_XML_NS_TAG = /^<[a-z0-9]+:[a-z0-9]+/i;
+const _RE_TAG_NAME = /(?!<)[a-zA-Z0-9-]+/;
+const _RE_ON_HANDLER = /\s(?:on[a-z]+)\s*=\s*(")[^"]*\1/gi;
+const _RE_STYLE_EQ = /style=/i;
+const _RE_STYLE_ATTR = /style\s*=\s*(?:"|')[^"']*(?:"|')/;
+const _RE_LEADING_SPACE = /^\s/;
+
+// #cleanStyle
+const _RE_TAG_ATTRS = /<[^\s]+\s(.+)/;
+const _RE_SIZE_ATTR = /\ssize="([^"]+)"/i;
+const _RE_FACE_ATTR = /\sface="([^"]+)"/i;
+const _RE_COLOR_ATTR = /\scolor="([^"]+)"/i;
+const _RE_AMP_QUOT = /&quot;/g;
+const _RE_CSS_PROP = /([a-zA-Z0-9-]+)(:)([^"']+)/;
+const _RE_CSS_GLOBAL = /inherit|initial|revert|unset/i;
+const _RE_DQUOTE = /"/g;
+const _RE_CSS_VALUE = /:\s*([^;]+)/;
+const _RE_TRANSPARENT_COLOR = /rgba\(([0-9]+\s*,\s*){3}0\)|windowtext/i;
+
+// #dupleCheck
+const _RE_CSS_PARTS = /[^;]+;/g;
+const _RE_SPAN = /^span$/i;
+
+// _isSafeAttribute
+const _SAFE_URL_PROTOCOL = /^(?:https?|ftps?|mailto|tel|blob|sms|geo|webcal|callto):|^[#/]|^data:image\//i;
+const _URL_ATTR_PATTERN = /^(?:href|src)\s*=\s*(?:'|"|\s)*/i;
+const _RE_ATTR_VALUE = /=\s*(?:"|'|)\s*([^"'\s>]*)/;
+const _RE_WHITESPACE = /[\s\r\n\t]+/g;
+const _RE_HTML_ENTITY = /&(#x?[0-9a-f]+|[a-z]+);/gi;
+const _RE_COLON = /:/i;
+
+function _isSafeAttribute(attr) {
+	if (!_URL_ATTR_PATTERN.test(attr)) return true;
+
+	const urlMatch = attr.match(_RE_ATTR_VALUE);
+	if (!urlMatch) return true;
+
+	const url = urlMatch[1].replace(_RE_WHITESPACE, '').replace(_RE_HTML_ENTITY, '');
+	return _SAFE_URL_PROTOCOL.test(url) || !_RE_COLON.test(url);
 }
 
 /**

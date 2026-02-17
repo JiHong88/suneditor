@@ -20,7 +20,8 @@ class Modal {
 	#globalEventHandlers;
 
 	#bindClose = null;
-	#closeSignal = false;
+	#hasNoCloseButton = false;
+	#bindCloseClick = null;
 	#currentHandle = null;
 	#resizeDir = '';
 	#offetTop = 0;
@@ -55,7 +56,7 @@ class Modal {
 
 		// init
 		this.#$.eventManager.addEvent(element.querySelector('form'), 'submit', this.#Action.bind(this));
-		this.#closeSignal = !this.#$.eventManager.addEvent(element.querySelector('[data-command="close"]'), 'click', this.close.bind(this));
+		this.#hasNoCloseButton = !this.#$.eventManager.addEvent(element.querySelector('[data-command="close"]'), 'click', this.close.bind(this));
 
 		// resize
 		if (element.querySelector('.se-modal-resize-handle-w') || element.querySelector('.se-modal-resize-handle-h') || element.querySelector('.se-modal-resize-handle-c') || element.querySelector('.se-modal-resize-form')) {
@@ -140,7 +141,11 @@ class Modal {
 		this.#$.ui.offCurrentModal();
 		this.#fixCurrentController(true);
 
-		if (this.#closeSignal) this.#modalInner.addEventListener('click', this.#closeListener[1]);
+		if (this.#hasNoCloseButton) {
+			if (this.#bindCloseClick) this.#$.eventManager.removeEvent(this.#bindCloseClick);
+			this.#bindCloseClick = this.#$.eventManager.addEvent(this.#modalInner, 'click', this.#closeListener[1]);
+		}
+
 		this.#bindClose &&= this.#$.eventManager.removeGlobalEvent(this.#bindClose);
 		this.#bindClose = this.#$.eventManager.addGlobalEvent('keydown', this.#closeListener[0]);
 		this.isUpdate = this.kind === this.#$.ui.currentControllerName;
@@ -176,7 +181,13 @@ class Modal {
 			this.#$.ui.opendModal = null;
 		}, 0);
 
-		if (this.#closeSignal) this.#modalInner.removeEventListener('click', this.#closeListener[1]);
+		if (this.#hasNoCloseButton) {
+			if (this.#bindCloseClick) {
+				this.#$.eventManager.removeEvent(this.#bindCloseClick);
+				this.#bindCloseClick = null;
+			}
+		}
+
 		this.#bindClose &&= this.#$.eventManager.removeGlobalEvent(this.#bindClose);
 
 		// close

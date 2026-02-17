@@ -34,6 +34,7 @@ declare class EventOrchestrator extends KernelInjector {
 	_resizeClientY: number;
 	/** @internal @type {Array<Node>} */
 	__cacheStyleNodes: Array<Node>;
+	__onDownEv: any;
 	/** @internal @type {boolean} */
 	_inputFocus: boolean;
 	/** @internal @type {?Object<string, *>} */

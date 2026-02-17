@@ -3,13 +3,6 @@ import { _DragHandle } from '../../../modules/ui';
 
 const { _w } = env;
 
-let _onDownEv = null;
-
-function _offDownFn() {
-	this.$.store.set('_mousedown', false);
-	_onDownEv = this.$.eventManager.removeGlobalEvent(_onDownEv);
-}
-
 /**
  * @typedef {import('../eventOrchestrator').default} EventManagerThis_handler_ww_mouse
  */
@@ -23,8 +16,8 @@ export async function OnMouseDown_wysiwyg(fc, e) {
 	const eventTarget = dom.query.getEventTarget(e);
 
 	this.$.store.set('_mousedown', true);
-	if (_onDownEv) _offDownFn.call(this);
-	_onDownEv = this.$.eventManager.addGlobalEvent('mouseup', _offDownFn.bind(this));
+	if (this.__onDownEv) _offDownFn.call(this);
+	this.__onDownEv = this.$.eventManager.addGlobalEvent('mouseup', _offDownFn.bind(this));
 
 	if (fc.get('isReadOnly') || dom.check.isNonEditable(fc.get('wysiwyg'))) return;
 	if (this.$.format._isExcludeSelectionElement(eventTarget)) {
@@ -50,6 +43,14 @@ export async function OnMouseDown_wysiwyg(fc, e) {
 	}
 
 	if (/FIGURE/i.test(eventTarget?.nodeName)) e.preventDefault();
+}
+
+/**
+ * @this {EventManagerThis_handler_ww_mouse}
+ */
+function _offDownFn() {
+	this.$.store.set('_mousedown', false);
+	this.__onDownEv = this.$.eventManager.removeGlobalEvent(this.__onDownEv);
 }
 
 /**

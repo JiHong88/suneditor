@@ -31,12 +31,9 @@ class Editor {
 
 		this.$ = kernel.$;
 
-		try {
-			this.#Create(options);
-		} catch (e) {
+		this.#Create(options).catch((e) => {
 			console.error('[SUNEDITOR:E_CREATE_FAIL] Failed to create editor instance.', e);
-			throw e;
-		}
+		});
 	}
 
 	/**

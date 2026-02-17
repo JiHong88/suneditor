@@ -91,6 +91,7 @@ class EventOrchestrator extends KernelInjector {
 		this._resizeClientY = 0;
 		/** @internal @type {Array<Node>} */
 		this.__cacheStyleNodes = [];
+		this.__onDownEv = null;
 
 		// input plugins
 		/** @internal @type {boolean} */
@@ -103,7 +104,6 @@ class EventOrchestrator extends KernelInjector {
 		this.__inputKeyEvent = null;
 
 		// viewport
-
 		/** @type {number|void} */
 		this.__retainTimer = null;
 		/** @type {Document} */

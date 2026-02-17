@@ -274,20 +274,41 @@ class CoreKernel {
 	/**
 	 * @description Destroy the kernel and release all resources.
 	 * Teardown order (reverse of init): plugins -> logic -> event -> config -> store
+	 * Uses error aggregation to ensure all modules are cleaned up even if some fail.
 	 */
 	_destroy() {
-		for (const [, instance] of this.#logic) {
-			instance?._destroy?.();
+		if (this.$ === null) return;
+
+		const errors = [];
+
+		for (const [key, instance] of this.#logic) {
+			try {
+				instance?._destroy?.();
+			} catch (e) {
+				errors.push(`[Logic:${key}] ${e.message}`);
+			}
 		}
 		this.#logic.clear();
 
-		this._eventOrchestrator._removeAllEvents();
+		try {
+			this._eventOrchestrator?._removeAllEvents();
+		} catch (e) {
+			errors.push(`[EventOrchestrator] ${e.message}`);
+		}
 		this._eventOrchestrator = null;
 
-		for (const [, instance] of this.#config) {
-			instance?._destroy?.();
+		for (const [key, instance] of this.#config) {
+			try {
+				instance?._destroy?.();
+			} catch (e) {
+				errors.push(`[Config:${key}] ${e.message}`);
+			}
 		}
 		this.#config.clear();
+
+		if (errors.length > 0) {
+			console.warn('[CoreKernel._destroy] Cleanup completed with errors:', errors);
+		}
 
 		this.$ = null;
 		this.store._destroy();
