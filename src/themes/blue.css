@@ -1,0 +1,146 @@
+.sun-editor.se-theme-blue,
+.sun-editor-editable.se-theme-blue {
+	/** Theme color tokens used by suneditor.css and suneditor-contents.css. */
+	/** --------------------------- content - [colors] ----------- */
+	/* caret and placeholder */
+	--se-caret-color: #ccc;
+	--se-drag-caret-color: #18aa7a;
+	--se-placeholder-color: #64718c;
+
+	/* editable text tones */
+	--se-edit-font-color: #ccc;
+	--se-edit-font-pre: #aaa;
+	--se-edit-font-quote: #888;
+
+	/* editable surfaces */
+	--se-edit-background-color: #0f1828;
+	--se-edit-background-pre: #364153;
+
+	/* content border scale */
+	--se-edit-border-light: #555;
+	--se-edit-border-dark: #444;
+	--se-edit-border-dark-n1: #555;
+	--se-edit-border-dark-n2: #666;
+
+	/* links and horizontal rules */
+	--se-edit-anchor: #77aaff;
+	--se-edit-anchor-on-back: #004cff;
+	--se-edit-anchor-on-font: #e8f7ff;
+	--se-edit-hr-color: #ccc;
+	--se-edit-hr-on-back: #77aaff;
+
+	/* content interaction states */
+	--se-edit-active: #77aaff;
+	--se-edit-hover: #5599ff;
+	--se-edit-outline: #444;
+
+	/** --------------------------- layout - [colors] ----------- */
+	/* main shell and typography */
+	--se-main-font-family: Helvetica Neue;
+	--se-main-out-color: #444;
+	--se-main-color: #ccc;
+	--se-main-color-lighter: #aaa;
+	--se-main-background-color: #0f1828;
+	--se-code-view-color: #030712;
+	--se-main-font-color: #ccc;
+	--se-code-view-background-color: #ddd;
+	--se-main-divider-color: #555;
+	--se-main-border-color: #666;
+	--se-main-outline-color: #444;
+	--se-main-shadow-color: #222;
+	--se-statusbar-font-color: #aaa;
+	--se-overlay-background-color: #111;
+
+	/* hover states */
+	--se-hover-color: #0d200c;
+	--se-hover-dark-color: #8192a3;
+	--se-hover-dark2-color: #738495;
+	--se-hover-dark3-color: #667788;
+	--se-hover-light-color: #9ab0c5;
+	--se-hover-light2-color: #adc2d7;
+	--se-hover-light3-color: #c0d3e5;
+
+	/* active foreground states */
+	--se-active-color: #5cd2e6;
+	--se-active-hover-color: #6de9f5;
+	--se-active-dark-color: #3bb9cd;
+	--se-active-dark2-color: #2a9fb1;
+	--se-active-dark3-color: #5cd2e6;
+	--se-active-dark4-color: #3bb9cd;
+	--se-active-dark5-color: #197d91;
+
+	/* active background states */
+	--se-active-light-color: #17303a;
+	--se-active-light2-color: #1e3f4d;
+	--se-active-light3-color: #255e6f;
+	--se-active-light4-color: #2c7d91;
+	--se-active-light5-color: #33aacc;
+	--se-active-light6-color: #3bd1f2;
+
+	/* floating layer shadow */
+	--se-shadow-layer-color: rgba(0, 64, 128, 0.25);
+
+	/* drag feedback */
+	--se-drag-over-color: #ffcc00;
+
+	/* modal, browser, dropdown surfaces */
+	--se-modal-background-color: #1c202a;
+	--se-modal-color: #ececec;
+	--se-modal-border-color: #555;
+	--se-modal-anchor-color: #77aaff;
+	--se-modal-preview-color: #aaa;
+	--se-modal-file-input-background-color: #232837;
+	--se-modal-input-disabled-color: #666;
+	--se-modal-input-disabled-background-color: #333;
+
+	/* dropdown text */
+	--se-dropdown-font-color: #ccc;
+
+	/* media/controller chrome */
+	--se-controller-border-color: #555;
+	--se-controller-background-color: #091025;
+	--se-controller-color: #ececec;
+	--se-shadow-controller-color: rgba(80, 200, 255, 0.2);
+
+	/* input-side button states */
+	--se-input-btn-border-color: #444;
+	--se-input-btn-disabled-color: #666;
+
+	/* success status palette */
+	--se-success-color: #2cb67d;
+	--se-success-dark-color: #1f8f65;
+	--se-success-dark2-color: #186f4f;
+	--se-success-dark3-color: #125f44;
+	--se-success-light-color: #3dd9a5;
+	--se-success-light2-color: #57e2b7;
+	--se-success-light3-color: #8cf0ce;
+	--se-success-light4-color: #c1fae4;
+	--se-success-light5-color: #e9fef5;
+
+	/* error status palette */
+	--se-error-color: #ef4444;
+	--se-error-dark-color: #991b1b;
+	--se-error-dark2-color: #7f1d1d;
+	--se-error-dark3-color: #651616;
+	--se-error-light-color: #f87171;
+	--se-error-light2-color: #fca5a5;
+	--se-error-light3-color: #fecaca;
+	--se-error-light4-color: #fee2e2;
+	--se-error-light5-color: #fef2f2;
+
+	/* document mode palette */
+	--se-doc-background: #344153;
+	--se-doc-info-page-font-color: #0f1828;
+	--se-doc-info-page-background-color: #cfcfcf;
+	--se-doc-info-font-color: #cfcfcf;
+	--se-doc-info-active-color: #5599ff;
+
+	/* loading indicator */
+	--se-loading-color: #77aaff;
+
+	/* show-blocks debug colors */
+	--se-show-blocks-color: #5599ff;
+	--se-show-blocks-li-color: #d539ff;
+	--se-show-blocks-pre-color: #27c022;
+	--se-show-blocks-component-color: #f4b124;
+}

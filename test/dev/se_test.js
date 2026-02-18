@@ -4,6 +4,7 @@ import '../../src/typedef'; // Import typedef for global SunEditor namespace
 require('../../src/assets/suneditor.css');
 require('../../src/assets/suneditor-contents.css');
 require('../../src/themes/dark.css');
+require('../../src/themes/blue.css');
 
 // katex
 import Katex from 'katex';
@@ -627,7 +628,7 @@ const options1 = {
 
 	video: null,
 	subToolbar: {
-		buttonList: [['bold', 'dir', 'dir_ltr', 'dir_rtl', 'save']],
+		buttonList: [['bold', 'dir', 'dir_ltr', 'dir_rtl', 'save', 'list']],
 		width: 'auto',
 		mode: 'balloon', // balloon, balloon-always, balloon-block
 	},

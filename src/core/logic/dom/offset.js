@@ -191,12 +191,8 @@ class Offset {
 			left += iframeRect.left;
 		}
 
-		let wy = 0;
-		let wx = 0;
-		if (!this.#frameContext.get('isFullScreen')) {
-			wy += _w.scrollY;
-			wx += _w.scrollX;
-		}
+		const wy = _w.scrollY;
+		const wx = _w.scrollX;
 
 		return {
 			top: top + wy,
@@ -535,16 +531,8 @@ class Offset {
 		const elW = element.offsetWidth;
 		const aw = arrow ? arrow.offsetWidth : 0;
 		// margin
-		const tmlw = targetRect.left;
-		const tmrw = clientSize.w - targetRect.right;
-		let rml, rmr;
-		if (this.#frameContext.get('isFullScreen')) {
-			rml = tmlw;
-			rmr = tmrw;
-		} else {
-			rml = targetRect.left;
-			rmr = clientSize.w - targetRect.right;
-		}
+		const rml = targetRect.left;
+		const rmr = clientSize.w - targetRect.right;
 
 		if (isWWTarget && (rml + targetW <= 0 || rmr + targetW <= 0)) return;
 		if (arrow) {
@@ -744,43 +732,38 @@ class Offset {
 		let tMargin = 0;
 		let bMargin = 0;
 
-		if (this.#frameContext.get('isFullScreen')) {
-			rmt = tmtw - toolbarH;
-			rmb = tmbw;
-		} else {
-			const isIframe = this.#frameOptions.get('iframe');
-			tMargin = targetRect.top;
-			bMargin = clientSize.h - targetRect.bottom;
-			const editorOffset = this.getGlobal();
+		const isIframe = this.#frameOptions.get('iframe');
+		tMargin = targetRect.top;
+		bMargin = clientSize.h - targetRect.bottom;
+		const editorOffset = this.getGlobal();
 
-			if (!isTextSelection) {
-				const emt = editorOffset.fixedTop > 0 ? editorOffset.fixedTop : 0;
-				const emb = _w.innerHeight - (editorOffset.fixedTop + editorOffset.height);
-				rt = !isToolbarTarget && (this.#$.toolbar.isSticky || !this.#$.toolbar.isBalloonMode) ? toolbarH : 0;
-				rmt = tMargin - (!isToolbarTarget ? emt : 0) - rt;
-				rmb = bMargin - (emb > 0 ? emb : 0);
-			} else {
-				rt = !isToolbarTarget && !this.#$.toolbar.isSticky && !this.#options.get('toolbar_container') ? toolbarH : 0;
-				const wst = !isIframe ? editorOffset.top - _w.scrollY + rt : 0;
-				const wsb = !isIframe ? this.#store.get('currentViewportHeight') - (editorOffset.top + editorOffset.height - _w.scrollY) : 0;
-				let st = wst;
-				if (toolbarH > wst) {
-					if (this.#$.toolbar.isSticky) {
-						st = toolbarH;
-					} else {
-						st = wst + toolbarH;
-					}
-				} else if (this.#options.get('toolbar_container') && !this.#$.toolbar.isSticky) {
-					toolbarH = 0;
+		if (!isTextSelection) {
+			const emt = editorOffset.fixedTop > 0 ? editorOffset.fixedTop : 0;
+			const emb = _w.innerHeight - (editorOffset.fixedTop + editorOffset.height);
+			rt = !isToolbarTarget && (this.#$.toolbar.isSticky || !this.#$.toolbar.isBalloonMode) ? toolbarH : 0;
+			rmt = tMargin - (!isToolbarTarget ? emt : 0) - rt;
+			rmb = bMargin - (emb > 0 ? emb : 0);
+		} else {
+			rt = !isToolbarTarget && !this.#$.toolbar.isSticky && !this.#options.get('toolbar_container') ? toolbarH : 0;
+			const wst = !isIframe ? editorOffset.top - _w.scrollY + rt : 0;
+			const wsb = !isIframe ? this.#store.get('currentViewportHeight') - (editorOffset.top + editorOffset.height - _w.scrollY) : 0;
+			let st = wst;
+			if (toolbarH > wst) {
+				if (this.#$.toolbar.isSticky) {
+					st = toolbarH;
 				} else {
 					st = wst + toolbarH;
 				}
-
-				rmt = targetRect.top - wwRects.top - st + toolbarH;
-				rmb = wwRects.bottom - targetRect.bottom - wsb;
-				// display margin
-				rmt = rmt > 0 ? rmt : rmt - toolbarH;
+			} else if (this.#options.get('toolbar_container') && !this.#$.toolbar.isSticky) {
+				toolbarH = 0;
+			} else {
+				st = wst + toolbarH;
 			}
+
+			rmt = targetRect.top - wwRects.top - st + toolbarH;
+			rmb = wwRects.bottom - targetRect.bottom - wsb;
+			// display margin
+			rmt = rmt > 0 ? rmt : rmt - toolbarH;
 		}
 
 		return {

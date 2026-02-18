@@ -102,7 +102,7 @@ export function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 				<div class="se-modal-body">
 					${createFileInputHtml}
 					${createUrlInputHtml}
-					<div style="border-bottom: 1px dashed #ccc;"></div>
+					<div class="se-modal-hr"></div>
 					<div class="se-modal-form">
 						<label>${lang.image_modal_altText}</label><input class="se-input-form _se_image_alt" type="text" />
 					</div>
