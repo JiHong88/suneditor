@@ -364,6 +364,7 @@ const options1 = {
 	strictMode: {
 		// styleFilter: false
 	},
+	mode: 'balloon',
 	// strictMode: false,
 	// strictMode: false,
 	// lang: langs.ko,
@@ -1985,7 +1986,7 @@ const options_test = {
 
 	// Modes & Themes
 	v2Migration: false,
-	mode: 'classic',
+	mode: 'balloon',
 	type: 'document:header,page',
 	theme: '',
 	lang: langs.en,

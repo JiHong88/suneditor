@@ -760,8 +760,8 @@ class Offset {
 				st = wst + toolbarH;
 			}
 
-			rmt = targetRect.top - wwRects.top - st + toolbarH;
-			rmb = wwRects.bottom - targetRect.bottom - wsb;
+			rmt = targetRect.top - (wwRects.top - st) + toolbarH;
+			rmb = wwRects.bottom - (targetRect.bottom - wsb);
 			// display margin
 			rmt = rmt > 0 ? rmt : rmt - toolbarH;
 		}
