@@ -6,6 +6,7 @@ import { dom, numbers } from '../../../helper';
  * - Manages the 'active' state of plugins and commands.
  */
 export default class SelectionState {
+	#eventOrchestrator;
 	#$;
 
 	/** @type {RegExp} */
@@ -13,11 +14,12 @@ export default class SelectionState {
 
 	/**
 	 * @constructor
-	 * @param {import('../eventOrchestrator').default} inst
+	 * @param {import('../eventOrchestrator').default} eventOrchestrator
 	 */
-	constructor({ $ }) {
-		this.#$ = $;
-		this.#onButtonsCheck = new RegExp(`^(${Object.keys($.options.get('_defaultStyleTagMap')).join('|')})$`, 'i');
+	constructor(eventOrchestrator) {
+		this.#eventOrchestrator = eventOrchestrator;
+		this.#$ = eventOrchestrator.$;
+		this.#onButtonsCheck = new RegExp(`^(${Object.keys(this.#$.options.get('_defaultStyleTagMap')).join('|')})$`, 'i');
 	}
 
 	/**
@@ -138,7 +140,7 @@ export default class SelectionState {
 		this.#setKeyEffect(commandMapNodes);
 
 		// cache style nodes
-		this.__cacheStyleNodes = styleNodes.reverse();
+		this.#eventOrchestrator.__cacheStyleNodes = styleNodes.reverse();
 
 		/** save current nodes */
 		this.#$.store.set('currentNodes', currentNodes.reverse());

@@ -7,9 +7,9 @@ import type {} from '../../../typedef';
 export default class SelectionState {
 	/**
 	 * @constructor
-	 * @param {import('../eventOrchestrator').default} inst
+	 * @param {import('../eventOrchestrator').default} eventOrchestrator
 	 */
-	constructor({ $ }: import('../eventOrchestrator').default);
+	constructor(eventOrchestrator: import('../eventOrchestrator').default);
 	/**
 	 * @description Updates the toolbar state based on the current selection.
 	 * - Traverses the DOM from the selection to the root.
@@ -19,7 +19,6 @@ export default class SelectionState {
 	 * @returns {Node|undefined} The processed selection node.
 	 */
 	update(selectionNode?: Node): Node | undefined;
-	__cacheStyleNodes: Node[];
 	/**
 	 * @description Resets the toolbar state.
 	 * - Deactivates all buttons and clears the effect.

@@ -143,31 +143,31 @@ export default class CommandExecutor {
 	}
 
 	copyFormat() {
-		if (this.#onCopyFormatInfo) {
-			try {
-				const _styleNode = [...this.#onCopyFormatInfo];
-				const n = _styleNode.pop();
+		if (!this.#onCopyFormatInfo?.length) return;
 
-				this.#$.inline.remove();
+		try {
+			const _styleNode = [...this.#onCopyFormatInfo];
+			const n = _styleNode.pop();
 
-				if (n) {
-					const insertedNode = this.#$.inline.apply(n, { stylesToModify: null, nodesToRemove: [n.nodeName], strictRemove: false });
-					const { parent, inner } = this.#$.nodeTransform.createNestedNode(_styleNode);
-					insertedNode.parentNode.insertBefore(parent, insertedNode);
-					inner.appendChild(insertedNode);
+			this.#$.inline.remove();
 
-					this.#$.selection.setRange(insertedNode, dom.check.isZeroWidth(insertedNode) ? 1 : 0, insertedNode, 1);
-				}
+			if (n) {
+				const insertedNode = this.#$.inline.apply(n, { stylesToModify: null, nodesToRemove: [n.nodeName], strictRemove: false });
+				const { parent, inner } = this.#$.nodeTransform.createNestedNode(_styleNode);
+				insertedNode.parentNode.insertBefore(parent, insertedNode);
+				inner.appendChild(insertedNode);
 
-				if (this.#options.get('copyFormatKeepOn')) return;
+				this.#$.selection.setRange(insertedNode, dom.check.isZeroWidth(insertedNode) ? 1 : 0, insertedNode, 1);
+			}
 
-				this.#onCopyFormatInitMethod();
-			} catch (err) {
-				console.warn('[SUNEDITOR.copyFormat.error] ', err);
-				if (!this.#onCopyFormatInitMethod?.()) {
-					this.#onCopyFormatInfo = null;
-					this.#onCopyFormatInitMethod = null;
-				}
+			if (this.#options.get('copyFormatKeepOn')) return;
+
+			this.#onCopyFormatInitMethod();
+		} catch (err) {
+			console.warn('[SUNEDITOR.copyFormat.error] ', err);
+			if (!this.#onCopyFormatInitMethod?.()) {
+				this.#onCopyFormatInfo = null;
+				this.#onCopyFormatInitMethod = null;
 			}
 		}
 	}
