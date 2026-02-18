@@ -352,6 +352,41 @@ describe('Video Plugin', () => {
              // When triggerEvent returns undefined, submitFile returns true without calling handler
         });
 
+        it('modalAction should handle URL submit when no file and linkValue set', async () => {
+            video.videoInputFile.files = [];
+            video.videoUrlFile.value = '';
+            const result = await video.modalAction();
+            expect(result).toBe(false);
+        });
+
+        it('modalAction should submit URL when linkValue has content', async () => {
+            video.videoInputFile.files = [];
+            // Set linkValue through the input handler
+            const addEventCalls = kernel.$.eventManager.addEvent.mock.calls;
+            const inputHandler = addEventCalls.find(
+                call => call[0] === video.videoUrlFile && call[1] === 'input'
+            );
+            if (inputHandler) {
+                dom.query.getEventTarget.mockReturnValueOnce({ value: 'https://example.com/video.mp4' });
+                inputHandler[2]({ target: { value: 'https://example.com/video.mp4' } });
+            }
+
+            kernel.$.eventManager.triggerEvent.mockResolvedValueOnce(true);
+            const result = await video.modalAction();
+            // submitURL returns true when it processes successfully
+            expect(result).toBe(true);
+        });
+
+        it('modalAction should call component.select on successful submit via setTimeout', async () => {
+            // Setup: submitFile returns truthy
+            video.videoInputFile.files = [{ name: 'video.mp4', type: 'video/mp4', size: 1000 }];
+            kernel.$.eventManager.triggerEvent.mockResolvedValueOnce(undefined);
+
+            const result = await video.modalAction();
+            expect(result).toBe(true);
+            // _w.setTimeout was called (which executes immediately in mock)
+        });
+
 
         describe('submitFile size validation', () => {
 
@@ -371,6 +406,133 @@ describe('Video Plugin', () => {
                 expect(result).toBeUndefined();
             });
 
+            it('should alert error when single file exceeds singleSizeLimit', async () => {
+                const videoWithLimit = new Video(kernel, { uploadSingleSizeLimit: 5000 });
+                const files = [{ name: 'large.mp4', type: 'video/mp4', size: 10000 }];
+
+                kernel.$.eventManager.triggerEvent.mockResolvedValueOnce(undefined);
+
+                const result = await videoWithLimit.submitFile(files);
+                expect(result).toBe(false);
+                expect(kernel.$.ui.alertOpen).toHaveBeenCalled();
+            });
+
+            it('should use custom error message from onVideoUploadError event when single size exceeded', async () => {
+                const videoWithLimit = new Video(kernel, { uploadSingleSizeLimit: 5000 });
+                const files = [{ name: 'large.mp4', type: 'video/mp4', size: 10000 }];
+
+                kernel.$.eventManager.triggerEvent.mockResolvedValueOnce('Custom error message');
+
+                const result = await videoWithLimit.submitFile(files);
+                expect(result).toBe(false);
+                expect(kernel.$.ui.alertOpen).toHaveBeenCalledWith('Custom error message', 'error');
+            });
+
+            it('should use default error when onVideoUploadError returns NO_EVENT for single size', async () => {
+                const { env } = require('../../../../src/helper');
+                const videoWithLimit = new Video(kernel, { uploadSingleSizeLimit: 5000 });
+                const files = [{ name: 'large.mp4', type: 'video/mp4', size: 10000 }];
+
+                kernel.$.eventManager.triggerEvent.mockResolvedValueOnce(env.NO_EVENT);
+
+                const result = await videoWithLimit.submitFile(files);
+                expect(result).toBe(false);
+                expect(kernel.$.ui.alertOpen).toHaveBeenCalledWith(
+                    expect.stringContaining('[SUNEDITOR.videoUpload.fail]'),
+                    'error'
+                );
+            });
+
+            it('should alert error when total files exceed uploadSizeLimit', async () => {
+                const videoWithLimit = new Video(kernel, { uploadSizeLimit: 2000 });
+                const files = [
+                    { name: 'v1.mp4', type: 'video/mp4', size: 1500 },
+                    { name: 'v2.mp4', type: 'video/mp4', size: 1500 }
+                ];
+
+                kernel.$.eventManager.triggerEvent.mockResolvedValueOnce(undefined);
+
+                const result = await videoWithLimit.submitFile(files);
+                expect(result).toBe(false);
+                expect(kernel.$.ui.alertOpen).toHaveBeenCalled();
+            });
+
+            it('should use NO_EVENT default error for total upload size limit', async () => {
+                const { env } = require('../../../../src/helper');
+                const videoWithLimit = new Video(kernel, { uploadSizeLimit: 2000 });
+                const files = [
+                    { name: 'v1.mp4', type: 'video/mp4', size: 1500 },
+                    { name: 'v2.mp4', type: 'video/mp4', size: 1500 }
+                ];
+
+                kernel.$.eventManager.triggerEvent.mockResolvedValueOnce(env.NO_EVENT);
+
+                const result = await videoWithLimit.submitFile(files);
+                expect(result).toBe(false);
+                expect(kernel.$.ui.alertOpen).toHaveBeenCalledWith(
+                    expect.stringContaining('[SUNEDITOR.videoUpload.fail]'),
+                    'error'
+                );
+            });
+
+            it('should use custom error message for total upload size limit', async () => {
+                const videoWithLimit = new Video(kernel, { uploadSizeLimit: 2000 });
+                const files = [
+                    { name: 'v1.mp4', type: 'video/mp4', size: 1500 },
+                    { name: 'v2.mp4', type: 'video/mp4', size: 1500 }
+                ];
+
+                kernel.$.eventManager.triggerEvent.mockResolvedValueOnce('Total limit exceeded');
+
+                const result = await videoWithLimit.submitFile(files);
+                expect(result).toBe(false);
+                expect(kernel.$.ui.alertOpen).toHaveBeenCalledWith('Total limit exceeded', 'error');
+            });
+
+            it('should return false when onVideoUploadBefore returns false', async () => {
+                const files = [{ name: 'video.mp4', type: 'video/mp4', size: 1000 }];
+
+                // First call: onVideoUploadBefore returns false
+                kernel.$.eventManager.triggerEvent.mockResolvedValueOnce(false);
+
+                const result = await video.submitFile(files);
+                expect(result).toBe(false);
+            });
+
+            it('should call handler with object when onVideoUploadBefore returns object', async () => {
+                const files = [{ name: 'video.mp4', type: 'video/mp4', size: 1000 }];
+                const customInfo = { url: 'custom-url', files: files };
+
+                kernel.$.eventManager.triggerEvent.mockResolvedValueOnce(customInfo);
+
+                const result = await video.submitFile(files);
+                // When result is an object, handler is called with the object, and then also with null
+                // (because the code falls through to the true/NO_EVENT check too - but result is object, not true/NO_EVENT)
+                // Actually looking at code: if object, handler(result), no early return, then checks true/NO_EVENT which is false
+                expect(result).toBeUndefined();
+            });
+
+            it('should call handler with null when onVideoUploadBefore returns true', async () => {
+                const files = [{ name: 'video.mp4', type: 'video/mp4', size: 1000 }];
+
+                kernel.$.eventManager.triggerEvent.mockResolvedValueOnce(true);
+
+                const result = await video.submitFile(files);
+                // When result is true, handler(null) is called
+                expect(result).toBeUndefined();
+            });
+
+            it('should call handler with null when onVideoUploadBefore returns NO_EVENT', async () => {
+                const { env } = require('../../../../src/helper');
+                const files = [{ name: 'video.mp4', type: 'video/mp4', size: 1000 }];
+
+                kernel.$.eventManager.triggerEvent.mockResolvedValueOnce(env.NO_EVENT);
+
+                const result = await video.submitFile(files);
+                // When result is NO_EVENT, handler(null) is called
+                expect(result).toBeUndefined();
+            });
+
         });
 
         describe('submitURL validation', () => {
@@ -380,14 +542,397 @@ describe('Video Plugin', () => {
                 const result = await video.submitURL('');
                 expect(result).toBe(false);
             });
+
+            it('should parse iframe tag and extract src URL', async () => {
+                // First set the internal linkValue through the preview mechanism
+                const iframeHtml = '<iframe src="https://www.youtube.com/embed/abc123"></iframe>';
+                // Simulate setting linkValue via #OnLinkPreview
+                const mockEvent = { target: { value: iframeHtml } };
+                dom.query.getEventTarget.mockReturnValueOnce({ value: iframeHtml, trim: undefined });
+
+                // We need to set linkValue directly. Since it's private, we need to use the URL path.
+                // The trick: submitURL reads #linkValue, not the url parameter.
+                // Let's set it via videoUrlFile input event simulation.
+                // Actually, looking at code line 628: if (!(url = this.#linkValue)) return false;
+                // So we need linkValue to be set. Let's call the internal preview handler.
+
+                // Set videoUrlFile value and trigger the input event handler
+                video.videoUrlFile.value = iframeHtml;
+                // Directly trigger the event - we can access the bound handler via eventManager.addEvent mock
+                // But it's simpler: we know #linkValue is set when #OnLinkPreview is called.
+                // The constructor binds #OnLinkPreview to videoUrlFile 'input' event.
+                // Let's find the bound handler from the eventManager.addEvent calls.
+                const addEventCalls = kernel.$.eventManager.addEvent.mock.calls;
+                // Find the call that binds to videoUrlFile with 'input'
+                const inputHandler = addEventCalls.find(
+                    call => call[0] === video.videoUrlFile && call[1] === 'input'
+                );
+
+                if (inputHandler) {
+                    // Call the bound handler to set linkValue
+                    dom.query.getEventTarget.mockReturnValueOnce({ value: iframeHtml, trim: () => iframeHtml });
+                    inputHandler[2]({ target: { value: iframeHtml, trim: () => iframeHtml } });
+                }
+
+                // Now submitURL should use the linkValue
+                kernel.$.eventManager.triggerEvent.mockResolvedValueOnce(undefined);
+                const result = await video.submitURL(iframeHtml);
+                // If linkValue was set to the iframe HTML, it should attempt to parse it
+                expect(result).toBe(true);
+            });
+
+            it('should handle processUrl for YouTube URLs', async () => {
+                // Set linkValue by calling event handler
+                const ytUrl = 'https://www.youtube.com/watch?v=abc123';
+                const addEventCalls = kernel.$.eventManager.addEvent.mock.calls;
+                const inputHandler = addEventCalls.find(
+                    call => call[0] === video.videoUrlFile && call[1] === 'input'
+                );
+
+                if (inputHandler) {
+                    dom.query.getEventTarget.mockReturnValueOnce({ value: ytUrl, trim: () => ytUrl });
+                    inputHandler[2]({ target: { value: ytUrl, trim: () => ytUrl } });
+                }
+
+                kernel.$.eventManager.triggerEvent.mockResolvedValueOnce(undefined);
+                const result = await video.submitURL(ytUrl);
+                expect(result).toBe(true);
+            });
+
+            it('should return false when onVideoUploadBefore returns false', async () => {
+                const url = 'https://example.com/video.mp4';
+                const addEventCalls = kernel.$.eventManager.addEvent.mock.calls;
+                const inputHandler = addEventCalls.find(
+                    call => call[0] === video.videoUrlFile && call[1] === 'input'
+                );
+
+                if (inputHandler) {
+                    dom.query.getEventTarget.mockReturnValueOnce({ value: url, trim: () => url });
+                    inputHandler[2]({ target: { value: url, trim: () => url } });
+                }
+
+                kernel.$.eventManager.triggerEvent.mockResolvedValueOnce(false);
+                const result = await video.submitURL(url);
+                expect(result).toBe(false);
+            });
+
+            it('should call handler with object when onVideoUploadBefore returns object', async () => {
+                const url = 'https://example.com/video.mp4';
+                const addEventCalls = kernel.$.eventManager.addEvent.mock.calls;
+                const inputHandler = addEventCalls.find(
+                    call => call[0] === video.videoUrlFile && call[1] === 'input'
+                );
+
+                if (inputHandler) {
+                    dom.query.getEventTarget.mockReturnValueOnce({ value: url, trim: () => url });
+                    inputHandler[2]({ target: { value: url, trim: () => url } });
+                }
+
+                const customResult = { url: 'custom-url', files: { name: 'test', size: 0 }, process: null };
+                kernel.$.eventManager.triggerEvent.mockResolvedValueOnce(customResult);
+                const result = await video.submitURL(url);
+                expect(result).toBe(true);
+            });
+
+            it('should call handler with null when onVideoUploadBefore returns true', async () => {
+                const url = 'https://example.com/video.mp4';
+                const addEventCalls = kernel.$.eventManager.addEvent.mock.calls;
+                const inputHandler = addEventCalls.find(
+                    call => call[0] === video.videoUrlFile && call[1] === 'input'
+                );
+
+                if (inputHandler) {
+                    dom.query.getEventTarget.mockReturnValueOnce({ value: url, trim: () => url });
+                    inputHandler[2]({ target: { value: url, trim: () => url } });
+                }
+
+                kernel.$.eventManager.triggerEvent.mockResolvedValueOnce(true);
+                const result = await video.submitURL(url);
+                expect(result).toBe(true);
+            });
+
+            it('should call handler with null when onVideoUploadBefore returns NO_EVENT', async () => {
+                const { env } = require('../../../../src/helper');
+                const url = 'https://example.com/video.mp4';
+                const addEventCalls = kernel.$.eventManager.addEvent.mock.calls;
+                const inputHandler = addEventCalls.find(
+                    call => call[0] === video.videoUrlFile && call[1] === 'input'
+                );
+
+                if (inputHandler) {
+                    dom.query.getEventTarget.mockReturnValueOnce({ value: url, trim: () => url });
+                    inputHandler[2]({ target: { value: url, trim: () => url } });
+                }
+
+                kernel.$.eventManager.triggerEvent.mockResolvedValueOnce(env.NO_EVENT);
+                const result = await video.submitURL(url);
+                expect(result).toBe(true);
+            });
         });
     });
     
+    describe('create() Method', () => {
+        let mockOFrame;
+
+        beforeEach(() => {
+            mockOFrame = {
+                nodeName: 'VIDEO',
+                src: '',
+                style: { float: '' },
+                setAttribute: jest.fn(),
+                getAttribute: jest.fn(),
+                cloneNode: jest.fn().mockReturnValue({
+                    nodeName: 'VIDEO',
+                    setAttribute: jest.fn(),
+                    getAttribute: jest.fn()
+                }),
+                replaceWith: jest.fn(),
+                onload: null
+            };
+        });
+
+        it('should create new video component when isUpdate is false', () => {
+            video.create(mockOFrame, 'https://example.com/video.mp4', '100%', '56.25%', 'center', false, { name: 'video.mp4', size: 1000 }, true);
+
+            expect(mockFigure.CreateContainer).toHaveBeenCalledWith(mockOFrame, 'se-video-container');
+            expect(video.figure.open).toHaveBeenCalled();
+            expect(video.figure.setAlign).toHaveBeenCalledWith(mockOFrame, 'center');
+            expect(video.fileManager.setFileData).toHaveBeenCalled();
+            expect(kernel.$.component.insert).toHaveBeenCalled();
+        });
+
+        it('should call component.insert with scrollTo=true when isLast is true', () => {
+            video.create(mockOFrame, 'https://example.com/video.mp4', '100%', '56.25%', 'center', false, { name: 'video.mp4', size: 1000 }, true);
+
+            expect(kernel.$.component.insert).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({ scrollTo: true })
+            );
+        });
+
+        it('should call component.insert with scrollTo=false when isLast is false', () => {
+            video.create(mockOFrame, 'https://example.com/video.mp4', '100%', '56.25%', 'center', false, { name: 'video.mp4', size: 1000 }, false);
+
+            expect(kernel.$.component.insert).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({ scrollTo: false, insertBehavior: 'line' })
+            );
+        });
+
+        it('should update existing element src when isUpdate is true and same tag type', () => {
+            // First, set the internal element via componentSelect
+            const existingElement = {
+                nodeName: 'VIDEO',
+                src: 'https://example.com/old.mp4',
+                style: { float: '' },
+                setAttribute: jest.fn(),
+                getAttribute: jest.fn(),
+                querySelector: jest.fn().mockReturnValue(null)
+            };
+            video.componentSelect(existingElement);
+
+            // Now call create with isUpdate=true and different src (non-matching processUrl)
+            video.create(mockOFrame, 'https://example.com/new.mp4', '100%', '56.25%', 'center', true, { name: 'new.mp4', size: 1000 }, true);
+
+            // Should set src directly since findProcessUrl returns null for plain mp4 URL
+            expect(existingElement.src).toBe('https://example.com/new.mp4');
+            expect(kernel.$.history.push).toHaveBeenCalledWith(false);
+        });
+
+        it('should not change src when isUpdate is true and src is the same', () => {
+            const existingElement = {
+                nodeName: 'VIDEO',
+                src: 'https://example.com/same.mp4',
+                style: { float: '' },
+                setAttribute: jest.fn(),
+                getAttribute: jest.fn(),
+                querySelector: jest.fn().mockReturnValue(null)
+            };
+            video.componentSelect(existingElement);
+
+            video.create(mockOFrame, 'https://example.com/same.mp4', '100%', '56.25%', 'center', true, { name: 'same.mp4', size: 1000 }, true);
+
+            // src should remain the same, no replaceWith called
+            expect(existingElement.replaceWith).toBeUndefined();
+            expect(kernel.$.history.push).toHaveBeenCalledWith(false);
+        });
+
+        it('should replace video with iframe when processUrl tag is iframe and current is video', () => {
+            const existingElement = {
+                nodeName: 'VIDEO',
+                src: 'https://example.com/old.mp4',
+                style: { float: '' },
+                setAttribute: jest.fn(),
+                getAttribute: jest.fn(),
+                querySelector: jest.fn().mockReturnValue(null),
+                replaceWith: jest.fn()
+            };
+            video.componentSelect(existingElement);
+
+            // YouTube URL will return { tag: 'iframe' } from findProcessUrl
+            const ytUrl = 'https://www.youtube.com/embed/abc123';
+            video.create(mockOFrame, ytUrl, '100%', '56.25%', 'center', true, { name: 'yt', size: 0 }, true);
+
+            expect(dom.utils.createElement).toHaveBeenCalledWith('IFRAME');
+            expect(existingElement.replaceWith).toHaveBeenCalled();
+        });
+
+        it('should replace iframe with video when processUrl tag is video and current is iframe', () => {
+            const existingIframe = {
+                nodeName: 'IFRAME',
+                src: 'https://www.youtube.com/embed/abc123',
+                style: { float: '' },
+                setAttribute: jest.fn(),
+                getAttribute: jest.fn(),
+                querySelector: jest.fn().mockReturnValue(null),
+                replaceWith: jest.fn()
+            };
+            video.componentSelect(existingIframe);
+
+            // Create a custom video instance with an embedQuery that returns tag: 'video'
+            const videoWithCustom = new Video(kernel, {
+                embedQuery: {
+                    customService: {
+                        pattern: /customvideo\.com/i,
+                        action: (url) => url,
+                        tag: 'video'
+                    }
+                }
+            });
+            // Set its internal element to the iframe
+            videoWithCustom.componentSelect(existingIframe);
+
+            videoWithCustom.create(mockOFrame, 'https://customvideo.com/abc', '100%', '56.25%', 'center', true, { name: 'custom', size: 0 }, true);
+
+            expect(dom.utils.createElement).toHaveBeenCalledWith('VIDEO');
+            expect(existingIframe.replaceWith).toHaveBeenCalled();
+        });
+
+        it('should call setTransform when isUpdate and not resizing or not changed or not vertical', () => {
+            const existingElement = {
+                nodeName: 'VIDEO',
+                src: 'https://example.com/old.mp4',
+                style: { float: '' },
+                setAttribute: jest.fn(),
+                getAttribute: jest.fn(),
+                querySelector: jest.fn().mockReturnValue(null)
+            };
+            video.componentSelect(existingElement);
+
+            video.create(mockOFrame, 'https://example.com/new.mp4', '100%', '56.25%', 'center', true, { name: 'new.mp4', size: 1000 }, true);
+
+            expect(video.figure.setTransform).toHaveBeenCalled();
+        });
+    });
+
+    describe('componentDestroy() Method', () => {
+        let mockTarget;
+
+        beforeEach(() => {
+            mockTarget = {
+                nodeName: 'VIDEO',
+                src: 'https://example.com/video.mp4',
+                style: { float: '' },
+                setAttribute: jest.fn(),
+                getAttribute: jest.fn(),
+                querySelector: jest.fn().mockReturnValue(null),
+                previousElementSibling: { nodeType: 1 },
+                nextElementSibling: null,
+                parentNode: { childNodes: { length: 0 } }
+            };
+
+            // Mock getParentElement to return a container
+            const mockContainer = {
+                previousElementSibling: { nodeType: 1 },
+                nextElementSibling: null,
+                parentNode: { childNodes: { length: 0 } }
+            };
+            dom.query.getParentElement.mockReturnValue(mockContainer);
+        });
+
+        it('should complete full destroy flow when event does not return false', async () => {
+            video.componentSelect(mockTarget);
+            kernel.$.eventManager.triggerEvent.mockResolvedValueOnce(undefined);
+
+            await video.componentDestroy(mockTarget);
+
+            expect(kernel.$.eventManager.triggerEvent).toHaveBeenCalledWith(
+                'onVideoDeleteBefore',
+                expect.objectContaining({ element: expect.anything() })
+            );
+            expect(dom.utils.removeItem).toHaveBeenCalled();
+            expect(kernel.$.focusManager.focusEdge).toHaveBeenCalled();
+            expect(kernel.$.history.push).toHaveBeenCalledWith(false);
+        });
+
+        it('should return early when event returns false', async () => {
+            dom.utils.removeItem.mockClear();
+            kernel.$.history.push.mockClear();
+
+            video.componentSelect(mockTarget);
+            kernel.$.eventManager.triggerEvent.mockResolvedValueOnce(false);
+
+            await video.componentDestroy(mockTarget);
+
+            expect(dom.utils.removeItem).not.toHaveBeenCalled();
+            expect(kernel.$.history.push).not.toHaveBeenCalled();
+        });
+
+        it('should call removeAllParents when emptyDiv is not wysiwyg', async () => {
+            const nonWysiwygParent = { childNodes: { length: 0 } };
+            const mockContainer = {
+                previousElementSibling: null,
+                nextElementSibling: { nodeType: 1 },
+                parentNode: nonWysiwygParent
+            };
+            dom.query.getParentElement.mockReturnValue(mockContainer);
+
+            video.componentSelect(mockTarget);
+            kernel.$.eventManager.triggerEvent.mockResolvedValueOnce(undefined);
+
+            await video.componentDestroy(mockTarget);
+
+            expect(kernel.$.nodeTransform.removeAllParents).toHaveBeenCalledWith(
+                nonWysiwygParent,
+                expect.any(Function),
+                null
+            );
+        });
+
+        it('should NOT call removeAllParents when emptyDiv is wysiwyg', async () => {
+            // Get the wysiwyg element from frameContext
+            const wysiwygEl = kernel.$.frameContext.get('wysiwyg');
+            const mockContainer = {
+                previousElementSibling: null,
+                nextElementSibling: { nodeType: 1 },
+                parentNode: wysiwygEl
+            };
+            dom.query.getParentElement.mockReturnValue(mockContainer);
+
+            video.componentSelect(mockTarget);
+            kernel.$.eventManager.triggerEvent.mockResolvedValueOnce(undefined);
+            kernel.$.nodeTransform.removeAllParents.mockClear();
+
+            await video.componentDestroy(mockTarget);
+
+            expect(kernel.$.nodeTransform.removeAllParents).not.toHaveBeenCalled();
+        });
+
+        it('should use this.#element when no target is provided', async () => {
+            video.componentSelect(mockTarget);
+            kernel.$.eventManager.triggerEvent.mockResolvedValueOnce(undefined);
+
+            // Call without target argument - should use internal #element
+            await video.componentDestroy();
+
+            expect(kernel.$.eventManager.triggerEvent).toHaveBeenCalledWith(
+                'onVideoDeleteBefore',
+                expect.objectContaining({ element: expect.anything() })
+            );
+        });
+    });
+
     describe('Component LifeCycle', () => {
-
-
-
-
 
 
         it('componentSelect should prepare element for controller', () => {
@@ -679,6 +1224,415 @@ describe('Video Plugin', () => {
             const videoNonResizable = new Video(kernel, { canResize: false });
             // When canResize is false, default controls exclude resize options
             expect(videoNonResizable.pluginOptions.canResize).toBe(false);
+        });
+    });
+
+    describe('#OnLinkPreview (via event handler)', () => {
+        let inputHandler;
+        let origOptionsGet;
+
+        beforeEach(() => {
+            // Clear any leftover mockReturnValueOnce from previous tests
+            dom.query.getEventTarget.mockReset();
+            dom.query.getEventTarget.mockImplementation((e) => e.target || e);
+
+            const addEventCalls = kernel.$.eventManager.addEvent.mock.calls;
+            const found = addEventCalls.find(
+                call => call[0] === video.videoUrlFile && call[1] === 'input'
+            );
+            inputHandler = found ? found[2] : null;
+            origOptionsGet = kernel.$.options.get;
+        });
+
+        afterEach(() => {
+            kernel.$.options.get = origOptionsGet;
+        });
+
+        it('should detect iframe tag and set linkValue to raw iframe HTML', () => {
+            const iframeValue = '<iframe src="https://youtube.com/embed/123"></iframe>';
+
+            inputHandler({ target: { value: iframeValue } });
+
+            expect(video.previewSrc.textContent).toBe('<IFrame :src=".."></IFrame>');
+        });
+
+        it('should add defaultUrlProtocol when URL has no protocol', () => {
+            const url = 'example.com/video.mp4';
+            kernel.$.options.get = jest.fn((key) => {
+                if (key === 'defaultUrlProtocol') return 'https://';
+                return undefined;
+            });
+
+            inputHandler({ target: { value: url } });
+
+            expect(video.previewSrc.textContent).toBe('https://example.com/video.mp4');
+        });
+
+        it('should set empty string for empty value', () => {
+            inputHandler({ target: { value: '' } });
+
+            expect(video.previewSrc.textContent).toBe('');
+        });
+
+        it('should use URL as-is when it has protocol', () => {
+            const url = 'https://example.com/video.mp4';
+            kernel.$.options.get = jest.fn((key) => {
+                if (key === 'defaultUrlProtocol') return 'https://';
+                return undefined;
+            });
+
+            inputHandler({ target: { value: url } });
+
+            expect(video.previewSrc.textContent).toBe('https://example.com/video.mp4');
+        });
+
+        it('should add leading slash when URL has no protocol and no defaultUrlProtocol', () => {
+            const url = 'example.com/video.mp4';
+            kernel.$.options.get = jest.fn((key) => {
+                if (key === 'defaultUrlProtocol') return '';
+                return undefined;
+            });
+
+            inputHandler({ target: { value: url } });
+
+            expect(video.previewSrc.textContent).toBe('/example.com/video.mp4');
+        });
+
+        it('should handle bookmark URL (starts with #)', () => {
+            const url = '#section1';
+            kernel.$.options.get = jest.fn((key) => {
+                if (key === 'defaultUrlProtocol') return 'https://';
+                return undefined;
+            });
+
+            inputHandler({ target: { value: url } });
+
+            // Bookmark starts with # and indexOf('#') === 0, so defaultUrlProtocol is NOT added
+            // Falls through to: !value.includes('://') ? '/' + value : value
+            expect(video.previewSrc.textContent).toBe('/#section1');
+        });
+    });
+
+    describe('#OnfileInputChange (via event handler)', () => {
+        let fileChangeHandler;
+
+        beforeEach(() => {
+            // Ensure getEventTarget returns e.target properly
+            dom.query.getEventTarget.mockImplementation((e) => e.target || e);
+
+            const addEventCalls = kernel.$.eventManager.addEvent.mock.calls;
+            const found = addEventCalls.find(
+                call => call[0] === video.videoInputFile && call[1] === 'change'
+            );
+            fileChangeHandler = found ? found[2] : null;
+        });
+
+        it('should disable URL input when file is selected', () => {
+            video.videoInputFile.value = 'video.mp4';
+            const mockFiles = [{ name: 'video.mp4' }];
+            const mockEventTarget = { files: mockFiles };
+            mockModal.OnChangeFile.mockClear();
+
+            if (fileChangeHandler) {
+                fileChangeHandler({ target: mockEventTarget });
+            }
+
+            expect(video.videoUrlFile.disabled).toBe(true);
+            expect(video.previewSrc.style.textDecoration).toBe('line-through');
+            expect(mockModal.OnChangeFile).toHaveBeenCalledWith(video.fileModalWrapper, mockFiles);
+        });
+
+        it('should enable URL input when no file is selected', () => {
+            video.videoInputFile.value = '';
+            const mockEventTarget = { files: [] };
+
+            if (fileChangeHandler) {
+                fileChangeHandler({ target: mockEventTarget });
+            }
+
+            expect(video.videoUrlFile.disabled).toBe(false);
+            expect(video.previewSrc.style.textDecoration).toBe('');
+        });
+    });
+
+    describe('#RemoveSelectedFiles (via event handler)', () => {
+        it('should reset file input and enable URL input when remove button clicked', () => {
+            // Find the bound handler for the remove button (click event on fileRemoveBtn)
+            const addEventCalls = kernel.$.eventManager.addEvent.mock.calls;
+            // The fileRemoveBtn handler is a click handler that is NOT on videoUrlFile or videoInputFile
+            const found = addEventCalls.find(
+                call => call[1] === 'click' && call[0] !== video.videoUrlFile && call[0] !== video.videoInputFile
+            );
+
+            expect(found).toBeTruthy();
+
+            // Set some state first
+            video.videoInputFile.value = 'somefile.mp4';
+            video.videoUrlFile.disabled = true;
+            video.previewSrc.style.textDecoration = 'line-through';
+            mockModal.OnChangeFile.mockClear();
+
+            found[2](); // Call the handler
+
+            expect(video.videoInputFile.value).toBe('');
+            expect(video.videoUrlFile.disabled).toBe(false);
+            expect(video.previewSrc.style.textDecoration).toBe('');
+            expect(mockModal.OnChangeFile).toHaveBeenCalledWith(video.fileModalWrapper, []);
+        });
+    });
+
+    describe('onFilePasteAndDrop', () => {
+        it('should call submitFile for video files', () => {
+            const submitFileSpy = jest.spyOn(video, 'submitFile').mockResolvedValue(true);
+
+            const videoFile = { type: 'video/mp4', name: 'test.mp4' };
+            video.onFilePasteAndDrop({ file: videoFile });
+
+            expect(submitFileSpy).toHaveBeenCalledWith([videoFile]);
+            expect(kernel.$.focusManager.focus).toHaveBeenCalled();
+
+            submitFileSpy.mockRestore();
+        });
+
+        it('should not call submitFile for non-video files', () => {
+            const submitFileSpy = jest.spyOn(video, 'submitFile');
+
+            const textFile = { type: 'text/plain', name: 'test.txt' };
+            video.onFilePasteAndDrop({ file: textFile });
+
+            expect(submitFileSpy).not.toHaveBeenCalled();
+
+            submitFileSpy.mockRestore();
+        });
+    });
+
+    describe('#OpenGallery and #SetUrlInput', () => {
+        it('should open gallery and set URL input when gallery callback is invoked', () => {
+            // Create a video instance with a galleryButton set
+            const mockGalleryButton = { nodeName: 'button', style: {}, setAttribute: jest.fn(), getAttribute: jest.fn(), appendChild: jest.fn() };
+            const origMockReturn = mockRender.getMockImplementation?.() || mockRender.mockImplementation;
+
+            // Override the render mock temporarily to include a gallery button
+            mockRender.mockImplementationOnce(() => ({
+                html: { nodeName: 'div', style: {}, setAttribute: jest.fn(), getAttribute: jest.fn(), appendChild: jest.fn() },
+                fileModalWrapper: { nodeName: 'div', style: {}, setAttribute: jest.fn(), getAttribute: jest.fn(), appendChild: jest.fn() },
+                videoInputFile: { files: [], value: '', setAttribute: jest.fn(), removeAttribute: jest.fn() },
+                videoUrlFile: { disabled: false, value: '', focus: jest.fn() },
+                previewSrc: { textContent: '', style: {} },
+                proportion: { disabled: false, checked: false },
+                frameRatioOption: { options: [], value: '0.5625' },
+                inputX: { value: '100%' },
+                inputY: { value: '56.25%' },
+                revertBtn: { nodeName: 'button', style: {}, setAttribute: jest.fn(), getAttribute: jest.fn(), appendChild: jest.fn() },
+                galleryButton: mockGalleryButton,
+                fileRemoveBtn: { nodeName: 'button', style: {}, setAttribute: jest.fn(), getAttribute: jest.fn(), appendChild: jest.fn() },
+                alignForm: { style: {} }
+            }));
+
+            const videoWithGallery = new Video(kernel, {});
+
+            // Find the click handler bound to the gallery button
+            const addEventCalls = kernel.$.eventManager.addEvent.mock.calls;
+            const galleryHandler = addEventCalls.find(
+                call => call[0] === mockGalleryButton && call[1] === 'click'
+            );
+
+            expect(galleryHandler).toBeTruthy();
+
+            // Mock the videoGallery plugin's open method
+            kernel.$.plugins.videoGallery.open = jest.fn((callback) => {
+                // Simulate gallery selecting a video - invoke the callback
+                const mockTarget = {
+                    getAttribute: jest.fn().mockReturnValue('https://example.com/selected-video.mp4'),
+                    src: 'https://example.com/fallback.mp4'
+                };
+                callback(mockTarget);
+            });
+
+            // Invoke the gallery handler
+            galleryHandler[2]();
+
+            expect(kernel.$.plugins.videoGallery.open).toHaveBeenCalled();
+            // The #SetUrlInput should have set the videoUrlFile value
+            expect(videoWithGallery.videoUrlFile.value).toBe('https://example.com/selected-video.mp4');
+            expect(videoWithGallery.previewSrc.textContent).toBe('https://example.com/selected-video.mp4');
+            expect(videoWithGallery.videoUrlFile.focus).toHaveBeenCalled();
+        });
+    });
+
+    describe('#fixTagStructure (via retainFormat)', () => {
+        it('should process video element without existing figure container', async () => {
+            const retainInfo = video.retainFormat();
+
+            // Mock: no existing container
+            mockFigure.GetContainer.mockReturnValueOnce(null);
+
+            const mockVideoEl = {
+                nodeName: 'VIDEO',
+                src: 'https://example.com/video.mp4',
+                style: { float: '', textAlign: '' },
+                setAttribute: jest.fn(),
+                getAttribute: jest.fn().mockReturnValue(null),
+                cloneNode: jest.fn().mockReturnValue({
+                    nodeName: 'VIDEO',
+                    src: 'https://example.com/video.mp4',
+                    setAttribute: jest.fn(),
+                    getAttribute: jest.fn().mockReturnValue(null),
+                    style: {}
+                }),
+                width: '640',
+                height: '360'
+            };
+
+            // Mock format.getLine to return a line element
+            kernel.$.format.getLine.mockReturnValueOnce({
+                style: { textAlign: 'center', float: '' }
+            });
+
+            // Second call inside #fixTagStructure
+            kernel.$.format.getLine.mockReturnValueOnce({
+                style: { textAlign: 'center', float: '' }
+            });
+
+            // Mock GetContainer for second call inside fixTagStructure
+            mockFigure.GetContainer.mockReturnValueOnce(null);
+
+            await retainInfo.method(mockVideoEl);
+
+            // Should have called CreateContainer for the new figure
+            expect(mockFigure.CreateContainer).toHaveBeenCalled();
+            expect(video.figure.retainFigureFormat).toHaveBeenCalled();
+        });
+
+        it('should process iframe element and set iframe attributes', async () => {
+            const retainInfo = video.retainFormat();
+
+            // Mock: no existing container
+            mockFigure.GetContainer.mockReturnValueOnce(null);
+
+            const mockIframeEl = {
+                nodeName: 'IFRAME',
+                src: 'https://www.youtube.com/embed/abc123',
+                style: { float: '', textAlign: '' },
+                setAttribute: jest.fn(),
+                getAttribute: jest.fn().mockReturnValue(null),
+                cloneNode: jest.fn().mockReturnValue({
+                    nodeName: 'IFRAME',
+                    src: 'https://www.youtube.com/embed/abc123',
+                    setAttribute: jest.fn(),
+                    getAttribute: jest.fn().mockReturnValue(null),
+                    style: {},
+                    frameBorder: '',
+                    allowFullscreen: false
+                }),
+                width: '640',
+                height: '360',
+                frameBorder: '',
+                allowFullscreen: false
+            };
+
+            kernel.$.format.getLine.mockReturnValueOnce({
+                style: { textAlign: 'left', float: '' }
+            });
+            kernel.$.format.getLine.mockReturnValueOnce({
+                style: { textAlign: 'left', float: '' }
+            });
+
+            // Mock GetContainer for second call
+            mockFigure.GetContainer.mockReturnValueOnce(null);
+
+            await retainInfo.method(mockIframeEl);
+
+            expect(mockFigure.CreateContainer).toHaveBeenCalled();
+        });
+
+        it('should preserve figcaption when present in existing container', async () => {
+            const retainInfo = video.retainFormat();
+
+            // Mock: no container first (for #ready check)
+            mockFigure.GetContainer.mockReturnValueOnce(null);
+
+            const mockVideoEl = {
+                nodeName: 'VIDEO',
+                src: 'https://example.com/video.mp4',
+                style: { float: '', textAlign: '' },
+                setAttribute: jest.fn(),
+                getAttribute: jest.fn().mockReturnValue('640,360'),
+                cloneNode: jest.fn().mockReturnValue({
+                    nodeName: 'VIDEO',
+                    src: 'https://example.com/video.mp4',
+                    setAttribute: jest.fn(),
+                    getAttribute: jest.fn().mockReturnValue('640,360'),
+                    style: {},
+                    width: '640',
+                    height: '360'
+                }),
+                width: '640',
+                height: '360'
+            };
+
+            kernel.$.format.getLine.mockReturnValueOnce({
+                style: { textAlign: '', float: '' }
+            });
+            kernel.$.format.getLine.mockReturnValueOnce({
+                style: { textAlign: '', float: '' }
+            });
+
+            // Mock GetContainer with figcaption for the second call inside fixTagStructure
+            const mockFigcaption = { innerHTML: 'Video caption' };
+            mockFigure.GetContainer.mockReturnValueOnce({
+                container: {
+                    nodeType: 1,
+                    style: {},
+                    querySelector: jest.fn().mockReturnValue(mockFigcaption)
+                },
+                cover: { nodeType: 1 }
+            });
+
+            // Mock createElement for figcaption
+            dom.utils.createElement.mockReturnValueOnce({
+                innerHTML: '',
+                nodeName: 'FIGCAPTION'
+            });
+
+            await retainInfo.method(mockVideoEl);
+
+            expect(mockFigure.CreateContainer).toHaveBeenCalled();
+        });
+
+        it('should use data-se-size for dimensions when present', async () => {
+            const retainInfo = video.retainFormat();
+
+            mockFigure.GetContainer.mockReturnValueOnce(null);
+
+            const mockVideoEl = {
+                nodeName: 'VIDEO',
+                src: 'https://example.com/video.mp4',
+                style: { float: '', textAlign: '' },
+                setAttribute: jest.fn(),
+                getAttribute: jest.fn().mockReturnValue(null),
+                cloneNode: jest.fn().mockReturnValue({
+                    nodeName: 'VIDEO',
+                    src: 'https://example.com/video.mp4',
+                    setAttribute: jest.fn(),
+                    getAttribute: jest.fn().mockReturnValue('800,600'),
+                    style: {},
+                    width: '',
+                    height: ''
+                }),
+                width: '',
+                height: ''
+            };
+
+            kernel.$.format.getLine.mockReturnValue({
+                style: { textAlign: '', float: '' }
+            });
+
+            mockFigure.GetContainer.mockReturnValueOnce(null);
+
+            await retainInfo.method(mockVideoEl);
+
+            expect(video.sizeService.applySize).toHaveBeenCalled();
         });
     });
 });

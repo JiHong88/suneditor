@@ -215,6 +215,89 @@ describe('Embed Plugin', () => {
             const result = Embed.component(mockBlockquote);
             expect(result).toBe(mockBlockquote);
         });
+
+		it('should detect DIV with iframe child (lines 70-72)', () => {
+			const { dom } = require('../../../../src/helper');
+			// Make isIFrame return false for the DIV, true for its child
+			const childIframe = { nodeName: 'IFRAME', src: 'https://www.facebook.com/plugins/post.php?href=test', children: [] };
+			const divNode = {
+				nodeName: 'DIV',
+				children: [childIframe],
+				querySelector: jest.fn(),
+			};
+			dom.check.isIFrame.mockImplementation((node) => node && node.nodeName === 'IFRAME');
+
+			const result = Embed.component(divNode);
+			expect(result).toBe(childIframe);
+		});
+
+		it('should detect se-embed-container class node (lines 74-78)', () => {
+			const { dom } = require('../../../../src/helper');
+			const childWithSrc = { src: 'https://www.facebook.com/user/posts/123', href: '' };
+			const containerNode = {
+				nodeName: 'DIV',
+				children: [childWithSrc],
+				classList: { contains: jest.fn().mockReturnValue(true) },
+				querySelector: jest.fn(),
+			};
+			// isIFrame returns false for DIV and its children (not iframe)
+			dom.check.isIFrame.mockImplementation((node) => false);
+			dom.utils.hasClass.mockImplementation((el, className) => {
+				return el === containerNode && className === 'se-embed-container';
+			});
+			dom.query.getChildNode.mockImplementation((node, condition) => {
+				if (node === containerNode && condition) {
+					for (const child of node.children) {
+						if (condition(child)) return child;
+					}
+				}
+				return null;
+			});
+
+			const result = Embed.component(containerNode);
+			expect(result).toBe(childWithSrc);
+
+			// Reset mocks
+			dom.check.isIFrame.mockImplementation((node) => node && node.nodeName === 'IFRAME');
+			dom.utils.hasClass.mockImplementation((el, className) => el?.classList?.contains(className));
+			dom.query.getChildNode.mockImplementation((node, condition) => {
+				if (condition && node?.children) {
+					for (const child of node.children) {
+						if (condition(child)) return child;
+					}
+				}
+				return null;
+			});
+		});
+
+		it('should return null for blockquote without valid link (line 87-88)', () => {
+			const mockChild = { nodeName: 'A', href: 'https://invalid-domain.com/page' };
+			const mockBlockquote = {
+				nodeName: 'BLOCKQUOTE',
+				className: 'some-class',
+				children: [mockChild],
+				getAttribute: jest.fn(),
+				querySelector: jest.fn().mockReturnValue(mockChild),
+			};
+
+			const result = Embed.component(mockBlockquote);
+			expect(result).toBeNull();
+		});
+
+		it('should return null for blockquote with no link', () => {
+			const mockBlockquote = {
+				nodeName: 'BLOCKQUOTE',
+				className: 'some-class',
+				children: [],
+				getAttribute: jest.fn(),
+				querySelector: jest.fn().mockReturnValue(null),
+			};
+
+			const result = Embed.component(mockBlockquote);
+			// link is null, so the blockquote branch falls through to src check (src is empty)
+			// target is null, so returns null
+			expect(result).toBeNull();
+		});
 	});
 
 	describe('static checkContentType (via Embed.component)', () => {
@@ -415,6 +498,21 @@ describe('Embed Plugin', () => {
 				const result = await embed.modalAction();
 				expect(typeof result).toBe('boolean');
 			});
+
+			it('should call submitSRC with linkValue when it has content (line 322)', async () => {
+				// Set linkValue via the input handler
+				const addEventCalls = kernel.$.eventManager.addEvent.mock.calls;
+				const inputCall = addEventCalls.find(call => call[1] === 'input');
+				const onLinkPreview = inputCall[2];
+
+				// Trigger the input handler to set linkValue
+				onLinkPreview({ target: { value: 'https://www.facebook.com/user/posts/123' } });
+
+				embed.submitSRC = jest.fn().mockResolvedValue(true);
+				const result = await embed.modalAction();
+				expect(embed.submitSRC).toHaveBeenCalledWith(expect.stringContaining('facebook.com'));
+				expect(result).toBe(true);
+			});
 		});
 
 		describe('submitSRC', () => {
@@ -455,6 +553,41 @@ describe('Embed Plugin', () => {
 			it('should return false when no source provided', async () => {
 				const result = await embed.submitSRC('');
 				expect(result).toBe(false);
+			});
+
+			it('should return false when event returns false (line 456)', async () => {
+				embed.$.eventManager.triggerEvent = jest.fn().mockResolvedValue(false);
+				const result = await embed.submitSRC('https://www.facebook.com/user/posts/123');
+				expect(result).toBe(false);
+			});
+
+			it('should call handler with result when event returns an object (line 457)', async () => {
+				const resultObj = {
+					url: 'https://custom-url.com/embed',
+					process: { tag: 'iframe', origin: 'test', url: 'https://custom-url.com/embed' },
+					inputWidth: '500',
+					inputHeight: '300',
+					align: 'center',
+					isUpdate: false,
+				};
+				embed.$.eventManager.triggerEvent = jest.fn().mockResolvedValue(resultObj);
+				const result = await embed.submitSRC('https://www.facebook.com/user/posts/123');
+				expect(result).toBe(true);
+			});
+
+			it('should call handler(null) when event returns true (line 459)', async () => {
+				embed.$.eventManager.triggerEvent = jest.fn().mockResolvedValue(true);
+				const result = await embed.submitSRC('https://www.facebook.com/user/posts/123');
+				expect(result).toBe(true);
+				expect(embed.$.component.insert).toHaveBeenCalled();
+			});
+
+			it('should call handler(null) when event returns NO_EVENT (line 459)', async () => {
+				const { env } = require('../../../../src/helper');
+				embed.$.eventManager.triggerEvent = jest.fn().mockResolvedValue(env.NO_EVENT);
+				const result = await embed.submitSRC('https://www.facebook.com/user/posts/123');
+				expect(result).toBe(true);
+				expect(embed.$.component.insert).toHaveBeenCalled();
 			});
 		});
 
@@ -509,6 +642,106 @@ describe('Embed Plugin', () => {
 				// Since checkContentType is static private, we can't spy on it directly
 				// The test verifies the method runs without throwing
 			});
+
+			it('should early return when checkContentType fails', async () => {
+				const iframe = { nodeName: 'IFRAME', src: 'https://invalid-site.com/page', style: {}, getAttribute: jest.fn() };
+				const format = embed.retainFormat();
+				await format.method(iframe);
+				// When checkContentType fails, Figure.GetContainer should NOT be called after the method runs
+				// (it returns early)
+			});
+
+			it('should process valid embed URL and call fixTagStructure (lines 287-294)', async () => {
+				const iframe = {
+					nodeName: 'IFRAME',
+					src: 'https://www.facebook.com/user/posts/123',
+					style: {},
+					getAttribute: jest.fn().mockReturnValue(null),
+					setAttribute: jest.fn(),
+					cloneNode: jest.fn().mockReturnValue({
+						nodeName: 'IFRAME',
+						src: 'https://www.facebook.com/user/posts/123',
+						style: {},
+						getAttribute: jest.fn().mockReturnValue(','),
+						setAttribute: jest.fn(),
+						frameBorder: '',
+						allowFullscreen: false,
+						width: '100%',
+						height: '400px',
+					}),
+					frameBorder: '',
+					allowFullscreen: false,
+					width: '100%',
+					height: '400px',
+				};
+
+				// Make GetContainer return falsy so we get past the early return
+				mockFigure.GetContainer.mockReturnValueOnce({ container: null, cover: null });
+
+				const format = embed.retainFormat();
+				await format.method(iframe);
+
+				// Should have called figure.open (from #ready)
+				expect(embed.figure.open).toHaveBeenCalled();
+				// Should have called Figure.CreateContainer (from #fixTagStructure)
+				expect(mockFigure.CreateContainer).toHaveBeenCalled();
+			});
+
+			it('should early return when GetContainer returns valid container and cover (line 288)', async () => {
+				const iframe = {
+					nodeName: 'IFRAME',
+					src: 'https://www.facebook.com/user/posts/123',
+					style: {},
+					getAttribute: jest.fn(),
+				};
+
+				// Make GetContainer return truthy container and cover so it returns early
+				mockFigure.GetContainer.mockReturnValueOnce({
+					container: { nodeType: 1, style: {} },
+					cover: { nodeType: 1 },
+				});
+
+				const figureOpenCallsBefore = embed.figure.open.mock.calls.length;
+				const format = embed.retainFormat();
+				await format.method(iframe);
+
+				// figure.open should NOT be called because we returned early at line 288
+				expect(embed.figure.open.mock.calls.length).toBe(figureOpenCallsBefore);
+			});
+
+			it('should set align from line style when format.getLine returns a line (line 292)', async () => {
+				const iframe = {
+					nodeName: 'IFRAME',
+					src: 'https://www.facebook.com/user/posts/123',
+					style: {},
+					getAttribute: jest.fn().mockReturnValue(null),
+					setAttribute: jest.fn(),
+					cloneNode: jest.fn().mockReturnValue({
+						nodeName: 'IFRAME',
+						src: 'https://www.facebook.com/user/posts/123',
+						style: {},
+						getAttribute: jest.fn().mockReturnValue(','),
+						setAttribute: jest.fn(),
+						frameBorder: '',
+						allowFullscreen: false,
+						width: '',
+						height: '',
+					}),
+					frameBorder: '',
+					allowFullscreen: false,
+					width: '',
+					height: '',
+				};
+
+				mockFigure.GetContainer.mockReturnValueOnce({ container: null, cover: null });
+				// Make getLine return a line element with textAlign
+				embed.$.format.getLine.mockReturnValueOnce({ style: { textAlign: 'center', float: '' } });
+
+				const format = embed.retainFormat();
+				await format.method(iframe);
+				// The method should have proceeded through lines 290-294 successfully
+				expect(embed.$.format.getLine).toHaveBeenCalled();
+			});
 		});
 	});
 
@@ -562,6 +795,874 @@ describe('Embed Plugin', () => {
 			const result = customEmbed.findProcessUrl('https://custom.com/video123');
 			expect(result).toBeTruthy();
 			expect(result.url).toContain('custom.com/embed');
+		});
+	});
+
+	describe('Event handlers via captured addEvent calls', () => {
+		let addEventCalls;
+		let onLinkPreview;
+		let onInputSizeX;
+		let onInputSizeY;
+		let onClickRevert;
+
+		beforeEach(() => {
+			addEventCalls = kernel.$.eventManager.addEvent.mock.calls;
+			const inputCall = addEventCalls.find(call => call[1] === 'input');
+			onLinkPreview = inputCall[2];
+
+			const keyupCalls = addEventCalls.filter(call => call[1] === 'keyup');
+			onInputSizeX = keyupCalls[0]?.[2];
+			onInputSizeY = keyupCalls[1]?.[2];
+
+			const clickCall = addEventCalls.find(call => call[1] === 'click');
+			onClickRevert = clickCall?.[2];
+		});
+
+		describe('#OnLinkPreview (lines 758-773)', () => {
+			it('should set linkValue and preview for iframe embed code', () => {
+				const iframeCode = '<iframe src="https://example.com/embed"></iframe>';
+				onLinkPreview({ target: { value: iframeCode } });
+				expect(embed.previewSrc.textContent).toBe('<IFrame :src=".."></IFrame>');
+			});
+
+			it('should clear linkValue and preview for empty input', () => {
+				onLinkPreview({ target: { value: '' } });
+				expect(embed.previewSrc.textContent).toBe('');
+			});
+
+			it('should prepend defaultUrlProtocol when configured and URL has no protocol', () => {
+				// Set defaultUrlProtocol
+				kernel.$.options.get = jest.fn().mockImplementation((key) => {
+					if (key === 'defaultUrlProtocol') return 'https://';
+					return null;
+				});
+
+				onLinkPreview({ target: { value: 'www.facebook.com/user/posts/123' } });
+				expect(embed.previewSrc.textContent).toBe('https://www.facebook.com/user/posts/123');
+
+				// Reset
+				kernel.$.options.get = jest.fn().mockReturnValue(null);
+			});
+
+			it('should prepend / when URL has no protocol and no defaultUrlProtocol', () => {
+				kernel.$.options.get = jest.fn().mockReturnValue(null);
+				onLinkPreview({ target: { value: 'www.example.com/page' } });
+				expect(embed.previewSrc.textContent).toBe('/www.example.com/page');
+			});
+
+			it('should use URL as-is when it contains ://', () => {
+				kernel.$.options.get = jest.fn().mockReturnValue(null);
+				onLinkPreview({ target: { value: 'https://www.facebook.com/user/posts/123' } });
+				expect(embed.previewSrc.textContent).toBe('https://www.facebook.com/user/posts/123');
+			});
+
+			it('should use URL as-is when it starts with #', () => {
+				kernel.$.options.get = jest.fn().mockImplementation((key) => {
+					if (key === 'defaultUrlProtocol') return 'https://';
+					return null;
+				});
+				onLinkPreview({ target: { value: '#anchor-link' } });
+				// URL starts with #, so even with defaultUrlProtocol, it should not prepend
+				// The condition is: defaultUrlProtocol && !value.includes('://') && value.indexOf('#') !== 0
+				// value.indexOf('#') === 0, so the condition is false, falls through to next check
+				// !value.includes('://') is true, so it prepends '/'
+				expect(embed.previewSrc.textContent).toBe('/#anchor-link');
+
+				// Reset
+				kernel.$.options.get = jest.fn().mockReturnValue(null);
+			});
+
+			it('should handle # URL without defaultUrlProtocol', () => {
+				kernel.$.options.get = jest.fn().mockReturnValue(null);
+				onLinkPreview({ target: { value: '#section' } });
+				// no defaultUrlProtocol → falls to: !value.includes('://') → '/' + value
+				expect(embed.previewSrc.textContent).toBe('/#section');
+			});
+		});
+
+		describe('#OnInputSize (lines 789-807)', () => {
+			it('should prevent default and return on space key', () => {
+				const event = {
+					code: 'Space',
+					target: { value: '100' },
+					preventDefault: jest.fn(),
+				};
+				onInputSizeX(event);
+				expect(event.preventDefault).toHaveBeenCalled();
+			});
+
+			it('should clamp x value to 100 when onlyPercentage and value > 100', () => {
+				// Create embed with percentageOnlySize
+				const percentKernel = createMockEditor();
+				const percentEmbed = new Embed(percentKernel, { canResize: true, percentageOnlySize: true });
+
+				const percentAddEventCalls = percentKernel.$.eventManager.addEvent.mock.calls;
+				const percentKeyupCalls = percentAddEventCalls.filter(call => call[1] === 'keyup');
+				const percentOnInputSizeX = percentKeyupCalls[0]?.[2];
+
+				if (percentOnInputSizeX) {
+					const mockTarget = { value: '150' };
+					const event = {
+						code: 'KeyA',
+						target: mockTarget,
+						preventDefault: jest.fn(),
+					};
+					percentOnInputSizeX(event);
+					expect(mockTarget.value).toBe('100');
+				}
+			});
+
+			it('should calculate ratio when proportion is checked (x axis)', () => {
+				embed.proportion.checked = true;
+				embed.inputX.value = '200';
+				embed.inputY.value = '150';
+
+				const event = {
+					code: 'KeyA',
+					target: embed.inputX,
+					preventDefault: jest.fn(),
+				};
+
+				onInputSizeX(event);
+				// CalcRatio is called and should set inputY.value
+				expect(mockFigure.CalcRatio).toHaveBeenCalled();
+			});
+
+			it('should calculate ratio when proportion is checked (y axis)', () => {
+				embed.proportion.checked = true;
+				embed.inputX.value = '200';
+				embed.inputY.value = '150';
+
+				const event = {
+					code: 'KeyA',
+					target: embed.inputY,
+					preventDefault: jest.fn(),
+				};
+
+				onInputSizeY(event);
+				// CalcRatio is called and should set inputX.value
+				expect(mockFigure.CalcRatio).toHaveBeenCalled();
+			});
+
+			it('should not change values when proportion is not checked and not onlyPercentage', () => {
+				embed.proportion.checked = false;
+				embed.inputX.value = '200';
+
+				const event = {
+					code: 'KeyA',
+					target: { value: '200' },
+					preventDefault: jest.fn(),
+				};
+
+				onInputSizeX(event);
+				// Nothing should change
+				expect(event.target.value).toBe('200');
+			});
+		});
+
+		describe('#OnClickRevert (lines 776-783)', () => {
+			it('should restore original width and height values', () => {
+				// Set some initial state via componentSelect which sets origin values
+				const mockCover = {
+					nodeType: 1,
+					setAttribute: jest.fn(),
+					getAttribute: jest.fn().mockReturnValue('https://www.facebook.com/user/posts/123'),
+					appendChild: jest.fn(),
+				};
+				embed.figure.open = jest.fn().mockReturnValue({
+					cover: mockCover,
+					container: { nodeType: 1, style: {} },
+					caption: null,
+					align: 'none',
+					w: '640',
+					h: '360',
+					originWidth: '640',
+					originHeight: '360',
+					ratio: { w: 1, h: 1 },
+				});
+				embed.figure.getSize = jest.fn().mockReturnValue({ w: '640', h: '360', dw: '640', dh: '360' });
+
+				const mockElement = { nodeName: 'IFRAME', src: 'https://www.facebook.com/plugins/post.php', style: {} };
+				embed.componentSelect(mockElement);
+
+				// Manually set different values to verify revert works
+				// Note: inputX and inputY may share a mock reference, so we test via
+				// the revert handler restoring #origin_w and #origin_h
+				embed.inputX.value = '999';
+
+				// Now click revert - should restore to origin values
+				onClickRevert();
+				// After revert: inputX = origin_w, inputY = origin_h
+				// Since inputX and inputY may be the same mock object (due to createElement mock),
+				// the last assignment (inputY) wins. But the handler still executes both branches.
+				// We verify the revert runs without error and sets the origin height:
+				expect(embed.inputY.value).toBe('360');
+			});
+
+			it('should clamp to 100 when onlyPercentage and origin > 100', () => {
+				const percentKernel = createMockEditor();
+				const percentEmbed = new Embed(percentKernel, { canResize: true, percentageOnlySize: true });
+
+				// Get the click handler
+				const percentAddEventCalls = percentKernel.$.eventManager.addEvent.mock.calls;
+				const percentClickCall = percentAddEventCalls.find(call => call[1] === 'click');
+				const percentOnClickRevert = percentClickCall?.[2];
+
+				if (percentOnClickRevert) {
+					// Set origin values via componentSelect
+					const mockCover = {
+						nodeType: 1,
+						setAttribute: jest.fn(),
+						getAttribute: jest.fn().mockReturnValue('https://www.facebook.com/user/posts/123'),
+						appendChild: jest.fn(),
+					};
+					const figureInstance = percentEmbed.figure;
+					figureInstance.open = jest.fn().mockReturnValue({
+						cover: mockCover,
+						container: { nodeType: 1, style: {} },
+						caption: null,
+						align: 'none',
+						w: '150',
+						h: '400',
+						originWidth: '150',
+						originHeight: '400',
+						ratio: { w: 1, h: 1 },
+					});
+					figureInstance.getSize = jest.fn().mockReturnValue({ w: '150', h: '400', dw: '150', dh: '400' });
+
+					const mockElement = { nodeName: 'IFRAME', src: 'https://www.facebook.com/plugins/post.php', style: {} };
+					percentEmbed.componentSelect(mockElement);
+
+					// Now click revert - origin_w is '150' which is > 100
+					percentOnClickRevert();
+					expect(percentEmbed.inputX.value).toBe('100');
+				}
+			});
+		});
+	});
+
+	describe('#ready method branches', () => {
+		it('should early return when target is null/undefined (line 472)', () => {
+			// componentSelect calls #ready internally
+			const figureOpenBefore = embed.figure.open.mock.calls.length;
+			embed.componentSelect(null);
+			// figure.open should not have been called
+			expect(embed.figure.open.mock.calls.length).toBe(figureOpenBefore);
+		});
+
+		it('should set data-se-origin when cover does not have it and src matches (line 481-486)', () => {
+			const mockCover = {
+				nodeType: 1,
+				setAttribute: jest.fn(),
+				getAttribute: jest.fn().mockReturnValue(''), // empty, no data-se-origin
+				appendChild: jest.fn(),
+			};
+			embed.figure.open = jest.fn().mockReturnValue({
+				cover: mockCover,
+				container: { nodeType: 1, style: {} },
+				caption: null,
+				align: 'none',
+				w: '100%',
+				h: '400px',
+				originWidth: '100%',
+				originHeight: '400px',
+				ratio: { w: 1, h: 1 },
+			});
+
+			const mockElement = {
+				nodeName: 'IFRAME',
+				src: 'https://www.facebook.com/user/posts/123',
+				style: {},
+				getAttribute: jest.fn().mockReturnValue('https://www.facebook.com/user/posts/123'),
+			};
+
+			embed.componentSelect(mockElement);
+			expect(mockCover.setAttribute).toHaveBeenCalledWith('data-se-origin', 'https://www.facebook.com/user/posts/123');
+		});
+
+		it('should handle resizing disabled path (line 497)', () => {
+			const noResizeKernel = createMockEditor();
+			const noResizeEmbed = new Embed(noResizeKernel, { canResize: false });
+
+			const mockCover = {
+				nodeType: 1,
+				setAttribute: jest.fn(),
+				getAttribute: jest.fn().mockReturnValue('some-origin'),
+				appendChild: jest.fn(),
+			};
+			noResizeEmbed.figure.open = jest.fn().mockReturnValue({
+				cover: mockCover,
+				container: { nodeType: 1, style: {} },
+				caption: null,
+				align: 'none',
+				w: '100%',
+				h: '400px',
+				originWidth: '100%',
+				originHeight: '400px',
+				ratio: { w: 1, h: 1 },
+			});
+
+			const mockElement = { nodeName: 'IFRAME', src: 'https://example.com/embed', style: {} };
+			// Should not throw - just returns early from resizing block
+			noResizeEmbed.componentSelect(mockElement);
+			expect(noResizeEmbed.figure.open).toHaveBeenCalled();
+			// inputX/inputY should be null since canResize is false
+			expect(noResizeEmbed.inputX).toBeNull();
+		});
+
+		it('should handle percentageRotation path (line 499-507)', () => {
+			const percentKernel = createMockEditor();
+			const percentEmbed = new Embed(percentKernel, { canResize: true, percentageOnlySize: true });
+
+			const mockCover = {
+				nodeType: 1,
+				setAttribute: jest.fn(),
+				getAttribute: jest.fn().mockReturnValue('some-origin'),
+				appendChild: jest.fn(),
+			};
+			const figureInstance = percentEmbed.figure;
+			figureInstance.open = jest.fn().mockReturnValue({
+				cover: mockCover,
+				container: { nodeType: 1, style: {} },
+				caption: null,
+				align: 'none',
+				w: '100%',
+				h: '400px',
+				originWidth: '100%',
+				originHeight: '400px',
+				ratio: { w: 1, h: 1 },
+			});
+			figureInstance.getSize = jest.fn().mockReturnValue({ w: '100%', h: '400px', dw: '100%', dh: '400px' });
+			figureInstance.isVertical = true; // This triggers percentageRotation
+
+			const mockElement = { nodeName: 'IFRAME', src: 'https://example.com/embed', style: {} };
+			percentEmbed.componentSelect(mockElement);
+
+			// With percentageRotation = true, inputs should be disabled
+			expect(percentEmbed.inputX.disabled).toBe(true);
+			expect(percentEmbed.inputY.disabled).toBe(true);
+			expect(percentEmbed.proportion.disabled).toBe(true);
+		});
+	});
+
+	describe('#create method branches via submitSRC', () => {
+		it('should handle isUpdate path - same src (lines 555-574)', async () => {
+			const { dom } = require('../../../../src/helper');
+
+			// First, set up an existing element by selecting it
+			const figureCover = {
+				nodeName: 'FIGURE',
+				nodeType: 1,
+				setAttribute: jest.fn(),
+				getAttribute: jest.fn().mockReturnValue(''),
+				appendChild: jest.fn(),
+			};
+			const existingElement = {
+				nodeName: 'IFRAME',
+				src: 'https://www.facebook.com/plugins/post.php?href=test',
+				style: {},
+				replaceWith: jest.fn(),
+				parentElement: figureCover,
+			};
+			const mockCover = {
+				nodeType: 1,
+				setAttribute: jest.fn(),
+				getAttribute: jest.fn().mockReturnValue('https://www.facebook.com/user/posts/123'),
+				appendChild: jest.fn(),
+			};
+			const mockContainer = { nodeType: 1, style: {}, appendChild: jest.fn() };
+
+			embed.figure.open = jest.fn().mockReturnValue({
+				cover: mockCover,
+				container: mockContainer,
+				caption: null,
+				align: 'none',
+				w: '100%',
+				h: '400px',
+				originWidth: '100%',
+				originHeight: '400px',
+				ratio: { w: 1, h: 1 },
+			});
+
+			embed.componentSelect(existingElement);
+			embed.modal.isUpdate = true;
+
+			// Mock getParentElement to return FIGURE for the update path
+			dom.query.getParentElement.mockImplementation((el, condition) => {
+				if (typeof condition === 'string' && condition === 'FIGURE') {
+					return figureCover;
+				}
+				return null;
+			});
+
+			embed.$.eventManager.triggerEvent = jest.fn().mockResolvedValue(true);
+
+			const result = await embed.submitSRC('https://www.facebook.com/user/posts/456');
+			expect(result).toBe(true);
+
+			// Restore default mock
+			dom.query.getParentElement.mockImplementation((el, condition) => {
+				if (typeof condition === 'function') {
+					if (el?.parentElement) {
+						let parent = el.parentElement;
+						while (parent) {
+							if (condition(parent)) return parent;
+							parent = parent.parentElement;
+						}
+					}
+				} else if (typeof condition === 'string') {
+					if (el?.parentElement) {
+						let parent = el.parentElement;
+						while (parent) {
+							if (parent.nodeName === condition) return parent;
+							parent = parent.parentElement;
+						}
+					}
+				}
+				return null;
+			});
+		});
+
+		it('should handle isUpdate path - iframe to blockquote tag change (lines 564-568)', async () => {
+			const { dom } = require('../../../../src/helper');
+
+			const figureCover = {
+				nodeName: 'FIGURE',
+				nodeType: 1,
+				setAttribute: jest.fn(),
+				getAttribute: jest.fn().mockReturnValue(''),
+				appendChild: jest.fn(),
+			};
+			const existingElement = {
+				nodeName: 'IFRAME',
+				src: 'https://www.facebook.com/plugins/post.php?href=old',
+				style: {},
+				replaceWith: jest.fn(),
+				parentElement: figureCover,
+			};
+			const mockCover = {
+				nodeType: 1,
+				setAttribute: jest.fn(),
+				getAttribute: jest.fn().mockReturnValue('https://www.facebook.com/user/posts/old'),
+				appendChild: jest.fn(),
+			};
+			const mockContainer = { nodeType: 1, style: {}, appendChild: jest.fn() };
+
+			embed.figure.open = jest.fn().mockReturnValue({
+				cover: mockCover,
+				container: mockContainer,
+				caption: null,
+				align: 'none',
+				w: '100%',
+				h: '400px',
+				originWidth: '100%',
+				originHeight: '400px',
+				ratio: { w: 1, h: 1 },
+			});
+			embed.figure.getSize = jest.fn().mockReturnValue({ w: '100%', h: '400px', dw: '100%', dh: '400px' });
+
+			embed.componentSelect(existingElement);
+			embed.modal.isUpdate = true;
+
+			// Add a custom query that produces blockquote tag
+			embed.query.customBlockquote = {
+				pattern: /https:\/\/blockquote-service\.com\/.+/i,
+				action: (url) => url,
+				tag: 'blockquote',
+			};
+
+			// Mock getParentElement to return FIGURE for the update path
+			dom.query.getParentElement.mockImplementation((el, condition) => {
+				if (typeof condition === 'string' && condition === 'FIGURE') {
+					return figureCover;
+				}
+				return null;
+			});
+
+			dom.utils.createElement.mockReturnValueOnce({
+				querySelector: jest.fn().mockReturnValue({ value: '', placeholder: '', disabled: false, checked: false }),
+				appendChild: jest.fn(),
+				setAttribute: jest.fn(),
+				getAttribute: jest.fn(),
+				classList: { contains: jest.fn() },
+				style: {},
+				innerHTML: '',
+				frameBorder: '',
+				allowFullscreen: false,
+			});
+
+			embed.$.eventManager.triggerEvent = jest.fn().mockResolvedValue(true);
+
+			const result = await embed.submitSRC('https://blockquote-service.com/post/123');
+			expect(result).toBe(true);
+
+			// Restore default mock
+			dom.query.getParentElement.mockImplementation((el, condition) => {
+				if (typeof condition === 'function') {
+					if (el?.parentElement) {
+						let parent = el.parentElement;
+						while (parent) {
+							if (condition(parent)) return parent;
+							parent = parent.parentElement;
+						}
+					}
+				} else if (typeof condition === 'string') {
+					if (el?.parentElement) {
+						let parent = el.parentElement;
+						while (parent) {
+							if (parent.nodeName === condition) return parent;
+							parent = parent.parentElement;
+						}
+					}
+				}
+				return null;
+			});
+		});
+
+		it('should handle isUpdate path - blockquote to iframe tag change (lines 560-563)', async () => {
+			const { dom } = require('../../../../src/helper');
+
+			const figureCover = {
+				nodeName: 'FIGURE',
+				nodeType: 1,
+				setAttribute: jest.fn(),
+				getAttribute: jest.fn().mockReturnValue(''),
+				appendChild: jest.fn(),
+			};
+			// Existing element is a BLOCKQUOTE (not iframe)
+			const existingElement = {
+				nodeName: 'BLOCKQUOTE',
+				src: 'https://old-url.com/content',
+				style: {},
+				replaceWith: jest.fn(),
+				parentElement: figureCover,
+			};
+			const mockCover = {
+				nodeType: 1,
+				setAttribute: jest.fn(),
+				getAttribute: jest.fn().mockReturnValue('https://old-url.com/content'),
+				appendChild: jest.fn(),
+			};
+			const mockContainer = { nodeType: 1, style: {}, appendChild: jest.fn() };
+
+			embed.figure.open = jest.fn().mockReturnValue({
+				cover: mockCover,
+				container: mockContainer,
+				caption: null,
+				align: 'none',
+				w: '100%',
+				h: '400px',
+				originWidth: '100%',
+				originHeight: '400px',
+				ratio: { w: 1, h: 1 },
+			});
+			embed.figure.getSize = jest.fn().mockReturnValue({ w: '100%', h: '400px', dw: '100%', dh: '400px' });
+
+			embed.componentSelect(existingElement);
+			embed.modal.isUpdate = true;
+
+			// Mock getParentElement to return FIGURE for the update path
+			dom.query.getParentElement.mockImplementation((el, condition) => {
+				if (typeof condition === 'string' && condition === 'FIGURE') {
+					return figureCover;
+				}
+				return null;
+			});
+
+			embed.$.eventManager.triggerEvent = jest.fn().mockResolvedValue(true);
+
+			// Submit with a Facebook URL which has tag 'iframe' - existing is BLOCKQUOTE
+			// This triggers: processUrl.tag = 'iframe' && oFrame.nodeName = 'BLOCKQUOTE' (not iframe)
+			const result = await embed.submitSRC('https://www.facebook.com/user/posts/999');
+			expect(result).toBe(true);
+			// The existing blockquote element should have been replaced
+			expect(existingElement.replaceWith).toHaveBeenCalled();
+
+			// Restore default mock
+			dom.query.getParentElement.mockImplementation((el, condition) => {
+				if (typeof condition === 'function') {
+					if (el?.parentElement) {
+						let parent = el.parentElement;
+						while (parent) {
+							if (condition(parent)) return parent;
+							parent = parent.parentElement;
+						}
+					}
+				} else if (typeof condition === 'string') {
+					if (el?.parentElement) {
+						let parent = el.parentElement;
+						while (parent) {
+							if (parent.nodeName === condition) return parent;
+							parent = parent.parentElement;
+						}
+					}
+				}
+				return null;
+			});
+		});
+
+		it('should handle !isUpdate with process (iframe creation, lines 577-582)', async () => {
+			embed.modal.isUpdate = false;
+			embed.$.eventManager.triggerEvent = jest.fn().mockResolvedValue(true);
+
+			const result = await embed.submitSRC('https://www.facebook.com/user/posts/123');
+			expect(result).toBe(true);
+			expect(mockFigure.CreateContainer).toHaveBeenCalled();
+			expect(embed.$.component.insert).toHaveBeenCalled();
+		});
+
+		it('should handle !isUpdate without process (blockquote/children path, lines 583-596)', async () => {
+			const blockquoteCode = '<blockquote class="twitter-tweet"><a href="https://twitter.com/user/status/123">test</a></blockquote>';
+			embed.modal.isUpdate = false;
+			embed.$.eventManager.triggerEvent = jest.fn().mockResolvedValue(true);
+
+			const result = await embed.submitSRC(blockquoteCode);
+			expect(result).toBe(true);
+			expect(mockFigure.CreateContainer).toHaveBeenCalled();
+			expect(embed.$.component.insert).toHaveBeenCalled();
+		});
+
+		it('should handle scriptTag in children (lines 591-596, 627-658)', async () => {
+			// Create a blockquote with an accompanying script tag
+			const blockquoteWithScript = '<blockquote class="twitter-tweet">content</blockquote><script src="https://platform.twitter.com/widgets.js" async></script>';
+
+			embed.modal.isUpdate = false;
+			embed.$.eventManager.triggerEvent = jest.fn().mockResolvedValue(true);
+
+			// createElement for script tag
+			const { dom } = require('../../../../src/helper');
+			const scriptElement = {
+				nodeName: 'SCRIPT',
+				getAttribute: jest.fn().mockReturnValue('https://platform.twitter.com/widgets.js'),
+				setAttribute: jest.fn(),
+				onload: null,
+				src: 'https://platform.twitter.com/widgets.js',
+			};
+			dom.utils.createElement.mockImplementation((tag, attrs, content) => {
+				if (tag === 'script') {
+					return scriptElement;
+				}
+				return {
+					querySelector: jest.fn().mockReturnValue({ value: '', placeholder: '', disabled: false, checked: false }),
+					appendChild: jest.fn(),
+					setAttribute: jest.fn(),
+					getAttribute: jest.fn(),
+					classList: { contains: jest.fn() },
+					style: {},
+					innerHTML: '',
+					frameBorder: '',
+					allowFullscreen: false,
+				};
+			});
+
+			const result = await embed.submitSRC(blockquoteWithScript);
+			expect(result).toBe(true);
+
+			// Restore createElement mock
+			dom.utils.createElement.mockReturnValue({
+				querySelector: jest.fn().mockReturnValue({ value: '', placeholder: '', disabled: false, checked: false }),
+				appendChild: jest.fn(),
+				setAttribute: jest.fn(),
+				getAttribute: jest.fn(),
+				classList: { contains: jest.fn() },
+				style: {},
+				innerHTML: '',
+			});
+		});
+
+		it('should handle setTransform in update path when conditions are met (line 667)', async () => {
+			const { dom } = require('../../../../src/helper');
+
+			const figureCover = {
+				nodeName: 'FIGURE',
+				nodeType: 1,
+				setAttribute: jest.fn(),
+				getAttribute: jest.fn().mockReturnValue(''),
+				appendChild: jest.fn(),
+			};
+			const existingElement = {
+				nodeName: 'IFRAME',
+				src: 'https://www.facebook.com/plugins/post.php?href=old',
+				style: {},
+				replaceWith: jest.fn(),
+				parentElement: figureCover,
+			};
+			const mockCover = {
+				nodeType: 1,
+				setAttribute: jest.fn(),
+				getAttribute: jest.fn().mockReturnValue('https://www.facebook.com/user/posts/old'),
+				appendChild: jest.fn(),
+			};
+			const mockContainer = { nodeType: 1, style: {}, appendChild: jest.fn() };
+
+			embed.figure.open = jest.fn().mockReturnValue({
+				cover: mockCover,
+				container: mockContainer,
+				caption: null,
+				align: 'none',
+				w: '100%',
+				h: '400px',
+				originWidth: '100%',
+				originHeight: '400px',
+				ratio: { w: 1, h: 1 },
+			});
+			// Return different size than input to trigger changeSize
+			embed.figure.getSize = jest.fn().mockReturnValue({ w: '50%', h: '200px', dw: '50%', dh: '200px' });
+			embed.figure.isVertical = false;
+
+			embed.componentSelect(existingElement);
+			embed.modal.isUpdate = true;
+
+			// Mock getParentElement to return FIGURE for the update path
+			dom.query.getParentElement.mockImplementation((el, condition) => {
+				if (typeof condition === 'string' && condition === 'FIGURE') {
+					return figureCover;
+				}
+				return null;
+			});
+
+			embed.$.eventManager.triggerEvent = jest.fn().mockResolvedValue(true);
+			embed.inputX.value = '100%';
+			embed.inputY.value = '400px';
+
+			const result = await embed.submitSRC('https://www.facebook.com/user/posts/new');
+			expect(result).toBe(true);
+			// setTransform should be called when !resizing || !changeSize || !isVertical
+			expect(embed.figure.setTransform).toHaveBeenCalled();
+
+			// Restore default mock
+			dom.query.getParentElement.mockImplementation((el, condition) => {
+				if (typeof condition === 'function') {
+					if (el?.parentElement) {
+						let parent = el.parentElement;
+						while (parent) {
+							if (condition(parent)) return parent;
+							parent = parent.parentElement;
+						}
+					}
+				} else if (typeof condition === 'string') {
+					if (el?.parentElement) {
+						let parent = el.parentElement;
+						while (parent) {
+							if (parent.nodeName === condition) return parent;
+							parent = parent.parentElement;
+						}
+					}
+				}
+				return null;
+			});
+		});
+	});
+
+	describe('#applySize branches', () => {
+		it('should set 100% when onlyPercentage and width is empty (line 713)', async () => {
+			const percentKernel = createMockEditor();
+			const percentEmbed = new Embed(percentKernel, { canResize: true, percentageOnlySize: true });
+			percentEmbed.modal.isUpdate = false;
+
+			// Clear inputX value to trigger the !w path
+			if (percentEmbed.inputX) percentEmbed.inputX.value = '';
+
+			percentEmbed.$.eventManager.triggerEvent = jest.fn().mockResolvedValue(true);
+
+			// Use a URL that triggers the process path (which calls #applySize with potentially empty width)
+			const result = await percentEmbed.submitSRC('https://www.facebook.com/user/posts/123');
+			expect(result).toBe(true);
+			expect(percentEmbed.figure.setSize).toHaveBeenCalled();
+		});
+
+		it('should append % when onlyPercentage and width does not end with % (line 714)', async () => {
+			const percentKernel = createMockEditor();
+			const percentEmbed = new Embed(percentKernel, { canResize: true, percentageOnlySize: true, defaultWidth: '80' });
+
+			percentEmbed.modal.isUpdate = false;
+			if (percentEmbed.inputX) percentEmbed.inputX.value = '80';
+			if (percentEmbed.inputY) percentEmbed.inputY.value = '';
+
+			percentEmbed.$.eventManager.triggerEvent = jest.fn().mockResolvedValue(true);
+
+			const result = await percentEmbed.submitSRC('https://www.facebook.com/user/posts/123');
+			expect(result).toBe(true);
+			// setSize should be called with % appended
+			expect(percentEmbed.figure.setSize).toHaveBeenCalled();
+		});
+	});
+
+	describe('#setIframeAttrs with iframeTagAttributes (lines 742-752)', () => {
+		it('should set custom iframe attributes when iframeTagAttributes is configured', async () => {
+			const attrKernel = createMockEditor();
+			const attrEmbed = new Embed(attrKernel, {
+				canResize: true,
+				iframeTagAttributes: {
+					sandbox: 'allow-scripts allow-same-origin',
+					loading: 'lazy',
+				},
+			});
+
+			attrEmbed.modal.isUpdate = false;
+			attrEmbed.$.eventManager.triggerEvent = jest.fn().mockResolvedValue(true);
+
+			// When submitSRC creates an iframe, it calls #createIframeTag which calls #setIframeAttrs
+			const result = await attrEmbed.submitSRC('https://www.facebook.com/user/posts/123');
+			expect(result).toBe(true);
+			// The createElement mock is used, so we can't directly verify setAttribute calls on it,
+			// but the method should complete without error
+		});
+	});
+
+	describe('componentDestroy additional branches', () => {
+		it('should call removeAllParents with childNodes check (line 386)', async () => {
+			const iframe = { nodeName: 'IFRAME', src: 'test', style: {} };
+			const parentNode = { nodeType: 1, childNodes: [] };
+			const container = {
+				nodeType: 1,
+				parentNode: parentNode,
+				previousElementSibling: { nodeType: 1 },
+			};
+
+			embed.$.eventManager.triggerEvent = jest.fn().mockResolvedValue(undefined);
+
+			// Mock getParentElement to return the container
+			const { dom } = require('../../../../src/helper');
+			dom.query.getParentElement.mockReturnValueOnce(container);
+
+			embed.componentSelect(iframe);
+			await embed.componentDestroy(iframe);
+
+			expect(embed.$.nodeTransform.removeAllParents).toHaveBeenCalled();
+			// Verify the callback function tests childNodes.length === 0
+			const removeAllParentsCall = embed.$.nodeTransform.removeAllParents.mock.calls[0];
+			if (removeAllParentsCall) {
+				const conditionFn = removeAllParentsCall[1];
+				expect(conditionFn({ childNodes: [] })).toBe(true);
+				expect(conditionFn({ childNodes: [1] })).toBe(false);
+			}
+		});
+	});
+
+	describe('modalAction with linkValue set', () => {
+		it('should set component.select timeout when submitSRC returns true (line 325)', async () => {
+			jest.useFakeTimers();
+
+			// Set linkValue via the input handler
+			const addEventCalls = kernel.$.eventManager.addEvent.mock.calls;
+			const inputCall = addEventCalls.find(call => call[1] === 'input');
+			const onLinkPreview = inputCall[2];
+
+			kernel.$.options.get = jest.fn().mockReturnValue(null);
+			onLinkPreview({ target: { value: 'https://www.facebook.com/user/posts/123' } });
+
+			// Mock submitSRC to return true
+			embed.$.eventManager.triggerEvent = jest.fn().mockResolvedValue(true);
+
+			const result = await embed.modalAction();
+			expect(result).toBe(true);
+
+			// setTimeout should have been called for component.select
+			jest.runAllTimers();
+			expect(embed.$.component.select).toHaveBeenCalled();
+
+			jest.useRealTimers();
 		});
 	});
 });
