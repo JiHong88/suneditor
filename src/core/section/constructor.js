@@ -415,9 +415,9 @@ export function InitOptions(options, editorTargets, plugins) {
 	o.set('autoLinkify', options.autoLinkify ?? !!plugins.link);
 	o.set('autoStyleify', Array.isArray(options.autoStyleify) ? options.autoStyleify : ['bold', 'underline', 'italic', 'strike']);
 
-	let retainStyleMode = options.retainStyleMode;
+	let retainStyleMode = options.retainStyleMode || 'repeat';
 	if (typeof retainStyleMode === 'string' && !DEFAULTS.RETAIN_STYLE_MODE.includes(retainStyleMode)) {
-		console.error(`Invalid retainStyleMode: ${retainStyleMode}. Valid options are ${DEFAULTS.RETAIN_STYLE_MODE.join(', ')}. Using default 'once'.`);
+		console.error(`Invalid retainStyleMode: ${retainStyleMode}. Valid options are ${DEFAULTS.RETAIN_STYLE_MODE.join(', ')}. Using default 'repeat'.`);
 		retainStyleMode = 'repeat';
 	}
 	o.set('retainStyleMode', retainStyleMode);
@@ -814,11 +814,11 @@ function InitFrameOptions(o, origin) {
 	fo.set('editableFrameAttributes', { spellcheck: 'false', ...editableFrameAttributes });
 	// styles
 	fo.set('width', width ? String(numbers.is(width) ? width + 'px' : width) : '100%');
-	fo.set('minWidth', String(numbers.is(minWidth) ? minWidth + 'px' : minWidth) || '');
-	fo.set('maxWidth', String(numbers.is(maxWidth) ? maxWidth + 'px' : maxWidth) || '');
+	fo.set('minWidth', minWidth ? String(numbers.is(minWidth) ? minWidth + 'px' : minWidth) : '');
+	fo.set('maxWidth', maxWidth ? String(numbers.is(maxWidth) ? maxWidth + 'px' : maxWidth) : '');
 	fo.set('height', height ? String(numbers.is(height) ? height + 'px' : height) : 'auto');
-	fo.set('minHeight', String(numbers.is(minHeight) ? minHeight + 'px' : minHeight) || '');
-	fo.set('maxHeight', String(numbers.is(maxHeight) ? maxHeight + 'px' : maxHeight) || '');
+	fo.set('minHeight', minHeight ? String(numbers.is(minHeight) ? minHeight + 'px' : minHeight) : '');
+	fo.set('maxHeight', maxHeight ? String(numbers.is(maxHeight) ? maxHeight + 'px' : maxHeight) : '');
 	fo.set('editorStyle', editorStyle);
 	fo.set('_defaultStyles', converter._setDefaultOptionStyle(fo, typeof editorStyle === 'string' ? editorStyle : ''));
 	// iframe
