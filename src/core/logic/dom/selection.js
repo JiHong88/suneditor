@@ -401,8 +401,10 @@ class Selection_ {
 			console.warn('[SUNEDITOR.html.scrollTo.warn] "selectionRange" must be Selection or Range or Node object.', ref);
 		}
 
+		const el = dom.query.getParentElement(ref?.startContainer, (current) => current.nodeType === 1);
+		if (!el) return;
+
 		scrollOption = { behavior: 'smooth', block: 'nearest', inline: 'nearest', ...scrollOption };
-		const el = dom.query.getParentElement(ref.startContainer, (current) => current.nodeType === 1);
 
 		const ww = this.#frameContext.get('_ww');
 		const wwFrame = this.#frameContext.get('wysiwygFrame');
