@@ -364,7 +364,7 @@ const options1 = {
 	strictMode: {
 		// styleFilter: false
 	},
-	mode: 'balloon',
+	// mode: 'balloon',
 	// strictMode: false,
 	// strictMode: false,
 	// lang: langs.ko,

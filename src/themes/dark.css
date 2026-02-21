@@ -109,6 +109,12 @@
 	--se-input-btn-border-color: #3a3a3a;
 	--se-input-btn-disabled-color: #777;
 
+	/* table picker */
+	--se-table-picker-color: #3a3a3a;
+	--se-table-picker-border-color: #555;
+	--se-table-picker-highlight-color: #304a5c;
+	--se-table-picker-highlight-border-color: #6589a0;
+
 	/* success status palette */
 	--se-success-color: #22c55e;
 	--se-success-dark-color: #16a34a;
