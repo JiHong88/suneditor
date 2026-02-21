@@ -430,7 +430,7 @@
 	table-layout: auto !important;
 	border-width: 1px;
 	border-style: solid;
-	border-color: var(--se-edit-border-light);
+	border-color: var(--se-edit-border-table);
 	width: 100%;
 	max-width: 100%;
 	margin: 0;
@@ -451,7 +451,7 @@
 	padding: 0.5em;
 	margin: 0;
 	background-color: var(--se-edit-background-pre);
-	border: 1px solid var(--se-edit-border-light);
+	border: 1px solid var(--se-edit-border-table);
 	outline: none;
 }
 .sun-editor-editable table caption.se-table-caption-top {
@@ -480,7 +480,7 @@
 .sun-editor-editable table td {
 	border-width: 1px;
 	border-style: solid;
-	border-color: var(--se-edit-border-light);
+	border-color: var(--se-edit-border-table);
 	padding: 0.4em;
 	background-clip: padding-box;
 	background-color: inherit;

@@ -1,6 +1,8 @@
-.sun-editor.se-theme-blue,
-.sun-editor-editable.se-theme-blue {
-	/** Theme color tokens used by suneditor.css and suneditor-contents.css. */
+/** Theme color tokens used by suneditor.css and suneditor-contents.css. */
+/** [ assets/design/color.css ] */
+
+.sun-editor.se-theme-cobalt,
+.sun-editor-editable.se-theme-cobalt {
 	/** --------------------------- content - [colors] ----------- */
 	/* caret and placeholder */
 	--se-caret-color: #ccc;
@@ -10,23 +12,24 @@
 	/* editable text tones */
 	--se-edit-font-color: #ccc;
 	--se-edit-font-pre: #aaa;
-	--se-edit-font-quote: #888;
+	--se-edit-font-quote: #8899aa;
 
 	/* editable surfaces */
 	--se-edit-background-color: #0f1828;
 	--se-edit-background-pre: #364153;
 
 	/* content border scale */
-	--se-edit-border-light: #555;
-	--se-edit-border-dark: #444;
-	--se-edit-border-dark-n1: #555;
-	--se-edit-border-dark-n2: #666;
+	--se-edit-border-light: #2a4a7a;
+	--se-edit-border-dark: #1e3a6a;
+	--se-edit-border-dark-n1: #244070;
+	--se-edit-border-dark-n2: #305088;
+	--se-edit-border-table: #4a5565;
 
 	/* links and horizontal rules */
 	--se-edit-anchor: #77aaff;
 	--se-edit-anchor-on-back: #004cff;
 	--se-edit-anchor-on-font: #e8f7ff;
-	--se-edit-hr-color: #ccc;
+	--se-edit-hr-color: #556688;
 	--se-edit-hr-on-back: #77aaff;
 
 	/* content interaction states */
