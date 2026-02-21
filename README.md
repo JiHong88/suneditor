@@ -173,7 +173,13 @@ See [Contribution Guide](./CONTRIBUTING.md#-ai-plugin-helper) for tips and examp
 
 ## 💎 Sponsors
 
-[![Financial Contributors on Open Collective](https://opencollective.com/suneditor/contributors.svg?width=890&avatarHeight=64&button=false)](https://opencollective.com/suneditor)
+### Backers
+
+[![Backers on Open Collective](https://opencollective.com/suneditor/backers.svg?width=890&avatarHeight=64&button=false)](https://opencollective.com/suneditor)
+
+### Sponsors
+
+[![Sponsors on Open Collective](https://opencollective.com/suneditor/sponsors.svg?width=890&avatarHeight=64&button=false)](https://opencollective.com/suneditor)
 
 ---
 
