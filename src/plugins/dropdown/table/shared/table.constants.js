@@ -34,29 +34,29 @@ export const BORDER_NS = {
 export const DEFAULT_BORDER_UNIT = 'px';
 
 export const DEFAULT_COLOR_LIST = [
-	// row-1
-	'#b0dbb0',
-	'#efef7e',
-	'#f2acac',
-	'#dcb0f6',
-	'#99bdff',
-	// row-2
-	'#5dbd5d',
-	'#e7c301',
-	'#f64444',
-	'#e57ff4',
-	'#4387f1',
-	// row-3
-	'#27836a',
-	'#f69915',
-	'#ba0808',
-	'#a90bed',
-	'#134299',
-	// row-4
-	'#e4e4e4',
-	'#B3B3B3',
-	'#808080',
-	'#4D4D4D',
+	// row-1 (light)
+	'#bbf7d0',
+	'#fde68a',
+	'#fecaca',
+	'#e9d5ff',
+	'#bfdbfe',
+	// row-2 (vivid)
+	'#22c55e',
+	'#eab308',
+	'#ef4444',
+	'#a855f7',
+	'#3b82f6',
+	// row-3 (deep)
+	'#15803d',
+	'#ca8a04',
+	'#b91c1c',
+	'#7e22ce',
+	'#1d4ed8',
+	// row-4 (gray)
+	'#e5e7eb',
+	'#9ca3af',
+	'#6b7280',
+	'#374151',
 	'#000000',
 ];
 

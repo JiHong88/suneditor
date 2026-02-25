@@ -865,7 +865,7 @@ const options1 = {
 	},
 	fontColor: {
 		// disableHEXInput: true,
-		items: [{ name: 'red', value: '#ff0000' }, '#ff5e00', '#ffe400', '#abf200', '#00d8ff', '#0055ff', '#6600ff', '#ff00dd', '#000000'],
+		//items: [{ name: 'red', value: '#ff0000' }, '#ff5e00', '#ffe400', '#abf200', '#00d8ff', '#0055ff', '#6600ff', '#ff00dd', '#000000'],
 	},
 	fileUpload: {
 		uploadUrl: 'http://localhost:3000/editor/files/upload',
@@ -2149,12 +2149,12 @@ const options_test = {
 			Authorization: 'Bearer token',
 		},
 	},
-	backgroundColor: {
-		colors: [
-			['#ff0000', '#00ff00', '#0000ff'],
-			['#ffff00', '#ff00ff', '#00ffff'],
-		],
-	},
+	// backgroundColor: {
+	// 	colors: [
+	// 		['#ff0000', '#00ff00', '#0000ff'],
+	// 		['#ffff00', '#ff00ff', '#00ffff'],
+	// 	],
+	// },
 	blockStyle: {
 		_default: 'Default',
 		spaced: 'Spaced',
@@ -2195,12 +2195,12 @@ const options_test = {
 		],
 		default: 'Arial',
 	},
-	fontColor: {
-		colors: [
-			['#000000', '#ffffff'],
-			['#ff0000', '#00ff00'],
-		],
-	},
+	// fontColor: {
+	// 	colors: [
+	// 		['#000000', '#ffffff'],
+	// 		['#ff0000', '#00ff00'],
+	// 	],
+	// },
 	fontSize: {
 		list: [
 			{ text: '8pt', value: '8pt' },
