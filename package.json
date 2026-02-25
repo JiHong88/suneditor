@@ -47,8 +47,8 @@
 	"scripts": {
 		"dev": "webpack-dev-server --config webpack/dev.js",
 		"start": "npm run dev",
-		"build:dev": "cross-env NODE_ENV=development webpack --config webpack/builder.js",
-		"build:prod": "cross-env NODE_ENV=production webpack --config webpack/builder.js",
+		"build:dev": "cross-env NODE_ENV=development webpack --config webpack/builder.js && cross-env NODE_ENV=development webpack --config webpack/builder-contents.js && rm -f dist/_suneditor-contents.js",
+		"build:prod": "cross-env NODE_ENV=production webpack --config webpack/builder.js && cross-env NODE_ENV=production webpack --config webpack/builder-contents.js && rm -f dist/_suneditor-contents.js",
 		"lint:type": "npx tsc --noEmit",
 		"lint:fix-js": "npx eslint \"src/**/*.js\" --fix",
 		"lint:fix-ts": "npx eslint types/ --fix",
