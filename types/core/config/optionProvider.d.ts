@@ -14,7 +14,7 @@ import type {} from '../../typedef';
  * @property {<K extends keyof ConfigAllBaseOptions>(k: K, v: ConfigAllBaseOptions[K]) => void} set - Sets the value of a specific option.
  * @property {<K extends keyof ConfigAllBaseOptions>(k: K) => boolean} has - Checks if a specific option exists.
  * @property {() => Object<keyof ConfigAllBaseOptions, *>} getAll - Retrieves all options as an object.
- * @property {(options: Partial<ConfigAllBaseOptions>) => void} setMany - Sets multiple options at once.
+ * @property {(options: Map<*, *>) => void} setMany - Sets multiple options at once.
  * @property {(newMap: SunEditor.InitOptions) => void} reset - Replaces all options with a new Map.
  * @property {() => number} size - Get option size
  * @property {() => void} clear - Clears all stored options.
@@ -30,7 +30,7 @@ import type {} from '../../typedef';
  * @property {<K extends keyof ConfigAllFrameOptions>(k: K, v: ConfigAllFrameOptions[K]) => void} set - Sets the value of a specific option.
  * @property {<K extends keyof ConfigAllFrameOptions>(k: K) => boolean} has - Checks if a specific option exists.
  * @property {() => Object<keyof ConfigAllFrameOptions, *>} getAll - Retrieves all options as an object.
- * @property {(options: Partial<ConfigAllFrameOptions>) => void} setMany - Sets multiple options at once.
+ * @property {(options: Map<*, *>) => void} setMany - Sets multiple options at once.
  * @property {(newMap: SunEditor.FrameOptions) => void} reset - Replaces all options with a new Map.
  * @property {() => number} size - Get option size
  * @property {() => void} clear - Clears all stored options.
@@ -88,7 +88,7 @@ export type BaseOptionsMap = {
 	/**
 	 * - Sets multiple options at once.
 	 */
-	setMany: (options: Partial<ConfigAllBaseOptions>) => void;
+	setMany: (options: Map<any, any>) => void;
 	/**
 	 * - Replaces all options with a new Map.
 	 */
@@ -128,7 +128,7 @@ export type FrameOptionsMap = {
 	/**
 	 * - Sets multiple options at once.
 	 */
-	setMany: (options: Partial<ConfigAllFrameOptions>) => void;
+	setMany: (options: Map<any, any>) => void;
 	/**
 	 * - Replaces all options with a new Map.
 	 */

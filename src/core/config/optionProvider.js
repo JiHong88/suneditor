@@ -19,7 +19,7 @@ import { UpdateStatusbarContext } from '../schema/frameContext';
  * @property {<K extends keyof ConfigAllBaseOptions>(k: K, v: ConfigAllBaseOptions[K]) => void} set - Sets the value of a specific option.
  * @property {<K extends keyof ConfigAllBaseOptions>(k: K) => boolean} has - Checks if a specific option exists.
  * @property {() => Object<keyof ConfigAllBaseOptions, *>} getAll - Retrieves all options as an object.
- * @property {(options: Partial<ConfigAllBaseOptions>) => void} setMany - Sets multiple options at once.
+ * @property {(options: Map<*, *>) => void} setMany - Sets multiple options at once.
  * @property {(newMap: SunEditor.InitOptions) => void} reset - Replaces all options with a new Map.
  * @property {() => number} size - Get option size
  * @property {() => void} clear - Clears all stored options.
@@ -36,7 +36,7 @@ import { UpdateStatusbarContext } from '../schema/frameContext';
  * @property {<K extends keyof ConfigAllFrameOptions>(k: K, v: ConfigAllFrameOptions[K]) => void} set - Sets the value of a specific option.
  * @property {<K extends keyof ConfigAllFrameOptions>(k: K) => boolean} has - Checks if a specific option exists.
  * @property {() => Object<keyof ConfigAllFrameOptions, *>} getAll - Retrieves all options as an object.
- * @property {(options: Partial<ConfigAllFrameOptions>) => void} setMany - Sets multiple options at once.
+ * @property {(options: Map<*, *>) => void} setMany - Sets multiple options at once.
  * @property {(newMap: SunEditor.FrameOptions) => void} reset - Replaces all options with a new Map.
  * @property {() => number} size - Get option size
  * @property {() => void} clear - Clears all stored options.
@@ -153,6 +153,7 @@ export default class OptionProvider {
 		// init options
 		const options = this.#optionsMap;
 		const newO = InitOptions(_originOptions, newRoots, plugins);
+
 		const newOptionMap = newO.o;
 		const newFrameMap = newO.frameMap;
 		/** --------- [root start] --------- */
@@ -225,39 +226,39 @@ export default class OptionProvider {
 			}
 			/** --------- [root end] --------- */
 
-			//  --- set options ---
-			options.set(k, newOptionMap.get(k));
-
 			/** Options that require a function call */
 			switch (k) {
 				case 'theme': {
-					ui.setTheme(options.get('theme'));
+					ui.setTheme(newOptionMap.get('theme'));
 					break;
 				}
 				case 'events': {
-					const events = options.get('events');
+					const events = newOptionMap.get('events');
 					for (const name in events) {
 						eventManager.events[name] = events[name];
 					}
 					break;
 				}
 				case 'autoStyleify': {
-					html.__resetAutoStyleify(options.get('autoStyleify'));
+					html.__resetAutoStyleify(newOptionMap.get('autoStyleify'));
 					break;
 				}
 				case 'textDirection': {
-					ui.setDir(options.get('_rtl') ? 'rtl' : 'ltr');
+					ui.setDir(newOptionMap.get('textDirection') === 'rtl' ? 'rtl' : 'ltr');
 					break;
 				}
 				case 'historyStackDelayTime': {
-					history.resetDelayTime(options.get('historyStackDelayTime'));
+					history.resetDelayTime(newOptionMap.get('historyStackDelayTime'));
 					break;
 				}
 				case 'defaultLineBreakFormat': {
-					format.__resetBrLineBreak(options.get('defaultLineBreakFormat'));
+					format.__resetBrLineBreak(newOptionMap.get('defaultLineBreakFormat'));
 				}
 			}
 		}
+
+		//  --- set options ---
+		options.setMany(newOptionMap);
 
 		/** apply options */
 		// _origin
@@ -369,9 +370,9 @@ export default class OptionProvider {
 			getAll() {
 				return Object.fromEntries(store.entries());
 			},
-			/** @param {Partial<ConfigAllBaseOptions>} obj */
+			/** @param {Map<*, *>} obj */
 			setMany(obj) {
-				Object.entries(obj).forEach(([k, v]) => store.set(k, v));
+				obj.forEach((v, k) => store.set(k, v));
 			},
 			/** @param {SunEditor.InitOptions} newMap */
 			reset(newMap) {
@@ -423,9 +424,9 @@ export default class OptionProvider {
 			getAll() {
 				return Object.fromEntries(store.entries());
 			},
-			/** @param {Partial<ConfigAllFrameOptions>} obj */
+			/** @param {Map<*, *>} obj */
 			setMany(obj) {
-				Object.entries(obj).forEach(([k, v]) => store.set(k, v));
+				obj.forEach((v, k) => store.set(k, v));
 			},
 			/** @param {SunEditor.FrameOptions} newMap */
 			reset(newMap) {

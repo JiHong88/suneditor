@@ -200,7 +200,7 @@ export namespace DEFAULTS {
  * @property {string} [theme=""] - Editor theme.
  * @property {Object<string, string>} [lang] - Language configuration. default : EN
  * @property {Object<string, string>} [icons] - Overrides the default icons.
- * @property {string} [textDirection="ltr"] - Text direction: "ltr" or "rtl".
+ * @property {"ltr"|"rtl"} [textDirection="ltr"] - Text direction: "ltr" or "rtl".
  * @property {Array<string>} [reverseButtons=['indent-outdent']] - An array of command pairs whose shortcut icons should be opposite each other, depending on the "textDirection" mode.
  * ///
  *
@@ -744,7 +744,7 @@ export type EditorBaseOptions = {
 	/**
 	 * - Text direction: "ltr" or "rtl".
 	 */
-	textDirection?: string;
+	textDirection?: 'ltr' | 'rtl';
 	/**
 	 * - An array of command pairs whose shortcut icons should be opposite each other, depending on the "textDirection" mode.
 	 * ///

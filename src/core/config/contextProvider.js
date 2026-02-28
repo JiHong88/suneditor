@@ -167,7 +167,7 @@ export default class ContextProvider {
 
 	/**
 	 * @description Creates a utility wrapper for editor base options.
-	 * - Provides get, set, has, getAll, and setMany methods with internal Map support.
+	 * - Provides get, set, has, getAll with internal Map support.
 	 * @param {*} _context - Origin options object
 	 * @returns {ContextMap}
 	 */
@@ -201,7 +201,7 @@ export default class ContextProvider {
 
 	/**
 	 * @description Creates a utility wrapper for editor base options.
-	 * - Provides get, set, has, getAll, and setMany methods with internal Map support.
+	 * - Provides get, set, has, getAll with internal Map support.
 	 * @param {{value: Map}} _frameContext - The editor instance
 	 * @returns {FrameContextMap}
 	 */
