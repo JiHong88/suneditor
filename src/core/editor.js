@@ -143,6 +143,9 @@ class Editor {
 		this.$.store._editorInitFinished = true;
 		this.$.pluginManager.checkFileInfo(true);
 
+		// history reset
+		this.$.history.reset();
+
 		// Defer post-init tasks (observers, history reset, plugin init, onload) to allow DOM to settle after iframe/wysiwyg insertion
 		env._w.setTimeout(() => {
 			// Check if instance was destroyed (e.g., in SSR with dynamic imports mistake)
@@ -162,8 +165,6 @@ class Editor {
 				this.$.ui._syncFrameState(e);
 			});
 
-			// history reset
-			this.$.history.reset();
 			// plugin hook
 			for (const plugin of Object.values(this.$.plugins)) {
 				plugin.init?.();
