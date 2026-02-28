@@ -116,7 +116,12 @@ describe('OptionProvider', () => {
 
 		it('should set multiple base options at once', () => {
 			const options = optionProvider.options;
-			options.setMany({ mode: 'inline', charCounter_type: 'byte' });
+			options.setMany(
+				new Map([
+					['mode', 'inline'],
+					['charCounter_type', 'byte'],
+				]),
+			);
 			expect(options.get('mode')).toBe('inline');
 			expect(options.get('charCounter_type')).toBe('byte');
 		});
@@ -179,7 +184,12 @@ describe('OptionProvider', () => {
 
 		it('should set multiple frame options at once', () => {
 			const frameOptions = optionProvider.frameOptions;
-			frameOptions.setMany({ height: '400px', width: '600px' });
+			frameOptions.setMany(
+				new Map([
+					['height', '400px'],
+					['width', '600px'],
+				]),
+			);
 			expect(frameOptions.get('height')).toBe('400px');
 			expect(frameOptions.get('width')).toBe('600px');
 		});

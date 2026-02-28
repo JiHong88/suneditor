@@ -22,15 +22,15 @@ describe('OptionProvider', () => {
 			char: { display: jest.fn() },
 			uiManager: { setTheme: jest.fn(), setDir: jest.fn(), setEditorStyle: jest.fn() },
 			viewer: { codeView: jest.fn(), showBlocks: jest.fn() },
-			events: {}
+			events: {},
 		};
 
 		mockProduct = {
 			options: new Map([
 				['plugins', []],
 				['buttonList', ['bold', 'italic']],
-				['strictMode', true]
-			])
+				['strictMode', true],
+			]),
 		};
 
 		mockOptions = {};
@@ -73,16 +73,18 @@ describe('OptionProvider', () => {
 			expect(all).toEqual({
 				plugins: [],
 				buttonList: ['bold', 'italic'],
-				strictMode: true
+				strictMode: true,
 			});
 		});
 
 		it('should set many values at once', () => {
-			optionProvider.options.setMany({
-				mode: 'balloon',
-				lang: 'ko',
-				shortcuts: { 'ctrl+b': 'bold' }
-			});
+			optionProvider.options.setMany(
+				new Map([
+					['mode', 'balloon'],
+					['lang', 'ko'],
+					['shortcuts', { 'ctrl+b': 'bold' }],
+				]),
+			);
 
 			expect(optionProvider.options.get('mode')).toBe('balloon');
 			expect(optionProvider.options.get('lang')).toBe('ko');
@@ -92,7 +94,7 @@ describe('OptionProvider', () => {
 		it('should reset with new map', () => {
 			const newMap = new Map([
 				['elementWhitelist', 'p|div'],
-				['textDirection', 'rtl']
+				['textDirection', 'rtl'],
 			]);
 			optionProvider.options.reset(newMap);
 
@@ -108,13 +110,13 @@ describe('OptionProvider', () => {
 		});
 
 		it('should handle complex data types', () => {
-			const complexData = {
-				array: [1, 2, 3],
-				object: { a: 1, b: 2 },
-				function: () => 'test',
-				null: null,
-				undefined: undefined
-			};
+			const complexData = new Map([
+				['array', [1, 2, 3]],
+				['object', { a: 1, b: 2 }],
+				['function', () => 'test'],
+				['null', null],
+				['undefined', undefined],
+			]);
 
 			optionProvider.options.setMany(complexData);
 
@@ -163,16 +165,18 @@ describe('OptionProvider', () => {
 			expect(all).toEqual({
 				width: '100%',
 				height: '300px',
-				iframe: false
+				iframe: false,
 			});
 		});
 
 		it('should set many values at once', () => {
-			optionProvider.frameOptions.setMany({
-				minWidth: '200px',
-				maxHeight: '500px',
-				statusbar: true
-			});
+			optionProvider.frameOptions.setMany(
+				new Map([
+					['minWidth', '200px'],
+					['maxHeight', '500px'],
+					['statusbar', true],
+				]),
+			);
 
 			expect(optionProvider.frameOptions.get('minWidth')).toBe('200px');
 			expect(optionProvider.frameOptions.get('maxHeight')).toBe('500px');
@@ -182,7 +186,7 @@ describe('OptionProvider', () => {
 		it('should reset with new map', () => {
 			const newMap = new Map([
 				['theme', 'dark'],
-				['mode', 'inline']
+				['mode', 'inline'],
 			]);
 			optionProvider.frameOptions.reset(newMap);
 
@@ -219,5 +223,4 @@ describe('OptionProvider', () => {
 			expect(optionProvider.frameOptions.has('theme')).toBe(false);
 		});
 	});
-
 });
