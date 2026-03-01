@@ -8,14 +8,14 @@ import type {} from '../typedef';
 export class PluginBrowser extends Base {
 	/**
 	 * @abstract
-	 * @description Executes the method that is called when a "Browser" module's is opened.
+	 * @description Executes the method that is called when a `Browser` module's is opened.
 	 * @param {?(target: Node) => *} [onSelectfunction] - Method to be executed after selecting an item in the gallery
 	 * @returns {void}
 	 */
 	open(onSelectfunction?: ((target: Node) => any) | null): void;
 	/**
 	 * @abstract
-	 * @description Executes the method that is called when a "Browser" module's is closed.
+	 * @description Executes the method that is called when a `Browser` module's is closed.
 	 * @returns {void}
 	 */
 	close(): void;
@@ -30,7 +30,7 @@ export class PluginCommand extends Base {
 	/**
 	 * @abstract
 	 * @description Executes the main execution method of the plugin.
-	 * - It is executed by clicking a toolbar "command" button or calling an API.
+	 * - It is executed by clicking a toolbar `command` button or calling an API.
 	 * - MUST be overridden by child classes
 	 * @param {HTMLElement} [target] - The plugin's toolbar button element
 	 * @returns {void | Promise<void>}
@@ -55,7 +55,7 @@ export class PluginDropdown extends Base {
 	/**
 	 * @abstract
 	 * @description Executes the main execution method of the plugin.
-	 * - Called when an item in the "dropdown" menu is clicked.
+	 * - Called when an item in the `dropdown` menu is clicked.
 	 * - MUST be overridden by child classes
 	 * @param {HTMLElement} target - The clicked dropdown item element
 	 * @returns {void | Promise<void>}
@@ -92,8 +92,8 @@ export class PluginDropdownFree extends Base {
  * These plugins typically respond to input events in the wysiwyg area
  *
  * **Commonly used hooks:**
- * - `onInput()` - Responds to input events in the editor (See: mention plugin)
- * - Other event hooks can be used as needed (onKeydown, onClick, etc.)
+ * - `onInput()` - Responds to input events in the editor (See: `mention` plugin)
+ * - Other event hooks can be used as needed (`onKeydown`, `onClick`, etc.)
  *
  * Child classes MAY optionally implement event hook methods
  * @see {Mention} - Example implementation using onInput hook
@@ -102,14 +102,14 @@ export class PluginField extends Base {}
 export class PluginInput extends Base {
 	/**
 	 * @optional
-	 * @description Executes the event function of toolbar's input tag - "keydown".
+	 * @description Executes the event function of toolbar's input tag - `keydown`.
 	 * @param {SunEditor.HookParams.ToolbarInputKeyDown} params - Input event information
 	 * @returns {void}
 	 */
 	toolbarInputKeyDown?(params: SunEditor.HookParams.ToolbarInputKeyDown): void;
 	/**
 	 * @optional
-	 * @description Executes the event function of toolbar's input tag - "change".
+	 * @description Executes the event function of toolbar's input tag - `change`.
 	 * @param {SunEditor.HookParams.ToolbarInputChange} params - Input event information
 	 * @returns {void}
 	 */
@@ -137,7 +137,7 @@ export class PluginPopup extends Base {
  * Base class for all plugins - contains common properties
  */
 declare class Base extends KernelInjector {
-	/** @type {string} - Plugin type ("browser"|"command"|"dropdown"|"field"|"input"|"modal"|"popup") */
+	/** @type {string} - Plugin type (`browser`|`command`|`dropdown`|`field`|`input`|`modal`|`popup`) */
 	static type: string;
 	/** @type {string} - Unique plugin identifier */
 	static key: string;

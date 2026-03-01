@@ -40,7 +40,7 @@ export type EmbedPluginOptions = {
 	 */
 	uploadSingleSizeLimit?: number;
 	/**
-	 * - Additional attributes to set on the iframe tag.
+	 * - Additional attributes to set on the `IFRAME` tag.
 	 */
 	iframeTagAttributes?: {
 		[x: string]: string;
@@ -90,7 +90,7 @@ export type EmbedPluginOptions = {
 	 */
 	controls?: SunEditor.Module.Figure.Controls;
 	/**
-	 * - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+	 * - Component insertion behavior for selection and cursor placement. [default: `options.get('componentInsertBehavior')`]
 	 * - `auto`: Move cursor to the next line if possible, otherwise select the component.
 	 * - `select`: Always select the inserted component.
 	 * - `line`: Move cursor to the next line if possible, or create a new line and move there.
@@ -109,7 +109,7 @@ export type EmbedPluginOptions = {
  * @property {Object<string, string>} [uploadHeaders] - Headers to include in file upload requests.
  * @property {number} [uploadSizeLimit] - The total file upload size limit in bytes.
  * @property {number} [uploadSingleSizeLimit] - The single file upload size limit in bytes.
- * @property {Object<string, string>} [iframeTagAttributes] - Additional attributes to set on the iframe tag.
+ * @property {Object<string, string>} [iframeTagAttributes] - Additional attributes to set on the `IFRAME` tag.
  * @property {string} [query_youtube] - YouTube query parameter.
  * @property {string} [query_vimeo] - Vimeo query parameter.
  * @property {Array<RegExp>} [urlPatterns] - Additional URL patterns for embed.
@@ -133,7 +133,7 @@ export type EmbedPluginOptions = {
  *   // Additional services...
  * }
  * @property {SunEditor.Module.Figure.Controls} [controls] - Figure controls.
- * @property {SunEditor.ComponentInsertType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+ * @property {SunEditor.ComponentInsertType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: `options.get('componentInsertBehavior')`]
  * - `auto`: Move cursor to the next line if possible, otherwise select the component.
  * - `select`: Always select the inserted component.
  * - `line`: Move cursor to the next line if possible, or create a new line and move there.
@@ -142,7 +142,7 @@ export type EmbedPluginOptions = {
 /**
  * @class
  * @description Embed modal plugin.
- * - This plugin provides a modal interface for embedding external content (e.g., videos, iframes) into the editor.
+ * - This plugin provides a modal interface for embedding external content (e.g., videos, `IFRAME` elements) into the editor.
  */
 declare class Embed extends PluginModal {
 	/**
@@ -153,7 +153,7 @@ declare class Embed extends PluginModal {
 	/**
 	 * @description Checks if the given URL matches any of the defined URL patterns.
 	 * @param {string} url - The URL to check.
-	 * @returns {boolean} True if the URL matches a known pattern; otherwise, false.
+	 * @returns {boolean} `true` if the URL matches a known pattern; otherwise, `false`.
 	 */
 	static #checkContentType(url: string): boolean;
 	/** @type {Array<RegExp>} */
@@ -244,8 +244,8 @@ declare class Embed extends PluginModal {
 	/**
 	 * @description Finds and processes the URL for embedding by matching it against known service patterns.
 	 * @param {string} url - The original URL.
-	 * @returns {{origin: string, url: string, tag: string}|null} An object containing the original URL, the processed URL, and the tag type (e.g., 'iframe'),
-	 * or null if no matching pattern is found.
+	 * @returns {{origin: string, url: string, tag: string}|null} An object containing the original URL, the processed URL, and the tag type (e.g., `iframe`),
+	 * or `null` if no matching pattern is found.
 	 */
 	findProcessUrl(url: string): {
 		origin: string;
@@ -256,7 +256,7 @@ declare class Embed extends PluginModal {
 	 * @description Processes the provided source (URL or embed code) and submits it for embedding.
 	 * - It parses the input, triggers any necessary events, and creates or updates the embed component.
 	 * @param {string} [src] - The embed source. If not provided, uses the internally stored link value.
-	 * @returns {Promise<boolean>} A promise that resolves to true on success or false on failure.
+	 * @returns {Promise<boolean>} A promise that resolves to `true` on success or `false` on failure.
 	 */
 	submitSRC(src?: string): Promise<boolean>;
 	_caption: HTMLElement;

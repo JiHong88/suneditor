@@ -14,7 +14,7 @@ export type StoreState = {
 	 */
 	tabSize: number;
 	/**
-	 * - Block indent margin size (px).
+	 * - `block` indent margin size (px).
 	 */
 	indentSize: number;
 	/**
@@ -38,15 +38,15 @@ export type StoreState = {
 	 */
 	currentViewportHeight: number;
 	/**
-	 * - Whether a controller or component is currently active, used to manage blur/focus behavior.
+	 * - Whether a controller or component is currently active, used to manage `blur`/`focus` behavior.
 	 */
 	controlActive: boolean;
 	/**
-	 * - Whether the frame content is scrollable (derived from height/maxHeight options).
+	 * - Whether the frame content is scrollable (derived from `height`/`maxHeight` options).
 	 */
 	isScrollable: (fc: SunEditor.FrameContext) => boolean;
 	/**
-	 * - Last selection node processed by selectionState.update() (cache for dedup).
+	 * - Last selection node processed by `selectionState.update()` (cache for dedup).
 	 */
 	_lastSelectionNode: Node | null;
 	/**
@@ -54,15 +54,15 @@ export type StoreState = {
 	 */
 	_range: Range | null;
 	/**
-	 * - Whether mouse button is pressed.
+	 * - Whether `mousedown` is pressed.
 	 */
 	_mousedown: boolean;
 	/**
-	 * - Suppress blur event handling.
+	 * - Suppress `blur` event handling.
 	 */
 	_preventBlur: boolean;
 	/**
-	 * - Suppress focus event handling.
+	 * - Suppress `focus` event handling.
 	 */
 	_preventFocus: boolean;
 };
@@ -75,23 +75,23 @@ export type StoreMode = {
 	 */
 	isClassic: boolean;
 	/**
-	 * - Whether the toolbar is in inline mode (appears above the editor on focus).
+	 * - Whether the toolbar is in `inline` mode (appears above the editor on focus).
 	 */
 	isInline: boolean;
 	/**
-	 * - Whether the toolbar is in balloon mode (appears on text selection).
+	 * - Whether the toolbar is in `balloon` mode (appears on text selection).
 	 */
 	isBalloon: boolean;
 	/**
-	 * - Whether the toolbar is in balloon-always mode (always visible as floating).
+	 * - Whether the toolbar is in `balloon-always` mode (always visible as floating).
 	 */
 	isBalloonAlways: boolean;
 	/**
-	 * - Whether the sub-toolbar is in balloon mode.
+	 * - Whether the sub-toolbar is in `balloon` mode.
 	 */
 	isSubBalloon: boolean;
 	/**
-	 * - Whether the sub-toolbar is in balloon-always mode.
+	 * - Whether the sub-toolbar is in `balloon-always` mode.
 	 */
 	isSubBalloonAlways: boolean;
 };
@@ -100,34 +100,34 @@ export type StoreMode = {
  * @property {*} rootKey - Current root frame key.
  * @property {boolean} hasFocus - Whether the editor has focus.
  * @property {number} tabSize - Tab character space count.
- * @property {number} indentSize - Block indent margin size (px).
+ * @property {number} indentSize - `block` indent margin size (px).
  * @property {number} codeIndentSize - Code view indent space count.
  * @property {Array<string>} currentNodes - Selection path tag names (for navigation bar).
  * @property {Array<string>} currentNodesMap - Active command/style names from selection path.
  * @property {number} initViewportHeight - Viewport height at initialization.
  * @property {number} currentViewportHeight - Current visual viewport height.
- * @property {boolean} controlActive - Whether a controller or component is currently active, used to manage blur/focus behavior.
- * @property {(fc: SunEditor.FrameContext) => boolean} isScrollable - Whether the frame content is scrollable (derived from height/maxHeight options).
- * @property {?Node} _lastSelectionNode - Last selection node processed by selectionState.update() (cache for dedup).
+ * @property {boolean} controlActive - Whether a controller or component is currently active, used to manage `blur`/`focus` behavior.
+ * @property {(fc: SunEditor.FrameContext) => boolean} isScrollable - Whether the frame content is scrollable (derived from `height`/`maxHeight` options).
+ * @property {?Node} _lastSelectionNode - Last selection node processed by `selectionState.update()` (cache for dedup).
  * @property {?Range} _range - Cached selection range.
- * @property {boolean} _mousedown - Whether mouse button is pressed.
- * @property {boolean} _preventBlur - Suppress blur event handling.
- * @property {boolean} _preventFocus - Suppress focus event handling.
+ * @property {boolean} _mousedown - Whether `mousedown` is pressed.
+ * @property {boolean} _preventBlur - Suppress `blur` event handling.
+ * @property {boolean} _preventFocus - Suppress `focus` event handling.
  */
 /**
  * @typedef {Object} StoreMode - Toolbar display mode flags (immutable after init).
  * @property {boolean} isClassic - Whether the toolbar is in classic (top-fixed) mode.
- * @property {boolean} isInline - Whether the toolbar is in inline mode (appears above the editor on focus).
- * @property {boolean} isBalloon - Whether the toolbar is in balloon mode (appears on text selection).
- * @property {boolean} isBalloonAlways - Whether the toolbar is in balloon-always mode (always visible as floating).
- * @property {boolean} isSubBalloon - Whether the sub-toolbar is in balloon mode.
- * @property {boolean} isSubBalloonAlways - Whether the sub-toolbar is in balloon-always mode.
+ * @property {boolean} isInline - Whether the toolbar is in `inline` mode (appears above the editor on focus).
+ * @property {boolean} isBalloon - Whether the toolbar is in `balloon` mode (appears on text selection).
+ * @property {boolean} isBalloonAlways - Whether the toolbar is in `balloon-always` mode (always visible as floating).
+ * @property {boolean} isSubBalloon - Whether the sub-toolbar is in `balloon` mode.
+ * @property {boolean} isSubBalloonAlways - Whether the sub-toolbar is in `balloon-always` mode.
  */
 /**
- * @description Central runtime state management for the editor
- * - Does not store DOM references (kept in frameContext)
- * - Does not store configuration values (kept in options)
- * - Only manages runtime state
+ * @description Central runtime state management for the editor.
+ * - Does not store DOM references (kept in `frameContext`).
+ * - Does not store configuration values (kept in `options`).
+ * - Only manages runtime state.
  */
 declare class Store {
 	/**
@@ -136,7 +136,7 @@ declare class Store {
 	constructor(product: import('../section/constructor').ConstructorReturnType);
 	/**
 	 * @internal
-	 * @description If true, initialize all indexes of image, video information
+	 * @description If `true`, initialize all indexes of image, video information
 	 * @type {boolean}
 	 */
 	_editorInitFinished: boolean;

@@ -6,19 +6,19 @@ export type FileManagerParams = {
 	 */
 	query: string;
 	/**
-	 * Event name for file load (e.g., 'onImageLoad')
+	 * Event name for file load (e.g., `'onImageLoad'`)
 	 */
 	loadEventName: string;
 	/**
-	 * Event name for file action (e.g., 'onImageAction')
+	 * Event name for file action (e.g., `'onImageAction'`)
 	 */
 	actionEventName: string;
 };
 /**
  * @typedef {Object} FileManagerParams
  * @property {string} query The query selector used to find file elements in the editor
- * @property {string} loadEventName Event name for file load (e.g., 'onImageLoad')
- * @property {string} actionEventName Event name for file action (e.g., 'onImageAction')
+ * @property {string} loadEventName Event name for file load (e.g., `'onImageLoad'`)
+ * @property {string} actionEventName Event name for file action (e.g., `'onImageAction'`)
  */
 /**
  * @class
@@ -116,7 +116,7 @@ declare class FileManager {
 	_checkInfo(loaded: boolean): void;
 	/**
 	 * @internal
-	 * @description Reset info object and "infoList = []", "infoIndex = 0"
+	 * @description Reset info object and `infoList = []`, `infoIndex = 0`
 	 */
 	_resetInfo(): void;
 	#private;

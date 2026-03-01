@@ -1,7 +1,7 @@
 import type {} from '../../../../typedef';
 /**
  * @class ImageUploadService
- * @description Handles image upload operations including file upload, URL upload, and Base64 conversion.
+ * @description Handles image upload operations including file upload, URL upload, and `Base64` conversion.
  */
 export class ImageUploadService {
 	/**

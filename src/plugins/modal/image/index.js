@@ -15,8 +15,8 @@ const { NO_EVENT } = env;
  * @typedef {Object} ImagePluginOptions
  * @property {boolean} [canResize=true] - Whether the image element can be resized.
  * @property {boolean} [showHeightInput=true] - Whether to display the height input field.
- * @property {string} [defaultWidth="auto"] - The default width of the image. If a number is provided, "px" will be appended.
- * @property {string} [defaultHeight="auto"] - The default height of the image. If a number is provided, "px" will be appended.
+ * @property {string} [defaultWidth="auto"] - The default width of the image. If a number is provided, `"px"` will be appended.
+ * @property {string} [defaultHeight="auto"] - The default height of the image. If a number is provided, `"px"` will be appended.
  * @property {boolean} [percentageOnlySize=false] - Whether to allow only percentage-based sizing.
  * @property {boolean} [createFileInput=true] - Whether to create a file input element for image uploads.
  * @property {boolean} [createUrlInput=true] - Whether to create a URL input element for image insertion.
@@ -26,12 +26,12 @@ const { NO_EVENT } = env;
  * @property {number} [uploadSingleSizeLimit] - The single file upload size limit in bytes.
  * @property {boolean} [allowMultiple=false] - Whether multiple image uploads are allowed.
  * @property {string} [acceptedFormats="image/*"] - The accepted file formats for image uploads.
- * @property {boolean} [useFormatType=true] - Whether to enable format type selection (block or inline).
- * @property {'block'|'inline'} [defaultFormatType="block"] - The default image format type ("block" or "inline").
+ * @property {boolean} [useFormatType=true] - Whether to enable format type selection (`block` or `inline`).
+ * @property {'block'|'inline'} [defaultFormatType="block"] - The default image format type (`"block"` or `"inline"`).
  * @property {boolean} [keepFormatType=false] - Whether to retain the chosen format type after image insertion.
  * @property {boolean} [linkEnableFileUpload] - Whether to enable file uploads for linked images.
  * @property {SunEditor.Module.Figure.Controls} [controls] - Figure controls.
- * @property {SunEditor.ComponentInsertType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+ * @property {SunEditor.ComponentInsertType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: `options.get('componentInsertBehavior')`]
  * - For inline components: places the cursor near the inserted component or selects it if no nearby range is available.
  * - For block components: executes behavior based on `selectMode`:
  * - `auto`: Move cursor to the next line if possible, otherwise select the component.
@@ -42,7 +42,7 @@ const { NO_EVENT } = env;
 
 /**
  * @typedef {Object} ImageState
- * @property {string} sizeUnit - Size unit ('px' or '%')
+ * @property {string} sizeUnit - Size unit (`'px'` or `'%'`)
  * @property {boolean} onlyPercentage - Whether only percentage sizing is allowed
  * @property {number} produceIndex - Image production index for batch operations
  */
@@ -345,9 +345,9 @@ class Image_ extends PluginModal {
 	}
 
 	/**
-	 * @description Create an "image" component using the provided files.
+	 * @description Create an `image` component using the provided files.
 	 * @param {FileList|File[]} fileList File object list
-	 * @returns {Promise<boolean>} If return false, the file upload will be canceled
+	 * @returns {Promise<boolean>} If return `false`, the file upload will be canceled
 	 */
 	async submitFile(fileList) {
 		if (fileList.length === 0) return false;
@@ -413,9 +413,9 @@ class Image_ extends PluginModal {
 	}
 
 	/**
-	 * @description Create an "image" component using the provided url.
+	 * @description Create an `image` component using the provided url.
 	 * @param {string} url File url
-	 * @returns {Promise<boolean>} If return false, the file upload will be canceled
+	 * @returns {Promise<boolean>} If return `false`, the file upload will be canceled
 	 */
 	async submitURL(url) {
 		if (!(url ||= this.#linkValue)) return false;
@@ -532,7 +532,7 @@ class Image_ extends PluginModal {
 	 * - Ensures that the controller is properly positioned and initialized.
 	 * - Prevents duplicate event handling if the component is already selected.
 	 * @param {HTMLElement} target - The selected element.
-	 * @param {boolean} [infoOnly=false] - If true, only retrieves information without opening the controller.
+	 * @param {boolean} [infoOnly=false] - If `true`, only retrieves information without opening the controller.
 	 * @returns {{w: string, h: string}} - The width and height of the component.
 	 */
 	#ready(target, infoOnly = false) {
@@ -589,8 +589,8 @@ class Image_ extends PluginModal {
 	}
 
 	/**
-	 * @description Toggles between block and inline image format.
-	 * @param {boolean} isInline - Whether the image should be inline.
+	 * @description Toggles between `block` and `inline` image format.
+	 * @param {boolean} isInline - Whether the image should be `inline`.
 	 */
 	#activeAsInline(isInline) {
 		if (isInline) {
@@ -817,7 +817,7 @@ class Image_ extends PluginModal {
 	/**
 	 * @description Wraps an image element with an anchor if provided.
 	 * @param {Node} imgTag - The image element to be wrapped.
-	 * @param {?Node} anchor - The anchor element to wrap around the image. If null, returns the image itself.
+	 * @param {?Node} anchor - The anchor element to wrap around the image. If `null`, returns the image itself.
 	 * @returns {Node} - The wrapped image inside the anchor or the original image element.
 	 */
 	#setAnchor(imgTag, anchor) {

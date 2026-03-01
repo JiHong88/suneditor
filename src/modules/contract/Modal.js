@@ -77,8 +77,8 @@ class Modal {
 	 * @description Create a file input tag in the modal window.
 	 * @param {{icons: SunEditor.Deps['icons'], lang: SunEditor.Deps['lang']}} param0 - icons and language object
 	 * @param {{acceptedFormats?: string, allowMultiple?: boolean}} param1 - options
-	 * - acceptedFormats: "image/*, video/*, audio/*", etc.
-	 * - allowMultiple: true or false
+	 * - acceptedFormats: `"image/*, video/*, audio/*"`, etc.
+	 * - allowMultiple: `true` or `false`
 	 * @returns {string} HTML string
 	 */
 	static CreateFileInput({ icons, lang }, { acceptedFormats, allowMultiple }) {
@@ -104,8 +104,8 @@ class Modal {
 	}
 
 	/**
-	 * @description A function called when the contents of "input" have changed and you want to adjust the style.
-	 * @param {Element} wrapper - Modal file input wrapper(.se-flex-input-wrapper)
+	 * @description A function called when the contents of `input` have changed and you want to adjust the style.
+	 * @param {Element} wrapper - Modal file input wrapper(`.se-flex-input-wrapper`)
 	 * @param {FileList|File[]} files - FileList object
 	 */
 	static OnChangeFile(wrapper, files) {
@@ -135,7 +135,7 @@ class Modal {
 
 	/**
 	 * @description Open a modal plugin
-	 * - The plugin's "init" method is called.
+	 * - The plugin's `init` method is called.
 	 */
 	open() {
 		this.#$.ui.offCurrentModal();
@@ -172,7 +172,7 @@ class Modal {
 
 	/**
 	 * @description Close a modal plugin
-	 * - The plugin's "init" and "modalOff" method is called.
+	 * - The plugin's `init` and `modalOff` method is called.
 	 */
 	close() {
 		this.#removeGlobalEvent();
@@ -244,11 +244,11 @@ class Modal {
 	}
 
 	/**
-	 * The loading bar is executed before "modalAction" is executed.
+	 * The loading bar is executed before `modalAction` is executed.
 	 * return type -
-	 * true : the loading bar and modal window are closed.
-	 * false : only the loading bar is closed.
-	 * undefined : only the modal window is closed.
+	 * `true` : the loading bar and modal window are closed.
+	 * `false` : only the loading bar is closed.
+	 * `undefined` : only the modal window is closed.
 	 * -
 	 * exception occurs : the modal window and loading bar are closed.
 	 * @param {SubmitEvent} e - Event object

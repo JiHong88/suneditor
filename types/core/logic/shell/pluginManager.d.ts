@@ -25,7 +25,7 @@ export type ComponentChecker = (element: Node | null) => any;
  */
 /**
  * @description Manages plugin registration and state.
- * Extracts "plugin" related responsibilities from the monolithic Editor class.
+ * Extracts `plugin` related responsibilities from the monolithic `Editor` class.
  */
 declare class PluginManager {
 	/**
@@ -75,7 +75,7 @@ declare class PluginManager {
 	emitEventAsync(name: string, e: PluginEventParam): Promise<boolean | undefined>;
 	/**
 	 * @description Check the components such as image and video and modify them according to the format.
-	 * @param {boolean} loaded If true, the component is loaded.
+	 * @param {boolean} loaded If `true`, the component is loaded.
 	 */
 	checkFileInfo(loaded: boolean): void;
 	/**
@@ -83,8 +83,8 @@ declare class PluginManager {
 	 */
 	resetFileInfo(): void;
 	/**
-	 * @description If the plugin is not added, add the plugin and call the 'add' function.
-	 * - If the plugin is added call callBack function.
+	 * @description If the plugin is not added, add the plugin and call the `add` function.
+	 * - If the plugin is added call `callBack` function.
 	 * @param {string} pluginName The name of the plugin to call
 	 * @param {?Array<HTMLElement>} targets Plugin target button
 	 * @param {?Object<string, *>} pluginOptions Plugin's options

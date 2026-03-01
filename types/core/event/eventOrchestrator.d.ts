@@ -5,7 +5,7 @@ export default EventOrchestrator;
  */
 declare class EventOrchestrator extends KernelInjector {
 	/**
-	 * @description Old browsers: When there is no 'e.isComposing' in the keyup event
+	 * @description Old browsers: When there is no `e.isComposing` in the `keyup` event
 	 * @type {boolean}
 	 */
 	isComposing: boolean;
@@ -53,7 +53,7 @@ declare class EventOrchestrator extends KernelInjector {
 	__secopy: string;
 	/**
 	 * @description Activates the corresponding button with the tags information of the current cursor position,
-	 * - such as 'bold', 'underline', etc., and executes the 'active' method of the plugins.
+	 * - such as `bold`, `underline`, etc., and executes the `active` method of the plugins.
 	 * @param {?Node} [selectionNode] selectionNode
 	 * @returns {Node|undefined} selectionNode
 	 */
@@ -80,13 +80,13 @@ declare class EventOrchestrator extends KernelInjector {
 	_hideToolbar_sub(): void;
 	/**
 	 * @internal
-	 * @description If there is no default format, add a line and move 'selection'.
-	 * @param {?string} formatName Format tag name (default: 'P')
+	 * @description If there is no default format, add a `line` and move `selection`.
+	 * @param {?string} formatName Format tag name (default: `P`)
 	 */
 	_setDefaultLine(formatName: string | null): void;
 	/**
 	 * @internal
-	 * @description Handles data transfer actions for paste and drop events.
+	 * @description Handles data transfer actions for `paste` and `drop` events.
 	 * - It processes clipboard data, triggers relevant events, and inserts cleaned data into the editor.
 	 * @param {"paste"|"drop"} type The type of event
 	 * @param {Event} e The original event object
@@ -103,15 +103,15 @@ declare class EventOrchestrator extends KernelInjector {
 	_addCommonEvents(): void;
 	/**
 	 * @internal
-	 * @description Registers event listeners for the editor's frame, including text input, selection, and UI interactions.
-	 * - Handles events inside an iframe or within the standard wysiwyg editor.
+	 * @description Registers event listeners for the editor's frame, including text `input`, selection, and UI interactions.
+	 * - Handles events inside an `iframe` or within the standard wysiwyg editor.
 	 * @param {SunEditor.FrameContext} fc The frame context object
 	 */
 	_addFrameEvents(fc: SunEditor.FrameContext): void;
 	/**
 	 * @internal
 	 * @description Adds event listeners for resizing the status bar if resizing is enabled.
-	 * - If resizing is not enabled, applies a non-resizable class.
+	 * - If resizing is not enabled, applies a `se-resizing-none` class.
 	 * @param {SunEditor.FrameContext} fc The frame context object
 	 * @param {SunEditor.FrameOptions} fo The frame options object
 	 */
@@ -125,7 +125,7 @@ declare class EventOrchestrator extends KernelInjector {
 	__focusTemp: any;
 	/**
 	 * @internal
-	 * @description Synchronizes the selection state by resetting it on mouseup.
+	 * @description Synchronizes the selection state by resetting it on `mouseup`.
 	 * - Ensures selection updates correctly across different interactions.
 	 */
 	_setSelectionSync(): void;
@@ -139,7 +139,7 @@ declare class EventOrchestrator extends KernelInjector {
 	_retainStyleNodes(formatEl: HTMLElement, _styleNodes: Array<Node>): void;
 	/**
 	 * @internal
-	 * @description Clears retained style nodes by replacing content with a single line break.
+	 * @description Clears retained style nodes by replacing content with a single `line` break.
 	 * - Resets the selection to the start of the cleared element.
 	 * @param {HTMLElement} formatEl The format element where styles should be cleared
 	 */

@@ -124,7 +124,7 @@
  *   keyCode: string,
  *   $: SunEditor.Deps
  * }} ShortcutInfo
- * @description Information of the "shortcut" plugin hook
+ * @description Information of the `shortcut` plugin hook
  */
 
 export {};

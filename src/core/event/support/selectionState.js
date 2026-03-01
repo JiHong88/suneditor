@@ -3,7 +3,7 @@ import { dom, numbers } from '../../../helper';
 /**
  * @description Service class managing the selection state and toolbar updates.
  * - Handles activating toolbar buttons based on the current selection.
- * - Manages the 'active' state of plugins and commands.
+ * - Manages the `active` state of plugins and commands.
  */
 export default class SelectionState {
 	#eventOrchestrator;
@@ -157,7 +157,7 @@ export default class SelectionState {
 	/**
 	 * @description Resets the toolbar state.
 	 * - Deactivates all buttons and clears the effect.
-	 * - Equivalent to calling setKeyEffect([]).
+	 * - Equivalent to calling `setKeyEffect([])`.
 	 */
 	reset() {
 		this.#setKeyEffect([]);
@@ -165,8 +165,8 @@ export default class SelectionState {
 
 	/**
 	 * @description Internal logic to update the visual state of buttons.
-	 * - Checks the list of active commands and updates the DOM classes (active/inactive).
-	 * @param {Array<string>} ignoredList List of formatting commands to keep active (others will be deactivated).
+	 * - Checks the list of `active` commands and updates the DOM classes (`active`/inactive).
+	 * @param {Array<string>} ignoredList List of formatting commands to keep `active` (others will be deactivated).
 	 */
 	#setKeyEffect(ignoredList) {
 		const activeCommands = this.#$.commandDispatcher.activeCommands;
@@ -194,9 +194,9 @@ export default class SelectionState {
 	}
 
 	/**
-	 * @description Checks if a node is a non-focusable element(.data-se-non-focus). (e.g. fileUpload.component > span)
+	 * @description Checks if a node is a non-focusable element(`.data-se-non-focus`). (e.g. fileUpload.component > span)
 	 * @param {Node} node Node to check
-	 * @returns {boolean} True if the node is non-focusable, otherwise false
+	 * @returns {boolean} `true` if the node is non-focusable, otherwise `false`
 	 */
 	#isNonFocusNode(node) {
 		return dom.check.isElement(node) && node.getAttribute('data-se-non-focus') === 'true';

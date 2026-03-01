@@ -1,7 +1,3 @@
-/**
- * @fileoverview eventManager class
- */
-
 import { dom, numbers, env } from '../../helper';
 import { _DragHandle } from '../../modules/ui';
 

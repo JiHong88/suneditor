@@ -18,7 +18,7 @@ export type ShortcutInfo = {
 	 */
 	enter: boolean;
 	/**
-	 * - The command key. (e.g. "bold")
+	 * - The command key. (e.g. `bold`)
 	 */
 	command: string;
 	/**
@@ -26,7 +26,7 @@ export type ShortcutInfo = {
 	 */
 	edge: boolean;
 	/**
-	 * - The key pressed (e.g., "1.").
+	 * - The key pressed (e.g., `1.`).
 	 */
 	key?: string;
 	/**
@@ -34,7 +34,7 @@ export type ShortcutInfo = {
 	 */
 	keyCode?: string;
 	/**
-	 * - A plugin's "shortcut" method that is called instead of the default "editor.run" method.
+	 * - A plugin's `shortcut` method that is called instead of the default `editor.run` method.
 	 */
 	method?: string | ((...args: any) => any);
 	/**
@@ -42,7 +42,7 @@ export type ShortcutInfo = {
 	 */
 	plugin: string;
 	/**
-	 * - Plugin's type. ("command", "dropdown", "modal", "browser", "input", "field", "popup").
+	 * - Plugin's type. (`command`, `dropdown`, `modal`, `browser`, `input`, `field`, `popup`).
 	 */
 	type: string;
 	/**
@@ -64,13 +64,13 @@ export type ShortcutInfo = {
  * @property {boolean} s - Whether the [Shift] key is pressed.
  * @property {boolean} space - Whether the [Space] key is pressed.
  * @property {boolean} enter - Whether the Enter key is pressed.
- * @property {string} command - The command key. (e.g. "bold")
+ * @property {string} command - The command key. (e.g. `bold`)
  * @property {boolean} edge - Whether the cursor is at the end of the line.
- * @property {string} [key] - The key pressed (e.g., "1.").
+ * @property {string} [key] - The key pressed (e.g., `1.`).
  * @property {string} [keyCode] - The keyEvent.code.
- * @property {string|((...args: *) => *)} [method] - A plugin's "shortcut" method that is called instead of the default "editor.run" method.
+ * @property {string|((...args: *) => *)} [method] - A plugin's `shortcut` method that is called instead of the default `editor.run` method.
  * @property {string} plugin - The plugin name.
- * @property {string} type - Plugin's type. ("command", "dropdown", "modal", "browser", "input", "field", "popup").
+ * @property {string} type - Plugin's type. (`command`, `dropdown`, `modal`, `browser`, `input`, `field`, `popup`).
  * @property {Node} button - The plugin command button.
  * @property {Array<string>} r - An array of key codes generated with the reverseButtons option, used to reverse the action for a specific key combination.
  * @property {string} textTrigger - Whether the event was triggered by a text input (e.g., mention like @ab).
@@ -85,12 +85,12 @@ declare class Shortcuts {
 	 */
 	constructor(kernel: SunEditor.Kernel);
 	/**
-	 * @description Shoutcuts key map
+	 * @description Shortcuts key map
 	 * @type {Map<string, *>}
 	 */
 	keyMap: Map<string, any>;
 	/**
-	 * @description Shoutcuts reverse key array
+	 * @description Shortcuts reverse key array
 	 * - An array of key codes generated with the reverseButtons option, used to reverse the action for a specific key combination.
 	 * @type {Set<string>}
 	 */
@@ -118,7 +118,7 @@ declare class Shortcuts {
 	enable(): void;
 	/**
 	 * @internal
-	 * @description Registers custom shortcut keys (keys starting with "_") into the shortcut map.
+	 * @description Registers custom shortcut keys (keys starting with `_`) into the shortcut map.
 	 * Called during initialization and when toolbar is reset.
 	 */
 	_registerCustomShortcuts(): void;

@@ -21,7 +21,7 @@ export type BlockStylePluginOptions = {
  */
 /**
  * @class
- * @description BlockStyle Plugin (P, BLOCKQUOTE, PRE, H1, H2...)
+ * @description BlockStyle Plugin (`P`, `BLOCKQUOTE`, `PRE`, `H1`, `H2`...)
  */
 declare class BlockStyle extends PluginDropdown {
 	/**
@@ -36,9 +36,9 @@ declare class BlockStyle extends PluginDropdown {
 	currentFormat: string;
 	active(element: HTMLElement | null, target: HTMLElement | null): boolean | void;
 	/**
-	 * @description Create a header tag, call by "shortcut" class
+	 * @description Create a header tag, call by `shortcut` class
 	 * - (e.g. shortcuts._h1: ['c+s+49+$~blockStyle.applyHeaderByShortcut', ''])
-	 * @param {SunEditor.HookParams.Shortcut} params - Information of the "shortcut" plugin
+	 * @param {SunEditor.HookParams.Shortcut} params - Information of the `shortcut` plugin
 	 */
 	applyHeaderByShortcut({ keyCode }: SunEditor.HookParams.Shortcut): void;
 }

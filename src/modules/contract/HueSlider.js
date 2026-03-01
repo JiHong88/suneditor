@@ -1,7 +1,3 @@
-/**
- * @fileoverview Implements HueSlider.
- */
-
 import { dom, env } from '../../helper';
 import Controller from './Controller';
 
@@ -91,7 +87,7 @@ function CreateSliderCtx() {
 /**
  * @class
  * @description Create a Hue slider. (only create one at a time)
- * - When you call the .attach() method, the hue slider is appended to the form element.
+ * - When you call the `.attach()` method, the hue slider is appended to the form element.
  * It must be called every time it is used.
  */
 class HueSlider {
@@ -185,7 +181,7 @@ class HueSlider {
 
 	/**
 	 * @description Close the hue slider.
-	 * - Call the instance's hueSliderCancelAction method.
+	 * - Call the instance's `hueSliderCancelAction` method.
 	 */
 	close() {
 		this.ctx = {

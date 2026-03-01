@@ -1,8 +1,4 @@
 /**
- * @fileoverview Number-related helper functions
- */
-
-/**
  * @description Checks for numeric (with decimal point).
  * @param {*} text Text string or number
  * @returns {boolean}
@@ -14,7 +10,7 @@ export function is(text) {
 /**
  * @description Get a number.
  * @param {string|number} value Text string or number
- * @param {number} [maxDec=0] Maximum number of decimal places (-1 : Infinity)
+ * @param {number} [maxDec=0] Maximum number of decimal places (`-1` : `Infinity`)
  * @returns {number}
  */
 export function get(value, maxDec = 0) {
@@ -28,8 +24,8 @@ export function get(value, maxDec = 0) {
 }
 
 /**
- * @description It compares the start and end indexes of 'a' and 'b' and returns the number of overlapping indexes in the range.
- * - e.g.) 1, 5, 4, 6 => '2' (4,5)
+ * @description It compares the start and end indexes of `a` and `b` and returns the number of overlapping indexes in the range.
+ * - e.g.) 1, 5, 4, 6 => `2` (4,5)
  * @param {number} aStart Start index of 'a'
  * @param {number} aEnd End index of 'a'
  * @param {number} bStart Start index of 'b'

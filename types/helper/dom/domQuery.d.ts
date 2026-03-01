@@ -6,12 +6,12 @@ import type {} from '../../typedef';
  */
 export function getPositionIndex(node: Node): number;
 /**
- * @description Returns the position of the "node" in the "parentNode" in a numerical array.
+ * @description Returns the position of the `node` in the `parentNode` in a numerical array.
  * - e.g.) <p><span>aa</span><span>bb</span></p> : getNodePath(node: "bb", parentNode: "<P>") -> [1, 0]
  * @param {Node} node The Node to find position path
- * @param {?Node} parentNode Parent node. If null, wysiwyg div area
- * @param {?{s: number, e: number}} [_newOffsets] If you send an object of the form "{s: 0, e: 0}", the text nodes that are attached together are merged into one, centered on the "node" argument.
- * "_newOffsets.s" stores the length of the combined characters after "node" and "_newOffsets.e" stores the length of the combined characters before "node".
+ * @param {?Node} parentNode Parent node. If `null`, wysiwyg `div` area
+ * @param {?{s: number, e: number}} [_newOffsets] If you send an object of the form `{s: 0, e: 0}`, the text nodes that are attached together are merged into one, centered on the `node` argument.
+ * `_newOffsets.s` stores the length of the combined characters after `node` and `_newOffsets.e` stores the length of the combined characters before `node`.
  * Do not use unless absolutely necessary.
  * @returns {Array<number>}
  */
@@ -25,15 +25,15 @@ export function getNodePath(
 ): Array<number>;
 /**
  * @template {Node} T
- * @description Returns the node in the location of the path array obtained from "helper.dom.getNodePath".
- * @param {Array<number>} offsets Position array, array obtained from "helper.dom.getNodePath"
+ * @description Returns the node in the location of the path array obtained from `helper.dom.getNodePath`.
+ * @param {Array<number>} offsets Position array, array obtained from `helper.dom.getNodePath`
  * @param {Node} parentNode Base parent element
  * @returns {T}
  */
 export function getNodeFromPath<T extends Node>(offsets: Array<number>, parentNode: Node): T;
 /**
  * @template {HTMLElement} T
- * @description Get all "child node" of the argument value element
+ * @description Get all `child node` of the argument value element
  * @param {Node} element element to get child node
  * @param {?(current: *) => boolean} validation Conditional function
  * @returns {T|null}
@@ -41,7 +41,7 @@ export function getNodeFromPath<T extends Node>(offsets: Array<number>, parentNo
 export function getChildNode<T extends HTMLElement>(element: Node, validation: ((current: any) => boolean) | null): T | null;
 /**
  * @template {HTMLElement} T
- * @description Get all "children" of the argument value element (Without text nodes)
+ * @description Get all `children` of the argument value element (Without text nodes)
  * @param {Node} element element to get child node
  * @param {?(current: *) => boolean} validation Conditional function
  * @param {?number} depth Number of child levels to depth.
@@ -50,7 +50,7 @@ export function getChildNode<T extends HTMLElement>(element: Node, validation: (
 export function getListChildren<T extends HTMLElement>(element: Node, validation: ((current: any) => boolean) | null, depth: number | null): Array<T>;
 /**
  * @template {Node} T
- * @description Get all "childNodes" of the argument value element (Include text nodes)
+ * @description Get all `childNodes` of the argument value element (Include text nodes)
  * @param {Node} element element to get child node
  * @param {?(current: *) => boolean} validation Conditional function
  * @param {?number} depth Number of child levels to depth.
@@ -59,8 +59,8 @@ export function getListChildren<T extends HTMLElement>(element: Node, validation
 export function getListChildNodes<T extends Node>(element: Node, validation: ((current: any) => boolean) | null, depth: number | null): Array<T>;
 /**
  * @description Returns the number of parents nodes.
- * - "0" when the parent node is the WYSIWYG area.
- * - '-1' when the element argument is the WYSIWYG area.
+ * - `0` when the parent node is the WYSIWYG area.
+ * - `-1` when the element argument is the WYSIWYG area.
  * @param {Node} node The element to check
  * @returns {number}
  */
@@ -68,7 +68,7 @@ export function getNodeDepth(node: Node): number;
 /**
  * @description Sort a node array by depth of element.
  * @param {Array<Node>} array Node array
- * @param {boolean} des true: descending order / false: ascending order
+ * @param {boolean} des `true`: descending order / `false`: ascending order
  */
 export function sortNodeByDepth(array: Array<Node>, des: boolean): void;
 /**
@@ -90,12 +90,21 @@ export function compareElements(
  * @template {HTMLElement} T
  * @description Get the parent element of the argument value.
  * - A tag that satisfies the query condition is imported.
+ * @example
+ * // Find by tag name
+ * const table = dom.query.getParentElement(cell, 'TABLE');
+ *
+ * // Find by CSS class
+ * const wrapper = dom.query.getParentElement(node, '.se-wrapper');
+ *
+ * // Find by validation function
+ * const line = dom.query.getParentElement(node, (el) => el.nodeType === 1);
  * @param {Node} element Reference element
- * @param {string|((current: *) => boolean)|Node} query Query String (nodeName, .className, #ID, :name) or validation function.
+ * @param {string|((current: *) => boolean)|Node} query Query String (`nodeName`, `.className`, `#ID`, `:name`) or validation function.
  * - Not use it like jquery.
  * - Only one condition can be entered at a time.
  * @param {?number} [depth] Number of parent levels to depth.
- * @returns {T|null} Not found: null
+ * @returns {T|null} Not found: `null`
  */
 export function getParentElement<T extends HTMLElement>(element: Node, query: string | ((current: any) => boolean) | Node, depth?: number | null): T | null;
 /**
@@ -103,7 +112,7 @@ export function getParentElement<T extends HTMLElement>(element: Node, query: st
  * @description Gets all ancestors of the argument value.
  * - Get all tags that satisfy the query condition.
  * @param {Node} element Reference element
- * @param {string|((current: *) => boolean)|Node} query Query String (nodeName, .className, #ID, :name) or validation function.
+ * @param {string|((current: *) => boolean)|Node} query Query String (`nodeName`, `.className`, `#ID`, `:name`) or validation function.
  * Not use it like jquery.
  * Only one condition can be entered at a time.
  * @param {?number} [depth] Number of parent levels to depth.
@@ -112,7 +121,7 @@ export function getParentElement<T extends HTMLElement>(element: Node, query: st
 export function getParentElements<T extends HTMLElement>(element: Node, query: string | ((current: any) => boolean) | Node, depth?: number | null): Array<T>;
 /**
  * @template {HTMLElement} T
- * @description Gets the element with "data-command" attribute among the parent elements.
+ * @description Gets the element with `data-command` attribute among the parent elements.
  * @param {Node} target Target element
  * @returns {T|null}
  */
@@ -129,21 +138,21 @@ export function getEventTarget<T extends HTMLElement>(event: Event): T | null;
  * @description Get the child element of the argument value.
  * - A tag that satisfies the query condition is imported.
  * @param {Node} node Reference element
- * @param {string|((current: *) => boolean)|Node} query Query String (nodeName, .className, #ID, :name) or validation function.
- * @param {boolean} last If true returns the last node among the found child nodes. (default: first node)
+ * @param {string|((current: *) => boolean)|Node} query Query String (`nodeName`, `.className`, `#ID`, `:name`) or validation function.
+ * @param {boolean} last If `true` returns the last node among the found child nodes. (default: first node)
  * Not use it like jquery.
  * Only one condition can be entered at a time.
- * @returns {T|null} Not found: null
+ * @returns {T|null} Not found: `null`
  */
 export function getEdgeChild<T extends Node>(node: Node, query: string | ((current: any) => boolean) | Node, last: boolean): T | null;
 /**
  * @description Get edge child nodes of the argument value.
- * - 1. The first node of all the child nodes of the "first" element is returned.
- * - 2. The last node of all the child nodes of the "last" element is returned.
- * - 3. When there is no "last" element, the first and last nodes of all the children of the "first" element are returned.
+ * - 1. The first node of all the child nodes of the `first` element is returned.
+ * - 2. The last node of all the child nodes of the `last` element is returned.
+ * - 3. When there is no `last` element, the first and last nodes of all the children of the `first` element are returned.
  * @param {Node} first First element
  * @param {?Node} last Last element
- * @returns {{sc: Node, ec: Node}} { sc: "first", ec: "last" }
+ * @returns {{sc: Node, ec: Node}} { sc: `first`, ec: `last` }
  */
 export function getEdgeChildNodes(
 	first: Node,
@@ -157,7 +166,7 @@ export function getEdgeChildNodes(
  * @description Gets the previous sibling last child. If there is no sibling, then it'll take it from the closest ancestor with child
  * @param {Node} node Reference element
  * @param {?Node} [ceiling] Highest boundary allowed
- * @returns {T|null} Not found: null
+ * @returns {T|null} Not found: `null`
  */
 export function getPreviousDeepestNode<T extends Node>(node: Node, ceiling?: Node | null): T | null;
 /**
@@ -165,12 +174,12 @@ export function getPreviousDeepestNode<T extends Node>(node: Node, ceiling?: Nod
  * @description Gets the next sibling first child. If there is no sibling, then it'll take it from the closest ancestor with child
  * @param {Node} node Reference element
  * @param {?Node} [ceiling] Highest boundary allowed
- * @returns {T|null} Not found: null
+ * @returns {T|null} Not found: `null`
  */
 export function getNextDeepestNode<T extends Node>(node: Node, ceiling?: Node | null): T | null;
 /**
- * @description Find the index of the text node in the line element.
- * @param {Node} line Line element (p, div, etc.)
+ * @description Find the index of the text node in the `line` element.
+ * @param {Node} line `line` element (p, div, etc.)
  * @param {Node} offsetContainer Base node to start searching
  * @param {number} offset Base offset to start searching
  * @param {?(current: *) => boolean} [validate] Validation function
@@ -180,7 +189,7 @@ export function findTextIndexOnLine(line: Node, offsetContainer: Node, offset: n
 /**
  * @description Find the end index of a sequence of at least minTabSize consecutive non-breaking spaces or spaces
  * - which are interpreted as a tab key, occurring after a given base index in a text string.
- * @param {Node} line Line element (p, div, etc.)
+ * @param {Node} line `line` element (p, div, etc.)
  * @param {number} baseIndex Base index to start searching
  * @param {number} minTabSize Minimum number of consecutive spaces to consider as a tab
  * @returns {number} The adjusted index within the line element accounting for non-space characters
@@ -188,7 +197,7 @@ export function findTextIndexOnLine(line: Node, offsetContainer: Node, offset: n
 export function findTabEndIndex(line: Node, baseIndex: number, minTabSize: number): number;
 /**
  * @description Finds the table cell that appears visually at the bottom-right position,
- * considering both rowSpan and colSpan, even if smaller cells are placed after large merged cells.
+ * considering both `rowSpan` and `colSpan`, even if smaller cells are placed after large merged cells.
  *
  * @param {HTMLTableCellElement[]} cells
  * @returns {HTMLTableCellElement|null}
@@ -201,8 +210,8 @@ export function findVisualLastCell(cells: HTMLTableCellElement[]): HTMLTableCell
  */
 export function getScrollParents(element: HTMLElement): HTMLElement[];
 /**
- * @description Get the argument iframe's document object if use the "iframe" or "fullPage" options
- * @param {HTMLIFrameElement} iframe Iframe element (this.frameContext.get('wysiwygFrame'))
+ * @description Get the argument iframe's document object if use the `iframe` or `fullPage` options
+ * @param {HTMLIFrameElement} iframe Iframe element (`this.frameContext.get('wysiwygFrame')`)
  * @returns {Document}
  */
 export function getIframeDocument(iframe: HTMLIFrameElement): Document;

@@ -1,13 +1,9 @@
-/**
- * @fileoverview Implements Helper for checking the node type and attributes.
- */
-
 import { onlyZeroWidthRegExp } from '../unicode';
 
 const _RE_EXCLUDE_FORMAT = /(\s|^)(katex|MathJax|se-exclude-format)(\s|$)/;
 
 /**
- * @description A method that checks If the text is blank or to see if it contains 'ZERO WIDTH SPACE' or empty (unicode.zeroWidthSpace)
+ * @description A method that checks If the text is blank or to see if it contains `ZERO WIDTH SPACE` or empty (`unicode.zeroWidthSpace`)
  * @param {string|Node} text String value or Node
  * @returns {boolean}
  */
@@ -30,7 +26,7 @@ export function isZeroWidth(text) {
  * @description Determine if this offset is the edge offset of container
  * @param {Node} container The node of the selection object. (range.startContainer..)
  * @param {number} offset The offset of the selection object. (core.getRange().startOffset...)
- * @param {?("front"|"end")} [dir] Select check point - Both edge, Front edge or End edge. ("front": Front edge, "end": End edge, undefined: Both edge)
+ * @param {?("front"|"end")} [dir] Select check point - Both edge, Front edge or End edge. (`"front"`: Front edge, `"end"`: End edge, `undefined`: Both edge)
  * @returns {boolean}
  */
 export function isEdgePoint(container, offset, dir) {
@@ -182,8 +178,8 @@ export function isContentLess(node) {
 }
 
 /**
- * @description Check the line element is empty.
- * @param {Node} node "line" element node
+ * @description Check the `line` element is empty.
+ * @param {Node} node `line` element node
  * @returns {boolean}
  */
 export function isEmptyLine(node) {
@@ -193,9 +189,9 @@ export function isEmptyLine(node) {
 }
 
 /**
- * @description Checks if the given node is a container component (class "se-component-container").
+ * @description Checks if the given node is a container component (class `se-component-container`).
  * @param {Node} element
- * @returns {boolean} True if the node is a container component, otherwise false.
+ * @returns {boolean} `true` if the node is a container component, otherwise `false`.
  */
 export function isComponentContainer(element) {
 	if (element?.nodeType !== 1) return false;
@@ -208,7 +204,7 @@ export function isComponentContainer(element) {
 }
 
 /**
- * @description It is judged whether it is the edit region top div element or iframe's body tag.
+ * @description It is judged whether it is the edit region top `div` element or `iframe`'s `body` tag.
  * @param {?Node} node The node to check
  * @returns {node is HTMLElement}
  */
@@ -223,7 +219,7 @@ export function isWysiwygFrame(node) {
 }
 
 /**
- * @description It is judged whether it is the contenteditable property is false.
+ * @description It is judged whether it is the `contenteditable` property is `false`.
  * @param {?Node} node The node to check
  * @returns {node is HTMLElement}
  */
@@ -232,7 +228,7 @@ export function isNonEditable(node) {
 }
 
 /**
- * @description Check the span's attributes are empty.
+ * @description Check the `span`'s attributes are empty.
  * @param {?Node} node Element node
  * @returns {boolean}
  */
@@ -274,7 +270,7 @@ export function isSameAttributes(a, b) {
 }
 
 /**
- * @description It is judged whether it is the not checking node. (class="katex", "MathJax", "se-exclude-format")
+ * @description It is judged whether it is the not checking node. (class=`katex`, `MathJax`, `se-exclude-format`)
  * @param {Node} node The node to check
  * @returns {node is HTMLElement}
  */
@@ -283,8 +279,8 @@ export function isExcludeFormat(node) {
 }
 
 /**
- * @description Checks for "__se__uneditable" in the class list.
- * - Components with class "__se__uneditable" cannot be modified.
+ * @description Checks for `__se__uneditable` in the class list.
+ * - Components with class `__se__uneditable` cannot be modified.
  * @param {Node} node The element to check
  * @returns {boolean}
  */

@@ -1,7 +1,7 @@
 import type {} from '../../../typedef';
 export default Component;
 /**
- * @description Class for managing components such as images and tables that are not in line format
+ * @description Class for managing components such as images and tables that are not in `line` format
  */
 declare class Component {
 	/**
@@ -49,14 +49,14 @@ declare class Component {
 	_init(): void;
 	/**
 	 * @description Inserts an element and returns it. (Used for elements: table, hr, image, video)
-	 * - If "element" is "HR", inserts and returns the new line.
+	 * - If `element` is `HR`, inserts and returns the new line.
 	 * @param {Node} element Element to be inserted
 	 * @param {Object} [options] Options
-	 * @param {boolean} [options.skipCharCount=false] If true, it will be inserted even if "frameOptions.get('charCounter_max')" is exceeded.
-	 * @param {boolean} [options.skipHistory=false] If true, do not push to history.
-	 * @param {boolean} [options.scrollTo=true] true : Scroll to the inserted element, false : Do not scroll.
-	 * @param {SunEditor.ComponentInsertType} [options.insertBehavior] If true, do not automatically select the inserted component. [default: options.get('componentInsertBehavior')]
-	 * - If null, noting action is performed after insertion.
+	 * @param {boolean} [options.skipCharCount=false] If `true`, it will be inserted even if `frameOptions.get('charCounter_max')` is exceeded.
+	 * @param {boolean} [options.skipHistory=false] If `true`, do not push to history.
+	 * @param {boolean} [options.scrollTo=true] `true` : Scroll to the inserted element, `false` : Do not scroll.
+	 * @param {SunEditor.ComponentInsertType} [options.insertBehavior] If `true`, do not automatically select the inserted component. [default: `options.get('componentInsertBehavior')`]
+	 * - If `null`, no action is performed after insertion.
 	 * @returns {HTMLElement} The inserted element or new line (for HR)
 	 */
 	insert(
@@ -92,7 +92,7 @@ declare class Component {
 	 * @param {Node} element Target element
 	 * @param {string} pluginName The plugin name for the selected target.
 	 * @param {Object} [options] Options
-	 * @param {boolean} [options.isInput=false] Whether the target is an input component.(table)
+	 * @param {boolean} [options.isInput=false] Whether the target is an input component (table).
 	 */
 	select(
 		element: Node,
@@ -108,16 +108,16 @@ declare class Component {
 	 */
 	deselect(): void;
 	/**
-	 * @description Determines if the specified node is a block component (e.g., img, iframe, video, audio, table) with the class "se-component"
-	 * - or a direct FIGURE node. This function checks if the node itself is a component
+	 * @description Determines if the specified node is a block component (e.g., img, iframe, video, audio, table) with the class `se-component`
+	 * - or a direct `FIGURE` node. This function checks if the node itself is a component
 	 * - or if it belongs to any components identified by the component manager.
 	 * @param {Node} element The DOM node to check.
 	 * @returns {boolean} True if the node is a block component or part of it, otherwise false.
 	 */
 	is(element: Node): boolean;
 	/**
-	 * @description Checks if the given node is an inline component (class "se-inline-component").
-	 * - If the node is a FIGURE, it checks the parent element instead.
+	 * @description Checks if the given node is an inline component (class `se-inline-component`).
+	 * - If the node is a `FIGURE`, it checks the parent element instead.
 	 * - It also verifies whether the node is part of an inline component recognized by the component manager.
 	 * @param {Node} element The DOM node to check.
 	 * @returns {boolean} True if the node is an inline component or part of it, otherwise false.
@@ -133,7 +133,7 @@ declare class Component {
 	isBasic(element: Node): boolean;
 	/**
 	 * @description Copies the specified component node to the clipboard.
-	 * - This function is different from the one called when the user presses the "Ctrl + C" key combination.
+	 * - This function is different from the one called when the user presses the `Ctrl + C` key combination.
 	 * @param {Node} container The DOM node to check.
 	 */
 	copy(container: Node): Promise<void>;

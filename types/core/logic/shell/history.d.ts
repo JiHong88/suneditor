@@ -6,10 +6,10 @@ import type {} from '../../../typedef';
 export default function History(kernel: SunEditor.Kernel): {
 	/**
 	 * @description Saving the current status to the history object stack
-	 * - If "delay" is true, it will be saved after (options.get('historyStackDelayTime') || 400) milliseconds.
-	 * - If the function is called again with the "delay" argument true before it is saved, the delay time is renewed.
+	 * - If `delay` is `true`, it will be saved after (`options.get('historyStackDelayTime')` || 400) milliseconds.
+	 * - If the function is called again with the `delay` argument `true` before it is saved, the delay time is renewed.
 	 * - You can specify the delay time by sending a number.
-	 * @param {boolean|number} delay If true, add stack without delay time.
+	 * @param {boolean|number} delay If `true`, add stack without delay time.
 	 * @param {*} [rootKey] The key of the root frame to save history for.
 	 */
 	push(delay: boolean | number, rootKey?: any): void;
@@ -54,8 +54,8 @@ export default function History(kernel: SunEditor.Kernel): {
 	 * @description Returns the root stack containing the history of each frame.
 	 * @returns {{content: string, s: {path: number|number[], offset: number|number[]}, e: {path: number|number[], offset: number|number[]}, frame: HTMLElement}} The root stack object.
 	 * - content: content html string
-	 * - s: depth info of the "start" range
-	 * - e: depth info of the "end" range
+	 * - s: depth info of the `start` range
+	 * - e: depth info of the `end` range
 	 * - frame: wysiwyg editable element.
 	 */
 	getRootStack(): {

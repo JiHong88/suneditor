@@ -74,7 +74,7 @@ declare class Toolbar {
 	 */
 	resetResponsiveToolbar(): void;
 	/**
-	 * @description Reset the buttons on the toolbar. (Editor is not reloaded)
+	 * @description Reset the buttons on the toolbar. (Editor is not reloaded.)
 	 * - You cannot set a new plugin for the button.
 	 * @param {Array} buttonList Button list
 	 */
@@ -91,20 +91,20 @@ declare class Toolbar {
 	_setResponsive(): void;
 	/**
 	 * @internal
-	 * @description Show the balloon toolbar based on the current selection.
+	 * @description Show the `balloon` toolbar based on the current selection.
 	 * @param {?Range} [rangeObj] - Selection range
 	 */
 	_showBalloon(rangeObj?: Range | null): void;
 	/**
 	 * @internal
-	 * @description Adjust the balloon toolbar's position.
+	 * @description Adjust the `balloon` toolbar's position.
 	 * @param {boolean} positionTop - Whether the toolbar should be positioned above the selection
 	 * @param {Range} [range] - Selection range
 	 */
 	_setBalloonOffset(positionTop: boolean, range?: Range): void;
 	/**
 	 * @internal
-	 * @description Show the inline toolbar mode.
+	 * @description Show the `inline` toolbar mode.
 	 */
 	_showInline(): void;
 	/**

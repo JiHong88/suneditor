@@ -10,11 +10,11 @@ export type VideoPluginOptions = {
 	 */
 	showHeightInput?: boolean;
 	/**
-	 * - The default width of the video element. If a number is provided, "px" will be appended.
+	 * - The default width of the video element. If a number is provided, `"px"` will be appended.
 	 */
 	defaultWidth?: string;
 	/**
-	 * - The default height of the video element. If a number is provided, "px" will be appended.
+	 * - The default height of the video element. If a number is provided, `"px"` will be appended.
 	 */
 	defaultHeight?: string;
 	/**
@@ -52,7 +52,7 @@ export type VideoPluginOptions = {
 	 */
 	allowMultiple?: boolean;
 	/**
-	 * - Accepted file formats for video uploads.
+	 * - Accepted file formats for video uploads (`"video/*"`).
 	 */
 	acceptedFormats?: string;
 	/**
@@ -68,13 +68,13 @@ export type VideoPluginOptions = {
 	 */
 	ratioOptions?: any[];
 	/**
-	 * - Additional attributes to set on the video tag.
+	 * - Additional attributes to set on the `VIDEO` tag.
 	 */
 	videoTagAttributes?: {
 		[x: string]: string;
 	};
 	/**
-	 * - Additional attributes to set on the iframe tag.
+	 * - Additional attributes to set on the `IFRAME` tag.
 	 */
 	iframeTagAttributes?: {
 		[x: string]: string;
@@ -110,7 +110,7 @@ export type VideoPluginOptions = {
 	 */
 	controls?: SunEditor.Module.Figure.Controls;
 	/**
-	 * - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+	 * - Component insertion behavior for selection and cursor placement. [default: `options.get('componentInsertBehavior')`]
 	 * - `auto`: Move cursor to the next line if possible, otherwise select the component.
 	 * - `select`: Always select the inserted component.
 	 * - `line`: Move cursor to the next line if possible, or create a new line and move there.
@@ -127,8 +127,8 @@ export type VideoState = {
  * @typedef {Object} VideoPluginOptions
  * @property {boolean} [canResize=true] - Whether the video element can be resized.
  * @property {boolean} [showHeightInput=true] - Whether to display the height input field.
- * @property {string} [defaultWidth] - The default width of the video element. If a number is provided, "px" will be appended.
- * @property {string} [defaultHeight] - The default height of the video element. If a number is provided, "px" will be appended.
+ * @property {string} [defaultWidth] - The default width of the video element. If a number is provided, `"px"` will be appended.
+ * @property {string} [defaultHeight] - The default height of the video element. If a number is provided, `"px"` will be appended.
  * @property {boolean} [percentageOnlySize=false] - Whether to allow only percentage-based sizing.
  * @property {boolean} [createFileInput=false] - Whether to create a file input element for video uploads.
  * @property {boolean} [createUrlInput=true] - Whether to create a URL input element for video embedding.
@@ -137,19 +137,19 @@ export type VideoState = {
  * @property {number} [uploadSizeLimit] - The total upload size limit for videos in bytes.
  * @property {number} [uploadSingleSizeLimit] - The single file upload size limit for videos in bytes.
  * @property {boolean} [allowMultiple=false] - Whether multiple video uploads are allowed.
- * @property {string} [acceptedFormats="video/*"] - Accepted file formats for video uploads.
+ * @property {string} [acceptedFormats="video/*"] - Accepted file formats for video uploads (`"video/*"`).
  * @property {number} [defaultRatio=0.5625] - The default aspect ratio for the video (e.g., 16:9 is 0.5625).
  * @property {boolean} [showRatioOption=true] - Whether to display the ratio option in the modal.
  * @property {Array} [ratioOptions] - Custom ratio options for video resizing.
- * @property {Object<string, string>} [videoTagAttributes] - Additional attributes to set on the video tag.
- * @property {Object<string, string>} [iframeTagAttributes] - Additional attributes to set on the iframe tag.
+ * @property {Object<string, string>} [videoTagAttributes] - Additional attributes to set on the `VIDEO` tag.
+ * @property {Object<string, string>} [iframeTagAttributes] - Additional attributes to set on the `IFRAME` tag.
  * @property {string} [query_youtube=""] - Additional query parameters for YouTube embedding.
  * @property {string} [query_vimeo=""] - Additional query parameters for Vimeo embedding.
  * @property {Object<string, {pattern: RegExp, action: (url: string) => string, tag: string}>} [embedQuery] - Custom query objects for additional embedding services.
  * @property {Array<RegExp>} [urlPatterns] - Additional URL patterns for video embedding.
  * @property {Array<string>} [extensions] - Additional file extensions to be recognized for video uploads.
  * @property {SunEditor.Module.Figure.Controls} [controls] - Figure controls.
- * @property {SunEditor.ComponentInsertType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+ * @property {SunEditor.ComponentInsertType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: `options.get('componentInsertBehavior')`]
  * - `auto`: Move cursor to the next line if possible, otherwise select the component.
  * - `select`: Always select the inserted component.
  * - `line`: Move cursor to the next line if possible, or create a new line and move there.
@@ -176,7 +176,7 @@ declare class Video extends PluginModal {
 	/**
 	 * @description Checks if the given URL matches any of the defined URL patterns.
 	 * @param {string} url - The URL to check.
-	 * @returns {boolean} True if the URL matches a known pattern; otherwise, false.
+	 * @returns {boolean} `true` if the URL matches a known pattern; otherwise, `false`.
 	 */
 	static #checkContentType(url: string): boolean;
 	static #extensions: string[];
@@ -261,8 +261,8 @@ declare class Video extends PluginModal {
 	/**
 	 * @description Finds and processes the URL for video by matching it against known service patterns.
 	 * @param {string} url - The original URL.
-	 * @returns {{origin: string, url: string, tag: string}|null} An object containing the original URL, the processed URL, and the tag type (e.g., 'iframe'),
-	 * or null if no matching pattern is found.
+	 * @returns {{origin: string, url: string, tag: string}|null} An object containing the original URL, the processed URL, and the tag type (e.g., `iframe`),
+	 * or `null` if no matching pattern is found.
 	 */
 	findProcessUrl(url: string): {
 		origin: string;
@@ -271,7 +271,7 @@ declare class Video extends PluginModal {
 	} | null;
 	/**
 	 * @description Converts a YouTube URL into an embeddable URL.
-	 * - If the URL does not start with "http", it prepends "https://". It also replaces "watch?v=" with the embed path.
+	 * - If the URL does not start with `"http"`, it prepends `"https://"`. It also replaces `"watch?v="` with the embed path.
 	 * @param {string} url - The original YouTube URL.
 	 * @returns {string} The converted YouTube embed URL.
 	 */
@@ -285,7 +285,7 @@ declare class Video extends PluginModal {
 	convertUrlVimeo(url: string): string;
 	/**
 	 * @description Adds query parameters to a URL.
-	 * - If the URL already contains a query string, the provided query is appended with an "&".
+	 * - If the URL already contains a query string, the provided query is appended with an `"&"`.
 	 * @param {string} url - The original URL.
 	 * @param {string} query - The query string to append.
 	 * @returns {string} The URL with the appended query parameters.
@@ -318,29 +318,29 @@ declare class Video extends PluginModal {
 		isLast: boolean,
 	): void;
 	/**
-	 * @description Creates a new iframe element for video embedding.
+	 * @description Creates a new `IFRAME` element for video embedding.
 	 * - Applies any additional properties provided and sets the necessary attributes for embedding.
-	 * @param {Object<string, string>} [props] - An optional object containing properties to assign to the iframe.
-	 * @returns {HTMLIFrameElement} The newly created iframe element.
+	 * @param {Object<string, string>} [props] - An optional object containing properties to assign to the `IFRAME`.
+	 * @returns {HTMLIFrameElement} The newly created `IFRAME` element.
 	 */
 	createIframeTag(props?: { [x: string]: string }): HTMLIFrameElement;
 	/**
-	 * @description Creates a new video element for video embedding.
+	 * @description Creates a new `VIDEO` element for video embedding.
 	 * - Applies any additional properties provided and sets the necessary attributes.
-	 * @param {Object<string, string>} [props] - An optional object containing properties to assign to the video element.
-	 * @returns {HTMLVideoElement} The newly created video element.
+	 * @param {Object<string, string>} [props] - An optional object containing properties to assign to the `VIDEO` element.
+	 * @returns {HTMLVideoElement} The newly created `VIDEO` element.
 	 */
 	createVideoTag(props?: { [x: string]: string }): HTMLVideoElement;
 	/**
-	 * @description Create an "video" component using the provided files.
+	 * @description Create a `video` component using the provided files.
 	 * @param {FileList|File[]} fileList File object list
-	 * @returns {Promise<boolean>} If return false, the file upload will be canceled
+	 * @returns {Promise<boolean>} If return `false`, the file upload will be canceled
 	 */
 	submitFile(fileList: FileList | File[]): Promise<boolean>;
 	/**
-	 * @description Create an "video" component using the provided url.
+	 * @description Create a `video` component using the provided url.
 	 * @param {string} url File url
-	 * @returns {Promise<boolean>} If return false, the file upload will be canceled
+	 * @returns {Promise<boolean>} If return `false`, the file upload will be canceled
 	 */
 	submitURL(url: string): Promise<boolean>;
 	#private;

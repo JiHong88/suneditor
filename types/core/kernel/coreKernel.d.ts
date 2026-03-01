@@ -183,9 +183,9 @@ export type Deps = {
  */
 /**
  * @description Core dependency container for the editor.
- * - Stores and retrieves config/logic/plugin instances
- * - Orchestrates dependency injection across layers
- * - Initialization order: L1 Store -> L2 Config ($ Phase 1) -> L3 Logic ($ Phase 2) -> L4 Event
+ * - Stores and retrieves config/logic/plugin instances.
+ * - Orchestrates dependency injection across layers.
+ * - Initialization order: L1 Store -> L2 Config (`$` Phase 1) -> L3 Logic (`$` Phase 2) -> L4 Event.
  */
 declare class CoreKernel {
 	/**

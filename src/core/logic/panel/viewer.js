@@ -1,13 +1,9 @@
-/**
- * @fileoverview Viewer class
- */
-
 import { dom, env, converter, numbers } from '../../../helper';
 
 const { _w, _d } = env;
 
 /**
- * @description Viewer(codeView, fullScreen, showBlocks) class
+ * @description Viewer (`codeView`, `fullScreen`, `showBlocks`) class
  */
 class Viewer {
 	#kernel;
@@ -64,7 +60,7 @@ class Viewer {
 
 	/**
 	 * @description Changes to code view or wysiwyg view
-	 * @param {boolean} [value] true/false, If undefined toggle the codeView mode.
+	 * @param {boolean} [value] `true`/`false`, If `undefined` toggle the `codeView` mode.
 	 */
 	codeView(value) {
 		const fc = this.#frameContext;
@@ -163,7 +159,7 @@ class Viewer {
 
 	/**
 	 * @description Changes to full screen or default screen
-	 * @param {boolean} [value] true/false, If undefined toggle the codeView mode.
+	 * @param {boolean} [value] `true`/`false`, If `undefined` toggle the `fullScreen` mode.
 	 */
 	fullScreen(value) {
 		const fc = this.#frameContext;
@@ -315,8 +311,8 @@ class Viewer {
 	}
 
 	/**
-	 * @description Add or remove the class name of "body" so that the code block is visible
-	 * @param {boolean} [value] true/false, If undefined toggle the codeView mode.
+	 * @description Add or remove the class name of `body` so that the code block is visible
+	 * @param {boolean} [value] `true`/`false`, If `undefined` toggle the `showBlocks` mode.
 	 */
 	showBlocks(value) {
 		const fc = this.#frameContext;
@@ -336,7 +332,7 @@ class Viewer {
 
 	/**
 	 * @internal
-	 * @description Set the active class to the button of the toolbar
+	 * @description Set the `active` class to the button of the toolbar
 	 */
 	_setButtonsActive() {
 		const fc = this.#frameContext;
@@ -535,9 +531,9 @@ class Viewer {
 
 	/**
 	 * @internal
-	 * @description Run CodeMirror Editor
-	 * @param {"set"|"get"|"readonly"|"refresh"} key method key
-	 * @param {*} value CodeMirror params
+	 * @description Run `CodeMirror` Editor
+	 * @param {"set"|"get"|"readonly"|"refresh"} key Method key
+	 * @param {*} value `CodeMirror` params
 	 * @param {string} [rootKey] Root key
 	 */
 	_codeMirrorEditor(key, value, rootKey) {
@@ -603,10 +599,10 @@ class Viewer {
 	/**
 	 * @internal
 	 * @description Adjusts the height of the code view area.
-	 * - Ensures the code block auto-resizes based on its content.
+	 * - Ensures the code block `auto`-resizes based on its content.
 	 * @param {HTMLElement} code - Code area
 	 * @param {HTMLTextAreaElement} codeNumbers - Code numbers area
-	 * @param {boolean} isAuto - Auto height option
+	 * @param {boolean} isAuto - `auto` height option
 	 */
 	_codeViewAutoHeight(code, codeNumbers, isAuto) {
 		if (isAuto) code.style.height = code.scrollHeight + 'px';
@@ -626,7 +622,7 @@ class Viewer {
 	}
 
 	/**
-	 * @description Convert the data of the code view and put it in the WYSIWYG area.
+	 * @description Convert the data of the code view and put it in the `WYSIWYG` area.
 	 */
 	#setCodeDataToEditor() {
 		const code_html = this._getCodeView();
@@ -674,7 +670,7 @@ class Viewer {
 	}
 
 	/**
-	 * @description Convert the data of the WYSIWYG area and put it in the code view area.
+	 * @description Convert the data of the `WYSIWYG` area and put it in the code view area.
 	 */
 	#setEditorDataToCodeView() {
 		const codeContent = this.#$.html._convertToCode(this.#frameContext.get('wysiwyg'), false);
@@ -744,7 +740,7 @@ function CreateLineNumbers(fc) {
 }
 
 /**
- * @description Get the line height of the textarea
+ * @description Get the `line-height` of the textarea
  * @param {HTMLTextAreaElement} textarea Textarea element
  * @returns {number}
  */

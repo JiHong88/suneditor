@@ -14,7 +14,7 @@ const { _w, NO_EVENT } = env;
  * @property {Object<string, string>} [uploadHeaders] - Headers to include in file upload requests.
  * @property {number} [uploadSizeLimit] - The total file upload size limit in bytes.
  * @property {number} [uploadSingleSizeLimit] - The single file upload size limit in bytes.
- * @property {Object<string, string>} [iframeTagAttributes] - Additional attributes to set on the iframe tag.
+ * @property {Object<string, string>} [iframeTagAttributes] - Additional attributes to set on the `IFRAME` tag.
  * @property {string} [query_youtube] - YouTube query parameter.
  * @property {string} [query_vimeo] - Vimeo query parameter.
  * @property {Array<RegExp>} [urlPatterns] - Additional URL patterns for embed.
@@ -38,7 +38,7 @@ const { _w, NO_EVENT } = env;
  *   // Additional services...
  * }
  * @property {SunEditor.Module.Figure.Controls} [controls] - Figure controls.
- * @property {SunEditor.ComponentInsertType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+ * @property {SunEditor.ComponentInsertType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: `options.get('componentInsertBehavior')`]
  * - `auto`: Move cursor to the next line if possible, otherwise select the component.
  * - `select`: Always select the inserted component.
  * - `line`: Move cursor to the next line if possible, or create a new line and move there.
@@ -48,7 +48,7 @@ const { _w, NO_EVENT } = env;
 /**
  * @class
  * @description Embed modal plugin.
- * - This plugin provides a modal interface for embedding external content (e.g., videos, iframes) into the editor.
+ * - This plugin provides a modal interface for embedding external content (e.g., videos, `IFRAME` elements) into the editor.
  */
 class Embed extends PluginModal {
 	static key = 'embed';
@@ -97,7 +97,7 @@ class Embed extends PluginModal {
 	/**
 	 * @description Checks if the given URL matches any of the defined URL patterns.
 	 * @param {string} url - The URL to check.
-	 * @returns {boolean} True if the URL matches a known pattern; otherwise, false.
+	 * @returns {boolean} `true` if the URL matches a known pattern; otherwise, `false`.
 	 */
 	static #checkContentType(url) {
 		url = url?.toLowerCase() || '';
@@ -397,8 +397,8 @@ class Embed extends PluginModal {
 	/**
 	 * @description Finds and processes the URL for embedding by matching it against known service patterns.
 	 * @param {string} url - The original URL.
-	 * @returns {{origin: string, url: string, tag: string}|null} An object containing the original URL, the processed URL, and the tag type (e.g., 'iframe'),
-	 * or null if no matching pattern is found.
+	 * @returns {{origin: string, url: string, tag: string}|null} An object containing the original URL, the processed URL, and the tag type (e.g., `iframe`),
+	 * or `null` if no matching pattern is found.
 	 */
 	findProcessUrl(url) {
 		const query = this.query;
@@ -420,7 +420,7 @@ class Embed extends PluginModal {
 	 * @description Processes the provided source (URL or embed code) and submits it for embedding.
 	 * - It parses the input, triggers any necessary events, and creates or updates the embed component.
 	 * @param {string} [src] - The embed source. If not provided, uses the internally stored link value.
-	 * @returns {Promise<boolean>} A promise that resolves to true on success or false on failure.
+	 * @returns {Promise<boolean>} A promise that resolves to `true` on success or `false` on failure.
 	 */
 	async submitSRC(src) {
 		if (!(src ||= this.#linkValue)) return false;
@@ -466,7 +466,7 @@ class Embed extends PluginModal {
 	 * - Ensures that the controller is properly positioned and initialized.
 	 * - Prevents duplicate event handling if the component is already selected.
 	 * @param {HTMLElement} target - The selected element.
-	 * @param {boolean} [infoOnly=false] - If true, only retrieves information without opening the controller.
+	 * @param {boolean} [infoOnly=false] - If `true`, only retrieves information without opening the controller.
 	 */
 	#ready(target, infoOnly = false) {
 		if (!target) return;
@@ -515,8 +515,8 @@ class Embed extends PluginModal {
 	}
 
 	/**
-	 * @description Creates an iframe element for embedding external content.
-	 * @returns {HTMLIFrameElement} The created iframe element.
+	 * @description Creates an `IFRAME` element for embedding external content.
+	 * @returns {HTMLIFrameElement} The created `IFRAME` element.
 	 */
 	#createIframeTag() {
 		/** @type {HTMLIFrameElement} */
@@ -526,8 +526,8 @@ class Embed extends PluginModal {
 	}
 
 	/**
-	 * @description Creates an blockquote element for embedding external content.
-	 * @returns {HTMLElement} The created iframe element.
+	 * @description Creates a `BLOCKQUOTE` element for embedding external content.
+	 * @returns {HTMLElement} The created `BLOCKQUOTE` element.
 	 */
 	#createEmbedTag() {
 		const quoteTag = dom.utils.createElement('BLOCKQUOTE');
@@ -535,7 +535,7 @@ class Embed extends PluginModal {
 	}
 
 	/**
-	 * @description Creates an embed component (iframe or blockquote) and inserts it into the editor.
+	 * @description Creates an embed component (`IFRAME` or `BLOCKQUOTE`) and inserts it into the editor.
 	 * @param {string} originSrc - The origin input source.
 	 * @param {SunEditor.EventParams.ProcessInfo} process - Processed embed information.
 	 * @param {string} src - The source URL.
@@ -736,8 +736,8 @@ class Embed extends PluginModal {
 	}
 
 	/**
-	 * @description Sets default attributes for an iframe element.
-	 * @param {HTMLIFrameElement} element - The iframe element to modify.
+	 * @description Sets default attributes for an `IFRAME` element.
+	 * @param {HTMLIFrameElement} element - The `IFRAME` element to modify.
 	 */
 	#setIframeAttrs(element) {
 		element.frameBorder = '0';

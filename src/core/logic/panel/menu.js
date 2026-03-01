@@ -1,7 +1,3 @@
-/**
- * @fileoverview Toolbar Menu class
- */
-
 import { dom, converter } from '../../../helper';
 
 /**
@@ -73,7 +69,7 @@ class Menu {
 
 	/**
 	 * @description Method for managing dropdown element.
-	 * - You must add the "dropdown" element using the this method at custom plugin.
+	 * - You must add the `dropdown` element using this method at custom plugin.
 	 * @param {{key: string, type: string}} classObj Class object
 	 * @param {Node} menu Dropdown element
 	 */
@@ -159,10 +155,10 @@ class Menu {
 	}
 
 	/**
-	 * @description Shows a previously hidden dropdown menu that is still in "on" state.
-	 * - Only works when a dropdown is active (currentButton exists)
-	 * - Re-displays the dropdown that was hidden by dropdownHide()
-	 * - Recalculates menu position by calling dropdownOn() again
+	 * @description Shows a previously hidden dropdown menu that is still in `on` state.
+	 * - Only works when a dropdown is active (`currentButton` exists)
+	 * - Re-displays the dropdown that was hidden by `dropdownHide()`
+	 * - Recalculates menu position by calling `dropdownOn()` again
 	 */
 	dropdownShow() {
 		if (this.currentButton) {
@@ -172,9 +168,9 @@ class Menu {
 
 	/**
 	 * @description Temporarily hides the currently active dropdown menu without closing it.
-	 * - Unlike dropdownOff(), this does not clear the dropdown state or event listeners
-	 * - The dropdown remains "on" but visually hidden
-	 * - Use dropdownShow() to make it visible again
+	 * - Unlike `dropdownOff()`, this does not clear the dropdown state or event listeners
+	 * - The dropdown remains `on` but visually hidden
+	 * - Use `dropdownShow()` to make it visible again
 	 */
 	dropdownHide() {
 		if (this.currentDropdown) {

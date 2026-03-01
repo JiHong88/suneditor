@@ -1,7 +1,3 @@
-/**
- * @fileoverview Inline class
- */
-
 import { dom, unicode, converter } from '../../../helper';
 
 /**
@@ -38,25 +34,25 @@ class Inline {
 
 	/**
 	 * @description Adds, updates, or deletes style nodes from selected text (a, span, strong, etc.).
-	 * - 1. If styleNode is provided, a node with the same tags and attributes is added to the selected text.
+	 * - 1. If `styleNode` is provided, a node with the same tags and attributes is added to the selected text.
 	 * - 2. If the same tag already exists, only its attributes are updated.
-	 * - 3. If styleNode is null, existing nodes are updated or removed without adding new ones.
-	 * - 4. Styles matching those in stylesToModify are removed. (Use CSS attribute names, e.g., "background-color")
-	 * - 5. Classes matching those in stylesToModify (prefixed with ".") are removed.
-	 * - 6. stylesToModify is used to avoid duplicate property values from styleNode.
-	 * - 7. Nodes with all styles and classes removed are deleted if they match styleNode, are in nodesToRemove, or if styleNode is null.
-	 * - 8. Tags matching names in nodesToRemove are deleted regardless of their style and class.
-	 * - 9. If strictRemove is true, nodes in nodesToRemove are only removed if all their styles and classes are removed.
+	 * - 3. If `styleNode` is `null`, existing nodes are updated or removed without adding new ones.
+	 * - 4. Styles matching those in `stylesToModify` are removed. (Use CSS attribute names, e.g., `background-color`)
+	 * - 5. Classes matching those in `stylesToModify` (prefixed with `"."`) are removed.
+	 * - 6. `stylesToModify` is used to avoid duplicate property values from `styleNode`.
+	 * - 7. Nodes with all styles and classes removed are deleted if they match `styleNode`, are in `nodesToRemove`, or if `styleNode` is `null`.
+	 * - 8. Tags matching names in `nodesToRemove` are deleted regardless of their style and class.
+	 * - 9. If `strictRemove` is `true`, nodes in `nodesToRemove` are only removed if all their styles and classes are removed.
 	 * - 10. The function won't modify nodes if the parent has the same class and style values.
-	 * - However, if nodesToRemove has values, it will work and separate text nodes even if there's no node to replace.
-	 * @param {?Node} styleNode The element to be added to the selection. If null, only existing nodes are modified or removed.
+	 * - However, if `nodesToRemove` has values, it will work and separate text nodes even if there's no node to replace.
+	 * @param {?Node} styleNode The element to be added to the selection. If `null`, only existing nodes are modified or removed.
 	 * @param {Object} [options] Options
 	 * @param {Array<string>} [options.stylesToModify=null] Array of style or class names to check and modify.
 	 *        (e.g., ['font-size'], ['.className'], ['font-family', 'color', '.className'])
 	 * @param {Array<string>} [options.nodesToRemove=null] Array of node names to remove.
-	 *        If empty array or null when styleNode is null, all formats are removed.
+	 *        If empty array or `null` when `styleNode` is `null`, all formats are removed.
 	 *        (e.g., ['span'], ['strong', 'em'])
-	 * @param {boolean} [options.strictRemove=false] If true, only removes nodes from nodesToRemove if all styles and classes are removed.
+	 * @param {boolean} [options.strictRemove=false] If `true`, only removes nodes from `nodesToRemove` if all styles and classes are removed.
 	 * @returns {HTMLElement} The element that was added to or modified in the selection.
 	 * @example
 	 * // Apply bold formatting
@@ -409,7 +405,7 @@ class Inline {
 
 	/**
 	 * @description Remove all inline formats (styles and tags) from the currently selected text.
-	 * - This is a convenience method that calls apply() with null parameters to strip all formatting.
+	 * - This is a convenience method that calls `apply()` with `null` parameters to strip all formatting.
 	 * - Removes all inline style nodes (span, strong, em, a, etc.)
 	 * - Preserves only the plain text content
 	 * - Works on the current selection or collapsed cursor position
@@ -446,14 +442,14 @@ class Inline {
 	 * @param {Node} element The node of the line that contains the selected text node.
 	 * @param {Node} newInnerNode The dom that will wrap the selected text area
 	 * @param {(current: Node) => Node|null} validation Check if the node should be stripped.
-	 * @param {Node} startCon The startContainer property of the selection object.
-	 * @param {number} startOff The startOffset property of the selection object.
-	 * @param {Node} endCon The endContainer property of the selection object.
-	 * @param {number} endOff The endOffset property of the selection object.
+	 * @param {Node} startCon The `startContainer` property of the selection object.
+	 * @param {number} startOff The `startOffset` property of the selection object.
+	 * @param {Node} endCon The `endContainer` property of the selection object.
+	 * @param {number} endOff The `endOffset` property of the selection object.
 	 * @param {boolean} isRemoveFormat Is the remove all formats command?
-	 * @param {boolean} isRemoveNode "newInnerNode" is remove node?
-	 * @param {boolean} collapsed range.collapsed
-	 * @param {Object} _removeCheck Object with "v" property tracking removal state.
+	 * @param {boolean} isRemoveNode `newInnerNode` is remove node?
+	 * @param {boolean} collapsed `range.collapsed`
+	 * @param {Object} _removeCheck Object with `v` property tracking removal state.
 	 * @param {(element: Node) => Node|null} _getMaintainedNode Function to get maintained parent node.
 	 * @param {(element: Node) => boolean} _isMaintainedNode Function to check if node should be maintained.
 	 * @returns {{ancestor: *, startContainer: *, startOffset: *, endContainer: *, endOffset: *}}
@@ -915,10 +911,10 @@ class Inline {
 	 * @param {Node} element The node of the line that contains the selected text node.
 	 * @param {Node} newInnerNode The dom that will wrap the selected text area
 	 * @param {(current: Node) => Node|null} validation Check if the node should be stripped.
-	 * @param {Node} startCon The startContainer property of the selection object.
-	 * @param {number} startOff The startOffset property of the selection object.
+	 * @param {Node} startCon The `startContainer` property of the selection object.
+	 * @param {number} startOff The `startOffset` property of the selection object.
 	 * @param {boolean} isRemoveFormat Is the remove all formats command?
-	 * @param {boolean} isRemoveNode "newInnerNode" is remove node?
+	 * @param {boolean} isRemoveNode `newInnerNode` is remove node?
 	 * @param {Object} _removeCheck Object tracking removal state.
 	 * @param {(element: Node) => Node|null} _getMaintainedNode Function to get maintained parent node.
 	 * @param {(element: Node) => boolean} _isMaintainedNode Function to check if node should be maintained.
@@ -1224,10 +1220,10 @@ class Inline {
 	 * @param {Node} newInnerNode The dom that will wrap the selected text area
 	 * @param {(current: Node) => Node|null} validation Check if the node should be stripped.
 	 * @param {boolean} isRemoveFormat Is the remove all formats command?
-	 * @param {boolean} isRemoveNode "newInnerNode" is remove node?
+	 * @param {boolean} isRemoveNode `newInnerNode` is remove node?
 	 * @param {Object} _removeCheck Object tracking removal state.
-	 * @param {Node} _endContainer Offset node of last line already modified (end.container)
-	 * @returns {NodeStyleContainerType} { ancestor, endContainer: "If end container is renewed, returned renewed node" }
+	 * @param {Node} _endContainer Offset node of last line already modified (`end.container`)
+	 * @returns {NodeStyleContainerType} { ancestor, endContainer: If end container is renewed, returned renewed node }
 	 */
 	#setNode_middleLine(element, newInnerNode, validation, isRemoveFormat, isRemoveNode, _removeCheck, _endContainer) {
 		// not add tag
@@ -1360,10 +1356,10 @@ class Inline {
 	 * @param {Node} element The node of the line that contains the selected text node.
 	 * @param {Node} newInnerNode The dom that will wrap the selected text area
 	 * @param {(current: Node) => Node|null} validation Check if the node should be stripped.
-	 * @param {Node} endCon The endContainer property of the selection object.
-	 * @param {number} endOff The endOffset property of the selection object.
+	 * @param {Node} endCon The `endContainer` property of the selection object.
+	 * @param {number} endOff The `endOffset` property of the selection object.
 	 * @param {boolean} isRemoveFormat Is the remove all formats command?
-	 * @param {boolean} isRemoveNode "newInnerNode" is remove node?
+	 * @param {boolean} isRemoveNode `newInnerNode` is remove node?
 	 * @param {Object} _removeCheck Object tracking removal state.
 	 * @param {(element: Node) => Node|null} _getMaintainedNode Function to get maintained parent node.
 	 * @param {(element: Node) => boolean} _isMaintainedNode Function to check if node should be maintained.
@@ -1679,7 +1675,7 @@ class Inline {
 	}
 
 	/**
-	 * @description Node with font-size style
+	 * @description Node with `font-size` style
 	 * @param {Node} element Element to check
 	 * @returns {boolean}
 	 */
@@ -1714,8 +1710,8 @@ class Inline {
 
 	/**
 	 * @description If certain styles are applied to all child nodes of the list cell, the style of the list cell is also changed. (bold, color, size)
-	 * @param {Node} el List cell element. <li>
-	 * @param {?Node} child Variable for recursive call. ("null" on the first call)
+	 * @param {Node} el List cell element. `<li>`
+	 * @param {?Node} child Variable for recursive call. (`null` on the first call)
 	 */
 	#sn_setCommonListStyle(el, child) {
 		if (!dom.check.isListCell(el)) return;
@@ -1764,7 +1760,7 @@ class Inline {
 
 	/**
 	 * @description Watch the applied text nodes and adjust the common styles of the list.
-	 * @param {Node} el "LI" element
+	 * @param {Node} el `LI` element
 	 * @param {?Array} styleArray Refer style array
 	 */
 	#sn_resetCommonListCell(el, styleArray) {

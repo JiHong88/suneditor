@@ -1,7 +1,3 @@
-/**
- * @fileoverview Offset class
- */
-
 import { getParentElement } from '../../../helper/dom/domQuery';
 import { isWysiwygFrame, isElement } from '../../../helper/dom/domCheck';
 import { hasClass, addClass, removeClass, getClientSize } from '../../../helper/dom/domUtils';

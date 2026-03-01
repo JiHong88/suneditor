@@ -48,15 +48,15 @@ export type ColorPickerParams = {
  */
 /**
  * @class
- * @description Create a color picker element and register for related events. (this.target)
- * - When calling the color selection, "submit", and "remove" buttons, the "action" method of the instance is called with the "color" value as an argument.
+ * @description Create a color picker element and register for related events. (`this.target`)
+ * - When calling the color selection, `submit`, and `remove` buttons, the `action` method of the instance is called with the `color` value as an argument.
  */
 declare class ColorPicker {
 	/**
 	 * @constructor
 	 * @param {*} host The instance object that called the constructor.
 	 * @param {SunEditor.Deps} $ Kernel dependencies
-	 * @param {string} styles style property ("color", "backgroundColor"..)
+	 * @param {string} styles style property (`"color"`, `"backgroundColor"`..)
 	 * @param {ColorPickerParams} params Color picker options
 	 */
 	constructor(host: any, $: SunEditor.Deps, styles: string, params: ColorPickerParams);
@@ -79,7 +79,7 @@ declare class ColorPicker {
 	 * @param {Node|string} nodeOrColor Current Selected node
 	 * @param {Node} target target
 	 * @param {?(current: Node) => boolean} [stopCondition] - A function used to stop traversing parent nodes while finding the color.
-	 * - When this function returns true, the traversal ends at that node.
+	 * - When this function returns `true`, the traversal ends at that node.
 	 * - e.g., `(node) => this.format.isLine(node)` stops at line-level elements like <p>, <div>.
 	 */
 	init(nodeOrColor: Node | string, target: Node, stopCondition?: ((current: Node) => boolean) | null): void;

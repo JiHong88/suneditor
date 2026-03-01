@@ -22,7 +22,7 @@ const { _w, _d } = env;
 /**
  * @class
  * @description Math plugin.
- * - This plugin provides support for rendering mathematical expressions using either the KaTeX or MathJax libraries.
+ * - This plugin provides support for rendering mathematical expressions using either the `KaTeX` or `MathJax` libraries.
  * - If external library is provided, a warning is issued.
  */
 class Math_ extends PluginModal {
@@ -309,7 +309,7 @@ class Math_ extends PluginModal {
 	}
 
 	/**
-	 * @description Renders the given math expression using KaTeX or MathJax.
+	 * @description Renders the given math expression using `KaTeX` or `MathJax`.
 	 * @param {string} exp - The math expression to render.
 	 * @returns {string} - The rendered math expression as HTML.
 	 */
@@ -350,7 +350,7 @@ class Math_ extends PluginModal {
 	/**
 	 * @description Escapes or unescapes backslashes in a given string.
 	 * @param {string} str - The input string.
-	 * @param {boolean} decode - If true, decodes escaped backslashes; otherwise, encodes them.
+	 * @param {boolean} decode - If `true`, decodes escaped backslashes; otherwise, encodes them.
 	 * @returns {string} - The processed string.
 	 */
 	#escapeBackslashes(str, decode) {
@@ -403,7 +403,7 @@ class Math_ extends PluginModal {
 	}
 
 	/**
-	 * @returns {*} - The KaTeX instance or null if the instance is invalid.
+	 * @returns {*} - The `KaTeX` instance or `null` if the instance is invalid.
 	 */
 	#CheckKatex() {
 		const katex = this.$.options.get('externalLibs').katex;

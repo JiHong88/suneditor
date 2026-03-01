@@ -3,7 +3,7 @@ import { dom } from '../../helper';
 
 /**
  * @class
- * @description List Plugin (OL, UL)
+ * @description List Plugin (`OL`, `UL`)
  */
 class List extends PluginDropdown {
 	static key = 'list';

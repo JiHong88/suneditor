@@ -1,7 +1,3 @@
-/**
- * @fileoverview eventOrchestrator class
- */
-
 import KernelInjector from '../kernel/kernelInjector';
 import { dom, unicode, numbers, env, converter } from '../../helper';
 import { _DragHandle } from '../../modules/ui';
@@ -59,7 +55,7 @@ class EventOrchestrator extends KernelInjector {
 		this.#menu = this.$.menu;
 
 		/**
-		 * @description Old browsers: When there is no 'e.isComposing' in the keyup event
+		 * @description Old browsers: When there is no `e.isComposing` in the `keyup` event
 		 * @type {boolean}
 		 */
 		this.isComposing = false;
@@ -114,7 +110,7 @@ class EventOrchestrator extends KernelInjector {
 
 	/**
 	 * @description Activates the corresponding button with the tags information of the current cursor position,
-	 * - such as 'bold', 'underline', etc., and executes the 'active' method of the plugins.
+	 * - such as `bold`, `underline`, etc., and executes the `active` method of the plugins.
 	 * @param {?Node} [selectionNode] selectionNode
 	 * @returns {Node|undefined} selectionNode
 	 */
@@ -179,8 +175,8 @@ class EventOrchestrator extends KernelInjector {
 
 	/**
 	 * @internal
-	 * @description If there is no default format, add a line and move 'selection'.
-	 * @param {?string} formatName Format tag name (default: 'P')
+	 * @description If there is no default format, add a `line` and move `selection`.
+	 * @param {?string} formatName Format tag name (default: `P`)
 	 */
 	_setDefaultLine(formatName) {
 		return this.defaultLineManager.execute(formatName);
@@ -188,7 +184,7 @@ class EventOrchestrator extends KernelInjector {
 
 	/**
 	 * @internal
-	 * @description Handles data transfer actions for paste and drop events.
+	 * @description Handles data transfer actions for `paste` and `drop` events.
 	 * - It processes clipboard data, triggers relevant events, and inserts cleaned data into the editor.
 	 * @param {"paste"|"drop"} type The type of event
 	 * @param {Event} e The original event object
@@ -212,7 +208,7 @@ class EventOrchestrator extends KernelInjector {
 
 	/**
 	 * @internal
-	 * @description Processes clipboard data for paste and drop events, handling text and HTML cleanup.
+	 * @description Processes clipboard data for `paste` and `drop` events, handling text and HTML cleanup.
 	 * - Supports specific handling for content from Microsoft Office applications.
 	 * @param {"paste"|"drop"} type The type of event
 	 * @param {Event} e The original event object
@@ -376,8 +372,8 @@ class EventOrchestrator extends KernelInjector {
 
 	/**
 	 * @internal
-	 * @description Registers event listeners for the editor's frame, including text input, selection, and UI interactions.
-	 * - Handles events inside an iframe or within the standard wysiwyg editor.
+	 * @description Registers event listeners for the editor's frame, including text `input`, selection, and UI interactions.
+	 * - Handles events inside an `iframe` or within the standard wysiwyg editor.
 	 * @param {SunEditor.FrameContext} fc The frame context object
 	 */
 	_addFrameEvents(fc) {
@@ -473,7 +469,7 @@ class EventOrchestrator extends KernelInjector {
 	/**
 	 * @internal
 	 * @description Adds event listeners for resizing the status bar if resizing is enabled.
-	 * - If resizing is not enabled, applies a non-resizable class.
+	 * - If resizing is not enabled, applies a `se-resizing-none` class.
 	 * @param {SunEditor.FrameContext} fc The frame context object
 	 * @param {SunEditor.FrameOptions} fo The frame options object
 	 */
@@ -535,7 +531,7 @@ class EventOrchestrator extends KernelInjector {
 
 	/**
 	 * @internal
-	 * @description Synchronizes the selection state by resetting it on mouseup.
+	 * @description Synchronizes the selection state by resetting it on `mouseup`.
 	 * - Ensures selection updates correctly across different interactions.
 	 */
 	_setSelectionSync() {
@@ -574,7 +570,7 @@ class EventOrchestrator extends KernelInjector {
 
 	/**
 	 * @internal
-	 * @description Clears retained style nodes by replacing content with a single line break.
+	 * @description Clears retained style nodes by replacing content with a single `line` break.
 	 * - Resets the selection to the start of the cleared element.
 	 * @param {HTMLElement} formatEl The format element where styles should be cleared
 	 */
@@ -671,7 +667,7 @@ class EventOrchestrator extends KernelInjector {
 
 	/**
 	 * @description Resets the frame status, adjusting toolbar and UI elements based on the current state.
-	 * - Handles inline editor adjustments, fullscreen mode, and responsive toolbar updates.
+	 * - Handles `inline` editor adjustments, fullscreen mode, and responsive toolbar updates.
 	 */
 	#resetFrameStatus() {
 		if (!env.isResizeObserverSupported) {

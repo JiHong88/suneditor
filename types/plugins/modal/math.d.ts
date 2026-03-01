@@ -46,7 +46,7 @@ export type MathPluginOptions = {
 /**
  * @class
  * @description Math plugin.
- * - This plugin provides support for rendering mathematical expressions using either the KaTeX or MathJax libraries.
+ * - This plugin provides support for rendering mathematical expressions using either the `KaTeX` or `MathJax` libraries.
  * - If external library is provided, a warning is issued.
  */
 declare class Math_ extends PluginModal {

@@ -54,8 +54,13 @@ function NodeToJson(node) {
 
 /**
  * @description Parses an HTML string into a DOM tree, then recursively traverses the nodes to convert them into a structured JSON representation.
- * -Each element includes its tag name, attributes, and children.
- * -Text nodes are represented as { type: 'text', content: '...' }.
+ * - Each element includes its tag name, attributes, and children.
+ * - Text nodes are represented as `{ type: 'text', content: '...' }`.
+ * @example
+ * const json = converter.htmlToJson('<p class="txt">Hello</p>');
+ * // { type: 'element', tag: 'p', attributes: { class: 'txt' }, children: [
+ * //   { type: 'text', content: 'Hello' }
+ * // ]}
  * @param {string} content HTML string
  * @returns {Object<string, *>} JSON data
  */
@@ -67,9 +72,15 @@ export function htmlToJson(content) {
 
 /**
  * @description Takes a JSON structure representing HTML elements and recursively serializes it into a valid HTML string.
- * -It rebuilds each tag with attributes and inner content.
+ * - It rebuilds each tag with attributes and inner content.
  * Text content and attributes are safely escaped to prevent parsing issues or XSS.
  * Useful for restoring dynamic HTML from a data format.
+ * @example
+ * const html = converter.jsonToHtml({
+ *   type: 'element', tag: 'p', attributes: { class: 'txt' },
+ *   children: [{ type: 'text', content: 'Hello' }],
+ * });
+ * // '<p class="txt">Hello</p>'
  * @param {Object<string, *>} jsonData
  * @returns {string} HTML string
  */
@@ -193,7 +204,7 @@ export function getValues(obj) {
 }
 
 /**
- * @description Convert the CamelCase To the KebabCase.
+ * @description Convert the `CamelCase` To the `KebabCase`.
  * @param {string|Array<string>} param [Camel string]
  */
 export function camelToKebabCase(param) {
@@ -208,13 +219,13 @@ export function camelToKebabCase(param) {
 
 /**
  * @overload
- * @param {string} param - Kebab-case string.
- * @returns {string} CamelCase string.
+ * @param {string} param - `Kebab-case` string.
+ * @returns {string} `CamelCase` string.
  */
 /**
  * @overload
- * @param {Array<string>} param - Array of Kebab-case strings.
- * @returns {Array<string>} Array of CamelCase strings.
+ * @param {Array<string>} param - Array of `Kebab-case` strings.
+ * @returns {Array<string>} Array of `CamelCase` strings.
  */
 export function kebabToCamelCase(param) {
 	if (typeof param === 'string') {
@@ -227,9 +238,14 @@ export function kebabToCamelCase(param) {
 }
 
 /**
- *
+ * @description Converts a font size string from one CSS unit to another.
+ * @example
+ * converter.toFontUnit('px', '1rem');   // '16px'
+ * converter.toFontUnit('em', '16px');   // '1.00em'
+ * converter.toFontUnit('pt', '16px');   // '12pt'
+ * converter.toFontUnit('%', '16px');    // '100%'
  * @param {"em"|"rem"|"%"|"pt"|"px"} to Size units to be converted
- * @param {string} size siSize to convert with units (ex: "15rem")
+ * @param {string} size Size to convert with units (ex: `"15rem"`)
  * @returns {string}
  */
 export function toFontUnit(to, size) {
@@ -289,8 +305,8 @@ export function swapKeyValue(obj) {
 }
 
 /**
- * @description Create whitelist RegExp object.
- * @param {string} list Tags list ("br|p|div|pre...")
+ * @description Create whitelist `RegExp` object.
+ * @param {string} list Tags list (`"br|p|div|pre..."`)
  * @returns {RegExp} Return RegExp format: new RegExp("<\\/?\\b(?!" + list + ")\\b[^>^<]*+>", "gi")
  */
 export function createElementWhitelist(list) {
@@ -298,8 +314,8 @@ export function createElementWhitelist(list) {
 }
 
 /**
- * @description Create blacklist RegExp object.
- * @param {string} list Tags list ("br|p|div|pre...")
+ * @description Create blacklist `RegExp` object.
+ * @param {string} list Tags list (`"br|p|div|pre..."`)
  * @returns {RegExp} Return RegExp format: new RegExp("<\\/?\\b(?:" + list + ")\\b[^>^<]*+>", "gi")
  */
 export function createElementBlacklist(list) {
@@ -315,7 +331,7 @@ export function isHexColor(str) {
 }
 
 /**
- * @description Function to convert hex format to a rgb color
+ * @description Function to convert hex format to a `rgb` color
  * @param {string} rgba RGBA color format
  * @returns {string}
  */
@@ -363,7 +379,7 @@ export function getWidthInPercentage(target, parentTarget) {
 /**
  * @description Convert url pattern text node to anchor node
  * @param {Node} node Text node
- * @returns {boolean} Return true if the text node is converted to an anchor node
+ * @returns {boolean} Return `true` if the text node is converted to an anchor node
  */
 export function textToAnchor(node) {
 	const URLPattern = /https?:\/\/[^\s]+/g;
@@ -398,8 +414,8 @@ export function textToAnchor(node) {
 }
 
 /**
- * Converts styles within a <span> tag to corresponding HTML tags (e.g., <strong>, <em>, <u>, <s>).
- * Maintains the original <span> tag and wraps its content with the new tags.
+ * Converts styles within a `<span>` tag to corresponding HTML tags (e.g., `<strong>`, `<em>`, `<u>`, `<s>`).
+ * Maintains the original `<span>` tag and wraps its content with the new tags.
  * @param {{ regex: RegExp, tag: string }} styleToTag An object mapping style properties to HTML tags. ex) {bold: { regex: /font-weight\s*:\s*bold/i, tag: 'strong' },}
  * @param {Node} node Node
  */
@@ -462,7 +478,7 @@ export function addUrlQuery(url, query) {
 
 /**
  * @description Converts options-related styles and returns them for each frame.
- * @param {SunEditor.FrameOptions} fo editor.frameOptions
+ * @param {SunEditor.FrameOptions} fo `editor.frameOptions`
  * @param {string} cssText Style string
  * @returns {OptionStyleResult_converter}
  */
@@ -505,9 +521,9 @@ export function _setDefaultOptionStyle(fo, cssText) {
 }
 
 /**
- * @description Set default style tag of the iframe
- * @param {Array<string>} linkNames link names array of CSS files or '*' for all stylesheets
- * @returns {string} "<link rel="stylesheet" href=".." />.."
+ * @description Set default style tag of the `iframe`
+ * @param {Array<string>} linkNames link names array of CSS files or `'*'` for all stylesheets
+ * @returns {string} `"<link rel="stylesheet" href=".." />.."`
  */
 export function _setIframeStyleLinks(linkNames) {
 	let tagString = '';
@@ -554,9 +570,9 @@ export function _setIframeStyleLinks(linkNames) {
 }
 
 /**
- * @description When iframe height options is "auto" return "<style>" tag that required.
+ * @description When `iframe` height options is `"auto"` return `"<style>"` tag that required.
  * @param {string|number} frameHeight height
- * @returns {string} "<style>...</style>"
+ * @returns {string} `"<style>...</style>"`
  */
 export function _setAutoHeightStyle(frameHeight) {
 	return frameHeight === 'auto' ? '<style>\n/** Iframe height auto */\nbody{height: min-content; overflow: hidden;}\n</style>' : '';

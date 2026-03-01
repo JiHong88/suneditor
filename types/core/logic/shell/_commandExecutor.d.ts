@@ -1,6 +1,7 @@
 import type {} from '../../../typedef';
 /**
- * @description Command executor
+ * @description Executes built-in editor commands (formatting, undo/redo, save, codeView, etc.)
+ * - and manages copy-format state.
  */
 export default class CommandExecutor {
 	/**

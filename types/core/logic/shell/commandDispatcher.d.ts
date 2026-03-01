@@ -1,7 +1,7 @@
 import type {} from '../../../typedef';
 export const COMMAND_BUTTONS: '.se-menu-list .se-toolbar-btn[data-command]';
 /**
- * @description
+ * @description Routes toolbar button commands to their handlers and manages active button states.
  */
 export default class CommandDispatcher {
 	/**
@@ -28,18 +28,18 @@ export default class CommandDispatcher {
 	/**
 	 * @description Run plugin calls and basic commands.
 	 * @param {string} command Command string
-	 * @param {string} type Display type string ('command', 'dropdown', 'modal', 'container')
+	 * @param {string} type Display type string (`command`, `dropdown`, `modal`, `container`)
 	 * @param {?Node} [button] The element of command button
 	 */
 	run(command: string, type: string, button?: Node | null): void;
 	/**
-	 * @description Execute "editor.run" with command button.
+	 * @description Execute `editor.run` with command button.
 	 * @param {Node} target Command target
 	 */
 	runFromTarget(target: Node): void;
 	/**
-	 * @description It is executed by inserting the button of commandTargets as the argument value of the "f" function.
-	 * - "func" is called as long as the button array's length.
+	 * @description It is executed by inserting the button of `commandTargets` as the argument value of the `func` function.
+	 * - `func` is called as long as the button array's length.
 	 * @param {string} cmd data-command
 	 * @param {(...args: *) => *} func Function.
 	 */

@@ -26,7 +26,7 @@ declare class Menu {
 	currentDropdownPlugin: any;
 	/**
 	 * @description Method for managing dropdown element.
-	 * - You must add the "dropdown" element using the this method at custom plugin.
+	 * - You must add the `dropdown` element using this method at custom plugin.
 	 * @param {{key: string, type: string}} classObj Class object
 	 * @param {Node} menu Dropdown element
 	 */
@@ -50,17 +50,17 @@ declare class Menu {
 	 */
 	dropdownOff(): void;
 	/**
-	 * @description Shows a previously hidden dropdown menu that is still in "on" state.
-	 * - Only works when a dropdown is active (currentButton exists)
-	 * - Re-displays the dropdown that was hidden by dropdownHide()
-	 * - Recalculates menu position by calling dropdownOn() again
+	 * @description Shows a previously hidden dropdown menu that is still in `on` state.
+	 * - Only works when a dropdown is active (`currentButton` exists)
+	 * - Re-displays the dropdown that was hidden by `dropdownHide()`
+	 * - Recalculates menu position by calling `dropdownOn()` again
 	 */
 	dropdownShow(): void;
 	/**
 	 * @description Temporarily hides the currently active dropdown menu without closing it.
-	 * - Unlike dropdownOff(), this does not clear the dropdown state or event listeners
-	 * - The dropdown remains "on" but visually hidden
-	 * - Use dropdownShow() to make it visible again
+	 * - Unlike `dropdownOff()`, this does not clear the dropdown state or event listeners
+	 * - The dropdown remains `on` but visually hidden
+	 * - Use `dropdownShow()` to make it visible again
 	 */
 	dropdownHide(): void;
 	/**

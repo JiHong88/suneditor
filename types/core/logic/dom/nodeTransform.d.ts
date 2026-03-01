@@ -11,9 +11,9 @@ declare class NodeTransform {
 	constructor(kernel: SunEditor.Kernel);
 	/**
 	 * @template {HTMLElement} T
-	 * @description Split all tags based on "baseNode"
+	 * @description Split all tags based on `baseNode`
 	 * @param {Node} baseNode Element or text node on which to base
-	 * @param {?(number|Node)} offset Text offset of "baseNode" (Only valid when "baseNode" is a text node)
+	 * @param {?(number|Node)} offset Text offset of `baseNode` (Only valid when `baseNode` is a text node)
 	 * @param {number} [depth=0] The nesting depth of the element being split. (default: 0)
 	 * @returns {T} The last element of the splited tag.
 	 * @example
@@ -30,12 +30,12 @@ declare class NodeTransform {
 	 */
 	split<T extends HTMLElement>(baseNode: Node, offset: (number | Node) | null, depth?: number): T;
 	/**
-	 * @description Use with "npdePath (dom-query-GetNodePath)" to merge the same attributes and tags if they are present and modify the nodepath.
-	 * - If "offset" has been changed, it will return as much "offset" as it has been modified.
-	 * - An array containing change offsets is returned in the order of the "nodePathArray" array.
+	 * @description Use with `npdePath` (dom-query-GetNodePath) to merge the same attributes and tags if they are present and modify the nodepath.
+	 * - If `offset` has been changed, it will return as much `offset` as it has been modified.
+	 * - An array containing change offsets is returned in the order of the `nodePathArray` array.
 	 * @param {Node} element Element
-	 * @param {?number[][]} [nodePathArray] Array of NodePath object ([dom-query-GetNodePath(), ..])
-	 * @param {?boolean} [onlyText] If true, non-text nodes like 'span', 'strong'.. are ignored.
+	 * @param {?number[][]} [nodePathArray] Array of `NodePath` object ([dom-query-GetNodePath(), ..])
+	 * @param {?boolean} [onlyText] If `true`, non-text nodes like `span`, `strong`.. are ignored.
 	 * @returns {Array<number>} [offset, ..]
 	 * @example
 	 * // Merge adjacent tags with same attributes
@@ -54,16 +54,16 @@ declare class NodeTransform {
 	/**
 	 * @description Remove nested tags without other child nodes.
 	 * @param {Node} element Element object
-	 * @param {?(((current: Node) => boolean)|string)} [validation] Validation function / String("tag1|tag2..") / If null, all tags are applicable.
+	 * @param {?(((current: Node) => boolean)|string)} [validation] Validation function / String(`tag1|tag2..`) / If `null`, all tags are applicable.
 	 */
 	mergeNestedTags(element: Node, validation?: (((current: Node) => boolean) | string) | null): void;
 	/**
 	 * @description Delete itself and all parent nodes that match the condition.
-	 * - Returns an {sc: previousSibling, ec: nextSibling}(the deleted node reference) or null.
+	 * - Returns an {sc: previousSibling, ec: nextSibling}(the deleted node reference) or `null`.
 	 * @param {Node} item Node to be remove
-	 * @param {?(current: Node) => boolean} [validation] Validation function. default(Deleted if it only have breakLine and blanks)
-	 * @param {?Node} [stopParent] Stop when the parent node reaches stopParent
-	 * @returns {{sc: Node|null, ec: Node|null}|null} {sc: previousSibling, ec: nextSibling} (the deleted node reference) or null.
+	 * @param {?(current: Node) => boolean} [validation] Validation function. default(Deleted if it only have `breakLine` and blanks)
+	 * @param {?Node} [stopParent] Stop when the parent node reaches `stopParent`
+	 * @returns {{sc: Node|null, ec: Node|null}|null} {sc: previousSibling, ec: nextSibling} (the deleted node reference) or `null`.
 	 * @example
 	 * // Remove empty parent elements recursively
 	 * const emptySpan = document.querySelector('span:empty');

@@ -30,6 +30,9 @@ const { _w, _d } = env;
  * @property {() => void} clear - Clear all elements in the context.
  */
 
+/**
+ * @description Provides Map-based access to editor DOM contexts (global and per-frame).
+ */
 export default class ContextProvider {
 	/**
 	 * @description Frame root map

@@ -1,7 +1,3 @@
-/**
- * @fileoverview keyCode helper
- */
-
 const _arrow = 'ArrowLeft|ArrowUp|ArrowRight|ArrowDown';
 const _fN = 'F1|F2|F3|F4|F5|F6|F7|F8|F9|F10|F11|F12';
 // const DIR_KEYCODE = /^(3[7-9]|40)$/;
@@ -19,7 +15,7 @@ const NON_RESPONSE_CODE = `ControlLeft|ControlRight|AltLeft|AltRight|Pause|CapsL
 
 /** ------------------------------------------------------- [meta] -------------------------------------------------------  */
 /**
- * @description Shift check
+ * @description `Shift` check
  * @param {KeyboardEvent} e Event object
  * @returns {boolean}
  */
@@ -28,7 +24,7 @@ export function isShift(e) {
 }
 
 /**
- * @description [Ctrl|Meta] check
+ * @description [`Ctrl`|`Meta`] check
  * @param {KeyboardEvent} e Event object
  * @returns {boolean}
  */
@@ -39,7 +35,7 @@ export function isCtrl(e) {
 }
 
 /**
- * @description Alt check
+ * @description `Alt` check
  * @param {KeyboardEvent} e Event object
  * @returns {boolean}
  */
@@ -58,8 +54,8 @@ export function isComposing(e) {
 }
 
 /**
- * @description Backspace key check
- * @param {string} code Event.code
+ * @description `Backspace` key check
+ * @param {string} code `Event.code`
  * @returns {boolean}
  */
 export function isBackspace(code) {
@@ -68,8 +64,8 @@ export function isBackspace(code) {
 }
 
 /**
- * @description Tab key check
- * @param {string} code Event.code
+ * @description `Tab` key check
+ * @param {string} code `Event.code`
  * @returns {boolean}
  */
 export function isTab(code) {
@@ -78,8 +74,8 @@ export function isTab(code) {
 }
 
 /**
- * @description Enter key check
- * @param {string} code Event.code
+ * @description `Enter` key check
+ * @param {string} code `Event.code`
  * @returns {boolean}
  */
 export function isEnter(code) {
@@ -88,8 +84,8 @@ export function isEnter(code) {
 }
 
 /**
- * @description ESC key check
- * @param {string} code Event.code
+ * @description `ESC` key check
+ * @param {string} code `Event.code`
  * @returns {boolean}
  */
 export function isEsc(code) {
@@ -98,8 +94,8 @@ export function isEsc(code) {
 }
 
 /**
- * @description Space key check
- * @param {string} code Event.code
+ * @description `Space` key check
+ * @param {string} code `Event.code`
  * @returns {boolean}
  */
 export function isSpace(code) {
@@ -111,7 +107,7 @@ export function isSpace(code) {
 
 /**
  * @description Direction key check
- * @param {string} code Event.code
+ * @param {string} code `Event.code`
  * @returns {boolean}
  */
 export function isDirectionKey(code) {
@@ -119,8 +115,8 @@ export function isDirectionKey(code) {
 }
 
 /**
- * @description [delete, backspace] key check
- * @param {string} code Event.code
+ * @description [`delete`, `backspace`] key check
+ * @param {string} code `Event.code`
  * @returns {boolean}
  */
 export function isRemoveKey(code) {
@@ -129,7 +125,7 @@ export function isRemoveKey(code) {
 
 /**
  * @description Non-text key check
- * @param {string} code Event.code
+ * @param {string} code `Event.code`
  * @returns {boolean}
  */
 export function isNonTextKey(code) {
@@ -138,7 +134,7 @@ export function isNonTextKey(code) {
 
 /**
  * @description Check if the given key is relevant for history push
- * @param {string} code - Event.code
+ * @param {string} code - `Event.code`
  * @returns {boolean}
  */
 export function isHistoryRelevantKey(code) {
@@ -147,7 +143,7 @@ export function isHistoryRelevantKey(code) {
 
 /**
  * @description Document type observer key check
- * @param {string} code Event.code
+ * @param {string} code `Event.code`
  * @returns {boolean}
  */
 export function isDocumentTypeObserverKey(code) {
@@ -156,7 +152,7 @@ export function isDocumentTypeObserverKey(code) {
 
 /**
  * @description Non-response key check
- * @param {string} code Event.code
+ * @param {string} code `Event.code`
  * @returns {boolean}
  */
 export function isNonResponseKey(code) {

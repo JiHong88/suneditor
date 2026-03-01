@@ -15,12 +15,12 @@ declare class HTML {
 	 * - Allows custom validation functions to replace, modify, or remove elements.
 	 * @param {string} html - The HTML string to be filtered.
 	 * @param {Object} params - Filtering parameters.
-	 * @param {string} [params.tagWhitelist] - Allowed tags, specified as a string with tags separated by '|'. (e.g. "div|p|span").
-	 * @param {string} [params.tagBlacklist] - Disallowed tags, specified as a string with tags separated by '|'. (e.g. "script|iframe").
+	 * @param {string} [params.tagWhitelist] - Allowed tags, specified as a string with tags separated by `'|'`. (e.g. `"div|p|span"`).
+	 * @param {string} [params.tagBlacklist] - Disallowed tags, specified as a string with tags separated by `'|'`. (e.g. `"script|iframe"`).
 	 * @param {(node: Node) => Node | string | null} [params.validate] - Function to validate and modify individual nodes.
 	 *   - Return `null` to remove the node.
 	 *   - Return a `Node` to replace the current node.
-	 *   - Return a `string` to replace the node's outerHTML.
+	 *   - Return a `string` to replace the node's `outerHTML`.
 	 * @param {boolean} [params.validateAll] - Whether to apply validation to all nodes.
 	 * @returns {string} - The filtered HTML string.
 	 * @example
@@ -62,12 +62,12 @@ declare class HTML {
 	 * @description Cleans and compresses HTML code to suit the editor format.
 	 * @param {string} html HTML string to clean and compress
 	 * @param {Object} [options] Cleaning options
-	 * @param {boolean} [options.forceFormat=false] If true, wraps text nodes without a format node in the format tag.
+	 * @param {boolean} [options.forceFormat=false] If `true`, wraps text nodes without a format node in the format tag.
 	 * @param {?(string|RegExp)} [options.whitelist] Regular expression of allowed tags.
-	 * Create RegExp object using helper.converter.createElementWhitelist method.
+	 * Create RegExp object using `helper.converter.createElementWhitelist` method.
 	 * @param {?(string|RegExp)} [options.blacklist] Regular expression of disallowed tags.
-	 * Create RegExp object using helper.converter.createElementBlacklist method.
-	 * @param {boolean} [options._freeCodeViewMode=false] If true, the free code view mode is enabled.
+	 * Create RegExp object using `helper.converter.createElementBlacklist` method.
+	 * @param {boolean} [options._freeCodeViewMode=false] If `true`, the free code view mode is enabled.
 	 * @returns {string} Cleaned and compressed HTML string
 	 * @example
 	 * // Basic cleaning
@@ -97,13 +97,13 @@ declare class HTML {
 	): string;
 	/**
 	 * @description Inserts an (HTML element / HTML string / plain string) at the selection range.
-	 * - If "frameOptions.get('charCounter_max')" is exceeded when "html" is added, null is returned without addition.
+	 * - If `frameOptions.get('charCounter_max')` is exceeded when `html` is added, `null` is returned without addition.
 	 * @param {Node|string} html HTML Element or HTML string or plain string
 	 * @param {Object} [options] Options
-	 * @param {boolean} [options.selectInserted=false] If true, selects the range of the inserted node.
-	 * @param {boolean} [options.skipCharCount=false] If true, inserts even if "frameOptions.get('charCounter_max')" is exceeded.
-	 * @param {boolean} [options.skipCleaning=false] If true, inserts the HTML string without refining it with html.clean.
-	 * @returns {HTMLElement|null} The inserted element or null if insertion failed
+	 * @param {boolean} [options.selectInserted=false] If `true`, selects the range of the inserted node.
+	 * @param {boolean} [options.skipCharCount=false] If `true`, inserts even if `frameOptions.get('charCounter_max')` is exceeded.
+	 * @param {boolean} [options.skipCleaning=false] If `true`, inserts the HTML string without refining it with `html.clean`.
+	 * @returns {HTMLElement|null} The inserted element or `null` if insertion failed
 	 * @example
 	 * // Insert HTML string at cursor
 	 * editor.html.insert('<strong>Bold text</strong>');
@@ -128,12 +128,12 @@ declare class HTML {
 	): HTMLElement | null;
 	/**
 	 * @description Delete selected node and insert argument value node and return.
-	 * - If the "afterNode" exists, it is inserted after the "afterNode"
-	 * - Inserting a text node merges with both text nodes on both sides and returns a new "{ container, startOffset, endOffset }".
+	 * - If the `afterNode` exists, it is inserted after the `afterNode`
+	 * - Inserting a text node merges with both text nodes on both sides and returns a new `{ container, startOffset, endOffset }`.
 	 * @param {Node} oNode Node to be inserted
 	 * @param {Object} [options] Options
 	 * @param {Node} [options.afterNode=null] If the node exists, it is inserted after the node
-	 * @param {boolean} [options.skipCharCount=null] If true, it will be inserted even if "frameOptions.get('charCounter_max')" is exceeded.
+	 * @param {boolean} [options.skipCharCount=null] If `true`, it will be inserted even if `frameOptions.get('charCounter_max')` is exceeded.
 	 * @returns {Object|Node|null}
 	 * @example
 	 * // Insert node at current selection
@@ -162,10 +162,10 @@ declare class HTML {
 	/**
 	 * @description Delete the selected range.
 	 * @returns {{container: Node, offset: number, commonCon?: ?Node, prevContainer?: ?Node}}
-	 * - container: "the last element after deletion"
-	 * - offset: "offset"
-	 * - commonCon: "commonAncestorContainer"
-	 * - prevContainer: "previousElementSibling Of the deleted area"
+	 * - `container`: the last element after deletion
+	 * - `offset`: offset
+	 * - `commonCon`: `commonAncestorContainer`
+	 * - `prevContainer`: `previousElementSibling` of the deleted area
 	 */
 	remove(): {
 		container: Node;
@@ -176,9 +176,9 @@ declare class HTML {
 	/**
 	 * @description Gets the current content
 	 * @param {Object} [options] Options
-	 * @param {boolean} [options.withFrame=false] Gets the current content with containing parent div.sun-editor-editable (<div class="sun-editor-editable">{content}</div>).
-	 * Ignored for targetOptions.get('iframe_fullPage') is true.
-	 * @param {boolean} [options.includeFullPage=false] Return only the content of the body without headers when the "iframe_fullPage" option is true
+	 * @param {boolean} [options.withFrame=false] Gets the current content with containing parent `div.sun-editor-editable` (`<div class="sun-editor-editable">{content}</div>`).
+	 * Ignored for `targetOptions.get('iframe_fullPage')` is `true`.
+	 * @param {boolean} [options.includeFullPage=false] Return only the content of the body without headers when the `iframe_fullPage` option is `true`
 	 * @param {number|Array<number>} [options.rootKey=null] Root index
 	 * @returns {string|Object<*, string>}
 	 */
@@ -214,7 +214,7 @@ declare class HTML {
 	/**
 	 * @description Gets the current content to JSON data
 	 * @param {Object} [options] Options
-	 * @param {boolean} [options.withFrame=false] Gets the current content with containing parent div.sun-editor-editable (<div class="sun-editor-editable">{content}</div>).
+	 * @param {boolean} [options.withFrame=false] Gets the current content with containing parent `div.sun-editor-editable` (`<div class="sun-editor-editable">{content}</div>`).
 	 * @param {number|Array<number>} [options.rootKey=null] Root index
 	 * @returns {Object<string, *>} JSON data
 	 */
@@ -238,13 +238,13 @@ declare class HTML {
 		},
 	): void;
 	/**
-	 * @description Call "clipboard.write" to copy the contents and display a success/failure toast message.
+	 * @description Call `clipboard.write` to copy the contents and display a success/failure toast message.
 	 * @param {Node|Element|Text|string} content Content to be copied to the clipboard
 	 * @returns {Promise<boolean>} Success or failure
 	 */
 	copy(content: Node | Element | Text | string): Promise<boolean>;
 	/**
-	 * @description Sets the content of the iframe's head tag and body tag when using the "iframe" or "iframe_fullPage" option.
+	 * @description Sets the content of the iframe's head tag and body tag when using the `iframe` or `iframe_fullPage` option.
 	 * @param {{head: string, body: string}} ctx { head: HTML string, body: HTML string}
 	 * @param {Object} [options] Options
 	 * @param {number|Array<number>} [options.rootKey=null] Root index
@@ -270,7 +270,7 @@ declare class HTML {
 	 * @internal
 	 * @description construct wysiwyg area element to html string
 	 * @param {Node|string} html WYSIWYG element (this.#frameContext.get('wysiwyg')) or HTML string.
-	 * @param {boolean} comp If true, does not line break and indentation of tags.
+	 * @param {boolean} comp If `true`, does not line break and indentation of tags.
 	 * @returns {string}
 	 */
 	_convertToCode(html: Node | string, comp: boolean): string;
@@ -278,7 +278,7 @@ declare class HTML {
 	 * @internal
 	 * @description Reset autoStyleify options.
 	 * @param {Array.<string>} autoStyleify Styles applied automatically on text input.
-	 * - ex ["bold", "underline", "italic", "strike"]
+	 * - ex `["bold", "underline", "italic", "strike"]`
 	 */
 	__resetAutoStyleify(autoStyleify: Array<string>): void;
 	/**

@@ -12,7 +12,7 @@ import { dom } from '../../helper';
 
 /**
  * @class
- * @description BlockStyle Plugin (P, BLOCKQUOTE, PRE, H1, H2...)
+ * @description BlockStyle Plugin (`P`, `BLOCKQUOTE`, `PRE`, `H1`, `H2`...)
  */
 class BlockStyle extends PluginDropdown {
 	static key = 'blockStyle';
@@ -116,9 +116,9 @@ class BlockStyle extends PluginDropdown {
 	}
 
 	/**
-	 * @description Create a header tag, call by "shortcut" class
+	 * @description Create a header tag, call by `shortcut` class
 	 * - (e.g. shortcuts._h1: ['c+s+49+$~blockStyle.applyHeaderByShortcut', ''])
-	 * @param {SunEditor.HookParams.Shortcut} params - Information of the "shortcut" plugin
+	 * @param {SunEditor.HookParams.Shortcut} params - Information of the `shortcut` plugin
 	 */
 	applyHeaderByShortcut({ keyCode }) {
 		const headerNum = keyCode.match(/\d+$/)?.[0];

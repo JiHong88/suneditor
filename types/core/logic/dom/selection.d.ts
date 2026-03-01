@@ -33,10 +33,10 @@ declare class Selection_ {
 	getRange(): Range;
 	/**
 	 * @description Set current editor's range object and return.
-	 * @param {Node|Range} startCon Range object or The startContainer property of the selection object
-	 * @param {number} [startOff] The startOffset property of the selection object.
-	 * @param {Node} [endCon] The endContainer property of the selection object.
-	 * @param {number} [endOff] The endOffset property of the selection object.
+	 * @param {Node|Range} startCon Range object or The `startContainer` property of the selection object
+	 * @param {number} [startOff] The `startOffset` property of the selection object.
+	 * @param {Node} [endCon] The `endContainer` property of the selection object.
+	 * @param {number} [endOff] The `endOffset` property of the selection object.
 	 * @returns {Range}
 	 * @example
 	 * // Set range using container and offset
@@ -68,10 +68,10 @@ declare class Selection_ {
 		offset: number;
 	} | null;
 	/**
-	 * @description If the "range" object is a non-editable area, add a line at the top of the editor and update the "range" object.
+	 * @description If the `range` object is a non-editable area, add a line at the top of the editor and update the `range` object.
 	 * @param {Range} range core.getRange()
-	 * @param {?Node} [container] If there is "container" argument, it creates a line in front of the container.
-	 * @returns {Range} a new "range" or argument "range".
+	 * @param {?Node} [container] If there is `container` argument, it creates a line in front of the container.
+	 * @returns {Range} a new `range` or argument `range`.
 	 */
 	getRangeAndAddLine(range: Range, container?: Node | null): Range;
 	/**
@@ -81,7 +81,7 @@ declare class Selection_ {
 	getNode(): HTMLElement | Text;
 	/**
 	 * @description Get the Rects object.
-	 * @param {?(Range|Node)} target Range | Node | null
+	 * @param {?(Range|Node)} target `Range` | `Node` | `null`
 	 * @param {"start"|"end"} position It is based on the position of the rect object to be returned in case of range selection.
 	 * @returns {{rects: import('./offset').RectsInfo, position: "start"|"end", scrollLeft: number, scrollTop: number}}
 	 * @example
@@ -110,7 +110,7 @@ declare class Selection_ {
 	/**
 	 * @description Get the custom range object of the event.
 	 * @param {DragEvent} e Event object
-	 * @returns {{sc: Node, so: number, ec: Node, eo: number}} {sc: startContainer, so: startOffset, ec: endContainer, eo: endOffset}
+	 * @returns {{sc: Node, so: number, ec: Node, eo: number}} {sc: `startContainer`, so: `startOffset`, ec: `endContainer`, eo: `endOffset`}
 	 */
 	getDragEventLocationRange(e: DragEvent): {
 		sc: Node;
@@ -144,7 +144,7 @@ declare class Selection_ {
 	): void;
 	/**
 	 * @description Normalizes and resets the selection range to properly target text nodes instead of element nodes for accurate text editing.
-	 * @returns {boolean} Returns false if there is no valid selection.
+	 * @returns {boolean} Returns `false` if there is no valid selection.
 	 */
 	resetRangeToTextNode(): boolean;
 	/**

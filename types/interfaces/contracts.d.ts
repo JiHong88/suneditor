@@ -12,17 +12,17 @@ import type {} from '../typedef';
 export interface ModuleModal {
 	/**
 	 * @abstract
-	 * This function is called when a form within a modal window is "submit".
+	 * This function is called when a form within a modal window is `submit`.
 	 * @returns {Promise<boolean>}
-	 * - true: modal and loading are closed
-	 * - false: only loading is closed
-	 * - undefined: only modal is closed
+	 * - `true`: modal and loading are closed
+	 * - `false`: only loading is closed
+	 * - `undefined`: only modal is closed
 	 */
 	modalAction(): Promise<boolean>;
 	/**
 	 * @optional
 	 * Executes the method that is called when a plugin's modal is opened.
-	 * @param {boolean} isUpdate - Indicates whether the modal is for editing an existing component (true) or registering a new one (false).
+	 * @param {boolean} isUpdate - Indicates whether the modal is for editing an existing component (`true`) or registering a new one (`false`).
 	 * @returns {void}
 	 */
 	modalOn?(isUpdate: boolean): void;
@@ -35,7 +35,7 @@ export interface ModuleModal {
 	/**
 	 * @optional
 	 * Modal off callback.
-	 * @param {boolean} isUpdate - Indicates whether the modal is for editing an existing component (true) or registering a new one (false).
+	 * @param {boolean} isUpdate - Indicates whether the modal is for editing an existing component (`true`) or registering a new one (`false`).
 	 * @returns {void}
 	 */
 	modalOff?(isUpdate: boolean): void;
@@ -54,14 +54,14 @@ export interface ModuleModal {
 export interface ModuleController {
 	/**
 	 * @abstract
-	 * Executes the method that is called when a button is clicked in the "controller".
+	 * Executes the method that is called when a button is clicked in the `controller`.
 	 * @param {HTMLButtonElement} target Action button element
 	 * @returns {void}
 	 */
 	controllerAction(target: HTMLButtonElement): void;
 	/**
 	 * @optional
-	 * This function is called after the "controller" is opened.
+	 * This function is called after the `controller` is opened.
 	 * @param {HTMLFormElement} form Controller form element
 	 * @param {Node|Range} target Controller target element
 	 * @returns {void}
@@ -69,7 +69,7 @@ export interface ModuleController {
 	controllerOn?(form: HTMLFormElement, target: Node | Range): void;
 	/**
 	 * @optional
-	 * This function is called before the "controller" is closed.
+	 * This function is called before the `controller` is closed.
 	 * @returns {void}
 	 */
 	controllerClose?(): void;
@@ -82,7 +82,7 @@ export interface ModuleController {
 export interface ModuleBrowser {
 	/**
 	 * @optional
-	 * Executes the method that is called when a "Browser" module's is opened.
+	 * Executes the method that is called when a `Browser` module's is opened.
 	 * @returns {void}
 	 */
 	browserInit?(): void;
@@ -95,21 +95,21 @@ export interface ModuleBrowser {
 export interface ModuleColorPicker {
 	/**
 	 * @optional
-	 * Executes the method called when a button of "ColorPicker" module is clicked.
-	 * - This plugin is by applying the "ColorPicker" module globally to the "dropdown" menu, the default "action" method is not called.
+	 * Executes the method called when a button of `ColorPicker` module is clicked.
+	 * - This plugin is by applying the `ColorPicker` module globally to the `dropdown` menu, the default `action` method is not called.
 	 * @param {SunEditor.Module.HueSlider.Color} color - Selected color information
 	 * @returns {void}
 	 */
 	colorPickerAction?(color: SunEditor.Module.HueSlider.Color): void;
 	/**
 	 * @optional
-	 * Executes the method called when the "HueSlider" module is opened.
+	 * Executes the method called when the `HueSlider` module is opened.
 	 * @returns {void}
 	 */
 	colorPickerHueSliderOpen?(): void;
 	/**
 	 * @optional
-	 * Executes the method called when the "HueSlider" module is closed.
+	 * Executes the method called when the `HueSlider` module is closed.
 	 * @returns {void}
 	 */
 	colorPickerHueSliderClose?(): void;
@@ -140,7 +140,7 @@ export interface ModuleHueSlider {
  * **`inst._element` Requirement:**
  * Plugins with `static component` method must define a public `_element` property
  * that references the currently controlled DOM element.
- * - Used to detect clicks on the target element and prevent accidental controller closure.
+ * - Used to detect clicks on the target element and prevent accidental `controller` closure.
  *
  * @interface
  */
@@ -149,7 +149,7 @@ export interface EditorComponent {
 	 * @abstract
 	 * Executes the method that is called when a component of a plugin is selected.
 	 * @param {HTMLElement} target - Target component element
-	 * @returns {void|boolean} - If return true, Special components that are not wrapping as "figure"
+	 * @returns {void|boolean} - If return `true`, Special components that are not wrapping as `figure`
 	 */
 	componentSelect(target: HTMLElement): void | boolean;
 	/**
@@ -168,7 +168,7 @@ export interface EditorComponent {
 	componentEdit?(target: HTMLElement): void;
 	/**
 	 * @optional
-	 * Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
+	 * Method to delete a component of a plugin, called by the `FileManager`, `Controller` module.
 	 * @param {HTMLElement} target - Target element
 	 * @returns {Promise<void>}
 	 */
@@ -177,7 +177,7 @@ export interface EditorComponent {
 	 * @optional
 	 * Executes the method that is called when a component copy is requested.
 	 * @param {SunEditor.HookParams.CopyComponent} params - Copy component event information
-	 * @returns {boolean|void} - If return false, the copy will be canceled
+	 * @returns {boolean|void} - If return `false`, the copy will be canceled
 	 */
 	componentCopy?(params: SunEditor.HookParams.CopyComponent): boolean | void;
 }

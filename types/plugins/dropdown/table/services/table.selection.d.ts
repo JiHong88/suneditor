@@ -1,4 +1,7 @@
 import type {} from '../../../../typedef';
+/**
+ * @description Manages table cell selection including multi-cell range selection with keyboard and mouse events.
+ */
 export class TableSelectionService {
 	/**
 	 * @param {import('../index').default} main Table index
@@ -31,7 +34,7 @@ export class TableSelectionService {
 	 * **WARNING**: Registers global events (mousemove/mousedown, mouseup, touchmove).
 	 * These events are auto-removed on mouseup/touchmove, or call `#removeGlobalEvents()` manually.
 	 * @param {HTMLTableCellElement} tdElement The target table cell element.
-	 * @param {boolean} shift If true, enables shift+click range selection mode.
+	 * @param {boolean} shift If `true`, enables shift+click range selection mode.
 	 */
 	startCellSelection(tdElement: HTMLTableCellElement, shift: boolean): void;
 	/**

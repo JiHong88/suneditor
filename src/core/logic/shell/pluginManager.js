@@ -18,7 +18,7 @@ import { UpdateButton } from '../../section/constructor';
 
 /**
  * @description Manages plugin registration and state.
- * Extracts "plugin" related responsibilities from the monolithic Editor class.
+ * Extracts `plugin` related responsibilities from the monolithic `Editor` class.
  */
 class PluginManager {
 	#kernel;
@@ -32,13 +32,13 @@ class PluginManager {
 	#pluginCallButtons_sub;
 
 	/**
-	 * @description Properties for managing files in the "FileManager" module
+	 * @description Properties for managing files in the `FileManager` module
 	 * @type {Array<*>}
 	 */
 	#fileInfoPluginsCheck = [];
 
 	/**
-	 * @description Properties for managing files in the "FileManager" module
+	 * @description Properties for managing files in the `FileManager` module
 	 * @type {Array<*>}
 	 */
 	#fileInfoPluginsReset = [];
@@ -62,7 +62,7 @@ class PluginManager {
 
 	/**
 	 * @internal
-	 * @description plugin retainFormat info Map()
+	 * @description Plugin `retainFormat` info `Map`
 	 * @type {Map<string, { key: string, method: (...args: *) => * }>}
 	 */
 	#retainFormatCheckers = new Map();
@@ -189,7 +189,7 @@ class PluginManager {
 
 	/**
 	 * @description Check the components such as image and video and modify them according to the format.
-	 * @param {boolean} loaded If true, the component is loaded.
+	 * @param {boolean} loaded If `true`, the component is loaded.
 	 */
 	checkFileInfo(loaded) {
 		for (let i = 0, len = this.#fileInfoPluginsCheck.length; i < len; i++) {
@@ -207,8 +207,8 @@ class PluginManager {
 	}
 
 	/**
-	 * @description If the plugin is not added, add the plugin and call the 'add' function.
-	 * - If the plugin is added call callBack function.
+	 * @description If the plugin is not added, add the plugin and call the `add` function.
+	 * - If the plugin is added call `callBack` function.
 	 * @param {string} pluginName The name of the plugin to call
 	 * @param {?Array<HTMLElement>} targets Plugin target button
 	 * @param {?Object<string, *>} pluginOptions Plugin's options

@@ -82,7 +82,7 @@ export function CreateSliderCtx(): {
 /**
  * @class
  * @description Create a Hue slider. (only create one at a time)
- * - When you call the .attach() method, the hue slider is appended to the form element.
+ * - When you call the `.attach()` method, the hue slider is appended to the form element.
  * It must be called every time it is used.
  */
 declare class HueSlider {
@@ -130,7 +130,7 @@ declare class HueSlider {
 	open(target: Node): void;
 	/**
 	 * @description Close the hue slider.
-	 * - Call the instance's hueSliderCancelAction method.
+	 * - Call the instance's `hueSliderCancelAction` method.
 	 */
 	close(): void;
 	/**

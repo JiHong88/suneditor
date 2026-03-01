@@ -24,9 +24,9 @@ const { isOSX_IOS } = env;
  * @property {HTMLElement|Text} ctx.selectionNode - Current selection node
  * @property {HTMLElement} ctx.formatEl - Current format element
  * @property {string} ctx.keyCode - Key code
- * @property {boolean} ctx.ctrl - Whether the ctrl key is pressed
- * @property {boolean} ctx.alt - Whether the alt key is pressed
- * @property {boolean} ctx.shift - Whether the shift key is pressed
+ * @property {boolean} ctx.ctrl - Whether the `ctrl` key is pressed
+ * @property {boolean} ctx.alt - Whether the `alt` key is pressed
+ * @property {boolean} ctx.shift - Whether the `shift` key is pressed
  */
 
 /**

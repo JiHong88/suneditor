@@ -3,8 +3,8 @@ import ApiManager from './ApiManager';
 /**
  * @typedef {Object} FileManagerParams
  * @property {string} query The query selector used to find file elements in the editor
- * @property {string} loadEventName Event name for file load (e.g., 'onImageLoad')
- * @property {string} actionEventName Event name for file action (e.g., 'onImageAction')
+ * @property {string} loadEventName Event name for file load (e.g., `'onImageLoad'`)
+ * @property {string} actionEventName Event name for file action (e.g., `'onImageAction'`)
  */
 
 /**
@@ -191,7 +191,7 @@ class FileManager {
 
 	/**
 	 * @internal
-	 * @description Reset info object and "infoList = []", "infoIndex = 0"
+	 * @description Reset info object and `infoList = []`, `infoIndex = 0`
 	 */
 	_resetInfo() {
 		const params = { element: null, state: 'delete', info: null, remainingFilesCount: 0, pluginName: this.kind };
@@ -207,7 +207,7 @@ class FileManager {
 	}
 
 	/**
-	 * @description Delete info object at "infoList"
+	 * @description Delete info object at `infoList`
 	 * @param {number} index index of info object infoList[].index)
 	 */
 	#deleteInfo(index) {
@@ -225,7 +225,7 @@ class FileManager {
 	}
 
 	/**
-	 * @description Create info object of file and add it to "infoList"
+	 * @description Create info object of file and add it to `infoList`
 	 * @param {HTMLMediaElement} element
 	 * @param {{name: string, size: number}|null} file File information
 	 */

@@ -30,7 +30,7 @@ declare class DocumentType {
 	 * @param {number} t - The initial top position value to be adjusted.
 	 * @param {HTMLCollection} chr - The elements array in the current (main) page.
 	 * @param {HTMLCollection} mChr - The elements array in the mirrored page.
-	 * @returns {number|null} - The adjusted top value.
+	 * @returns {number|null} The adjusted top value.
 	 */
 	_calcPageBreakTop(t: number, chr: HTMLCollection, mChr: HTMLCollection): number | null;
 	/**
@@ -89,7 +89,7 @@ declare class DocumentType {
 	pageGo(pageNum: number): void;
 	/**
 	 * @description Highlights the header of the current line.
-	 * @param {Node} line - The "line" element to be highlighted.
+	 * @param {Node} line - The `line` element to be highlighted.
 	 */
 	on(line: Node): void;
 	/**
@@ -134,7 +134,7 @@ declare class DocumentType {
 	/**
 	 * @internal
 	 * @description Finds the closest header element from a given line.
-	 * @param {Node} line - The "line" to check.
+	 * @param {Node} line - The `line` to check.
 	 * @returns {Node|null} The closest header element, or null if not found.
 	 */
 	_findLinesHeader(line: Node): Node | null;

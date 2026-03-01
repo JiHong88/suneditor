@@ -2,23 +2,23 @@ import type {} from '../../typedef';
 /**
  * @description Create shortcuts desc span.
  * @param {string} command Command string
- * @param {Array<string>} values options.shortcuts[command]
+ * @param {Array<string>} values `options.shortcuts[command]`
  * @param {?Element} button Command button element
  * @param {Map<string, *>} keyMap Map to store shortcut key info
- * @param {Array} rc "_reverseCommandArray" option
+ * @param {Array} rc `_reverseCommandArray` option
  * @param {Set} reverseKeys Reverse key array
  */
 export function CreateShortcuts(command: string, button: Element | null, values: Array<string>, keyMap: Map<string, any>, rc: any[], reverseKeys: Set<any>): void;
 /**
  * @typedef {Object} InitOptionsReturnType
- * @property {Map<string, *>} o - Processed base options (Map containing {@link AllBaseOptions_constructor} keys)
+ * @property {Map<string, *>} o - Processed base options (`Map` containing {@link AllBaseOptions_constructor} keys)
  * @property {Object<string, string>} i - Icon set
  * @property {Object<string, string>} l - Language pack
  * @property {?string} v - Initial editor value
  * @property {SunEditor.UI.ButtonList} buttons - Toolbar button list (arrays for groups, strings for single buttons)
  * @property {?SunEditor.UI.ButtonList} subButtons - Sub-toolbar button list
  * @property {?Element} statusbarContainer - Container element for status bar (if specified)
- * @property {Map<string|null, SunEditor.FrameOptions>} frameMap - Map of frame-specific options (frame key => "SunEditor.FrameOptions")
+ * @property {Map<string|null, SunEditor.FrameOptions>} frameMap - Map of frame-specific options (frame key => `SunEditor.FrameOptions`)
  */
 /**
  * @description Initialize options
@@ -40,7 +40,7 @@ export function InitOptions(
 ): InitOptionsReturnType;
 /**
  * @description Create a context object for the editor frame.
- * @param {SunEditor.FrameOptions} targetOptions - editor.frameOptions
+ * @param {SunEditor.FrameOptions} targetOptions - `editor.frameOptions`
  * @param {HTMLElement} statusbar - statusbar element
  * @returns {{statusbar: HTMLElement, navigation: HTMLElement, charWrapper: HTMLElement, charCounter: HTMLElement}}
  */
@@ -74,11 +74,11 @@ export function UpdateButton(
 ): void;
 /**
  * @description Create editor HTML
- * @param {Array} buttonList option.buttonList
+ * @param {Array} buttonList `option.buttonList`
  * @param {?Object<string, *>} plugins Plugins
- * @param {Map<string, *>|SunEditor.Options} options options
- * @param {Object<string, string>} icons icons
- * @param {Object<string, string>} lang lang
+ * @param {Map<string, *>|SunEditor.Options} options Options
+ * @param {Object<string, string>} icons Icons
+ * @param {Object<string, string>} lang Lang
  * @param {boolean} isUpdate Is update
  * @returns {{element: HTMLElement, pluginCallButtons: Object<string, Array<HTMLElement>>, responsiveButtons: Array<HTMLElement>, buttonTray: HTMLElement, updateButtons: Array<{button: HTMLElement, plugin: *, key: string}>}}}
  */
@@ -120,7 +120,7 @@ export type ConstructorReturnType = {
 	 */
 	carrierWrapper: HTMLElement;
 	/**
-	 * - Processed editor options (Map)
+	 * - Processed editor options (`Map`)
 	 */
 	options: Map<string, any>;
 	/**
@@ -182,7 +182,7 @@ export type ConstructorReturnType = {
 };
 export type InitOptionsReturnType = {
 	/**
-	 * - Processed base options (Map containing {@link AllBaseOptions_constructor} keys)
+	 * - Processed base options (`Map` containing {@link AllBaseOptions_constructor} keys)
 	 */
 	o: Map<string, any>;
 	/**
@@ -214,7 +214,7 @@ export type InitOptionsReturnType = {
 	 */
 	statusbarContainer: Element | null;
 	/**
-	 * - Map of frame-specific options (frame key => "SunEditor.FrameOptions")
+	 * - Map of frame-specific options (frame key => `SunEditor.FrameOptions`)
 	 */
 	frameMap: Map<string | null, SunEditor.FrameOptions>;
 };
@@ -225,7 +225,7 @@ export type InitOptionsReturnType = {
  * @typedef {Object} ConstructorReturnType
  * @property {SunEditor.Context} context - Editor context object
  * @property {HTMLElement} carrierWrapper - Carrier wrapper element
- * @property {Map<string, *>} options - Processed editor options (Map)
+ * @property {Map<string, *>} options - Processed editor options (`Map`)
  * @property {Object<string, *>} plugins - Loaded plugins
  * @property {Object<string, string>} icons - Icon set
  * @property {Object<string, string>} lang - Language pack

@@ -18,9 +18,9 @@ const { _w, ON_OVER_COMPONENT } = env;
 
 /**
  * @typedef {Object} TablePluginOptions
- * @property {"x"|"y"|"xy"} [scrollType='x'] - Scroll type ('x', 'y', 'xy')
- * @property {"top"|"bottom"} [captionPosition='bottom'] - Caption position ('top', 'bottom')
- * @property {"cell"|"table"} [cellControllerPosition='cell'] - Cell controller position ('cell', 'table')
+ * @property {"x"|"y"|"xy"} [scrollType='x'] - Scroll type (`x`, `y`, `xy`)
+ * @property {"top"|"bottom"} [captionPosition='bottom'] - Caption position (`top`, `bottom`)
+ * @property {"cell"|"table"} [cellControllerPosition='cell'] - Cell controller position (`cell`, `table`)
  * @property {Array} [colorList] - Color list, used in cell color picker
  */
 
@@ -108,7 +108,7 @@ class Table extends PluginDropdownFree {
 
 		// members
 		/**
-		 * @description Same value a "this._selectedTable", but it maintain prev table element
+		 * @description Same value as `this._selectedTable`, but it maintains the prev table element
 		 * @type {HTMLTableElement}
 		 */
 		this._element = null;
@@ -906,7 +906,7 @@ class Table extends PluginDropdownFree {
 
 /**
  * @description Adjusts the z-index of the cell controller form.
- * @param {boolean} value - If true, brings to top; otherwise resets.
+ * @param {boolean} value - If `true`, brings to top; otherwise resets.
  */
 function _CellFormZIndex(value) {
 	this.controller_cell.bringToTop(value);

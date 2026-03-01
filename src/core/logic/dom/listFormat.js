@@ -1,12 +1,8 @@
-/**
- * @fileoverview Format class
- */
-
 import { dom } from '../../../helper';
 
 /**
- * @description Classes related to editor formats such as "list" (ol, ul, li)
- * - "list" is a special "line", "block" format.
+ * @description Classes related to editor formats such as `list` (ol, ul, li)
+ * - `list` is a special `line`, `block` format.
  */
 class ListFormat {
 	#$;
@@ -22,10 +18,10 @@ class ListFormat {
 	}
 
 	/**
-	 * @description Append all selected "line" element to the list and insert.
+	 * @description Append all selected `line` element to the list and insert.
 	 * @param {string} type List type. (ol | ul):[listStyleType]
-	 * @param {Array<Node>} selectedCells "line" elements or list cells.
-	 * @param {boolean} nested If true, indenting existing list cells.
+	 * @param {Array<Node>} selectedCells `line` elements or list cells.
+	 * @param {boolean} nested If `true`, indenting existing list cells.
 	 * @example
 	 * // Create ordered list from selected lines
 	 * const lines = editor.format.getLines();
@@ -230,10 +226,10 @@ class ListFormat {
 	}
 
 	/**
-	 * @description "selectedCells" array are detached from the list element.
-	 * - The return value is applied when the first and last lines of "selectedFormats" are "LI" respectively.
-	 * @param {Array<Node>} selectedCells Array of ["line", li] elements(LI, P...) to remove.
-	 * @param {boolean} shouldDelete If true, It does not just remove the list, it deletes the content.
+	 * @description `selectedCells` array are detached from the list element.
+	 * - The return value is applied when the first and last lines of `selectedFormats` are `LI` respectively.
+	 * @param {Array<Node>} selectedCells Array of [`line`, `li`] elements(LI, P...) to remove.
+	 * @param {boolean} shouldDelete If `true`, It does not just remove the list, it deletes the content.
 	 * @returns {{sc: Node, ec: Node}} Node information after deletion
 	 * - sc: Start container node
 	 * - ec: End container node
@@ -393,10 +389,10 @@ class ListFormat {
 	}
 
 	/**
-	 * @description Detach Nested all nested lists under the "baseNode".
+	 * @description Detach Nested all nested lists under the `baseNode`.
 	 * - Returns a list with nested removed.
 	 * @param {HTMLElement} baseNode Element on which to base.
-	 * @param {boolean} all If true, it also detach all nested lists of a returned list.
+	 * @param {boolean} all If `true`, it also detach all nested lists of a returned list.
 	 * @returns {Node} Result element
 	 * @example
 	 * // Remove first level of nesting

@@ -8,7 +8,7 @@ const { debounce } = converter;
 
 /**
  * @typedef {Object} MentionPluginOptions
- * @property {string} [triggerText="@"] - The character that triggers the mention list
+ * @property {string} [triggerText="@"] - The character that triggers the mention list.
  * @property {number} [limitSize=5] - The number of items to display in the mention list
  * @property {number} [searchStartLength=0] - The number of characters to start searching for the mention list
  * @property {number} [delayTime=200] - The time to wait before displaying the mention list
@@ -204,7 +204,7 @@ class Mention extends PluginField {
 	/**
 	 * @description Inserts a mention link into the editor when a user selects a mention from the list.
 	 * @param {{ key: string, name: string, url: string }} item - The selected mention item.
-	 * @returns {boolean} - Returns `false` if insertion fails, otherwise completes execution.
+	 * @returns {boolean} Returns `false` if insertion fails, otherwise completes execution.
 	 */
 	#SelectMention(item) {
 		if (!item) return false;

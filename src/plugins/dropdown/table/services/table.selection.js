@@ -12,6 +12,9 @@ function getCacheKey(startCell, endCell) {
 	return `${startRow.rowIndex},${startCell.cellIndex}-${endRow.rowIndex},${endCell.cellIndex}`;
 }
 
+/**
+ * @description Manages table cell selection including multi-cell range selection with keyboard and mouse events.
+ */
 export class TableSelectionService {
 	#main;
 	#$;
@@ -300,7 +303,7 @@ export class TableSelectionService {
 	 * **WARNING**: Registers global events (mousemove/mousedown, mouseup, touchmove).
 	 * These events are auto-removed on mouseup/touchmove, or call `#removeGlobalEvents()` manually.
 	 * @param {HTMLTableCellElement} tdElement The target table cell element.
-	 * @param {boolean} shift If true, enables shift+click range selection mode.
+	 * @param {boolean} shift If `true`, enables shift+click range selection mode.
 	 */
 	startCellSelection(tdElement, shift) {
 		if (!this.#state.isShiftPressed && !this.#state.ref) this.#removeGlobalEvents();

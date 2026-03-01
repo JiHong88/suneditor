@@ -1,7 +1,3 @@
-/**
- * @fileoverview Selection class
- */
-
 import { dom, unicode, env, numbers } from '../../../helper';
 const { _w } = env;
 
@@ -115,10 +111,10 @@ class Selection_ {
 
 	/**
 	 * @description Set current editor's range object and return.
-	 * @param {Node|Range} startCon Range object or The startContainer property of the selection object
-	 * @param {number} [startOff] The startOffset property of the selection object.
-	 * @param {Node} [endCon] The endContainer property of the selection object.
-	 * @param {number} [endOff] The endOffset property of the selection object.
+	 * @param {Node|Range} startCon Range object or The `startContainer` property of the selection object
+	 * @param {number} [startOff] The `startOffset` property of the selection object.
+	 * @param {Node} [endCon] The `endContainer` property of the selection object.
+	 * @param {number} [endOff] The `endOffset` property of the selection object.
 	 * @returns {Range}
 	 * @example
 	 * // Set range using container and offset
@@ -234,10 +230,10 @@ class Selection_ {
 	}
 
 	/**
-	 * @description If the "range" object is a non-editable area, add a line at the top of the editor and update the "range" object.
+	 * @description If the `range` object is a non-editable area, add a line at the top of the editor and update the `range` object.
 	 * @param {Range} range core.getRange()
-	 * @param {?Node} [container] If there is "container" argument, it creates a line in front of the container.
-	 * @returns {Range} a new "range" or argument "range".
+	 * @param {?Node} [container] If there is `container` argument, it creates a line in front of the container.
+	 * @returns {Range} a new `range` or argument `range`.
 	 */
 	getRangeAndAddLine(range, container) {
 		if (this.#isNone(range)) {
@@ -270,7 +266,7 @@ class Selection_ {
 
 	/**
 	 * @description Get the Rects object.
-	 * @param {?(Range|Node)} target Range | Node | null
+	 * @param {?(Range|Node)} target `Range` | `Node` | `null`
 	 * @param {"start"|"end"} position It is based on the position of the rect object to be returned in case of range selection.
 	 * @returns {{rects: import('./offset').RectsInfo, position: "start"|"end", scrollLeft: number, scrollTop: number}}
 	 * @example
@@ -346,7 +342,7 @@ class Selection_ {
 	/**
 	 * @description Get the custom range object of the event.
 	 * @param {DragEvent} e Event object
-	 * @returns {{sc: Node, so: number, ec: Node, eo: number}} {sc: startContainer, so: startOffset, ec: endContainer, eo: endOffset}
+	 * @returns {{sc: Node, so: number, ec: Node, eo: number}} {sc: `startContainer`, so: `startOffset`, ec: `endContainer`, eo: `endOffset`}
 	 */
 	getDragEventLocationRange(e) {
 		const wd = this.#frameContext.get('_wd');
@@ -511,7 +507,7 @@ class Selection_ {
 
 	/**
 	 * @description Normalizes and resets the selection range to properly target text nodes instead of element nodes for accurate text editing.
-	 * @returns {boolean} Returns false if there is no valid selection.
+	 * @returns {boolean} Returns `false` if there is no valid selection.
 	 */
 	resetRangeToTextNode() {
 		let rangeObj = this.getRange();
@@ -663,7 +659,7 @@ class Selection_ {
 	}
 
 	/**
-Ï	 * @description Set "range" and "selection" info.
+Ï	 * @description Set `range` and `selection` info.
 	 * @param {Range} range range object.
 	 * @param {Selection} selection selection object.
 	 */
@@ -682,7 +678,7 @@ class Selection_ {
 	}
 
 	/**
-	 * @description Returns true if there is no valid selection.
+	 * @description Returns `true` if there is no valid selection.
 	 * @param {Range} range selection.getRange()
 	 * @returns {boolean}
 	 */

@@ -1,4 +1,7 @@
 import type {} from '../../../../typedef';
+/**
+ * @description Manages table and cell styling including borders, colors, alignment, and property controllers.
+ */
 export class TableStyleService {
 	/**
 	 * @constructor
@@ -86,7 +89,7 @@ export class TableStyleService {
 	openColorPalette(button: Node, type: string): void;
 	/**
 	 * @description Toggles the font style.
-	 * @param {string} value - The style to toggle ("bold"|"underline"|"italic"|"strike").
+	 * @param {string} value - The style to toggle (`bold`|`underline`|`italic`|`strike`).
 	 */
 	toggleFontStyle(value: string): void;
 	/**

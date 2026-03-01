@@ -9,6 +9,9 @@ import { CreateCellsString, InvalidateTableCache } from '../shared/table.utils';
 
 const { _w } = env;
 
+/**
+ * @description Manages table and cell styling including borders, colors, alignment, and property controllers.
+ */
 export class TableStyleService {
 	#main;
 	#state;
@@ -224,7 +227,7 @@ export class TableStyleService {
 
 	/**
 	 * @description Toggles the font style.
-	 * @param {string} value - The style to toggle ("bold"|"underline"|"italic"|"strike").
+	 * @param {string} value - The style to toggle (`bold`|`underline`|`italic`|`strike`).
 	 */
 	toggleFontStyle(value) {
 		dom.utils.toggleClass(this.propTargets[`font_${value}`], 'on');
@@ -673,9 +676,9 @@ export class TableStyleService {
 	 * @description Gets the border style.
 	 * @param {string} borderStyle The border style string.
 	 * @returns {{w: string, s: string, c: string}} The parsed border style object.
-	 * - w: The border width.
-	 * - s: The border style.
-	 * - c: The border color.
+	 * - `w`: The border width.
+	 * - `s`: The border style.
+	 * - `c`: The border color.
 	 */
 	#getBorderStyle(borderStyle) {
 		const parts = borderStyle.split(/\s(?![^()]*\))/);
@@ -709,7 +712,7 @@ export class TableStyleService {
 	/**
 	 * @description Sets border format and styles.
 	 * @param {{left: Node[], top: Node[], right: Node[], bottom: Node[], all: Node[]}} cells The table cells categorized by border positions.
-	 * @param {string} borderKey Border style ("all"|"inside"|"horizon"|"vertical"|"outside"|"left"|"top"|"right"|"bottom")
+	 * @param {string} borderKey Border style (`all`|`inside`|`horizon`|`vertical`|`outside`|`left`|`top`|`right`|`bottom`)
 	 * @param {string} s The border style value.
 	 */
 	#setBorderStyles(cells, borderKey, s) {

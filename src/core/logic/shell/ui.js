@@ -1,7 +1,3 @@
-/**
- * @fileoverview UI class
- */
-
 import { dom, converter, keyCodeMap, env, numbers } from '../../../helper';
 import { _DragHandle } from '../../../modules/ui';
 import { COMMAND_BUTTONS } from './commandDispatcher';
@@ -39,19 +35,19 @@ class UIManager {
 	#toastToggle = null;
 
 	/**
-	 * @description List of buttons that are disabled when "controller" is opened
+	 * @description List of buttons that are disabled when `controller` is opened
 	 * @type {Array<HTMLButtonElement|HTMLInputElement>}
 	 */
 	#controllerOnDisabledButtons = [];
 
 	/**
-	 * @description List of buttons that are disabled when "codeView" mode opened
+	 * @description List of buttons that are disabled when `codeView` mode opened
 	 * @type {Array<HTMLButtonElement|HTMLInputElement>}
 	 */
 	#codeViewDisabledButtons = [];
 
 	/**
-	 * @description Variable that controls the "blur" event in the editor of inline or balloon mode when the focus is moved to dropdown
+	 * @description Variable that controls the `blur` event in the editor of `inline` or `balloon` mode when the focus is moved to dropdown
 	 * @type {boolean}
 	 */
 	#notHideToolbar = false;
@@ -106,19 +102,19 @@ class UIManager {
 		this.#backWrapper = /** @type {HTMLElement} */ (this.#carrierWrapper.querySelector('.se-back-wrapper'));
 
 		/**
-		 * @description Whether "SelectMenu" is open
+		 * @description Whether `SelectMenu` is open
 		 * @type {boolean}
 		 */
 		this.selectMenuOn = false;
 
 		/**
-		 * @description Currently open "Controller" info array
+		 * @description Currently open `Controller` info array
 		 * @type {Array<SunEditor.Module.Controller.Info>}
 		 */
 		this.opendControllers = [];
 
 		/**
-		 * @description Controller target's frame div (editor.frameContext.get('topArea'))
+		 * @description Controller target's frame div (`editor.frameContext.get('topArea')`)
 		 * @type {?HTMLElement}
 		 */
 		this.controllerTargetContext = null;
@@ -132,9 +128,9 @@ class UIManager {
 	}
 
 	/**
-	 * @description set editor frame styles.
+	 * @description Set editor frame styles.
 	 * - Define the style of the edit area
-	 * - It can also be defined with the "setOptions" method, but the "setEditorStyle" method does not render the editor again.
+	 * - It can also be defined with the `setOptions` method, but the `setEditorStyle` method does not render the editor again.
 	 * @param {string} style Style string
 	 * @param {?SunEditor.FrameContext} [fc] Frame context
 	 */
@@ -193,8 +189,8 @@ class UIManager {
 	}
 
 	/**
-	 * @description Set direction to "rtl" or "ltr".
-	 * @param {string} dir "rtl" or "ltr"
+	 * @description Set direction to `rtl` or `ltr`.
+	 * @param {string} dir `rtl` or `ltr`
 	 */
 	setDir(dir) {
 		const rtl = dir === 'rtl';
@@ -271,8 +267,8 @@ class UIManager {
 	}
 
 	/**
-	 * @description Switch to or off "ReadOnly" mode.
-	 * @param {boolean} value "readOnly" boolean value.
+	 * @description Switch to or off `ReadOnly` mode.
+	 * @param {boolean} value `readOnly` boolean value.
 	 * @param {string} [rootKey] Root key
 	 */
 	readOnly(value, rootKey) {
@@ -442,8 +438,8 @@ class UIManager {
 	}
 
 	/**
-	 * @description This method disables or enables the toolbar buttons when the controller is activated or deactivated.
-	 * - When the controller is activated, the toolbar buttons are disabled; when the controller is deactivated, the buttons are enabled.
+	 * @description This method disables or enables the toolbar buttons when the `controller` is activated or deactivated.
+	 * - When the `controller` is activated, the toolbar buttons are disabled; when the `controller` is deactivated, the buttons are enabled.
 	 * @param {boolean} active If `true`, the toolbar buttons will be disabled. If `false`, the toolbar buttons will be enabled.
 	 * @returns {boolean} The current state of the controller on disabled buttons.
 	 */
@@ -473,7 +469,7 @@ class UIManager {
 	}
 
 	/**
-	 * @description Activate the transparent background "div" so that other elements are not affected during resizing.
+	 * @description Activate the transparent background `div` so that other elements are not affected during resizing.
 	 * @param {string} cursor cursor css property
 	 */
 	enableBackWrapper(cursor) {
@@ -482,7 +478,7 @@ class UIManager {
 	}
 
 	/**
-	 * @description Disabled background "div"
+	 * @description Disabled background `div`
 	 */
 	disableBackWrapper() {
 		this.#backWrapper.style.display = 'none';
@@ -541,7 +537,7 @@ class UIManager {
 	/**
 	 * @internal
 	 * @description Closes all open controllers except those marked as `fixed`.
-	 * Iterates through `opendControllers`, calls `controllerClose()` on each non-fixed controller,
+	 * Iterates through `opendControllers`, calls `controllerClose` on each non-fixed controller,
 	 * hides their forms, and resets the controller state.
 	 * @see offCurrentController - Public method for closing a single controller via component deselect
 	 */
@@ -644,9 +640,9 @@ class UIManager {
 
 	/**
 	 * @internal
-	 * @description visible controllers
+	 * @description Visible controllers
 	 * @param {boolean} value hidden/show
-	 * @param {?boolean} [lineBreakShow] Line break hidden/show (default: Follows the value "value".)
+	 * @param {?boolean} [lineBreakShow] Line break hidden/show (default: Follows the value `value`.)
 	 */
 	_visibleControllers(value, lineBreakShow) {
 		const visible = value ? '' : 'hidden';
@@ -743,8 +739,8 @@ class UIManager {
 
 	/**
 	 * @internal
-	 * @description Updates placeholder visibility based on editor state.
-	 * Shows placeholder when editor is empty, hides it in code view or when content exists.
+	 * @description Updates `placeholder` visibility based on editor state.
+	 * Shows `placeholder` when editor is empty, hides it in code view or when content exists.
 	 * @param {SunEditor.FrameContext} [fc] - Frame context (defaults to current frameContext)
 	 */
 	_updatePlaceholder(fc) {
@@ -768,7 +764,7 @@ class UIManager {
 	/**
 	 * @internal
 	 * @description Synchronizes frame UI state after content changes.
-	 * Coordinates iframe height adjustment, placeholder visibility, and document type page sync.
+	 * Coordinates `iframe` height adjustment, `placeholder` visibility, and document type page sync.
 	 * @param {SunEditor.FrameContext} fc - Frame context to synchronize
 	 */
 	_syncFrameState(fc) {
@@ -784,9 +780,9 @@ class UIManager {
 
 	/**
 	 * @internal
-	 * @description Adjusts iframe height to match content height.
-	 * Handles auto-height iframes and manages scrolling based on maxHeight option.
-	 * @param {SunEditor.FrameContext} fc - Frame context containing the iframe
+	 * @description Adjusts `iframe` height to match content height.
+	 * Handles `auto`-height `iframe`s and manages scrolling based on `maxHeight` option.
+	 * @param {SunEditor.FrameContext} fc - Frame context containing the `iframe`
 	 */
 	_iframeAutoHeight(fc) {
 		if (!fc) return;
@@ -821,11 +817,11 @@ class UIManager {
 
 	/**
 	 * @internal
-	 * @description Emits the onResizeEditor event when editor height changes.
-	 * Calculates height from ResizeObserverEntry if not provided directly.
+	 * @description Emits the `onResizeEditor` event when editor height changes.
+	 * Calculates height from `ResizeObserverEntry` if not provided directly.
 	 * @param {SunEditor.FrameContext} fc - Frame context
-	 * @param {number} h - Height value (-1 to calculate from resizeObserverEntry)
-	 * @param {ResizeObserverEntry|null} resizeObserverEntry - ResizeObserver entry for height calculation
+	 * @param {number} h - Height value (`-1` to calculate from `resizeObserverEntry`)
+	 * @param {ResizeObserverEntry|null} resizeObserverEntry - `ResizeObserver` entry for height calculation
 	 */
 	_emitResizeEvent(fc, h, resizeObserverEntry) {
 		h =

@@ -15,7 +15,7 @@ const _d = env._d;
  * @typedef {Object} ConstructorReturnType
  * @property {SunEditor.Context} context - Editor context object
  * @property {HTMLElement} carrierWrapper - Carrier wrapper element
- * @property {Map<string, *>} options - Processed editor options (Map)
+ * @property {Map<string, *>} options - Processed editor options (`Map`)
  * @property {Object<string, *>} plugins - Loaded plugins
  * @property {Object<string, string>} icons - Icon set
  * @property {Object<string, string>} lang - Language pack
@@ -257,10 +257,10 @@ function Constructor(editorTargets, options) {
 /**
  * @description Create shortcuts desc span.
  * @param {string} command Command string
- * @param {Array<string>} values options.shortcuts[command]
+ * @param {Array<string>} values `options.shortcuts[command]`
  * @param {?Element} button Command button element
  * @param {Map<string, *>} keyMap Map to store shortcut key info
- * @param {Array} rc "_reverseCommandArray" option
+ * @param {Array} rc `_reverseCommandArray` option
  * @param {Set} reverseKeys Reverse key array
  */
 export function CreateShortcuts(command, button, values, keyMap, rc, reverseKeys) {
@@ -338,7 +338,7 @@ function _addTooltip(tooptipBtn, shift, shortcut) {
 }
 
 /**
- * @description Returns a new object with merge "a" and "b"
+ * @description Returns a new object with merge `a` and `b`
  * @param {Object<*, *>} a object
  * @param {Object<*, *>} b object
  * @returns {Object<*, *>} new object
@@ -354,14 +354,14 @@ function _mergeObject(a, b) {
 
 /**
  * @typedef {Object} InitOptionsReturnType
- * @property {Map<string, *>} o - Processed base options (Map containing {@link AllBaseOptions_constructor} keys)
+ * @property {Map<string, *>} o - Processed base options (`Map` containing {@link AllBaseOptions_constructor} keys)
  * @property {Object<string, string>} i - Icon set
  * @property {Object<string, string>} l - Language pack
  * @property {?string} v - Initial editor value
  * @property {SunEditor.UI.ButtonList} buttons - Toolbar button list (arrays for groups, strings for single buttons)
  * @property {?SunEditor.UI.ButtonList} subButtons - Sub-toolbar button list
  * @property {?Element} statusbarContainer - Container element for status bar (if specified)
- * @property {Map<string|null, SunEditor.FrameOptions>} frameMap - Map of frame-specific options (frame key => "SunEditor.FrameOptions")
+ * @property {Map<string|null, SunEditor.FrameOptions>} frameMap - Map of frame-specific options (frame key => `SunEditor.FrameOptions`)
  */
 
 /**
@@ -725,7 +725,7 @@ export function InitOptions(options, editorTargets, plugins) {
 
 /**
  * @description Create a context object for the editor frame.
- * @param {SunEditor.FrameOptions} targetOptions - editor.frameOptions
+ * @param {SunEditor.FrameOptions} targetOptions - `editor.frameOptions`
  * @param {HTMLElement} statusbar - statusbar element
  * @returns {{statusbar: HTMLElement, navigation: HTMLElement, charWrapper: HTMLElement, charCounter: HTMLElement}}
  */
@@ -777,7 +777,7 @@ export function CreateStatusbar(targetOptions, statusbar) {
  * @description Initialize options.
  * @param {SunEditor.InitFrameOptions} o - Target options
  * @param {SunEditor.InitOptions} origin - Full options
- * @returns {SunEditor.FrameOptions} Processed frame options Map
+ * @returns {SunEditor.FrameOptions} Processed frame options `Map`
  */
 function InitFrameOptions(o, origin) {
 	const fo = /** @type {SunEditor.FrameOptions} */ (/** @type {unknown} */ (new Map()));
@@ -841,11 +841,11 @@ function InitFrameOptions(o, origin) {
 }
 
 /**
- * @description Initialize property of suneditor elements
+ * @description Initialize property of `suneditor` elements
  * @param {string} key - The key of the editor frame
- * @param {Map<string, *>} options - options
- * @param {HTMLElement} topDiv - top div
- * @param {SunEditor.FrameOptions} targetOptions - editor.frameOptions
+ * @param {Map<string, *>} options - Options
+ * @param {HTMLElement} topDiv - Top div
+ * @param {SunEditor.FrameOptions} targetOptions - `editor.frameOptions`
  * @returns {{bottomBar: ReturnType<CreateStatusbar>, wysiwygFrame: HTMLElement, codeView: HTMLElement, placeholder: HTMLElement}}
  */
 function _initTargetElements(key, options, topDiv, targetOptions) {
@@ -916,9 +916,9 @@ function _initTargetElements(key, options, topDiv, targetOptions) {
 }
 
 /**
- * @description Check the CodeMirror option to apply the CodeMirror and return the CodeMirror element.
- * @param {Map<string, *>} options options
- * @param {HTMLElement} textarea textarea element
+ * @description Check the `CodeMirror` option to apply the `CodeMirror` and return the `CodeMirror` element.
+ * @param {Map<string, *>} options Options
+ * @param {HTMLElement} textarea Textarea element
  */
 function _checkCodeMirror(options, targetOptions, textarea) {
 	let cmeditor = null;
@@ -978,9 +978,9 @@ function _checkCodeMirror(options, targetOptions, textarea) {
 }
 
 /**
- * @description create blacklist
- * @param {string} blacklist blacklist
- * @param {string} defaultLine options.get('defaultLine')
+ * @description Create blacklist
+ * @param {string} blacklist Blacklist
+ * @param {string} defaultLine `options.get('defaultLine')`
  * @returns {string}
  */
 function _createBlacklist(blacklist, defaultLine) {
@@ -999,7 +999,7 @@ function _createBlacklist(blacklist, defaultLine) {
 }
 
 /**
- * @description create formats regexp object.
+ * @description Create formats regexp object.
  * @param {string} value value
  * @param {string} defaultValue default value
  * @param {string} blacklist blacklist
@@ -1019,7 +1019,7 @@ function _createFormatInfo(value, defaultValue, blacklist) {
 }
 
 /**
- * @description create whitelist or blacklist.
+ * @description Create whitelist or blacklist.
  * @param {Map<string, *>} o options
  * @returns {string} whitelist
  */
@@ -1034,8 +1034,8 @@ function _createWhitelist(o) {
 }
 
 /**
- * @description Suneditor's Default button list
- * @param {boolean} isRTL rtl
+ * @description SunEditor's default button list
+ * @param {boolean} isRTL `rtl`
  */
 function _defaultButtons(isRTL, icons, lang) {
 	return {
@@ -1087,12 +1087,12 @@ function _createModuleGroup() {
 
 /**
  * @description Create a button element
- * @param {string} className className in button
+ * @param {string} className `className` in button
  * @param {string} title Title in button
- * @param {string} dataCommand The data-command property of the button
- * @param {"command"|"dropdown"|"field"|"browser"|"input"|"modal"|"popup"} dataType The data-type property of the button
- * @param {string} innerHTML Html in button
- * @param {string} _disabled Button disabled
+ * @param {string} dataCommand The `data-command` property of the button
+ * @param {"command"|"dropdown"|"field"|"browser"|"input"|"modal"|"popup"} dataType The `data-type` property of the button
+ * @param {string} innerHTML HTML in button
+ * @param {string} _disabled Button `disabled`
  * @param {Object<string, string>} icons Icons
  * @returns {{li: HTMLElement, button: HTMLElement}}
  */
@@ -1209,11 +1209,11 @@ export function UpdateButton(element, plugin, icons, lang) {
 
 /**
  * @description Create editor HTML
- * @param {Array} buttonList option.buttonList
+ * @param {Array} buttonList `option.buttonList`
  * @param {?Object<string, *>} plugins Plugins
- * @param {Map<string, *>|SunEditor.Options} options options
- * @param {Object<string, string>} icons icons
- * @param {Object<string, string>} lang lang
+ * @param {Map<string, *>|SunEditor.Options} options Options
+ * @param {Object<string, string>} icons Icons
+ * @param {Object<string, string>} lang Lang
  * @param {boolean} isUpdate Is update
  * @returns {{element: HTMLElement, pluginCallButtons: Object<string, Array<HTMLElement>>, responsiveButtons: Array<HTMLElement>, buttonTray: HTMLElement, updateButtons: Array<{button: HTMLElement, plugin: *, key: string}>}}}
  */

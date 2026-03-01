@@ -158,7 +158,7 @@ export function makePorts(inst, { _styleNodes }) {
 
 		// === enter event specific ===
 		/**
-		 * @description Scrolls the editor view to the caret position after pressing Enter. (Ignored on mobile devices)
+		 * @description Scrolls the editor view to the caret position after pressing `Enter`. (Ignored on mobile devices)
 		 * @param {Range} range Range object
 		 */
 		enterScrollTo(range) {
@@ -169,7 +169,7 @@ export function makePorts(inst, { _styleNodes }) {
 			selection.scrollTo(range, { behavior: 'auto', block: 'nearest', inline: 'nearest' });
 		},
 		/**
-		 * @description Prevents the default behavior of the Enter key and refocuses the editor.
+		 * @description Prevents the default behavior of the `Enter` key and refocuses the editor.
 		 * @param {Event} e The keyboard event
 		 */
 		enterPrevent(e) {

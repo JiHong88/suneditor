@@ -120,9 +120,9 @@ export function CheckRowEdge(event, tableCell) {
 
 /**
  * @description Creates table cells as elements strings.
- * @param {string} nodeName The tag name of the cell (TD or TH).
+ * @param {string} nodeName The tag name of the cell (`TD` or `TH`).
  * @param {number} cnt The number of cells to create.
- * @returns {string} The created cells.
+ * @returns {string} The created cells string.
  */
 export function CreateCellsString(nodeName, cnt) {
 	nodeName = nodeName.toLowerCase();
@@ -131,8 +131,8 @@ export function CreateCellsString(nodeName, cnt) {
 
 /**
  * @description Creates table cells as element HTML.
- * @param {string} nodeName The tag name of the cell (TD or TH).
- * @returns {HTMLTableCellElement} The created cells.
+ * @param {string} nodeName The tag name of the cell (`TD` or `TH`).
+ * @returns {HTMLTableCellElement} The created cell element.
  */
 export function CreateCellsHTML(nodeName) {
 	nodeName = nodeName.toLowerCase();
@@ -182,7 +182,7 @@ export function GetLogicalCellIndex(table, rowIndex, cellIndex) {
 
 /**
  * @description Clone a table element and map selected cells to the cloned table
- * @param {HTMLTableElement} table <table> element
+ * @param {HTMLTableElement} table `<table>` element
  * @param {HTMLTableCellElement[]} selectedCells Selected cells array
  * @returns {{ clonedTable: HTMLTableElement, clonedSelectedCells: HTMLTableCellElement[] }}
  */

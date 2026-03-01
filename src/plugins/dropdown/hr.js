@@ -97,7 +97,7 @@ class HR extends PluginDropdown {
 	}
 
 	/**
-	 * @description Add a hr element
+	 * @description Add a `hr` element
 	 * @param {string} className HR class name
 	 */
 	submit(className) {

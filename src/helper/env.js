@@ -1,7 +1,3 @@
-/**
- * @fileoverview Environment  helper functions
- */
-
 /** @type {SunEditor.GlobalWindow} */
 export const _w = /** @type {SunEditor.GlobalWindow} */ (window);
 /** @type {Document} */
@@ -22,7 +18,7 @@ export const ON_OVER_COMPONENT = Symbol('onOverComponent');
 const userAgent = navigator.userAgent.toLowerCase();
 
 /**
- * @description Gets XMLHttpRequest object
+ * @description Gets `XMLHttpRequest` object
  * @returns {XMLHttpRequest}
  */
 export function getXMLHttpRequest() {
@@ -32,7 +28,7 @@ export function getXMLHttpRequest() {
 /**
  * @deprecated
  * @description Returns the CSS text that has been applied to the current page.
- * @param {?Document} doc To get the CSS text of an document. If null get the current document.
+ * @param {?Document} doc To get the CSS text of an document. If `null` get the current document.
  * @returns {string} Styles string
  */
 export function getPageStyle(doc) {
@@ -61,7 +57,7 @@ export function getPageStyle(doc) {
  * @description Get the the tag path of the arguments value
  * @param {Array<string>} nameArray File name array
  * @param {string} extension js, css
- * @returns {string} If not found, return the first found value
+ * @returns {string} If not found, return the first found value.
  */
 export function getIncludePath(nameArray, extension) {
 	let path = '';
@@ -106,16 +102,16 @@ export function getIncludePath(nameArray, extension) {
 
 /** --- Check browser --- */
 /**
- * @description Check if support ResizeObserver function
- * @returns {boolean} Whether support ResizeObserver function or not.
+ * @description Check if support `ResizeObserver` function
+ * @returns {boolean} Whether support `ResizeObserver` function or not.
  */
 export const isResizeObserverSupported = (() => {
 	return typeof ResizeObserver === 'function';
 })();
 
 /**
- * @description Check if support navigator.clipboard
- * @returns {boolean} Whether support navigator.clipboard or not.
+ * @description Check if support `navigator.clipboard`
+ * @returns {boolean} Whether support `navigator.clipboard` or not.
  */
 export const isClipboardSupported = (() => {
 	return typeof navigator.clipboard?.write === 'function';

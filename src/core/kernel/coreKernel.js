@@ -82,9 +82,9 @@ import EventOrchestrator from '../event/eventOrchestrator';
 
 /**
  * @description Core dependency container for the editor.
- * - Stores and retrieves config/logic/plugin instances
- * - Orchestrates dependency injection across layers
- * - Initialization order: L1 Store -> L2 Config ($ Phase 1) -> L3 Logic ($ Phase 2) -> L4 Event
+ * - Stores and retrieves config/logic/plugin instances.
+ * - Orchestrates dependency injection across layers.
+ * - Initialization order: L1 Store -> L2 Config (`$` Phase 1) -> L3 Logic (`$` Phase 2) -> L4 Event.
  */
 class CoreKernel {
 	#config = new Map();
@@ -130,7 +130,7 @@ class CoreKernel {
 	}
 
 	/**
-	 * @description L2: Register config instances.
+	 * @description L2: Register config instances
 	 * @param {ProductType} product  - The initial product object.
 	 * @param {SunEditor.InitOptions} options  - The initial options.
 	 */
@@ -145,8 +145,8 @@ class CoreKernel {
 	}
 
 	/**
-	 * @description $ Phase 1: Build dependency bag with config entries only.
-	 * Logic constructors can access kernel.$ for configs.
+	 * @description `$` Phase 1: Build dependency bag with config entries only.
+	 * Logic constructors can access `kernel.$` for configs.
 	 */
 	#buildConfigDeps() {
 		const contextProvider = this.#config.get('contextProvider');
@@ -224,8 +224,8 @@ class CoreKernel {
 	}
 
 	/**
-	 * @description Initialize Logic modules that need EventManager reference.
-	 * Called after EventManager is created.
+	 * @description Initialize Logic modules that need `EventManager` reference.
+	 * Called after `EventManager` is created.
 	 */
 	#initLogic() {
 		for (const [, instance] of this.#logic) {
@@ -236,7 +236,7 @@ class CoreKernel {
 	}
 
 	/**
-	 * @description $ Phase 2: Add logic entries to existing $ object.
+	 * @description `$` Phase 2: Add logic entries to existing `$` object.
 	 * Called after all logic instances are registered and initialized.
 	 */
 	#assignLogicDeps() {

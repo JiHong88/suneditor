@@ -56,7 +56,7 @@ export class VideoSizeService {
 	};
 	/**
 	 * @description Called when the modal is opened. Initializes inputs and ratio options.
-	 * @param {boolean} isUpdate - Indicates whether the modal is for editing an existing component (true) or registering a new one (false).
+	 * @param {boolean} isUpdate - Indicates whether the modal is for editing an existing component (`true`) or registering a new one (`false`).
 	 */
 	on(isUpdate: boolean): void;
 	/**

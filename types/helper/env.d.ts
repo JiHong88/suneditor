@@ -1,13 +1,13 @@
 import type {} from '../typedef';
 /**
- * @description Gets XMLHttpRequest object
+ * @description Gets `XMLHttpRequest` object
  * @returns {XMLHttpRequest}
  */
 export function getXMLHttpRequest(): XMLHttpRequest;
 /**
  * @deprecated
  * @description Returns the CSS text that has been applied to the current page.
- * @param {?Document} doc To get the CSS text of an document. If null get the current document.
+ * @param {?Document} doc To get the CSS text of an document. If `null` get the current document.
  * @returns {string} Styles string
  */
 export function getPageStyle(doc: Document | null): string;
@@ -16,12 +16,9 @@ export function getPageStyle(doc: Document | null): string;
  * @description Get the the tag path of the arguments value
  * @param {Array<string>} nameArray File name array
  * @param {string} extension js, css
- * @returns {string} If not found, return the first found value
+ * @returns {string} If not found, return the first found value.
  */
 export function getIncludePath(nameArray: Array<string>, extension: string): string;
-/**
- * @fileoverview Environment  helper functions
- */
 /** @type {SunEditor.GlobalWindow} */
 export const _w: SunEditor.GlobalWindow;
 /** @type {Document} */
@@ -38,13 +35,13 @@ export const NO_EVENT: symbol;
 export const ON_OVER_COMPONENT: symbol;
 /** --- Check browser --- */
 /**
- * @description Check if support ResizeObserver function
- * @returns {boolean} Whether support ResizeObserver function or not.
+ * @description Check if support `ResizeObserver` function
+ * @returns {boolean} Whether support `ResizeObserver` function or not.
  */
 export const isResizeObserverSupported: boolean;
 /**
- * @description Check if support navigator.clipboard
- * @returns {boolean} Whether support navigator.clipboard or not.
+ * @description Check if support `navigator.clipboard`
+ * @returns {boolean} Whether support `navigator.clipboard` or not.
  */
 export const isClipboardSupported: boolean;
 /**

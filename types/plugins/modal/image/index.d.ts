@@ -10,11 +10,11 @@ export type ImagePluginOptions = {
 	 */
 	showHeightInput?: boolean;
 	/**
-	 * - The default width of the image. If a number is provided, "px" will be appended.
+	 * - The default width of the image. If a number is provided, `"px"` will be appended.
 	 */
 	defaultWidth?: string;
 	/**
-	 * - The default height of the image. If a number is provided, "px" will be appended.
+	 * - The default height of the image. If a number is provided, `"px"` will be appended.
 	 */
 	defaultHeight?: string;
 	/**
@@ -56,11 +56,11 @@ export type ImagePluginOptions = {
 	 */
 	acceptedFormats?: string;
 	/**
-	 * - Whether to enable format type selection (block or inline).
+	 * - Whether to enable format type selection (`block` or `inline`).
 	 */
 	useFormatType?: boolean;
 	/**
-	 * - The default image format type ("block" or "inline").
+	 * - The default image format type (`"block"` or `"inline"`).
 	 */
 	defaultFormatType?: 'block' | 'inline';
 	/**
@@ -76,7 +76,7 @@ export type ImagePluginOptions = {
 	 */
 	controls?: SunEditor.Module.Figure.Controls;
 	/**
-	 * - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+	 * - Component insertion behavior for selection and cursor placement. [default: `options.get('componentInsertBehavior')`]
 	 * - For inline components: places the cursor near the inserted component or selects it if no nearby range is available.
 	 * - For block components: executes behavior based on `selectMode`:
 	 * - `auto`: Move cursor to the next line if possible, otherwise select the component.
@@ -88,7 +88,7 @@ export type ImagePluginOptions = {
 };
 export type ImageState = {
 	/**
-	 * - Size unit ('px' or '%')
+	 * - Size unit (`'px'` or `'%'`)
 	 */
 	sizeUnit: string;
 	/**
@@ -104,8 +104,8 @@ export type ImageState = {
  * @typedef {Object} ImagePluginOptions
  * @property {boolean} [canResize=true] - Whether the image element can be resized.
  * @property {boolean} [showHeightInput=true] - Whether to display the height input field.
- * @property {string} [defaultWidth="auto"] - The default width of the image. If a number is provided, "px" will be appended.
- * @property {string} [defaultHeight="auto"] - The default height of the image. If a number is provided, "px" will be appended.
+ * @property {string} [defaultWidth="auto"] - The default width of the image. If a number is provided, `"px"` will be appended.
+ * @property {string} [defaultHeight="auto"] - The default height of the image. If a number is provided, `"px"` will be appended.
  * @property {boolean} [percentageOnlySize=false] - Whether to allow only percentage-based sizing.
  * @property {boolean} [createFileInput=true] - Whether to create a file input element for image uploads.
  * @property {boolean} [createUrlInput=true] - Whether to create a URL input element for image insertion.
@@ -115,12 +115,12 @@ export type ImageState = {
  * @property {number} [uploadSingleSizeLimit] - The single file upload size limit in bytes.
  * @property {boolean} [allowMultiple=false] - Whether multiple image uploads are allowed.
  * @property {string} [acceptedFormats="image/*"] - The accepted file formats for image uploads.
- * @property {boolean} [useFormatType=true] - Whether to enable format type selection (block or inline).
- * @property {'block'|'inline'} [defaultFormatType="block"] - The default image format type ("block" or "inline").
+ * @property {boolean} [useFormatType=true] - Whether to enable format type selection (`block` or `inline`).
+ * @property {'block'|'inline'} [defaultFormatType="block"] - The default image format type (`"block"` or `"inline"`).
  * @property {boolean} [keepFormatType=false] - Whether to retain the chosen format type after image insertion.
  * @property {boolean} [linkEnableFileUpload] - Whether to enable file uploads for linked images.
  * @property {SunEditor.Module.Figure.Controls} [controls] - Figure controls.
- * @property {SunEditor.ComponentInsertType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+ * @property {SunEditor.ComponentInsertType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: `options.get('componentInsertBehavior')`]
  * - For inline components: places the cursor near the inserted component or selects it if no nearby range is available.
  * - For block components: executes behavior based on `selectMode`:
  * - `auto`: Move cursor to the next line if possible, otherwise select the component.
@@ -130,7 +130,7 @@ export type ImageState = {
  */
 /**
  * @typedef {Object} ImageState
- * @property {string} sizeUnit - Size unit ('px' or '%')
+ * @property {string} sizeUnit - Size unit (`'px'` or `'%'`)
  * @property {boolean} onlyPercentage - Whether only percentage sizing is allowed
  * @property {number} produceIndex - Image production index for batch operations
  */
@@ -211,15 +211,15 @@ declare class Image_ extends PluginModal {
 	componentEdit(target: HTMLElement): void;
 	componentDestroy(target: HTMLElement): Promise<void>;
 	/**
-	 * @description Create an "image" component using the provided files.
+	 * @description Create an `image` component using the provided files.
 	 * @param {FileList|File[]} fileList File object list
-	 * @returns {Promise<boolean>} If return false, the file upload will be canceled
+	 * @returns {Promise<boolean>} If return `false`, the file upload will be canceled
 	 */
 	submitFile(fileList: FileList | File[]): Promise<boolean>;
 	/**
-	 * @description Create an "image" component using the provided url.
+	 * @description Create an `image` component using the provided url.
 	 * @param {string} url File url
-	 * @returns {Promise<boolean>} If return false, the file upload will be canceled
+	 * @returns {Promise<boolean>} If return `false`, the file upload will be canceled
 	 */
 	submitURL(url: string): Promise<boolean>;
 	/**

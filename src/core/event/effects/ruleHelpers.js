@@ -9,8 +9,8 @@
  * 2. Return values for rule conditional logic
  *
  * Categories:
- * - QUERY (safe): isUneditableNode - reads DOM only
- * - COMMAND (side effect): hardDelete, cleanRemovedTags - modifies DOM + returns status
+ * - QUERY (safe): `isUneditableNode` - reads DOM only
+ * - COMMAND (side effect): `hardDelete`, `cleanRemovedTags` - modifies DOM + returns status
  */
 
 import { dom } from '../../../helper';
@@ -20,7 +20,7 @@ import { dom } from '../../../helper';
  */
 
 /**
- * @description Deletes specific elements such as tables in "Firefox" and media elements (image, video, audio) in "Chrome".
+ * @description Deletes specific elements such as tables in `Firefox` and media elements (image, video, audio) in `Chrome`.
  * - Handles deletion logic based on selection range and node types.
  * @param {EventPorts} ports - Reducer ports
  * @returns {boolean} Returns `true` if an element was deleted and focus was adjusted, otherwise `false`.
@@ -63,7 +63,7 @@ function hardDelete(ports) {
  * @param {EventPorts} ports - Reducer ports
  * @param {Node} startCon - Starting container node to clean
  * @param {Element} formatEl - Parent format element containing the structure
- * @returns {boolean} Returns true if nodes were removed, undefined otherwise
+ * @returns {boolean} Returns `true` if nodes were removed, `undefined` otherwise
  */
 function cleanRemovedTags(ports, startCon, formatEl) {
 	let prev = startCon.parentNode.previousSibling;
@@ -90,11 +90,11 @@ function cleanRemovedTags(ports, startCon, formatEl) {
 }
 
 /**
- * @description Determines if the "range" is within an uneditable node.
+ * @description Determines if the `range` is within an uneditable node.
  * @param {EventPorts} ports - Reducer ports
  * @param {Range} range The range object
  * @param {boolean} isFront Whether to check the start or end of the range
- * @returns {Node|null} The uneditable node if found, otherwise null
+ * @returns {Node|null} The uneditable node if found, otherwise `null`
  */
 function isUneditableNode(ports, range, isFront) {
 	const container = isFront ? range.startContainer : range.endContainer;
@@ -119,7 +119,7 @@ function isUneditableNode(ports, range, isFront) {
  * @param {Node} selectNode The selected node
  * @param {string} siblingKey The key to access the sibling (`previousSibling` or `nextSibling`)
  * @param {Node} container The parent container node
- * @returns {Node|null} The sibling node if found, otherwise null
+ * @returns {Node|null} The sibling node if found, otherwise `null`
  */
 function _isUneditableNode_getSibling(ports, selectNode, siblingKey, container) {
 	if (!selectNode) return null;
@@ -136,9 +136,9 @@ function _isUneditableNode_getSibling(ports, selectNode, siblingKey, container) 
 }
 
 /**
- * @description Excute eventManager._setDefaultLine
+ * @description Execute `eventManager._setDefaultLine`
  * @param {EventPorts} ports - Reducer ports
- * @param {string} lineTagName - line tag name
+ * @param {string} lineTagName - `line` tag name
  * @returns {void}
  */
 function setDefaultLine(ports, lineTagName) {

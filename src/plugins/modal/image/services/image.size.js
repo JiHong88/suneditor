@@ -153,7 +153,7 @@ export class ImageSizeService {
 
 	/**
 	 * @description Handles keyup events on size inputs to calculate proportion.
-	 * @param {'x'|'y'} xy - Axis ('x' for width, 'y' for height)
+	 * @param {'x'|'y'} xy - Axis (`'x'` for width, `'y'` for height)
 	 * @param {KeyboardEvent} e - Event object
 	 */
 	#OnInputSize(xy, e) {

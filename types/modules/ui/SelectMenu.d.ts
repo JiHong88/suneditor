@@ -2,15 +2,15 @@ import type {} from '../../typedef';
 export default SelectMenu;
 export type SelectMenuParams = {
 	/**
-	 * Position of the select menu, specified as "[left|right]-[middle|top|bottom]" or "[top|bottom]-[center|left|right]"
+	 * Position of the select menu, specified as `"[left|right]-[middle|top|bottom]"` or `"[top|bottom]-[center|left|right]"`
 	 */
 	position: string;
 	/**
-	 * Flag to determine if the checklist is enabled (true or false)
+	 * Flag to determine if the checklist is enabled (`true` or `false`)
 	 */
 	checkList?: boolean;
 	/**
-	 * Optional text direction: "rtl" for right-to-left, "ltr" for left-to-right
+	 * Optional text direction: `"rtl"` for right-to-left, `"ltr"` for left-to-right
 	 */
 	dir?: 'rtl' | 'ltr';
 	/**
@@ -28,9 +28,9 @@ export type SelectMenuParams = {
 };
 /**
  * @typedef {Object} SelectMenuParams
- * @property {string} position Position of the select menu, specified as "[left|right]-[middle|top|bottom]" or "[top|bottom]-[center|left|right]"
- * @property {boolean} [checkList=false] Flag to determine if the checklist is enabled (true or false)
- * @property {"rtl" | "ltr"} [dir="ltr"] Optional text direction: "rtl" for right-to-left, "ltr" for left-to-right
+ * @property {string} position Position of the select menu, specified as `"[left|right]-[middle|top|bottom]"` or `"[top|bottom]-[center|left|right]"`
+ * @property {boolean} [checkList=false] Flag to determine if the checklist is enabled (`true` or `false`)
+ * @property {"rtl" | "ltr"} [dir="ltr"] Optional text direction: `"rtl"` for right-to-left, `"ltr"` for left-to-right
  * @property {number} [splitNum=0] Optional split number for horizontal positioning; defines how many items per row
  * @property {() => void} [openMethod] Optional method to call when the menu is opened
  * @property {() => void} [closeMethod] Optional method to call when the menu is closed
@@ -83,7 +83,7 @@ declare class SelectMenu {
 	): void;
 	/**
 	 * @description Select menu open
-	 * @param {?string} [position] "[left|right]-[middle|top|bottom] | [top|bottom]-[center|left|right]"
+	 * @param {?string} [position] `"[left|right]-[middle|top|bottom] | [top|bottom]-[center|left|right]"`
 	 * @param {?string} [onItemQuerySelector] The querySelector string of the menu to be activated
 	 */
 	open(position?: string | null, onItemQuerySelector?: string | null): void;

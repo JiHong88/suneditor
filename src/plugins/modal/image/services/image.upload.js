@@ -4,7 +4,7 @@ const { NO_EVENT } = env;
 
 /**
  * @class ImageUploadService
- * @description Handles image upload operations including file upload, URL upload, and Base64 conversion.
+ * @description Handles image upload operations including file upload, URL upload, and `Base64` conversion.
  */
 export class ImageUploadService {
 	#main;
@@ -113,9 +113,9 @@ export class ImageUploadService {
 	}
 
 	/**
-	 * @description Converts an image file to Base64 and inserts it into the editor.
+	 * @description Converts an image file to `Base64` and inserts it into the editor.
 	 * @param {SunEditor.EventParams.ImageInfo} info - Image upload info.
-	 * @throws {Error} Throws error if base64 conversion fails.
+	 * @throws {Error} Throws error if `Base64` conversion fails.
 	 */
 	#setBase64(info) {
 		try {
@@ -160,10 +160,10 @@ export class ImageUploadService {
 	}
 
 	/**
-	 * @description Inserts an image using a Base64-encoded string.
+	 * @description Inserts an image using a `Base64`-encoded string.
 	 * @param {boolean} update - Whether the image is being updated.
-	 * @param {Array<{result: string, file: { name: string, size: number }}>} filesStack - Stack of Base64-encoded files.
-	 * - result: Image url or Base64-encoded string
+	 * @param {Array<{result: string, file: { name: string, size: number }}>} filesStack - Stack of `Base64`-encoded files.
+	 * - result: Image url or `Base64`-encoded string
 	 * - file: File metadata ({ name: string, size: number })
 	 * @param {HTMLImageElement} updateElement - The image element being updated.
 	 * @param {?HTMLAnchorElement} anchor - Optional anchor wrapping the image.

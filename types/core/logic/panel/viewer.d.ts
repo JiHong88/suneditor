@@ -1,7 +1,7 @@
 import type {} from '../../../typedef';
 export default Viewer;
 /**
- * @description Viewer(codeView, fullScreen, showBlocks) class
+ * @description Viewer (`codeView`, `fullScreen`, `showBlocks`) class
  */
 declare class Viewer {
 	/**
@@ -11,22 +11,22 @@ declare class Viewer {
 	constructor(kernel: SunEditor.Kernel);
 	/**
 	 * @description Changes to code view or wysiwyg view
-	 * @param {boolean} [value] true/false, If undefined toggle the codeView mode.
+	 * @param {boolean} [value] `true`/`false`, If `undefined` toggle the `codeView` mode.
 	 */
 	codeView(value?: boolean): void;
 	/**
 	 * @description Changes to full screen or default screen
-	 * @param {boolean} [value] true/false, If undefined toggle the codeView mode.
+	 * @param {boolean} [value] `true`/`false`, If `undefined` toggle the `fullScreen` mode.
 	 */
 	fullScreen(value?: boolean): void;
 	/**
-	 * @description Add or remove the class name of "body" so that the code block is visible
-	 * @param {boolean} [value] true/false, If undefined toggle the codeView mode.
+	 * @description Add or remove the class name of `body` so that the code block is visible
+	 * @param {boolean} [value] `true`/`false`, If `undefined` toggle the `showBlocks` mode.
 	 */
 	showBlocks(value?: boolean): void;
 	/**
 	 * @internal
-	 * @description Set the active class to the button of the toolbar
+	 * @description Set the `active` class to the button of the toolbar
 	 */
 	_setButtonsActive(): void;
 	/**
@@ -46,9 +46,9 @@ declare class Viewer {
 	_resetFullScreenHeight(): boolean;
 	/**
 	 * @internal
-	 * @description Run CodeMirror Editor
-	 * @param {"set"|"get"|"readonly"|"refresh"} key method key
-	 * @param {*} value CodeMirror params
+	 * @description Run `CodeMirror` Editor
+	 * @param {"set"|"get"|"readonly"|"refresh"} key Method key
+	 * @param {*} value `CodeMirror` params
 	 * @param {string} [rootKey] Root key
 	 */
 	_codeMirrorEditor(key: 'set' | 'get' | 'readonly' | 'refresh', value: any, rootKey?: string): any;
@@ -66,10 +66,10 @@ declare class Viewer {
 	/**
 	 * @internal
 	 * @description Adjusts the height of the code view area.
-	 * - Ensures the code block auto-resizes based on its content.
+	 * - Ensures the code block `auto`-resizes based on its content.
 	 * @param {HTMLElement} code - Code area
 	 * @param {HTMLTextAreaElement} codeNumbers - Code numbers area
-	 * @param {boolean} isAuto - Auto height option
+	 * @param {boolean} isAuto - `auto` height option
 	 */
 	_codeViewAutoHeight(code: HTMLElement, codeNumbers: HTMLTextAreaElement, isAuto: boolean): void;
 	/**

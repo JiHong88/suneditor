@@ -10,6 +10,16 @@ export function clone<T extends Node>(node: T, deep?: boolean): T;
 /**
  * @template {HTMLElement} T
  * @description Create Element node
+ * @example
+ * // Create with attributes
+ * const span = dom.utils.createElement('SPAN', { style: 'color:red;', class: 'highlight' });
+ *
+ * // Create with HTML string content
+ * const div = dom.utils.createElement('DIV', null, '<p>Hello</p>');
+ *
+ * // Create with a child node
+ * const br = dom.utils.createElement('BR');
+ * const p = dom.utils.createElement('P', null, br);
  * @param {string} elementName Element name
  * @param {?Object<string, string>} [attributes] The attributes of the tag. {style: 'font-size:12px;..', class: 'el_class',..}
  * @param {?string|Node} [inner] A innerHTML string or inner node.
@@ -85,7 +95,7 @@ export function prevIndex(array: SunEditor.NodeCollection, item: Node): number;
  */
 export function copyTagAttributes(originEl: Node, copyEl: Node, blacklist?: Array<string> | null): void;
 /**
- * @description Copy and apply attributes of format tag that should be maintained. (style, class) Ignore "__se__format__" class
+ * @description Copy and apply attributes of format tag that should be maintained. (style, class) Ignore `__se__format__` class
  * @param {Node} originEl Origin element
  * @param {Node} copyEl Element to copy
  */
@@ -110,19 +120,19 @@ export function changeTxt(node: Node, txt: string): void;
 /**
  * @description Set style, if all styles are deleted, the style properties are deleted.
  * @param {Node|Node[]} elements Element to set style
- * @param {string} styleName Style attribute name (marginLeft, textAlign...)
+ * @param {string} styleName Style attribute name (`marginLeft`, `textAlign`...)
  * @param {string|number} value Style value
  */
 export function setStyle(elements: Node | Node[], styleName: string, value: string | number): void;
 /**
  * @description Gets the style value of the element. If the elements is an array, the style of the first element is returned.
  * @param {Node} element Element to get style from.
- * @param {string} styleName Style attribute name (e.g., 'marginLeft', 'textAlign').
- * @returns {string | undefined} The value of the style attribute, or undefined if the element does not exist.
+ * @param {string} styleName Style attribute name (e.g., `marginLeft`, `textAlign`).
+ * @returns {string | undefined} The value of the style attribute, or `undefined` if the element does not exist.
  */
 export function getStyle(element: Node, styleName: string): string | undefined;
 /**
- * @description In the predefined code view mode, the buttons except the executable button are changed to the 'disabled' state.
+ * @description In the predefined code view mode, the buttons except the executable button are changed to the `disabled` state.
  * @param {SunEditor.NodeCollection} buttonList (Button | Input) Element array
  * @param {boolean} disabled Disabled value
  * @param {boolean} [important=false] If priveleged mode should be used (Necessary to switch importantDisabled buttons)
@@ -180,9 +190,9 @@ export function getViewportSize(): {
 	scale: number;
 };
 /**
- * @description Copies the "wwTarget" element and returns it with inline all styles applied.
- * @param {Node} wwTarget Target element to copy(.sun-editor.sun-editor-editable)
- * @param {boolean} includeWW Include the "wwTarget" element in the copy
+ * @description Copies the `wwTarget` element and returns it with inline all styles applied.
+ * @param {Node} wwTarget Target element to copy(`.sun-editor.sun-editor-editable`)
+ * @param {boolean} includeWW Include the `wwTarget` element in the copy
  * @param {Iterable<string>} styles Style list - kamel case
  * @returns
  */

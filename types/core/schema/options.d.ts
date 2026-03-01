@@ -70,8 +70,8 @@ export namespace DEFAULTS {
  *
  * === Iframe Mode ===
  * @property {boolean} [iframe=false] - Content will be placed in an iframe and isolated from the rest of the page.
- * @property {boolean} [iframe_fullPage=false] - Allows the usage of HTML, HEAD, BODY tags and DOCTYPE declaration on the "iframe".
- * @property {Object<string, string>} [iframe_attributes={}] - Attributes of the "iframe". (e.g. {'allow-scripts': 'true'})
+ * @property {boolean} [iframe_fullPage=false] - Allows the usage of HTML, HEAD, BODY tags and DOCTYPE declaration on the `iframe`.
+ * @property {Object<string, string>} [iframe_attributes={}] - Attributes of the `iframe`. (e.g. {'allow-scripts': 'true'})
  * @property {Array<string>} [iframe_cssFileName=["suneditor"]] - CSS files to apply inside the iframe.
  * - String: Filename pattern to search in document <link> tags (e.g. "suneditor" or "suneditor.[a-z0-9]+" matches "suneditor.abc123.css")
  * - "*": Wildcard to include ALL stylesheets from the page
@@ -84,13 +84,13 @@ export namespace DEFAULTS {
  * @property {boolean} [statusbar_showPathLabel=true] - Displays the current node structure to status bar.
  * @property {boolean} [statusbar_resizeEnable=true] - Enables resize function of bottom status bar
  * @property {boolean} [charCounter=false] - Shows the number of characters in the editor.
- * - If the maxCharCount option has a value, it becomes true.
+ * - If the `maxCharCount` option has a value, it becomes `true`.
  * @property {?number} [charCounter_max=null] - The maximum number of characters allowed to be inserted into the editor.
- * @property {?string} [charCounter_label=null] - Text to be displayed in the "charCounter" area of the bottom bar. (e.g. "Characters : 20/200")
- * @property {"char"|"byte"|"byte-html"} [charCounter_type="char"] - Defines the calculation method of the "charCounter" option.
- * - 'char': Characters length.
- * - 'byte': Binary data size of characters.
- * - 'byte-html': Binary data size of the full HTML string.
+ * @property {?string} [charCounter_label=null] - Text to be displayed in the `charCounter` area of the bottom bar. (e.g. "Characters : 20/200")
+ * @property {"char"|"byte"|"byte-html"} [charCounter_type="char"] - Defines the calculation method of the `charCounter` option.
+ * - `char`: Characters length.
+ * - `byte`: Binary data size of characters.
+ * - `byte-html`: Binary data size of the full HTML string.
  *
  */
 /** ================================================================================================================================ */
@@ -140,9 +140,9 @@ export namespace DEFAULTS {
  * -----------------
  *
  * === Defaults & Whitelists ===
- * @property {string} [__textStyleTags=CONSTANTS.TEXT_STYLE_TAGS] - The basic tags that serves as the base for "textStyleTags"
+ * @property {string} [__textStyleTags=CONSTANTS.TEXT_STYLE_TAGS] - The basic tags that serves as the base for `textStyleTags`
  * - The default follows {@link DEFAULTS.TEXT_STYLE_TAGS}
- * @property {Object<string, string>} [__tagStyles=CONSTANTS.TAG_STYLES] - The basic tags that serves as the base for "tagStyles"
+ * @property {Object<string, string>} [__tagStyles=CONSTANTS.TAG_STYLES] - The basic tags that serves as the base for `tagStyles`
  * - The default follows {@link DEFAULTS.TAG_STYLES}
  * @property {string} [__defaultElementWhitelist] - A custom string used to construct a list of HTML elements to allow.
  * - The final list of allowed elements (regex pattern) is dynamically generated according to the following rules:
@@ -158,15 +158,15 @@ export namespace DEFAULTS {
  * ///
  *
  *  === Formatting  ===
- * @property {string} [__defaultFormatLine=CONSTANTS.FORMAT_LINE] - Specifies the tag to be used as the editor's default "line" element.
+ * @property {string} [__defaultFormatLine=CONSTANTS.FORMAT_LINE] - Specifies the tag to be used as the editor's default `line` element.
  * - The default follows {@link DEFAULTS.FORMAT_LINE}
- * @property {string} [__defaultFormatBrLine=CONSTANTS.FORMAT_BR_LINE] - Specifies the tag to be used as the editor's default "brLine" element.
+ * @property {string} [__defaultFormatBrLine=CONSTANTS.FORMAT_BR_LINE] - Specifies the tag to be used as the editor's default `brLine` element.
  * - The default follows {@link DEFAULTS.FORMAT_BR_LINE}
- * @property {string} [__defaultFormatClosureBrLine=CONSTANTS.FORMAT_CLOSURE_BR_LINE] - Specifies the tag to be used as the editor's default "closureBrLine" element.
+ * @property {string} [__defaultFormatClosureBrLine=CONSTANTS.FORMAT_CLOSURE_BR_LINE] - Specifies the tag to be used as the editor's default `closureBrLine` element.
  * - The default follows {@link DEFAULTS.FORMAT_CLOSURE_BR_LINE}
- * @property {string} [__defaultFormatBlock=CONSTANTS.FORMAT_BLOCK] - Specifies the tag to be used as the editor's default "block" element.
+ * @property {string} [__defaultFormatBlock=CONSTANTS.FORMAT_BLOCK] - Specifies the tag to be used as the editor's default `block` element.
  * - The default follows {@link DEFAULTS.FORMAT_BLOCK}
- * @property {string} [__defaultFormatClosureBlock=CONSTANTS.FORMAT_CLOSURE_BLOCK] - Specifies the tag to be used as the editor's default "closureBlock" element.
+ * @property {string} [__defaultFormatClosureBlock=CONSTANTS.FORMAT_CLOSURE_BLOCK] - Specifies the tag to be used as the editor's default `closureBlock` element.
  * - The default follows {@link DEFAULTS.FORMAT_CLOSURE_BLOCK}
  * ///
  *
@@ -177,7 +177,7 @@ export namespace DEFAULTS {
  * - For example, when changing the font size or color of a list item (`<li>`),
  * - these styles will be applied to the `<li>` tag instead of wrapping the content inside additional tags.
  * @property {{pluginName: string, we: boolean}|boolean} [__pluginRetainFilter=true] - Plugin retain filter configuration. (Internal use primarily)
- * - You can turn it off/on globally with true/false or set it per plugin. (e.g. { table: false })
+ * - You can turn it off/on globally with `true`/`false` or set it per plugin. (e.g. { table: false })
  */
 /**
  * ================================================================================================================================
@@ -195,13 +195,13 @@ export namespace DEFAULTS {
  *
  * === Modes & Themes ===
  * @property {boolean} [v2Migration=false] - Enables migration mode for SunEditor v2.
- * @property {"classic"|"inline"|"balloon"|"balloon-always"} [mode="classic"] - Toolbar mode: "classic", "inline", "balloon", "balloon-always".
- * @property {string} [type=""] - Editor type: "document:header,page".
+ * @property {"classic"|"inline"|"balloon"|"balloon-always"} [mode="classic"] - Toolbar mode: `classic`, `inline`, `balloon`, `balloon-always`.
+ * @property {string} [type=""] - Editor type: `document:header,page`.
  * @property {string} [theme=""] - Editor theme.
  * @property {Object<string, string>} [lang] - Language configuration. default : EN
  * @property {Object<string, string>} [icons] - Overrides the default icons.
- * @property {"ltr"|"rtl"} [textDirection="ltr"] - Text direction: "ltr" or "rtl".
- * @property {Array<string>} [reverseButtons=['indent-outdent']] - An array of command pairs whose shortcut icons should be opposite each other, depending on the "textDirection" mode.
+ * @property {"ltr"|"rtl"} [textDirection="ltr"] - Text direction: `ltr` or `rtl`.
+ * @property {Array<string>} [reverseButtons=['indent-outdent']] - An array of command pairs whose shortcut icons should be opposite each other, depending on the `textDirection` mode.
  * ///
  *
  * === Strict & Advanced Filtering ===
@@ -228,7 +228,7 @@ export namespace DEFAULTS {
  * - Tags specified here will eventually be removed, even if they are included in other whitelists.
  * @property {string} [allowedEmptyTags=CONSTANTS.ALLOWED_EMPTY_NODE_LIST] - A list of tags that are allowed to be kept even if their values are empty.
  * - The default follows {@link DEFAULTS.ALLOWED_EMPTY_NODE_LIST}
- * - It is concatenated with the value of "ALLOWED_EMPTY_NODE_LIST" to form the final 'allowedEmptyTags' list.
+ * - It is concatenated with the value of `ALLOWED_EMPTY_NODE_LIST` to form the final `allowedEmptyTags` list.
  * @property {string} [allowedClassName=""] - Allowed class names.
  * - Added the default value {@link DEFAULTS.CLASS_NAME}
  * ///
@@ -247,50 +247,50 @@ export namespace DEFAULTS {
  * @property {Object<string, string>} [convertTextTags={bold: "strong", underline: "u", italic: "em", strike: "del", subscript: "sub", superscript: "sup"}] - Maps text styles to specific HTML tags.
  * @property {string} [allUsedStyles] - Specifies additional styles to the list of allowed styles. Delimiter: "|" (e.g. "color|background-color").
  * @property {Object<string, string>} [tagStyles={}] - Specifies allowed styles for HTML tags.
- * @property {string} [spanStyles=CONSTANTS.SPAN_STYLES] - Specifies allowed styles for the "span" tag.
+ * @property {string} [spanStyles=CONSTANTS.SPAN_STYLES] - Specifies allowed styles for the `span` tag.
  * - The default follows {@link DEFAULTS.SPAN_STYLES}
- * @property {string} [lineStyles=CONSTANTS.LINE_STYLES] - Specifies allowed styles for the "line" element (p..).
+ * @property {string} [lineStyles=CONSTANTS.LINE_STYLES] - Specifies allowed styles for the `line` element (p..).
  * - The default follows {@link DEFAULTS.LINE_STYLES}
  * @property {Array<string>} [fontSizeUnits=CONSTANTS.SIZE_UNITS] - Allowed font size units.
  * - The default follows {@link DEFAULTS.SIZE_UNITS}
  * @property {"repeat"|"always"|"none"} [retainStyleMode="repeat"] - This option determines how inline elements (such as <span>, <strong>, etc.) are handled when deleting text.
- * - "repeat": Inline styles are retained unless the backspace key is repeatedly pressed. If the user continuously presses backspace, the styles will eventually be removed.
- * - "none": Inline styles are not retained at all. When deleting text, the associated inline elements are immediately removed along with it.
- * - "always": Inline styles persist indefinitely unless explicitly removed. Even if all text inside an inline element is deleted, the element itself remains until manually removed.
+ * - `repeat`: Inline styles are retained unless the backspace key is repeatedly pressed. If the user continuously presses backspace, the styles will eventually be removed.
+ * - `none`: Inline styles are not retained at all. When deleting text, the associated inline elements are immediately removed along with it.
+ * - `always`: Inline styles persist indefinitely unless explicitly removed. Even if all text inside an inline element is deleted, the element itself remains until manually removed.
  * ///
  *
  * #### 4) Line & Block Formatting
- * @property {string} [defaultLine="p"] - Default line element when inserting new lines.
+ * @property {string} [defaultLine="p"] - Default `line` element when inserting new lines.
  * @property {"line"|"br"} [defaultLineBreakFormat="line"] - Specifies the default line break format.
- * - [Recommended] "line" :  is a line break that is divided into general tags.
- * - [Not recommended] "br" : Line breaks are treated as <br> on the same line. (like shift+enter)
- * - Line breaks are handled as <br> within "line".
- * - You can create a new "line" by entering a line break twice in a row.
- * - Formats that include "line", such as "Quote", still operate on a "line" basis.
- * - ● suneditor processes work in "line" units.
- * - ● When set to "br", performance may decrease when editing a lot of data.
+ * - [Recommended] `line` :  is a line break that is divided into general tags.
+ * - [Not recommended] `br` : Line breaks are treated as <br> on the same line. (like shift+enter)
+ * - Line breaks are handled as <br> within `line`.
+ * - You can create a new `line` by entering a line break twice in a row.
+ * - Formats that include `line`, such as "Quote", still operate on a `line` basis.
+ * - suneditor processes work in `line` units.
+ * - When set to `br`, performance may decrease when editing a lot of data.
  * @property {string} [lineAttrReset=""] - Line properties that should be reset when changing lines (e.g. "id|name").
- * @property {string} [formatLine=__defaultFormatLine] - Additionally allowed "line" elements beyond the default. Delimiter: "|" (e.g. "p|div").
- * It is concatenated with the value of {@link PrivateBaseOptions.__defaultFormatLine} to form the final 'line' element list.
- * - "line" element also contain "brLine" element
- * @property {string} [formatBrLine=__defaultFormatBrLine] - Additionally allowed "brLine" elements beyond the default. (e.g. "PRE").
- * - It is concatenated with the value of {@link PrivateBaseOptions.__defaultFormatBrLine} to form the final 'brLine' element list.
- * - "brLine" elements is included in the "line" element.
- * - "brLine" elements's line break is "BR" tag.
- * ※ Entering the Enter key in the space on the last line ends "brLine" and appends "line".
- * @property {string} [formatClosureBrLine=__defaultFormatClosureBrLine] - Additionally allowed "closureBrLine" elements beyond the default.
- * - It is concatenated with the value of {@link PrivateBaseOptions.__defaultFormatClosureBrLine} to form the final 'closureBrLine' element list.
- * - "closureBrLine" elements is included in the "brLine".
- * - "closureBrLine" elements's line break is "BR" tag.
+ * @property {string} [formatLine=__defaultFormatLine] - Additionally allowed `line` elements beyond the default. Delimiter: "|" (e.g. "p|div").
+ * It is concatenated with the value of {@link PrivateBaseOptions.__defaultFormatLine} to form the final `line` element list.
+ * - `line` element also contain `brLine` element
+ * @property {string} [formatBrLine=__defaultFormatBrLine] - Additionally allowed `brLine` elements beyond the default. (e.g. "PRE").
+ * - It is concatenated with the value of {@link PrivateBaseOptions.__defaultFormatBrLine} to form the final `brLine` element list.
+ * - `brLine` elements is included in the `line` element.
+ * - `brLine` elements's line break is `BR` tag.
+ * ※ Entering the Enter key in the space on the last line ends `brLine` and appends `line`.
+ * @property {string} [formatClosureBrLine=__defaultFormatClosureBrLine] - Additionally allowed `closureBrLine` elements beyond the default.
+ * - It is concatenated with the value of {@link PrivateBaseOptions.__defaultFormatClosureBrLine} to form the final `closureBrLine` element list.
+ * - `closureBrLine` elements is included in the `brLine`.
+ * - `closureBrLine` elements's line break is `BR` tag.
  * - ※ You cannot exit this format with the Enter key or Backspace key.
  * - ※ Use it only in special cases. ([ex] format of table cells)
- * @property {string} [formatBlock=__defaultFormatBlock] - Additionally allowed "block" elements beyond the default.
- * - It is concatenated with the value of {@link PrivateBaseOptions.__defaultFormatBlock} to form the final 'block' element list.
- * - "block" is wrap the "line" and "component"
- * @property {string} [formatClosureBlock=__defaultFormatClosureBlock] - Additionally allowed "closureBlock" elements beyond the default.
- * - It is concatenated with the value of {@link PrivateBaseOptions.__defaultFormatClosureBlock} to form the final 'closureBlock' element list.
- * - "closureBlock" elements is included in the "block".
- * - "closureBlock" element is wrap the "line" and "component"
+ * @property {string} [formatBlock=__defaultFormatBlock] - Additionally allowed `block` elements beyond the default.
+ * - It is concatenated with the value of {@link PrivateBaseOptions.__defaultFormatBlock} to form the final `block` element list.
+ * - `block` is wrap the `line` and `component`
+ * @property {string} [formatClosureBlock=__defaultFormatClosureBlock] - Additionally allowed `closureBlock` elements beyond the default.
+ * - It is concatenated with the value of {@link PrivateBaseOptions.__defaultFormatClosureBlock} to form the final `closureBlock` element list.
+ * - `closureBlock` elements is included in the `block`.
+ * - `closureBlock` element is wrap the `line` and `component`
  * - ※ You cannot exit this format with the Enter key or Backspace key.
  * - ※ Use it only in special cases. (e.g. format of table cells)
  * ///
@@ -305,7 +305,7 @@ export namespace DEFAULTS {
  * @property {boolean} [toolbar_hide=false] - Hides toolbar initially.
  * @property {Object} [subToolbar={}] - Sub-toolbar configuration.
  * @property {SunEditor.UI.ButtonList} [subToolbar.buttonList] - List of Sub-toolbar buttons, grouped by sub-arrays.
- * @property {"balloon"|"balloon-always"} [subToolbar.mode="balloon"] - Sub-toolbar mode: "balloon", "balloon-always".
+ * @property {"balloon"|"balloon-always"} [subToolbar.mode="balloon"] - Sub-toolbar mode: `balloon`, `balloon-always`.
  * @property {string} [subToolbar.width="auto"] - Sub-toolbar width.
  * @property {?HTMLElement} [statusbar_container] - Container element for the status bar.
  * @property {boolean} [shortcutsHint=true] - Displays shortcut hints in tooltips.
@@ -315,8 +315,8 @@ export namespace DEFAULTS {
  *
  * === Advanced Features ===
  * @property {boolean} [copyFormatKeepOn=false] - Keeps the format of the copied content.
- * @property {boolean} [autoLinkify] - Automatically converts URLs into hyperlinks. ("Link" plugin required)
- * - Default value is determined dynamically based on whether the 'link' plugin is enabled. (default : Boolean(plugins.link))
+ * @property {boolean} [autoLinkify] - Automatically converts URLs into hyperlinks. (`Link` plugin required)
+ * - Default value is determined dynamically based on whether the `link` plugin is enabled. (default : `Boolean(plugins.link)`)
  * @property {Array<string>} [autoStyleify=["bold", "underline", "italic", "strike"]] - Styles applied automatically on text input.
  * @property {number} [historyStackDelayTime=400] - Delay time for history stack updates (ms).
  * @property {string} [printClass=""] - Class name for printing.
@@ -384,14 +384,14 @@ export namespace DEFAULTS {
  *
  * **Runtime-only base options (computed internally, cannot be set by users)**
  *
- * @property {string} [_themeClass] - Computed className for the selected theme (e.g., 'se-theme-default').
+ * @property {string} [_themeClass] - Computed className for the selected theme (e.g., `se-theme-default`).
  * @property {string} [_type_options] - Additional sub-type string from the `type` option (after `:`).
  * @property {string} [_allowedExtraTag] - Preprocessed allowed tag string for RegExp (e.g., "mark|figure").
  * @property {string} [_disallowedExtraTag] - Preprocessed disallowed tag string.
  * @property {string} [_editableClass] - Final computed editable class (used in editor wrapper).
  * @property {boolean} [_rtl] - Whether text direction is RTL.
  * @property {string[]} [_reverseCommandArray] - Internal key shortcut matcher for reverse commands.
- * @property {string} [_subMode] - Sub toolbar mode (e.g., 'balloon').
+ * @property {string} [_subMode] - Sub toolbar mode (e.g., `balloon`).
  * @property {string[]} [_textStyleTags] - Tag names used for text styling, plus span/li.
  * @property {RegExp} [_textStylesRegExp] - Regex to match inline styles (e.g., fontSize, color).
  * @property {RegExp} [_lineStylesRegExp] - Regex to match line styles (e.g., text-align, padding).
@@ -403,7 +403,7 @@ export namespace DEFAULTS {
  * @property {Set} [buttons] - List of currently used toolbar buttons
  * @property {Set} [buttons_sub] - List of currently used sub-toolbar buttons
  * @property {string} [toolbar_sub_width] - Sub-toolbar width.
- * @property {string[]} [reverseCommands] - Merged reverse command pairs array (includes default 'indent-outdent' + user's reverseButtons).
+ * @property {string[]} [reverseCommands] - Merged reverse command pairs array (includes default `indent-outdent` + user's `reverseButtons`).
  *
  * @property {*} [codeMirror] - CodeMirror configuration object from `externalLibs.codeMirror`.
  * @property {boolean} [codeMirror6Editor] - Whether CodeMirror 6 is available (base-level flag). Frame-level stores the actual EditorView instance.
@@ -425,13 +425,13 @@ export namespace DEFAULTS {
  */
 /**
  * @description For all EditorInitOptions keys, only boolean | null values are allowed.
- * - 'fixed' → Immutable / null → Resettable.
+ * - `fixed` → Immutable / `null` → Resettable.
  * @type {Partial<Object<keyof EditorInitOptions, "fixed" | true>>}
  */
 export const OPTION_FRAME_FIXED_FLAG: Partial<any>;
 /**
  * @description For all EditorInitOptions keys, only boolean | null values are allowed.
- * - 'fixed' → Immutable / null → Resettable.
+ * - `fixed` → Immutable / `null` → Resettable.
  * @type {Partial<Object<keyof EditorInitOptions, "fixed" | true>>}
  */
 export const OPTION_FIXED_FLAG: Partial<any>;
@@ -495,11 +495,11 @@ export type EditorFrameOptions = {
 	 */
 	iframe?: boolean;
 	/**
-	 * - Allows the usage of HTML, HEAD, BODY tags and DOCTYPE declaration on the "iframe".
+	 * - Allows the usage of HTML, HEAD, BODY tags and DOCTYPE declaration on the `iframe`.
 	 */
 	iframe_fullPage?: boolean;
 	/**
-	 * - Attributes of the "iframe". (e.g. {'allow-scripts': 'true'})
+	 * - Attributes of the `iframe`. (e.g. {'allow-scripts': 'true'})
 	 */
 	iframe_attributes?: {
 		[x: string]: string;
@@ -529,7 +529,7 @@ export type EditorFrameOptions = {
 	statusbar_resizeEnable?: boolean;
 	/**
 	 * - Shows the number of characters in the editor.
-	 * - If the maxCharCount option has a value, it becomes true.
+	 * - If the `maxCharCount` option has a value, it becomes `true`.
 	 */
 	charCounter?: boolean;
 	/**
@@ -537,14 +537,14 @@ export type EditorFrameOptions = {
 	 */
 	charCounter_max?: number | null;
 	/**
-	 * - Text to be displayed in the "charCounter" area of the bottom bar. (e.g. "Characters : 20/200")
+	 * - Text to be displayed in the `charCounter` area of the bottom bar. (e.g. "Characters : 20/200")
 	 */
 	charCounter_label?: string | null;
 	/**
-	 * - Defines the calculation method of the "charCounter" option.
-	 * - 'char': Characters length.
-	 * - 'byte': Binary data size of characters.
-	 * - 'byte-html': Binary data size of the full HTML string.
+	 * - Defines the calculation method of the `charCounter` option.
+	 * - `char`: Characters length.
+	 * - `byte`: Binary data size of characters.
+	 * - `byte-html`: Binary data size of the full HTML string.
 	 */
 	charCounter_type?: 'char' | 'byte' | 'byte-html';
 };
@@ -606,12 +606,12 @@ export type ProcessedFrameOptions = Omit<AllFrameOptions, TransformedFrameOption
  */
 export type PrivateBaseOptions = {
 	/**
-	 * - The basic tags that serves as the base for "textStyleTags"
+	 * - The basic tags that serves as the base for `textStyleTags`
 	 * - The default follows {@link DEFAULTS.TEXT_STYLE_TAGS}
 	 */
 	__textStyleTags?: string;
 	/**
-	 * - The basic tags that serves as the base for "tagStyles"
+	 * - The basic tags that serves as the base for `tagStyles`
 	 * - The default follows {@link DEFAULTS.TAG_STYLES}
 	 */
 	__tagStyles?: {
@@ -637,27 +637,27 @@ export type PrivateBaseOptions = {
 	 */
 	__defaultAttributeWhitelist?: string;
 	/**
-	 * - Specifies the tag to be used as the editor's default "line" element.
+	 * - Specifies the tag to be used as the editor's default `line` element.
 	 * - The default follows {@link DEFAULTS.FORMAT_LINE}
 	 */
 	__defaultFormatLine?: string;
 	/**
-	 * - Specifies the tag to be used as the editor's default "brLine" element.
+	 * - Specifies the tag to be used as the editor's default `brLine` element.
 	 * - The default follows {@link DEFAULTS.FORMAT_BR_LINE}
 	 */
 	__defaultFormatBrLine?: string;
 	/**
-	 * - Specifies the tag to be used as the editor's default "closureBrLine" element.
+	 * - Specifies the tag to be used as the editor's default `closureBrLine` element.
 	 * - The default follows {@link DEFAULTS.FORMAT_CLOSURE_BR_LINE}
 	 */
 	__defaultFormatClosureBrLine?: string;
 	/**
-	 * - Specifies the tag to be used as the editor's default "block" element.
+	 * - Specifies the tag to be used as the editor's default `block` element.
 	 * - The default follows {@link DEFAULTS.FORMAT_BLOCK}
 	 */
 	__defaultFormatBlock?: string;
 	/**
-	 * - Specifies the tag to be used as the editor's default "closureBlock" element.
+	 * - Specifies the tag to be used as the editor's default `closureBlock` element.
 	 * - The default follows {@link DEFAULTS.FORMAT_CLOSURE_BLOCK}///
 	 *
 	 * === Filters & Behavior ===
@@ -676,7 +676,7 @@ export type PrivateBaseOptions = {
 	__listCommonStyle?: Array<string>;
 	/**
 	 * - Plugin retain filter configuration. (Internal use primarily)
-	 * - You can turn it off/on globally with true/false or set it per plugin. (e.g. { table: false })
+	 * - You can turn it off/on globally with `true`/`false` or set it per plugin. (e.g. { table: false })
 	 */
 	__pluginRetainFilter?:
 		| {
@@ -718,11 +718,11 @@ export type EditorBaseOptions = {
 	 */
 	v2Migration?: boolean;
 	/**
-	 * - Toolbar mode: "classic", "inline", "balloon", "balloon-always".
+	 * - Toolbar mode: `classic`, `inline`, `balloon`, `balloon-always`.
 	 */
 	mode?: 'classic' | 'inline' | 'balloon' | 'balloon-always';
 	/**
-	 * - Editor type: "document:header,page".
+	 * - Editor type: `document:header,page`.
 	 */
 	type?: string;
 	/**
@@ -742,11 +742,11 @@ export type EditorBaseOptions = {
 		[x: string]: string;
 	};
 	/**
-	 * - Text direction: "ltr" or "rtl".
+	 * - Text direction: `ltr` or `rtl`.
 	 */
 	textDirection?: 'ltr' | 'rtl';
 	/**
-	 * - An array of command pairs whose shortcut icons should be opposite each other, depending on the "textDirection" mode.
+	 * - An array of command pairs whose shortcut icons should be opposite each other, depending on the `textDirection` mode.
 	 * ///
 	 *
 	 * === Strict & Advanced Filtering ===
@@ -788,7 +788,7 @@ export type EditorBaseOptions = {
 	elementBlacklist?: string;
 	/**
 	 * - A list of tags that are allowed to be kept even if their values are empty.
-	 * - The default follows {@link DEFAULTS.ALLOWED_EMPTY_NODE_LIST}- It is concatenated with the value of "ALLOWED_EMPTY_NODE_LIST" to form the final 'allowedEmptyTags' list.
+	 * - The default follows {@link DEFAULTS.ALLOWED_EMPTY_NODE_LIST}- It is concatenated with the value of `ALLOWED_EMPTY_NODE_LIST` to form the final `allowedEmptyTags` list.
 	 */
 	allowedEmptyTags?: string;
 	/**
@@ -838,12 +838,12 @@ export type EditorBaseOptions = {
 		[x: string]: string;
 	};
 	/**
-	 * - Specifies allowed styles for the "span" tag.
+	 * - Specifies allowed styles for the `span` tag.
 	 * - The default follows {@link DEFAULTS.SPAN_STYLES}
 	 */
 	spanStyles?: string;
 	/**
-	 * - Specifies allowed styles for the "line" element (p..).
+	 * - Specifies allowed styles for the `line` element (p..).
 	 * - The default follows {@link DEFAULTS.LINE_STYLES}
 	 */
 	lineStyles?: string;
@@ -854,27 +854,27 @@ export type EditorBaseOptions = {
 	fontSizeUnits?: Array<string>;
 	/**
 	 * - This option determines how inline elements (such as <span>, <strong>, etc.) are handled when deleting text.
-	 * - "repeat": Inline styles are retained unless the backspace key is repeatedly pressed. If the user continuously presses backspace, the styles will eventually be removed.
-	 * - "none": Inline styles are not retained at all. When deleting text, the associated inline elements are immediately removed along with it.
-	 * - "always": Inline styles persist indefinitely unless explicitly removed. Even if all text inside an inline element is deleted, the element itself remains until manually removed.
+	 * - `repeat`: Inline styles are retained unless the backspace key is repeatedly pressed. If the user continuously presses backspace, the styles will eventually be removed.
+	 * - `none`: Inline styles are not retained at all. When deleting text, the associated inline elements are immediately removed along with it.
+	 * - `always`: Inline styles persist indefinitely unless explicitly removed. Even if all text inside an inline element is deleted, the element itself remains until manually removed.
 	 * ///
 	 *
 	 * #### 4) Line & Block Formatting
 	 */
 	retainStyleMode?: 'repeat' | 'always' | 'none';
 	/**
-	 * - Default line element when inserting new lines.
+	 * - Default `line` element when inserting new lines.
 	 */
 	defaultLine?: string;
 	/**
 	 * - Specifies the default line break format.
-	 * - [Recommended] "line" :  is a line break that is divided into general tags.
-	 * - [Not recommended] "br" : Line breaks are treated as <br> on the same line. (like shift+enter)
-	 * - Line breaks are handled as <br> within "line".
-	 * - You can create a new "line" by entering a line break twice in a row.
-	 * - Formats that include "line", such as "Quote", still operate on a "line" basis.
-	 * - ● suneditor processes work in "line" units.
-	 * - ● When set to "br", performance may decrease when editing a lot of data.
+	 * - [Recommended] `line` :  is a line break that is divided into general tags.
+	 * - [Not recommended] `br` : Line breaks are treated as <br> on the same line. (like shift+enter)
+	 * - Line breaks are handled as <br> within `line`.
+	 * - You can create a new `line` by entering a line break twice in a row.
+	 * - Formats that include `line`, such as "Quote", still operate on a `line` basis.
+	 * - suneditor processes work in `line` units.
+	 * - When set to `br`, performance may decrease when editing a lot of data.
 	 */
 	defaultLineBreakFormat?: 'line' | 'br';
 	/**
@@ -882,39 +882,39 @@ export type EditorBaseOptions = {
 	 */
 	lineAttrReset?: string;
 	/**
-	 * - Additionally allowed "line" elements beyond the default. Delimiter: "|" (e.g. "p|div").
-	 * It is concatenated with the value of {@link PrivateBaseOptions.__defaultFormatLine} to form the final 'line' element list.
-	 * - "line" element also contain "brLine" element
+	 * - Additionally allowed `line` elements beyond the default. Delimiter: "|" (e.g. "p|div").
+	 * It is concatenated with the value of {@link PrivateBaseOptions.__defaultFormatLine} to form the final `line` element list.
+	 * - `line` element also contain `brLine` element
 	 */
 	formatLine?: string;
 	/**
-	 * - Additionally allowed "brLine" elements beyond the default. (e.g. "PRE").
-	 * - It is concatenated with the value of {@link PrivateBaseOptions.__defaultFormatBrLine} to form the final 'brLine' element list.
-	 * - "brLine" elements is included in the "line" element.
-	 * - "brLine" elements's line break is "BR" tag.
-	 * ※ Entering the Enter key in the space on the last line ends "brLine" and appends "line".
+	 * - Additionally allowed `brLine` elements beyond the default. (e.g. "PRE").
+	 * - It is concatenated with the value of {@link PrivateBaseOptions.__defaultFormatBrLine} to form the final `brLine` element list.
+	 * - `brLine` elements is included in the `line` element.
+	 * - `brLine` elements's line break is `BR` tag.
+	 * ※ Entering the Enter key in the space on the last line ends `brLine` and appends `line`.
 	 */
 	formatBrLine?: string;
 	/**
-	 * - Additionally allowed "closureBrLine" elements beyond the default.
-	 * - It is concatenated with the value of {@link PrivateBaseOptions.__defaultFormatClosureBrLine} to form the final 'closureBrLine' element list.
-	 * - "closureBrLine" elements is included in the "brLine".
-	 * - "closureBrLine" elements's line break is "BR" tag.
+	 * - Additionally allowed `closureBrLine` elements beyond the default.
+	 * - It is concatenated with the value of {@link PrivateBaseOptions.__defaultFormatClosureBrLine} to form the final `closureBrLine` element list.
+	 * - `closureBrLine` elements is included in the `brLine`.
+	 * - `closureBrLine` elements's line break is `BR` tag.
 	 * - ※ You cannot exit this format with the Enter key or Backspace key.
 	 * - ※ Use it only in special cases. ([ex] format of table cells)
 	 */
 	formatClosureBrLine?: string;
 	/**
-	 * - Additionally allowed "block" elements beyond the default.
-	 * - It is concatenated with the value of {@link PrivateBaseOptions.__defaultFormatBlock} to form the final 'block' element list.
-	 * - "block" is wrap the "line" and "component"
+	 * - Additionally allowed `block` elements beyond the default.
+	 * - It is concatenated with the value of {@link PrivateBaseOptions.__defaultFormatBlock} to form the final `block` element list.
+	 * - `block` is wrap the `line` and `component`
 	 */
 	formatBlock?: string;
 	/**
-	 * - Additionally allowed "closureBlock" elements beyond the default.
-	 * - It is concatenated with the value of {@link PrivateBaseOptions.__defaultFormatClosureBlock} to form the final 'closureBlock' element list.
-	 * - "closureBlock" elements is included in the "block".
-	 * - "closureBlock" element is wrap the "line" and "component"
+	 * - Additionally allowed `closureBlock` elements beyond the default.
+	 * - It is concatenated with the value of {@link PrivateBaseOptions.__defaultFormatClosureBlock} to form the final `closureBlock` element list.
+	 * - `closureBlock` elements is included in the `block`.
+	 * - `closureBlock` element is wrap the `line` and `component`
 	 * - ※ You cannot exit this format with the Enter key or Backspace key.
 	 * - ※ Use it only in special cases. (e.g. format of table cells)
 	 * ///
@@ -984,8 +984,8 @@ export type EditorBaseOptions = {
 	 */
 	copyFormatKeepOn?: boolean;
 	/**
-	 * - Automatically converts URLs into hyperlinks. ("Link" plugin required)
-	 * - Default value is determined dynamically based on whether the 'link' plugin is enabled. (default : Boolean(plugins.link))
+	 * - Automatically converts URLs into hyperlinks. (`Link` plugin required)
+	 * - Default value is determined dynamically based on whether the `link` plugin is enabled. (default : `Boolean(plugins.link)`)
 	 */
 	autoLinkify?: boolean;
 	/**
@@ -1098,7 +1098,7 @@ export type EditorBaseOptions = {
  */
 export type InternalBaseOptions = {
 	/**
-	 * - Computed className for the selected theme (e.g., 'se-theme-default').
+	 * - Computed className for the selected theme (e.g., `se-theme-default`).
 	 */
 	_themeClass?: string;
 	/**
@@ -1126,7 +1126,7 @@ export type InternalBaseOptions = {
 	 */
 	_reverseCommandArray?: string[];
 	/**
-	 * - Sub toolbar mode (e.g., 'balloon').
+	 * - Sub toolbar mode (e.g., `balloon`).
 	 */
 	_subMode?: string;
 	/**
@@ -1176,7 +1176,7 @@ export type InternalBaseOptions = {
 	 */
 	toolbar_sub_width?: string;
 	/**
-	 * - Merged reverse command pairs array (includes default 'indent-outdent' + user's reverseButtons).
+	 * - Merged reverse command pairs array (includes default `indent-outdent` + user's `reverseButtons`).
 	 */
 	reverseCommands?: string[];
 	/**

@@ -2,15 +2,15 @@ import type {} from '../../typedef';
 export default Drawing;
 export type DrawingPluginOptions = {
 	/**
-	 * - The output format of the drawing. Options: "dataurl", "svg".
+	 * - The output format of the drawing. Options: `"dataurl"`, `"svg"`.
 	 */
 	outputFormat?: string;
 	/**
-	 * - Whether to enable format type selection (block vs inline).
+	 * - Whether to enable format type selection (`block` vs `inline`).
 	 */
 	useFormatType?: boolean;
 	/**
-	 * - The default format type, either "block" or "inline".
+	 * - The default format type, either `"block"` or `"inline"`.
 	 */
 	defaultFormatType?: string;
 	/**
@@ -26,7 +26,7 @@ export type DrawingPluginOptions = {
 	 */
 	lineReconnect?: boolean;
 	/**
-	 * - The style of the line cap ("butt", "round", or "square").
+	 * - The style of the line cap (`"butt"`, `"round"`, or `"square"`).
 	 */
 	lineCap?: CanvasLineCap;
 	/**
@@ -55,13 +55,13 @@ export type DrawingPluginOptions = {
 };
 /**
  * @typedef {Object} DrawingPluginOptions
- * @property {string} [outputFormat="dataurl"] - The output format of the drawing. Options: "dataurl", "svg".
- * @property {boolean} [useFormatType=false] - Whether to enable format type selection (block vs inline).
- * @property {string} [defaultFormatType="block"] - The default format type, either "block" or "inline".
+ * @property {string} [outputFormat="dataurl"] - The output format of the drawing. Options: `"dataurl"`, `"svg"`.
+ * @property {boolean} [useFormatType=false] - Whether to enable format type selection (`block` vs `inline`).
+ * @property {string} [defaultFormatType="block"] - The default format type, either `"block"` or `"inline"`.
  * @property {boolean} [keepFormatType=false] - Whether to maintain the chosen format type after drawing.
  * @property {number} [lineWidth=5] - The width of the drawing line.
  * @property {boolean} [lineReconnect=false] - Whether to reconnect lines when drawing.
- * @property {CanvasLineCap} [lineCap="round"] - The style of the line cap ("butt", "round", or "square").
+ * @property {CanvasLineCap} [lineCap="round"] - The style of the line cap (`"butt"`, `"round"`, or `"square"`).
  * @property {string} [lineColor=""] - The color of the drawing line.
  * @property {boolean} [canResize=true] - Whether the modal form can be resized.
  * @property {boolean} [maintainRatio=true] - Whether to maintain the aspect ratio when resizing.

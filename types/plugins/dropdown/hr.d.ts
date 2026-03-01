@@ -37,7 +37,7 @@ declare class HR extends PluginDropdown {
 	componentDestroy(target: HTMLElement): Promise<void>;
 	shortcut(params: SunEditor.HookParams.Shortcut): void;
 	/**
-	 * @description Add a hr element
+	 * @description Add a `hr` element
 	 * @param {string} className HR class name
 	 */
 	submit(className: string): HTMLElement;

@@ -7,18 +7,18 @@ const { NO_EVENT, ON_OVER_COMPONENT } = env;
 
 /**
  * @typedef {Object} AudioPluginOptions
- * @property {string} [defaultWidth="300px"] - The default width of the audio tag (e.g., "300px").
- * @property {string} [defaultHeight="150px"] - The default height of the audio tag (e.g., "150px").
+ * @property {string} [defaultWidth="300px"] - The default width of the `AUDIO` tag (e.g., `"300px"`).
+ * @property {string} [defaultHeight="150px"] - The default height of the `AUDIO` tag (e.g., `"150px"`).
  * @property {boolean} [createFileInput] - Whether to create a file input element.
- * @property {boolean} [createUrlInput] - Whether to create a URL input element (default is true if file input is not created).
+ * @property {boolean} [createUrlInput] - Whether to create a URL input element (default is `true` if file input is not created).
  * @property {string} [uploadUrl] - The URL to which files will be uploaded.
  * @property {Object<string, string>} [uploadHeaders] - Headers to include in the file upload request.
  * @property {number} [uploadSizeLimit] - The total upload size limit in bytes.
  * @property {number} [uploadSingleSizeLimit] - The single file size limit in bytes.
  * @property {boolean} [allowMultiple] - Whether to allow multiple file uploads.
- * @property {string} [acceptedFormats="audio/*"] - Accepted file formats (default is "audio/*").
- * @property {Object<string, string>} [audioTagAttributes] - Additional attributes to set on the audio tag.
- * @property {SunEditor.ComponentInsertType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+ * @property {string} [acceptedFormats="audio/*"] - Accepted file formats (default is `"audio/*"`).
+ * @property {Object<string, string>} [audioTagAttributes] - Additional attributes to set on the `AUDIO` tag.
+ * @property {SunEditor.ComponentInsertType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: `options.get('componentInsertBehavior')`]
  * - `auto`: Move cursor to the next line if possible, otherwise select the component.
  * - `select`: Always select the inserted component.
  * - `line`: Move cursor to the next line if possible, or create a new line and move there.
@@ -260,9 +260,9 @@ class Audio_ extends PluginModal {
 	}
 
 	/**
-	 * @description Create an "audio" component using the provided files.
+	 * @description Create an `audio` component using the provided files.
 	 * @param {FileList|File[]} fileList File object list
-	 * @returns {Promise<boolean>} If return false, the file upload will be canceled
+	 * @returns {Promise<boolean>} If return `false`, the file upload will be canceled
 	 */
 	async submitFile(fileList) {
 		if (fileList.length === 0) return false;
@@ -329,7 +329,7 @@ class Audio_ extends PluginModal {
 	}
 
 	/**
-	 * @description Create an "audio" component using the provided url.
+	 * @description Create an `audio` component using the provided url.
 	 * @param {string} url File url
 	 * @returns {Promise<boolean>}
 	 */
@@ -364,10 +364,10 @@ class Audio_ extends PluginModal {
 	}
 
 	/**
-	 * @description Creates or updates an audio component within the editor.
+	 * @description Creates or updates an `audio` component within the editor.
 	 * - If `isUpdate` is `true`, updates the existing element's `src`.
-	 * - Otherwise, inserts a new audio component with the given file.
-	 * @param {HTMLAudioElement} element - The target audio element.
+	 * - Otherwise, inserts a new `audio` component with the given file.
+	 * @param {HTMLAudioElement} element - The target `AUDIO` element.
 	 * @param {string} src - The source URL of the audio file.
 	 * @param {{name: string, size: number}} file - The file metadata (name, size).
 	 * @param {boolean} isUpdate - Whether to update an existing element.
@@ -433,9 +433,9 @@ class Audio_ extends PluginModal {
 	}
 
 	/**
-	 * @description Creates a new `<audio>` element with default attributes.
+	 * @description Creates a new `AUDIO` element with default attributes.
 	 * - Applies width, height, and additional attributes from plugin options.
-	 * @returns {HTMLAudioElement} - The newly created `<audio>` element.
+	 * @returns {HTMLAudioElement} - The newly created `AUDIO` element.
 	 */
 	#createAudioTag() {
 		const w = this.#defaultWidth;
@@ -447,9 +447,9 @@ class Audio_ extends PluginModal {
 	}
 
 	/**
-	 * @description Sets attributes on an audio element based on plugin options.
+	 * @description Sets attributes on an `AUDIO` element based on plugin options.
 	 * - Adds the `controls` attribute and applies any custom attributes.
-	 * @param {HTMLElement} element - The `<audio>` element to modify.
+	 * @param {HTMLElement} element - The `AUDIO` element to modify.
 	 */
 	#setTagAttrs(element) {
 		element.setAttribute('controls', 'true');

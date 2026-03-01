@@ -24,6 +24,9 @@ import type {} from '../../typedef';
  * @property {number} size - Get context size
  * @property {() => void} clear - Clear all elements in the context.
  */
+/**
+ * @description Provides Map-based access to editor DOM contexts (global and per-frame).
+ */
 export default class ContextProvider {
 	/**
 	 * @constructor

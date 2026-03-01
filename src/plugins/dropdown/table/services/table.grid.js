@@ -4,6 +4,9 @@ import { SelectMenu } from '../../../../modules/ui';
 import { CreateCellsHTML, CreateCellsString, InvalidateTableCache } from '../shared/table.utils';
 import { CreateColumnMenu, CreateRowMenu } from '../render/table.menu';
 
+/**
+ * @description Manages table grid operations including row and column insertion, deletion, and header toggling.
+ */
 export class TableGridService {
 	#main;
 	#$;
@@ -57,8 +60,8 @@ export class TableGridService {
 
 	/**
 	 * @description Edits the table by adding, removing, or modifying rows and cells, based on the provided options. Supports both single and multi-cell/row editing.
-	 * @param {"row"|"cell"} type The type of element to edit ('row' or 'cell').
-	 * @param {?"up"|"down"|"left"|"right"} option The action to perform: 'up', 'down', 'left', 'right', or `null` for removing.
+	 * @param {"row"|"cell"} type The type of element to edit (`row` or `cell`).
+	 * @param {?"up"|"down"|"left"|"right"} option The action to perform: `up`, `down`, `left`, `right`, or `null` for removing.
 	 */
 	editTable(type, option) {
 		const table = this.#main._element;
@@ -167,10 +170,10 @@ export class TableGridService {
 
 	/**
 	 * @description Edits a table cell(column), either adding, removing, or modifying the cell based on the provided option.
-	 * @param {?string} option The action to perform on the cell ("left"|"right"|null)
-	 * - null: to remove the cell
-	 * - left: to insert a new cell to the left
-	 * - right: to insert a new cell to the right
+	 * @param {?string} option The action to perform on the cell (`left`|`right`|`null`)
+	 * - `null`: to remove the cell
+	 * - `left`: to insert a new cell to the left
+	 * - `right`: to insert a new cell to the right
 	 * @param {?HTMLTableCellElement} [targetCell] Target cell, (default: current selected cell)
 	 * @param {?HTMLTableCellElement} [positionResetElement] The element to reset the position of (optional). This can be the cell that triggered the column edit.
 	 * @returns {HTMLTableCellElement} Target table cell
@@ -347,10 +350,10 @@ export class TableGridService {
 
 	/**
 	 * @description Edits a table row, either adding, removing, the row
-	 * @param {?string} option The action to perform on the row ("up"|"down"|null)
-	 * - null: to remove the row
-	 * - 'up': to insert the row up
-	 * - 'down': to insert the row down, or null to remove.
+	 * @param {?string} option The action to perform on the row (`up`|`down`|`null`)
+	 * - `null`: to remove the row
+	 * - `up`: to insert the row up
+	 * - `down`: to insert the row down, or `null` to remove.
 	 * @param {?HTMLTableCellElement} [targetCell] Target cell, (default: current selected cell)
 	 * @param {?HTMLTableCellElement} [positionResetElement] The element to reset the position of (optional). This can be the cell that triggered the row edit.
 	 */

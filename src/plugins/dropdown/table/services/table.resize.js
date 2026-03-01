@@ -6,6 +6,9 @@ import { CheckCellEdge, CheckRowEdge } from '../shared/table.utils';
 
 const { _w } = env;
 
+/**
+ * @description Manages table and cell resizing with drag-based dimension adjustments and visual guide lines.
+ */
 export class TableResizeService {
 	#main;
 	#$;
@@ -49,7 +52,7 @@ export class TableResizeService {
 	 * @description Display a guide line during resize operations logic.
 	 * @param {MouseEvent} event - Mouse event
 	 * @param {HTMLElement} target - Target element (table cell or row)
-	 * @returns {boolean|undefined} Returns false if resizing started, otherwise undefined.
+	 * @returns {boolean|undefined} Returns `false` if resizing started, otherwise `undefined`.
 	 */
 	onResizeGuide(event, target) {
 		const cellEdge = CheckCellEdge(event, target);
@@ -87,7 +90,7 @@ export class TableResizeService {
 	 * @description Prepares for resizing from the edge of a cell or row.
 	 * @param {MouseEvent} event - Mouse event
 	 * @param {HTMLTableCellElement} target - Target element
-	 * @returns {boolean|undefined} Returns false if resizing started.
+	 * @returns {boolean|undefined} Returns `false` if resizing started.
 	 */
 	readyResizeFromEdge(event, target) {
 		const cellEdge = CheckCellEdge(event, target);
@@ -165,7 +168,7 @@ export class TableResizeService {
 	}
 
 	/**
-	 * @description Converts the width of <col> elements to percentages.
+	 * @description Converts the width of `<col>` elements to percentages.
 	 * @param {HTMLTableElement} target - The target table element.
 	 */
 	#resizePercentCol(target) {

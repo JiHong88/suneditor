@@ -1,4 +1,7 @@
 import type {} from '../../../../typedef';
+/**
+ * @description Manages table and cell resizing with drag-based dimension adjustments and visual guide lines.
+ */
 export class TableResizeService {
 	/**
 	 * @param {import('../index').default} main Table index
@@ -13,7 +16,7 @@ export class TableResizeService {
 	 * @description Display a guide line during resize operations logic.
 	 * @param {MouseEvent} event - Mouse event
 	 * @param {HTMLElement} target - Target element (table cell or row)
-	 * @returns {boolean|undefined} Returns false if resizing started, otherwise undefined.
+	 * @returns {boolean|undefined} Returns `false` if resizing started, otherwise `undefined`.
 	 */
 	onResizeGuide(event: MouseEvent, target: HTMLElement): boolean | undefined;
 	/**
@@ -24,7 +27,7 @@ export class TableResizeService {
 	 * @description Prepares for resizing from the edge of a cell or row.
 	 * @param {MouseEvent} event - Mouse event
 	 * @param {HTMLTableCellElement} target - Target element
-	 * @returns {boolean|undefined} Returns false if resizing started.
+	 * @returns {boolean|undefined} Returns `false` if resizing started.
 	 */
 	readyResizeFromEdge(event: MouseEvent, target: HTMLTableCellElement): boolean | undefined;
 	/**

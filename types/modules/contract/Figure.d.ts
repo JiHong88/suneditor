@@ -5,23 +5,23 @@ export default Figure;
  */
 export type FigureInfo = {
 	/**
-	 * - Target element (img, iframe, video, audio, table, etc.)
+	 * - Target element (`img`, `iframe`, `video`, `audio`, `table`, etc.)
 	 */
 	target: HTMLElement;
 	/**
-	 * - Container element (div.se-component|span.se-component.se-inline-component)
+	 * - Container element (`div.se-component`|`span.se-component.se-inline-component`)
 	 */
 	container: HTMLElement;
 	/**
-	 * - Cover element (FIGURE|null)
+	 * - Cover element (`FIGURE`|`null`)
 	 */
 	cover: HTMLElement | null;
 	/**
-	 * - Inline cover element (span.se-inline-component)
+	 * - Inline cover element (`span.se-inline-component`)
 	 */
 	inlineCover: HTMLElement | null;
 	/**
-	 * - Caption element (FIGCAPTION)
+	 * - Caption element (`FIGCAPTION`)
 	 */
 	caption: HTMLElement | null;
 	/**
@@ -34,15 +34,15 @@ export type FigureInfo = {
  */
 export type FigureTargetInfo = {
 	/**
-	 * - Container element (div.se-component|span.se-component.se-inline-component)
+	 * - Container element (`div.se-component`|`span.se-component.se-inline-component`)
 	 */
 	container: HTMLElement;
 	/**
-	 * - Cover element (FIGURE|null)
+	 * - Cover element (`FIGURE`|`null`)
 	 */
 	cover?: HTMLElement | null;
 	/**
-	 * - Caption element (FIGCAPTION)
+	 * - Caption element (`FIGCAPTION`)
 	 */
 	caption?: HTMLElement | null;
 	/**
@@ -77,11 +77,11 @@ export type FigureTargetInfo = {
 	 */
 	l?: number;
 	/**
-	 * - Width, can be a number or 'auto'.
+	 * - Width, can be a number or `auto`.
 	 */
 	width: string | number;
 	/**
-	 * - Height, can be a number or 'auto'.
+	 * - Height, can be a number or `auto`.
 	 */
 	height: string | number;
 	/**
@@ -120,16 +120,16 @@ export type ControlCustomAction = {
  * - `"mirror_v"`: Mirror vertically
  * - `"rotate_l"`: Rotate left (-90°)
  * - `"rotate_r"`: Rotate right (90°)
- * - `"caption"`: Toggle caption (FIGCAPTION)
+ * - `"caption"`: Toggle caption (`FIGCAPTION`)
  * - `"revert"`: Revert to original size
  * - `"edit"`: Open edit modal
  * - `"copy"`: Copy component
  * - `"remove"`: Remove component
- * - `"as"`: Format type (block/inline) - requires `useFormatType` option
- * - `"align"`: Alignment (none/left/center/right)
+ * - `"as"`: Format type (`block`/`inline`) - requires `useFormatType` option
+ * - `"align"`: Alignment (`none`/`left`/`center`/`right`)
  * - `"onalign"`: Alignment button (opens alignment menu)
  * - `"onresize"`: Resize button (opens resize menu)
- * - `"resize_auto,50,75,100"`: Auto-resize with percentage values (e.g., "resize_auto,100,75,50")
+ * - `"resize_auto,50,75,100"`: Auto-resize with percentage values (e.g., `"resize_auto,100,75,50"`)
  * - Custom action object with action, command, value, title, icon
  */
 export type FigureControls = Array<Array<FigureControlButton | FigureControlResize | ControlCustomAction | string>>;
@@ -139,7 +139,7 @@ export type FigureParams = {
 	 */
 	sizeUnit?: string;
 	/**
-	 * Auto ratio { current: '00%', default: '00%' }
+	 * Auto ratio `{ current: '00%', default: '00%' }`
 	 */
 	autoRatio?: {
 		current: string;
@@ -149,19 +149,19 @@ export type FigureParams = {
 /**
  * Figure information object
  * @typedef {Object} FigureInfo
- * @property {HTMLElement} target - Target element (img, iframe, video, audio, table, etc.)
- * @property {HTMLElement} container - Container element (div.se-component|span.se-component.se-inline-component)
- * @property {?HTMLElement} cover - Cover element (FIGURE|null)
- * @property {?HTMLElement} inlineCover - Inline cover element (span.se-inline-component)
- * @property {?HTMLElement} caption - Caption element (FIGCAPTION)
+ * @property {HTMLElement} target - Target element (`img`, `iframe`, `video`, `audio`, `table`, etc.)
+ * @property {HTMLElement} container - Container element (`div.se-component`|`span.se-component.se-inline-component`)
+ * @property {?HTMLElement} cover - Cover element (`FIGURE`|`null`)
+ * @property {?HTMLElement} inlineCover - Inline cover element (`span.se-inline-component`)
+ * @property {?HTMLElement} caption - Caption element (`FIGCAPTION`)
  * @property {boolean} isVertical - Whether to rotate vertically
  */
 /**
  * Figure target information object (for resize/align operations)
  * @typedef {Object} FigureTargetInfo
- * @property {HTMLElement} container - Container element (div.se-component|span.se-component.se-inline-component)
- * @property {?HTMLElement} [cover] - Cover element (FIGURE|null)
- * @property {?HTMLElement} [caption] - Caption element (FIGCAPTION)
+ * @property {HTMLElement} container - Container element (`div.se-component`|`span.se-component.se-inline-component`)
+ * @property {?HTMLElement} [cover] - Cover element (`FIGURE`|`null`)
+ * @property {?HTMLElement} [caption] - Caption element (`FIGCAPTION`)
  * @property {string} [align] - Alignment of the element.
  * @property {{w:number, h:number}} [ratio] - The aspect ratio of the element.
  * @property {boolean} isVertical - Whether to rotate vertically
@@ -169,8 +169,8 @@ export type FigureParams = {
  * @property {string|number} [h] - Height of the element.
  * @property {number} [t] - Top position.
  * @property {number} [l] - Left position.
- * @property {string|number} width - Width, can be a number or 'auto'.
- * @property {string|number} height - Height, can be a number or 'auto'.
+ * @property {string|number} width - Width, can be a number or `auto`.
+ * @property {string|number} height - Height, can be a number or `auto`.
  * @property {number} [originWidth] - Original width from `naturalWidth` or `offsetWidth`.
  * @property {number} [originHeight] - Original height from `naturalHeight` or `offsetHeight`.
  */
@@ -201,16 +201,16 @@ export type FigureParams = {
  * - `"mirror_v"`: Mirror vertically
  * - `"rotate_l"`: Rotate left (-90°)
  * - `"rotate_r"`: Rotate right (90°)
- * - `"caption"`: Toggle caption (FIGCAPTION)
+ * - `"caption"`: Toggle caption (`FIGCAPTION`)
  * - `"revert"`: Revert to original size
  * - `"edit"`: Open edit modal
  * - `"copy"`: Copy component
  * - `"remove"`: Remove component
- * - `"as"`: Format type (block/inline) - requires `useFormatType` option
- * - `"align"`: Alignment (none/left/center/right)
+ * - `"as"`: Format type (`block`/`inline`) - requires `useFormatType` option
+ * - `"align"`: Alignment (`none`/`left`/`center`/`right`)
  * - `"onalign"`: Alignment button (opens alignment menu)
  * - `"onresize"`: Resize button (opens resize menu)
- * - `"resize_auto,50,75,100"`: Auto-resize with percentage values (e.g., "resize_auto,100,75,50")
+ * - `"resize_auto,50,75,100"`: Auto-resize with percentage values (e.g., `"resize_auto,100,75,50"`)
  * - Custom action object with action, command, value, title, icon
  *
  * @example
@@ -229,7 +229,7 @@ export type FigureParams = {
 /**
  * @typedef {Object} FigureParams
  * @property {string} [sizeUnit="px"] Size unit
- * @property {{ current: string, default: string }} [autoRatio=null] Auto ratio { current: '00%', default: '00%' }
+ * @property {{ current: string, default: string }} [autoRatio=null] Auto ratio `{ current: '00%', default: '00%' }`
  */
 /**
  * @class
@@ -240,25 +240,25 @@ declare class Figure {
 	/**
 	 * @description Create a container for the resizing component and insert the element.
 	 * @param {Node} element Target element
-	 * @param {string} [className] Class name of container (fixed: se-component)
+	 * @param {string} [className] Class name of container (fixed: `se-component`)
 	 * @returns {FigureInfo} {target, container, cover, inlineCover, caption}
 	 */
 	static CreateContainer(element: Node, className?: string): FigureInfo;
 	/**
 	 * @description Create a container for the inline resizing component and insert the element.
 	 * @param {Node} element Target element
-	 * @param {string} [className] Class name of container (fixed: se-component se-inline-component)
+	 * @param {string} [className] Class name of container (fixed: `se-component` `se-inline-component`)
 	 * @returns {FigureInfo} {target, container, cover, inlineCover, caption}
 	 */
 	static CreateInlineContainer(element: Node, className?: string): FigureInfo;
 	/**
-	 * @description Return HTML string of caption(FIGCAPTION) element
-	 * @param {Node} cover Cover element(FIGURE). "CreateContainer().cover"
+	 * @description Return HTML string of caption(`FIGCAPTION`) element
+	 * @param {Node} cover Cover element(`FIGURE`). `CreateContainer().cover`
 	 * @returns {HTMLElement} caption element
 	 */
 	static CreateCaption(cover: Node, text: any): HTMLElement;
 	/**
-	 * @description Get the element's container(.se-component) info.
+	 * @description Get the element's container(`.se-component`) info.
 	 * @param {Node} element Target element
 	 * @returns {FigureInfo} {target, container, cover, inlineCover, caption}
 	 */
@@ -267,7 +267,7 @@ declare class Figure {
 	 * @description Ratio calculation
 	 * @param {string|number} w Width size
 	 * @param {string|number} h Height size
-	 * @param {?string} [defaultSizeUnit="px"] Default size unit (default: "px")
+	 * @param {?string} [defaultSizeUnit="px"] Default size unit (default: `"px"`)
 	 * @return {{w: number, h: number}}
 	 */
 	static GetRatio(
@@ -282,7 +282,7 @@ declare class Figure {
 	 * @description Ratio calculation
 	 * @param {string|number} w Width size
 	 * @param {string|number} h Height size
-	 * @param {string} defaultSizeUnit Default size unit (default: "px")
+	 * @param {string} defaultSizeUnit Default size unit (default: `"px"`)
 	 * @param {?{w: number, h: number}} [ratio] Ratio size (Figure.GetRatio)
 	 * @return {{w: string|number, h: string|number}}
 	 */
@@ -299,7 +299,7 @@ declare class Figure {
 		h: string | number;
 	};
 	/**
-	 * @description It is judged whether it is the component[img, iframe, video, audio, table] cover(class="se-component") and table, hr
+	 * @description It is judged whether it is the component[`img`, `iframe`, `video`, `audio`, `table`] cover(class=`"se-component"`) and `table`, `hr`
 	 * @param {Node} element Target element
 	 * @returns {boolean}
 	 */
@@ -369,8 +369,8 @@ declare class Figure {
 	 * @param {boolean} [params.nonResizing=false] Do not display the resizing button
 	 * @param {boolean} [params.nonSizeInfo=false] Do not display the size information
 	 * @param {boolean} [params.nonBorder=false] Do not display the selected style line
-	 * @param {boolean} [params.figureTarget=false] If true, the target is a figure element
-	 * @param {boolean} [params.infoOnly=false] If true, returns only the figure target info without opening the controller
+	 * @param {boolean} [params.figureTarget=false] If `true`, the target is a figure element
+	 * @param {boolean} [params.infoOnly=false] If `true`, returns only the figure target info without opening the controller
 	 * @returns {FigureTargetInfo|undefined} figure target info
 	 */
 	open(
@@ -401,9 +401,9 @@ declare class Figure {
 	 * @description Open the figure's controller
 	 * @param {Node} target Target element
 	 * @param {Object} [params={}] params
-	 * @param {boolean} [params.isWWTarget] If the controller is in the WYSIWYG area, set it to true.
+	 * @param {boolean} [params.isWWTarget] If the controller is in the WYSIWYG area, set it to `true`.
 	 * @param {() => void} [params.initMethod] Method to be called when the controller is closed.
-	 * @param {boolean} [params.disabled] If true, the controller is disabled.
+	 * @param {boolean} [params.disabled] If `true`, the controller is disabled.
 	 * @param {{left: number, top: number}} [params.addOffset] Additional offset values
 	 */
 	controllerOpen(
@@ -444,7 +444,7 @@ declare class Figure {
 	/**
 	 * @description Align the container.
 	 * @param {?Node} targetNode Target element
-	 * @param {string} align "none"|"left"|"center"|"right"
+	 * @param {string} align `"none"`|`"left"`|`"center"`|`"right"`
 	 */
 	setAlign(targetNode: Node | null, align: string): void;
 	/**

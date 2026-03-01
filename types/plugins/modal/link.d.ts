@@ -76,15 +76,15 @@ declare class Link extends PluginModal {
 		 */
 		openNewWindow?: boolean;
 		/**
-		 * - If true, disables the automatic prefixing of the host URL to the value of the link.
+		 * - If `true`, disables the automatic prefixing of the host URL to the value of the link.
 		 */
 		noAutoPrefix?: boolean;
 		/**
-		 * - The "rel" attribute list of anchor tag.
+		 * - The `rel` attribute list of anchor tag.
 		 */
 		relList?: Array<string>;
 		/**
-		 * - Default "rel" attributes of anchor tag.
+		 * - Default `rel` attributes of anchor tag.
 		 */
 		defaultRel?: {
 			default?: string;

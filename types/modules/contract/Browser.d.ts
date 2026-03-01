@@ -79,7 +79,7 @@ export type BrowserParams = {
 	 */
 	selectorHandler: (target: Node) => void;
 	/**
-	 * - Whether to use the search function. Optional. Default: true.
+	 * - Whether to use the search function. Optional. Default: `true`.
 	 */
 	useSearch?: boolean;
 	/**
@@ -101,11 +101,11 @@ export type BrowserParams = {
 	 */
 	drawItemHandler?: (item: BrowserFile) => string;
 	/**
-	 * - "props" argument to "drawItemHandler" function. Optional. Can be overridden in browser.
+	 * - `props` argument to `drawItemHandler` function. Optional. Can be overridden in browser.
 	 */
 	props?: Array<any>;
 	/**
-	 * - Number of "div.se-file-item-column" to be created. Optional. Can be overridden in browser. Default: 4.
+	 * - Number of `div.se-file-item-column` to be created. Optional. Can be overridden in browser. Default: 4.
 	 */
 	columnSize?: number;
 	/**
@@ -135,13 +135,13 @@ export type BrowserParams = {
  * @property {string} [url] - File server url. Required. Can be overridden in browser.
  * @property {Object<string, string>} [headers] - File server http header. Required. Can be overridden in browser.
  * @property {(target: Node) => void} selectorHandler - Function that actions when an item is clicked. Required. Can be overridden in browser.
- * @property {boolean} [useSearch] - Whether to use the search function. Optional. Default: true.
+ * @property {boolean} [useSearch] - Whether to use the search function. Optional. Default: `true`.
  * @property {string} [searchUrl] - File server search url. Optional. Can be overridden in browser.
  * @property {Object<string, string>} [searchUrlHeader] - File server search http header. Optional. Can be overridden in browser.
  * @property {string} [listClass] - Class name of list div. Required. Can be overridden in browser.
  * @property {(item: BrowserFile) => string} [drawItemHandler] - Function that defines the HTML of a file item. Required. Can be overridden in browser.
- * @property {Array<*>} [props] - "props" argument to "drawItemHandler" function. Optional. Can be overridden in browser.
- * @property {number} [columnSize] - Number of "div.se-file-item-column" to be created. Optional. Can be overridden in browser. Default: 4.
+ * @property {Array<*>} [props] - `props` argument to `drawItemHandler` function. Optional. Can be overridden in browser.
+ * @property {number} [columnSize] - Number of `div.se-file-item-column` to be created. Optional. Can be overridden in browser. Default: 4.
  * @property {((item: BrowserFile) => string)} [thumbnail] - Default thumbnail
  */
 /**
@@ -220,10 +220,10 @@ declare class Browser {
 	/**
 	 * @description Open a file browser plugin
 	 * @param {Object} [params={}]
-	 * @param {string} [params.listClass] - Class name of list div. If not, use "this.listClass".
-	 * @param {string} [params.title] - File browser window title. If not, use "this.title".
-	 * @param {string} [params.url] - File server url. If not, use "this.url".
-	 * @param {Object<string, string>} [params.urlHeader] - File server http header. If not, use "this.urlHeader".
+	 * @param {string} [params.listClass] - Class name of list div. If not, use `this.listClass`.
+	 * @param {string} [params.title] - File browser window title. If not, use `this.title`.
+	 * @param {string} [params.url] - File server url. If not, use `this.url`.
+	 * @param {Object<string, string>} [params.urlHeader] - File server http header. If not, use `this.urlHeader`.
 	 */
 	open(params?: {
 		listClass?: string;
@@ -235,7 +235,7 @@ declare class Browser {
 	}): void;
 	/**
 	 * @description Close a browser plugin
-	 * - The plugin's "init" method is called.
+	 * - The plugin's `init` method is called.
 	 */
 	close(): void;
 	/**

@@ -137,7 +137,7 @@ export class VideoSizeService {
 
 	/**
 	 * @description Called when the modal is opened. Initializes inputs and ratio options.
-	 * @param {boolean} isUpdate - Indicates whether the modal is for editing an existing component (true) or registering a new one (false).
+	 * @param {boolean} isUpdate - Indicates whether the modal is for editing an existing component (`true`) or registering a new one (`false`).
 	 */
 	on(isUpdate) {
 		if (!this.#resizing) return;
@@ -204,7 +204,7 @@ export class VideoSizeService {
 	/**
 	 * @description Selects a ratio option in the ratio dropdown.
 	 * @param {string|number} value - The selected ratio value.
-	 * @returns {boolean} Returns true if a ratio was selected.
+	 * @returns {boolean} Returns `true` if a ratio was selected.
 	 */
 	#setRatioSelect(value) {
 		if (!this.frameRatioOption) return;
@@ -250,7 +250,7 @@ export class VideoSizeService {
 
 	/**
 	 * @description Handles keyup events on size inputs to calculate proportion or update ratio selection.
-	 * @param {'x'|'y'} xy - Axis ('x' for width, 'y' for height)
+	 * @param {'x'|'y'} xy - Axis (`'x'` for width, `'y'` for height)
 	 * @param {KeyboardEvent} e - Event object
 	 */
 	#OnInputSize(xy, e) {

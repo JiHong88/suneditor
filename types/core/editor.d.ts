@@ -29,11 +29,23 @@ declare class Editor {
 	isEmpty(fc?: SunEditor.FrameContext | null): boolean;
 	/**
 	 * @description Add or reset option property (Editor is reloaded)
+	 * @example
+	 * // Change toolbar buttons and height
+	 * editor.resetOptions({
+	 *   buttonList: [['bold', 'italic'], ['image']],
+	 *   height: '500px',
+	 * });
 	 * @param {SunEditor.InitOptions} newOptions Options
 	 */
 	resetOptions(newOptions: SunEditor.InitOptions): void;
 	/**
 	 * @description Change the current root index.
+	 * @example
+	 * // Switch to the 'body' frame in a multi-root editor
+	 * editor.changeFrameContext('body');
+	 *
+	 * // Switch back to the 'header' frame
+	 * editor.changeFrameContext('header');
 	 * @param {*} rootKey Root frame key.
 	 */
 	changeFrameContext(rootKey: any): void;

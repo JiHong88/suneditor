@@ -4,6 +4,10 @@ import { SelectMenu } from '../../../../modules/ui';
 import { CloneTable, CreateCellsHTML, InvalidateTableCache } from '../shared/table.utils';
 import { CreateSplitMenu } from '../render/table.menu';
 
+/**
+ * @description Handles table cell operations including merging, splitting,
+ * - and multi-cell selection management.
+ */
 export class TableCellService {
 	#main;
 	#$;
@@ -50,7 +54,7 @@ export class TableCellService {
 	 * @description Merges the selected table cells into one cell by combining their contents and adjusting their row and column spans.
 	 * - This method removes the selected cells, consolidates their contents, and applies the appropriate row and column spans to the merged cell.
 	 * @param {HTMLTableCellElement[]} selectedCells Cells array
-	 * @param {boolean} [skipPostProcess=false] - If true, skips table cloning, cell re-selection, history stack push, and rendering.
+	 * @param {boolean} [skipPostProcess=false] - If `true`, skips table cloning, cell re-selection, history stack push, and rendering.
 	 */
 	mergeCells(selectedCells, skipPostProcess = false) {
 		const originTable = selectedCells[0].closest('table');
@@ -149,7 +153,7 @@ export class TableCellService {
 	/**
 	 * @description Unmerges a table cell that has been merged using rowspan and/or colspan.
 	 * @param {HTMLTableCellElement[]} selectedCells - Cells array
-	 * @param {boolean} [skipPostProcess=false] - If true, skips table cloning, cell re-selection, history stack push, and rendering.
+	 * @param {boolean} [skipPostProcess=false] - If `true`, skips table cloning, cell re-selection, history stack push, and rendering.
 	 */
 	unmergeCells(selectedCells, skipPostProcess = false) {
 		if (!selectedCells?.length) return;

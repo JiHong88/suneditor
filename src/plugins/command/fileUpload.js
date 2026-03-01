@@ -13,9 +13,9 @@ const { NO_EVENT } = env;
  * @property {number} [uploadSingleSizeLimit] - Single file size limit in bytes
  * @property {boolean} [allowMultiple=false] - Allow multiple file uploads
  * @property {string} [acceptedFormats="*"] - Accepted file formats (e.g., 'image/*, .pdf')
- * @property {string} [as="box"] - Specify the default form of the file component as 'box' or 'link'
+ * @property {string} [as="box"] - Specify the default form of the file component as `box` or `link`
  * @property {Array<string>} [controls] - Additional controls to be added to the figure
- * @property {SunEditor.ComponentInsertType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+ * @property {SunEditor.ComponentInsertType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: `options.get('componentInsertBehavior')`]
  * - `auto`: Move cursor to the next line if possible, otherwise select the component.
  * - `select`: Always select the inserted component.
  * - `line`: Move cursor to the next line if possible, or create a new line and move there.
@@ -215,7 +215,7 @@ class FileUpload extends PluginCommand {
 	}
 
 	/**
-	 * @description Create an "file" component using the provided files.
+	 * @description Create a `file` component using the provided files.
 	 * @param {File[]|FileList} fileList File object list
 	 * @returns {Promise<boolean>} If return false, the file upload will be canceled
 	 */
@@ -287,9 +287,9 @@ class FileUpload extends PluginCommand {
 	}
 
 	/**
-	 * @description Convert format to link or block
+	 * @description Convert format to `link` or `block`
 	 * @param {HTMLElement} target Target element
-	 * @param {string} value 'link' or 'block'
+	 * @param {string} value `link` or `block`
 	 */
 	convertFormat(target, value) {
 		if (value === 'link') {

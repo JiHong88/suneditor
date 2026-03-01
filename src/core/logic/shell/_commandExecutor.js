@@ -14,7 +14,8 @@ const StyleMap = {
 };
 
 /**
- * @description Command executor
+ * @description Executes built-in editor commands (formatting, undo/redo, save, codeView, etc.)
+ * - and manages copy-format state.
  */
 export default class CommandExecutor {
 	#kernel;
@@ -30,7 +31,7 @@ export default class CommandExecutor {
 
 	/**
 	 * @description Copy format info
-	 * - eventManager.__cacheStyleNodes copied
+	 * - `eventManager.__cacheStyleNodes` copied
 	 * @type {?Array<Node>}
 	 */
 	#onCopyFormatInfo = null;

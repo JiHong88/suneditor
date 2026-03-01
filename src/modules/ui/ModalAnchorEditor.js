@@ -8,15 +8,15 @@ const { _w, NO_EVENT } = env;
  * @property {boolean} [title=false] - Modal title display.
  * @property {boolean} [textToDisplay=''] - Create Text to display input.
  * @property {boolean} [openNewWindow=false] - Default checked value of the "Open in new window" checkbox.
- * @property {boolean} [noAutoPrefix=false] - If true, disables the automatic prefixing of the host URL to the value of the link.
- * @property {Array<string>} [relList=[]] - The "rel" attribute list of anchor tag.
- * @property {{default?: string, check_new_window?: string, check_bookmark?: string}} [defaultRel={}] - Default "rel" attributes of anchor tag.
+ * @property {boolean} [noAutoPrefix=false] - If `true`, disables the automatic prefixing of the host URL to the value of the link.
+ * @property {Array<string>} [relList=[]] - The `rel` attribute list of anchor tag.
+ * @property {{default?: string, check_new_window?: string, check_bookmark?: string}} [defaultRel={}] - Default `rel` attributes of anchor tag.
  * @property {string} [uploadUrl] - File upload URL.
  * @property {Object<string, string>} [uploadHeaders] - File upload headers.
  * @property {number} [uploadSizeLimit] - File upload size limit.
  * @property {number} [uploadSingleSizeLimit] - File upload single size limit.
  * @property {string} [acceptedFormats] - File upload accepted formats.
- * @property {boolean} [enableFileUpload] - If true, enables file upload.
+ * @property {boolean} [enableFileUpload] - If `true`, enables file upload.
  */
 
 /**

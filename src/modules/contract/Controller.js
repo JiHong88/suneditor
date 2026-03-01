@@ -11,28 +11,28 @@ const INDEX_1 = '2147483641';
  * Controller information object
  * @typedef {Object} ControllerInfo
  * @property {*} inst - The controller instance
- * @property {string} [position="bottom"] - The controller position ("bottom"|"top")
+ * @property {string} [position="bottom"] - The controller position (`"bottom"`|`"top"`)
  * @property {HTMLElement} [form=null] - The controller element
  * @property {HTMLElement|Range} [target=null] - The controller target element
- * @property {boolean} [notInCarrier=false] - If the controller is not in the "carrierWrapper", set it to true.
- * @property {boolean} [isRangeTarget=false] - If the target is a Range, set it to true.
- * @property {boolean} [fixed=false] - If the controller is fixed and should not be closed, set it to true.
+ * @property {boolean} [notInCarrier=false] - If the controller is not in the `carrierWrapper`, set it to `true`.
+ * @property {boolean} [isRangeTarget=false] - If the target is a `Range`, set it to `true`.
+ * @property {boolean} [fixed=false] - If the controller is fixed and should not be closed, set it to `true`.
  */
 
 /**
  * @typedef {Object} ControllerParams
  * @property {"top"|"bottom"} [position="bottom"] Controller position
- * @property {boolean} [isWWTarget=true] If the controller is in the WYSIWYG area, set it to true.
+ * @property {boolean} [isWWTarget=true] If the controller is in the WYSIWYG area, set it to `true`.
  * @property {() => void} [initMethod=null] Method to be called when the controller is closed.
- * @property {boolean} [disabled=false] If true, When the "controller" is opened, buttons without the "se-component-enabled" class are disabled.
- * @property {Array<Controller|HTMLElement>} [parents=[]] The parent "controller" instance array when "controller" is opened nested.
- * @property {boolean} [parentsHide=false] If true, the parent element is hidden when the controller is opened.
+ * @property {boolean} [disabled=false] If `true`, When the `controller` is opened, buttons without the `se-component-enabled` class are disabled.
+ * @property {Array<Controller|HTMLElement>} [parents=[]] The parent `controller` instance array when `controller` is opened nested.
+ * @property {boolean} [parentsHide=false] If `true`, the parent element is hidden when the controller is opened.
  * @property {HTMLElement} [sibling=null] The related sibling controller element that this controller is positioned relative to.
  * - e.g.) table plugin :: 118
- * @property {boolean} [siblingMain=false] If true, This sibling controller is the main controller.
- * - You must specify this option, if use "sibling"
- * @property {boolean} [isInsideForm=false] If the controller is inside a form, set it to true.
- * @property {boolean} [isOutsideForm=false] If the controller is outside a form, set it to true.
+ * @property {boolean} [siblingMain=false] If `true`, This sibling controller is the main controller.
+ * - You must specify this option, if use `sibling`
+ * @property {boolean} [isInsideForm=false] If the controller is inside a form, set it to `true`.
+ * @property {boolean} [isOutsideForm=false] If the controller is outside a form, set it to `true`.
  */
 
 /**
@@ -123,9 +123,9 @@ class Controller {
 	 * @param {Node|Range} target Target element
 	 * @param {Node} [positionTarget] Position target element
 	 * @param {Object} [params={}] params
-	 * @param {boolean} [params.isWWTarget] If the controller is in the WYSIWYG area, set it to true.
+	 * @param {boolean} [params.isWWTarget] If the controller is in the WYSIWYG area, set it to `true`.
 	 * @param {() => void} [params.initMethod] Method to be called when the controller is closed.
-	 * @param {boolean} [params.disabled] If true, When the "controller" is opened, buttons without the "se-component-enabled" class are disabled. (default: this.disabled)
+	 * @param {boolean} [params.disabled] If `true`, When the `controller` is opened, buttons without the `se-component-enabled` class are disabled. (default: `this.disabled`)
 	 * @param {{left?: number, top?: number}} [params.addOffset] Additional offset values
 	 */
 	open(target, positionTarget, { isWWTarget, initMethod, disabled, addOffset } = {}) {
@@ -186,8 +186,8 @@ class Controller {
 
 	/**
 	 * @description Close a modal plugin
-	 * - The plugin's "init" method is called.
-	 * @param {boolean} [force] If true, parent controllers are forcibly closed.
+	 * - The plugin's `init` method is called.
+	 * @param {boolean} [force] If `true`, parent controllers are forcibly closed.
 	 */
 	close(force) {
 		if (!force && (!this.isOpen || this.#preventClose)) return;
@@ -238,8 +238,8 @@ class Controller {
 	}
 
 	/**
-	 * @description Sets whether the element (form) should be brought to the top based on z-index.
-	 * @param {boolean} value - true: '2147483646', false: '2147483645'.
+	 * @description Sets whether the element (form) should be brought to the top based on `z-index`.
+	 * @param {boolean} value - `true`: `'2147483646'`, `false`: `'2147483645'`.
 	 */
 	bringToTop(value) {
 		this.toTop = value;
@@ -306,7 +306,7 @@ class Controller {
 	/**
 	 * @description Calculate if a child controller should be hidden based on all parent states
 	 * @param {Controller} children - The child controller
-	 * @returns {boolean} True if any parent wants it hidden
+	 * @returns {boolean} `true` if any parent wants it hidden
 	 */
 	#calculateShouldBeHidden(children) {
 		for (const wantsHidden of children.#__hiddenByParents__.values()) {
@@ -316,10 +316,10 @@ class Controller {
 	}
 
 	/**
-	 * @description Show controller at editor area (controller elements, function, "controller target element(@Required)", "controller name(@Required)", etc..)
+	 * @description Show controller at editor area (controller elements, function, `controller target element(@Required)`, `controller name(@Required)`, etc..)
 	 * @param {HTMLFormElement} form Controller element
 	 * @param {Node|Range} target Controller target element
-	 * @param {boolean} isRangeTarget If the target is a Range, set it to true.
+	 * @param {boolean} isRangeTarget If the target is a `Range`, set it to `true`.
 	 */
 	async #controllerOn(form, target, isRangeTarget) {
 		/** @type {ControllerInfo} */
@@ -383,9 +383,9 @@ class Controller {
 	/**
 	 * @description Specify the position of the controller.
 	 * @param {HTMLElement} controller Controller element.
-	 * @param {Node|Range} refer Element or Range that is the basis of the controller's position.
-	 * @param {boolean} [skipAutoReposition=false] If true, skips scroll/resize-based automatic positioning logic.
-	 * @returns {boolean} - view : true || hide : false
+	 * @param {Node|Range} refer Element or `Range` that is the basis of the controller's position.
+	 * @param {boolean} [skipAutoReposition=false] If `true`, skips scroll/resize-based automatic positioning logic.
+	 * @returns {boolean} - view : `true` || hide : `false`
 	 */
 	#setControllerPosition(controller, refer, skipAutoReposition) {
 		if (!refer) return false;
@@ -457,7 +457,7 @@ class Controller {
 
 	/**
 	 * @description Checks if the controller is fixed and should not be closed.
-	 * @returns {boolean} True if the controller is fixed.
+	 * @returns {boolean} `true` if the controller is fixed.
 	 */
 	#checkFixed() {
 		if (this.#$.ui.selectMenuOn) return true;
@@ -474,7 +474,7 @@ class Controller {
 	/**
 	 * @description Checks if the given target is within a form or controller.
 	 * @param {Node} target The target element.
-	 * @returns {boolean} True if the target is inside a form or controller.
+	 * @returns {boolean} `true` if the target is inside a form or controller.
 	 */
 	#checkForm(target) {
 		if (dom.check.isWysiwygFrame(target) || target.contains(this.form)) return false;

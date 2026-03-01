@@ -205,7 +205,7 @@ declare global {
 			/**
 			 * EventHandlers object containing all event callback functions
 			 * To access individual handler types, use indexed access:
-			 * Use SunEditor.Event.Handlers["onload"] to get the onload callback type
+			 * Use `SunEditor.Event.Handlers["onload"]` to get the `onload` callback type
 			 */
 			type Handlers = import('./events').EventHandlers;
 		}
@@ -256,7 +256,7 @@ declare global {
 			 * Special toolbar control strings
 			 * - `"|"`: Vertical separator between buttons
 			 * - `"/"`: Line break (start new row)
-			 * - `":[title]-[icon]"`: More button with dropdown (e.g., ":More Button-default.more_vertical")
+			 * - `":[title]-[icon]"`: More button with dropdown (e.g., `":More Button-default.more_vertical"`)
 			 * - `"-left"|"-right"`: Float alignment for button groups
 			 * - `"#fix"`: RTL direction fix
 			 * - `"%100"|"%50"`: Responsive breakpoint (percentage)

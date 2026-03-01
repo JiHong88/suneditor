@@ -42,6 +42,9 @@ import { UpdateStatusbarContext } from '../schema/frameContext';
  * @property {() => void} clear - Clears all stored options.
  */
 
+/**
+ * @description Provides Map-based access to editor options (base and per-frame).
+ */
 export default class OptionProvider {
 	#kernel;
 

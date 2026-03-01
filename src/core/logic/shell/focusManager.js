@@ -1,5 +1,8 @@
 import { dom } from '../../../helper';
 
+/**
+ * @description Manages editor focus and blur behavior across frames and controllers.
+ */
 export default class FocusManager {
 	#kernel;
 	#$;
@@ -58,8 +61,8 @@ export default class FocusManager {
 	}
 
 	/**
-	 * @description If "focusEl" is a component, then that component is selected; if it is a format element, the last text is selected
-	 * - If "focusEdge" is null, then selected last element
+	 * @description If `focusEl` is a component, then that component is selected; if it is a format element, the last text is selected
+	 * - If `focusEl` is `null`, then selected last element
 	 * @param {?Node} [focusEl] Focus element
 	 */
 	focusEdge(focusEl) {
@@ -87,7 +90,7 @@ export default class FocusManager {
 	}
 
 	/**
-	 * @description Focus to wysiwyg area using "native focus function"
+	 * @description Focus to wysiwyg area using native focus function
 	 */
 	nativeFocus() {
 		this.#$.selection.__focus();

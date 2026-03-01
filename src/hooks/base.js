@@ -14,33 +14,33 @@ export const Event = {
 	 * @param {?HTMLElement} element - Node element where the cursor is currently located
 	 * @param {?HTMLElement} target - The plugin's toolbar button element
 	 * @returns {boolean|void} - Whether the plugin is active
-	 * - If it returns "undefined", it will no longer be called in this scope.
+	 * - If it returns `undefined`, it will no longer be called in this scope.
 	 */
 	Active(element, target) {},
 
 	/**
-	 * Executes the event function of "focus".
+	 * Executes the event function of `focus`.
 	 * @param {SunEditor.HookParams.FocusBlur} params - Event parameters
 	 * @returns {void}
 	 */
 	OnFocus(params) {},
 
 	/**
-	 * Executes the event function of "blur".
+	 * Executes the event function of `blur`.
 	 * @param {SunEditor.HookParams.FocusBlur} params - Event parameters
 	 * @returns {void}
 	 */
 	OnBlur(params) {},
 
 	/**
-	 * Executes the event function of "mousemove".
+	 * Executes the event function of `mousemove`.
 	 * @param {SunEditor.HookParams.MouseEvent} params - Mouse event information
 	 * @returns {void}
 	 */
 	OnMouseMove(params) {},
 
 	/**
-	 * Executes the event function of "scroll".
+	 * Executes the event function of `scroll`.
 	 * @param {SunEditor.HookParams.Scroll} params - Event parameters
 	 * @returns {void}
 	 */
@@ -51,90 +51,90 @@ export const Event = {
 	// ------- Interruptible events (returning boolean stops event processing) ---
 
 	/**
-	 * Executes the event function of "keydown" (sync).
+	 * Executes the event function of `keydown` (sync).
 	 * Called sequentially on all plugins. Returning a boolean stops the loop.
 	 * @param {SunEditor.HookParams.KeyEvent} params - Key event information
-	 * @returns {void|boolean} - Return false to prevent the editor's keydown processing (shortcuts, actions)
+	 * @returns {void|boolean} - Return `false` to prevent the editor's `keydown` processing (shortcuts, actions)
 	 */
 	OnKeyDown(params) {},
 
 	/**
-	 * Executes the event function of "keydown" (async).
+	 * Executes the event function of `keydown` (async).
 	 * Called sequentially on all plugins. Returning a boolean stops the loop.
 	 * @param {SunEditor.HookParams.KeyEvent} params - Key event information
-	 * @returns {Promise<void|boolean>} - Return false to prevent the editor's keydown processing (shortcuts, actions)
+	 * @returns {Promise<void|boolean>} - Return `false` to prevent the editor's `keydown` processing (shortcuts, actions)
 	 */
 	async OnKeyDownAsync(params) {
 		return;
 	},
 
 	/**
-	 * Executes the event function of "keyup" (sync).
+	 * Executes the event function of `keyup` (sync).
 	 * Called sequentially on all plugins. Returning a boolean stops the loop.
 	 * @param {SunEditor.HookParams.KeyEvent} params - Key event information
-	 * @returns {void|boolean} - Return false to prevent adding to history
+	 * @returns {void|boolean} - Return `false` to prevent adding to history
 	 */
 	OnKeyUp(params) {},
 
 	/**
-	 * Executes the event function of "keyup" (async).
+	 * Executes the event function of `keyup` (async).
 	 * Called sequentially on all plugins. Returning a boolean stops the loop.
 	 * @param {SunEditor.HookParams.KeyEvent} params - Key event information
-	 * @returns {Promise<void|boolean>} - Return false to prevent adding to history
+	 * @returns {Promise<void|boolean>} - Return `false` to prevent adding to history
 	 */
 	async OnKeyUpAsync(params) {
 		return;
 	},
 
 	/**
-	 * Executes the event function of "mousedown" (sync).
+	 * Executes the event function of `mousedown` (sync).
 	 * Called sequentially on all plugins. Returning a boolean stops the loop.
 	 * @param {SunEditor.HookParams.MouseEvent} params - Mouse event information
-	 * @returns {void|boolean} - Return false to prevent the editor's mousedown processing
+	 * @returns {void|boolean} - Return `false` to prevent the editor's `mousedown` processing
 	 */
 	OnMouseDown(params) {},
 
 	/**
-	 * Executes the event function of "mousedown" (async).
+	 * Executes the event function of `mousedown` (async).
 	 * Called sequentially on all plugins. Returning a boolean stops the loop.
 	 * @param {SunEditor.HookParams.MouseEvent} params - Mouse event information
-	 * @returns {Promise<void|boolean>} - Return false to prevent the editor's mousedown processing
+	 * @returns {Promise<void|boolean>} - Return `false` to prevent the editor's `mousedown` processing
 	 */
 	async OnMouseDownAsync(params) {
 		return;
 	},
 
 	/**
-	 * Executes the event function of "click" (sync).
+	 * Executes the event function of `click` (sync).
 	 * Called sequentially on all plugins. Returning a boolean stops the loop.
 	 * @param {SunEditor.HookParams.MouseEvent} params - Mouse event information
-	 * @returns {void|boolean} - Return false to prevent the editor's click processing (component selection)
+	 * @returns {void|boolean} - Return `false` to prevent the editor's `click` processing (component selection)
 	 */
 	OnClick(params) {},
 
 	/**
-	 * Executes the event function of "click" (async).
+	 * Executes the event function of `click` (async).
 	 * Called sequentially on all plugins. Returning a boolean stops the loop.
 	 * @param {SunEditor.HookParams.MouseEvent} params - Mouse event information
-	 * @returns {Promise<void|boolean>} - Return false to prevent the editor's click processing (component selection)
+	 * @returns {Promise<void|boolean>} - Return `false` to prevent the editor's `click` processing (component selection)
 	 */
 	async OnClickAsync(params) {
 		return;
 	},
 
 	/**
-	 * Executes the event function of "paste" (sync).
+	 * Executes the event function of `paste` (sync).
 	 * Called sequentially on all plugins. Returning a boolean stops the loop.
-	 * Returning false will stop event propagation and cancel the paste.
+	 * Returning `false` will stop event propagation and cancel the paste.
 	 * @param {SunEditor.HookParams.Paste} params - Paste event information
 	 * @returns {void|boolean}
 	 */
 	OnPaste(params) {},
 
 	/**
-	 * Executes the event function of "paste" (async).
+	 * Executes the event function of `paste` (async).
 	 * Called sequentially on all plugins. Returning a boolean stops the loop.
-	 * Returning false will stop event propagation and cancel the paste.
+	 * Returning `false` will stop event propagation and cancel the paste.
 	 * @param {SunEditor.HookParams.Paste} params - Paste event information
 	 * @returns {Promise<void|boolean>}
 	 */
@@ -145,7 +145,7 @@ export const Event = {
 	// ------- Observation events (non-interruptible) ------
 
 	/**
-	 * Executes the event function of "beforeinput" (sync).
+	 * Executes the event function of `beforeinput` (sync).
 	 * Called after validation but before the input is processed.
 	 * @param {SunEditor.HookParams.InputWithData} params - Event parameters
 	 * @returns {void}
@@ -153,7 +153,7 @@ export const Event = {
 	OnBeforeInput(params) {},
 
 	/**
-	 * Executes the event function of "beforeinput" (async).
+	 * Executes the event function of `beforeinput` (async).
 	 * Called after validation but before the input is processed.
 	 * @param {SunEditor.HookParams.InputWithData} params - Event parameters
 	 * @returns {Promise<void>}
@@ -163,7 +163,7 @@ export const Event = {
 	},
 
 	/**
-	 * Executes the event function of "input" (sync).
+	 * Executes the event function of `input` (sync).
 	 * Called after the input has been processed.
 	 * @param {SunEditor.HookParams.InputWithData} params - Event parameters
 	 * @returns {void}
@@ -171,7 +171,7 @@ export const Event = {
 	OnInput(params) {},
 
 	/**
-	 * Executes the event function of "input" (async).
+	 * Executes the event function of `input` (async).
 	 * Called after the input has been processed.
 	 * @param {SunEditor.HookParams.InputWithData} params - Event parameters
 	 * @returns {Promise<void>}
@@ -181,14 +181,14 @@ export const Event = {
 	},
 
 	/**
-	 * Executes the event function of "mouseup" (sync).
+	 * Executes the event function of `mouseup` (sync).
 	 * @param {SunEditor.HookParams.MouseEvent} params - Mouse event information
 	 * @returns {void}
 	 */
 	OnMouseUp(params) {},
 
 	/**
-	 * Executes the event function of "mouseup" (async).
+	 * Executes the event function of `mouseup` (async).
 	 * @param {SunEditor.HookParams.MouseEvent} params - Mouse event information
 	 * @returns {Promise<void>}
 	 */
@@ -197,14 +197,14 @@ export const Event = {
 	},
 
 	/**
-	 * Executes the event function of "mouseleave" (sync).
+	 * Executes the event function of `mouseleave` (sync).
 	 * @param {SunEditor.HookParams.MouseEvent} params - Mouse event information
 	 * @returns {void}
 	 */
 	OnMouseLeave(params) {},
 
 	/**
-	 * Executes the event function of "mouseleave" (async).
+	 * Executes the event function of `mouseleave` (async).
 	 * @param {SunEditor.HookParams.MouseEvent} params - Mouse event information
 	 * @returns {Promise<void>}
 	 */
@@ -235,7 +235,7 @@ export const Component = {
 	/**
 	 * Executes the method that is called when a component of a plugin is selected.
 	 * @param {HTMLElement} target - Target component element
-	 * @returns {void|boolean} - If return true, Special components that are not wrapping as "figure"
+	 * @returns {void|boolean} - If return `true`, Special components that are not wrapping as `figure`
 	 */
 	Select(target) {},
 
@@ -254,7 +254,7 @@ export const Component = {
 	Edit(target) {},
 
 	/**
-	 * Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
+	 * Method to delete a component of a plugin, called by the `FileManager`, `Controller` module.
 	 * @param {HTMLElement} target - Target element
 	 * @returns {Promise<void>}
 	 */
@@ -265,7 +265,7 @@ export const Component = {
 	/**
 	 * Executes the method that is called when a component copy is requested.
 	 * @param {SunEditor.HookParams.CopyComponent} params - Copy component event information
-	 * @returns {boolean | void} - If return false, the copy will be canceled
+	 * @returns {boolean | void} - If return `false`, the copy will be canceled
 	 */
 	Copy(params) {},
 };
@@ -286,21 +286,21 @@ export const Core = {
 
 	/**
 	 * Executes methods called by shortcut keys.
-	 * @param {SunEditor.HookParams.Shortcut} params - Information of the "shortcut" plugin
+	 * @param {SunEditor.HookParams.Shortcut} params - Information of the `shortcut` plugin
 	 * @returns {void}
 	 */
 	Shortcut(params) {},
 
 	/**
-	 * Executes the method called when the rtl, ltr mode changes. ("editor.ui.setDir")
-	 * @param {string} dir - Direction ("rtl" or "ltr")
+	 * Executes the method called when the rtl, ltr mode changes. (`editor.ui.setDir`)
+	 * @param {string} dir - Direction (`rtl` or `ltr`)
 	 * @returns {void}
 	 */
 	SetDir(dir) {},
 
 	/**
 	 * Executes when the editor or plugin is initialized.
-	 * Called during editor initialization and when resetOptions is called.
+	 * Called during editor initialization and when `resetOptions` is called.
 	 * @returns {void}
 	 */
 	Init() {},

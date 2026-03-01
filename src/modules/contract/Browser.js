@@ -25,13 +25,13 @@ import ApiManager from '../manager/ApiManager';
  * @property {string} [url] - File server url. Required. Can be overridden in browser.
  * @property {Object<string, string>} [headers] - File server http header. Required. Can be overridden in browser.
  * @property {(target: Node) => void} selectorHandler - Function that actions when an item is clicked. Required. Can be overridden in browser.
- * @property {boolean} [useSearch] - Whether to use the search function. Optional. Default: true.
+ * @property {boolean} [useSearch] - Whether to use the search function. Optional. Default: `true`.
  * @property {string} [searchUrl] - File server search url. Optional. Can be overridden in browser.
  * @property {Object<string, string>} [searchUrlHeader] - File server search http header. Optional. Can be overridden in browser.
  * @property {string} [listClass] - Class name of list div. Required. Can be overridden in browser.
  * @property {(item: BrowserFile) => string} [drawItemHandler] - Function that defines the HTML of a file item. Required. Can be overridden in browser.
- * @property {Array<*>} [props] - "props" argument to "drawItemHandler" function. Optional. Can be overridden in browser.
- * @property {number} [columnSize] - Number of "div.se-file-item-column" to be created. Optional. Can be overridden in browser. Default: 4.
+ * @property {Array<*>} [props] - `props` argument to `drawItemHandler` function. Optional. Can be overridden in browser.
+ * @property {number} [columnSize] - Number of `div.se-file-item-column` to be created. Optional. Can be overridden in browser. Default: 4.
  * @property {((item: BrowserFile) => string)} [thumbnail] - Default thumbnail
  */
 
@@ -131,10 +131,10 @@ class Browser {
 	/**
 	 * @description Open a file browser plugin
 	 * @param {Object} [params={}]
-	 * @param {string} [params.listClass] - Class name of list div. If not, use "this.listClass".
-	 * @param {string} [params.title] - File browser window title. If not, use "this.title".
-	 * @param {string} [params.url] - File server url. If not, use "this.url".
-	 * @param {Object<string, string>} [params.urlHeader] - File server http header. If not, use "this.urlHeader".
+	 * @param {string} [params.listClass] - Class name of list div. If not, use `this.listClass`.
+	 * @param {string} [params.title] - File browser window title. If not, use `this.title`.
+	 * @param {string} [params.url] - File server url. If not, use `this.url`.
+	 * @param {Object<string, string>} [params.urlHeader] - File server http header. If not, use `this.urlHeader`.
 	 */
 	open(params = {}) {
 		this.#addGlobalEvent();
@@ -160,7 +160,7 @@ class Browser {
 
 	/**
 	 * @description Close a browser plugin
-	 * - The plugin's "init" method is called.
+	 * - The plugin's `init` method is called.
 	 */
 	close() {
 		this.#removeGlobalEvent();
@@ -299,7 +299,7 @@ class Browser {
 	/**
 	 * @description Renders the file items or folder structure from data.
 	 * @param {BrowserFile[]|BrowserFile} data - The data representing the file structure.
-	 * @returns {boolean} True if rendering was successful, false otherwise.
+	 * @returns {boolean} `true` if rendering was successful, `false` otherwise.
 	 */
 	#drowItems(data) {
 		if (Array.isArray(data)) {
@@ -636,8 +636,8 @@ function CreateHTMLInfos($, useSearch) {
 
 /**
  * @this {{ thumbnail: ((...args: *) => *), props: Array<*> }}
- * @description Define the HTML of the item to be put in "div.se-file-item-column".
- * - Format: [ { src: "image src", name: "name(@option)", alt: "image alt(@option)", tag: "tag name(@option)" } ]
+ * @description Define the HTML of the item to be put in `div.se-file-item-column`.
+ * - Format: `[ { src: "image src", name: "name(@option)", alt: "image alt(@option)", tag: "tag name(@option)" } ]`
  * @param {BrowserFile} item Item of the response data's array
  */
 function DrawItems(item) {

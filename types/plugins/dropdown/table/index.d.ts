@@ -2,15 +2,15 @@ import type {} from '../../../typedef';
 export default Table;
 export type TablePluginOptions = {
 	/**
-	 * - Scroll type ('x', 'y', 'xy')
+	 * - Scroll type (`x`, `y`, `xy`)
 	 */
 	scrollType?: 'x' | 'y' | 'xy';
 	/**
-	 * - Caption position ('top', 'bottom')
+	 * - Caption position (`top`, `bottom`)
 	 */
 	captionPosition?: 'top' | 'bottom';
 	/**
-	 * - Cell controller position ('cell', 'table')
+	 * - Cell controller position (`cell`, `table`)
 	 */
 	cellControllerPosition?: 'cell' | 'table';
 	/**
@@ -21,9 +21,9 @@ export type TablePluginOptions = {
 export type TableState = import('./shared/table.constants').TableState;
 /**
  * @typedef {Object} TablePluginOptions
- * @property {"x"|"y"|"xy"} [scrollType='x'] - Scroll type ('x', 'y', 'xy')
- * @property {"top"|"bottom"} [captionPosition='bottom'] - Caption position ('top', 'bottom')
- * @property {"cell"|"table"} [cellControllerPosition='cell'] - Cell controller position ('cell', 'table')
+ * @property {"x"|"y"|"xy"} [scrollType='x'] - Scroll type (`x`, `y`, `xy`)
+ * @property {"top"|"bottom"} [captionPosition='bottom'] - Caption position (`top`, `bottom`)
+ * @property {"cell"|"table"} [cellControllerPosition='cell'] - Cell controller position (`cell`, `table`)
  * @property {Array} [colorList] - Color list, used in cell color picker
  */
 /**
@@ -57,7 +57,7 @@ declare class Table extends PluginDropdownFree {
 	controller_table: Controller;
 	figure: Figure;
 	/**
-	 * @description Same value a "this._selectedTable", but it maintain prev table element
+	 * @description Same value as `this._selectedTable`, but it maintains the prev table element
 	 * @type {HTMLTableElement}
 	 */
 	_element: HTMLTableElement;

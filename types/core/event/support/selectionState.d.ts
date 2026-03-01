@@ -2,7 +2,7 @@ import type {} from '../../../typedef';
 /**
  * @description Service class managing the selection state and toolbar updates.
  * - Handles activating toolbar buttons based on the current selection.
- * - Manages the 'active' state of plugins and commands.
+ * - Manages the `active` state of plugins and commands.
  */
 export default class SelectionState {
 	/**
@@ -22,7 +22,7 @@ export default class SelectionState {
 	/**
 	 * @description Resets the toolbar state.
 	 * - Deactivates all buttons and clears the effect.
-	 * - Equivalent to calling setKeyEffect([]).
+	 * - Equivalent to calling `setKeyEffect([])`.
 	 */
 	reset(): void;
 	#private;

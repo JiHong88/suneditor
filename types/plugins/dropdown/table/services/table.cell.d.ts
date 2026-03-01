@@ -1,4 +1,8 @@
 import type {} from '../../../../typedef';
+/**
+ * @description Handles table cell operations including merging, splitting,
+ * - and multi-cell selection management.
+ */
 export class TableCellService {
 	/**
 	 * @param {import('../index').default} main Table index
@@ -38,13 +42,13 @@ export class TableCellService {
 	 * @description Merges the selected table cells into one cell by combining their contents and adjusting their row and column spans.
 	 * - This method removes the selected cells, consolidates their contents, and applies the appropriate row and column spans to the merged cell.
 	 * @param {HTMLTableCellElement[]} selectedCells Cells array
-	 * @param {boolean} [skipPostProcess=false] - If true, skips table cloning, cell re-selection, history stack push, and rendering.
+	 * @param {boolean} [skipPostProcess=false] - If `true`, skips table cloning, cell re-selection, history stack push, and rendering.
 	 */
 	mergeCells(selectedCells: HTMLTableCellElement[], skipPostProcess?: boolean): void;
 	/**
 	 * @description Unmerges a table cell that has been merged using rowspan and/or colspan.
 	 * @param {HTMLTableCellElement[]} selectedCells - Cells array
-	 * @param {boolean} [skipPostProcess=false] - If true, skips table cloning, cell re-selection, history stack push, and rendering.
+	 * @param {boolean} [skipPostProcess=false] - If `true`, skips table cloning, cell re-selection, history stack push, and rendering.
 	 */
 	unmergeCells(selectedCells: HTMLTableCellElement[], skipPostProcess?: boolean): void;
 	/**

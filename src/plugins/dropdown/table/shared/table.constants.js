@@ -64,7 +64,7 @@ export const DEFAULT_COLOR_LIST = [
  * @typedef {Object} TableState
  * @property {number} physical_cellCnt The number of physical cells in the current row.
  * @property {number} logical_cellCnt The number of logical cells (columns) in the table.
- * @property {number} cellCnt Alias for logical_cellCnt.
+ * @property {number} cellCnt Alias for `logical_cellCnt`.
  * @property {number} rowCnt The total number of rows in the table.
  * @property {number} rowIndex The index of the current row.
  * @property {number} physical_cellIndex The physical index of the current cell.

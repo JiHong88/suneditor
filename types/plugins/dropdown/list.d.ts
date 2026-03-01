@@ -2,7 +2,7 @@ import type {} from '../../typedef';
 export default List;
 /**
  * @class
- * @description List Plugin (OL, UL)
+ * @description List Plugin (`OL`, `UL`)
  */
 declare class List extends PluginDropdown {
 	title: any;
