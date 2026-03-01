@@ -215,6 +215,13 @@ export namespace DEFAULTS {
  * 	}} [strictMode=true]  - Enables strict filtering of tags, attributes, and styles.
  * - Use `true` to enable all filters (default), or an object to control individual filters.
  * - Setting `false` is not supported; use the object form to disable specific filters instead.
+ * - :filter description
+ * - `tagFilter`: Filters disallowed HTML tags (`elementWhitelist`/`elementBlacklist`)
+ * - `formatFilter`: Filters format elements (`formatLine`/`formatBlock`)
+ * - `classFilter`: Filters disallowed CSS class names (`allowedClassName`)
+ * - `textStyleTagFilter`: Filters text style tags (b, i, u, span, etc.)
+ * - `attrFilter`: Filters disallowed HTML attributes (`attributeWhitelist`/`attributeBlacklist`)
+ * - `styleFilter`: Filters disallowed inline styles (`spanStyles`/`lineStyles`/`allUsedStyles`)
  * @property {Array<string>} [scopeSelectionTags=CONSTANTS.SCOPE_SELECTION_TAGS] - Tags treated as whole units when selecting all content.
  * - The default follows {@link DEFAULTS.SCOPE_SELECTION_TAGS}
  * ///
@@ -756,6 +763,13 @@ export type EditorBaseOptions = {
 	 * - Enables strict filtering of tags, attributes, and styles.
 	 * - Use `true` to enable all filters (default), or an object to control individual filters.
 	 * - Setting `false` is not supported; use the object form to disable specific filters instead.
+	 * - :filter description
+	 * - `tagFilter`: Filters disallowed HTML tags (`elementWhitelist`/`elementBlacklist`)
+	 * - `formatFilter`: Filters format elements (`formatLine`/`formatBlock`)
+	 * - `classFilter`: Filters disallowed CSS class names (`allowedClassName`)
+	 * - `textStyleTagFilter`: Filters text style tags (b, i, u, span, etc.)
+	 * - `attrFilter`: Filters disallowed HTML attributes (`attributeWhitelist`/`attributeBlacklist`)
+	 * - `styleFilter`: Filters disallowed inline styles (`spanStyles`/`lineStyles`/`allUsedStyles`)
 	 */
 	strictMode?:
 		| true
@@ -1204,11 +1218,29 @@ export type EditorInitOptions = EditorBaseOptions & PrivateBaseOptions & EditorF
 export type AllBaseOptions = EditorBaseOptions & PrivateBaseOptions & InternalBaseOptions;
 export type TransformedOptionKeys = 'formatClosureBrLine' | 'formatBrLine' | 'formatLine' | 'formatClosureBlock' | 'formatBlock' | 'toolbar_width' | 'toolbar_container' | 'toolbar_sticky' | 'strictMode' | 'lineAttrReset';
 export type StrictModeOptions = {
+	/**
+	 * - Filters disallowed HTML tags (`elementWhitelist`/`elementBlacklist`)
+	 */
 	tagFilter: boolean;
+	/**
+	 * - Filters format elements (`formatLine`/`formatBlock`)
+	 */
 	formatFilter: boolean;
+	/**
+	 * - Filters disallowed CSS class names (`allowedClassName`)
+	 */
 	classFilter: boolean;
+	/**
+	 * - Filters text style tags (b, i, u, span, etc.)
+	 */
 	textStyleTagFilter: boolean;
+	/**
+	 * - Filters disallowed HTML attributes (`attributeWhitelist`/`attributeBlacklist`)
+	 */
 	attrFilter: boolean;
+	/**
+	 * - Filters disallowed inline styles (`spanStyles`/`lineStyles`/`allUsedStyles`)
+	 */
 	styleFilter: boolean;
 };
 export type TransformedOptions = {

@@ -269,6 +269,13 @@ export const DEFAULTS = {
  * 	}} [strictMode=true]  - Enables strict filtering of tags, attributes, and styles.
  * - Use `true` to enable all filters (default), or an object to control individual filters.
  * - Setting `false` is not supported; use the object form to disable specific filters instead.
+ * - :filter description
+ * - `tagFilter`: Filters disallowed HTML tags (`elementWhitelist`/`elementBlacklist`)
+ * - `formatFilter`: Filters format elements (`formatLine`/`formatBlock`)
+ * - `classFilter`: Filters disallowed CSS class names (`allowedClassName`)
+ * - `textStyleTagFilter`: Filters text style tags (b, i, u, span, etc.)
+ * - `attrFilter`: Filters disallowed HTML attributes (`attributeWhitelist`/`attributeBlacklist`)
+ * - `styleFilter`: Filters disallowed inline styles (`spanStyles`/`lineStyles`/`allUsedStyles`)
  * @property {Array<string>} [scopeSelectionTags=CONSTANTS.SCOPE_SELECTION_TAGS] - Tags treated as whole units when selecting all content.
  * - The default follows {@link DEFAULTS.SCOPE_SELECTION_TAGS}
  * ///
@@ -601,12 +608,12 @@ export const OPTION_FIXED_FLAG = {
 
 /**
  * @typedef {Object} StrictModeOptions
- * @property {boolean} tagFilter
- * @property {boolean} formatFilter
- * @property {boolean} classFilter
- * @property {boolean} textStyleTagFilter
- * @property {boolean} attrFilter
- * @property {boolean} styleFilter
+ * @property {boolean} tagFilter - Filters disallowed HTML tags (`elementWhitelist`/`elementBlacklist`)
+ * @property {boolean} formatFilter - Filters format elements (`formatLine`/`formatBlock`)
+ * @property {boolean} classFilter - Filters disallowed CSS class names (`allowedClassName`)
+ * @property {boolean} textStyleTagFilter - Filters text style tags (b, i, u, span, etc.)
+ * @property {boolean} attrFilter - Filters disallowed HTML attributes (`attributeWhitelist`/`attributeBlacklist`)
+ * @property {boolean} styleFilter - Filters disallowed inline styles (`spanStyles`/`lineStyles`/`allUsedStyles`)
  */
 
 /**
