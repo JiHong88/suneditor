@@ -22,20 +22,20 @@ export interface ModuleModal {
 	/**
 	 * @optional
 	 * Executes the method that is called when a plugin's modal is opened.
-	 * @param {boolean} isUpdate - Indicates whether the modal is for editing an existing component (`true`) or registering a new one (`false`).
+	 * @param {boolean} isUpdate - Whether the modal is for editing (`true`) or creating a new one (`false`).
 	 * @returns {void}
 	 */
 	modalOn?(isUpdate: boolean): void;
 	/**
 	 * @optional
-	 * This function is called before the modal window is opened, but before it is closed.
+	 * This function is called before the modal window opens or closes.
 	 * @returns {void}
 	 */
 	modalInit?(): void;
 	/**
 	 * @optional
 	 * Modal off callback.
-	 * @param {boolean} isUpdate - Indicates whether the modal is for editing an existing component (`true`) or registering a new one (`false`).
+	 * @param {boolean} isUpdate - Whether the modal is for editing (`true`) or creating a new one (`false`).
 	 * @returns {void}
 	 */
 	modalOff?(isUpdate: boolean): void;
@@ -82,7 +82,7 @@ export interface ModuleController {
 export interface ModuleBrowser {
 	/**
 	 * @optional
-	 * Executes the method that is called when a `Browser` module's is opened.
+	 * Executes the method that is called when a `Browser` module is opened.
 	 * @returns {void}
 	 */
 	browserInit?(): void;
@@ -96,7 +96,8 @@ export interface ModuleColorPicker {
 	/**
 	 * @optional
 	 * Executes the method called when a button of `ColorPicker` module is clicked.
-	 * - This plugin is by applying the `ColorPicker` module globally to the `dropdown` menu, the default `action` method is not called.
+	 * - When applying the `ColorPicker` module globally to the `dropdown` menu,
+	 * - the default `action` method is not called.
 	 * @param {SunEditor.Module.HueSlider.Color} color - Selected color information
 	 * @returns {void}
 	 */

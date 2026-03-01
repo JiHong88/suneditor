@@ -90,7 +90,8 @@ export type EmbedPluginOptions = {
 	 */
 	controls?: SunEditor.Module.Figure.Controls;
 	/**
-	 * - Component insertion behavior for selection and cursor placement. [default: `options.get('componentInsertBehavior')`]
+	 * - Component insertion behavior for selection and cursor placement.
+	 * - [default: `options.get('componentInsertBehavior')`]
 	 * - `auto`: Move cursor to the next line if possible, otherwise select the component.
 	 * - `select`: Always select the inserted component.
 	 * - `line`: Move cursor to the next line if possible, or create a new line and move there.
@@ -133,7 +134,8 @@ export type EmbedPluginOptions = {
  *   // Additional services...
  * }
  * @property {SunEditor.Module.Figure.Controls} [controls] - Figure controls.
- * @property {SunEditor.ComponentInsertType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: `options.get('componentInsertBehavior')`]
+ * @property {SunEditor.ComponentInsertType} [insertBehavior] - Component insertion behavior for selection and cursor placement.
+ * - [default: `options.get('componentInsertBehavior')`]
  * - `auto`: Move cursor to the next line if possible, otherwise select the component.
  * - `select`: Always select the inserted component.
  * - `line`: Move cursor to the next line if possible, or create a new line and move there.
@@ -142,7 +144,8 @@ export type EmbedPluginOptions = {
 /**
  * @class
  * @description Embed modal plugin.
- * - This plugin provides a modal interface for embedding external content (e.g., videos, `IFRAME` elements) into the editor.
+ * - This plugin provides a modal interface for embedding external content
+ * - (e.g., videos, `IFRAME` elements) into the editor.
  */
 declare class Embed extends PluginModal {
 	/**

@@ -34,17 +34,21 @@ class Inline {
 
 	/**
 	 * @description Adds, updates, or deletes style nodes from selected text (a, span, strong, etc.).
-	 * - 1. If `styleNode` is provided, a node with the same tags and attributes is added to the selected text.
+	 * - 1. If `styleNode` is provided, a node with the same tags and attributes is added to the selection.
 	 * - 2. If the same tag already exists, only its attributes are updated.
 	 * - 3. If `styleNode` is `null`, existing nodes are updated or removed without adding new ones.
-	 * - 4. Styles matching those in `stylesToModify` are removed. (Use CSS attribute names, e.g., `background-color`)
+	 * - 4. Styles matching those in `stylesToModify` are removed.
+	 * - (Use CSS attribute names, e.g., `background-color`)
 	 * - 5. Classes matching those in `stylesToModify` (prefixed with `"."`) are removed.
 	 * - 6. `stylesToModify` is used to avoid duplicate property values from `styleNode`.
-	 * - 7. Nodes with all styles and classes removed are deleted if they match `styleNode`, are in `nodesToRemove`, or if `styleNode` is `null`.
+	 * - 7. Nodes with all styles/classes removed are deleted.
+	 * - Applies when they match `styleNode`, are in `nodesToRemove`, or `styleNode` is `null`.
 	 * - 8. Tags matching names in `nodesToRemove` are deleted regardless of their style and class.
-	 * - 9. If `strictRemove` is `true`, nodes in `nodesToRemove` are only removed if all their styles and classes are removed.
+	 * - 9. If `strictRemove` is `true`, nodes in `nodesToRemove` are only removed
+	 * - if all their styles and classes are removed.
 	 * - 10. The function won't modify nodes if the parent has the same class and style values.
-	 * - However, if `nodesToRemove` has values, it will work and separate text nodes even if there's no node to replace.
+	 * - However, if `nodesToRemove` has values, it will work and separate text nodes
+	 * - even if there's no node to replace.
 	 * @param {?Node} styleNode The element to be added to the selection. If `null`, only existing nodes are modified or removed.
 	 * @param {Object} [options] Options
 	 * @param {Array<string>} [options.stylesToModify=null] Array of style or class names to check and modify.

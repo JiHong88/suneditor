@@ -22,7 +22,8 @@ class Base extends KernelInjector {
 	 * Plugin-specific options
 	 * @type {{eventIndex?: number, isInputComponent?: boolean}}
 	 * @property {number} [eventIndex=0] - Plugin event handler execution priority (higher = later)
-	 * @property {boolean} [isInputComponent=false] - Allow keyboard input inside component (e.g., table cells), prevents auto-selection on arrow keys
+	 * @property {boolean} [isInputComponent=false] - Allow keyboard input inside component (e.g., table cells).
+	 * - Prevents auto-selection on arrow keys.
 	 */
 	static options = {};
 
@@ -61,7 +62,7 @@ export class PluginBrowser extends Base {
 
 	/**
 	 * @abstract
-	 * @description Executes the method that is called when a `Browser` module's is opened.
+	 * @description Executes the method that is called when a `Browser` module is opened.
 	 * @param {?(target: Node) => *} [onSelectfunction] - Method to be executed after selecting an item in the gallery
 	 * @returns {void}
 	 */
@@ -71,7 +72,7 @@ export class PluginBrowser extends Base {
 
 	/**
 	 * @abstract
-	 * @description Executes the method that is called when a `Browser` module's is closed.
+	 * @description Executes the method that is called when a `Browser` module is closed.
 	 * @returns {void}
 	 */
 	close() {

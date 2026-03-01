@@ -31,7 +31,8 @@ import ApiManager from '../manager/ApiManager';
  * @property {string} [listClass] - Class name of list div. Required. Can be overridden in browser.
  * @property {(item: BrowserFile) => string} [drawItemHandler] - Function that defines the HTML of a file item. Required. Can be overridden in browser.
  * @property {Array<*>} [props] - `props` argument to `drawItemHandler` function. Optional. Can be overridden in browser.
- * @property {number} [columnSize] - Number of `div.se-file-item-column` to be created. Optional. Can be overridden in browser. Default: 4.
+ * @property {number} [columnSize] - Number of `div.se-file-item-column` to be created.
+ * - Optional. Can be overridden in browser. Default: 4.
  * @property {((item: BrowserFile) => string)} [thumbnail] - Default thumbnail
  */
 
@@ -637,7 +638,8 @@ function CreateHTMLInfos($, useSearch) {
 /**
  * @this {{ thumbnail: ((...args: *) => *), props: Array<*> }}
  * @description Define the HTML of the item to be put in `div.se-file-item-column`.
- * - Format: `[ { src: "image src", name: "name(@option)", alt: "image alt(@option)", tag: "tag name(@option)" } ]`
+ * - Format:
+ * - `[ { src: "image src", name: "name(@option)", alt: "image alt(@option)", tag: "tag name(@option)" } ]`
  * @param {BrowserFile} item Item of the response data's array
  */
 function DrawItems(item) {

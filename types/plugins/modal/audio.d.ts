@@ -50,7 +50,8 @@ export type AudioPluginOptions = {
 		[x: string]: string;
 	};
 	/**
-	 * - Component insertion behavior for selection and cursor placement. [default: `options.get('componentInsertBehavior')`]
+	 * - Component insertion behavior for selection and cursor placement.
+	 * - [default: `options.get('componentInsertBehavior')`]
 	 * - `auto`: Move cursor to the next line if possible, otherwise select the component.
 	 * - `select`: Always select the inserted component.
 	 * - `line`: Move cursor to the next line if possible, or create a new line and move there.
@@ -71,7 +72,8 @@ export type AudioPluginOptions = {
  * @property {boolean} [allowMultiple] - Whether to allow multiple file uploads.
  * @property {string} [acceptedFormats="audio/*"] - Accepted file formats (default is `"audio/*"`).
  * @property {Object<string, string>} [audioTagAttributes] - Additional attributes to set on the `AUDIO` tag.
- * @property {SunEditor.ComponentInsertType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: `options.get('componentInsertBehavior')`]
+ * @property {SunEditor.ComponentInsertType} [insertBehavior] - Component insertion behavior for selection and cursor placement.
+ * - [default: `options.get('componentInsertBehavior')`]
  * - `auto`: Move cursor to the next line if possible, otherwise select the component.
  * - `select`: Always select the inserted component.
  * - `line`: Move cursor to the next line if possible, or create a new line and move there.

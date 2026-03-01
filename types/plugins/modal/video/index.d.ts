@@ -110,7 +110,8 @@ export type VideoPluginOptions = {
 	 */
 	controls?: SunEditor.Module.Figure.Controls;
 	/**
-	 * - Component insertion behavior for selection and cursor placement. [default: `options.get('componentInsertBehavior')`]
+	 * - Component insertion behavior for selection and cursor placement.
+	 * - [default: `options.get('componentInsertBehavior')`]
 	 * - `auto`: Move cursor to the next line if possible, otherwise select the component.
 	 * - `select`: Always select the inserted component.
 	 * - `line`: Move cursor to the next line if possible, or create a new line and move there.
@@ -149,7 +150,8 @@ export type VideoState = {
  * @property {Array<RegExp>} [urlPatterns] - Additional URL patterns for video embedding.
  * @property {Array<string>} [extensions] - Additional file extensions to be recognized for video uploads.
  * @property {SunEditor.Module.Figure.Controls} [controls] - Figure controls.
- * @property {SunEditor.ComponentInsertType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: `options.get('componentInsertBehavior')`]
+ * @property {SunEditor.ComponentInsertType} [insertBehavior] - Component insertion behavior for selection and cursor placement.
+ * - [default: `options.get('componentInsertBehavior')`]
  * - `auto`: Move cursor to the next line if possible, otherwise select the component.
  * - `select`: Always select the inserted component.
  * - `line`: Move cursor to the next line if possible, or create a new line and move there.
@@ -271,7 +273,8 @@ declare class Video extends PluginModal {
 	} | null;
 	/**
 	 * @description Converts a YouTube URL into an embeddable URL.
-	 * - If the URL does not start with `"http"`, it prepends `"https://"`. It also replaces `"watch?v="` with the embed path.
+	 * - If the URL does not start with `"http"`, it prepends `"https://"`.
+	 * - It also replaces `"watch?v="` with the embed path.
 	 * @param {string} url - The original YouTube URL.
 	 * @returns {string} The converted YouTube embed URL.
 	 */
@@ -293,7 +296,8 @@ declare class Video extends PluginModal {
 	addQuery(url: string, query: string): string;
 	/**
 	 * @description Creates or updates a video embed component.
-	 * - When updating, it replaces the existing element if necessary and applies the new source, size, and alignment.
+	 * - When updating, it replaces the existing element if necessary
+	 * - and applies the new source, size, and alignment.
 	 * - When creating, it wraps the provided element in a figure container.
 	 * @param {HTMLIFrameElement|HTMLVideoElement} oFrame - The existing video element (for update) or a newly created one.
 	 * @param {string} src - The source URL for the video.

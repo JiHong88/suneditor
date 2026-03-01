@@ -31,8 +31,9 @@ const { NO_EVENT } = env;
  * @property {boolean} [keepFormatType=false] - Whether to retain the chosen format type after image insertion.
  * @property {boolean} [linkEnableFileUpload] - Whether to enable file uploads for linked images.
  * @property {SunEditor.Module.Figure.Controls} [controls] - Figure controls.
- * @property {SunEditor.ComponentInsertType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: `options.get('componentInsertBehavior')`]
- * - For inline components: places the cursor near the inserted component or selects it if no nearby range is available.
+ * @property {SunEditor.ComponentInsertType} [insertBehavior] - Component insertion behavior for selection and cursor placement.
+ * - [default: `options.get('componentInsertBehavior')`]
+ * - For inline components: places cursor near the component, or selects if no nearby range.
  * - For block components: executes behavior based on `selectMode`:
  * - `auto`: Move cursor to the next line if possible, otherwise select the component.
  * - `select`: Always select the inserted component.

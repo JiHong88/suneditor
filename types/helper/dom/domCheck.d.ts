@@ -9,7 +9,8 @@ export function isZeroWidth(text: string | Node): boolean;
  * @description Determine if this offset is the edge offset of container
  * @param {Node} container The node of the selection object. (range.startContainer..)
  * @param {number} offset The offset of the selection object. (core.getRange().startOffset...)
- * @param {?("front"|"end")} [dir] Select check point - Both edge, Front edge or End edge. (`"front"`: Front edge, `"end"`: End edge, `undefined`: Both edge)
+ * @param {?("front"|"end")} [dir] Select check point.
+ * - `"front"`: Front edge, `"end"`: End edge, `undefined`: Both edge.
  * @returns {boolean}
  */
 export function isEdgePoint(container: Node, offset: number, dir?: ('front' | 'end') | null): boolean;
