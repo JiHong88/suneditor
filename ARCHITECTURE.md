@@ -222,6 +222,35 @@ class Modal {
 | **L3: Logic**  | Core editing logic           | `Selection`, `Format`, `History`, `PluginManager`, `Toolbar`, `Component` |
 | **L4: Event**  | Input Orchestration          | `EventOrchestrator` (Redux-style event pipeline)                          |
 
+### Layer Dependency Rules
+
+Dependency boundaries are enforced at build time via **dependency-cruiser** (`.dependency-cruiser.js`).
+
+```
+Allowed dependency direction:
+
+  L1 (Kernel) ─── orchestrates all layers
+       ↓
+  L2 (Config) ─── available to L3/L4 via $
+       ↓
+  L3 (Logic)  ─── cross-references via $ only (no direct imports between L3 modules)
+       ↓
+  L4 (Event)  ─── accesses L2/L3 via $
+       ↓
+  Helper      ─── pure utilities, all layers can import
+```
+
+**Enforced constraints:**
+
+| Rule                 | Description                                                                      |
+| :------------------- | :------------------------------------------------------------------------------- |
+| **Helper isolation** | `helper/*` cannot import from any other layer                                    |
+| **Module isolation** | `modules/*` cannot import `core/*` or `plugins/*` — receives `$` via constructor |
+| **Plugin isolation** | Plugins cannot import other plugins (same plugin submodules OK)                  |
+| **No circular deps** | No module can import from a module that imports it                               |
+
+**Circular dependency resolution:** L3 modules that need each other (e.g., `format` ↔ `selection`) don't import directly. Both receive the full `$` bag after Phase 2, resolving circular references at runtime.
+
 ---
 
 ## 4. State Management (The Store)
@@ -506,21 +535,118 @@ DOM Event → Handler → Reducer → Rules → Action[] → Executor → Effect
 | **Executor** | `event/executor.js` | Dispatches action list through effect registries                            |
 | **Effects**  | `event/effects/`    | Side-effect handlers (`common.registry`, `keydown.registry`, `ruleHelpers`) |
 
-### Data Flow
+### 3-Stage Event Processing
+
+Wysiwyg DOM events pass through three stages in order. Each stage can cancel further processing by returning `false`.
 
 ```
-1. Wysiwyg User Action (typing, paste, etc.):
-   User Action → EventOrchestrator → Handler → Reducer → Rules → Action[]
-                                                                    ↓
-                                                              Executor → Effects → Logic Classes
-                                                                                        ↓
-                                                                                  [Plugin action]
-                                                                                        ↓
-                                                                                   DOM Update
-                                                                                        ↓
-                                                                                 History Push
-                                                                                        ↓
-                                                                            Trigger onChange Event
+DOM Event (keydown, input, click, paste, ...)
+       ↓
+  ┌─────────────────────────────────────┐
+  │ Stage 1: Public Event               │
+  │ eventManager.triggerEvent('onXxx')   │
+  │ → user-registered callback           │
+  │ → return false = cancel              │
+  └──────────────┬──────────────────────┘
+                 ↓
+  ┌─────────────────────────────────────┐
+  │ Stage 2: Plugin Event               │
+  │ pluginManager.emitEventAsync('onXxx')│
+  │ → each plugin's onXxx() hook         │
+  │ → sorted by eventIndex               │
+  │ → first boolean return stops loop    │
+  └──────────────┬──────────────────────┘
+                 ↓
+  ┌─────────────────────────────────────┐
+  │ Stage 3: Core Processing            │
+  │ Reducer → Rules → Action[]           │
+  │ → Executor → Effects → DOM Update    │
+  │ → History Push                       │
+  │ → triggerEvent('onChange')            │
+  └─────────────────────────────────────┘
+```
+
+**Example — `onKeyDown` in `handler_ww_key.js`:**
+
+```javascript
+// Stage 1: User event
+if ((await this.$.eventManager.triggerEvent('onKeyDown', { frameContext, event })) === false) return;
+
+// Stage 2: Plugin event
+if ((await this._callPluginEventAsync('onKeyDown', { frameContext, event, range, line })) === false) return;
+
+// Stage 3: Core processing (reducer → actions → effects)
+```
+
+### Toolbar Button → Plugin Activation
+
+Toolbar clicks bypass the 3-stage pipeline and dispatch directly to plugins via `CommandDispatcher`:
+
+```
+OnClick_toolbar(e)
+    ↓
+commandDispatcher.runFromTarget(button)
+    ↓
+Extract: data-command, data-type
+    ↓
+Branch by type:
+    ├─ "command"      → plugins[cmd].action(button)
+    ├─ "dropdown"     → menu.dropdownOn(button) → plugin.on() → item click → plugin.action()
+    ├─ "dropdown-free"→ menu.dropdownOn(button) → plugin.on() → plugin handles own events
+    ├─ "modal"        → plugins[cmd].open(button)
+    ├─ "browser"      → plugins[cmd].open(null)
+    ├─ "popup"        → plugins[cmd].show()
+    └─ (built-in)     → CommandExecutor.execute(cmd) (bold, undo, etc.)
+```
+
+### Public Event API
+
+**`EventManager.triggerEvent(name, data)`** dispatches events to user-registered handlers (from `options.events`).
+
+```javascript
+// Internal implementation
+triggerEvent = async (eventName, eventData) => {
+	const handler = this.events[eventName];
+	if (typeof handler === 'function') {
+		return await handler({ $: this.#$, ...eventData });
+	}
+	return NO_EVENT; // no handler registered
+};
+```
+
+**Return values:**
+
+- `false` — Handler explicitly canceled the action
+- `true` / truthy — Handler processed, continue normally
+- `NO_EVENT` — No handler registered (distinct from `false`)
+
+### Data Flow Summary
+
+```
+1. Wysiwyg Input (typing, paste, etc.):
+
+   DOM Event → Handler
+                 ├─→ Stage 1: triggerEvent('onXxx')     [user callback]
+                 ├─→ Stage 2: emitEventAsync('onXxx')   [plugin hooks]
+                 └─→ Stage 3: Reducer → Rules → Action[] → Executor → Effects
+                                                                          ↓
+                                                                     DOM Update → History Push → onChange
+
+2. Toolbar Click:
+
+   Button Click → CommandDispatcher.run(cmd, type)
+                    ├─→ plugin.action() / plugin.open() / plugin.show()
+                    └─→ (for built-ins) → CommandExecutor → inline/format logic
+                                                                ↓
+                                                           DOM Update → History Push → onChange
+
+3. Selection Change:
+
+   selectionchange → EventOrchestrator.applyTagEffect(node)
+                       ├─→ selectionState.update()   [track current node path]
+                       └─→ plugin.active(element, button) for each active command
+                                                                ↓
+                                                           Toolbar button state updated
 ```
 
 This separation keeps event handling predictable and easier to maintain across browsers.

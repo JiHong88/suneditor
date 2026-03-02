@@ -306,180 +306,20 @@ Contracts can be combined with a base plugin class via `implements`.
 
 ---
 
-#### Plugin Methods Reference
+#### Plugin Hooks & Methods Reference
 
-Plugin methods are organized into three categories:
+> **Full reference:** [Custom Plugin Guide](./guide/custom-plugin.md) — Complete hook tables, parameter types, code examples, and multi-interface patterns.
 
-1. **Interface Methods** - Type-specific methods defined by plugin base classes
-2. **Common Hooks** - Lifecycle and event hooks available to ALL plugins
-3. **Module Hooks** - Hooks for plugins using specific modules (Modal, Controller, etc.)
+Plugin hooks are organized into four categories:
 
-> **Legend:**
->
-> - Required | Optional
-> - Very common | Moderate | Rare
+| Category            | Interfaces                                                                                 | Key Methods                                                                                            |
+| ------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| **Common Hooks**    | (all plugins)                                                                              | `active()`, `init()`, `retainFormat()`, `shortcut()`, `setDir()`                                       |
+| **Event Hooks**     | (all plugins)                                                                              | `onKeyDown`, `onInput`, `onClick`, `onPaste`, `onFocus`, `onBlur`, +8 more                             |
+| **Module Hooks**    | `ModuleModal`, `ModuleController`, `ModuleColorPicker`, `ModuleHueSlider`, `ModuleBrowser` | `modalAction()`, `controllerAction()`, `colorPickerAction()`, etc.                                     |
+| **Component Hooks** | `EditorComponent`                                                                          | `componentSelect()`, `componentDeselect()`, `componentEdit()`, `componentDestroy()`, `componentCopy()` |
 
----
-
-##### 1. Module Hooks (When Using Modules)
-
-Interface definitions: [`src/interfaces/contracts.js`](src/interfaces/contracts.js)
-
-###### Modal Module — Interface: `ModuleModal`
-
-| Hook                 | Required | When Called             | Return             |
-| -------------------- | -------- | ----------------------- | ------------------ |
-| `modalAction()`      | Required | Form submit             | `Promise<boolean>` |
-| `modalOn(isUpdate)`  | Optional | After modal opens       | `void`             |
-| `modalOff(isUpdate)` | Optional | After modal closes      | `void`             |
-| `modalInit()`        | Optional | Before modal open/close | `void`             |
-| `modalResize()`      | Optional | Modal window resized    | `void`             |
-
-###### Controller Module — Interface: `ModuleController`
-
-| Hook                         | Required | When Called              | Return |
-| ---------------------------- | -------- | ------------------------ | ------ |
-| `controllerAction(target)`   | Required | Controller button click  | `void` |
-| `controllerOn(form, target)` | Optional | After controller opens   | `void` |
-| `controllerClose()`          | Optional | Before controller closes | `void` |
-
-###### ColorPicker Module — Interface: `ModuleColorPicker`
-
-| Hook                          | Required | When Called               | Return |
-| ----------------------------- | -------- | ------------------------- | ------ |
-| `colorPickerAction(color)`    | Optional | Color selected            | `void` |
-| `colorPickerHueSliderOpen()`  | Optional | Before hue slider opens   | `void` |
-| `colorPickerHueSliderClose()` | Optional | When hue slider cancelled | `void` |
-
-###### HueSlider Module — Interface: `ModuleHueSlider`
-
-| Hook                      | Required | When Called              | Return |
-| ------------------------- | -------- | ------------------------ | ------ |
-| `hueSliderAction(color)`  | Required | Color selected in slider | `void` |
-| `hueSliderCancelAction()` | Optional | Hue slider cancelled     | `void` |
-
-###### Browser Module — Interface: `ModuleBrowser`
-
-| Hook            | Required | When Called    | Return |
-| --------------- | -------- | -------------- | ------ |
-| `browserInit()` | Optional | Browser opened | `void` |
-
----
-
-##### 2. Component Hooks — Interface: `EditorComponent`
-
-For plugins that create **static components** (e.g., image, video, embed) using `this.$.component.setInfo()`.
-
-**`static component(node)` Method:**
-
-Component plugins must define a static `component` method that identifies whether a DOM node belongs to this plugin.
-
-```javascript
-class MyComponentPlugin extends PluginModal {
-	static component(node) {
-		return /^IMG$/i.test(node?.nodeName) ? node : null;
-	}
-}
-```
-
-**`_element` Property Requirement:**
-
-Component plugins must define a public `_element` property that references the currently controlled DOM element.
-
-| Hook                        | Required | When Called                 | Return            |
-| --------------------------- | -------- | --------------------------- | ----------------- |
-| `componentSelect(target)`   | Required | Component selected          | `void \| boolean` |
-| `componentDeselect(target)` | Optional | Component deselected        | `void`            |
-| `componentEdit(target)`     | Optional | Component edit button click | `void`            |
-| `componentDestroy(target)`  | Optional | Component delete            | `Promise<void>`   |
-| `componentCopy(params)`     | Optional | Copy event                  | `boolean \| void` |
-
-##### 3. Common Hooks (All Plugins)
-
-These hooks from `src/hooks/base.js` can be implemented by **any plugin type**.
-
-| Hook                      | When Called                          | Return                 |
-| ------------------------- | ------------------------------------ | ---------------------- |
-| `active(element, target)` | Selection change                     | `boolean \| undefined` |
-| `init()`                  | Editor initialization / resetOptions | `void`                 |
-| `retainFormat()`          | HTML cleaning/validation             | `{query, method}`      |
-| `shortcut(params)`        | Shortcut key triggered               | `void`                 |
-| `setDir(dir)`             | RTL direction change                 | `void`                 |
-
-###### Toolbar Input Hooks (PluginInput only)
-
-| Hook                          | When Called                      | Return |
-| ----------------------------- | -------------------------------- | ------ |
-| `toolbarInputKeyDown(params)` | Keydown in toolbar input element | `void` |
-| `toolbarInputChange(params)`  | Input value changes (blur/click) | `void` |
-
-###### Event Hooks
-
-Event hooks are dispatched by the runtime using the `on*` names below (`onKeyDown`, `onInput`, ...).  
-If asynchronous behavior is needed, implement the same hook as `async` (e.g., `async onKeyDown(params) { ... }`).
-
-> **Interruptible**: Returning a boolean stops the event hook loop and controls default behavior.
-
-| Hook                 | When Called          | Interruptible | Return                                        |
-| -------------------- | -------------------- | ------------- | --------------------------------------------- |
-| `onKeyDown`          | Key down in editor   | Yes           | `boolean \| void \| Promise<boolean \| void>` |
-| `onKeyUp`            | Key up in editor     | Yes           | `boolean \| void \| Promise<boolean \| void>` |
-| `onMouseDown`        | Mouse down in editor | Yes           | `boolean \| void \| Promise<boolean \| void>` |
-| `onClick`            | Click in editor      | Yes           | `boolean \| void \| Promise<boolean \| void>` |
-| `onPaste`            | Paste event          | Yes           | `boolean \| void \| Promise<boolean \| void>` |
-| `onBeforeInput`      | Before input event   | No            | `void \| Promise<void>`                       |
-| `onInput`            | Editor content input | No            | `void \| Promise<void>`                       |
-| `onMouseUp`          | Mouse up in editor   | No            | `void \| Promise<void>`                       |
-| `onMouseLeave`       | Mouse leave editor   | No            | `void \| Promise<void>`                       |
-| `onMouseMove`        | Mouse move in editor | No            | `void \| Promise<void>`                       |
-| `onScroll`           | Editor scroll        | No            | `void \| Promise<void>`                       |
-| `onFocus`            | Editor focus         | No            | `void \| Promise<void>`                       |
-| `onBlur`             | Editor blur          | No            | `void \| Promise<void>`                       |
-| `onFilePasteAndDrop` | File paste/drop      | No            | `void \| Promise<void>`                       |
-
-**Interruptible Event Return Values:**
-
-- `false` — Stops remaining plugins **and** prevents default editor behavior
-- `true` — Stops remaining plugins, **allows** default editor behavior
-- `void`/`undefined` — Continues to next plugin
-
-###### Event Hook Execution Order (`eventIndex`)
-
-When multiple plugins implement the same event hook, execution order is controlled by `eventIndex` in `static options`:
-
-```javascript
-class MyPlugin extends PluginField {
-	static options = {
-		eventIndex: 100, // Default priority for all events
-		eventIndex_onKeyDown: 50, // Per-event override (lower = earlier)
-		eventIndex_onInput: 200, // Higher = later execution
-	};
-}
-```
-
-Lower `eventIndex` values execute first. Per-event overrides (e.g., `eventIndex_onKeyDown`) take precedence over the default `eventIndex`.
-
----
-
-#### Hook Parameter Types
-
-Many hook methods receive standardized parameter objects defined in [`src/hooks/params.js`](src/hooks/params.js).
-
-**Common Parameter Types:**
-
-| Type                                 | Properties                                 | Used By                                                              |
-| ------------------------------------ | ------------------------------------------ | -------------------------------------------------------------------- |
-| **`HookParams.MouseEvent`**          | `{ frameContext, event }`                  | `onMouseDown`, `onMouseUp`, `onClick`, `onMouseMove`, `onMouseLeave` |
-| **`HookParams.KeyEvent`**            | `{ frameContext, event, range, line }`     | `onKeyDown`, `onKeyUp`                                               |
-| **`HookParams.FocusBlur`**           | `{ frameContext, event }`                  | `onFocus`, `onBlur`                                                  |
-| **`HookParams.Scroll`**              | `{ frameContext, event }`                  | `onScroll`                                                           |
-| **`HookParams.InputWithData`**       | `{ frameContext, event, data }`            | `onBeforeInput`, `onInput`                                           |
-| **`HookParams.Paste`**               | `{ frameContext, event, data, doc }`       | `onPaste`                                                            |
-| **`HookParams.FilePasteDrop`**       | `{ frameContext, event, file }`            | `onFilePasteAndDrop`                                                 |
-| **`HookParams.ToolbarInputKeyDown`** | `{ target, event }`                        | `toolbarInputKeyDown`                                                |
-| **`HookParams.ToolbarInputChange`**  | `{ target, event, value }`                 | `toolbarInputChange`                                                 |
-| **`HookParams.Shortcut`**            | `{ range, line, info, event, keyCode, $ }` | `shortcut`                                                           |
-| **`HookParams.CopyComponent`**       | `{ event, cloneContainer, info }`          | `componentCopy`                                                      |
+**Event hook execution order** is controlled by `eventIndex` in `static options` (lower = earlier).
 
 ---
 
@@ -838,5 +678,6 @@ The `dist/` folder is NOT tracked in git and is built via CI/CD.
 
 ## Supplementary Guides
 
+- [Custom Plugin Guide](./guide/custom-plugin.md) - Creating custom plugins
 - [External Libraries](./guide/external-libraries.md) - CodeMirror, KaTeX, MathJax integration
 - [Type Definitions](./guide/typedef-guide.md) - SunEditor namespace types reference
