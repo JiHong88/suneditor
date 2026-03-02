@@ -231,8 +231,12 @@ class MyPlugin extends PluginModal {
 	static key = 'myPlugin';
 	static className = 'se-btn-my-plugin';
 
-	constructor(editor, pluginOptions) {
-		super(editor);
+	/**
+	 * @constructor
+	 * @param {SunEditor.Kernel} kernel - The core kernel
+	 */
+	constructor(kernel, pluginOptions) {
+		super(kernel);
 		this.title = this.$.lang.myPlugin; // language string
 		this.icon = 'myPlugin';
 	}

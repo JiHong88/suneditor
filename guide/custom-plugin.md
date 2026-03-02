@@ -13,11 +13,13 @@ Technical reference for creating custom SunEditor plugins. Covers all plugin typ
 - [Constructor Pattern](#constructor-pattern)
 - [Dependency Bag (`this.$`)](#dependency-bag-this)
 - [Hooks Reference](#hooks-reference)
+    - [JSDoc Type Annotations](#jsdoc-type-annotations)
     - [Common Hooks](#common-hooks-all-plugins)
     - [Event Hooks](#event-hooks-all-plugins)
     - [Module Hooks](#module-hooks-contract-interfaces)
     - [Component Hooks](#component-hooks-editorcomponent-interface)
 - [Multi-Interface Pattern](#multi-interface-pattern)
+    - [`extends` vs `implements`](#extends-vs-implements)
 - [Modules Reference](#modules-reference)
 - [Complete Examples](#complete-examples)
 - [Plugin Registration](#plugin-registration)
@@ -73,12 +75,20 @@ import { dom } from 'suneditor/src/helper';
 class HelloWorld extends PluginCommand {
 	static key = 'helloWorld';
 
-	constructor(editor) {
-		super(editor);
+	/**
+	 * @constructor
+	 * @param {SunEditor.Kernel} kernel - The core kernel
+	 */
+	constructor(kernel) {
+		super(kernel);
 		this.title = 'Hello World';
 		this.icon = '<span style="font-size:14px">HW</span>';
 	}
 
+	/**
+	 * @override
+	 * @type {PluginCommand['action']}
+	 */
 	action() {
 		this.$.html.insert('<p>Hello, World!</p>');
 		this.$.history.push(false);
@@ -97,8 +107,8 @@ import type { SunEditor } from 'suneditor/types';
 class HelloWorld extends PluginCommand {
 	static key = 'helloWorld';
 
-	constructor(editor: SunEditor.Kernel) {
-		super(editor);
+	constructor(kernel: SunEditor.Kernel) {
+		super(kernel);
 		this.title = 'Hello World';
 		this.icon = '<span style="font-size:14px">HW</span>';
 	}
@@ -153,12 +163,20 @@ import { dom } from 'suneditor/src/helper';
 class ToggleStrikethrough extends PluginCommand {
 	static key = 'toggleStrikethrough';
 
-	constructor(editor) {
-		super(editor);
+	/**
+	 * @constructor
+	 * @param {SunEditor.Kernel} kernel - The core kernel
+	 */
+	constructor(kernel) {
+		super(kernel);
 		this.title = 'Strikethrough';
 		this.icon = 'strikethrough'; // built-in icon key, or raw SVG/HTML
 	}
 
+	/**
+	 * @hook Editor.EventManager
+	 * @type {SunEditor.Hook.Event.Active}
+	 */
 	active(element, target) {
 		if (/^S$/i.test(element?.nodeName)) {
 			dom.utils.addClass(target, 'active');
@@ -168,6 +186,10 @@ class ToggleStrikethrough extends PluginCommand {
 		return false;
 	}
 
+	/**
+	 * @override
+	 * @type {PluginCommand['action']}
+	 */
 	action() {
 		const node = dom.utils.createElement('S');
 		this.$.inline.apply(node, { stylesToModify: null, nodesToRemove: null });
@@ -183,11 +205,21 @@ Opens a dropdown menu. `on()` is called when the menu opens, `action()` when an 
 import { PluginDropdown } from 'suneditor/src/interfaces';
 import { dom } from 'suneditor/src/helper';
 
+/**
+ * @typedef {Object} CustomAlignPluginOptions
+ * @property {Array.<"right"|"center"|"left"|"justify">} [items] - Align items
+ */
+
 class CustomAlign extends PluginDropdown {
 	static key = 'customAlign';
 
-	constructor(editor) {
-		super(editor);
+	/**
+	 * @constructor
+	 * @param {SunEditor.Kernel} kernel - The core kernel
+	 * @param {CustomAlignPluginOptions} pluginOptions
+	 */
+	constructor(kernel, pluginOptions) {
+		super(kernel);
 		this.title = this.$.lang.align;
 		this.icon = 'align_left';
 
@@ -208,10 +240,18 @@ class CustomAlign extends PluginDropdown {
 		this.$.menu.initDropdownTarget(CustomAlign, menu);
 	}
 
+	/**
+	 * @override
+	 * @type {PluginDropdown['on']}
+	 */
 	on(target) {
 		// Called when dropdown opens. Update active states.
 	}
 
+	/**
+	 * @override
+	 * @type {PluginDropdown['action']}
+	 */
 	action(target) {
 		const value = target.getAttribute('data-command');
 		if (!value) return;
@@ -238,8 +278,12 @@ import { PluginDropdownFree } from 'suneditor/src/interfaces';
 class CustomPicker extends PluginDropdownFree {
   static key = 'customPicker';
 
-  constructor(editor) {
-    super(editor);
+  /**
+   * @constructor
+   * @param {SunEditor.Kernel} kernel - The core kernel
+   */
+  constructor(kernel) {
+    super(kernel);
     this.title = 'Custom Picker';
     this.icon = 'color';
 
@@ -277,8 +321,12 @@ import { dom } from 'suneditor/src/helper';
 class InsertCode extends PluginModal {
 	static key = 'insertCode';
 
-	constructor(editor) {
-		super(editor);
+	/**
+	 * @constructor
+	 * @param {SunEditor.Kernel} kernel - The core kernel
+	 */
+	constructor(kernel) {
+		super(kernel);
 		this.title = 'Insert Code';
 		this.icon = 'code';
 
@@ -303,12 +351,18 @@ class InsertCode extends PluginModal {
 		this.textarea = modalEl.querySelector('textarea');
 	}
 
-	// Required: opens the modal
+	/**
+	 * @override
+	 * @type {PluginModal['open']}
+	 */
 	open() {
 		this.modal.open();
 	}
 
-	// ModuleModal hook: form submitted
+	/**
+	 * @hook Modules.Modal
+	 * @type {SunEditor.Hook.Modal.Action}
+	 */
 	async modalAction() {
 		const code = this.textarea.value;
 		if (!code) return false; // close loading only
@@ -323,13 +377,19 @@ class InsertCode extends PluginModal {
 		return true; // close modal + loading
 	}
 
-	// ModuleModal hook: modal opened
+	/**
+	 * @hook Modules.Modal
+	 * @type {SunEditor.Hook.Modal.On}
+	 */
 	modalOn(isUpdate) {
 		if (!isUpdate) this.textarea.value = '';
 		this.textarea.focus();
 	}
 
-	// ModuleModal hook: modal closed
+	/**
+	 * @hook Modules.Modal
+	 * @type {SunEditor.Hook.Modal.Off}
+	 */
 	modalOff() {
 		this.textarea.value = '';
 	}
@@ -347,8 +407,12 @@ import Browser from 'suneditor/src/modules/contract/Browser';
 class MyGallery extends PluginBrowser {
 	static key = 'myGallery';
 
-	constructor(editor) {
-		super(editor);
+	/**
+	 * @constructor
+	 * @param {SunEditor.Kernel} kernel - The core kernel
+	 */
+	constructor(kernel) {
+		super(kernel);
 		this.title = 'My Gallery';
 		this.icon = 'image';
 
@@ -377,11 +441,19 @@ class HashtagDetector extends PluginField {
 	static key = 'hashtagDetector';
 	static className = '';
 
-	constructor(editor) {
-		super(editor);
+	/**
+	 * @constructor
+	 * @param {SunEditor.Kernel} kernel - The core kernel
+	 */
+	constructor(kernel) {
+		super(kernel);
 		this.onInput = converter.debounce(this.onInput.bind(this), 200);
 	}
 
+	/**
+	 * @hook Editor.EventManager
+	 * @type {SunEditor.Hook.Event.OnInput}
+	 */
 	onInput({ frameContext }) {
 		const sel = this.$.selection.get();
 		const text = sel.anchorNode?.textContent || '';
@@ -406,11 +478,19 @@ import { PluginInput } from 'suneditor/src/interfaces';
 class CustomInput extends PluginInput {
 	static key = 'customInput';
 
-	constructor(editor) {
-		super(editor);
+	/**
+	 * @constructor
+	 * @param {SunEditor.Kernel} kernel - The core kernel
+	 */
+	constructor(kernel) {
+		super(kernel);
 		this.title = 'Custom Input';
 	}
 
+	/**
+	 * @override
+	 * @type {PluginInput['toolbarInputKeyDown']}
+	 */
 	toolbarInputKeyDown({ target, event }) {
 		if (event.key === 'Enter') {
 			event.preventDefault();
@@ -419,6 +499,10 @@ class CustomInput extends PluginInput {
 		}
 	}
 
+	/**
+	 * @override
+	 * @type {PluginInput['toolbarInputChange']}
+	 */
 	toolbarInputChange({ target, value }) {
 		// Handle input blur/change
 	}
@@ -435,8 +519,12 @@ import { PluginPopup } from 'suneditor/src/interfaces';
 class InfoPopup extends PluginPopup {
 	static key = 'infoPopup';
 
-	constructor(editor) {
-		super(editor);
+	/**
+	 * @constructor
+	 * @param {SunEditor.Kernel} kernel - The core kernel
+	 */
+	constructor(kernel) {
+		super(kernel);
 		this.title = 'Info';
 	}
 
@@ -489,13 +577,30 @@ class MyImagePlugin extends PluginModal {
 
 ## Constructor Pattern
 
+Plugin options are defined as a `@typedef` above the class, and the constructor receives `kernel` + `pluginOptions`:
+
 ```javascript
+/**
+ * @typedef {Object} MyPluginOptions
+ * @property {boolean} [canResize=true] - Whether the element can be resized.
+ * @property {string} [defaultWidth="auto"] - The default width.
+ */
+
+/**
+ * @class
+ * @description MyPlugin description.
+ */
 class MyPlugin extends PluginModal {
 	static key = 'myPlugin';
 	static className = 'se-btn-my-plugin';
 
-	constructor(editor, pluginOptions) {
-		super(editor); // Required: sets this.$ = kernel.$
+	/**
+	 * @constructor
+	 * @param {SunEditor.Kernel} kernel - The core kernel
+	 * @param {MyPluginOptions} pluginOptions
+	 */
+	constructor(kernel, pluginOptions) {
+		super(kernel); // Required: sets this.$ = kernel.$
 
 		// Plugin metadata (used by toolbar button)
 		this.title = this.$.lang.myPlugin || 'My Plugin';
@@ -518,8 +623,8 @@ class MyPlugin extends PluginModal {
 
 **Parameters:**
 
-- `editor` (`SunEditor.Kernel`) — The kernel instance. Pass to `super()`.
-- `pluginOptions` (`object`) — Plugin-specific options from `options[pluginKey]`.
+- `kernel` (`SunEditor.Kernel`) — The core kernel instance. Pass to `super()`.
+- `pluginOptions` (`object`) — Plugin-specific options from `options[pluginKey]`. Define a `@typedef` for type checking.
 
 ---
 
@@ -593,6 +698,96 @@ Source: [`src/core/kernel/kernelInjector.js`](../src/core/kernel/kernelInjector.
 
 Hooks are methods that the editor core or modules call on plugin instances at specific lifecycle points.
 
+### JSDoc Type Annotations
+
+All hook methods should be annotated with JSDoc tags to enable type checking and IDE support. There are three annotation patterns:
+
+#### `@hook` + `@type` — Hook Methods
+
+Used for methods called by the editor core or modules. The `@hook` tag indicates which system calls the method, and `@type` provides the type signature.
+
+```javascript
+/**
+ * @hook Editor.EventManager
+ * @type {SunEditor.Hook.Event.Active}
+ */
+active(element, target) { ... }
+
+/**
+ * @hook Editor.EventManager
+ * @type {SunEditor.Hook.Event.OnKeyDown}
+ */
+onKeyDown({ frameContext, event, range, line }) { ... }
+
+/**
+ * @hook Editor.Core
+ * @type {SunEditor.Hook.Core.Shortcut}
+ */
+shortcut({ range, info }) { ... }
+
+/**
+ * @hook Modules.Modal
+ * @type {SunEditor.Hook.Modal.Action}
+ */
+async modalAction() { ... }
+
+/**
+ * @hook Editor.Component
+ * @type {SunEditor.Hook.Component.Select}
+ */
+componentSelect(target) { ... }
+```
+
+**Available `@hook` categories and their `@type` namespaces:**
+
+| `@hook` Category      | `@type` Namespace              | Methods                                                                         |
+| --------------------- | ------------------------------ | ------------------------------------------------------------------------------- |
+| `Editor.EventManager` | `SunEditor.Hook.Event.*`       | `Active`, `OnKeyDown`, `OnInput`, `OnClick`, `OnPaste`, `OnFocus`, `OnBlur` ... |
+| `Editor.Core`         | `SunEditor.Hook.Core.*`        | `RetainFormat`, `Shortcut`, `SetDir`, `Init`                                    |
+| `Editor.Component`    | `SunEditor.Hook.Component.*`   | `Select`, `Deselect`, `Edit`, `Destroy`, `Copy`                                 |
+| `Modules.Modal`       | `SunEditor.Hook.Modal.*`       | `Action`, `On`, `Init`, `Off`, `Resize`                                         |
+| `Modules.Controller`  | `SunEditor.Hook.Controller.*`  | `Action`, `On`, `Close`                                                         |
+| `Modules.ColorPicker` | `SunEditor.Hook.ColorPicker.*` | `Action`, `HueSliderOpen`, `HueSliderClose`                                     |
+| `Modules.HueSlider`   | `SunEditor.Hook.HueSlider.*`   | `Action`, `CancelAction`                                                        |
+
+#### `@override` + `@type` — Base Class Method Overrides
+
+Used when overriding required/optional methods from the base plugin class:
+
+```javascript
+/**
+ * @override
+ * @type {PluginModal['open']}
+ */
+open(target) { ... }
+
+/**
+ * @override
+ * @type {PluginInput['toolbarInputKeyDown']}
+ */
+toolbarInputKeyDown({ target, event }) { ... }
+```
+
+#### `@imple` + `@type` — Cross-Plugin Interface Methods
+
+Used when a plugin implements methods from **another plugin type** via `@implements` (see [`extends` vs `implements`](#extends-vs-implements)):
+
+```javascript
+/**
+ * @imple Command
+ * @type {PluginCommand['action']}
+ */
+action(target) { ... }
+
+/**
+ * @imple Dropdown
+ * @type {PluginDropdown['on']}
+ */
+on(target) { ... }
+```
+
+---
+
 ### Common Hooks (All Plugins)
 
 Source: [`src/hooks/base.js`](../src/hooks/base.js) — `Core` object
@@ -610,6 +805,10 @@ These can be implemented by **any** plugin type.
 **`active()` example:**
 
 ```javascript
+/**
+ * @hook Editor.EventManager
+ * @type {SunEditor.Hook.Event.Active}
+ */
 active(element, target) {
   if (/^BLOCKQUOTE$/i.test(element?.nodeName)) {
     dom.utils.addClass(target, 'active');
@@ -675,6 +874,10 @@ class MyPlugin extends PluginField {
 		eventIndex_onInput: 200, // Override: run onInput later
 	};
 
+	/**
+	 * @hook Editor.EventManager
+	 * @type {SunEditor.Hook.Event.OnKeyDown}
+	 */
 	onKeyDown({ event, range }) {
 		if (event.key === 'Tab') {
 			event.preventDefault();
@@ -816,52 +1019,52 @@ class CustomEmbed extends interfaces.PluginModal
     return /^IFRAME$/i.test(node?.nodeName) ? node : null;
   }
 
-  // PluginModal (required)
+  /** @override PluginModal */
   open(target?: HTMLElement): void {
     this.modal.open();
   }
 
-  // ModuleModal (required)
+  /** @hook Modules.Modal — Action */
   async modalAction(): Promise<boolean> {
     // Handle form submission
     this.$.history.push(false);
     return true;
   }
 
-  // ModuleModal (optional)
+  /** @hook Modules.Modal — On */
   modalOn(isUpdate: boolean): void {
     // Initialize modal state
   }
 
-  // ModuleModal (optional)
+  /** @hook Modules.Modal — Off */
   modalOff(isUpdate: boolean): void {
     // Cleanup
   }
 
-  // ModuleController (required)
+  /** @hook Modules.Controller — Action */
   controllerAction(target: HTMLElement): void {
     const command = target.getAttribute('data-command');
     if (command === 'edit') this.modal.open();
     if (command === 'delete') this.componentDestroy(this._element!);
   }
 
-  // ModuleController (optional)
+  /** @hook Modules.Controller — Close */
   controllerClose(): void {
     // Cleanup on controller close
   }
 
-  // EditorComponent (required)
+  /** @hook Editor.Component — Select */
   componentSelect(target: HTMLElement): void {
     this._element = target;
     this.controller.open(target, null, { isWWTarget: false });
   }
 
-  // EditorComponent (optional)
+  /** @hook Editor.Component — Deselect */
   componentDeselect(target: HTMLElement): void {
     this._element = null;
   }
 
-  // EditorComponent (optional)
+  /** @hook Editor.Component — Destroy */
   async componentDestroy(target: HTMLElement): Promise<void> {
     const container = target.parentElement;
     container?.remove();
@@ -888,34 +1091,70 @@ class CustomEmbed extends PluginModal {
 		return /^IFRAME$/i.test(node?.nodeName) ? node : null;
 	}
 
-	constructor(editor) {
-		super(editor);
+	/**
+	 * @constructor
+	 * @param {SunEditor.Kernel} kernel - The core kernel
+	 */
+	constructor(kernel) {
+		super(kernel);
 		this._element = null;
 		this.modal = new Modal(this, this.$, modalEl);
 		this.controller = new Controller(this, this.$, controllerEl);
 	}
 
+	/**
+	 * @override
+	 * @type {PluginModal['open']}
+	 */
 	open() {
 		this.modal.open();
 	}
+	/**
+	 * @hook Modules.Modal
+	 * @type {SunEditor.Hook.Modal.Action}
+	 */
 	async modalAction() {
 		/* ... */ return true;
 	}
+	/**
+	 * @hook Modules.Modal
+	 * @type {SunEditor.Hook.Modal.On}
+	 */
 	modalOn(isUpdate) {
 		/* ... */
 	}
+	/**
+	 * @hook Modules.Modal
+	 * @type {SunEditor.Hook.Modal.Off}
+	 */
 	modalOff(isUpdate) {
 		/* ... */
 	}
+	/**
+	 * @hook Modules.Controller
+	 * @type {SunEditor.Hook.Controller.Action}
+	 */
 	controllerAction(target) {
 		/* ... */
 	}
+	/**
+	 * @hook Editor.Component
+	 * @type {SunEditor.Hook.Component.Select}
+	 */
 	componentSelect(target) {
 		this._element = target;
 	}
+	/**
+	 * @hook Editor.Component
+	 * @type {SunEditor.Hook.Component.Deselect}
+	 */
 	componentDeselect(target) {
 		this._element = null;
 	}
+	/**
+	 * @hook Editor.Component
+	 * @type {SunEditor.Hook.Component.Destroy}
+	 */
 	async componentDestroy(target) {
 		/* ... */
 	}
@@ -923,6 +1162,104 @@ class CustomEmbed extends PluginModal {
 ```
 
 > **Key insight:** TypeScript `implements` only provides compile-time type checking — it enforces that you implement all required methods with correct signatures. At runtime, the behavior is identical to JavaScript.
+
+### `extends` vs `implements`
+
+A plugin uses **`extends`** and **`implements`** for different purposes:
+
+| Keyword          | Purpose                                                                | Multiplicity     |
+| ---------------- | ---------------------------------------------------------------------- | ---------------- |
+| **`extends`**    | Inherit from a plugin base class (determines the plugin type)          | Exactly **one**  |
+| **`implements`** | Compose additional interfaces (module contracts or other plugin types) | **Zero or more** |
+
+#### 1. `extends` — Plugin Base Type (single inheritance)
+
+Every plugin `extends` exactly **one** base class. This determines its primary type and lifecycle:
+
+```
+extends PluginModal    → type: 'modal'    (required: open())
+extends PluginCommand  → type: 'command'  (required: action())
+extends PluginInput    → type: 'input'    (optional: toolbarInputKeyDown/Change)
+extends PluginDropdown → type: 'dropdown' (required: action())
+```
+
+#### 2. `implements` — Module Contracts
+
+Plugins `implements` module contracts to hook into module lifecycles:
+
+```typescript
+class Image extends PluginModal
+  implements ModuleModal, ModuleController, EditorComponent { ... }
+```
+
+- `ModuleModal` → `modalAction()`, `modalOn()`, `modalOff()`
+- `ModuleController` → `controllerAction()`, `controllerOn()`
+- `EditorComponent` → `componentSelect()`, `componentDestroy()`
+
+#### 3. `implements` — Cross-Plugin-Type Composition
+
+A plugin can also `implements` **other plugin type interfaces** to provide multiple interaction modes. The `fontSize` plugin is a representative example:
+
+```
+FontSize extends PluginInput          ← base type (toolbar input)
+  @implements {PluginCommand}         ← provides action() for inc/dec buttons
+  @implements {PluginDropdown}        ← provides on() for dropdown menu
+```
+
+**JavaScript** — Use `@implements` JSDoc tags for type hints:
+
+```javascript
+import { PluginCommand, PluginDropdown, PluginInput } from 'suneditor/src/interfaces';
+
+void PluginCommand;
+void PluginDropdown;
+
+/**
+ * @implements {PluginCommand}
+ * @implements {PluginDropdown}
+ */
+class FontSize extends PluginInput {
+	static key = 'fontSize';
+
+	// PluginInput base
+	toolbarInputKeyDown(params) {
+		/* handle arrow keys, enter */
+	}
+	toolbarInputChange(params) {
+		/* apply typed value */
+	}
+
+	// PluginCommand (implements) — inc/dec button clicks
+	action(target) {
+		/* adjust font size */
+	}
+
+	// PluginDropdown (implements) — dropdown open
+	on(target) {
+		/* highlight active size in list */
+	}
+}
+```
+
+**TypeScript** — Use `implements` keyword:
+
+```typescript
+import { interfaces } from 'suneditor';
+import type { SunEditor } from 'suneditor/types';
+
+class FontSize extends interfaces.PluginInput
+  implements interfaces.PluginCommand, interfaces.PluginDropdown
+{
+  static key = 'fontSize';
+
+  toolbarInputKeyDown(params: SunEditor.HookParams.ToolbarInputKeyDown): void { ... }
+  toolbarInputChange(params: SunEditor.HookParams.ToolbarInputChange): void { ... }
+  action(target: HTMLElement): void { ... }
+  on(target: HTMLElement): void { ... }
+}
+```
+
+> **When to use cross-plugin implements:** When a single plugin provides **multiple interaction modes** (e.g., an input field + dropdown menu + command buttons all controlling the same feature). The base `extends` determines the primary type; `implements` adds methods from other plugin types that the editor calls by name.
 
 ---
 
@@ -965,12 +1302,20 @@ import { PluginCommand } from 'suneditor/src/interfaces';
 class WordCount extends PluginCommand {
 	static key = 'wordCount';
 
-	constructor(editor) {
-		super(editor);
+	/**
+	 * @constructor
+	 * @param {SunEditor.Kernel} kernel - The core kernel
+	 */
+	constructor(kernel) {
+		super(kernel);
 		this.title = 'Word Count';
 		this.icon = '<span style="font-size:12px;font-weight:bold">WC</span>';
 	}
 
+	/**
+	 * @override
+	 * @type {PluginCommand['action']}
+	 */
 	action() {
 		const text = this.$.html.get({ format: 'text' });
 		const words = text.trim().split(/\s+/).filter(Boolean).length;
@@ -998,8 +1343,12 @@ class QuickStyle extends PluginDropdown {
 		{ name: 'Info', class: 'info-block', bg: '#e3f2fd' },
 	];
 
-	constructor(editor) {
-		super(editor);
+	/**
+	 * @constructor
+	 * @param {SunEditor.Kernel} kernel - The core kernel
+	 */
+	constructor(kernel) {
+		super(kernel);
 		this.title = 'Quick Style';
 		this.icon = 'blockStyle';
 
@@ -1014,6 +1363,10 @@ class QuickStyle extends PluginDropdown {
 		this.$.menu.initDropdownTarget(QuickStyle, menu);
 	}
 
+	/**
+	 * @override
+	 * @type {PluginDropdown['action']}
+	 */
 	action(target) {
 		const className = target.getAttribute('data-command');
 		if (!className) return;
@@ -1097,12 +1450,12 @@ class Embed extends interfaces.PluginModal implements interfaces.ModuleModal, in
 		this.urlInput = modalEl.querySelector('input')!;
 	}
 
-	// -- PluginModal --
+	/** @override PluginModal */
 	open(): void {
 		this.modal.open();
 	}
 
-	// -- ModuleModal --
+	/** @hook Modules.Modal — Action */
 	async modalAction(): Promise<boolean> {
 		const url = this.urlInput.value.trim();
 		if (!url) return false;
@@ -1124,21 +1477,24 @@ class Embed extends interfaces.PluginModal implements interfaces.ModuleModal, in
 		return true;
 	}
 
+	/** @hook Modules.Modal — On */
 	modalOn(isUpdate: boolean): void {
 		this.#isUpdate = isUpdate;
 		this.urlInput.value = isUpdate && this._element ? this._element.src : '';
 		this.urlInput.focus();
 	}
 
+	/** @hook Modules.Modal — Init */
 	modalInit(): void {
 		this.controller.close();
 	}
 
+	/** @hook Modules.Modal — Off */
 	modalOff(): void {
 		this.urlInput.value = '';
 	}
 
-	// -- ModuleController --
+	/** @hook Modules.Controller — Action */
 	controllerAction(target: HTMLElement): void {
 		const command = target.getAttribute('data-command');
 		if (command === 'edit') {
@@ -1148,16 +1504,18 @@ class Embed extends interfaces.PluginModal implements interfaces.ModuleModal, in
 		}
 	}
 
-	// -- EditorComponent --
+	/** @hook Editor.Component — Select */
 	componentSelect(target: HTMLElement): void {
 		this._element = target as HTMLIFrameElement;
 		this.controller.open(target, null, { isWWTarget: false });
 	}
 
+	/** @hook Editor.Component — Deselect */
 	componentDeselect(): void {
 		this._element = null;
 	}
 
+	/** @hook Editor.Component — Destroy */
 	async componentDestroy(target: HTMLElement): Promise<void> {
 		const container = dom.query.getParentElement(target, dom.check.isFigure) || target;
 		const focusEl = container.previousElementSibling || container.nextElementSibling;
@@ -1213,7 +1571,7 @@ SUNEDITOR.create('editor', {
 });
 ```
 
-These options are passed as the second argument to the constructor: `constructor(editor, pluginOptions)`.
+These options are passed as the second argument to the constructor: `constructor(kernel, pluginOptions)`.
 
 ### Registration Rules
 
