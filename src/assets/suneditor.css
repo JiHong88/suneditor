@@ -772,7 +772,7 @@
 }
 
 .sun-editor .se-arrow.se-arrow-down::after {
-	top: -12px;
+	top: -14px;
 	content: ' ';
 	border-bottom-width: 0;
 	border-top-color: var(--se-controller-background-color);
