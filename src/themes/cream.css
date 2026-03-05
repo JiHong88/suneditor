@@ -1,0 +1,155 @@
+/** Theme color tokens used by suneditor.css and suneditor-contents.css. */
+/** [ assets/design/color.css ] */
+
+.sun-editor.se-theme-cream,
+.sun-editor-editable.se-theme-cream {
+	/** --------------------------- content - [colors] ----------- */
+	/* caret and placeholder */
+	--se-caret-color: #2b2b2b;
+	--se-drag-caret-color: #0077cc;
+	--se-placeholder-color: #8c8c8c;
+
+	/* editable text tones */
+	--se-edit-font-color: #2b2b2b;
+	--se-edit-font-pre: #3a3a3a;
+	--se-edit-font-quote: #555555;
+
+	/* editable surfaces */
+	--se-edit-background-color: #efe7d3;
+	--se-edit-background-pre: #e2d9c3;
+
+	/* content border scale */
+	--se-edit-border-light: #c4a06e;
+	--se-edit-border-dark: #b8956a;
+	--se-edit-border-dark-n1: #c0a070;
+	--se-edit-border-dark-n2: #a88a5e;
+	--se-edit-border-table: #c4a06e;
+
+	/* links and horizontal rules */
+	--se-edit-anchor: #0066bb;
+	--se-edit-anchor-on-back: #d4e8fc;
+	--se-edit-anchor-on-font: #003366;
+	--se-edit-hr-color: #b5a48a;
+	--se-edit-hr-on-back: #c8b898;
+
+	/* content interaction states */
+	--se-edit-active: #0077cc;
+	--se-edit-hover: #0088dd;
+	--se-edit-outline: #c4a06e;
+
+	/** --------------------------- layout - [colors] ----------- */
+	/* main shell and typography */
+	--se-main-font-family: Helvetica Neue;
+	--se-main-out-color: #ddd4c2;
+	--se-main-color: #2b2b2b;
+	--se-main-color-lighter: #555555;
+	--se-main-background-color: #efe7d3;
+	--se-code-view-color: #2b2b2b;
+	--se-main-font-color: #2b2b2b;
+	--se-code-view-background-color: #fdfaf2;
+	--se-main-divider-color: #c8b898;
+	--se-main-border-color: #c4a06e;
+	--se-main-outline-color: #d5c9b0;
+	--se-main-shadow-color: #a8997e;
+	--se-statusbar-font-color: #666666;
+	--se-overlay-background-color: rgba(0, 0, 0, 0.3);
+
+	/* hover states */
+	--se-hover-color: #d6e8f8;
+	--se-hover-dark-color: #6ba3d6;
+	--se-hover-dark2-color: #5593c6;
+	--se-hover-dark3-color: #4080b4;
+	--se-hover-light-color: #89b8e4;
+	--se-hover-light2-color: #a0c9ee;
+	--se-hover-light3-color: #bdd9f5;
+
+	/* active foreground states */
+	--se-active-color: #0077cc;
+	--se-active-hover-color: #0088dd;
+	--se-active-dark-color: #006ab5;
+	--se-active-dark2-color: #005c9e;
+	--se-active-dark3-color: #0077cc;
+	--se-active-dark4-color: #006ab5;
+	--se-active-dark5-color: #004d87;
+
+	/* active background states */
+	--se-active-light-color: #c8dfef;
+	--se-active-light2-color: #b0d0e8;
+	--se-active-light3-color: #98c1e0;
+	--se-active-light4-color: #80b2d8;
+	--se-active-light5-color: #68a3d0;
+	--se-active-light6-color: #5094c8;
+
+	/* floating layer shadow */
+	--se-shadow-layer-color: rgba(0, 0, 0, 0.15);
+
+	/* drag feedback */
+	--se-drag-over-color: #e8a020;
+
+	/* modal, browser, dropdown surfaces */
+	--se-modal-background-color: #f5edd9;
+	--se-modal-color: #2b2b2b;
+	--se-modal-border-color: #c4a06e;
+	--se-modal-anchor-color: #0066bb;
+	--se-modal-preview-color: #666666;
+	--se-modal-file-input-background-color: #e8e0cc;
+	--se-modal-input-disabled-color: #999999;
+	--se-modal-input-disabled-background-color: #e5dcca;
+
+	/* dropdown text */
+	--se-dropdown-font-color: #2b2b2b;
+
+	/* media/controller chrome */
+	--se-controller-border-color: #c4a06e;
+	--se-controller-background-color: #f5edd9;
+	--se-controller-color: #2b2b2b;
+	--se-shadow-controller-color: rgba(0, 0, 0, 0.18);
+
+	/* input-side button states */
+	--se-input-btn-border-color: #c4a06e;
+	--se-input-btn-disabled-color: #999999;
+
+	/* table picker */
+	--se-table-picker-color: #e8e0cc;
+	--se-table-picker-border-color: #c4a06e;
+	--se-table-picker-highlight-color: #c8dfef;
+	--se-table-picker-highlight-border-color: #0077cc;
+
+	/* success status palette */
+	--se-success-color: #1a8c3a;
+	--se-success-dark-color: #157030;
+	--se-success-dark2-color: #105826;
+	--se-success-dark3-color: #0c441e;
+	--se-success-light-color: #30a854;
+	--se-success-light2-color: #50c070;
+	--se-success-light3-color: #80d898;
+	--se-success-light4-color: #b5ecbf;
+	--se-success-light5-color: #e0f8e5;
+
+	/* error status palette */
+	--se-error-color: #d02040;
+	--se-error-dark-color: #b51a35;
+	--se-error-dark2-color: #9a142c;
+	--se-error-dark3-color: #800f24;
+	--se-error-light-color: #e04060;
+	--se-error-light2-color: #e87088;
+	--se-error-light3-color: #f0a0b0;
+	--se-error-light4-color: #f8d0d8;
+	--se-error-light5-color: #fce8ec;
+
+	/* document mode palette */
+	--se-doc-background: #e8e0cc;
+	--se-doc-info-page-font-color: #f5edd9;
+	--se-doc-info-page-background-color: #555555;
+	--se-doc-info-font-color: #555555;
+	--se-doc-info-active-color: #0077cc;
+
+	/* loading indicator */
+	--se-loading-color: #0077cc;
+
+	/* show-blocks debug colors */
+	--se-show-blocks-color: #0077cc;
+	--se-show-blocks-li-color: #8844dd;
+	--se-show-blocks-pre-color: #1a8c3a;
+	--se-show-blocks-component-color: #e8a020;
+}

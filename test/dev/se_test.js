@@ -5,6 +5,8 @@ require('../../src/assets/suneditor.css');
 require('../../src/assets/suneditor-contents.css');
 require('../../src/themes/dark.css');
 require('../../src/themes/cobalt.css');
+require('../../src/themes/cream.css');
+require('../../src/themes/midnight.css');
 
 // katex
 import Katex from 'katex';
@@ -1760,7 +1762,7 @@ const options1 = {
 
 <p><br>
 </p>
-`
+`,
 };
 
 window.editor_root = suneditor.create('#editor_classic', options1);
@@ -2224,7 +2226,7 @@ const options_test = {
 		imageRotation: true,
 		imageRatio: 0.5625,
 		imageSizeOnlyPercentage: false,
-		uploadUrl: 'http://localhost:3000/editor/upload'
+		uploadUrl: 'http://localhost:3000/editor/upload',
 	},
 	imageGallery: {
 		title: 'Image Gallery',
