@@ -47,9 +47,9 @@
 	--se-code-view-color: #111111;
 	--se-main-font-color: #e4e4e4;
 	--se-code-view-background-color: #dadada;
-	--se-main-divider-color: #333;
+	--se-main-divider-color: #3d4350;
 	--se-main-border-color: #444;
-	--se-main-outline-color: #2c2c2c;
+	--se-main-outline-color: #383838;
 	--se-main-shadow-color: #000;
 	--se-statusbar-font-color: #a1a1a1;
 	--se-overlay-background-color: rgba(0, 0, 0, 0.6);
@@ -100,13 +100,13 @@
 	--se-dropdown-font-color: #e4e4e4;
 
 	/* media/controller chrome */
-	--se-controller-border-color: #3a3a3a;
+	--se-controller-border-color: #4a4a4a;
 	--se-controller-background-color: #212121;
 	--se-controller-color: #e4e4e4;
 	--se-shadow-controller-color: rgba(0, 0, 0, 0.45);
 
 	/* input-side button states */
-	--se-input-btn-border-color: #3a3a3a;
+	--se-input-btn-border-color: #4a4a4a;
 	--se-input-btn-disabled-color: #777;
 
 	/* table picker */
