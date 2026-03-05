@@ -34,10 +34,10 @@ export type FileGalleryPluginOptions = {
 declare class FileGallery extends PluginBrowser {
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} editor - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 * @param {FileGalleryPluginOptions} pluginOptions
 	 */
-	constructor(editor: SunEditor.Kernel, pluginOptions: FileGalleryPluginOptions);
+	constructor(kernel: SunEditor.Kernel, pluginOptions: FileGalleryPluginOptions);
 	title: any;
 	onSelectfunction: (target: Node) => any;
 	browser: Browser;

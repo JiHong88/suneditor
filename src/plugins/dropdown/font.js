@@ -18,11 +18,11 @@ class Font extends PluginDropdown {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} editor - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 * @param {FontPluginOptions} pluginOptions - plugin options
 	 */
-	constructor(editor, pluginOptions) {
-		super(editor);
+	constructor(kernel, pluginOptions) {
+		super(kernel);
 		// plugin basic properties
 		this.title = this.$.lang.font;
 		this.inner = '<span class="se-txt">' + this.$.lang.font + '</span>' + this.$.icons.arrow_down;

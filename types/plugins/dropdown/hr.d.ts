@@ -26,10 +26,10 @@ declare class HR extends PluginDropdown {
 	static component(node: HTMLElement): HTMLElement | null;
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} editor - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 * @param {HRPluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(editor: SunEditor.Kernel, pluginOptions: HRPluginOptions);
+	constructor(kernel: SunEditor.Kernel, pluginOptions: HRPluginOptions);
 	title: any;
 	list: NodeListOf<HTMLButtonElement>;
 	componentSelect(target: HTMLElement): void | boolean;

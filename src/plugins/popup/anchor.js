@@ -26,10 +26,10 @@ class Anchor extends PluginPopup {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} editor - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 */
-	constructor(editor) {
-		super(editor);
+	constructor(kernel) {
+		super(kernel);
 		// plugin basic properties
 		this.title = this.$.lang.anchor;
 		this.icon = 'bookmark_anchor';

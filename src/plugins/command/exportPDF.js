@@ -20,11 +20,11 @@ class ExportPDF extends PluginCommand {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} editor - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 * @param {ExportPDFPluginOptions} pluginOptions - plugin options
 	 */
-	constructor(editor, pluginOptions) {
-		super(editor);
+	constructor(kernel, pluginOptions) {
+		super(kernel);
 		// plugin basic properties
 		this.title = this.$.lang.exportPDF;
 		this.icon = 'PDF';

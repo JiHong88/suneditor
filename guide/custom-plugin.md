@@ -36,14 +36,14 @@ All plugins extend a base class from `src/interfaces/plugins.js`. The inheritanc
 KernelInjector → Base → PluginCommand / PluginModal / PluginDropdown / ...
 ```
 
-- **`KernelInjector`** — Receives the kernel and exposes `this.$` (the dependency bag).
+- **`KernelInjector`** — Receives the Kernel and exposes `this.$` (Deps bag — the shared dependency object, not the Kernel itself).
 - **`Base`** — Adds common static properties (`key`, `type`, `className`, `options`) and instance properties (`title`, `icon`).
 - **Plugin type class** — Defines required abstract methods per plugin type.
 
 ### Key Principles
 
-1. **Class references, not instances** — Register plugin classes in `options.plugins`. The kernel instantiates them.
-2. **Dependency injection** — All editor services are accessed via `this.$` (never import core modules directly).
+1. **Class references, not instances** — Register plugin classes in `options.plugins`. The Kernel instantiates them.
+2. **Dependency injection** — All editor services are accessed via `this.$` (the Deps bag), never import core modules directly.
 3. **Contracts via interfaces** — Plugins can implement multiple contracts (e.g., `ModuleModal`, `EditorComponent`) to hook into module lifecycles.
 
 ### Registration Flow
@@ -53,7 +53,7 @@ options.plugins: [MyPlugin]
        ↓
 PluginManager.init()
        ↓
-new MyPlugin(kernel, pluginOptions)  →  super(kernel)  →  this.$ = kernel.$
+new MyPlugin(kernel, pluginOptions)  →  super(kernel)  →  this.$ = kernel.$ (Deps bag)
        ↓
 Toolbar buttons updated (title, icon)
        ↓
@@ -77,7 +77,7 @@ class HelloWorld extends PluginCommand {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} kernel - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 */
 	constructor(kernel) {
 		super(kernel);
@@ -165,7 +165,7 @@ class ToggleStrikethrough extends PluginCommand {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} kernel - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 */
 	constructor(kernel) {
 		super(kernel);
@@ -215,7 +215,7 @@ class CustomAlign extends PluginDropdown {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} kernel - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 * @param {CustomAlignPluginOptions} pluginOptions
 	 */
 	constructor(kernel, pluginOptions) {
@@ -280,7 +280,7 @@ class CustomPicker extends PluginDropdownFree {
 
   /**
    * @constructor
-   * @param {SunEditor.Kernel} kernel - The core kernel
+   * @param {SunEditor.Kernel} kernel - The Kernel instance
    */
   constructor(kernel) {
     super(kernel);
@@ -323,7 +323,7 @@ class InsertCode extends PluginModal {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} kernel - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 */
 	constructor(kernel) {
 		super(kernel);
@@ -409,7 +409,7 @@ class MyGallery extends PluginBrowser {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} kernel - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 */
 	constructor(kernel) {
 		super(kernel);
@@ -443,7 +443,7 @@ class HashtagDetector extends PluginField {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} kernel - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 */
 	constructor(kernel) {
 		super(kernel);
@@ -480,7 +480,7 @@ class CustomInput extends PluginInput {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} kernel - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 */
 	constructor(kernel) {
 		super(kernel);
@@ -521,7 +521,7 @@ class InfoPopup extends PluginPopup {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} kernel - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 */
 	constructor(kernel) {
 		super(kernel);
@@ -577,7 +577,7 @@ class MyImagePlugin extends PluginModal {
 
 ## Constructor Pattern
 
-Plugin options are defined as a `@typedef` above the class, and the constructor receives `kernel` + `pluginOptions`:
+Plugin options are defined as a `@typedef` above the class, and the constructor receives `kernel` (Kernel instance) + `pluginOptions`:
 
 ```javascript
 /**
@@ -596,11 +596,11 @@ class MyPlugin extends PluginModal {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} kernel - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 * @param {MyPluginOptions} pluginOptions
 	 */
 	constructor(kernel, pluginOptions) {
-		super(kernel); // Required: sets this.$ = kernel.$
+		super(kernel); // KernelInjector → this.$ = kernel.$ (Deps bag)
 
 		// Plugin metadata (used by toolbar button)
 		this.title = this.$.lang.myPlugin || 'My Plugin';
@@ -623,14 +623,14 @@ class MyPlugin extends PluginModal {
 
 **Parameters:**
 
-- `kernel` (`SunEditor.Kernel`) — The core kernel instance. Pass to `super()`.
+- `kernel` (`SunEditor.Kernel`) — The Kernel instance (runtime container). Pass to `super()` to inject `this.$` (Deps bag).
 - `pluginOptions` (`object`) — Plugin-specific options from `options[pluginKey]`. Define a `@typedef` for type checking.
 
 ---
 
 ## Dependency Bag (`this.$`)
 
-All plugins access editor services through `this.$`. This object is built once by `CoreKernel` and shared across all consumers.
+All plugins access editor services through `this.$` (the Deps bag). This shared dependency object is built once by the Kernel (`CoreKernel`) and provided to all consumers. **`$` is not the Kernel itself** — it is the dependency context that the Kernel provides.
 
 Source: [`src/core/kernel/kernelInjector.js`](../src/core/kernel/kernelInjector.js)
 
@@ -1093,7 +1093,7 @@ class CustomEmbed extends PluginModal {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} kernel - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 */
 	constructor(kernel) {
 		super(kernel);
@@ -1304,7 +1304,7 @@ class WordCount extends PluginCommand {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} kernel - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 */
 	constructor(kernel) {
 		super(kernel);
@@ -1345,7 +1345,7 @@ class QuickStyle extends PluginDropdown {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} kernel - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 */
 	constructor(kernel) {
 		super(kernel);

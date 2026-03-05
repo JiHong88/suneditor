@@ -26,10 +26,10 @@ export type BlockStylePluginOptions = {
 declare class BlockStyle extends PluginDropdown {
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} editor - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 * @param {BlockStylePluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(editor: SunEditor.Kernel, pluginOptions: BlockStylePluginOptions);
+	constructor(kernel: SunEditor.Kernel, pluginOptions: BlockStylePluginOptions);
 	title: any;
 	inner: string;
 	formatList: NodeListOf<Element>;

@@ -19,11 +19,11 @@ class FontColor extends PluginDropdownFree {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} editor - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 * @param {FontColorPluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(editor, pluginOptions) {
-		super(editor);
+	constructor(kernel, pluginOptions) {
+		super(kernel);
 		// plugin basic properties
 		this.title = this.$.lang.fontColor;
 		this.icon = 'font_color';

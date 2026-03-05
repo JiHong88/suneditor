@@ -29,13 +29,23 @@ The editor supports a modular plugin architecture where features can be enabled/
 
 **Architecture Components:**
 
-- **Kernel**: Central dependency container, state store, dependency injection
+- **Kernel** (`CoreKernel`): Central runtime container — orchestrates initialization, builds the Deps bag, manages Store
+- **Deps** (`$`): Shared dependency object built by the Kernel — all services in one object. **Not the Kernel itself.**
+- **Store**: Central runtime state (mode, focus, selection cache, etc.)
 - **Config**: Context providers, option providers, event management
 - **Logic**: DOM operations (selection, format, inline), shell operations (component, history, focus), panel UI (toolbar, menu, viewer)
 - **Event**: Redux-like event orchestration (handlers, reducers, effects)
 - **Plugins**: image, video, link, table, mention, etc.
 - **Modules**: Modal, Controller, Figure, ColorPicker, etc.
 - **Helpers**: DOM utilities, converters, env detection
+
+**Terminology:**
+
+| Subject               | Name                      | Description                                      |
+| --------------------- | ------------------------- | ------------------------------------------------ |
+| `CoreKernel` instance | **Kernel**                | Central runtime container (init, DI, lifecycle)  |
+| `kernel.$` / `this.$` | **Deps** (dependency bag) | Shared dependency object — NOT the Kernel itself |
+| `kernel.store`        | **Store**                 | Central runtime state management                 |
 
 ## Directory Structure
 
@@ -167,12 +177,12 @@ suneditor/
 
 **Layer Architecture:**
 
-| Layer  | Directory | Responsibility                             | Examples                                                        |
-| ------ | --------- | ------------------------------------------ | --------------------------------------------------------------- |
-| **L1** | `kernel/` | Dependency container, state store          | CoreKernel, Store, KernelInjector                               |
-| **L2** | `config/` | Configuration, context, options, event API | ContextProvider, OptionProvider, InstanceCheck, EventManager    |
-| **L3** | `logic/`  | Business logic, DOM operations, UI         | Selection, Format, Component, Toolbar, History                  |
-| **L4** | `event/`  | Internal DOM event processing              | EventOrchestrator, handlers, reducers, rules, executor, effects |
+| Layer  | Directory | Responsibility                                            | Examples                                                        |
+| ------ | --------- | --------------------------------------------------------- | --------------------------------------------------------------- |
+| **L1** | `kernel/` | Kernel (runtime container), Store (state), Deps bag (`$`) | CoreKernel, Store, KernelInjector                               |
+| **L2** | `config/` | Configuration, context, options, event API                | ContextProvider, OptionProvider, InstanceCheck, EventManager    |
+| **L3** | `logic/`  | Business logic, DOM operations, UI                        | Selection, Format, Component, Toolbar, History                  |
+| **L4** | `event/`  | Internal DOM event processing                             | EventOrchestrator, handlers, reducers, rules, executor, effects |
 
 **Initialization Order:**
 
@@ -180,11 +190,11 @@ suneditor/
 1. suneditor.create() → Validates target, merges options
 2. new Editor() → Creates editor instance
 3. Constructor() → Builds DOM (toolbar, statusbar, wysiwyg frames)
-4. new CoreKernel() → Dependency container
-   a. L1: Store (state)
-   b. $ Phase 1: Config deps (L2)
-   c. L3: Logic (dom, shell, panel)
-   d. $ Phase 2: Logic deps added to $
+4. new CoreKernel() → Kernel (runtime container)
+   a. L1: Store (state management)
+   b. Deps Phase 1: Config deps added to $ (L2)
+   c. L3: Logic instances created (dom, shell, panel)
+   d. Deps Phase 2: Logic deps added to $ (Deps bag complete)
    e. L3 Init Pass: _init() called on L3 instances that need post-Phase 2 setup
    f. L4: EventOrchestrator
 5. editor.#Create() → Plugin registration, event setup
@@ -197,7 +207,7 @@ suneditor/
 
 Plugins are modular features that extend editor functionality.
 
-**Architecture Pattern**: ES6 classes extending plugin type base classes from `src/interfaces/plugins.js`, which extend `KernelInjector`.
+**Architecture Pattern**: ES6 classes extending plugin type base classes from `src/interfaces/plugins.js`, which extend `KernelInjector` (injects `this.$` — the Deps bag).
 
 **Inheritance Chain:**
 
@@ -233,11 +243,11 @@ class MyPlugin extends PluginModal {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} kernel - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 */
 	constructor(kernel, pluginOptions) {
-		super(kernel);
-		this.title = this.$.lang.myPlugin; // language string
+		super(kernel); // KernelInjector → this.$ = kernel.$ (Deps bag)
+		this.title = this.$.lang.myPlugin; // access via Deps
 		this.icon = 'myPlugin';
 	}
 
@@ -299,7 +309,7 @@ class MyPlugin extends interfaces.PluginModal
 
 Contracts can be combined with a base plugin class via `implements`.
 
-**Available via `this.$`:**
+**Available via `this.$` (Deps bag):**
 
 - **Config**: `options`, `frameOptions`, `context`, `frameContext`, `frameRoots`, `lang`, `icons`
 - **DOM Logic**: `selection`, `html`, `format`, `inline`, `listFormat`, `nodeTransform`, `char`, `offset`
@@ -329,9 +339,9 @@ Plugin hooks are organized into four categories:
 
 ### Modules (`src/modules/`)
 
-**Architecture Pattern**: ES6 classes that receive `$` (Deps) directly — **no inheritance from KernelInjector**.
+**Architecture Pattern**: ES6 classes that receive `$` (Deps bag) directly — **no inheritance from KernelInjector**.
 
-- Constructor: `constructor(inst, $, ...)` → receives plugin instance + deps + custom params
+- Constructor: `constructor(inst, $, ...)` → receives plugin instance + Deps bag + custom params
 - Private fields: `#privateField` (ES2022 syntax)
 - Manually instantiated by plugins (not auto-registered)
 
@@ -494,7 +504,7 @@ npm run check:inject    # Inject plugin JSDoc types into options.js
 - Register events without EventManager → Use `this.$.eventManager.addEvent(element, 'click', handler)`
 - Use `document.execCommand` → Use `this.$.html`, `this.$.format`, or `this.$.inline` methods
 - Create plugin without extending base class → Always extend from `src/interfaces/plugins.js`
-- Access deps directly from kernel → Use `this.$` (the Deps bag)
+- Access kernel internals directly → Use `this.$` (the Deps bag, not the kernel itself)
 
 **DO:**
 
@@ -518,7 +528,7 @@ Constructor.js: stores as class references in product.plugins
          ↓
 CoreKernel → PluginManager: loops through plugins
          ↓
-new Plugin(kernel, options) → super(kernel) → KernelInjector → this.$ = kernel.$
+new Plugin(kernel, options) → super(kernel) → KernelInjector → this.$ = kernel.$ (Deps bag)
          ↓
 Plugin events registered (_onPluginEvents Map)
 ```

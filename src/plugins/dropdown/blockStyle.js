@@ -20,11 +20,11 @@ class BlockStyle extends PluginDropdown {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} editor - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 * @param {BlockStylePluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(editor, pluginOptions) {
-		super(editor);
+	constructor(kernel, pluginOptions) {
+		super(kernel);
 		// plugin basic properties
 		this.title = this.$.lang.formats;
 		this.inner = '<span class="se-txt">' + this.$.lang.formats + '</span>' + this.$.icons.arrow_down;

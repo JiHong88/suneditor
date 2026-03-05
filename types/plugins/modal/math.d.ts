@@ -57,10 +57,10 @@ declare class Math_ extends PluginModal {
 	static component(node: HTMLElement): HTMLElement | null;
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} editor - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 * @param {MathPluginOptions} pluginOptions
 	 */
-	constructor(editor: SunEditor.Kernel, pluginOptions: MathPluginOptions);
+	constructor(kernel: SunEditor.Kernel, pluginOptions: MathPluginOptions);
 	title: any;
 	katex: any;
 	mathjax: any;

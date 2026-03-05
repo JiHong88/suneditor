@@ -15,11 +15,11 @@ class Align extends PluginDropdown {
 	static className = '';
 
 	/**
-	 * @param {SunEditor.Kernel} editor - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 * @param {AlignPluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(editor, pluginOptions) {
-		super(editor);
+	constructor(kernel, pluginOptions) {
+		super(kernel);
 		this.title = this.$.lang.align;
 		this.icon = this.$.options.get('_rtl') ? 'align_right' : 'align_left';
 

@@ -15,10 +15,10 @@ class PageNavigator extends PluginInput {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} editor - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 */
-	constructor(editor) {
-		super(editor);
+	constructor(kernel) {
+		super(kernel);
 
 		// create HTML
 		this.title = this.$.lang.pageNumber;

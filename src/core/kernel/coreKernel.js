@@ -111,13 +111,13 @@ class CoreKernel {
 		// L2: Config
 		this.#registerConfig(product, options);
 
-		// $ Phase 1: Config deps (available to Logic constructors via kernel.$)
+		// Deps Phase 1: Config deps added to $ (available to Logic constructors)
 		this.#buildConfigDeps();
 
 		// L3: Logic (dom, shell, ui)
 		this.#registerLogic(product);
 
-		// $ Phase 2: Add Logic deps
+		// Deps Phase 2: Logic deps added to $
 		this.#assignLogicDeps();
 
 		//----------------------------------------------
@@ -145,8 +145,8 @@ class CoreKernel {
 	}
 
 	/**
-	 * @description `$` Phase 1: Build dependency bag with config entries only.
-	 * Logic constructors can access `kernel.$` for configs.
+	 * @description Deps Phase 1: Build Deps bag with config entries only.
+	 * Logic constructors can access the Deps bag via `kernel.$`.
 	 */
 	#buildConfigDeps() {
 		const contextProvider = this.#config.get('contextProvider');
@@ -236,8 +236,8 @@ class CoreKernel {
 	}
 
 	/**
-	 * @description `$` Phase 2: Add logic entries to existing `$` object.
-	 * Called after all logic instances are registered and initialized.
+	 * @description Deps Phase 2: Add logic entries to the Deps bag (`$`).
+	 * Called after all logic instances are registered.
 	 */
 	#assignLogicDeps() {
 		const pluginManager = this.#logic.get('pluginManager');

@@ -64,12 +64,12 @@ class Table extends PluginDropdownFree {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} editor - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 * @param {TablePluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(editor, pluginOptions) {
+	constructor(kernel, pluginOptions) {
 		// plugin bisic properties
-		super(editor);
+		super(kernel);
 		this.title = this.$.lang.table;
 		this.icon = 'table';
 

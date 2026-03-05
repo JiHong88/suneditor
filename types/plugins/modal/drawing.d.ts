@@ -80,10 +80,10 @@ export type DrawingPluginOptions = {
 declare class Drawing extends PluginModal {
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} editor - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 * @param {DrawingPluginOptions} pluginOptions
 	 */
-	constructor(editor: SunEditor.Kernel, pluginOptions: DrawingPluginOptions);
+	constructor(kernel: SunEditor.Kernel, pluginOptions: DrawingPluginOptions);
 	title: any;
 	pluginOptions: {
 		outputFormat: string;

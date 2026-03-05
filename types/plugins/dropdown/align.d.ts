@@ -16,10 +16,10 @@ export type AlignPluginOptions = {
  */
 declare class Align extends PluginDropdown {
 	/**
-	 * @param {SunEditor.Kernel} editor - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 * @param {AlignPluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(editor: SunEditor.Kernel, pluginOptions: AlignPluginOptions);
+	constructor(kernel: SunEditor.Kernel, pluginOptions: AlignPluginOptions);
 	title: any;
 	_itemMenu: HTMLUListElement;
 	defaultDir: string;

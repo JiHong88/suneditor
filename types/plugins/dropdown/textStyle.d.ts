@@ -24,10 +24,10 @@ export type TextStylePluginOptions = {
 declare class TextStyle extends PluginDropdown {
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} editor - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 * @param {TextStylePluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(editor: SunEditor.Kernel, pluginOptions: TextStylePluginOptions);
+	constructor(kernel: SunEditor.Kernel, pluginOptions: TextStylePluginOptions);
 	title: any;
 	styleList: NodeListOf<Element>;
 }

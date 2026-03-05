@@ -549,7 +549,7 @@ class ModalAnchorEditor {
 }
 
 /**
- * @param {SunEditor.Deps} $ - Editor instance
+ * @param {SunEditor.Deps} $ - Kernel dependencies
  * @param {ModalAnchorEditorParams} params - ModalAnchorEditor options
  * @param {Array<string>} relList - REL attribute list
  * @returns {HTMLElement} - Modal form element

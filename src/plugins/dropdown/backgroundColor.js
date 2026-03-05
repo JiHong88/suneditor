@@ -19,11 +19,11 @@ class BackgroundColor extends PluginDropdownFree {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} editor - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 * @param {BackgroundColorPluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(editor, pluginOptions) {
-		super(editor);
+	constructor(kernel, pluginOptions) {
+		super(kernel);
 		// plugin basic properties
 		this.title = this.$.lang.backgroundColor;
 		this.icon = 'background_color';

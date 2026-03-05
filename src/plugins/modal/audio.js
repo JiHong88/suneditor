@@ -49,12 +49,12 @@ class Audio_ extends PluginModal {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} editor - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 * @param {AudioPluginOptions} pluginOptions
 	 */
-	constructor(editor, pluginOptions) {
+	constructor(kernel, pluginOptions) {
 		// plugin basic properties
-		super(editor);
+		super(kernel);
 		this.title = this.$.lang.audio;
 		this.icon = 'audio';
 

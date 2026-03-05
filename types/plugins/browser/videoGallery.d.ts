@@ -34,10 +34,10 @@ export type VideoGalleryPluginOptions = {
 declare class VideoGallery extends PluginBrowser {
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} editor - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 * @param {VideoGalleryPluginOptions} pluginOptions
 	 */
-	constructor(editor: SunEditor.Kernel, pluginOptions: VideoGalleryPluginOptions);
+	constructor(kernel: SunEditor.Kernel, pluginOptions: VideoGalleryPluginOptions);
 	title: any;
 	onSelectfunction: (target: Node) => any;
 	browser: Browser;

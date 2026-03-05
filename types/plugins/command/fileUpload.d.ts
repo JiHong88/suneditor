@@ -77,10 +77,10 @@ declare class FileUpload extends PluginCommand {
 	static component(node: HTMLElement): HTMLElement | null;
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} editor - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 * @param {FileUploadPluginOptions} pluginOptions - plugin options
 	 */
-	constructor(editor: SunEditor.Kernel, pluginOptions: FileUploadPluginOptions);
+	constructor(kernel: SunEditor.Kernel, pluginOptions: FileUploadPluginOptions);
 	title: any;
 	uploadUrl: string;
 	uploadHeaders: {

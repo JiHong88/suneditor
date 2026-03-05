@@ -30,12 +30,12 @@ class Link extends PluginModal {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} editor - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 * @param {LinkPluginOptions} pluginOptions
 	 */
-	constructor(editor, pluginOptions) {
+	constructor(kernel, pluginOptions) {
 		// plugin bisic properties
-		super(editor);
+		super(kernel);
 		this.title = this.$.lang.link;
 		this.icon = 'link';
 

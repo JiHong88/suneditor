@@ -45,10 +45,10 @@ export type LinkPluginOptions = Omit<LinkOptions & import('../../modules/ui/Moda
 declare class Link extends PluginModal {
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} editor - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 * @param {LinkPluginOptions} pluginOptions
 	 */
-	constructor(editor: SunEditor.Kernel, pluginOptions: LinkPluginOptions);
+	constructor(kernel: SunEditor.Kernel, pluginOptions: LinkPluginOptions);
 	title: any;
 	target: HTMLAnchorElement;
 	isUpdateState: boolean;

@@ -17,10 +17,10 @@ export type FontPluginOptions = {
 declare class Font extends PluginDropdown {
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} editor - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 * @param {FontPluginOptions} pluginOptions - plugin options
 	 */
-	constructor(editor: SunEditor.Kernel, pluginOptions: FontPluginOptions);
+	constructor(kernel: SunEditor.Kernel, pluginOptions: FontPluginOptions);
 	title: any;
 	inner: string;
 	currentFont: string;

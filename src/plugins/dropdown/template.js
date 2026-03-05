@@ -16,12 +16,12 @@ class Template extends PluginDropdown {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} editor - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 * @param {TemplatePluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(editor, pluginOptions) {
+	constructor(kernel, pluginOptions) {
 		// plugin bisic properties
-		super(editor);
+		super(kernel);
 		this.title = this.$.lang.template;
 		this.icon = 'template';
 

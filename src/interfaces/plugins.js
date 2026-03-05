@@ -29,10 +29,10 @@ class Base extends KernelInjector {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} editor - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 */
-	constructor(editor) {
-		super(editor);
+	constructor(kernel) {
+		super(kernel);
 
 		// plugin basic properties
 		/** @type {string} */

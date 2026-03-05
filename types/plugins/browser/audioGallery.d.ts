@@ -34,7 +34,7 @@ export type AudioGalleryPluginOptions = {
 declare class AudioGallery extends PluginBrowser {
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} kernel - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 * @param {AudioGalleryPluginOptions} pluginOptions
 	 */
 	constructor(kernel: SunEditor.Kernel, pluginOptions: AudioGalleryPluginOptions);

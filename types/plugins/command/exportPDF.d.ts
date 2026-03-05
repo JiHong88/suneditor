@@ -22,10 +22,10 @@ export type ExportPDFPluginOptions = {
 declare class ExportPDF extends PluginCommand {
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} editor - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 * @param {ExportPDFPluginOptions} pluginOptions - plugin options
 	 */
-	constructor(editor: SunEditor.Kernel, pluginOptions: ExportPDFPluginOptions);
+	constructor(kernel: SunEditor.Kernel, pluginOptions: ExportPDFPluginOptions);
 	title: any;
 	apiUrl: string;
 	fileName: string;

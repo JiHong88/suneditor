@@ -185,10 +185,10 @@ declare class Video extends PluginModal {
 	static #urlPatterns: RegExp[];
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} editor - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 * @param {VideoPluginOptions} pluginOptions
 	 */
-	constructor(editor: SunEditor.Kernel, pluginOptions: VideoPluginOptions);
+	constructor(kernel: SunEditor.Kernel, pluginOptions: VideoPluginOptions);
 	title: any;
 	pluginOptions: {
 		canResize: boolean;

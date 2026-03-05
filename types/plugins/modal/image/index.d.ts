@@ -149,10 +149,10 @@ declare class Image_ extends PluginModal {
 	static component(node: Element): Element | null;
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} editor - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 * @param {ImagePluginOptions} pluginOptions
 	 */
-	constructor(editor: SunEditor.Kernel, pluginOptions: ImagePluginOptions);
+	constructor(kernel: SunEditor.Kernel, pluginOptions: ImagePluginOptions);
 	title: any;
 	pluginOptions: {
 		canResize: boolean;

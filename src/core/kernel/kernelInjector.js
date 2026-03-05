@@ -1,8 +1,8 @@
 /**
- * @description Base class for kernel consumers (plugins, modules).
- * - Provides cached access to kernel dependencies via `$` object.
- * - Dependencies are built once in `CoreKernel` and shared across all consumers.
- * - Eliminates circular references by routing through the kernel.
+ * @description Base class for kernel consumers (plugins, event orchestrator).
+ * - Injects `this.$` (Deps bag) — the shared dependency object built by CoreKernel.
+ * - `$` is NOT the kernel itself; it is the dependency context that the kernel provides.
+ * - Eliminates circular references by routing through the Deps bag.
  */
 class KernelInjector {
 	/** @type {SunEditor.Deps} */

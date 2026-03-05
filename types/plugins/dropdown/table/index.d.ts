@@ -44,10 +44,10 @@ declare class Table extends PluginDropdownFree {
 	static component(node: HTMLElement): HTMLElement | null;
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} editor - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 * @param {TablePluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(editor: SunEditor.Kernel, pluginOptions: TablePluginOptions);
+	constructor(kernel: SunEditor.Kernel, pluginOptions: TablePluginOptions);
 	title: any;
 	figureScrollList: string[];
 	figureScroll: string;

@@ -33,10 +33,10 @@ export type FontColorPluginOptions = {
 declare class FontColor extends PluginDropdownFree {
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} editor - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 * @param {FontColorPluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(editor: SunEditor.Kernel, pluginOptions: FontColorPluginOptions);
+	constructor(kernel: SunEditor.Kernel, pluginOptions: FontColorPluginOptions);
 	title: any;
 	colorPicker: ColorPicker;
 	active(element: HTMLElement | null, target: HTMLElement | null): boolean | void;

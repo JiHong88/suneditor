@@ -11,10 +11,10 @@ class Blockquote extends PluginCommand {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} editor - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 */
-	constructor(editor) {
-		super(editor);
+	constructor(kernel) {
+		super(kernel);
 		// plugin basic properties
 		this.title = this.$.lang.tag_blockquote;
 		this.icon = 'blockquote';

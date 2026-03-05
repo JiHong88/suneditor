@@ -20,10 +20,10 @@ export type LayoutPluginOptions = {
 declare class Layout extends PluginDropdown {
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} editor - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 * @param {LayoutPluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(editor: SunEditor.Kernel, pluginOptions: LayoutPluginOptions);
+	constructor(kernel: SunEditor.Kernel, pluginOptions: LayoutPluginOptions);
 	title: any;
 	selectedIndex: number;
 	items: {

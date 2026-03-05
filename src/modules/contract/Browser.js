@@ -578,7 +578,7 @@ class Browser {
 }
 
 /**
- * @param {SunEditor.Deps} $ - editor instance
+ * @param {SunEditor.Deps} $ - Kernel dependencies
  * @param {boolean} useSearch - Whether to use the search function
  * @returns {{ html: HTMLElement, header: HTMLElement, titleArea: HTMLElement, tagArea: HTMLElement, body: HTMLElement, list: HTMLElement, side: HTMLElement, wrapper: HTMLElement, _loading: HTMLElement }} HTML
  */

@@ -18,12 +18,12 @@ class LineHeight extends PluginDropdown {
 
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} editor - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 * @param {LineHeightPluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(editor, pluginOptions) {
+	constructor(kernel, pluginOptions) {
 		// plugin bisic properties
-		super(editor);
+		super(kernel);
 		this.title = this.$.lang.lineHeight;
 		this.icon = 'line_height';
 

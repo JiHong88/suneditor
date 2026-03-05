@@ -101,9 +101,11 @@ graph TD
 
 The central runtime container is **CoreKernel** (`src/core/kernel/coreKernel.js`).
 
+> **Terminology:** The **Kernel** (`CoreKernel`) is the runtime container that orchestrates initialization and lifecycle. The **`$`** (Deps bag) is the shared dependency object that the Kernel builds and provides — it is **not** the Kernel itself. The **Store** manages runtime state.
+
 ### The `$` (Deps) Object
 
-Instead of passing dozens of arguments between modules, the Kernel builds a single dependency bag called **`$`**. This object is shared by reference across the entire system.
+Instead of passing dozens of arguments between modules, the Kernel builds a single dependency bag called **`$`** (Deps). This object is shared by reference across the entire system. `$` is the dependency context provided by the Kernel, not the Kernel itself.
 
 **Full `$` Object Structure:**
 
@@ -142,9 +144,9 @@ $ = {
 
 ### The 2-Phase Injection Strategy
 
-1.  **Phase 1 (Config)**: The Kernel initializes L2 providers (`contextProvider`, `optionProvider`). These are added to `$` immediately.
+1.  **Phase 1 (Config)**: The Kernel initializes L2 providers (`contextProvider`, `optionProvider`). These are added to the Deps bag (`$`) immediately.
     - _Why?_ L3 Logic classes need these configs during their own construction.
-2.  **Phase 2 (Logic)**: The Kernel initializes L3 Logic modules (`selection`, `history`, `toolbar`), then assigns them to `$`.
+2.  **Phase 2 (Logic)**: The Kernel initializes L3 Logic modules (`selection`, `history`, `toolbar`), then assigns them to the Deps bag (`$`).
     - _Why?_ Events and circular dependencies are resolved by assigning these instances to `$` _after_ they are all created.
 3.  **Init Pass**: After Phase 2, the Kernel runs `_init()` on each L3 instance that implements it.
     - _Why?_ Some Logic modules require references to other L3 modules (which only become available after Phase 2).
@@ -152,12 +154,12 @@ $ = {
 
 ### Dependency Access Patterns
 
-| Consumer                   | Constructor                           | Access Pattern                                          |
-| -------------------------- | ------------------------------------- | ------------------------------------------------------- |
-| **Plugin**                 | `constructor(kernel, pluginOptions?)` | `this.$` via KernelInjector                             |
-| **Core Logic** (L3)        | `constructor(kernel)`                 | `#kernel`, `#$` (= kernel.$), `#store` (= kernel.store) |
-| **Module**                 | `constructor(inst, $, ...)`           | `#$` (Deps passed directly)                             |
-| **EventOrchestrator** (L4) | `constructor(kernel)`                 | `this.$` via KernelInjector                             |
+| Consumer                   | Constructor                           | Access Pattern                                        |
+| -------------------------- | ------------------------------------- | ----------------------------------------------------- |
+| **Plugin**                 | `constructor(kernel, pluginOptions?)` | `this.$` (Deps bag) via KernelInjector                |
+| **Core Logic** (L3)        | `constructor(kernel)`                 | `#kernel` (Kernel), `#$` (Deps bag), `#store` (Store) |
+| **Module**                 | `constructor(inst, $, ...)`           | `#$` (Deps bag passed directly)                       |
+| **EventOrchestrator** (L4) | `constructor(kernel)`                 | `this.$` (Deps bag) via KernelInjector                |
 
 **Example - Plugin:**
 
@@ -167,8 +169,8 @@ import { PluginCommand } from '../../interfaces';
 class Blockquote extends PluginCommand {
 	static key = 'blockquote';
 
-	constructor(editor) {
-		super(editor); // KernelInjector → this.$ = kernel.$
+	constructor(kernel) {
+		super(kernel); // KernelInjector → this.$ = kernel.$ (Deps bag)
 		this.title = this.$.lang.tag_blockquote;
 	}
 
@@ -188,10 +190,10 @@ class Component {
 	#store;
 
 	constructor(kernel) {
-		this.#kernel = kernel;
-		this.#$ = kernel.$;
-		this.#store = kernel.store;
-		// Cache frequently used deps
+		this.#kernel = kernel; // Kernel (runtime container)
+		this.#$ = kernel.$; // Deps bag (shared dependency object)
+		this.#store = kernel.store; // Store (runtime state)
+		// Cache frequently used services from Deps
 		this.#options = this.#$.options;
 		this.#frameContext = this.#$.frameContext;
 		this.#eventManager = this.#$.eventManager;
@@ -206,7 +208,7 @@ class Modal {
     #$;
 
     constructor(inst, $, element) {
-        this.#$ = $;  // Deps passed directly, no inheritance
+        this.#$ = $;  // Deps bag passed directly, no inheritance
         this.inst = inst;
         this.#$.eventManager.addEvent(element, 'submit', ...);
     }
@@ -231,25 +233,25 @@ Allowed dependency direction:
 
   L1 (Kernel) ─── orchestrates all layers
        ↓
-  L2 (Config) ─── available to L3/L4 via $
+  L2 (Config) ─── available to L3/L4 via Deps ($)
        ↓
-  L3 (Logic)  ─── cross-references via $ only (no direct imports between L3 modules)
+  L3 (Logic)  ─── cross-references via Deps ($) only (no direct imports between L3 modules)
        ↓
-  L4 (Event)  ─── accesses L2/L3 via $
+  L4 (Event)  ─── accesses L2/L3 via Deps ($)
        ↓
   Helper      ─── pure utilities, all layers can import
 ```
 
 **Enforced constraints:**
 
-| Rule                 | Description                                                                      |
-| :------------------- | :------------------------------------------------------------------------------- |
-| **Helper isolation** | `helper/*` cannot import from any other layer                                    |
-| **Module isolation** | `modules/*` cannot import `core/*` or `plugins/*` — receives `$` via constructor |
-| **Plugin isolation** | Plugins cannot import other plugins (same plugin submodules OK)                  |
-| **No circular deps** | No module can import from a module that imports it                               |
+| Rule                 | Description                                                                             |
+| :------------------- | :-------------------------------------------------------------------------------------- |
+| **Helper isolation** | `helper/*` cannot import from any other layer                                           |
+| **Module isolation** | `modules/*` cannot import `core/*` or `plugins/*` — receives Deps (`$`) via constructor |
+| **Plugin isolation** | Plugins cannot import other plugins (same plugin submodules OK)                         |
+| **No circular deps** | No module can import from a module that imports it                                      |
 
-**Circular dependency resolution:** L3 modules that need each other (e.g., `format` ↔ `selection`) don't import directly. Both receive the full `$` bag after Phase 2, resolving circular references at runtime.
+**Circular dependency resolution:** L3 modules that need each other (e.g., `format` ↔ `selection`) don't import directly. Both receive the full Deps bag (`$`) after Phase 2, resolving circular references at runtime.
 
 ---
 
@@ -309,18 +311,18 @@ SunEditor uses JSDoc for type annotations and TypeScript for type checking (no T
 
 ### Key Type Names
 
-| JSDoc Type               | Meaning            | Used For                              |
-| ------------------------ | ------------------ | ------------------------------------- |
-| `SunEditor.Kernel`       | CoreKernel class   | Constructor `@param` in L3/L4 classes |
-| `SunEditor.Deps`         | `$` dependency bag | `this.$` type, event callback params  |
-| `SunEditor.Store`        | Store class        | `kernel.store`, `this.#store`         |
-| `SunEditor.Instance`     | Editor class       | Public API facade                     |
-| `SunEditor.Context`      | ContextMap         | Global context (toolbar, statusbar)   |
-| `SunEditor.FrameContext` | FrameContextMap    | Per-frame context                     |
-| `SunEditor.Options`      | BaseOptionsMap     | Shared options                        |
-| `SunEditor.FrameOptions` | FrameOptionsMap    | Per-frame options                     |
+| JSDoc Type               | Meaning                                                   | Used For                              |
+| ------------------------ | --------------------------------------------------------- | ------------------------------------- |
+| `SunEditor.Kernel`       | Kernel (CoreKernel) — runtime container                   | Constructor `@param` in L3/L4 classes |
+| `SunEditor.Deps`         | Deps bag (`$`) — shared dependency object, NOT the Kernel | `this.$` type, event callback params  |
+| `SunEditor.Store`        | Store — runtime state management                          | `kernel.store`, `this.#store`         |
+| `SunEditor.Instance`     | Editor class                                              | Public API facade                     |
+| `SunEditor.Context`      | ContextMap                                                | Global context (toolbar, statusbar)   |
+| `SunEditor.FrameContext` | FrameContextMap                                           | Per-frame context                     |
+| `SunEditor.Options`      | BaseOptionsMap                                            | Shared options                        |
+| `SunEditor.FrameOptions` | FrameOptionsMap                                           | Per-frame options                     |
 
-**Rule:** `SunEditor.Kernel` is used ONLY for constructor parameter types. For everything else (event params, plugin `this.$`, module deps), use `SunEditor.Deps`.
+**Rule:** `SunEditor.Kernel` is used ONLY for constructor parameter types (the Kernel instance). For everything else (event params, plugin `this.$`, module deps), use `SunEditor.Deps` (the Deps bag).
 
 ---
 
@@ -487,7 +489,7 @@ Plugins follow the same integration pattern as core consumers. They extend **`Ke
 ```javascript
 class MyPlugin extends PluginCommand {
 	constructor(kernel) {
-		super(kernel); // Injects this.$ automatically
+		super(kernel); // KernelInjector → this.$ = kernel.$ (Deps bag)
 	}
 
 	action() {
@@ -498,7 +500,7 @@ class MyPlugin extends PluginCommand {
 }
 ```
 
-Because plugins extend `KernelInjector`, they can access the same shared `$` dependency bag as core modules.
+Because plugins extend `KernelInjector`, they receive `this.$` — the same Deps bag that core modules use. Note that `$` is the dependency context provided by the Kernel, not the Kernel itself.
 
 ---
 

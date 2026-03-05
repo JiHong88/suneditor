@@ -43,10 +43,10 @@ export type FileBrowserPluginOptions = {
 declare class FileBrowser extends PluginBrowser {
 	/**
 	 * @constructor
-	 * @param {SunEditor.Kernel} editor - The core kernel
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
 	 * @param {FileBrowserPluginOptions} pluginOptions
 	 */
-	constructor(editor: SunEditor.Kernel, pluginOptions: FileBrowserPluginOptions);
+	constructor(kernel: SunEditor.Kernel, pluginOptions: FileBrowserPluginOptions);
 	title: any;
 	onSelectfunction: (target: Node) => any;
 	browser: Browser;
