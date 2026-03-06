@@ -72,9 +72,11 @@ class DocumentType {
 		this.#documentTypeInner = fc.get('documentTypeInner');
 		this.#mirror = fc.get('documentTypePageMirror');
 
-		const mirrorStyles = _w.getComputedStyle(this.#mirror);
-		this.#paddingTop = numbers.get(mirrorStyles.paddingTop);
-		this.#paddingBottom = numbers.get(mirrorStyles.paddingBottom);
+		if (this.#mirror) {
+			const mirrorStyles = _w.getComputedStyle(this.#mirror);
+			this.#paddingTop = numbers.get(mirrorStyles.paddingTop);
+			this.#paddingBottom = numbers.get(mirrorStyles.paddingBottom);
+		}
 
 		// init header
 		if (this.useHeader) {
