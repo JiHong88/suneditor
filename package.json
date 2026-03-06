@@ -138,10 +138,6 @@
 		"not IE 11",
 		"not op_mini all"
 	],
-	"ignore": [
-		"**/.*",
-		"node_modules"
-	],
 	"files": [
 		"src",
 		"types",
