@@ -23,18 +23,18 @@ SunEditor supports all modern browsers without dependencies or polyfills.
 SunEditor is a lightweight, fast, and extensible WYSIWYG editor written in pure JavaScript.  
 It's easy to integrate, highly customizable, and built for modern web applications.
 
-### Key Features
+### ⚡ Key Features
 
-- ⚡ **No dependencies** — Optimized for speed and simplicity
-- 🧩 **Modular architecture** — Enable only the plugins you need
-- 📱 **Responsive UI** — Works smoothly on all modern devices
-- 🔌 **Framework-friendly** — Easy to use with React, Vue, Svelte, etc.
-- 💼 **Feature-rich plugin ecosystem**, including:
-    - 🏷 @Mentions with autocomplete
-    - 🎨 Advanced table editing & custom layouts
-    - 🧮 Math (LaTeX), drawing, and code block support
-    - 📂 Built-in media galleries (image, video, audio, file)
-    - 📄 PDF export, templates, and embedded content (audio/video/iframe)
+- **No dependencies** — Optimized for speed and simplicity
+- **Modular architecture** — Enable only the plugins you need
+- **Responsive UI** — Works smoothly on all modern devices
+- **Framework-friendly** — Easy to use with React, Vue, Svelte, etc.
+- **Feature-rich plugin ecosystem**, including:
+    - @Mentions with autocomplete
+    - Advanced table editing & custom layouts
+    - Math (LaTeX), drawing, and code block support
+    - Built-in media galleries (image, video, audio, file)
+    - PDF export, templates, and embedded content (audio/video/iframe)
 
 ### 📝 Content Editing Approach
 

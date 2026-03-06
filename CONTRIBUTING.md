@@ -71,10 +71,10 @@ SunEditor supports a modular plugin architecture where features can be enabled/d
 
 ## 🔁 CI/CD
 
-📦 The `dist/` folder is **not included** in the git repository.  
-⚙️ It is automatically built and deployed via **GitHub Actions** after changes are pushed to the `release` branch.  
-🛑 **Do not build or commit `dist/` files manually** – this may cause merge conflicts.  
-✅ The CI/CD pipeline ensures clean and consistent builds for every release.
+- The `dist/` folder is **not included** in the git repository.
+- It is automatically built and deployed via **GitHub Actions** after changes are pushed to the `release` branch.
+- **Do not build or commit `dist/` files manually** – this may cause merge conflicts.
+- The CI/CD pipeline ensures clean and consistent builds for every release.
 
 ---
 
