@@ -61,7 +61,7 @@ class Controller {
 	#__childrenControllers__ = [];
 	/**
 	 * @type {Map<Controller, boolean>}
-	 * @description Track each parent's desired visibility state: true = wants hidden, false = wants visible
+	 * @description Track each parent's desired visibility state: `true` = wants hidden, `false` = wants visible
 	 */
 	#__hiddenByParents__ = new Map();
 

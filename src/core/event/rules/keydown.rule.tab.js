@@ -13,7 +13,7 @@ import { A } from '../actions';
  * @param {EventActions} actions - Action list
  * @param {EventPorts} _ports - Ports for interacting with editor
  * @param {EventKeydownCtx} ctx - Context object
- * @returns {boolean} Return false to stop the processing
+ * @returns {boolean} Return `false` to stop the processing
  */
 export function reduceTabDown(actions, _ports, ctx) {
 	const { options, selectionNode, range, formatEl, ctrl, alt, shift } = ctx;

@@ -147,7 +147,7 @@ declare class UIManager {
 	offCurrentModal(): void;
 	/**
 	 * @description Get the current figure container only if it is visible (active).
-	 * @returns {?HTMLElement} The active figure element or null.
+	 * @returns {?HTMLElement} The active figure element or `null`.
 	 */
 	getVisibleFigure(): HTMLElement | null;
 	/**

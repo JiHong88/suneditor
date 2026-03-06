@@ -14,7 +14,7 @@ import { A } from '../actions';
  * @param {EventActions} actions - Action list
  * @param {EventPorts} ports - Ports for interacting with editor
  * @param {EventKeydownCtx} ctx - Context object
- * @returns {boolean} Return false to stop the processing
+ * @returns {boolean} Return `false` to stop the processing
  */
 export function reduceDeleteDown(actions, ports, ctx) {
 	const { format, component } = ports;

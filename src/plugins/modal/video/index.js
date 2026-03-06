@@ -457,7 +457,7 @@ class Video extends PluginModal {
 	 * @param {string} width - The desired width for the video element.
 	 * @param {string} height - The desired height for the video element.
 	 * @param {string} align - The alignment to apply to the video element (e.g., 'left', 'center', 'right').
-	 * @param {boolean} isUpdate - Indicates whether this is an update to an existing component (true) or a new creation (false).
+	 * @param {boolean} isUpdate - Indicates whether this is an update to an existing component (`true`) or a new creation (`false`).
 	 * @param {{name: string, size: number}} file - File metadata associated with the video
 	 * @param {boolean} isLast - Indicates whether this is the last file in the batch (used for scroll and insert actions).
 	 */

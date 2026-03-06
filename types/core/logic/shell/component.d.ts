@@ -82,7 +82,7 @@ declare class Component {
 	applyInsertBehavior(container: Node, oNode?: Node | null, insertBehavior?: SunEditor.ComponentInsertType): void;
 	/**
 	 * @description Gets the file component and that plugin name
-	 * - return: {target, component, pluginName} | null
+	 * - return: {target, component, pluginName} | `null`
 	 * @param {Node} element Target element (figure tag, component div, file tag)
 	 * @returns {SunEditor.ComponentInfo|null}
 	 */
@@ -112,7 +112,7 @@ declare class Component {
 	 * - or a direct `FIGURE` node. This function checks if the node itself is a component
 	 * - or if it belongs to any components identified by the component manager.
 	 * @param {Node} element The DOM node to check.
-	 * @returns {boolean} True if the node is a block component or part of it, otherwise false.
+	 * @returns {boolean} `true` if the node is a block component or part of it, otherwise `false`.
 	 */
 	is(element: Node): boolean;
 	/**
@@ -120,7 +120,7 @@ declare class Component {
 	 * - If the node is a `FIGURE`, it checks the parent element instead.
 	 * - It also verifies whether the node is part of an inline component recognized by the component manager.
 	 * @param {Node} element The DOM node to check.
-	 * @returns {boolean} True if the node is an inline component or part of it, otherwise false.
+	 * @returns {boolean} `true` if the node is an inline component or part of it, otherwise `false`.
 	 */
 	isInline(element: Node): boolean;
 	/**
@@ -128,7 +128,7 @@ declare class Component {
 	 * - This function verifies whether the node is recognized as a component by the `is` function, while also ensuring that it is not an inline component as determined by the `isInline` function.
 	 * - This is used to identify block-level elements or standalone components that are not part of the inline component classification.
 	 * @param {Node} element The DOM node to check.
-	 * @returns {boolean} True if the node is a basic (non-inline) component, otherwise false.
+	 * @returns {boolean} `true` if the node is a basic (non-inline) component, otherwise `false`.
 	 */
 	isBasic(element: Node): boolean;
 	/**

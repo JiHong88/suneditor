@@ -63,14 +63,14 @@ declare class PluginManager {
 	 * @description Dispatches an event to all registered plugin handlers synchronously.
 	 * @param {string} name The event name (e.g., 'onMouseMove', 'onFocus')
 	 * @param {PluginEventParam} e The event payload
-	 * @returns {boolean|undefined} Returns false if any handler cancels the event
+	 * @returns {boolean|undefined} Returns `false` if any handler cancels the event
 	 */
 	emitEvent(name: string, e: PluginEventParam): boolean | undefined;
 	/**
 	 * @description Dispatches an event to all registered plugin handlers asynchronously.
 	 * @param {string} name The event name (e.g., 'onKeyDown', 'onPaste')
 	 * @param {PluginEventParam} e The event payload
-	 * @returns {Promise<boolean|undefined>} Returns false if any handler cancels the event
+	 * @returns {Promise<boolean|undefined>} Returns `false` if any handler cancels the event
 	 */
 	emitEventAsync(name: string, e: PluginEventParam): Promise<boolean | undefined>;
 	/**

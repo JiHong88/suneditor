@@ -144,7 +144,7 @@ export function isSpanWithoutAttr(node: Node | null): boolean;
  * @description Compares the style and class for equal values.
  * @param {Node} a Node to compare
  * @param {Node} b Node to compare
- * @returns {boolean} Returns true if both are text nodes.
+ * @returns {boolean} Returns `true` if both are text nodes.
  */
 export function isSameAttributes(a: Node, b: Node): boolean;
 /**

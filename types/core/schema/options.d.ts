@@ -444,13 +444,13 @@ export namespace DEFAULTS {
  * =================================================================================================================================
  */
 /**
- * @description For all EditorInitOptions keys, only boolean | null values are allowed.
+ * @description For all EditorInitOptions keys, only `boolean` | `null` values are allowed.
  * - `fixed` → Immutable / `null` → Resettable.
  * @type {Partial<Object<keyof EditorInitOptions, "fixed" | true>>}
  */
 export const OPTION_FRAME_FIXED_FLAG: Partial<any>;
 /**
- * @description For all EditorInitOptions keys, only boolean | null values are allowed.
+ * @description For all EditorInitOptions keys, only `boolean` | `null` values are allowed.
  * - `fixed` → Immutable / `null` → Resettable.
  * @type {Partial<Object<keyof EditorInitOptions, "fixed" | true>>}
  */

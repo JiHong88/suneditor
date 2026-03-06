@@ -10,7 +10,7 @@ import type {} from '../../../typedef';
  * @param {EventActions} actions - Action list
  * @param {EventPorts} _ports - Ports for interacting with editor
  * @param {EventKeydownCtx} ctx - Context object
- * @returns {boolean} Return false to stop the processing
+ * @returns {boolean} Return `false` to stop the processing
  */
 export function reduceTabDown(this: void, actions: EventActions, _ports: EventPorts, ctx: EventKeydownCtx): boolean;
 export type EventActions = import('../actions').Action[];

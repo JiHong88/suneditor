@@ -229,7 +229,7 @@ class Component {
 
 	/**
 	 * @description Gets the file component and that plugin name
-	 * - return: {target, component, pluginName} | null
+	 * - return: {target, component, pluginName} | `null`
 	 * @param {Node} element Target element (figure tag, component div, file tag)
 	 * @returns {SunEditor.ComponentInfo|null}
 	 */
@@ -413,7 +413,7 @@ class Component {
 	 * - or a direct `FIGURE` node. This function checks if the node itself is a component
 	 * - or if it belongs to any components identified by the component manager.
 	 * @param {Node} element The DOM node to check.
-	 * @returns {boolean} True if the node is a block component or part of it, otherwise false.
+	 * @returns {boolean} `true` if the node is a block component or part of it, otherwise `false`.
 	 */
 	is(element) {
 		if (!element) return false;
@@ -429,7 +429,7 @@ class Component {
 	 * - If the node is a `FIGURE`, it checks the parent element instead.
 	 * - It also verifies whether the node is part of an inline component recognized by the component manager.
 	 * @param {Node} element The DOM node to check.
-	 * @returns {boolean} True if the node is an inline component or part of it, otherwise false.
+	 * @returns {boolean} `true` if the node is an inline component or part of it, otherwise `false`.
 	 */
 	isInline(element) {
 		if (!element) return false;
@@ -448,7 +448,7 @@ class Component {
 	 * - This function verifies whether the node is recognized as a component by the `is` function, while also ensuring that it is not an inline component as determined by the `isInline` function.
 	 * - This is used to identify block-level elements or standalone components that are not part of the inline component classification.
 	 * @param {Node} element The DOM node to check.
-	 * @returns {boolean} True if the node is a basic (non-inline) component, otherwise false.
+	 * @returns {boolean} `true` if the node is a basic (non-inline) component, otherwise `false`.
 	 */
 	isBasic(element) {
 		return this.is(element) && !this.isInline(element);
@@ -677,9 +677,9 @@ class Component {
 	 * Attempts to move the cursor to a valid line after the given container.
 	 * - If a valid next sibling line exists, moves the selection there.
 	 * - If no next sibling exists, creates a new line after the container and moves the selection there.
-	 * - If the next sibling exists but is not a valid line element and cannot create a new line, returns false.
+	 * - If the next sibling exists but is not a valid line element and cannot create a new line, returns `false`.
 	 * @param {Node} container The component container element.
-	 * @returns {boolean} Returns true if the selection moved to a line (existing or newly created), otherwise false.
+	 * @returns {boolean} Returns `true` if the selection moved to a line (existing or newly created), otherwise `false`.
 	 */
 	#moveToNextLineOrAdd(container) {
 		const nextSibling = /** @type {Element} */ (container).nextElementSibling;
@@ -699,7 +699,7 @@ class Component {
 	 * @description Checks if the given element is a file component by matching its tag name against the file manager's regular expressions.
 	 * - It also verifies whether the element has the required attributes based on the tag type.
 	 * @param {Node} element The element to check.
-	 * @returns {boolean} Returns true if the element is a file component, otherwise false.
+	 * @returns {boolean} Returns `true` if the element is a file component, otherwise `false`.
 	 */
 	#isFiles(element) {
 		const nodeName = element.nodeName.toLowerCase();

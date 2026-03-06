@@ -105,7 +105,7 @@ declare class FileUpload extends PluginCommand {
 	/**
 	 * @description Create a `file` component using the provided files.
 	 * @param {File[]|FileList} fileList File object list
-	 * @returns {Promise<boolean>} If return false, the file upload will be canceled
+	 * @returns {Promise<boolean>} If return `false`, the file upload will be canceled
 	 */
 	submitFile(fileList: File[] | FileList): Promise<boolean>;
 	/**

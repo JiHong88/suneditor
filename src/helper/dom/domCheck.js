@@ -243,7 +243,7 @@ export function isSpanWithoutAttr(node) {
  * @description Compares the style and class for equal values.
  * @param {Node} a Node to compare
  * @param {Node} b Node to compare
- * @returns {boolean} Returns true if both are text nodes.
+ * @returns {boolean} Returns `true` if both are text nodes.
  */
 export function isSameAttributes(a, b) {
 	if (a.nodeType === 3 && b.nodeType === 3) return true;

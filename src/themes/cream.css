@@ -15,8 +15,8 @@
 	--se-edit-font-quote: #555555;
 
 	/* editable surfaces */
-	--se-edit-background-color: #efe7d3;
-	--se-edit-background-pre: #e2d9c3;
+	--se-edit-background-color: #f8f3e8;
+	--se-edit-background-pre: #f0eadb;
 
 	/* content border scale */
 	--se-edit-border-light: #c4a06e;
@@ -40,16 +40,16 @@
 	/** --------------------------- layout - [colors] ----------- */
 	/* main shell and typography */
 	--se-main-font-family: Helvetica Neue;
-	--se-main-out-color: #ddd4c2;
+	--se-main-out-color: #ebe4d5;
 	--se-main-color: #2b2b2b;
 	--se-main-color-lighter: #555555;
-	--se-main-background-color: #efe7d3;
+	--se-main-background-color: #f8f3e8;
 	--se-code-view-color: #2b2b2b;
 	--se-main-font-color: #2b2b2b;
-	--se-code-view-background-color: #fdfaf2;
-	--se-main-divider-color: #c8b898;
+	--se-code-view-background-color: #fefcf6;
+	--se-main-divider-color: #d5c9b0;
 	--se-main-border-color: #c4a06e;
-	--se-main-outline-color: #d5c9b0;
+	--se-main-outline-color: #e0d6c2;
 	--se-main-shadow-color: #a8997e;
 	--se-statusbar-font-color: #666666;
 	--se-overlay-background-color: rgba(0, 0, 0, 0.3);
@@ -87,21 +87,21 @@
 	--se-drag-over-color: #e8a020;
 
 	/* modal, browser, dropdown surfaces */
-	--se-modal-background-color: #f5edd9;
+	--se-modal-background-color: #faf6ed;
 	--se-modal-color: #2b2b2b;
 	--se-modal-border-color: #c4a06e;
 	--se-modal-anchor-color: #0066bb;
 	--se-modal-preview-color: #666666;
-	--se-modal-file-input-background-color: #e8e0cc;
+	--se-modal-file-input-background-color: #f2ece0;
 	--se-modal-input-disabled-color: #999999;
-	--se-modal-input-disabled-background-color: #e5dcca;
+	--se-modal-input-disabled-background-color: #ede6da;
 
 	/* dropdown text */
 	--se-dropdown-font-color: #2b2b2b;
 
 	/* media/controller chrome */
 	--se-controller-border-color: #c4a06e;
-	--se-controller-background-color: #f5edd9;
+	--se-controller-background-color: #faf6ed;
 	--se-controller-color: #2b2b2b;
 	--se-shadow-controller-color: rgba(0, 0, 0, 0.18);
 
@@ -110,7 +110,7 @@
 	--se-input-btn-disabled-color: #999999;
 
 	/* table picker */
-	--se-table-picker-color: #e8e0cc;
+	--se-table-picker-color: #f2ece0;
 	--se-table-picker-border-color: #c4a06e;
 	--se-table-picker-highlight-color: #c8dfef;
 	--se-table-picker-highlight-border-color: #0077cc;
@@ -138,8 +138,8 @@
 	--se-error-light5-color: #fce8ec;
 
 	/* document mode palette */
-	--se-doc-background: #e8e0cc;
-	--se-doc-info-page-font-color: #f5edd9;
+	--se-doc-background: #f2ece0;
+	--se-doc-info-page-font-color: #faf6ed;
 	--se-doc-info-page-background-color: #555555;
 	--se-doc-info-font-color: #555555;
 	--se-doc-info-active-color: #0077cc;

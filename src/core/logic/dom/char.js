@@ -24,7 +24,7 @@ class Char {
 	}
 
 	/**
-	 * @description Returns false if char count is greater than "frameOptions.get('charCounter_max')" when "html" is added to the current editor.
+	 * @description Returns `false` if char count is greater than "frameOptions.get('charCounter_max')" when "html" is added to the current editor.
 	 * @param {Node|string} html Element node or String.
 	 * @returns {boolean}
 	 */
@@ -42,7 +42,7 @@ class Char {
 
 	/**
 	 * @description Get the [content]'s number of characters or binary data size. (frameOptions.get('charCounter_type'))
-	 * - If [content] is undefined, get the current editor's number of characters or binary data size.
+	 * - If [content] is `undefined`, get the current editor's number of characters or binary data size.
 	 * @param {string} [content] Content to count. (defalut: this.#frameContext.get('wysiwyg'))
 	 * @returns {number}
 	 */
@@ -99,7 +99,7 @@ class Char {
 	}
 
 	/**
-	 * @description Returns false if char count is greater than "frameOptions.get('charCounter_max')" when "inputText" is added to the current editor.
+	 * @description Returns `false` if char count is greater than "frameOptions.get('charCounter_max')" when "inputText" is added to the current editor.
 	 * - If the current number of characters is greater than "charCounter_max", the excess characters are removed.
 	 * And call the char.display()
 	 * @param {string} inputText Text added.

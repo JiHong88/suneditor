@@ -128,21 +128,21 @@ declare class DocumentType {
 	 * @internal
 	 * @description Finds an header element of innerHeaders element.
 	 * @param {Node} header - H tag element to find.
-	 * @returns {HTMLElement|null} The found element, or null if not found.
+	 * @returns {HTMLElement|null} The found element, or `null` if not found.
 	 */
 	_findItem(header: Node): HTMLElement | null;
 	/**
 	 * @internal
 	 * @description Finds the closest header element from a given line.
 	 * @param {Node} line - The `line` to check.
-	 * @returns {Node|null} The closest header element, or null if not found.
+	 * @returns {Node|null} The closest header element, or `null` if not found.
 	 */
 	_findLinesHeader(line: Node): Node | null;
 	/**
 	 * @internal
 	 * @description Checks if an element is a header.
 	 * @param {Node} element - The element to check.
-	 * @returns {boolean} True if the element is a header, otherwise false.
+	 * @returns {boolean} `true` if the element is a header, otherwise `false`.
 	 */
 	_is(element: Node): boolean;
 	/**

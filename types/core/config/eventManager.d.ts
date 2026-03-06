@@ -36,7 +36,7 @@ declare class EventManager {
 	/**
 	 * @description Remove event
 	 * @param {SunEditor.Event.Info} params event info = this.addEvent()
-	 * @returns {undefined|null} Success: null, Not found: undefined
+	 * @returns {undefined|null} Success: `null`, Not found: `undefined`
 	 */
 	removeEvent(params: SunEditor.Event.Info): undefined | null;
 	/**
@@ -54,12 +54,12 @@ declare class EventManager {
 	 * @param {string|SunEditor.Event.GlobalInfo} type Event type or (Event info = this.addGlobalEvent())
 	 * @param {(...args: *) => *} [listener] Event listener
 	 * @param {boolean|AddEventListenerOptions} [useCapture] Use event capture
-	 * @returns {undefined|null} Success: null, Not found: undefined
+	 * @returns {undefined|null} Success: `null`, Not found: `undefined`
 	 */
 	removeGlobalEvent(type: string | SunEditor.Event.GlobalInfo, listener?: (...args: any) => any, useCapture?: boolean | AddEventListenerOptions): undefined | null;
 	/**
 	 * @internal
-	 * @description Gives an active effect when the mouse down event is blocked. (Used when "env.isGecko" is true)
+	 * @description Gives an active effect when the mouse down event is blocked. (Used when "env.isGecko" is `true`)
 	 * @param {Node} target Target element
 	 */
 	_injectActiveEvent(target: Node): void;

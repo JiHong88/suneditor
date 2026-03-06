@@ -586,7 +586,7 @@ class Offset {
 	 * @description Sets the position of an element relative to a range
 	 * @param {HTMLElement} element Element to position
 	 * @param {?Range} range Range to position against.
-	 * - if null, the current selection range is used
+	 * - if `null`, the current selection range is used
 	 * @param {Object} [options={}] Position options
 	 * @param {"bottom"|"top"} [options.position="bottom"] Position ('bottom'|'top')
 	 * @param {number} [options.addTop=0] Additional top offset

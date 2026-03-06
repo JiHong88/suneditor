@@ -254,7 +254,7 @@ class Menu {
 	/**
 	 * @description Check if the element is part of a more layer
 	 * @param {Node} element The element to check
-	 * @returns {HTMLElement|null} The more layer element or null
+	 * @returns {HTMLElement|null} The more layer element or `null`
 	 */
 	#checkMoreLayer(element) {
 		const more = dom.query.getParentElement(element, '.se-more-layer');
