@@ -95,10 +95,8 @@ class Editor {
 		if (this.$.options.get('hasCodeMirror')) {
 			this.$.contextProvider.applyToRoots((e) => {
 				const opts = e.get('options');
-				const cm6 = opts.get('codeMirror6Editor');
-				const cm5 = opts.get('codeMirror5Editor');
-				if (cm6) cm6.destroy();
-				else if (cm5) cm5.toTextArea();
+				const cm = opts.get('codeMirrorEditor');
+				if (cm) cm.toTextArea();
 			});
 		}
 

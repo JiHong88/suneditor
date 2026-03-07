@@ -154,8 +154,7 @@ export const DEFAULTS = {
  * @property {Object} [__statusbarEvent] - Status bar event configuration.
  * @property {SunEditor.InitFrameOptions} _origin - origin frame options
  * @property {OptionStyleResult} [_defaultStyles] - Enables fixed positioning for the editor frame.
- * @property {*} [codeMirror5Editor] - CodeMirror5 editor instance (frame-level). Set by `_checkCodeMirror` after initialization.
- * @property {*} [codeMirror6Editor] - CodeMirror6 EditorView instance (frame-level). Set by `_checkCodeMirror` after initialization.
+ * @property {*} [codeMirrorEditor] - CodeMirror editor instance (frame-level). Set by `_checkCodeMirror` after initialization.
  */
 
 /**
@@ -479,9 +478,7 @@ export const DEFAULTS = {
  * - Includes default `indent-outdent` + user's `reverseButtons`.
  *
  * @property {*} [codeMirror] - CodeMirror configuration object from `externalLibs.codeMirror`.
- * @property {boolean} [codeMirror6Editor] - Whether CodeMirror 6 is available (base-level flag).
- * - Frame-level stores the actual EditorView instance.
- * @property {boolean} [codeMirror5Editor] - Whether CodeMirror 5 is available (base-level flag). Frame-level stores the actual CM5 instance.
+ * @property {boolean} [codeMirrorEditor] - Whether CodeMirror is available (base-level flag). Frame-level stores the actual CM instance.
  * @property {boolean} [hasCodeMirror] - Uses CodeMirror for code view.
  *
  * @property {Set<string>} [allUsedStyles] - Processed set of all allowed CSS styles.

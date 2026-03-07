@@ -659,10 +659,8 @@ export function InitOptions(options, editorTargets, plugins) {
 	const cm = o.get('externalLibs').codeMirror;
 	if (cm) {
 		o.set('codeMirror', cm);
-		if (cm.EditorView) {
-			o.set('codeMirror6Editor', true);
-		} else if (cm.src) {
-			o.set('codeMirror5Editor', true);
+		if (cm.src) {
+			o.set('codeMirrorEditor', true);
 		} else {
 			console.warn('[SUNEDITOR.options.externalLibs.codeMirror.fail] The codeMirror option is set incorrectly. See: https://github.com/ARA-developer/suneditor/blob/develop/guide/external-libraries.md');
 			o.set('codeMirror', null);
@@ -924,20 +922,7 @@ function _checkCodeMirror(options, targetOptions, textarea) {
 	let cmeditor = null;
 	let hasCodeMirror = false;
 
-	if (options.get('codeMirror6Editor')) {
-		const codeMirror = options.get('codeMirror');
-		const codeStyles = textarea.style.cssText;
-		const cm = new codeMirror.EditorView({
-			parent: textarea.parentElement,
-			extensions: codeMirror.extensions,
-			state: codeMirror.state,
-		});
-
-		targetOptions.set('codeMirror6Editor', cm);
-		cmeditor = cm.dom;
-		cmeditor.style.cssText = codeStyles;
-		hasCodeMirror = true;
-	} else if (options.get('codeMirror5Editor')) {
+	if (options.get('codeMirrorEditor')) {
 		const codeMirror = options.get('codeMirror');
 		const cmOptions = [
 			{
@@ -961,13 +946,14 @@ function _checkCodeMirror(options, targetOptions, textarea) {
 
 		const codeStyles = textarea.style.cssText;
 		const cm = codeMirror.src.fromTextArea(textarea, cmOptions);
-		targetOptions.set('codeMirror5Editor', cm);
+		targetOptions.set('codeMirrorEditor', cm);
 		cmeditor = cm.display.wrapper;
 		cmeditor.style.cssText = codeStyles;
 		hasCodeMirror = true;
 	}
 
 	options.set('hasCodeMirror', hasCodeMirror);
+
 	if (cmeditor) {
 		dom.utils.removeItem(textarea);
 		cmeditor.className += ' se-code-viewer-mirror';

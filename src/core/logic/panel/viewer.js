@@ -540,33 +540,15 @@ class Viewer {
 		const fo = rootKey ? this.#frameRoots.get(rootKey).get('options') : this.#frameOptions;
 		switch (key) {
 			case 'set':
-				if (fo.has('codeMirror5Editor')) {
-					fo.get('codeMirror5Editor').getDoc().setValue(value);
-				} else if (fo.has('codeMirror6Editor')) {
-					fo.get('codeMirror6Editor').dispatch({
-						changes: { from: 0, to: fo.get('codeMirror6Editor').state.doc.length, insert: value },
-					});
-				}
+				fo.get('codeMirrorEditor').getDoc().setValue(value);
 				break;
 			case 'get':
-				if (fo.has('codeMirror5Editor')) {
-					return fo.get('codeMirror5Editor').getDoc().getValue();
-				} else if (fo.has('codeMirror6Editor')) {
-					return fo.get('codeMirror6Editor').state.doc.toString();
-				}
-				break;
+				return fo.get('codeMirrorEditor').getDoc().getValue();
 			case 'readonly':
-				if (fo.has('codeMirror5Editor')) {
-					fo.get('codeMirror5Editor').setOption('readOnly', value);
-				} else if (fo.has('codeMirror6Editor')) {
-					if (!value) fo.get('codeMirror6Editor').contentDOM.setAttribute('contenteditable', true);
-					else fo.get('codeMirror6Editor').contentDOM.removeAttribute('contenteditable');
-				}
+				fo.get('codeMirrorEditor').setOption('readOnly', value);
 				break;
 			case 'refresh':
-				if (fo.has('codeMirror5Editor')) {
-					fo.get('codeMirror5Editor').refresh();
-				}
+				fo.get('codeMirrorEditor').refresh();
 				break;
 		}
 	}

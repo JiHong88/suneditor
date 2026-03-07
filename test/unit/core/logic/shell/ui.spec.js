@@ -831,8 +831,8 @@ describe('UIManager (real instance)', () => {
 			ui.setEditorStyle('color: red');
 
 			const fc = ctx.frameContext;
-			// code display should be set to none
-			expect(fc.get('code').style.display).toBe('none');
+			// code gets frame styles (height, min-height, max-height)
+			expect(fc.get('code').style.cssText).toBe(fc.get('options').get('_defaultStyles').frame);
 		});
 
 		it('should use the provided frame context when supplied', () => {
@@ -849,7 +849,7 @@ describe('UIManager (real instance)', () => {
 			]);
 
 			ui.setEditorStyle('font-size: 14px', customFc);
-			expect(customFc.get('code').style.display).toBe('none');
+			expect(customFc.get('code').style.cssText).toBe(customFc.get('options').get('_defaultStyles').frame);
 		});
 
 		it('should handle iframe mode by setting wysiwyg style separately', () => {
@@ -868,8 +868,8 @@ describe('UIManager (real instance)', () => {
 			]);
 
 			ui.setEditorStyle('font-size: 14px', customFc);
-			// In iframe mode, wysiwyg gets editor styles
-			expect(customFc.get('code').style.display).toBe('none');
+			// code gets frame styles regardless of iframe mode
+			expect(customFc.get('code').style.cssText).toBe(customFc.get('options').get('_defaultStyles').frame);
 		});
 	});
 

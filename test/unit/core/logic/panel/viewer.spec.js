@@ -406,6 +406,7 @@ describe('Viewer', () => {
 				env.frameOptions.set('height', 'auto');
 				env.options.set('hasCodeMirror', true);
 				env.frameContext.set('isFullScreen', false);
+				jest.spyOn(viewer, '_codeMirrorEditor').mockImplementation(() => {});
 				viewer.codeView(true);
 				// when hasCodeMirror is true the auto-height branch is skipped; code height stays unchanged
 				expect(env.mockCodeArea.style.height).not.toBe('100px');
@@ -1168,101 +1169,51 @@ describe('Viewer', () => {
 	// _codeMirrorEditor()
 	// ======================================================================
 	describe('_codeMirrorEditor', () => {
-		describe('with CodeMirror 5', () => {
-			let cm5;
-			let cm5Doc;
+		describe('with CodeMirror', () => {
+			let cm;
+			let cmDoc;
 			beforeEach(() => {
-				cm5Doc = {
+				cmDoc = {
 					setValue: jest.fn(),
-					getValue: jest.fn(() => '<p>cm5 content</p>'),
+					getValue: jest.fn(() => '<p>cm content</p>'),
 				};
-				cm5 = {
-					getDoc: jest.fn(() => cm5Doc),
+				cm = {
+					getDoc: jest.fn(() => cmDoc),
 					setOption: jest.fn(),
 					refresh: jest.fn(),
 				};
-				env.frameOptions.set('codeMirror5Editor', cm5);
+				env.frameOptions.set('codeMirrorEditor', cm);
 			});
 
 			it('should call setValue for set key', () => {
 				viewer._codeMirrorEditor('set', '<p>new</p>', null);
-				expect(cm5.getDoc).toHaveBeenCalled();
-				expect(cm5Doc.setValue).toHaveBeenCalledWith('<p>new</p>');
+				expect(cm.getDoc).toHaveBeenCalled();
+				expect(cmDoc.setValue).toHaveBeenCalledWith('<p>new</p>');
 			});
 
 			it('should call getValue for get key', () => {
 				const result = viewer._codeMirrorEditor('get', null, null);
-				expect(result).toBe('<p>cm5 content</p>');
+				expect(result).toBe('<p>cm content</p>');
 			});
 
 			it('should call setOption for readonly key', () => {
 				viewer._codeMirrorEditor('readonly', true, null);
-				expect(cm5.setOption).toHaveBeenCalledWith('readOnly', true);
+				expect(cm.setOption).toHaveBeenCalledWith('readOnly', true);
 			});
 
 			it('should call refresh for refresh key', () => {
 				viewer._codeMirrorEditor('refresh', null, null);
-				expect(cm5.refresh).toHaveBeenCalled();
-			});
-		});
-
-		describe('with CodeMirror 6', () => {
-			let cm6;
-			let contentDOM;
-			beforeEach(() => {
-				contentDOM = document.createElement('div');
-				cm6 = {
-					state: { doc: { length: 10, toString: jest.fn(() => '<p>cm6</p>') } },
-					dispatch: jest.fn(),
-					contentDOM,
-				};
-				env.frameOptions.set('codeMirror6Editor', cm6);
-			});
-
-			it('should dispatch changes for set key', () => {
-				viewer._codeMirrorEditor('set', '<p>new</p>', null);
-				expect(cm6.dispatch).toHaveBeenCalledWith({
-					changes: { from: 0, to: 10, insert: '<p>new</p>' },
-				});
-			});
-
-			it('should return doc.toString() for get key', () => {
-				const result = viewer._codeMirrorEditor('get', null, null);
-				expect(result).toBe('<p>cm6</p>');
-			});
-
-			it('should set contenteditable for readonly false', () => {
-				viewer._codeMirrorEditor('readonly', false, null);
-				expect(contentDOM.getAttribute('contenteditable')).toBe('true');
-			});
-
-			it('should remove contenteditable for readonly true', () => {
-				contentDOM.setAttribute('contenteditable', 'true');
-				viewer._codeMirrorEditor('readonly', true, null);
-				expect(contentDOM.hasAttribute('contenteditable')).toBe(false);
-			});
-
-			it('should not crash on refresh (no CM5 refresh method)', () => {
-				expect(() => viewer._codeMirrorEditor('refresh', null, null)).not.toThrow();
-			});
-		});
-
-		describe('with neither CodeMirror', () => {
-			it('should not crash for any key', () => {
-				expect(() => viewer._codeMirrorEditor('set', 'val', null)).not.toThrow();
-				expect(() => viewer._codeMirrorEditor('get', null, null)).not.toThrow();
-				expect(() => viewer._codeMirrorEditor('readonly', true, null)).not.toThrow();
-				expect(() => viewer._codeMirrorEditor('refresh', null, null)).not.toThrow();
+				expect(cm.refresh).toHaveBeenCalled();
 			});
 		});
 
 		describe('with rootKey', () => {
 			it('should use frameRoots when rootKey is provided', () => {
-				const rootFO = new Map([['codeMirror5Editor', { getDoc: jest.fn(() => ({ setValue: jest.fn() })), refresh: jest.fn() }]]);
+				const rootFO = new Map([['codeMirrorEditor', { getDoc: jest.fn(() => ({ setValue: jest.fn() })), refresh: jest.fn() }]]);
 				const rootFC = new Map([['options', rootFO]]);
 				env.deps.frameRoots.set('customRoot', rootFC);
 				viewer._codeMirrorEditor('refresh', null, 'customRoot');
-				expect(rootFO.get('codeMirror5Editor').refresh).toHaveBeenCalled();
+				expect(rootFO.get('codeMirrorEditor').refresh).toHaveBeenCalled();
 			});
 		});
 	});

@@ -80,8 +80,6 @@
 	"devDependencies": {
 		"@babel/core": "^7.28.4",
 		"@babel/preset-env": "^7.28.3",
-		"@codemirror/lang-html": "^6.4.10",
-		"@codemirror/lang-javascript": "^6.2.4",
 		"@google-cloud/translate": "^9.3.0",
 		"@octokit/rest": "^21.1.1",
 		"@playwright/test": "^1.56.0",
@@ -94,7 +92,6 @@
 		"baseline-browser-mapping": "^2.9.19",
 		"clean-webpack-plugin": "^4.0.0",
 		"codemirror": "^6.65.7",
-		"codemirror5": "npm:codemirror@5.65.20",
 		"cross-env": "^7.0.3",
 		"css-loader": "^7.1.2",
 		"css-minimizer-webpack-plugin": "^8.0.0",

@@ -19,15 +19,10 @@ import { CHTML } from 'mathjax-full/js/output/chtml.js';
 import { browserAdaptor } from 'mathjax-full/js/adaptors/browserAdaptor.js';
 import { RegisterHTMLHandler } from 'mathjax-full/js/handlers/html.js';
 
-// codemirror6
-import { EditorView, basicSetup, minimalSetup } from 'codemirror';
-import { javascript } from '@codemirror/lang-javascript';
-import { html } from '@codemirror/lang-html';
-
-// // codemirror5
-import Codemirror5 from 'codemirror5';
-require('codemirror5/lib/codemirror.css');
-require('codemirror5/mode/htmlmixed/htmlmixed');
+// codemirror
+import CodeMirror from 'codemirror';
+require('codemirror/lib/codemirror.css');
+require('codemirror/mode/htmlmixed/htmlmixed');
 
 // perfect-freehand
 // import PerfectFreehand from 'perfect-freehand';
@@ -261,20 +256,8 @@ const mode = ['inline', 'balloon-always', 'balloon', 'classic'][1];
 // 	// tableCellControllerPosition: 'top',
 // 	statusbar: true,
 // 	codeMirror: {
-// 		EditorView: EditorView,
-// 		extensions: [
-// 			basicSetup,
-// 			html({
-// 				matchClosingTags: true,
-// 				autoCloseTags: true
-// 			}),
-// 			javascript()
-// 		],
-// 		minimalSetup: minimalSetup
+// 		src: CodeMirror
 // 	},
-// 	// codeMirror: {
-// 	// 	src: Codemirror5
-// 	// },
 // 	// mode: "inline",
 // 	// imageUploadUrl: 'http://localhost:3000/editor/upload',
 // 	// videoUploadUrl: 'http://localhost:3000/editor/upload',
@@ -579,25 +562,9 @@ const options1 = {
 	attributeWhitelist: { '*': 'class', img: 'scee' },
 	// statusbar_container: '#root_statusbar_container',
 	// shortcutsHint: false,
-	/** codemirror6 -- */
-	codeMirror: {
-		EditorView: EditorView,
-		extensions: [
-			basicSetup,
-			html({
-				matchClosingTags: true,
-				autoCloseTags: true,
-			}),
-			javascript(),
-		],
-		minimalSetup: minimalSetup,
-	},
-	/** -- codemirror6 */
-	/** codemirror5 -- */
 	// codeMirror: {
-	// 	src: Codemirror5
+	// 	src: CodeMirror
 	// },
-	/** -- codemirror5 */
 	// iframe: true,
 	// iframe_attributes: 'abc',
 	// defaultLine: 'p',
@@ -799,21 +766,11 @@ const options1 = {
 	// iframe_attributes: { aaa: true },
 	type: 'document:header,page',
 	externalLibs: {
-      codeMirror: { src: Codemirror5 },
-    },
+		codeMirror: { src: CodeMirror },
+	},
+	height: 'auto',
 	// externalLibs: {
-	// 	codeMirror: {
-	// 		EditorView: EditorView,
-	// 		extensions: [
-	// 			basicSetup,
-	// 			html({
-	// 				matchClosingTags: true,
-	// 				autoCloseTags: true,
-	// 			}),
-	// 			javascript(),
-	// 		],
-	// 		minimalSetup: minimalSetup,
-	// 	},
+	// 	codeMirror: { src: CodeMirror },
 	// },
 	link: {
 		uploadUrl: 'http://localhost:3000/editor/files/upload',
@@ -925,20 +882,7 @@ const options1 = {
 	// 		RegisterHTMLHandler,
 	// 	},
 	// 	// perfectFreehand: PerfectFreehand,
-	// 	// codemirror
-	// 	codeMirror: {
-	// 		EditorView: EditorView,
-	// 		extensions: [
-	// 			basicSetup,
-	// 			html({
-	// 				matchClosingTags: true,
-	// 				autoCloseTags: true,
-	// 			}),
-	// 			javascript(),
-	// 		],
-	// 		minimalSetup: minimalSetup,
-	// 		// src: Codemirror5
-	// 	},
+	// 	codeMirror: { src: CodeMirror },
 	// },
 	value: `
     <div >
@@ -2006,18 +1950,7 @@ const options_test = {
 	v2Migration: false,
 	mode: 'balloon',
 	type: 'document:header,page',
-	codeMirror: {
-		EditorView: EditorView,
-		extensions: [
-			basicSetup,
-			html({
-				matchClosingTags: true,
-				autoCloseTags: true,
-			}),
-			javascript(),
-		],
-		minimalSetup: minimalSetup,
-	},
+	// codeMirror: { src: CodeMirror },
 	theme: '',
 	lang: langs.en,
 	icons: {},

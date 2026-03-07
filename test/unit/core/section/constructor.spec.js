@@ -321,21 +321,7 @@ describe('Core Section - Constructor', () => {
             consoleSpy.mockRestore();
         });
 
-        it('should handle CodeMirror 6 configuration', () => {
-            const mockEditorView = function() {};
-            mockEditorView.prototype = {};
-            const result = InitOptions({
-                externalLibs: {
-                    codeMirror: {
-                        EditorView: mockEditorView,
-                        extensions: []
-                    }
-                }
-            }, [{ key: null, target: document.createElement('div'), options: {} }], {});
-            expect(result.o.get('codeMirror6Editor')).toBe(true);
-        });
-
-        it('should handle CodeMirror 5 configuration', () => {
+        it('should handle CodeMirror configuration', () => {
             const result = InitOptions({
                 externalLibs: {
                     codeMirror: {
@@ -343,7 +329,7 @@ describe('Core Section - Constructor', () => {
                     }
                 }
             }, [{ key: null, target: document.createElement('div'), options: {} }], {});
-            expect(result.o.get('codeMirror5Editor')).toBe(true);
+            expect(result.o.get('codeMirrorEditor')).toBe(true);
         });
 
         it('should warn on invalid CodeMirror configuration', () => {

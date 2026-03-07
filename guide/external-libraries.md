@@ -7,8 +7,6 @@ SunEditor supports integration with external libraries for enhanced functionalit
 ## Table of Contents
 
 - [CodeMirror Integration](#codemirror-integration)
-    - [CodeMirror 6](#codemirror-6)
-    - [CodeMirror 5](#codemirror-5)
 - [Math Libraries](#math-libraries)
     - [KaTeX](#katex)
     - [MathJax](#mathjax)
@@ -19,61 +17,12 @@ SunEditor supports integration with external libraries for enhanced functionalit
 
 ## CodeMirror Integration
 
-CodeMirror provides syntax highlighting and advanced editing features for the **code view** mode. SunEditor supports both CodeMirror 5 and CodeMirror 6.
-
-### CodeMirror 6
+CodeMirror provides syntax highlighting and advanced editing features for the **code view** mode.
 
 **Installation:**
 
 ```bash
-npm install codemirror @codemirror/lang-html @codemirror/lang-javascript
-```
-
-**Configuration:**
-
-```javascript
-import { EditorView, basicSetup } from 'codemirror';
-import { html } from '@codemirror/lang-html';
-import { javascript } from '@codemirror/lang-javascript';
-import SUNEDITOR from 'suneditor';
-import plugins from 'suneditor/src/plugins';
-
-const editor = SUNEDITOR.create('editor', {
-	plugins: plugins,
-	buttonList: [['codeView']],
-	externalLibs: {
-		codeMirror: {
-			EditorView: EditorView,
-			extensions: [
-				basicSetup,
-				html({
-					matchClosingTags: true,
-					autoCloseTags: true,
-				}),
-				javascript(),
-			],
-			// state: EditorState.create({...}) // Optional: custom initial state
-		},
-	},
-});
-```
-
-**CodeMirror 6 Options:**
-
-| Property     | Type          | Required | Description                          |
-| ------------ | ------------- | -------- | ------------------------------------ |
-| `EditorView` | `Class`       | ✅       | The EditorView class from codemirror |
-| `extensions` | `Array`       | ✅       | Array of CodeMirror 6 extensions     |
-| `state`      | `EditorState` | ❌       | Optional custom initial state        |
-
----
-
-### CodeMirror 5
-
-**Installation:**
-
-```bash
-npm install codemirror@5
+npm install codemirror
 ```
 
 **Configuration:**
@@ -103,14 +52,14 @@ const editor = SUNEDITOR.create('editor', {
 });
 ```
 
-**CodeMirror 5 Options:**
+**CodeMirror Options:**
 
 | Property  | Type     | Required | Description                      |
 | --------- | -------- | -------- | -------------------------------- |
 | `src`     | `Object` | ✅       | The CodeMirror library object    |
 | `options` | `Object` | ❌       | CodeMirror configuration options |
 
-**Default CodeMirror 5 Options:**
+**Default Options:**
 
 ```javascript
 {
@@ -125,13 +74,13 @@ const editor = SUNEDITOR.create('editor', {
 
 ```html
 <!-- CSS -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.0/lib/codemirror.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@6.65.7/lib/codemirror.min.css" />
 
 <!-- JavaScript -->
-<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.0/lib/codemirror.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.0/mode/htmlmixed/htmlmixed.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.0/mode/xml/xml.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.0/mode/css/css.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@6.65.7/lib/codemirror.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@6.65.7/mode/htmlmixed/htmlmixed.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@6.65.7/mode/xml/xml.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@6.65.7/mode/css/css.js"></script>
 ```
 
 ```javascript
@@ -144,8 +93,6 @@ SUNEDITOR.create('editor', {
 	},
 });
 ```
-
-> **Note:** CodeMirror 6 does not support CDN usage due to its modular ES module architecture.
 
 ---
 
@@ -314,7 +261,7 @@ SUNEDITOR.create('editor', {
 ### CodeMirror not working
 
 1. **Check import:** Ensure you're importing the correct version
-2. **Verify options:** CodeMirror 6 requires `EditorView`, CodeMirror 5 requires `src`
+2. **Verify options:** Ensure `src` property is set to the CodeMirror library object
 3. **Check console:** Look for `[SUNEDITOR.options.externalLibs.codeMirror.fail]` warnings
 
 ### Math formulas not rendering
@@ -325,10 +272,10 @@ SUNEDITOR.create('editor', {
 
 ### Common Console Warnings
 
-| Warning                                                         | Cause                               | Solution                                   |
-| --------------------------------------------------------------- | ----------------------------------- | ------------------------------------------ |
-| `The math plugin must need either "KaTeX" or "MathJax" library` | No math library configured          | Add katex or mathjax to externalLibs       |
-| `The katex option is set incorrectly`                           | Missing `src` property              | Add `src: katex` to katex options          |
-| `The MathJax option is set incorrectly`                         | Missing required MathJax components | Include all required MathJax imports       |
-| `The MathJax option is not supported in the iframe`             | Using MathJax with iframe mode      | Use KaTeX instead or disable iframe mode   |
-| `The codeMirror option is set incorrectly`                      | Neither EditorView nor src provided | Check CodeMirror version and configuration |
+| Warning                                                         | Cause                               | Solution                                    |
+| --------------------------------------------------------------- | ----------------------------------- | ------------------------------------------- |
+| `The math plugin must need either "KaTeX" or "MathJax" library` | No math library configured          | Add katex or mathjax to externalLibs        |
+| `The katex option is set incorrectly`                           | Missing `src` property              | Add `src: katex` to katex options           |
+| `The MathJax option is set incorrectly`                         | Missing required MathJax components | Include all required MathJax imports        |
+| `The MathJax option is not supported in the iframe`             | Using MathJax with iframe mode      | Use KaTeX instead or disable iframe mode    |
+| `The codeMirror option is set incorrectly`                      | Missing `src` property              | Add `src: CodeMirror` to codeMirror options |
