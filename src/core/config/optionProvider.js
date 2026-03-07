@@ -23,6 +23,10 @@ import { UpdateStatusbarContext } from '../schema/frameContext';
  * @property {(newMap: SunEditor.InitOptions) => void} reset - Replaces all options with a new Map.
  * @property {() => number} size - Get option size
  * @property {() => void} clear - Clears all stored options.
+ * @property {() => IterableIterator<[keyof ConfigAllBaseOptions, *]>} entries - Returns an iterator of [key, value] pairs.
+ * @property {() => IterableIterator<keyof ConfigAllBaseOptions>} keys - Returns an iterator of keys.
+ * @property {() => IterableIterator<*>} values - Returns an iterator of values.
+ * @property {(callbackfn: (value: *, key: string, map: Map<string, *>) => void) => void} forEach - Executes a function for each entry.
  */
 
 /**
@@ -40,6 +44,10 @@ import { UpdateStatusbarContext } from '../schema/frameContext';
  * @property {(newMap: SunEditor.FrameOptions) => void} reset - Replaces all options with a new Map.
  * @property {() => number} size - Get option size
  * @property {() => void} clear - Clears all stored options.
+ * @property {() => IterableIterator<[keyof ConfigAllFrameOptions, *]>} entries - Returns an iterator of [key, value] pairs.
+ * @property {() => IterableIterator<keyof ConfigAllFrameOptions>} keys - Returns an iterator of keys.
+ * @property {() => IterableIterator<*>} values - Returns an iterator of values.
+ * @property {(callbackfn: (value: *, key: string, map: Map<string, *>) => void) => void} forEach - Executes a function for each entry.
  */
 
 /**
@@ -169,8 +177,10 @@ export default class OptionProvider {
 				const originOptions = fc.get('options');
 				const newRootOptions = newFrameMap.get(k);
 
-				// --- set options : fc ---
-				fc.set('options', newRootOptions);
+				// --- merge frame options ---
+				for (const [mk, mv] of newRootOptions.entries()) {
+					originOptions.set(mk, mv);
+				}
 
 				// statusbar-changed
 				if (diff.has('statusbar-changed')) {
@@ -387,6 +397,18 @@ export default class OptionProvider {
 			clear() {
 				store.clear();
 			},
+			entries() {
+				return store.entries();
+			},
+			keys() {
+				return store.keys();
+			},
+			values() {
+				return store.values();
+			},
+			forEach(callbackfn) {
+				store.forEach(callbackfn);
+			},
 		};
 	}
 
@@ -440,6 +462,18 @@ export default class OptionProvider {
 			},
 			clear() {
 				store.clear();
+			},
+			entries() {
+				return store.entries();
+			},
+			keys() {
+				return store.keys();
+			},
+			values() {
+				return store.values();
+			},
+			forEach(callbackfn) {
+				store.forEach(callbackfn);
 			},
 		};
 	}

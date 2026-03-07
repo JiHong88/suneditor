@@ -18,6 +18,10 @@ import type {} from '../../typedef';
  * @property {(newMap: SunEditor.InitOptions) => void} reset - Replaces all options with a new Map.
  * @property {() => number} size - Get option size
  * @property {() => void} clear - Clears all stored options.
+ * @property {() => IterableIterator<[keyof ConfigAllBaseOptions, *]>} entries - Returns an iterator of [key, value] pairs.
+ * @property {() => IterableIterator<keyof ConfigAllBaseOptions>} keys - Returns an iterator of keys.
+ * @property {() => IterableIterator<*>} values - Returns an iterator of values.
+ * @property {(callbackfn: (value: *, key: string, map: Map<string, *>) => void) => void} forEach - Executes a function for each entry.
  */
 /**
  * @typedef {Object} FrameOptionsMap
@@ -34,6 +38,10 @@ import type {} from '../../typedef';
  * @property {(newMap: SunEditor.FrameOptions) => void} reset - Replaces all options with a new Map.
  * @property {() => number} size - Get option size
  * @property {() => void} clear - Clears all stored options.
+ * @property {() => IterableIterator<[keyof ConfigAllFrameOptions, *]>} entries - Returns an iterator of [key, value] pairs.
+ * @property {() => IterableIterator<keyof ConfigAllFrameOptions>} keys - Returns an iterator of keys.
+ * @property {() => IterableIterator<*>} values - Returns an iterator of values.
+ * @property {(callbackfn: (value: *, key: string, map: Map<string, *>) => void) => void} forEach - Executes a function for each entry.
  */
 /**
  * @description Provides Map-based access to editor options (base and per-frame).
@@ -104,6 +112,22 @@ export type BaseOptionsMap = {
 	 * - Clears all stored options.
 	 */
 	clear: () => void;
+	/**
+	 * - Returns an iterator of [key, value] pairs.
+	 */
+	entries: () => IterableIterator<[keyof ConfigAllBaseOptions, any]>;
+	/**
+	 * - Returns an iterator of keys.
+	 */
+	keys: () => IterableIterator<keyof ConfigAllBaseOptions>;
+	/**
+	 * - Returns an iterator of values.
+	 */
+	values: () => IterableIterator<any>;
+	/**
+	 * - Executes a function for each entry.
+	 */
+	forEach: (callbackfn: (value: any, key: string, map: Map<string, any>) => void) => void;
 };
 /**
  * - A Map containing all processed frame-level options.
@@ -144,4 +168,20 @@ export type FrameOptionsMap = {
 	 * - Clears all stored options.
 	 */
 	clear: () => void;
+	/**
+	 * - Returns an iterator of [key, value] pairs.
+	 */
+	entries: () => IterableIterator<[keyof ConfigAllFrameOptions, any]>;
+	/**
+	 * - Returns an iterator of keys.
+	 */
+	keys: () => IterableIterator<keyof ConfigAllFrameOptions>;
+	/**
+	 * - Returns an iterator of values.
+	 */
+	values: () => IterableIterator<any>;
+	/**
+	 * - Executes a function for each entry.
+	 */
+	forEach: (callbackfn: (value: any, key: string, map: Map<string, any>) => void) => void;
 };

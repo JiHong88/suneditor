@@ -580,18 +580,18 @@ const options1 = {
 	// statusbar_container: '#root_statusbar_container',
 	// shortcutsHint: false,
 	/** codemirror6 -- */
-	// codeMirror: {
-	// 	EditorView: EditorView,
-	// 	extensions: [
-	// 		basicSetup,
-	// 		html({
-	// 			matchClosingTags: true,
-	// 			autoCloseTags: true
-	// 		}),
-	// 		javascript()
-	// 	],
-	// 	minimalSetup: minimalSetup
-	// },
+	codeMirror: {
+		EditorView: EditorView,
+		extensions: [
+			basicSetup,
+			html({
+				matchClosingTags: true,
+				autoCloseTags: true,
+			}),
+			javascript(),
+		],
+		minimalSetup: minimalSetup,
+	},
 	/** -- codemirror6 */
 	/** codemirror5 -- */
 	// codeMirror: {
@@ -798,7 +798,23 @@ const options1 = {
 	// height: 1500,
 	// iframe_attributes: { aaa: true },
 	type: 'document:header,page',
-
+	externalLibs: {
+      codeMirror: { src: Codemirror5 },
+    },
+	// externalLibs: {
+	// 	codeMirror: {
+	// 		EditorView: EditorView,
+	// 		extensions: [
+	// 			basicSetup,
+	// 			html({
+	// 				matchClosingTags: true,
+	// 				autoCloseTags: true,
+	// 			}),
+	// 			javascript(),
+	// 		],
+	// 		minimalSetup: minimalSetup,
+	// 	},
+	// },
 	link: {
 		uploadUrl: 'http://localhost:3000/editor/files/upload',
 		relList: ['alternate', 'author', 'external', 'help', 'license', 'next', 'follow', 'nofollow', 'noreferrer', 'noopener', 'prev', 'search', 'tag'],
@@ -1990,6 +2006,18 @@ const options_test = {
 	v2Migration: false,
 	mode: 'balloon',
 	type: 'document:header,page',
+	codeMirror: {
+		EditorView: EditorView,
+		extensions: [
+			basicSetup,
+			html({
+				matchClosingTags: true,
+				autoCloseTags: true,
+			}),
+			javascript(),
+		],
+		minimalSetup: minimalSetup,
+	},
 	theme: '',
 	lang: langs.en,
 	icons: {},
@@ -2090,20 +2118,20 @@ const options_test = {
 	freeCodeViewMode: false,
 
 	// Dynamic Options
-	externalLibs: {
-		katex: Katex,
-		mathJax: {
-			src: (() => {
-				// Register HTML handler before creating document
-				RegisterHTMLHandler(browserAdaptor());
-				return mathjax.document(document, {
-					InputJax: new TeX(),
-					OutputJax: new CHTML(),
-				});
-			})(),
-			tex: {},
-		},
-	},
+	// externalLibs: {
+	// 	katex: Katex,
+	// 	mathJax: {
+	// 		src: (() => {
+	// 			// Register HTML handler before creating document
+	// 			RegisterHTMLHandler(browserAdaptor());
+	// 			return mathjax.document(document, {
+	// 				InputJax: new TeX(),
+	// 				OutputJax: new CHTML(),
+	// 			});
+	// 		})(),
+	// 		tex: {},
+	// 	},
+	// },
 	allowedExtraTags: {
 		script: false,
 		style: false,

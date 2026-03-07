@@ -148,8 +148,17 @@ class UIManager {
 
 		// code view
 		const code = fc.get('code');
-		code.style.cssText = fo.get('_defaultStyles').frame;
-		code.style.display = 'none';
+		if (this.#options.get('hasCodeMirror')) {
+			const frameStyleArr = fo.get('_defaultStyles').frame.split(';');
+			for (let i = 0, len = frameStyleArr.length, s; i < len; i++) {
+				s = frameStyleArr[i].trim();
+				if (!s) continue;
+				const [prop, val] = s.split(':');
+				code.style.setProperty(prop.trim(), val.trim());
+			}
+		} else {
+			code.style.cssText = fo.get('_defaultStyles').frame;
+		}
 
 		// wysiwyg frame
 		if (!fo.get('iframe')) {
