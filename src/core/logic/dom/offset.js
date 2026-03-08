@@ -604,12 +604,13 @@ class Offset {
 
 		const isFullScreen = this.#frameContext.get('isFullScreen');
 		const topArea = this.#frameContext.get('topArea');
+		const isInCarrier = this.#carrierWrapper.contains(element);
 		const rects = rectsObj.rects;
 		const scrollLeft = isFullScreen ? 0 : rectsObj.scrollLeft;
 		const scrollTop = isFullScreen ? 0 : rectsObj.scrollTop;
-		const editorWidth = topArea.offsetWidth;
+		const editorWidth = isInCarrier ? getClientSize(_d).w : topArea.offsetWidth;
 		const offsets = this.getGlobal(topArea);
-		const editorLeft = offsets.left;
+		const editorLeft = isInCarrier ? 0 : offsets.left;
 		const toolbarWidth = element.offsetWidth;
 		const toolbarHeight = element.offsetHeight;
 
