@@ -372,7 +372,7 @@ class Offset {
 			const isSameContainer = t_container.contains(element);
 			const containerTop = isSameContainer ? this.getGlobal(e_container).top : 0;
 			const elHeight = element.offsetHeight;
-			const scrollTop = this.getGlobalScroll().top;
+			const scrollTop = _w.scrollY;
 			const bt = tGlobal.top;
 
 			const menuHeight_bottom = getClientSize(_d).h - (containerTop - scrollTop + bt + target.offsetHeight);

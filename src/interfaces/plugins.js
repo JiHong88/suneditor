@@ -35,16 +35,18 @@ class Base extends KernelInjector {
 		super(kernel);
 
 		// plugin basic properties
-		/** @type {string} */
+		/** @type {string}Toolbar button tooltip text (e.g., `this.$.lang.font`) */
 		this.title = '';
-		/** @type {string} */
+		/** @type {string} - Toolbar button icon HTML string (e.g., `this.$.icons.bold`) */
 		this.icon = '';
 
-		/** @type {HTMLElement} */
+		/** @type {string|HTMLElement|boolean|null} - Inner content of the toolbar button. HTML string for dropdown text labels, HTMLElement for input fields, or `false` to hide. */
+		this.inner = null;
+		/** @type {HTMLElement} - Element inserted before the main toolbar button (e.g., decrease button in fontSize) */
 		this.beforeItem = null;
-		/** @type {HTMLElement} */
+		/** @type {HTMLElement} - Element inserted after the main toolbar button (e.g., dropdown arrow, increase button) */
 		this.afterItem = null;
-		/** @type {HTMLElement} */
+		/** @type {HTMLElement} - Replaces the entire default toolbar button with a custom element */
 		this.replaceButton = null;
 	}
 }

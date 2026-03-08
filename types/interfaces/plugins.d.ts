@@ -154,15 +154,17 @@ declare class Base extends KernelInjector {
 		eventIndex?: number;
 		isInputComponent?: boolean;
 	};
-	/** @type {string} */
+	/** @type {string}Toolbar button tooltip text (e.g., `this.$.lang.font`) */
 	title: string;
-	/** @type {string} */
+	/** @type {string} - Toolbar button icon HTML string (e.g., `this.$.icons.bold`) */
 	icon: string;
-	/** @type {HTMLElement} */
+	/** @type {string|HTMLElement|boolean|null} - Inner content of the toolbar button. HTML string for dropdown text labels, HTMLElement for input fields, or `false` to hide. */
+	inner: string | HTMLElement | boolean | null;
+	/** @type {HTMLElement} - Element inserted before the main toolbar button (e.g., decrease button in fontSize) */
 	beforeItem: HTMLElement;
-	/** @type {HTMLElement} */
+	/** @type {HTMLElement} - Element inserted after the main toolbar button (e.g., dropdown arrow, increase button) */
 	afterItem: HTMLElement;
-	/** @type {HTMLElement} */
+	/** @type {HTMLElement} - Replaces the entire default toolbar button with a custom element */
 	replaceButton: HTMLElement;
 }
 import KernelInjector from '../core/kernel/kernelInjector';

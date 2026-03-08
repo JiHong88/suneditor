@@ -37,7 +37,7 @@ KernelInjector → Base → PluginCommand / PluginModal / PluginDropdown / ...
 ```
 
 - **`KernelInjector`** — Receives the Kernel and exposes `this.$` (Deps bag — the shared dependency object, not the Kernel itself).
-- **`Base`** — Adds common static properties (`key`, `type`, `className`, `options`) and instance properties (`title`, `icon`).
+- **`Base`** — Adds common static properties (`key`, `type`, `className`, `options`) and instance properties (`title`, `icon`, `inner`, `beforeItem`, `afterItem`, `replaceButton`).
 - **Plugin type class** — Defines required abstract methods per plugin type.
 
 ### Key Principles
@@ -606,10 +606,11 @@ class MyPlugin extends PluginModal {
 		this.title = this.$.lang.myPlugin || 'My Plugin';
 		this.icon = 'myPlugin'; // icon key from this.$.icons, or raw HTML/SVG
 
-		// Optional: toolbar button positioning
-		this.beforeItem = null; // HTMLElement to insert before
-		this.afterItem = null; // HTMLElement to insert after
-		this.replaceButton = null; // HTMLElement to replace the default button
+		// Optional: toolbar button content and layout
+		this.inner = null; // string (HTML) | HTMLElement | false (hide) | null (use icon)
+		this.beforeItem = null; // HTMLElement to insert before the button
+		this.afterItem = null; // HTMLElement to insert after the button
+		this.replaceButton = null; // HTMLElement to replace the entire default button
 
 		// Plugin members
 		this.myState = {};
