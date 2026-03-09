@@ -183,7 +183,7 @@ class DocumentType {
 			const pages = [];
 
 			for (let i = 0; i < pageBreaks.length; i++) {
-				pages.push({ number: i, top: pageBreaks[i].offsetTop + pageBreakHeight / 2 - scrollTop });
+				pages.push({ number: i, top: pageBreaks[i].offsetTop + pageBreakHeight / 2 });
 			}
 
 			this.#mirrorCache = 0;

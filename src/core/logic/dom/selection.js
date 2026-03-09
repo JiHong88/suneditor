@@ -286,10 +286,9 @@ class Selection_ {
 	getRects(target, position) {
 		const targetAbs = dom.check.isElement(/** @type {Node} */ (target)) ? _w.getComputedStyle(target).position === 'absolute' : false;
 		target = /** @type {Range} */ (!target || dom.check.isText(/** @type {Node} */ (target)) ? this.getRange() : target);
-		const globalScroll = this.#$.offset.getGlobalScroll();
 		let isStartPosition = position === 'start';
-		let scrollLeft = globalScroll.left;
-		let scrollTop = globalScroll.top;
+		let scrollLeft = _w.scrollX;
+		let scrollTop = _w.scrollY;
 
 		let rects = /** @type {*} */ (target).getClientRects();
 		rects = rects[isStartPosition ? 0 : rects.length - 1];
