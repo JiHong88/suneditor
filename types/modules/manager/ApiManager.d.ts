@@ -71,6 +71,20 @@ declare class ApiManager {
 	/**
 	 * @description Call API
 	 * @param {ApiManagerParams} params
+	 * @example
+	 * // POST with FormData and callbacks
+	 * apiManager.call({
+	 *   method: 'POST', url: '/upload', headers: { 'x-custom': 'value' },
+	 *   data: formData,
+	 *   callBack: (xhr) => console.log(xhr.responseText),
+	 *   errorCallBack: (res, xhr) => res.errorMessage || 'Upload failed'
+	 * });
+	 *
+	 * // GET request with minimal params (uses constructor defaults for omitted options)
+	 * apiManager.call({
+	 *   method: 'GET', url: '/api/files',
+	 *   callBack: (xhr) => JSON.parse(xhr.responseText)
+	 * });
 	 */
 	call({ method, url, headers, data, callBack, errorCallBack, responseType }: ApiManagerParams): void;
 	/**
@@ -82,6 +96,18 @@ declare class ApiManager {
 	 * @param {*} [params.data] - API data
 	 * @param {XMLHttpRequestResponseType} [params.responseType] - XMLHttpRequest.responseType
 	 * @returns {Promise<XMLHttpRequest>}
+	 * @example
+	 * // POST FormData and await the response
+	 * const xhr = await apiManager.asyncCall({
+	 *   method: 'POST', url: '/upload',
+	 *   headers: { 'x-api-key': 'key' }, data: formData
+	 * });
+	 * const result = JSON.parse(xhr.responseText);
+	 *
+	 * // Send JSON data (uses constructor defaults for method/url)
+	 * const xhr = await apiManager.asyncCall({
+	 *   data: JSON.stringify({ fileName: 'doc.pdf', htmlContent })
+	 * });
 	 */
 	asyncCall({
 		method,

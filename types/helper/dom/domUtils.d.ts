@@ -43,6 +43,8 @@ export function createTextNode(text: string): Text;
  * @param {Node} element Element object
  * @param {?Array<string>} exceptAttrs Array of attribute names to exclude from the result
  * @returns {string}
+ * @example
+ * const attrs = dom.utils.getAttributesToString(element, ['id', 'class']);
  */
 export function getAttributesToString(element: Node, exceptAttrs: Array<string> | null): string;
 /**
@@ -92,6 +94,8 @@ export function prevIndex(array: SunEditor.NodeCollection, item: Node): number;
  * @param {Node} originEl Origin element
  * @param {Node} copyEl Element to copy
  * @param {?Array<string>} [blacklist] Blacklist array(LowerCase)
+ * @example
+ * dom.utils.copyTagAttributes(newElement, originalElement, ['contenteditable']);
  */
 export function copyTagAttributes(originEl: Node, copyEl: Node, blacklist?: Array<string> | null): void;
 /**
@@ -109,6 +113,9 @@ export function removeItem(item: Node): void;
  * @description Replace element
  * @param {Node} element Target element
  * @param {string|Node} newElement String or element of the new element to apply
+ * @example
+ * dom.utils.changeElement(oldSpan, 'STRONG');
+ * dom.utils.changeElement(oldElement, newElement);
  */
 export function changeElement(element: Node, newElement: string | Node): void;
 /**
@@ -122,6 +129,9 @@ export function changeTxt(node: Node, txt: string): void;
  * @param {Node|Node[]} elements Element to set style
  * @param {string} styleName Style attribute name (`marginLeft`, `textAlign`...)
  * @param {string|number} value Style value
+ * @example
+ * dom.utils.setStyle(element, 'color', 'red');
+ * dom.utils.setStyle([el1, el2], 'display', 'none');
  */
 export function setStyle(elements: Node | Node[], styleName: string, value: string | number): void;
 /**
@@ -149,12 +159,17 @@ export function hasClass(element: Node | null, className: string): boolean;
  * @description Append the className value of the argument value element
  * @param {Node|SunEditor.NodeCollection} element Elements to add class name
  * @param {string} className Class name to be add
+ * @example
+ * dom.utils.addClass(element, 'active');
+ * dom.utils.addClass(element.children, 'highlight');
  */
 export function addClass(element: Node | SunEditor.NodeCollection, className: string): void;
 /**
  * @description Delete the className value of the argument value element
  * @param {Node|SunEditor.NodeCollection} element Elements to remove class name
  * @param {string} className Class name to be remove
+ * @example
+ * dom.utils.removeClass(element, 'active');
  */
 export function removeClass(element: Node | SunEditor.NodeCollection, className: string): void;
 /**
@@ -169,6 +184,8 @@ export function toggleClass(element: Node, className: string): boolean | undefin
  * @param {Node} element Element to flash class name
  * @param {string} className class name
  * @param {number} [duration=120] duration milliseconds
+ * @example
+ * dom.utils.flashClass(element, 'blink', 500);
  */
 export function flashClass(element: Node, className: string, duration?: number): void;
 /**
@@ -195,6 +212,8 @@ export function getViewportSize(): {
  * @param {boolean} includeWW Include the `wwTarget` element in the copy
  * @param {Iterable<string>} styles Style list - kamel case
  * @returns
+ * @example
+ * dom.utils.applyInlineStylesAll(wysiwygElement, true, ['font-family', 'font-size']);
  */
 export function applyInlineStylesAll(wwTarget: Node, includeWW: boolean, styles: Iterable<string>): HTMLElement;
 /**
@@ -202,6 +221,8 @@ export function applyInlineStylesAll(wwTarget: Node, includeWW: boolean, styles:
  * @param {Node} target Target element
  * @param {number} timeout Timeout milliseconds
  * @returns {Promise<void>}
+ * @example
+ * await dom.utils.waitForMediaLoad(imgElement, 5000);
  */
 export function waitForMediaLoad(target: Node, timeout?: number): Promise<void>;
 /**

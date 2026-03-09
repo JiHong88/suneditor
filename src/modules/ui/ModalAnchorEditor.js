@@ -37,6 +37,17 @@ class ModalAnchorEditor {
 	 * @param {SunEditor.Deps} $ Kernel dependencies
 	 * @param {HTMLElement} modalForm Modal <form>
 	 * @param {ModalAnchorEditorParams} params ModalAnchorEditor options
+	 * @example
+	 * // In a link plugin (text anchor):
+	 * this.anchor = new ModalAnchorEditor(this.$, modalEl, this.pluginOptions);
+	 *
+	 * // In an image plugin (non-text anchor with custom options):
+	 * const linkOptions = this.$.plugins.link ? this.$.plugins.link.pluginOptions : {};
+	 * this.anchor = new ModalAnchorEditor(this.$, modalEl.html, {
+	 *   ...linkOptions,
+	 *   textToDisplay: false,
+	 *   title: true,
+	 * });
 	 */
 	constructor($, modalForm, params) {
 		this.#$ = $;
@@ -149,6 +160,13 @@ class ModalAnchorEditor {
 	/**
 	 * @description Opens the anchor editor modal and populates it with data.
 	 * @param {boolean} isUpdate - Indicates whether an existing anchor is being updated (`true`) or a new one is being created (`false`).
+	 * @example
+	 * // Called from modalOn() — populate form for a new link:
+	 * this.anchor.on(false);
+	 *
+	 * // Populate form to edit an existing link (call set() first):
+	 * this.anchor.set(existingAnchorElement);
+	 * this.anchor.on(true);
 	 */
 	on(isUpdate) {
 		if (!isUpdate) {
@@ -173,6 +191,17 @@ class ModalAnchorEditor {
 	 * @description Creates an anchor (`<a>`) element with the specified attributes.
 	 * @param {boolean} notText - If `true`, the anchor will not contain text content.
 	 * @returns {HTMLElement|null} - The newly created anchor element, or `null` if the URL is empty.
+	 * @example
+	 * // In a link plugin — create anchor with text content:
+	 * const oA = this.anchor.create(false);
+	 * if (oA === null) return false;
+	 * this.$.html.insertNode(oA);
+	 *
+	 * // In an image plugin — create anchor without text (wraps an image):
+	 * const anchor = this.anchor.create(true);
+	 * if (anchor) {
+	 *   anchor.appendChild(imgElement);
+	 * }
 	 */
 	create(notText) {
 		if (this.linkValue.length === 0) return null;

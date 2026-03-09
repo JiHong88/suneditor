@@ -181,6 +181,9 @@ declare class HTML {
 	 * @param {boolean} [options.includeFullPage=false] Return only the content of the body without headers when the `iframe_fullPage` option is `true`
 	 * @param {number|Array<number>} [options.rootKey=null] Root index
 	 * @returns {string|Object<*, string>}
+	 * @example
+	 * const html = editor.$.html.get();
+	 * const htmlWithFrame = editor.$.html.get({ withFrame: true });
 	 */
 	get({ withFrame, includeFullPage, rootKey }?: { withFrame?: boolean; includeFullPage?: boolean; rootKey?: number | Array<number> }): string | any;
 	/**
@@ -188,6 +191,9 @@ declare class HTML {
 	 * @param {string} html HTML string
 	 * @param {Object} [options] Options
 	 * @param {number|Array<number>} [options.rootKey=null] Root index
+	 * @example
+	 * editor.$.html.set('<p>New content</p>');
+	 * editor.$.html.set(html, { rootKey: 'header' });
 	 */
 	set(
 		html: string,
@@ -217,15 +223,25 @@ declare class HTML {
 	 * @param {boolean} [options.withFrame=false] Gets the current content with containing parent `div.sun-editor-editable` (`<div class="sun-editor-editable">{content}</div>`).
 	 * @param {number|Array<number>} [options.rootKey=null] Root index
 	 * @returns {Object<string, *>} JSON data
+	 * @example
+	 * const json = editor.$.html.getJson();
+	 * const jsonWithFrame = editor.$.html.getJson({ withFrame: true });
 	 */
 	getJson({ withFrame, rootKey }?: { withFrame?: boolean; rootKey?: number | Array<number> }): {
 		[x: string]: any;
 	};
 	/**
 	 * @description Sets the JSON data to the editor content
+	 * (see @link converter.jsonToHtml)
 	 * @param {Object<string, *>} jsdonData HTML string
 	 * @param {Object} [options] Options
 	 * @param {number|Array<number>} [options.rootKey=null] Root index
+	 * @example
+	 * const html = editor.$.html.setJson({
+	 *   type: 'element', tag: 'p', attributes: { class: 'txt' },
+	 *   children: [{ type: 'text', content: 'Hello' }],
+	 * });
+	 * // '<p class="txt">Hello</p>'
 	 */
 	setJson(
 		jsdonData: {

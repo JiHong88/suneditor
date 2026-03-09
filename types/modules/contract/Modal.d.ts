@@ -12,6 +12,12 @@ declare class Modal {
 	 * - acceptedFormats: `"image/*, video/*, audio/*"`, etc.
 	 * - allowMultiple: `true` or `false`
 	 * @returns {string} HTML string
+	 * @example
+	 * // Inside a plugin's modal HTML template:
+	 * const html = Modal.CreateFileInput(
+	 *   { icons, lang },
+	 *   { acceptedFormats: 'image/*', allowMultiple: true }
+	 * );
 	 */
 	static CreateFileInput(
 		{

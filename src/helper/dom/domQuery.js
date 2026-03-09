@@ -75,6 +75,8 @@ export function getNodePath(node, parentNode, _newOffsets) {
  * @param {Array<number>} offsets Position array, array obtained from `helper.dom.getNodePath`
  * @param {Node} parentNode Base parent element
  * @returns {T}
+ * @example
+ * const node = dom.query.getNodeFromPath([0, 1, 0], wysiwygElement);
  */
 export function getNodeFromPath(offsets, parentNode) {
 	let current = parentNode;
@@ -170,6 +172,8 @@ export function getListChildren(element, validation, depth) {
  * @param {?(current: *) => boolean} validation Conditional function
  * @param {?number} depth Number of child levels to depth.
  * @returns {Array<T>}
+ * @example
+ * const allNodes = dom.query.getListChildNodes(container, (node) => node.nodeType === 3);
  */
 export function getListChildNodes(element, validation, depth) {
 	const children = [];
@@ -221,6 +225,8 @@ export function getNodeDepth(node) {
  * @description Sort a node array by depth of element.
  * @param {Array<Node>} array Node array
  * @param {boolean} des `true`: descending order / `false`: ascending order
+ * @example
+ * const sorted = dom.query.sortNodeByDepth([nodeA, nodeB], true);
  */
 export function sortNodeByDepth(array, des) {
 	const t = !des ? -1 : 1;
@@ -239,6 +245,9 @@ export function sortNodeByDepth(array, des) {
  * @param {Node} a Node to compare.
  * @param {Node} b Node to compare.
  * @returns {{ancestor: ?HTMLElement, a: Node, b: Node, result: number}} { ancesstor, a, b, result: (a > b ? 1 : a < b ? -1 : 0) };
+ * @example
+ * const result = dom.query.compareElements(nodeA, nodeB);
+ * // result: { ancestor: true, result: 0 } (same node), { ancestor: true, result: 1 } (a before b)
  */
 export function compareElements(a, b) {
 	let aNode = a,
@@ -439,6 +448,9 @@ export function getEventTarget(event) {
  * Not use it like jquery.
  * Only one condition can be entered at a time.
  * @returns {T|null} Not found: `null`
+ * @example
+ * const firstLeaf = dom.query.getEdgeChild(container, (n) => n.nodeType === 3, false);
+ * const lastLeaf = dom.query.getEdgeChild(container, (n) => n.nodeType === 3, true);
  */
 export function getEdgeChild(node, query, last) {
 	let valid;

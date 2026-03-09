@@ -49,6 +49,15 @@ declare class FileManager {
 	 * @param {FileList|File[]|{formData: FormData, size: number}} data FormData in body or Files array
 	 * @param {?(xmlHttp: XMLHttpRequest) => boolean} [callBack] Success call back function
 	 * @param {?(res: *, xmlHttp: XMLHttpRequest) => string} [errorCallBack] Error call back function
+	 * @example
+	 * // Upload with a File array
+	 * const files = [new File(['content'], 'photo.jpg', { type: 'image/jpeg' })];
+	 * fileManager.upload('/api/upload', { Authorization: 'Bearer token' }, files, onSuccess, onError);
+	 *
+	 * // Upload with a pre-built FormData
+	 * const formData = new FormData();
+	 * formData.append('file-0', myFile);
+	 * fileManager.upload('/api/upload', null, { formData, size: 1 }, onSuccess, onError);
 	 */
 	upload(
 		uploadUrl: string,
@@ -71,6 +80,10 @@ declare class FileManager {
 	 * @param {?Object<string, string>} uploadHeader Request header
 	 * @param {FileList|File[]|{formData: FormData, size: number}} data FormData in body or Files array
 	 * @returns {Promise<XMLHttpRequest>}
+	 * @example
+	 * const files = [new File(['content'], 'photo.jpg')];
+	 * const xmlHttp = await fileManager.asyncUpload('/api/upload', { Authorization: 'Bearer token' }, files);
+	 * const response = JSON.parse(xmlHttp.responseText);
 	 */
 	asyncUpload(
 		uploadUrl: string,
@@ -92,6 +105,10 @@ declare class FileManager {
 	 * @param {string} params.name File name
 	 * @param {number} params.size File size
 	 * @returns
+	 * @example
+	 * const imgElement = document.createElement('img');
+	 * imgElement.src = 'https://example.com/photo.jpg';
+	 * fileManager.setFileData(imgElement, { name: 'photo.jpg', size: 2048 });
 	 */
 	setFileData(
 		element: Node,

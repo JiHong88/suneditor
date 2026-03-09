@@ -301,6 +301,8 @@ class NodeTransform {
 	 * @description Remove nested tags without other child nodes.
 	 * @param {Node} element Element object
 	 * @param {?(((current: Node) => boolean)|string)} [validation] Validation function / String(`tag1|tag2..`) / If `null`, all tags are applicable.
+	 * @example
+	 * editor.$.nodeTransform.mergeNestedTags(parentElement, (current) => current.nodeName === 'SPAN');
 	 */
 	mergeNestedTags(element, validation) {
 		if (typeof validation === 'string') {
@@ -419,6 +421,17 @@ class NodeTransform {
 	 * @param {SunEditor.NodeCollection} nodeArray An array of nodes to clone. The first node in the array will be the top-level parent.
 	 * @param {?(current: Node) => boolean} [validate] A validate function.
 	 * @returns {{ parent: Node, inner: Node }} An object containing the top-level parent node and the innermost child node.
+	 * @example
+	 * // [div, span, em] → <div><span><em></em></span></div> (cloned)
+	 * const { parent, inner } = editor.$.nodeTransform.createNestedNode([div, span, em]);
+	 * // parent = div (top), inner = em (innermost)
+	 *
+	 * // validate: skip nodes that fail the condition
+	 * const { parent, inner } = editor.$.nodeTransform.createNestedNode(
+	 *   [div, span, em],
+	 *   (node) => node.nodeName !== 'SPAN'
+	 * );
+	 * // Result: <div><em></em></div> (SPAN excluded)
 	 */
 	createNestedNode(nodeArray, validate) {
 		if (typeof validate !== 'function') validate = () => true;

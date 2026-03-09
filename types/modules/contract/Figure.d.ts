@@ -242,6 +242,12 @@ declare class Figure {
 	 * @param {Node} element Target element
 	 * @param {string} [className] Class name of container (fixed: `se-component`)
 	 * @returns {FigureInfo} {target, container, cover, inlineCover, caption}
+	 * @example
+	 * const imgEl = document.createElement('IMG');
+	 * imgEl.src = imageUrl;
+	 * const figureInfo = Figure.CreateContainer(imgEl, 'se-image-container');
+	 * // figureInfo.container → <div class="se-component se-image-container">
+	 * // figureInfo.cover     → <figure> wrapping the imgEl
 	 */
 	static CreateContainer(element: Node, className?: string): FigureInfo;
 	/**
@@ -249,6 +255,12 @@ declare class Figure {
 	 * @param {Node} element Target element
 	 * @param {string} [className] Class name of container (fixed: `se-component` `se-inline-component`)
 	 * @returns {FigureInfo} {target, container, cover, inlineCover, caption}
+	 * @example
+	 * const imgEl = document.createElement('IMG');
+	 * imgEl.src = imageUrl;
+	 * const figureInfo = Figure.CreateInlineContainer(imgEl, 'se-image-container');
+	 * // figureInfo.container    → <span class="se-component se-inline-component se-image-container">
+	 * // figureInfo.inlineCover  → same as container (inline mode)
 	 */
 	static CreateInlineContainer(element: Node, className?: string): FigureInfo;
 	/**
@@ -269,6 +281,13 @@ declare class Figure {
 	 * @param {string|number} h Height size
 	 * @param {?string} [defaultSizeUnit="px"] Default size unit (default: `"px"`)
 	 * @return {{w: number, h: number}}
+	 * @example
+	 * const ratio = Figure.GetRatio(200, 100, 'px');
+	 * // ratio → { w: 2, h: 0.5 }
+	 *
+	 * // Used with proportion-locked resizing
+	 * const ratio = Figure.GetRatio(inputX.value, inputY.value, sizeUnit);
+	 * const adjusted = Figure.CalcRatio(newWidth, newHeight, sizeUnit, ratio);
 	 */
 	static GetRatio(
 		w: string | number,
@@ -285,6 +304,11 @@ declare class Figure {
 	 * @param {string} defaultSizeUnit Default size unit (default: `"px"`)
 	 * @param {?{w: number, h: number}} [ratio] Ratio size (Figure.GetRatio)
 	 * @return {{w: string|number, h: string|number}}
+	 * @example
+	 * const ratio = Figure.GetRatio(200, 100, 'px');
+	 * // When width changes, recalculate height to maintain aspect ratio
+	 * const result = Figure.CalcRatio(inputX.value, inputY.value, 'px', ratio);
+	 * inputY.value = result.h; // adjusted height preserving ratio
 	 */
 	static CalcRatio(
 		w: string | number,
@@ -372,6 +396,19 @@ declare class Figure {
 	 * @param {boolean} [params.figureTarget=false] If `true`, the target is a figure element
 	 * @param {boolean} [params.infoOnly=false] If `true`, returns only the figure target info without opening the controller
 	 * @returns {FigureTargetInfo|undefined} figure target info
+	 * @example
+	 * // Open controller with full UI (resize handles, size info, border)
+	 * const info = this.figure.open(imgElement, {
+	 *   nonResizing: false, nonSizeInfo: false, nonBorder: false,
+	 *   figureTarget: false, infoOnly: false
+	 * });
+	 *
+	 * // Get figure info without opening the controller UI
+	 * const info = this.figure.open(oFrame, {
+	 *   nonResizing: false, nonSizeInfo: false, nonBorder: false,
+	 *   figureTarget: false, infoOnly: true
+	 * });
+	 * // info.width, info.height, info.ratio are available
 	 */
 	open(
 		targetNode: Node,
@@ -452,6 +489,13 @@ declare class Figure {
 	 * @param {?Node} targetNode Target element
 	 * @param {"block"|"inline"} formatStyle Format style
 	 * @returns {HTMLElement} New target element after conversion
+	 * @example
+	 * // Convert a block image to inline format
+	 * const newImgEl = this.figure.convertAsFormat(imgElement, 'inline');
+	 * // newImgEl is a cloned element inside a new inline container
+	 *
+	 * // Convert an inline image back to block format
+	 * const newImgEl = this.figure.convertAsFormat(imgElement, 'block');
 	 */
 	convertAsFormat(targetNode: Node | null, formatStyle: 'block' | 'inline'): HTMLElement;
 	controllerAction(target: HTMLButtonElement): void;
@@ -461,6 +505,13 @@ declare class Figure {
 	 * @param {Node} originEl - The original element of the figure component.
 	 * @param {Node} anchorCover - The anchor cover element of the figure component.
 	 * @param {import('../manager/FileManager').default} [fileManagerInst=null] - FileManager module instance, if used.
+	 * @example
+	 * // Insert a new image figure, replacing the original element in the DOM
+	 * const figureInfo = Figure.CreateContainer(imgElement, 'se-image-container');
+	 * this.figure.retainFigureFormat(figureInfo.container, this.#element, null, this.fileManager);
+	 *
+	 * // Replace with anchor cover (e.g., image wrapped in a link)
+	 * this.figure.retainFigureFormat(container, this.#element, anchorEl, this.fileManager);
 	 */
 	retainFigureFormat(container: Node, originEl: Node, anchorCover: Node, fileManagerInst?: import('../manager/FileManager').default): void;
 	/**
@@ -474,6 +525,12 @@ declare class Figure {
 	 * @param {?string|number} width Element's width size
 	 * @param {?string|number} height Element's height size
 	 * @param {?number} deg rotate value
+	 * @example
+	 * // Rotate element 90 degrees clockwise
+	 * this.figure.setTransform(imgElement, 100, 50, 90);
+	 *
+	 * // Apply size without additional rotation (deg=0 preserves current rotation)
+	 * this.figure.setTransform(oFrame, width, height, 0);
 	 */
 	setTransform(node: Node, width: (string | number) | null, height: (string | number) | null, deg: number | null): void;
 	/**

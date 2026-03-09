@@ -156,6 +156,17 @@ declare class Browser {
 	 * @param {*} host The instance object that called the constructor.
 	 * @param {SunEditor.Deps} $ Kernel dependencies
 	 * @param {BrowserParams} params Browser options
+	 * @example
+	 * // Inside a PluginBrowser constructor:
+	 * this.browser = new Browser(this, this.$, {
+	 *   title: this.$.lang.imageGallery,
+	 *   data: pluginOptions.data,
+	 *   url: pluginOptions.url,
+	 *   headers: pluginOptions.headers,
+	 *   selectorHandler: this.#OnSelect.bind(this),
+	 *   columnSize: 4,
+	 *   className: 'se-image-gallery',
+	 * });
 	 */
 	constructor(host: any, $: SunEditor.Deps, params: BrowserParams);
 	useSearch: boolean;
@@ -226,6 +237,16 @@ declare class Browser {
 	 * @param {string} [params.title] - File browser window title. If not, use `this.title`.
 	 * @param {string} [params.url] - File server url. If not, use `this.url`.
 	 * @param {Object<string, string>} [params.urlHeader] - File server http header. If not, use `this.urlHeader`.
+	 * @example
+	 * // Open with default settings (configured at construction):
+	 * this.browser.open();
+	 *
+	 * // Open with runtime overrides:
+	 * this.browser.open({
+	 *   title: 'Select a video',
+	 *   url: '/api/videos',
+	 *   urlHeader: { Authorization: 'Bearer token' },
+	 * });
 	 */
 	open(params?: {
 		listClass?: string;
@@ -249,6 +270,11 @@ declare class Browser {
 	 * @description Filter items by tag
 	 * @param {Array<BrowserFile>} items - Items to filter
 	 * @returns {Array<BrowserFile>}
+	 * @example
+	 * // Filter items by currently selected tags:
+	 * browser.selectedTags = ['photo', 'landscape'];
+	 * const filtered = browser.tagfilter(items);
+	 * // Returns only items whose `tag` array includes 'photo' or 'landscape'
 	 */
 	tagfilter(items: Array<BrowserFile>): Array<BrowserFile>;
 	/**

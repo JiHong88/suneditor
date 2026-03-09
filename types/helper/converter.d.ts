@@ -33,12 +33,16 @@ export function jsonToHtml(jsonData: { [x: string]: any }): string;
  * @description Convert HTML string to HTML Entity
  * @param {string} content
  * @returns {string} Content string
+ * @example
+ * converter.htmlToEntity('<div>'); // '&lt;div&gt;'
  */
 export function htmlToEntity(content: string): string;
 /**
  * @description Convert HTML Entity to HTML string
  * @param {string} content Content string
  * @returns {string}
+ * @example
+ * converter.entityToHTML('&lt;div&gt;'); // '<div>'
  */
 export function entityToHTML(content: string): string;
 /**
@@ -46,6 +50,9 @@ export function entityToHTML(content: string): string;
  * @param {(...args: *) => void} func function
  * @param {number} wait delay ms
  * @returns {*} executedFunction
+ * @example
+ * const debouncedSave = converter.debounce(() => save(), 300);
+ * input.addEventListener('input', debouncedSave);
  */
 export function debounce(func: (...args: any) => void, wait: number): any;
 /**
@@ -72,6 +79,9 @@ export function getValues(obj: any): Array<any>;
 /**
  * @description Convert the `CamelCase` To the `KebabCase`.
  * @param {string|Array<string>} param [Camel string]
+ * @example
+ * converter.camelToKebabCase('fontSize'); // 'font-size'
+ * converter.camelToKebabCase(['fontSize', 'fontFamily']); // ['font-size', 'font-family']
  */
 export function camelToKebabCase(param: string | Array<string>): any;
 /**
@@ -84,6 +94,8 @@ export function kebabToCamelCase(param: string): string;
  * @overload
  * @param {Array<string>} param - Array of `Kebab-case` strings.
  * @returns {Array<string>} Array of `CamelCase` strings.
+ * @example
+ * converter.kebabToCamelCase('font-size'); // 'fontSize'
  */
 export function kebabToCamelCase(param: Array<string>): Array<string>;
 /**
@@ -131,6 +143,9 @@ export function isHexColor(str: string): boolean;
  * @description Function to convert hex format to a `rgb` color
  * @param {string} rgba RGBA color format
  * @returns {string}
+ * @example
+ * converter.rgb2hex('rgb(255, 0, 0)'); // '#ff0000'
+ * converter.rgb2hex('rgba(255, 0, 0, 0.5)'); // '#ff000080'
  */
 export function rgb2hex(rgba: string): string;
 /**

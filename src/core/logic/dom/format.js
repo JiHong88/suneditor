@@ -94,6 +94,9 @@ class Format {
 	 * @param {Node} node Reference node.
 	 * @param {?(current: Node) => boolean} [validation] Additional validation function.
 	 * @returns {HTMLElement|null}
+	 * @example
+	 * const line = editor.$.format.getLine(editor.$.selection.getNode());
+	 * const lineWithFilter = editor.$.format.getLine(node, (el) => el.nodeName !== 'LI');
 	 */
 	getLine(node, validation) {
 		if (!node) return null;
@@ -125,6 +128,8 @@ class Format {
 	/**
 	 * @description Replace the br-line tag of the current selection.
 	 * @param {Node} element BR-Line element (PRE..)
+	 * @example
+	 * editor.$.format.setBrLine(document.createElement('pre'));
 	 */
 	setBrLine(element) {
 		if (!this.isBrLine(element)) {
@@ -195,6 +200,8 @@ class Format {
 	 * @param {Node} element Reference node.
 	 * @param {?(current: Node) => boolean} [validation] Additional validation function.
 	 * @returns {HTMLBRElement|null}
+	 * @example
+	 * const brLine = editor.$.format.getBrLine(editor.$.selection.getNode());
 	 */
 	getBrLine(element, validation) {
 		if (!element) return null;
@@ -245,6 +252,8 @@ class Format {
 	 * @param {Node} element Reference node.
 	 * @param {?(current: Node) => boolean} [validation] Additional validation function.
 	 * @returns {HTMLElement|null}
+	 * @example
+	 * const block = editor.$.format.getBlock(editor.$.selection.getNode());
 	 */
 	getBlock(element, validation) {
 		if (!element) return null;
@@ -777,6 +786,9 @@ class Format {
 	 * @description It is judged whether it is a node related to the text style.
 	 * @param {Node|string} element The node to check
 	 * @returns {element is HTMLElement}
+	 * @example
+	 * editor.$.format.isTextStyleNode('STRONG'); // true
+	 * editor.$.format.isTextStyleNode('P'); // false
 	 */
 	isTextStyleNode(element) {
 		return typeof element === 'string' ? this.#textStyleTagsCheck.test(element) : element?.nodeType === 1 && this.#textStyleTagsCheck.test(element.nodeName);
@@ -788,6 +800,9 @@ class Format {
 	 * - `line` element also contain `brLine` element
 	 * @param {Node|string} element The node to check
 	 * @returns {element is HTMLElement}
+	 * @example
+	 * editor.$.format.isLine(document.createElement('p')); // true
+	 * editor.$.format.isLine('SPAN'); // false
 	 */
 	isLine(element) {
 		return typeof element === 'string'
@@ -812,6 +827,8 @@ class Format {
 	 * ※ Entering the Enter key in the space on the last line ends `brLine` and appends `line`.
 	 * @param {Node|string} element The node to check
 	 * @returns {element is HTMLElement}
+	 * @example
+	 * editor.$.format.isBrLine(document.createElement('pre')); // true
 	 */
 	isBrLine(element) {
 		return (
@@ -828,6 +845,9 @@ class Format {
 	 * - `block` is wrap the `line` and `component`
 	 * @param {Node|string} element The node to check
 	 * @returns {element is HTMLElement}
+	 * @example
+	 * editor.$.format.isBlock(document.createElement('blockquote')); // true
+	 * editor.$.format.isBlock(document.createElement('ul')); // true
 	 */
 	isBlock(element) {
 		return typeof element === 'string'
@@ -871,6 +891,8 @@ class Format {
 	 * @description Returns a `line` array from selected range.
 	 * @param {?(current: Node) => boolean} [validation] The validation function. (Replaces the default validation `format.isLine(current)`)
 	 * @returns {Array<HTMLElement>}
+	 * @example
+	 * const selectedLines = editor.$.format.getLines();
 	 */
 	getLines(validation) {
 		if (!this.#$.selection.resetRangeToTextNode()) return [];

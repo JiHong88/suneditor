@@ -143,6 +143,12 @@ class ColorPicker {
 	 * @param {?(current: Node) => boolean} [stopCondition] - A function used to stop traversing parent nodes while finding the color.
 	 * - When this function returns `true`, the traversal ends at that node.
 	 * - e.g., `(node) => this.format.isLine(node)` stops at line-level elements like <p>, <div>.
+	 * @example
+	 * // Initialize with a selected node and stop traversal at line-level elements
+	 * this.colorPicker.init(this.$.selection.getNode(), target, (current) => this.$.format.isLine(current));
+	 *
+	 * // Initialize with a color string directly (e.g., from a table cell style)
+	 * this.colorPicker.init(color?.value || '', button);
 	 */
 	init(nodeOrColor, target, stopCondition) {
 		this.targetButton = target;

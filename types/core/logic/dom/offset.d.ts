@@ -262,6 +262,7 @@ declare class Offset {
 	 */
 	getGlobal(node?: Node | null): OffsetGlobalInfo;
 	/**
+	 * @deprecated
 	 * @description Gets the current editor-relative scroll offset.
 	 * @param {?Node} [node] Target element.
 	 * @returns {OffsetGlobalScrollInfo} Global scroll information.
@@ -291,6 +292,10 @@ declare class Offset {
 	 * @param {*} params.inst Instance object of caller
 	 * @param {HTMLElement} [params.sibling=null] The sibling controller element
 	 * @returns {{position: "top" | "bottom"} | undefined} Success -> {position: current position}
+	 * @example
+	 * const result = editor.$.offset.setAbsPosition(controller, targetElement, {
+	 *   position: 'bottom', inst: this, addOffset: { left: 0, top: 0 }
+	 * });
 	 */
 	setAbsPosition(
 		element: HTMLElement,
@@ -319,6 +324,9 @@ declare class Offset {
 	 * @param {"bottom"|"top"} [options.position="bottom"] Position ('bottom'|'top')
 	 * @param {number} [options.addTop=0] Additional top offset
 	 * @returns {boolean} Success / Failure
+	 * @example
+	 * const success = editor.$.offset.setRangePosition(toolbar, null, { position: 'bottom', addTop: 0 });
+	 * if (!success) toolbar.style.display = 'none';
 	 */
 	setRangePosition(
 		element: HTMLElement,

@@ -72,6 +72,12 @@ declare class SelectMenu {
 	 * @param {Node} referElement - The element that triggers the select menu.
 	 * @param {(command: string) => void} selectMethod - The function to execute when an item is selected.
 	 * @param {{class?: string, style?: string}} [attr={}] - Additional attributes for the select menu container.
+	 * @example
+	 * // Basic: attach menu to a button with a selection callback
+	 * selectMenu.on(this.alignButton, this.onAlignSelect.bind(this));
+	 *
+	 * // With custom attributes for styling
+	 * selectMenu.on(this.alignButton, this.onAlignSelect.bind(this), { class: 'se-figure-select-list' });
 	 */
 	on(
 		referElement: Node,
@@ -84,7 +90,17 @@ declare class SelectMenu {
 	/**
 	 * @description Select menu open
 	 * @param {?string} [position] `"[left|right]-[middle|top|bottom] | [top|bottom]-[center|left|right]"`
+	 * Always specify in LTR orientation. In RTL environments, left/right are automatically swapped.
 	 * @param {?string} [onItemQuerySelector] The querySelector string of the menu to be activated
+	 * @example
+	 * // Open with default position (uses constructor's position param)
+	 * selectMenu.open();
+	 *
+	 * // Open at a specific position (always use LTR basis; RTL is auto-mirrored)
+	 * selectMenu.open('bottom-left');
+	 *
+	 * // Open with an active item highlighted via querySelector
+	 * selectMenu.open('', '[data-command="' + this.align + '"]');
 	 */
 	open(position?: string | null, onItemQuerySelector?: string | null): void;
 	/**

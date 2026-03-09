@@ -62,6 +62,9 @@ declare class Selection_ {
 	 * - If there is no next sibling but a previous sibling exists, it returns the previous sibling with an offset of 1.
 	 * @param {Node} target Target node whose neighboring range is to be determined.
 	 * @returns {{container: Node, offset: number}|null} An object containing the nearest container node and its offset.
+	 * @example
+	 * const nearRange = editor.$.selection.getNearRange(targetNode);
+	 * if (nearRange) editor.$.selection.setRange(nearRange.container, nearRange.offset, nearRange.container, nearRange.offset);
 	 */
 	getNearRange(target: Node): {
 		container: Node;
@@ -77,6 +80,9 @@ declare class Selection_ {
 	/**
 	 * @description Get current select node
 	 * @returns {HTMLElement|Text}
+	 * @example
+	 * const node = editor.$.selection.getNode();
+	 * const line = editor.$.format.getLine(node);
 	 */
 	getNode(): HTMLElement | Text;
 	/**

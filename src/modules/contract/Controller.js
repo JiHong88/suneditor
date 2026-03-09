@@ -127,6 +127,15 @@ class Controller {
 	 * @param {() => void} [params.initMethod] Method to be called when the controller is closed.
 	 * @param {boolean} [params.disabled] If `true`, When the `controller` is opened, buttons without the `se-component-enabled` class are disabled. (default: `this.disabled`)
 	 * @param {{left?: number, top?: number}} [params.addOffset] Additional offset values
+	 * @example
+	 * // Open controller on a target element with default options
+	 * this.controller.open(target);
+	 *
+	 * // Open with explicit options and additional offset
+	 * this.controller.open(target, null, { isWWTarget: false, initMethod: null, addOffset: null });
+	 *
+	 * // Open on a Range target (e.g., text selection)
+	 * this.controller.open(this.$.selection.getRange());
 	 */
 	open(target, positionTarget, { isWWTarget, initMethod, disabled, addOffset } = {}) {
 		if (_DragHandle.get('__overInfo') === ON_OVER_COMPONENT) {
@@ -188,6 +197,12 @@ class Controller {
 	 * @description Close a modal plugin
 	 * - The plugin's `init` method is called.
 	 * @param {boolean} [force] If `true`, parent controllers are forcibly closed.
+	 * @example
+	 * // Close the controller (skips if not open or preventClose is set)
+	 * this.controller.close();
+	 *
+	 * // Force close, also closing parent controllers in the hierarchy
+	 * this.controller.close(true);
 	 */
 	close(force) {
 		if (!force && (!this.isOpen || this.#preventClose)) return;
@@ -240,6 +255,12 @@ class Controller {
 	/**
 	 * @description Sets whether the element (form) should be brought to the top based on `z-index`.
 	 * @param {boolean} value - `true`: `'2147483646'`, `false`: `'2147483645'`.
+	 * @example
+	 * // Bring controller to the highest z-index layer (2147483646)
+	 * this.controller_cell.bringToTop(true);
+	 *
+	 * // Restore to the default top z-index (2147483645)
+	 * this.controller_cell.bringToTop(false);
 	 */
 	bringToTop(value) {
 		this.toTop = value;
@@ -249,6 +270,12 @@ class Controller {
 	/**
 	 * @description Reset controller position
 	 * @param {Node} [target]
+	 * @example
+	 * // Reposition using a new target element
+	 * this.controller_cell.resetPosition(tdElement);
+	 *
+	 * // Reposition using the previously set target
+	 * this.controller.resetPosition();
 	 */
 	resetPosition(target) {
 		this.#setControllerPosition(this.form, target || this.currentPositionTarget, true);
