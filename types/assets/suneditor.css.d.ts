@@ -1,1 +1,1 @@
-declare module 'suneditor/css';
+declare module 'suneditor/css/editor';

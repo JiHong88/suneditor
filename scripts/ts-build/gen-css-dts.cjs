@@ -9,7 +9,7 @@ const path = require('path');
 
 const typesDir = path.join(__dirname, '../../types/assets');
 const cssFiles = [
-	{ module: 'suneditor/css', file: 'suneditor.css.d.ts' },
+	{ module: 'suneditor/css/editor', file: 'suneditor.css.d.ts' },
 	{ module: 'suneditor/css/contents', file: 'suneditor-contents.css.d.ts' },
 ];
 
