@@ -23,7 +23,7 @@
 			"types": "./types/langs/*.d.ts",
 			"default": "./src/langs/*.js"
 		},
-		"./css": {
+		"./css/editor": {
 			"types": "./types/assets/suneditor.css.d.ts",
 			"default": "./src/assets/suneditor.css"
 		},
@@ -35,7 +35,10 @@
 			"types": "./types/interfaces/index.d.ts",
 			"default": "./src/interfaces/index.js"
 		},
-		"./src/*": "./src/*",
+		"./src/*.js": {
+			"types": "./types/*.d.ts",
+			"default": "./src/*"
+		},
 		"./package.json": "./package.json"
 	},
 	"sideEffects": [

@@ -103,7 +103,7 @@ npm install suneditor --save
 ```
 
 ```js
-import 'suneditor/css'; // Editor UI
+import 'suneditor/css/editor'; // Editor UI
 import 'suneditor/css/contents'; // For displaying HTML
 import suneditor from 'suneditor';
 
