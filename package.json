@@ -35,6 +35,7 @@
 			"types": "./types/interfaces/index.d.ts",
 			"default": "./src/interfaces/index.js"
 		},
+		"./src/*.css": "./src/*.css",
 		"./src/*.js": {
 			"types": "./types/*.d.ts",
 			"default": "./src/*"
@@ -42,7 +43,8 @@
 		"./package.json": "./package.json"
 	},
 	"sideEffects": [
-		"./src/assets/*.css"
+		"./src/assets/*.css",
+		"./src/themes/*.css"
 	],
 	"engines": {
 		"node": ">=14.0.0"
