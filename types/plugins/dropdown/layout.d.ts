@@ -2,7 +2,10 @@ import type {} from '../../typedef';
 export default Layout;
 export type LayoutPluginOptions = {
 	/**
-	 * - Layout list
+	 * - Layout list. Each item defines a named layout template with raw HTML.
+	 * ```js
+	 * [{ name: 'Two Columns', html: '<div style="display:flex"><div style="flex:1">Left</div><div style="flex:1">Right</div></div>' }]
+	 * ```
 	 */
 	items?: Array<{
 		name: string;
@@ -11,7 +14,10 @@ export type LayoutPluginOptions = {
 };
 /**
  * @typedef {Object} LayoutPluginOptions
- * @property {Array<{name: string, html: string}>} [items] - Layout list
+ * @property {Array<{name: string, html: string}>} [items] - Layout list. Each item defines a named layout template with raw HTML.
+ * ```js
+ * [{ name: 'Two Columns', html: '<div style="display:flex"><div style="flex:1">Left</div><div style="flex:1">Right</div></div>' }]
+ * ```
  */
 /**
  * @class

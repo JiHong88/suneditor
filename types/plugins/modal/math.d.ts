@@ -10,9 +10,17 @@ export type MathPluginOptions = {
 	 */
 	autoHeight?: boolean;
 	/**
-	 * - A list of font size options for rendering math expressions.
+	 * - A list of font size options for the math expression size selector.
+	 * ```js
+	 * // fontSizeList
+	 * [{ text: '1', value: '1em', default: true }, { text: '1.5', value: '1.5em' }, { text: '2', value: '2em' }]
+	 * ```
 	 */
-	fontSizeList?: Array<object>;
+	fontSizeList?: Array<{
+		text: string;
+		value: string;
+		default?: true;
+	}>;
 	/**
 	 * - A callback function to handle paste events in the math input area.
 	 */
@@ -33,7 +41,11 @@ export type MathPluginOptions = {
  * @typedef {Object} MathPluginOptions
  * @property {boolean} [canResize=true] - Whether the math modal can be resized.
  * @property {boolean} [autoHeight=false] - Whether to automatically adjust the height of the modal.
- * @property {Array<object>} [fontSizeList] - A list of font size options for rendering math expressions.
+ * @property {Array<{text: string, value: string, default?: true}>} [fontSizeList] - A list of font size options for the math expression size selector.
+ * ```js
+ * // fontSizeList
+ * [{ text: '1', value: '1em', default: true }, { text: '1.5', value: '1.5em' }, { text: '2', value: '2em' }]
+ * ```
  * @property {?(...args: *) => *} [onPaste] - A callback function to handle paste events in the math input area.
  * @property {Object} [formSize={}] - An object specifying the dimensions for the math modal.
  * @property {string} [formSize.width="460px"] - The default width of the math modal.
@@ -93,7 +105,11 @@ declare class Math_ extends PluginModal {
 		};
 		canResize: boolean;
 		autoHeight: boolean;
-		fontSizeList: any[];
+		fontSizeList: {
+			text: string;
+			value: string;
+			default?: true;
+		}[];
 		onPaste: (...args: any) => any;
 	};
 	defaultFontSize: any;

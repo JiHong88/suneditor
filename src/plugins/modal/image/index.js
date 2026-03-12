@@ -22,6 +22,9 @@ const { NO_EVENT } = env;
  * @property {boolean} [createUrlInput=true] - Whether to create a URL input element for image insertion.
  * @property {string} [uploadUrl] - The URL endpoint for image file uploads.
  * @property {Object<string, string>} [uploadHeaders] - Additional headers to include in the file upload request.
+ * ```js
+ * { uploadUrl: '/api/upload/image', uploadHeaders: { Authorization: 'Bearer token' } }
+ * ```
  * @property {number} [uploadSizeLimit] - The total upload size limit in bytes.
  * @property {number} [uploadSingleSizeLimit] - The single file upload size limit in bytes.
  * @property {boolean} [allowMultiple=false] - Whether multiple image uploads are allowed.

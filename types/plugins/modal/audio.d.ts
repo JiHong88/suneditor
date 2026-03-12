@@ -2,11 +2,11 @@ import type {} from '../../typedef';
 export default Audio_;
 export type AudioPluginOptions = {
 	/**
-	 * - The default width of the `AUDIO` tag (e.g., `"300px"`).
+	 * - The default width of the `AUDIO` tag.
 	 */
 	defaultWidth?: string;
 	/**
-	 * - The default height of the `AUDIO` tag (e.g., `"150px"`).
+	 * - The default height of the `AUDIO` tag.
 	 */
 	defaultHeight?: string;
 	/**
@@ -45,6 +45,9 @@ export type AudioPluginOptions = {
 	acceptedFormats?: string;
 	/**
 	 * - Additional attributes to set on the `AUDIO` tag.
+	 * ```js
+	 * { audioTagAttributes: { controls: 'true', preload: 'metadata' } }
+	 * ```
 	 */
 	audioTagAttributes?: {
 		[x: string]: string;
@@ -61,8 +64,8 @@ export type AudioPluginOptions = {
 };
 /**
  * @typedef {Object} AudioPluginOptions
- * @property {string} [defaultWidth="300px"] - The default width of the `AUDIO` tag (e.g., `"300px"`).
- * @property {string} [defaultHeight="150px"] - The default height of the `AUDIO` tag (e.g., `"150px"`).
+ * @property {string} [defaultWidth="300px"] - The default width of the `AUDIO` tag.
+ * @property {string} [defaultHeight="150px"] - The default height of the `AUDIO` tag.
  * @property {boolean} [createFileInput] - Whether to create a file input element.
  * @property {boolean} [createUrlInput] - Whether to create a URL input element (default is `true` if file input is not created).
  * @property {string} [uploadUrl] - The URL to which files will be uploaded.
@@ -72,6 +75,9 @@ export type AudioPluginOptions = {
  * @property {boolean} [allowMultiple] - Whether to allow multiple file uploads.
  * @property {string} [acceptedFormats="audio/*"] - Accepted file formats (default is `"audio/*"`).
  * @property {Object<string, string>} [audioTagAttributes] - Additional attributes to set on the `AUDIO` tag.
+ * ```js
+ * { audioTagAttributes: { controls: 'true', preload: 'metadata' } }
+ * ```
  * @property {SunEditor.ComponentInsertType} [insertBehavior] - Component insertion behavior for selection and cursor placement.
  * - [default: `options.get('componentInsertBehavior')`]
  * - `auto`: Move cursor to the next line if possible, otherwise select the component.

@@ -41,42 +41,45 @@ export type EmbedPluginOptions = {
 	uploadSingleSizeLimit?: number;
 	/**
 	 * - Additional attributes to set on the `IFRAME` tag.
+	 * ```js
+	 * { iframeTagAttributes: { allowfullscreen: 'true', loading: 'lazy' } }
+	 * ```
 	 */
 	iframeTagAttributes?: {
 		[x: string]: string;
 	};
 	/**
-	 * - YouTube query parameter.
+	 * - YouTube query parameter appended to the embed URL.
+	 * ```js
+	 * { query_youtube: 'autoplay=1&mute=1' }
+	 * ```
 	 */
 	query_youtube?: string;
 	/**
-	 * - Vimeo query parameter.
+	 * - Vimeo query parameter appended to the embed URL.
+	 * ```js
+	 * { query_vimeo: 'autoplay=1' }
+	 * ```
 	 */
 	query_vimeo?: string;
 	/**
-	 * - Additional URL patterns for embed.
+	 * - Additional URL patterns to recognize as embeddable content.
 	 */
 	urlPatterns?: Array<RegExp>;
 	/**
-	 * - Custom query objects for additional embedding services.
-	 * Example :
+	 * - Custom embed service definitions.
+	 * Each key is a service name, with `pattern` to match the URL, `action` to transform it into an embed URL, and `tag` for the output element.
+	 * ```js
 	 * {
+	 * embedQuery: {
 	 * facebook: {
-	 * pattern: /(?:https?:\/\/)?(?:www\.)?(?:facebook\.com)\/(.+)/i,
-	 * action: (url) => {
-	 * return `https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(url)}&show_text=true&width=500`;
-	 * },
+	 * pattern: /(?:https?:\/\/)?(?:www\.)?facebook\.com\/(.+)/i,
+	 * action: (url) => `https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(url)}`,
 	 * tag: 'iframe'
-	 * },
-	 * twitter: {
-	 * pattern: /(?:https?:\/\/)?(?:www\.)?(?:twitter\.com)\/(status|embed)\/(.+)/i,
-	 * action: (url) => {
-	 * return `https://platform.twitter.com/embed/Tweet.html?url=${encodeURIComponent(url)}`;
-	 * },
-	 * tag: 'iframe'
-	 * },
-	 * // Additional services...
 	 * }
+	 * }
+	 * }
+	 * ```
 	 */
 	embedQuery?: {
 		[x: string]: {
@@ -111,28 +114,31 @@ export type EmbedPluginOptions = {
  * @property {number} [uploadSizeLimit] - The total file upload size limit in bytes.
  * @property {number} [uploadSingleSizeLimit] - The single file upload size limit in bytes.
  * @property {Object<string, string>} [iframeTagAttributes] - Additional attributes to set on the `IFRAME` tag.
- * @property {string} [query_youtube] - YouTube query parameter.
- * @property {string} [query_vimeo] - Vimeo query parameter.
- * @property {Array<RegExp>} [urlPatterns] - Additional URL patterns for embed.
- * @property {Object<string, {pattern: RegExp, action: (url: string) => string, tag: string}>} [embedQuery] - Custom query objects for additional embedding services.
- * Example :
+ * ```js
+ * { iframeTagAttributes: { allowfullscreen: 'true', loading: 'lazy' } }
+ * ```
+ * @property {string} [query_youtube] - YouTube query parameter appended to the embed URL.
+ * ```js
+ * { query_youtube: 'autoplay=1&mute=1' }
+ * ```
+ * @property {string} [query_vimeo] - Vimeo query parameter appended to the embed URL.
+ * ```js
+ * { query_vimeo: 'autoplay=1' }
+ * ```
+ * @property {Array<RegExp>} [urlPatterns] - Additional URL patterns to recognize as embeddable content.
+ * @property {Object<string, {pattern: RegExp, action: (url: string) => string, tag: string}>} [embedQuery] - Custom embed service definitions.
+ * Each key is a service name, with `pattern` to match the URL, `action` to transform it into an embed URL, and `tag` for the output element.
+ * ```js
  * {
- *   facebook: {
- *     pattern: /(?:https?:\/\/)?(?:www\.)?(?:facebook\.com)\/(.+)/i,
- *     action: (url) => {
- *       return `https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(url)}&show_text=true&width=500`;
- *     },
- *     tag: 'iframe'
- *   },
- *   twitter: {
- *     pattern: /(?:https?:\/\/)?(?:www\.)?(?:twitter\.com)\/(status|embed)\/(.+)/i,
- *     action: (url) => {
- *       return `https://platform.twitter.com/embed/Tweet.html?url=${encodeURIComponent(url)}`;
- *     },
- *     tag: 'iframe'
- *   },
- *   // Additional services...
+ *   embedQuery: {
+ *     facebook: {
+ *       pattern: /(?:https?:\/\/)?(?:www\.)?facebook\.com\/(.+)/i,
+ *       action: (url) => `https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(url)}`,
+ *       tag: 'iframe'
+ *     }
+ *   }
  * }
+ * ```
  * @property {SunEditor.Module.Figure.Controls} [controls] - Figure controls.
  * @property {SunEditor.ComponentInsertType} [insertBehavior] - Component insertion behavior for selection and cursor placement.
  * - [default: `options.get('componentInsertBehavior')`]

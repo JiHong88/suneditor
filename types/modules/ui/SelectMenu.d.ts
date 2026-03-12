@@ -2,7 +2,12 @@ import type {} from '../../typedef';
 export default SelectMenu;
 export type SelectMenuParams = {
 	/**
-	 * Position of the select menu, specified as `"[left|right]-[middle|top|bottom]"` or `"[top|bottom]-[center|left|right]"`
+	 * Position of the select menu, specified as `"[left|right]-[middle|top|bottom]"` or `"[top|bottom]-[center|left|right]"`.
+	 * ```js
+	 * // position
+	 * 'left-bottom' // menu appears below, aligned to the left
+	 * 'top-center'  // menu appears above, centered
+	 * ```
 	 */
 	position: string;
 	/**
@@ -28,7 +33,12 @@ export type SelectMenuParams = {
 };
 /**
  * @typedef {Object} SelectMenuParams
- * @property {string} position Position of the select menu, specified as `"[left|right]-[middle|top|bottom]"` or `"[top|bottom]-[center|left|right]"`
+ * @property {string} position Position of the select menu, specified as `"[left|right]-[middle|top|bottom]"` or `"[top|bottom]-[center|left|right]"`.
+ * ```js
+ * // position
+ * 'left-bottom' // menu appears below, aligned to the left
+ * 'top-center'  // menu appears above, centered
+ * ```
  * @property {boolean} [checkList=false] Flag to determine if the checklist is enabled (`true` or `false`)
  * @property {"rtl" | "ltr"} [dir="ltr"] Optional text direction: `"rtl"` for right-to-left, `"ltr"` for left-to-right
  * @property {number} [splitNum=0] Optional split number for horizontal positioning; defines how many items per row

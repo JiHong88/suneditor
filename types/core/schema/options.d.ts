@@ -55,7 +55,10 @@ export namespace DEFAULTS {
  * === Content & Editing ===
  * @property {string} [value=""] - Initial value for the editor.
  * @property {string} [placeholder=""] - Placeholder text.
- * @property {Object<string, string>} [editableFrameAttributes={spellcheck: "false"}] - Attributes for the editable frame[.sun-editor-editable]. (e.g. [key]: value)
+ * @property {Object<string, string>} [editableFrameAttributes={spellcheck: "false"}] - Attributes for the editable frame[.sun-editor-editable].
+ * ```js
+ * { editableFrameAttributes: { spellcheck: 'true', autocomplete: 'on' } }
+ * ```
  * ///
  *
  * === Layout & Sizing ===
@@ -65,19 +68,26 @@ export namespace DEFAULTS {
  * @property {string|number} [height="auto"] - Height for the editor.
  * @property {string|number} [minHeight=""] - Min height for the editor.
  * @property {string|number} [maxHeight=""] - Max height for the editor.
- * @property {string} [editorStyle=""] - Style string of the top frame of the editor. (e.g. "border: 1px solid #ccc;").
+ * @property {string} [editorStyle=""] - Style string of the top frame of the editor.
+ * ```js
+ * { editorStyle: 'border: 1px solid #ccc; border-radius: 4px;' }
+ * ```
  * ///
  *
  * === Iframe Mode ===
  * @property {boolean} [iframe=false] - Content will be placed in an iframe and isolated from the rest of the page.
  * @property {boolean} [iframe_fullPage=false] - Allows the usage of HTML, HEAD, BODY tags and DOCTYPE declaration on the `iframe`.
- * @property {Object<string, string>} [iframe_attributes={}] - Attributes of the `iframe`. (e.g. {'allow-scripts': 'true'})
+ * @property {Object<string, string>} [iframe_attributes={}] - Attributes of the `iframe`.
+ * ```js
+ * { iframe_attributes: { 'allow-scripts': 'true', sandbox: 'allow-same-origin' } }
+ * ```
  * @property {Array<string>} [iframe_cssFileName=["suneditor"]] - CSS files to apply inside the iframe.
  * - String: Filename pattern to search in document `<link>` tags.
- * - (e.g. "suneditor" or "suneditor.[a-z0-9]+" matches "suneditor.abc123.css")
- * - "*": Wildcard to include ALL stylesheets from the page.
- * - Array: Multiple patterns (e.g. ["suneditor", "custom", "*"]).
- * - Absolute URLs and data URLs (data:text/css,) are also supported.
+ * - `"*"`: Wildcard to include ALL stylesheets from the page.
+ * - Absolute URLs and data URLs (`data:text/css,`) are also supported.
+ * ```js
+ * { iframe_cssFileName: ['suneditor', 'custom', 'https://example.com/style.css'] }
+ * ```
  * ///
  *
  * === Statusbar & Character Counter ===
@@ -87,12 +97,14 @@ export namespace DEFAULTS {
  * @property {boolean} [charCounter=false] - Shows the number of characters in the editor.
  * - If the `maxCharCount` option has a value, it becomes `true`.
  * @property {?number} [charCounter_max=null] - The maximum number of characters allowed to be inserted into the editor.
- * @property {?string} [charCounter_label=null] - Text to be displayed in the `charCounter` area of the bottom bar. (e.g. "Characters : 20/200")
+ * @property {?string} [charCounter_label=null] - Text to be displayed in the `charCounter` area of the bottom bar.
+ * ```js
+ * { charCounter_label: 'Characters :' }
+ * ```
  * @property {"char"|"byte"|"byte-html"} [charCounter_type="char"] - Defines the calculation method of the `charCounter` option.
  * - `char`: Characters length.
  * - `byte`: Binary data size of characters.
  * - `byte-html`: Binary data size of the full HTML string.
- *
  */
 /** ================================================================================================================================ */
 /**
@@ -153,9 +165,11 @@ export namespace DEFAULTS {
  * - 'a|img|p|div|...' (REQUIRED + DEFAULT)
  * - 2. If options are given directly, the final pattern is:
  * - 'a|img|custom|tags' (REQUIRED + options.__defaultElementWhitelist)
- * @property {string} [__defaultAttributeWhitelist=CONSTANTS.ATTRIBUTE_WHITELIST] - A complete list of attributes that are allowed by default on all tags.
- * - Delimiter: "|" (e.g. "href|target").
+ * @property {string} [__defaultAttributeWhitelist=CONSTANTS.ATTRIBUTE_WHITELIST] - A complete list of attributes that are allowed by default on all tags. Delimiter: `"|"`.
  * - The default follows {@link DEFAULTS.ATTRIBUTE_WHITELIST}
+ * ```js
+ * { __defaultAttributeWhitelist: 'href|target|src|alt|class' }
+ * ```
  * ///
  *
  *  === Formatting  ===
@@ -177,7 +191,11 @@ export namespace DEFAULTS {
  * - For example, when changing the font size or color of a list item (`<li>`),
  * - these styles apply to the `<li>` tag instead of wrapping content in additional tags.
  * @property {{pluginName: string, we: boolean}|boolean} [__pluginRetainFilter=true] - Plugin retain filter configuration. (Internal use primarily)
- * - You can turn it off/on globally with `true`/`false` or set it per plugin. (e.g. { table: false })
+ * - You can turn it off/on globally with `true`/`false` or set it per plugin.
+ * ```js
+ * // __pluginRetainFilter - disable filter for table plugin only
+ * { __pluginRetainFilter: { table: false } }
+ * ```
  */
 /**
  * ================================================================================================================================
@@ -187,8 +205,18 @@ export namespace DEFAULTS {
  * -----------------
  *
  * === Plugins & Toolbar ===
- * @property {Object<string, *>|Array<Object<string, *>>} [plugins] - Plugin configuration.
- * @property {Array<string>} [excludedPlugins=[]] - Plugin configuration.
+ * @property {Object<string, *>|Array<Object<string, *>>} [plugins] - Plugin configuration. Pass an array of plugin classes or an object keyed by plugin name.
+ * ```js
+ * import plugins, { image, link, table } from 'suneditor/src/plugins';
+ * { plugins: plugins,
+ *   plugins: [image, link, table],
+ *   plugins: { image, link, table }
+ * }
+ * ```
+ * @property {Array<string>} [excludedPlugins=[]] - List of plugin names to exclude.
+ * ```js
+ * { excludedPlugins: ['image', 'video'] }
+ * ```
  * @property {SunEditor.UI.ButtonList} [buttonList=CONSTANTS.BUTTON_LIST] - List of toolbar buttons, grouped by sub-arrays.
  * - The default follows {@link DEFAULTS.BUTTON_LIST}
  * ///
@@ -196,7 +224,11 @@ export namespace DEFAULTS {
  * === Modes & Themes ===
  * @property {boolean} [v2Migration=false] - Enables migration mode for SunEditor v2.
  * @property {"classic"|"inline"|"balloon"|"balloon-always"} [mode="classic"] - Toolbar mode: `classic`, `inline`, `balloon`, `balloon-always`.
- * @property {string} [type=""] - Editor type: `document:header,page`.
+ * @property {string} [type=""] - Editor type. Use `"document"` for a document-style layout, with optional sub-types after `:`.
+ * ```js
+ * // type
+ * 'document:header,page'
+ * ```
  * @property {string} [theme=""] - Editor theme.
  * @property {Object<string, string>} [lang] - Language configuration. default : EN
  * @property {Object<string, string>} [icons] - Overrides the default icons.
@@ -223,6 +255,10 @@ export namespace DEFAULTS {
  * - `textStyleTagFilter`: Filters text style tags (b, i, u, span, etc.)
  * - `attrFilter`: Filters disallowed HTML attributes (`attributeWhitelist`/`attributeBlacklist`)
  * - `styleFilter`: Filters disallowed inline styles (`spanStyles`/`lineStyles`/`allUsedStyles`)
+ * ```js
+ * // disable only attribute and style filters
+ * { strictMode: { tagFilter: true, formatFilter: true, classFilter: true, textStyleTagFilter: true, attrFilter: false, styleFilter: false } }
+ * ```
  * @property {Array<string>} [scopeSelectionTags=CONSTANTS.SCOPE_SELECTION_TAGS] - Tags treated as whole units when selecting all content.
  * - The default follows {@link DEFAULTS.SCOPE_SELECTION_TAGS}
  * ///
@@ -230,12 +266,16 @@ export namespace DEFAULTS {
  * === Content Filtering & Formatting ===
  * ==
  * #### 1) Tag & Element Control
- * @property {string} [elementWhitelist=""] - Specifies HTML elements to additionally allow beyond the default allow list.
- * - Delimiter: "|" (e.g. "p|div", "*").
+ * @property {string} [elementWhitelist=""] - Specifies HTML elements to additionally allow beyond the default allow list. Delimiter: `"|"`.
  * - Added to the default list determined by {@link PrivateBaseOptions.__defaultElementWhitelist}.
- * @property {string} [elementBlacklist=""] - Specifies HTML elements that should not be used.
- * - Delimiter: "|" (e.g. "script|style").
+ * ```js
+ * { elementWhitelist: 'mark|details|summary' }
+ * ```
+ * @property {string} [elementBlacklist=""] - Specifies HTML elements that should not be used. Delimiter: `"|"`.
  * - Tags specified here will eventually be removed, even if they are included in other whitelists.
+ * ```js
+ * { elementBlacklist: 'script|style|iframe' }
+ * ```
  * @property {string} [allowedEmptyTags=CONSTANTS.ALLOWED_EMPTY_NODE_LIST] - A list of tags that are allowed to be kept even if their values are empty.
  * - The default follows {@link DEFAULTS.ALLOWED_EMPTY_NODE_LIST}
  * - Concatenated with `ALLOWED_EMPTY_NODE_LIST` to form the final `allowedEmptyTags` list.
@@ -244,22 +284,34 @@ export namespace DEFAULTS {
  * ///
  *
  * #### 2) Attribute Control
- * @property {{[key: string]: string|undefined}} [attributeWhitelist=null] - Specifies additional attributes to allow for each tag.
- * - (e.g. {a: "href|target", img: "src|alt", "*": "id"})
+ * @property {{[key: string]: string|undefined}} [attributeWhitelist=null] - Specifies additional attributes to allow for each tag. `"*"` applies to all tags.
  * - Rules specified here will be merged into {@link PrivateBaseOptions.__defaultAttributeWhitelist}.
- * @property {{[key: string]: string|undefined}} [attributeBlacklist=null] - Specifies attributes to disallow by tag.
- * - (e.g. {a: "href|target", img: "src|alt", "*": "name"})
+ * ```js
+ * { attributeWhitelist: { a: 'href|target', img: 'src|alt', '*': 'id|data-*' } }
+ * ```
+ * @property {{[key: string]: string|undefined}} [attributeBlacklist=null] - Specifies attributes to disallow by tag. `"*"` applies to all tags.
  * - Attributes specified here will eventually be removed even if they are allowed by other settings.
  * - A list of required elements, {@link DEFAULTS.REQUIRED_FORMAT_LINE}, is always included.
+ * ```js
+ * { attributeBlacklist: { '*': 'onclick|onerror' } }
+ * ```
  * ///
  *
  * #### 3) Text & Inline Style Control
  * @property {string} [textStyleTags=__textStyleTags] - Additional text style tags.
  * - The default follows {@link PrivateBaseOptions.__textStyleTags}
  * @property {Object<string, string>} [convertTextTags={bold: "strong", underline: "u", italic: "em", strike: "del", subscript: "sub", superscript: "sup"}] - Maps text styles to specific HTML tags.
- * @property {string} [allUsedStyles] - Specifies additional styles to the list of allowed styles.
- * - Delimiter: "|" (e.g. "color|background-color").
- * @property {Object<string, string>} [tagStyles={}] - Specifies allowed styles for HTML tags.
+ * ```js
+ * { convertTextTags: { bold: 'b', italic: 'i', underline: 'u', strike: 's' } }
+ * ```
+ * @property {string} [allUsedStyles] - Specifies additional styles to the list of allowed styles. Delimiter: `"|"`.
+ * ```js
+ * { allUsedStyles: 'color|background-color|text-shadow' }
+ * ```
+ * @property {Object<string, string>} [tagStyles={}] - Specifies allowed styles for HTML tags. Key is tag name(s), value is pipe-delimited allowed styles.
+ * ```js
+ * { tagStyles: { 'table|td': 'border|color|background-color', hr: 'border-top' } }
+ * ```
  * @property {string} [spanStyles=CONSTANTS.SPAN_STYLES] - Specifies allowed styles for the `span` tag.
  * - The default follows {@link DEFAULTS.SPAN_STYLES}
  * @property {string} [lineStyles=CONSTANTS.LINE_STYLES] - Specifies allowed styles for the `line` element (p..).
@@ -284,14 +336,23 @@ export namespace DEFAULTS {
  * - Formats that include `line`, such as "Quote", still operate on a `line` basis.
  * - suneditor processes work in `line` units.
  * - When set to `br`, performance may decrease when editing a lot of data.
- * @property {string} [lineAttrReset=""] - Line properties that should be reset when changing lines (e.g. "id|name").
- * @property {string} [formatLine=__defaultFormatLine] - Additionally allowed `line` elements beyond the default. Delimiter: "|" (e.g. "p|div").
+ * @property {string} [lineAttrReset=""] - Line properties that should be reset when changing lines. Delimiter: `"|"`.
+ * ```js
+ * { lineAttrReset: 'id|name' }
+ * ```
+ * @property {string} [formatLine=__defaultFormatLine] - Additionally allowed `line` elements beyond the default. Delimiter: `"|"`.
  * - Concatenated with {@link PrivateBaseOptions.__defaultFormatLine} to form the final `line` list.
  * - `line` element also contains `brLine` element.
- * @property {string} [formatBrLine=__defaultFormatBrLine] - Additionally allowed `brLine` elements beyond the default. (e.g. "PRE").
+ * ```js
+ * { formatLine: 'ARTICLE|SECTION' }
+ * ```
+ * @property {string} [formatBrLine=__defaultFormatBrLine] - Additionally allowed `brLine` elements beyond the default.
  * - Concatenated with {@link PrivateBaseOptions.__defaultFormatBrLine} to form the final `brLine` list.
  * - `brLine` elements are included in the `line` element.
  * - `brLine` elements' line break is `BR` tag.
+ * ```js
+ * { formatBrLine: 'CODE' }
+ * ```
  * - ※ Entering the Enter key on the last line ends `brLine` and appends `line`.
  * @property {string} [formatClosureBrLine=__defaultFormatClosureBrLine] - Additionally allowed `closureBrLine` elements beyond the default.
  * - Concatenated with {@link PrivateBaseOptions.__defaultFormatClosureBrLine} for the final `closureBrLine` list.
@@ -318,14 +379,23 @@ export namespace DEFAULTS {
  * @property {?HTMLElement} [toolbar_container] - Container element for the toolbar.
  * @property {number} [toolbar_sticky=0] - Enables sticky toolbar with optional offset.
  * @property {boolean} [toolbar_hide=false] - Hides toolbar initially.
- * @property {Object} [subToolbar={}] - Sub-toolbar configuration.
+ * @property {Object} [subToolbar={}] - Sub-toolbar configuration. A secondary toolbar that appears on text selection.
  * @property {SunEditor.UI.ButtonList} [subToolbar.buttonList] - List of Sub-toolbar buttons, grouped by sub-arrays.
  * @property {"balloon"|"balloon-always"} [subToolbar.mode="balloon"] - Sub-toolbar mode: `balloon`, `balloon-always`.
  * @property {string} [subToolbar.width="auto"] - Sub-toolbar width.
+ * ```js
+ * { subToolbar: { buttonList: [['bold', 'italic', 'link']], mode: 'balloon' } }
+ * ```
  * @property {?HTMLElement} [statusbar_container] - Container element for the status bar.
  * @property {boolean} [shortcutsHint=true] - Displays shortcut hints in tooltips.
  * @property {boolean} [shortcutsDisable=false] - Disables keyboard shortcuts.
  * @property {{[key: string]: Array<string>|undefined}} [shortcuts={}] - Custom keyboard shortcuts.
+ * Keys starting with `_` are user-defined custom shortcuts. Each value is an array of `[keyCombo, hintLabel]` pairs.
+ * Key combos use `c` (Ctrl/Cmd), `s` (Shift), and `KeyEvent.code` values joined by `+`.
+ * Use `$~pluginName.method` to call a specific plugin method.
+ * ```js
+ * { shortcuts: { bold: ['c+KeyB', 'B'], _h1: ['c+s+Digit1+$~blockStyle.applyHeaderByShortcut', ''] } }
+ * ```
  * ///
  *
  * === Advanced Features ===
@@ -336,8 +406,11 @@ export namespace DEFAULTS {
  * @property {number} [historyStackDelayTime=400] - Delay time for history stack updates (ms).
  * @property {string} [printClass=""] - Class name for printing.
  * @property {number} [fullScreenOffset=0] - Offset applied when entering fullscreen mode.
- * @property {?string} [previewTemplate=null] - Custom template for preview mode.
- * @property {?string} [printTemplate=null] - Custom template for print mode.
+ * @property {?string} [previewTemplate=null] - Custom HTML template for preview mode. Use `{{ contents }}` as a placeholder for editor content.
+ * @property {?string} [printTemplate=null] - Custom HTML template for print mode. Use `{{ contents }}` as a placeholder for editor content.
+ * ```js
+ * { previewTemplate: '<div class="my-preview"><h1>Preview</h1>{{ contents }}</div>' }
+ * ```
  * @property {SunEditor.ComponentInsertType} [componentInsertBehavior="auto"] - Enables automatic selection of inserted components.
  * - For inline components: places cursor near the component, or selects if no nearby range.
  * - For block components: executes behavior based on `selectMode`:
@@ -346,18 +419,27 @@ export namespace DEFAULTS {
  *    - `line`: Move cursor to the next line if possible, or create a new line and move there.
  *    - `none`: Do nothing.
  * @property {?string} [defaultUrlProtocol=null] - Default URL protocol for links.
- * @property {Object<"copy", number>} [toastMessageTime={copy: 1500}] - {"copy": 1500} - Duration for displaying toast messages.
+ * @property {Object<"copy", number>} [toastMessageTime={copy: 1500}] - Duration for displaying toast messages (ms).
  * @property {boolean} [freeCodeViewMode=false] - Enables free code view mode.
  *
  * === Dynamic Options ===
- * @property {Object<string, *>} [externalLibs] - External libraries like CodeMirror or MathJax.
+ * @property {Object<string, *>} [externalLibs] - External libraries like CodeMirror, KaTeX, or MathJax.
  * - See {@link https://github.com/ARA-developer/suneditor/blob/develop/guide/external-libraries.md External Libraries Guide}
- * @property {Object<string, boolean>} [allowedExtraTags=CONSTANTS.EXTRA_TAG_MAP] - Specifies extra allowed or disallowed tags.
+ * ```js
+ * { externalLibs: { katex: window.katex, codeMirror: { src: CodeMirror } } }
+ * ```
+ * @property {Object<string, boolean>} [allowedExtraTags=CONSTANTS.EXTRA_TAG_MAP] - Specifies extra allowed or disallowed tags. `true` to allow, `false` to disallow.
  * - The default follows {@link DEFAULTS.EXTRA_TAG_MAP}
+ * ```js
+ * { allowedExtraTags: { script: false, style: false, mark: true } }
+ * ```
  * ///
  *
  * === User Events ===
- * @property {SunEditor.Event.Handlers} [events] - User event handlers configuration
+ * @property {SunEditor.Event.Handlers} [events] - User event handlers configuration.
+ * ```js
+ * { events: { onChange: (content) => console.log(content), onImageUploadBefore: (files, info) => true } }
+ * ```
  * ///
  *
  * === [ Plugin-Specific Options ] ===
@@ -468,7 +550,10 @@ export type EditorFrameOptions = {
 	 */
 	placeholder?: string;
 	/**
-	 * - Attributes for the editable frame[.sun-editor-editable]. (e.g. [key]: value)
+	 * - Attributes for the editable frame[.sun-editor-editable].
+	 * ```js
+	 * { editableFrameAttributes: { spellcheck: 'true', autocomplete: 'on' } }
+	 * ```
 	 * ///
 	 *
 	 * === Layout & Sizing ===
@@ -501,7 +586,10 @@ export type EditorFrameOptions = {
 	 */
 	maxHeight?: string | number;
 	/**
-	 * - Style string of the top frame of the editor. (e.g. "border: 1px solid #ccc;").
+	 * - Style string of the top frame of the editor.
+	 * ```js
+	 * { editorStyle: 'border: 1px solid #ccc; border-radius: 4px;' }
+	 * ```
 	 * ///
 	 *
 	 * === Iframe Mode ===
@@ -516,7 +604,10 @@ export type EditorFrameOptions = {
 	 */
 	iframe_fullPage?: boolean;
 	/**
-	 * - Attributes of the `iframe`. (e.g. {'allow-scripts': 'true'})
+	 * - Attributes of the `iframe`.
+	 * ```js
+	 * { iframe_attributes: { 'allow-scripts': 'true', sandbox: 'allow-same-origin' } }
+	 * ```
 	 */
 	iframe_attributes?: {
 		[x: string]: string;
@@ -524,10 +615,11 @@ export type EditorFrameOptions = {
 	/**
 	 * - CSS files to apply inside the iframe.
 	 * - String: Filename pattern to search in document `<link>` tags.
-	 * - (e.g. "suneditor" or "suneditor.[a-z0-9]+" matches "suneditor.abc123.css")
-	 * - "*": Wildcard to include ALL stylesheets from the page.
-	 * - Array: Multiple patterns (e.g. ["suneditor", "custom", "*"]).
-	 * - Absolute URLs and data URLs (data:text/css,) are also supported.
+	 * - `"*"`: Wildcard to include ALL stylesheets from the page.
+	 * - Absolute URLs and data URLs (`data:text/css,`) are also supported.
+	 * ```js
+	 * { iframe_cssFileName: ['suneditor', 'custom', 'https://example.com/style.css'] }
+	 * ```
 	 * ///
 	 *
 	 * === Statusbar & Character Counter ===
@@ -555,7 +647,10 @@ export type EditorFrameOptions = {
 	 */
 	charCounter_max?: number | null;
 	/**
-	 * - Text to be displayed in the `charCounter` area of the bottom bar. (e.g. "Characters : 20/200")
+	 * - Text to be displayed in the `charCounter` area of the bottom bar.
+	 * ```js
+	 * { charCounter_label: 'Characters :' }
+	 * ```
 	 */
 	charCounter_label?: string | null;
 	/**
@@ -644,9 +739,11 @@ export type PrivateBaseOptions = {
 	 */
 	__defaultElementWhitelist?: string;
 	/**
-	 * - A complete list of attributes that are allowed by default on all tags.
-	 * - Delimiter: "|" (e.g. "href|target").
-	 * - The default follows {@link DEFAULTS.ATTRIBUTE_WHITELIST}///
+	 * - A complete list of attributes that are allowed by default on all tags. Delimiter: `"|"`.
+	 * - The default follows {@link DEFAULTS.ATTRIBUTE_WHITELIST}```js
+	 * { __defaultAttributeWhitelist: 'href|target|src|alt|class' }
+	 * ```
+	 * ///
 	 *
 	 * === Formatting  ===
 	 */
@@ -690,7 +787,11 @@ export type PrivateBaseOptions = {
 	__listCommonStyle?: Array<string>;
 	/**
 	 * - Plugin retain filter configuration. (Internal use primarily)
-	 * - You can turn it off/on globally with `true`/`false` or set it per plugin. (e.g. { table: false })
+	 * - You can turn it off/on globally with `true`/`false` or set it per plugin.
+	 * ```js
+	 * // __pluginRetainFilter - disable filter for table plugin only
+	 * { __pluginRetainFilter: { table: false } }
+	 * ```
 	 */
 	__pluginRetainFilter?:
 		| {
@@ -707,7 +808,14 @@ export type PrivateBaseOptions = {
  */
 export type EditorBaseOptions = {
 	/**
-	 * - Plugin configuration.
+	 * - Plugin configuration. Pass an array of plugin classes or an object keyed by plugin name.
+	 * ```js
+	 * import plugins, { image, link, table } from 'suneditor/src/plugins';
+	 * { plugins: plugins,
+	 * plugins: [image, link, table],
+	 * plugins: { image, link, table }
+	 * }
+	 * ```
 	 */
 	plugins?:
 		| {
@@ -717,7 +825,10 @@ export type EditorBaseOptions = {
 				[x: string]: any;
 		  }>;
 	/**
-	 * - Plugin configuration.
+	 * - List of plugin names to exclude.
+	 * ```js
+	 * { excludedPlugins: ['image', 'video'] }
+	 * ```
 	 */
 	excludedPlugins?: Array<string>;
 	/**
@@ -736,7 +847,11 @@ export type EditorBaseOptions = {
 	 */
 	mode?: 'classic' | 'inline' | 'balloon' | 'balloon-always';
 	/**
-	 * - Editor type: `document:header,page`.
+	 * - Editor type. Use `"document"` for a document-style layout, with optional sub-types after `:`.
+	 * ```js
+	 * // type
+	 * 'document:header,page'
+	 * ```
 	 */
 	type?: string;
 	/**
@@ -778,6 +893,10 @@ export type EditorBaseOptions = {
 	 * - `textStyleTagFilter`: Filters text style tags (b, i, u, span, etc.)
 	 * - `attrFilter`: Filters disallowed HTML attributes (`attributeWhitelist`/`attributeBlacklist`)
 	 * - `styleFilter`: Filters disallowed inline styles (`spanStyles`/`lineStyles`/`allUsedStyles`)
+	 * ```js
+	 * // disable only attribute and style filters
+	 * { strictMode: { tagFilter: true, formatFilter: true, classFilter: true, textStyleTagFilter: true, attrFilter: false, styleFilter: false } }
+	 * ```
 	 */
 	strictMode?:
 		| true
@@ -799,15 +918,19 @@ export type EditorBaseOptions = {
 	 */
 	scopeSelectionTags?: Array<string>;
 	/**
-	 * - Specifies HTML elements to additionally allow beyond the default allow list.
-	 * - Delimiter: "|" (e.g. "p|div", "*").
+	 * - Specifies HTML elements to additionally allow beyond the default allow list. Delimiter: `"|"`.
 	 * - Added to the default list determined by {@link PrivateBaseOptions.__defaultElementWhitelist}.
+	 * ```js
+	 * { elementWhitelist: 'mark|details|summary' }
+	 * ```
 	 */
 	elementWhitelist?: string;
 	/**
-	 * - Specifies HTML elements that should not be used.
-	 * - Delimiter: "|" (e.g. "script|style").
+	 * - Specifies HTML elements that should not be used. Delimiter: `"|"`.
 	 * - Tags specified here will eventually be removed, even if they are included in other whitelists.
+	 * ```js
+	 * { elementBlacklist: 'script|style|iframe' }
+	 * ```
 	 */
 	elementBlacklist?: string;
 	/**
@@ -823,18 +946,22 @@ export type EditorBaseOptions = {
 	 */
 	allowedClassName?: string;
 	/**
-	 * - Specifies additional attributes to allow for each tag.
-	 * - (e.g. {a: "href|target", img: "src|alt", "*": "id"})
+	 * - Specifies additional attributes to allow for each tag. `"*"` applies to all tags.
 	 * - Rules specified here will be merged into {@link PrivateBaseOptions.__defaultAttributeWhitelist}.
+	 * ```js
+	 * { attributeWhitelist: { a: 'href|target', img: 'src|alt', '*': 'id|data-*' } }
+	 * ```
 	 */
 	attributeWhitelist?: {
 		[key: string]: string | undefined;
 	};
 	/**
-	 * - Specifies attributes to disallow by tag.
-	 * - (e.g. {a: "href|target", img: "src|alt", "*": "name"})
+	 * - Specifies attributes to disallow by tag. `"*"` applies to all tags.
 	 * - Attributes specified here will eventually be removed even if they are allowed by other settings.
 	 * - A list of required elements, {@link DEFAULTS.REQUIRED_FORMAT_LINE}, is always included.
+	 * ```js
+	 * { attributeBlacklist: { '*': 'onclick|onerror' } }
+	 * ```
 	 * ///
 	 *
 	 * #### 3) Text & Inline Style Control
@@ -849,17 +976,25 @@ export type EditorBaseOptions = {
 	textStyleTags?: string;
 	/**
 	 * - Maps text styles to specific HTML tags.
+	 * ```js
+	 * { convertTextTags: { bold: 'b', italic: 'i', underline: 'u', strike: 's' } }
+	 * ```
 	 */
 	convertTextTags?: {
 		[x: string]: string;
 	};
 	/**
-	 * - Specifies additional styles to the list of allowed styles.
-	 * - Delimiter: "|" (e.g. "color|background-color").
+	 * - Specifies additional styles to the list of allowed styles. Delimiter: `"|"`.
+	 * ```js
+	 * { allUsedStyles: 'color|background-color|text-shadow' }
+	 * ```
 	 */
 	allUsedStyles?: string;
 	/**
-	 * - Specifies allowed styles for HTML tags.
+	 * - Specifies allowed styles for HTML tags. Key is tag name(s), value is pipe-delimited allowed styles.
+	 * ```js
+	 * { tagStyles: { 'table|td': 'border|color|background-color', hr: 'border-top' } }
+	 * ```
 	 */
 	tagStyles?: {
 		[x: string]: string;
@@ -907,20 +1042,29 @@ export type EditorBaseOptions = {
 	 */
 	defaultLineBreakFormat?: 'line' | 'br';
 	/**
-	 * - Line properties that should be reset when changing lines (e.g. "id|name").
+	 * - Line properties that should be reset when changing lines. Delimiter: `"|"`.
+	 * ```js
+	 * { lineAttrReset: 'id|name' }
+	 * ```
 	 */
 	lineAttrReset?: string;
 	/**
-	 * - Additionally allowed `line` elements beyond the default. Delimiter: "|" (e.g. "p|div").
+	 * - Additionally allowed `line` elements beyond the default. Delimiter: `"|"`.
 	 * - Concatenated with {@link PrivateBaseOptions.__defaultFormatLine} to form the final `line` list.
 	 * - `line` element also contains `brLine` element.
+	 * ```js
+	 * { formatLine: 'ARTICLE|SECTION' }
+	 * ```
 	 */
 	formatLine?: string;
 	/**
-	 * - Additionally allowed `brLine` elements beyond the default. (e.g. "PRE").
+	 * - Additionally allowed `brLine` elements beyond the default.
 	 * - Concatenated with {@link PrivateBaseOptions.__defaultFormatBrLine} to form the final `brLine` list.
 	 * - `brLine` elements are included in the `line` element.
 	 * - `brLine` elements' line break is `BR` tag.
+	 * ```js
+	 * { formatBrLine: 'CODE' }
+	 * ```
 	 * - ※ Entering the Enter key on the last line ends `brLine` and appends `line`.
 	 */
 	formatBrLine?: string;
@@ -980,7 +1124,7 @@ export type EditorBaseOptions = {
 	 */
 	toolbar_hide?: boolean;
 	/**
-	 * - Sub-toolbar configuration.
+	 * - Sub-toolbar configuration. A secondary toolbar that appears on text selection.
 	 */
 	subToolbar?: {
 		buttonList?: SunEditor.UI.ButtonList;
@@ -1001,6 +1145,12 @@ export type EditorBaseOptions = {
 	shortcutsDisable?: boolean;
 	/**
 	 * - Custom keyboard shortcuts.
+	 * Keys starting with `_` are user-defined custom shortcuts. Each value is an array of `[keyCombo, hintLabel]` pairs.
+	 * Key combos use `c` (Ctrl/Cmd), `s` (Shift), and `KeyEvent.code` values joined by `+`.
+	 * Use `$~pluginName.method` to call a specific plugin method.
+	 * ```js
+	 * { shortcuts: { bold: ['c+KeyB', 'B'], _h1: ['c+s+Digit1+$~blockStyle.applyHeaderByShortcut', ''] } }
+	 * ```
 	 * ///
 	 *
 	 * === Advanced Features ===
@@ -1034,11 +1184,14 @@ export type EditorBaseOptions = {
 	 */
 	fullScreenOffset?: number;
 	/**
-	 * - Custom template for preview mode.
+	 * - Custom HTML template for preview mode. Use `{{ contents }}` as a placeholder for editor content.
 	 */
 	previewTemplate?: string | null;
 	/**
-	 * - Custom template for print mode.
+	 * - Custom HTML template for print mode. Use `{{ contents }}` as a placeholder for editor content.
+	 * ```js
+	 * { previewTemplate: '<div class="my-preview"><h1>Preview</h1>{{ contents }}</div>' }
+	 * ```
 	 */
 	printTemplate?: string | null;
 	/**
@@ -1056,7 +1209,7 @@ export type EditorBaseOptions = {
 	 */
 	defaultUrlProtocol?: string | null;
 	/**
-	 * - {"copy": 1500} - Duration for displaying toast messages.
+	 * - Duration for displaying toast messages (ms).
 	 */
 	toastMessageTime?: any;
 	/**
@@ -1066,15 +1219,20 @@ export type EditorBaseOptions = {
 	 */
 	freeCodeViewMode?: boolean;
 	/**
-	 * - External libraries like CodeMirror or MathJax.
-	 * - See {@link https://github.com/ARA-developer/suneditor/blob/develop/guide/external-libraries.md External Libraries Guide}
+	 * - External libraries like CodeMirror, KaTeX, or MathJax.
+	 * - See {@link https://github.com/ARA-developer/suneditor/blob/develop/guide/external-libraries.md External Libraries Guide}```js
+	 * { externalLibs: { katex: window.katex, codeMirror: { src: CodeMirror } } }
+	 * ```
 	 */
 	externalLibs?: {
 		[x: string]: any;
 	};
 	/**
-	 * - Specifies extra allowed or disallowed tags.
-	 * - The default follows {@link DEFAULTS.EXTRA_TAG_MAP}///
+	 * - Specifies extra allowed or disallowed tags. `true` to allow, `false` to disallow.
+	 * - The default follows {@link DEFAULTS.EXTRA_TAG_MAP}```js
+	 * { allowedExtraTags: { script: false, style: false, mark: true } }
+	 * ```
+	 * ///
 	 *
 	 * === User Events ===
 	 */
@@ -1082,7 +1240,10 @@ export type EditorBaseOptions = {
 		[x: string]: boolean;
 	};
 	/**
-	 * - User event handlers configuration
+	 * - User event handlers configuration.
+	 * ```js
+	 * { events: { onChange: (content) => console.log(content), onImageUploadBefore: (files, info) => true } }
+	 * ```
 	 * ///
 	 *
 	 * === [ Plugin-Specific Options ] ===

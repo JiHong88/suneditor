@@ -100,7 +100,10 @@ export const DEFAULTS = {
  * === Content & Editing ===
  * @property {string} [value=""] - Initial value for the editor.
  * @property {string} [placeholder=""] - Placeholder text.
- * @property {Object<string, string>} [editableFrameAttributes={spellcheck: "false"}] - Attributes for the editable frame[.sun-editor-editable]. (e.g. [key]: value)
+ * @property {Object<string, string>} [editableFrameAttributes={spellcheck: "false"}] - Attributes for the editable frame[.sun-editor-editable].
+ * ```js
+ * { editableFrameAttributes: { spellcheck: 'true', autocomplete: 'on' } }
+ * ```
  * ///
  *
  * === Layout & Sizing ===
@@ -110,19 +113,26 @@ export const DEFAULTS = {
  * @property {string|number} [height="auto"] - Height for the editor.
  * @property {string|number} [minHeight=""] - Min height for the editor.
  * @property {string|number} [maxHeight=""] - Max height for the editor.
- * @property {string} [editorStyle=""] - Style string of the top frame of the editor. (e.g. "border: 1px solid #ccc;").
+ * @property {string} [editorStyle=""] - Style string of the top frame of the editor.
+ * ```js
+ * { editorStyle: 'border: 1px solid #ccc; border-radius: 4px;' }
+ * ```
  * ///
  *
  * === Iframe Mode ===
  * @property {boolean} [iframe=false] - Content will be placed in an iframe and isolated from the rest of the page.
  * @property {boolean} [iframe_fullPage=false] - Allows the usage of HTML, HEAD, BODY tags and DOCTYPE declaration on the `iframe`.
- * @property {Object<string, string>} [iframe_attributes={}] - Attributes of the `iframe`. (e.g. {'allow-scripts': 'true'})
+ * @property {Object<string, string>} [iframe_attributes={}] - Attributes of the `iframe`.
+ * ```js
+ * { iframe_attributes: { 'allow-scripts': 'true', sandbox: 'allow-same-origin' } }
+ * ```
  * @property {Array<string>} [iframe_cssFileName=["suneditor"]] - CSS files to apply inside the iframe.
  * - String: Filename pattern to search in document `<link>` tags.
- * - (e.g. "suneditor" or "suneditor.[a-z0-9]+" matches "suneditor.abc123.css")
- * - "*": Wildcard to include ALL stylesheets from the page.
- * - Array: Multiple patterns (e.g. ["suneditor", "custom", "*"]).
- * - Absolute URLs and data URLs (data:text/css,) are also supported.
+ * - `"*"`: Wildcard to include ALL stylesheets from the page.
+ * - Absolute URLs and data URLs (`data:text/css,`) are also supported.
+ * ```js
+ * { iframe_cssFileName: ['suneditor', 'custom', 'https://example.com/style.css'] }
+ * ```
  * ///
  *
  * === Statusbar & Character Counter ===
@@ -132,12 +142,14 @@ export const DEFAULTS = {
  * @property {boolean} [charCounter=false] - Shows the number of characters in the editor.
  * - If the `maxCharCount` option has a value, it becomes `true`.
  * @property {?number} [charCounter_max=null] - The maximum number of characters allowed to be inserted into the editor.
- * @property {?string} [charCounter_label=null] - Text to be displayed in the `charCounter` area of the bottom bar. (e.g. "Characters : 20/200")
+ * @property {?string} [charCounter_label=null] - Text to be displayed in the `charCounter` area of the bottom bar.
+ * ```js
+ * { charCounter_label: 'Characters :' }
+ * ```
  * @property {"char"|"byte"|"byte-html"} [charCounter_type="char"] - Defines the calculation method of the `charCounter` option.
  * - `char`: Characters length.
  * - `byte`: Binary data size of characters.
  * - `byte-html`: Binary data size of the full HTML string.
- *
  */
 
 /** ================================================================================================================================ */
@@ -206,9 +218,11 @@ export const DEFAULTS = {
  * - 'a|img|p|div|...' (REQUIRED + DEFAULT)
  * - 2. If options are given directly, the final pattern is:
  * - 'a|img|custom|tags' (REQUIRED + options.__defaultElementWhitelist)
- * @property {string} [__defaultAttributeWhitelist=CONSTANTS.ATTRIBUTE_WHITELIST] - A complete list of attributes that are allowed by default on all tags.
- * - Delimiter: "|" (e.g. "href|target").
+ * @property {string} [__defaultAttributeWhitelist=CONSTANTS.ATTRIBUTE_WHITELIST] - A complete list of attributes that are allowed by default on all tags. Delimiter: `"|"`.
  * - The default follows {@link DEFAULTS.ATTRIBUTE_WHITELIST}
+ * ```js
+ * { __defaultAttributeWhitelist: 'href|target|src|alt|class' }
+ * ```
  * ///
  *
  *  === Formatting  ===
@@ -245,8 +259,18 @@ export const DEFAULTS = {
  * -----------------
  *
  * === Plugins & Toolbar ===
- * @property {Object<string, *>|Array<Object<string, *>>} [plugins] - Plugin configuration.
- * @property {Array<string>} [excludedPlugins=[]] - Plugin configuration.
+ * @property {Object<string, *>|Array<Object<string, *>>} [plugins] - Plugin configuration. Pass an array of plugin classes or an object keyed by plugin name.
+ * ```js
+ * import plugins, { image, link, table } from 'suneditor/src/plugins';
+ * { plugins: plugins,
+ *   plugins: [image, link, table],
+ *   plugins: { image, link, table }
+ * }
+ * ```
+ * @property {Array<string>} [excludedPlugins=[]] - List of plugin names to exclude.
+ * ```js
+ * { excludedPlugins: ['image', 'video'] }
+ * ```
  * @property {SunEditor.UI.ButtonList} [buttonList=CONSTANTS.BUTTON_LIST] - List of toolbar buttons, grouped by sub-arrays.
  * - The default follows {@link DEFAULTS.BUTTON_LIST}
  * ///
@@ -296,12 +320,16 @@ export const DEFAULTS = {
  * === Content Filtering & Formatting ===
  * ==
  * #### 1) Tag & Element Control
- * @property {string} [elementWhitelist=""] - Specifies HTML elements to additionally allow beyond the default allow list.
- * - Delimiter: "|" (e.g. "p|div", "*").
+ * @property {string} [elementWhitelist=""] - Specifies HTML elements to additionally allow beyond the default allow list. Delimiter: `"|"`.
  * - Added to the default list determined by {@link PrivateBaseOptions.__defaultElementWhitelist}.
- * @property {string} [elementBlacklist=""] - Specifies HTML elements that should not be used.
- * - Delimiter: "|" (e.g. "script|style").
+ * ```js
+ * { elementWhitelist: 'mark|details|summary' }
+ * ```
+ * @property {string} [elementBlacklist=""] - Specifies HTML elements that should not be used. Delimiter: `"|"`.
  * - Tags specified here will eventually be removed, even if they are included in other whitelists.
+ * ```js
+ * { elementBlacklist: 'script|style|iframe' }
+ * ```
  * @property {string} [allowedEmptyTags=CONSTANTS.ALLOWED_EMPTY_NODE_LIST] - A list of tags that are allowed to be kept even if their values are empty.
  * - The default follows {@link DEFAULTS.ALLOWED_EMPTY_NODE_LIST}
  * - Concatenated with `ALLOWED_EMPTY_NODE_LIST` to form the final `allowedEmptyTags` list.
@@ -310,22 +338,34 @@ export const DEFAULTS = {
  * ///
  *
  * #### 2) Attribute Control
- * @property {{[key: string]: string|undefined}} [attributeWhitelist=null] - Specifies additional attributes to allow for each tag.
- * - (e.g. {a: "href|target", img: "src|alt", "*": "id"})
+ * @property {{[key: string]: string|undefined}} [attributeWhitelist=null] - Specifies additional attributes to allow for each tag. `"*"` applies to all tags.
  * - Rules specified here will be merged into {@link PrivateBaseOptions.__defaultAttributeWhitelist}.
- * @property {{[key: string]: string|undefined}} [attributeBlacklist=null] - Specifies attributes to disallow by tag.
- * - (e.g. {a: "href|target", img: "src|alt", "*": "name"})
+ * ```js
+ * { attributeWhitelist: { a: 'href|target', img: 'src|alt', '*': 'id|data-*' } }
+ * ```
+ * @property {{[key: string]: string|undefined}} [attributeBlacklist=null] - Specifies attributes to disallow by tag. `"*"` applies to all tags.
  * - Attributes specified here will eventually be removed even if they are allowed by other settings.
  * - A list of required elements, {@link DEFAULTS.REQUIRED_FORMAT_LINE}, is always included.
+ * ```js
+ * { attributeBlacklist: { '*': 'onclick|onerror' } }
+ * ```
  * ///
  *
  * #### 3) Text & Inline Style Control
  * @property {string} [textStyleTags=__textStyleTags] - Additional text style tags.
  * - The default follows {@link PrivateBaseOptions.__textStyleTags}
  * @property {Object<string, string>} [convertTextTags={bold: "strong", underline: "u", italic: "em", strike: "del", subscript: "sub", superscript: "sup"}] - Maps text styles to specific HTML tags.
- * @property {string} [allUsedStyles] - Specifies additional styles to the list of allowed styles.
- * - Delimiter: "|" (e.g. "color|background-color").
- * @property {Object<string, string>} [tagStyles={}] - Specifies allowed styles for HTML tags.
+ * ```js
+ * { convertTextTags: { bold: 'b', italic: 'i', underline: 'u', strike: 's' } }
+ * ```
+ * @property {string} [allUsedStyles] - Specifies additional styles to the list of allowed styles. Delimiter: `"|"`.
+ * ```js
+ * { allUsedStyles: 'color|background-color|text-shadow' }
+ * ```
+ * @property {Object<string, string>} [tagStyles={}] - Specifies allowed styles for HTML tags. Key is tag name(s), value is pipe-delimited allowed styles.
+ * ```js
+ * { tagStyles: { 'table|td': 'border|color|background-color', hr: 'border-top' } }
+ * ```
  * @property {string} [spanStyles=CONSTANTS.SPAN_STYLES] - Specifies allowed styles for the `span` tag.
  * - The default follows {@link DEFAULTS.SPAN_STYLES}
  * @property {string} [lineStyles=CONSTANTS.LINE_STYLES] - Specifies allowed styles for the `line` element (p..).
@@ -350,14 +390,23 @@ export const DEFAULTS = {
  * - Formats that include `line`, such as "Quote", still operate on a `line` basis.
  * - suneditor processes work in `line` units.
  * - When set to `br`, performance may decrease when editing a lot of data.
- * @property {string} [lineAttrReset=""] - Line properties that should be reset when changing lines (e.g. "id|name").
- * @property {string} [formatLine=__defaultFormatLine] - Additionally allowed `line` elements beyond the default. Delimiter: "|" (e.g. "p|div").
+ * @property {string} [lineAttrReset=""] - Line properties that should be reset when changing lines. Delimiter: `"|"`.
+ * ```js
+ * { lineAttrReset: 'id|name' }
+ * ```
+ * @property {string} [formatLine=__defaultFormatLine] - Additionally allowed `line` elements beyond the default. Delimiter: `"|"`.
  * - Concatenated with {@link PrivateBaseOptions.__defaultFormatLine} to form the final `line` list.
  * - `line` element also contains `brLine` element.
- * @property {string} [formatBrLine=__defaultFormatBrLine] - Additionally allowed `brLine` elements beyond the default. (e.g. "PRE").
+ * ```js
+ * { formatLine: 'ARTICLE|SECTION' }
+ * ```
+ * @property {string} [formatBrLine=__defaultFormatBrLine] - Additionally allowed `brLine` elements beyond the default.
  * - Concatenated with {@link PrivateBaseOptions.__defaultFormatBrLine} to form the final `brLine` list.
  * - `brLine` elements are included in the `line` element.
  * - `brLine` elements' line break is `BR` tag.
+ * ```js
+ * { formatBrLine: 'CODE' }
+ * ```
  * - ※ Entering the Enter key on the last line ends `brLine` and appends `line`.
  * @property {string} [formatClosureBrLine=__defaultFormatClosureBrLine] - Additionally allowed `closureBrLine` elements beyond the default.
  * - Concatenated with {@link PrivateBaseOptions.__defaultFormatClosureBrLine} for the final `closureBrLine` list.
@@ -424,7 +473,7 @@ export const DEFAULTS = {
  *    - `line`: Move cursor to the next line if possible, or create a new line and move there.
  *    - `none`: Do nothing.
  * @property {?string} [defaultUrlProtocol=null] - Default URL protocol for links.
- * @property {Object<"copy", number>} [toastMessageTime={copy: 1500}] - {"copy": 1500} - Duration for displaying toast messages.
+ * @property {Object<"copy", number>} [toastMessageTime={copy: 1500}] - Duration for displaying toast messages (ms).
  * @property {boolean} [freeCodeViewMode=false] - Enables free code view mode.
  *
  * === Dynamic Options ===
@@ -433,12 +482,18 @@ export const DEFAULTS = {
  * ```js
  * { externalLibs: { katex: window.katex, codeMirror: { src: CodeMirror } } }
  * ```
- * @property {Object<string, boolean>} [allowedExtraTags=CONSTANTS.EXTRA_TAG_MAP] - Specifies extra allowed or disallowed tags.
+ * @property {Object<string, boolean>} [allowedExtraTags=CONSTANTS.EXTRA_TAG_MAP] - Specifies extra allowed or disallowed tags. `true` to allow, `false` to disallow.
  * - The default follows {@link DEFAULTS.EXTRA_TAG_MAP}
+ * ```js
+ * { allowedExtraTags: { script: false, style: false, mark: true } }
+ * ```
  * ///
  *
  * === User Events ===
- * @property {SunEditor.Event.Handlers} [events] - User event handlers configuration
+ * @property {SunEditor.Event.Handlers} [events] - User event handlers configuration.
+ * ```js
+ * { events: { onChange: (content) => console.log(content), onImageUploadBefore: (files, info) => true } }
+ * ```
  * ///
  *
  * === [ Plugin-Specific Options ] ===

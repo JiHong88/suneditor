@@ -97,7 +97,11 @@ export type BrowserParams = {
 	 */
 	listClass?: string;
 	/**
-	 * - Function that defines the HTML of a file item. Required. Can be overridden in browser.
+	 * - Function that returns HTML string for rendering each file item. Required. Can be overridden in browser.
+	 * ```js
+	 * // drawItemHandler
+	 * (item) => `<div><img src="${item.thumbnail}"><span>${item.name}</span></div>`
+	 * ```
 	 */
 	drawItemHandler?: (item: BrowserFile) => string;
 	/**
@@ -140,7 +144,11 @@ export type BrowserParams = {
  * @property {string} [searchUrl] - File server search url. Optional. Can be overridden in browser.
  * @property {Object<string, string>} [searchUrlHeader] - File server search http header. Optional. Can be overridden in browser.
  * @property {string} [listClass] - Class name of list div. Required. Can be overridden in browser.
- * @property {(item: BrowserFile) => string} [drawItemHandler] - Function that defines the HTML of a file item. Required. Can be overridden in browser.
+ * @property {(item: BrowserFile) => string} [drawItemHandler] - Function that returns HTML string for rendering each file item. Required. Can be overridden in browser.
+ * ```js
+ * // drawItemHandler
+ * (item) => `<div><img src="${item.thumbnail}"><span>${item.name}</span></div>`
+ * ```
  * @property {Array<*>} [props] - `props` argument to `drawItemHandler` function. Optional. Can be overridden in browser.
  * @property {number} [columnSize] - Number of `div.se-file-item-column` to be created.
  * - Optional. Can be overridden in browser. Default: 4.

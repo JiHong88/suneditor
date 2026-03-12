@@ -2,7 +2,8 @@ import type {} from '../../typedef';
 export default FontColor;
 export type FontColorPluginOptions = {
 	/**
-	 * - Color list
+	 * - Color list.
+	 * Use HEX strings or objects with `value`/`name` for labeled colors.
 	 */
 	items?: Array<
 		| string
@@ -17,14 +18,21 @@ export type FontColorPluginOptions = {
 	splitNum?: number;
 	/**
 	 * - Disable HEX input
+	 * ```js
+	 * { items: ['#ff0000', '#00ff00', { value: '#0000ff', name: 'Blue' }], splitNum: 6 }
+	 * ```
 	 */
 	disableHEXInput?: boolean;
 };
 /**
  * @typedef {Object} FontColorPluginOptions
- * @property {Array<string|{value: string, name: string}>} [items] - Color list
+ * @property {Array<string|{value: string, name: string}>} [items] - Color list.
+ * Use HEX strings or objects with `value`/`name` for labeled colors.
  * @property {number} [splitNum] - Number of colors per line
  * @property {boolean} [disableHEXInput] - Disable HEX input
+ * ```js
+ * { items: ['#ff0000', '#00ff00', { value: '#0000ff', name: 'Blue' }], splitNum: 6 }
+ * ```
  */
 /**
  * @class

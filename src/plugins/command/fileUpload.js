@@ -12,7 +12,10 @@ const { NO_EVENT } = env;
  * @property {number} [uploadSizeLimit] - Total upload size limit in bytes
  * @property {number} [uploadSingleSizeLimit] - Single file size limit in bytes
  * @property {boolean} [allowMultiple=false] - Allow multiple file uploads
- * @property {string} [acceptedFormats="*"] - Accepted file formats (e.g., 'image/*, .pdf')
+ * @property {string} [acceptedFormats="*"] - Accepted file formats.
+ * ```js
+ * { acceptedFormats: 'image/*, .pdf, .docx' }
+ * ```
  * @property {string} [as="box"] - Specify the default form of the file component as `box` or `link`
  * @property {Array<string>} [controls] - Additional controls to be added to the figure
  * @property {SunEditor.ComponentInsertType} [insertBehavior] - Component insertion behavior for selection and cursor placement.

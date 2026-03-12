@@ -2,7 +2,7 @@ import type {} from '../../typedef';
 export default FileBrowser;
 export type FileBrowserPluginOptions = {
 	/**
-	 * - Direct data without server calls
+	 * - Direct data without server calls (bypasses URL fetch).
 	 */
 	data?:
 		| {
@@ -20,21 +20,27 @@ export type FileBrowserPluginOptions = {
 		[x: string]: string;
 	};
 	/**
-	 * - Default thumbnail
+	 * - Default thumbnail URL or a function that returns a thumbnail URL per item.
 	 */
 	thumbnail?: string | ((item: SunEditor.Module.Browser.File) => string);
 	/**
 	 * - Additional tag names
+	 * ```js
+	 * { url: '/api/files', headers: { Authorization: 'Bearer token' }, thumbnail: (item) => item.thumbUrl }
+	 * ```
 	 */
 	props?: Array<string>;
 };
 /**
  * @typedef {Object} FileBrowserPluginOptions
- * @property {Object<string, *>|Array<*>} [data] - Direct data without server calls
+ * @property {Object<string, *>|Array<*>} [data] - Direct data without server calls (bypasses URL fetch).
  * @property {string} [url] - Server request URL
  * @property {Object<string, string>} [headers] - Server request headers
- * @property {string|((item: SunEditor.Module.Browser.File) => string)} [thumbnail] - Default thumbnail
+ * @property {string|((item: SunEditor.Module.Browser.File) => string)} [thumbnail] - Default thumbnail URL or a function that returns a thumbnail URL per item.
  * @property {Array<string>} [props] - Additional tag names
+ * ```js
+ * { url: '/api/files', headers: { Authorization: 'Bearer token' }, thumbnail: (item) => item.thumbUrl }
+ * ```
  */
 /**
  * @class

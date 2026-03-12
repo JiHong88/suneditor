@@ -3,6 +3,12 @@ export default HR;
 export type HRPluginOptions = {
 	/**
 	 * - HR list
+	 * ```js
+	 * [
+	 * { name: 'Solid', class: '__se__solid', style: 'border-top: 1px solid #000;' },
+	 * { name: 'Dashed', class: '__se__dashed' }
+	 * ]
+	 * ```
 	 */
 	items?: Array<{
 		name: string;
@@ -13,6 +19,12 @@ export type HRPluginOptions = {
 /**
  * @typedef {Object} HRPluginOptions
  * @property {Array<{name: string, class: string, style?: string}>} [items] - HR list
+ * ```js
+ * [
+ *   { name: 'Solid', class: '__se__solid', style: 'border-top: 1px solid #000;' },
+ *   { name: 'Dashed', class: '__se__dashed' }
+ * ]
+ * ```
  */
 /**
  * @class

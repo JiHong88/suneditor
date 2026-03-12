@@ -3,6 +3,9 @@ export default Template;
 export type TemplatePluginOptions = {
 	/**
 	 * - Template list
+	 * ```js
+	 * [{ name: 'Greeting', html: '<p>Hello! Thank you for contacting us.</p>' }]
+	 * ```
 	 */
 	items?: Array<{
 		name: string;
@@ -12,6 +15,9 @@ export type TemplatePluginOptions = {
 /**
  * @typedef {Object} TemplatePluginOptions
  * @property {Array<{name: string, html: string}>} [items] - Template list
+ * ```js
+ * [{ name: 'Greeting', html: '<p>Hello! Thank you for contacting us.</p>' }]
+ * ```
  */
 /**
  * @class

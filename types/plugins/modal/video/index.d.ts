@@ -56,7 +56,7 @@ export type VideoPluginOptions = {
 	 */
 	acceptedFormats?: string;
 	/**
-	 * - The default aspect ratio for the video (e.g., 16:9 is 0.5625).
+	 * - The default aspect ratio for the video (height/width, e.g. 16:9 → `9/16 = 0.5625`).
 	 */
 	defaultRatio?: number;
 	/**
@@ -64,31 +64,50 @@ export type VideoPluginOptions = {
 	 */
 	showRatioOption?: boolean;
 	/**
-	 * - Custom ratio options for video resizing.
+	 * - Custom ratio options for video resizing (value = height/width).
+	 * ```js
+	 * // ratioOptions
+	 * [{ name: '16:9', value: 0.5625 }, { name: '4:3', value: 0.75 }]
+	 * ```
 	 */
-	ratioOptions?: any[];
+	ratioOptions?: Array<{
+		name: string;
+		value: number;
+	}>;
 	/**
 	 * - Additional attributes to set on the `VIDEO` tag.
+	 * ```js
+	 * { videoTagAttributes: { controls: 'true', muted: 'true', playsinline: '' } }
+	 * ```
 	 */
 	videoTagAttributes?: {
 		[x: string]: string;
 	};
 	/**
 	 * - Additional attributes to set on the `IFRAME` tag.
+	 * ```js
+	 * { iframeTagAttributes: { allowfullscreen: 'true', loading: 'lazy' } }
+	 * ```
 	 */
 	iframeTagAttributes?: {
 		[x: string]: string;
 	};
 	/**
 	 * - Additional query parameters for YouTube embedding.
+	 * ```js
+	 * { query_youtube: 'autoplay=1&mute=1' }
+	 * ```
 	 */
 	query_youtube?: string;
 	/**
 	 * - Additional query parameters for Vimeo embedding.
+	 * ```js
+	 * { query_vimeo: 'autoplay=1' }
+	 * ```
 	 */
 	query_vimeo?: string;
 	/**
-	 * - Custom query objects for additional embedding services.
+	 * - Custom embed service definitions (see `EmbedPluginOptions.embedQuery`).
 	 */
 	embedQuery?: {
 		[x: string]: {
@@ -139,14 +158,30 @@ export type VideoState = {
  * @property {number} [uploadSingleSizeLimit] - The single file upload size limit for videos in bytes.
  * @property {boolean} [allowMultiple=false] - Whether multiple video uploads are allowed.
  * @property {string} [acceptedFormats="video/*"] - Accepted file formats for video uploads (`"video/*"`).
- * @property {number} [defaultRatio=0.5625] - The default aspect ratio for the video (e.g., 16:9 is 0.5625).
+ * @property {number} [defaultRatio=0.5625] - The default aspect ratio for the video (height/width, e.g. 16:9 → `9/16 = 0.5625`).
  * @property {boolean} [showRatioOption=true] - Whether to display the ratio option in the modal.
- * @property {Array} [ratioOptions] - Custom ratio options for video resizing.
+ * @property {Array<{name: string, value: number}>} [ratioOptions] - Custom ratio options for video resizing (value = height/width).
+ * ```js
+ * // ratioOptions
+ * [{ name: '16:9', value: 0.5625 }, { name: '4:3', value: 0.75 }]
+ * ```
  * @property {Object<string, string>} [videoTagAttributes] - Additional attributes to set on the `VIDEO` tag.
+ * ```js
+ * { videoTagAttributes: { controls: 'true', muted: 'true', playsinline: '' } }
+ * ```
  * @property {Object<string, string>} [iframeTagAttributes] - Additional attributes to set on the `IFRAME` tag.
+ * ```js
+ * { iframeTagAttributes: { allowfullscreen: 'true', loading: 'lazy' } }
+ * ```
  * @property {string} [query_youtube=""] - Additional query parameters for YouTube embedding.
+ * ```js
+ * { query_youtube: 'autoplay=1&mute=1' }
+ * ```
  * @property {string} [query_vimeo=""] - Additional query parameters for Vimeo embedding.
- * @property {Object<string, {pattern: RegExp, action: (url: string) => string, tag: string}>} [embedQuery] - Custom query objects for additional embedding services.
+ * ```js
+ * { query_vimeo: 'autoplay=1' }
+ * ```
+ * @property {Object<string, {pattern: RegExp, action: (url: string) => string, tag: string}>} [embedQuery] - Custom embed service definitions (see `EmbedPluginOptions.embedQuery`).
  * @property {Array<RegExp>} [urlPatterns] - Additional URL patterns for video embedding.
  * @property {Array<string>} [extensions] - Additional file extensions to be recognized for video uploads.
  * @property {SunEditor.Module.Figure.Controls} [controls] - Figure controls.
@@ -208,7 +243,10 @@ declare class Video extends PluginModal {
 		acceptedFormats: string;
 		defaultRatio: number;
 		showRatioOption: boolean;
-		ratioOptions: any[];
+		ratioOptions: {
+			name: string;
+			value: number;
+		}[];
 		videoTagAttributes: {
 			[x: string]: string;
 		};

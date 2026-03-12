@@ -18,7 +18,11 @@ export type MentionPluginOptions = {
 	 */
 	delayTime?: number;
 	/**
-	 * - Use data without using API
+	 * - Static mention data (used instead of API).
+	 * ```js
+	 * // data
+	 * [{ key: 'john', name: 'John Doe', url: '/users/john' }]
+	 * ```
 	 */
 	data?: Array<{
 		key: string;
@@ -50,7 +54,11 @@ export type MentionPluginOptions = {
  * @property {number} [limitSize=5] - The number of items to display in the mention list
  * @property {number} [searchStartLength=0] - The number of characters to start searching for the mention list
  * @property {number} [delayTime=200] - The time to wait before displaying the mention list
- * @property {Array<{key: string, name: string, url: string}>} [data] - Use data without using API
+ * @property {Array<{key: string, name: string, url: string}>} [data] - Static mention data (used instead of API).
+ * ```js
+ * // data
+ * [{ key: 'john', name: 'John Doe', url: '/users/john' }]
+ * ```
  * @property {string} [apiUrl] - The URL to call the mention list
  * @property {Object<string, string>} [apiHeaders] - The headers to send with the API call
  * @property {boolean} [useCachingData=true] - Whether to cache the mention list data

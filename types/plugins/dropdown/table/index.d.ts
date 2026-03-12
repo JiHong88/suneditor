@@ -14,9 +14,12 @@ export type TablePluginOptions = {
 	 */
 	cellControllerPosition?: 'cell' | 'table';
 	/**
-	 * - Color list, used in cell color picker
+	 * - HEX color list for the cell background color picker.
+	 * ```js
+	 * { colorList: ['#bbf7d0', '#fde68a', '#fecaca', '#e9d5ff'] }
+	 * ```
 	 */
-	colorList?: any[];
+	colorList?: Array<string>;
 };
 export type TableState = import('./shared/table.constants').TableState;
 /**
@@ -24,7 +27,10 @@ export type TableState = import('./shared/table.constants').TableState;
  * @property {"x"|"y"|"xy"} [scrollType='x'] - Scroll type (`x`, `y`, `xy`)
  * @property {"top"|"bottom"} [captionPosition='bottom'] - Caption position (`top`, `bottom`)
  * @property {"cell"|"table"} [cellControllerPosition='cell'] - Cell controller position (`cell`, `table`)
- * @property {Array} [colorList] - Color list, used in cell color picker
+ * @property {Array<string>} [colorList] - HEX color list for the cell background color picker.
+ * ```js
+ * { colorList: ['#bbf7d0', '#fde68a', '#fecaca', '#e9d5ff'] }
+ * ```
  */
 /**
  * @typedef {import('./shared/table.constants').TableState} TableState

@@ -3,6 +3,9 @@ export default LineHeight;
 export type LineHeightPluginOptions = {
 	/**
 	 * - Line height list
+	 * ```js
+	 * [{ text: 'Single', value: '1' }, { text: '1.5', value: '1.5' }, { text: 'Double', value: '2' }]
+	 * ```
 	 */
 	items?: Array<{
 		text: string;
@@ -12,6 +15,9 @@ export type LineHeightPluginOptions = {
 /**
  * @typedef {Object} LineHeightPluginOptions
  * @property {Array<{text: string, value: string}>} [items] - Line height list
+ * ```js
+ * [{ text: 'Single', value: '1' }, { text: '1.5', value: '1.5' }, { text: 'Double', value: '2' }]
+ * ```
  */
 /**
  * @class

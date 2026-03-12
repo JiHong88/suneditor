@@ -2,7 +2,11 @@ import type {} from '../../typedef';
 export default TextStyle;
 export type TextStylePluginOptions = {
 	/**
-	 * - Text style item list
+	 * - Text style item list.
+	 * Use string shortcuts for built-in styles (e.g., `'shadow'`), or objects for custom styles.
+	 * ```js
+	 * ['shadow', { name: 'Highlight', class: 'my-highlight', tag: 'mark' }]
+	 * ```
 	 */
 	items?: Array<
 		| string
@@ -15,7 +19,11 @@ export type TextStylePluginOptions = {
 };
 /**
  * @typedef {Object} TextStylePluginOptions
- * @property {Array<string|{name: string, class: string, tag?: string}>} [items] - Text style item list
+ * @property {Array<string|{name: string, class: string, tag?: string}>} [items] - Text style item list.
+ * Use string shortcuts for built-in styles (e.g., `'shadow'`), or objects for custom styles.
+ * ```js
+ * ['shadow', { name: 'Highlight', class: 'my-highlight', tag: 'mark' }]
+ * ```
  */
 /**
  * @class

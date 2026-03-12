@@ -80,11 +80,15 @@ declare class Link extends PluginModal {
 		 */
 		noAutoPrefix?: boolean;
 		/**
-		 * - The `rel` attribute list of anchor tag.
+		 * - Available `rel` attribute values shown as checkboxes in the link modal.
 		 */
 		relList?: Array<string>;
 		/**
-		 * - Default `rel` attributes of anchor tag.
+		 * - Default `rel` values auto-applied by condition.
+		 * `default` is always applied, `check_new_window` when "Open in new window" is checked, `check_bookmark` for bookmark links.
+		 * ```js
+		 * { relList: ['nofollow', 'noreferrer', 'noopener'], defaultRel: { default: 'noopener', check_new_window: 'noreferrer' } }
+		 * ```
 		 */
 		defaultRel?: {
 			default?: string;
