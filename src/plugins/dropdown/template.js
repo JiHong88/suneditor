@@ -4,6 +4,9 @@ import { dom } from '../../helper';
 /**
  * @typedef {Object} TemplatePluginOptions
  * @property {Array<{name: string, html: string}>} [items] - Template list
+ * ```js
+ * [{ name: 'Greeting', html: '<p>Hello! Thank you for contacting us.</p>' }]
+ * ```
  */
 
 /**

@@ -4,15 +4,16 @@ import { dom } from '../../helper';
 /**
  * @typedef {Object} ParagraphStylePluginOptions
  * @property {Array<string|{name: string, class: string, _class: string}>} [items] - Paragraph item list
- * @example
- * use default paragraph styles
+ * ```js
+ * // use default paragraph styles
  * ['spaced', 'bordered', 'neon']
- * custom paragraph styles
+ * // custom paragraph styles
  * [
  *   { name: 'spaced', class: '__se__p-spaced', _class: '' },
  *   { name: 'bordered', class: '__se__p-bordered', _class: '' },
  *   { name: 'neon', class: '__se__p-neon', _class: '' }
  * ]
+ * ```
  */
 
 /**

@@ -4,9 +4,13 @@ import { dom } from '../../helper';
 
 /**
  * @typedef {Object} BackgroundColorPluginOptions
- * @property {Array<string|{value: string, name: string}>} [items] - Color list
+ * @property {Array<string|{value: string, name: string}>} [items] - Color list.
+ * Use HEX strings or objects with `value`/`name` for labeled colors.
  * @property {number} [splitNum] - Number of colors per line
  * @property {boolean} [disableHEXInput] - Disable HEX input
+ * ```js
+ * { items: ['#ff0000', '#00ff00', { value: '#0000ff', name: 'Blue' }], splitNum: 6 }
+ * ```
  */
 
 /**

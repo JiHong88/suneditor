@@ -96,7 +96,12 @@ const DEFAULT_UNIT_MAP = {
  * @property {boolean} [showDefaultSizeLabel=true] - Determines whether the default size label is displayed in the dropdown menu.
  * @property {boolean} [showIncDecControls=false] - When `true`, displays increase and decrease buttons for font size adjustments.
  * @property {boolean} [disableInput=true] - When `true`, disables the direct font size input box.
- * @property {Object<string, {default: number, inc: number, min: number, max: number, list: Array<number>}>} [unitMap={}] - Optional object to override or extend the default unit mapping for font sizes.
+ * @property {Object<string, {default: number, inc: number, min: number, max: number, list: Array<number>}>} [unitMap={}] - Override or extend the default unit mapping for font sizes.
+ * Each key is a unit name (e.g., `'px'`, `'em'`). `default`: initial size, `inc`: step for inc/dec buttons, `min`/`max`: range limits, `list`: dropdown values.
+ * When `sizeUnit` is `'text'`, list items use `{title: string, size: string}` instead of numbers.
+ * ```js
+ * { unitMap: { px: { default: 16, inc: 1, min: 8, max: 72, list: [8, 12, 16, 20, 24, 32, 48] } } }
+ * ```
  */
 
 /**

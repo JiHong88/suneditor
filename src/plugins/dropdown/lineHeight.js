@@ -4,6 +4,9 @@ import { dom } from '../../helper';
 /**
  * @typedef {Object} LineHeightPluginOptions
  * @property {Array<{text: string, value: string}>} [items] - Line height list
+ * ```js
+ * [{ text: 'Single', value: '1' }, { text: '1.5', value: '1.5' }, { text: 'Double', value: '2' }]
+ * ```
  */
 
 /**

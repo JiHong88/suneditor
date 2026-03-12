@@ -21,7 +21,10 @@ const { _w, ON_OVER_COMPONENT } = env;
  * @property {"x"|"y"|"xy"} [scrollType='x'] - Scroll type (`x`, `y`, `xy`)
  * @property {"top"|"bottom"} [captionPosition='bottom'] - Caption position (`top`, `bottom`)
  * @property {"cell"|"table"} [cellControllerPosition='cell'] - Cell controller position (`cell`, `table`)
- * @property {Array} [colorList] - Color list, used in cell color picker
+ * @property {Array<string>} [colorList] - HEX color list for the cell background color picker.
+ * ```js
+ * { colorList: ['#bbf7d0', '#fde68a', '#fecaca', '#e9d5ff'] }
+ * ```
  */
 
 /**

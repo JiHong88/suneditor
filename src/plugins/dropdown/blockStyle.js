@@ -7,7 +7,13 @@ import { dom } from '../../helper';
 
 /**
  * @typedef {Object} BlockStylePluginOptions
- * @property {Array<"p"|"div"|"blockquote"|"pre"|"h1"|"h2"|"h3"|"h4"|"h5"|"h6"|string|BlockStyleItem>} [items] - Format list
+ * @property {Array<"p"|"div"|"blockquote"|"pre"|"h1"|"h2"|"h3"|"h4"|"h5"|"h6"|string|BlockStyleItem>} [items] - Format list.
+ * Use string shortcuts for built-in tags, or `BlockStyleItem` objects for custom block styles.
+ * - `command` — `"line"`: single line block, `"br-line"`: br-separated block, `"block"`: container block.
+ * ```js
+ * // string shortcuts + custom item
+ * ['p', 'h1', 'h2', 'blockquote', { tag: 'div', command: 'block', name: 'Custom Block', class: 'my-block' }]
+ * ```
  */
 
 /**

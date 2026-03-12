@@ -3,7 +3,11 @@ import { dom } from '../../helper';
 
 /**
  * @typedef {Object} TextStylePluginOptions
- * @property {Array<string|{name: string, class: string, tag?: string}>} [items] - Text style item list
+ * @property {Array<string|{name: string, class: string, tag?: string}>} [items] - Text style item list.
+ * Use string shortcuts for built-in styles (e.g., `'shadow'`), or objects for custom styles.
+ * ```js
+ * ['shadow', { name: 'Highlight', class: 'my-highlight', tag: 'mark' }]
+ * ```
  */
 
 /**

@@ -9,8 +9,12 @@ const { _w, NO_EVENT } = env;
  * @property {boolean} [textToDisplay=''] - Create Text to display input.
  * @property {boolean} [openNewWindow=false] - Default checked value of the "Open in new window" checkbox.
  * @property {boolean} [noAutoPrefix=false] - If `true`, disables the automatic prefixing of the host URL to the value of the link.
- * @property {Array<string>} [relList=[]] - The `rel` attribute list of anchor tag.
- * @property {{default?: string, check_new_window?: string, check_bookmark?: string}} [defaultRel={}] - Default `rel` attributes of anchor tag.
+ * @property {Array<string>} [relList=[]] - Available `rel` attribute values shown as checkboxes in the link modal.
+ * @property {{default?: string, check_new_window?: string, check_bookmark?: string}} [defaultRel={}] - Default `rel` values auto-applied by condition.
+ * `default` is always applied, `check_new_window` when "Open in new window" is checked, `check_bookmark` for bookmark links.
+ * ```js
+ * { relList: ['nofollow', 'noreferrer', 'noopener'], defaultRel: { default: 'noopener', check_new_window: 'noreferrer' } }
+ * ```
  * @property {string} [uploadUrl] - File upload URL.
  * @property {Object<string, string>} [uploadHeaders] - File upload headers.
  * @property {number} [uploadSizeLimit] - File upload size limit.

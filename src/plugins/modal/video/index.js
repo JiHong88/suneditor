@@ -25,12 +25,16 @@ import { CreateHTML_modal } from './render/video.html';
  * @property {string} [acceptedFormats="video/*"] - Accepted file formats for video uploads (`"video/*"`).
  * @property {number} [defaultRatio=0.5625] - The default aspect ratio for the video (e.g., 16:9 is 0.5625).
  * @property {boolean} [showRatioOption=true] - Whether to display the ratio option in the modal.
- * @property {Array} [ratioOptions] - Custom ratio options for video resizing.
+ * @property {Array<{name: string, value: number}>} [ratioOptions] - Custom ratio options for video resizing (value = height/width).
+ * ```js
+ * // ratioOptions
+ * [{ name: '16:9', value: 0.5625 }, { name: '4:3', value: 0.75 }]
+ * ```
  * @property {Object<string, string>} [videoTagAttributes] - Additional attributes to set on the `VIDEO` tag.
  * @property {Object<string, string>} [iframeTagAttributes] - Additional attributes to set on the `IFRAME` tag.
- * @property {string} [query_youtube=""] - Additional query parameters for YouTube embedding.
- * @property {string} [query_vimeo=""] - Additional query parameters for Vimeo embedding.
- * @property {Object<string, {pattern: RegExp, action: (url: string) => string, tag: string}>} [embedQuery] - Custom query objects for additional embedding services.
+ * @property {string} [query_youtube=""] - Additional query parameters for YouTube embedding (e.g., `'autoplay=1&mute=1'`).
+ * @property {string} [query_vimeo=""] - Additional query parameters for Vimeo embedding (e.g., `'autoplay=1'`).
+ * @property {Object<string, {pattern: RegExp, action: (url: string) => string, tag: string}>} [embedQuery] - Custom embed service definitions (see `EmbedPluginOptions.embedQuery`).
  * @property {Array<RegExp>} [urlPatterns] - Additional URL patterns for video embedding.
  * @property {Array<string>} [extensions] - Additional file extensions to be recognized for video uploads.
  * @property {SunEditor.Module.Figure.Controls} [controls] - Figure controls.
