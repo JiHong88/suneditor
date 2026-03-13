@@ -54,9 +54,6 @@ class EventManager {
 
 			return NO_EVENT;
 		};
-
-		/** @type {HTMLInputElement} */
-		this.__focusTemp = contextProvider.carrierWrapper.querySelector('.__se__focus__temp__');
 	}
 
 	/**

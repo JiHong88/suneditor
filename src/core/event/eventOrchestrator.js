@@ -106,6 +106,9 @@ class EventOrchestrator extends KernelInjector {
 		this.__eventDoc = null;
 		/** @type {string} */
 		this.__secopy = null;
+
+		/** @type {HTMLInputElement} */
+		this.__focusTemp = this.#contextProvider.carrierWrapper.querySelector('.__se__focus__temp__');
 	}
 
 	/**

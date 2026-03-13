@@ -21,8 +21,6 @@ declare class EventManager {
 	 * @type {(eventName: string, ...args: *) => Promise<*>}
 	 */
 	triggerEvent: (eventName: string, ...args: any) => Promise<any>;
-	/** @type {HTMLInputElement} */
-	__focusTemp: HTMLInputElement;
 	/**
 	 * @description Register for an event.
 	 * - Only events registered with this method are unregistered or re-registered when methods such as 'setOptions', 'destroy' are called.

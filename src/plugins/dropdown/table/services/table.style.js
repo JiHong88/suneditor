@@ -597,7 +597,6 @@ export class TableStyleService {
 			align_v = verticalAlign;
 		this._propsCache = [];
 
-		const tempColorStyles = _w.getComputedStyle(this.#$.eventManager.__focusTemp);
 		for (let i = 0, t, isBreak; (t = targets[i]); i++) {
 			// eslint-disable-next-line no-shadow
 			const { cssText, border, backgroundColor, color, textAlign, verticalAlign, fontWeight, textDecoration, fontStyle } = t.style;
@@ -606,16 +605,13 @@ export class TableStyleService {
 
 			const { c, s, w } = this.#getBorderStyle(border);
 
-			// colors
+			// use getComputedStyle to normalize any CSS color format to rgb
 			let hexBackColor = backgroundColor;
 			let hexColor = color;
-			if (hexBackColor) {
-				this.#$.eventManager.__focusTemp.style.backgroundColor = hexBackColor;
-				hexBackColor = tempColorStyles.backgroundColor;
-			}
-			if (hexColor) {
-				this.#$.eventManager.__focusTemp.style.color = hexColor;
-				hexColor = tempColorStyles.color;
+			if (hexBackColor || hexColor) {
+				const computed = _w.getComputedStyle(t);
+				if (hexBackColor) hexBackColor = computed.backgroundColor;
+				if (hexColor) hexColor = computed.color;
 			}
 
 			if (b_color && cellBorder.c !== c) b_color = '';

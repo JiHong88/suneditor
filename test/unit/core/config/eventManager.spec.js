@@ -16,9 +16,7 @@ describe('EventManager', () => {
 		jest.clearAllMocks();
 
 		// Create mock frameContext
-		mockFrameContext = new Map([
-			['wysiwyg', document.createElement('div')],
-		]);
+		mockFrameContext = new Map([['wysiwyg', document.createElement('div')]]);
 
 		// Create mock frameOptions
 		mockFrameOptions = new Map();
@@ -35,9 +33,7 @@ describe('EventManager', () => {
 		mockContextProvider.carrierWrapper.appendChild(focusTempInput);
 
 		// Create mock options map
-		const mockOptionsMap = new Map([
-			['events', {}],
-		]);
+		const mockOptionsMap = new Map([['events', {}]]);
 
 		// Create mock optionProvider
 		mockOptionProvider = {
@@ -161,9 +157,7 @@ describe('EventManager', () => {
 			const eventData = { key: 'value' };
 			await eventManager.triggerEvent('testEvent', eventData);
 
-			expect(mockHandler).toHaveBeenCalledWith(
-				expect.objectContaining({ $: mockDeps })
-			);
+			expect(mockHandler).toHaveBeenCalledWith(expect.objectContaining({ $: mockDeps }));
 		});
 
 		it('should handle missing event handler', async () => {
@@ -200,18 +194,6 @@ describe('EventManager', () => {
 			if (typeof eventManager.removeGlobalEvent === 'function') {
 				const mockListener = jest.fn();
 				expect(() => eventManager.removeGlobalEvent('testEvent', mockListener)).not.toThrow();
-			}
-		});
-	});
-
-	describe('focus handling', () => {
-		it('should have focus temp input reference', () => {
-			expect(eventManager.__focusTemp).toBeDefined();
-		});
-
-		it('should focus temp input for blur prevention', () => {
-			if (eventManager.__focusTemp) {
-				expect(eventManager.__focusTemp.className).toContain('__se__focus__temp__');
 			}
 		});
 	});

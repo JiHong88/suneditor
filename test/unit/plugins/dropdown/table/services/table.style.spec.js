@@ -141,9 +141,6 @@ describe('TableStyleService', () => {
 			_setCellControllerPosition: jest.fn(),
 			_closeController: jest.fn(),
 			historyPush: jest.fn(),
-			eventManager: {
-				__focusTemp: document.createElement('div'),
-			},
 		};
 
 		// Make main act as its own kernel for dependency injection
