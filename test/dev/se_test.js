@@ -767,6 +767,16 @@ const options1 = {
 	type: 'document:header,page',
 	externalLibs: {
 		codeMirror: { src: CodeMirror },
+		// katex: {
+		// 	src: Katex
+		// },
+		mathjax: {
+			src: mathjax,
+			TeX,
+			CHTML,
+			browserAdaptor,
+			RegisterHTMLHandler,
+		},
 	},
 	height: 'auto',
 	// externalLibs: {

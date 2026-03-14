@@ -368,7 +368,8 @@ export function setDisabled(buttonList, disabled, important) {
  */
 export function hasClass(element, className) {
 	if (!element || element.nodeType !== 1) return;
-	return /** @type {HTMLElement} */ (element).classList.contains(className);
+
+	return className.split('|').some((cls) => /** @type {HTMLElement} */ (element).classList.contains(cls));
 }
 
 /**
