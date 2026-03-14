@@ -193,8 +193,10 @@ export namespace DEFAULTS {
  * @property {{pluginName: string, we: boolean}|boolean} [__pluginRetainFilter=true] - Plugin retain filter configuration. (Internal use primarily)
  * - You can turn it off/on globally with `true`/`false` or set it per plugin.
  * ```js
- * // __pluginRetainFilter - disable filter for table plugin only
- * { __pluginRetainFilter: { table: false } }
+ * // disable filter for table plugin only
+ * {
+ *   __pluginRetainFilter: { table: false }
+ * }
  * ```
  */
 /**
@@ -257,7 +259,16 @@ export namespace DEFAULTS {
  * - `styleFilter`: Filters disallowed inline styles (`spanStyles`/`lineStyles`/`allUsedStyles`)
  * ```js
  * // disable only attribute and style filters
- * { strictMode: { tagFilter: true, formatFilter: true, classFilter: true, textStyleTagFilter: true, attrFilter: false, styleFilter: false } }
+ * {
+ *   strictMode: {
+ *     tagFilter: true,
+ *     formatFilter: true,
+ *     classFilter: true,
+ *     textStyleTagFilter: true,
+ *     attrFilter: false,
+ *     styleFilter: false
+ *   }
+ * }
  * ```
  * @property {Array<string>} [scopeSelectionTags=CONSTANTS.SCOPE_SELECTION_TAGS] - Tags treated as whole units when selecting all content.
  * - The default follows {@link DEFAULTS.SCOPE_SELECTION_TAGS}
@@ -287,7 +298,13 @@ export namespace DEFAULTS {
  * @property {{[key: string]: string|undefined}} [attributeWhitelist=null] - Specifies additional attributes to allow for each tag. `"*"` applies to all tags.
  * - Rules specified here will be merged into {@link PrivateBaseOptions.__defaultAttributeWhitelist}.
  * ```js
- * { attributeWhitelist: { a: 'href|target', img: 'src|alt', '*': 'id|data-*' } }
+ * {
+ *   attributeWhitelist: {
+ *     a: 'href|target',
+ *     img: 'src|alt',
+ *     '*': 'id|data-*'
+ *   }
+ * }
  * ```
  * @property {{[key: string]: string|undefined}} [attributeBlacklist=null] - Specifies attributes to disallow by tag. `"*"` applies to all tags.
  * - Attributes specified here will eventually be removed even if they are allowed by other settings.
@@ -302,7 +319,14 @@ export namespace DEFAULTS {
  * - The default follows {@link PrivateBaseOptions.__textStyleTags}
  * @property {Object<string, string>} [convertTextTags={bold: "strong", underline: "u", italic: "em", strike: "del", subscript: "sub", superscript: "sup"}] - Maps text styles to specific HTML tags.
  * ```js
- * { convertTextTags: { bold: 'b', italic: 'i', underline: 'u', strike: 's' } }
+ * {
+ *   convertTextTags: {
+ *     bold: 'b',
+ *     italic: 'i',
+ *     underline: 'u',
+ *     strike: 's'
+ *   }
+ * }
  * ```
  * @property {string} [allUsedStyles] - Specifies additional styles to the list of allowed styles. Delimiter: `"|"`.
  * ```js
@@ -310,7 +334,12 @@ export namespace DEFAULTS {
  * ```
  * @property {Object<string, string>} [tagStyles={}] - Specifies allowed styles for HTML tags. Key is tag name(s), value is pipe-delimited allowed styles.
  * ```js
- * { tagStyles: { 'table|td': 'border|color|background-color', hr: 'border-top' } }
+ * {
+ *   tagStyles: {
+ *     'table|td': 'border|color|background-color',
+ *     hr: 'border-top'
+ *   }
+ * }
  * ```
  * @property {string} [spanStyles=CONSTANTS.SPAN_STYLES] - Specifies allowed styles for the `span` tag.
  * - The default follows {@link DEFAULTS.SPAN_STYLES}
@@ -390,11 +419,16 @@ export namespace DEFAULTS {
  * @property {boolean} [shortcutsHint=true] - Displays shortcut hints in tooltips.
  * @property {boolean} [shortcutsDisable=false] - Disables keyboard shortcuts.
  * @property {{[key: string]: Array<string>|undefined}} [shortcuts={}] - Custom keyboard shortcuts.
- * Keys starting with `_` are user-defined custom shortcuts. Each value is an array of `[keyCombo, hintLabel]` pairs.
- * Key combos use `c` (Ctrl/Cmd), `s` (Shift), and `KeyEvent.code` values joined by `+`.
- * Use `$~pluginName.method` to call a specific plugin method.
+ * - Keys starting with `_` are user-defined custom shortcuts. Each value is an array of `[keyCombo, hintLabel]` pairs.
+ * - Key combos use `c` (Ctrl/Cmd), `s` (Shift), and `KeyEvent.code` values joined by `+`.
+ * - Use `$~pluginName.method` to call a specific plugin method.
  * ```js
- * { shortcuts: { bold: ['c+KeyB', 'B'], _h1: ['c+s+Digit1+$~blockStyle.applyHeaderByShortcut', ''] } }
+ * {
+ *   shortcuts: {
+ *     bold: ['c+KeyB', 'B'],
+ *     _h1: ['c+s+Digit1+$~blockStyle.applyHeaderByShortcut', '']
+ *   }
+ * }
  * ```
  * ///
  *
@@ -426,19 +460,35 @@ export namespace DEFAULTS {
  * @property {Object<string, *>} [externalLibs] - External libraries like CodeMirror, KaTeX, or MathJax.
  * - See {@link https://github.com/ARA-developer/suneditor/blob/develop/guide/external-libraries.md External Libraries Guide}
  * ```js
- * { externalLibs: { katex: window.katex, codeMirror: { src: CodeMirror } } }
+ * {
+ *   externalLibs: {
+ *     katex: window.katex,
+ *     codeMirror: { src: CodeMirror }
+ *   }
+ * }
  * ```
  * @property {Object<string, boolean>} [allowedExtraTags=CONSTANTS.EXTRA_TAG_MAP] - Specifies extra allowed or disallowed tags. `true` to allow, `false` to disallow.
  * - The default follows {@link DEFAULTS.EXTRA_TAG_MAP}
  * ```js
- * { allowedExtraTags: { script: false, style: false, mark: true } }
+ * {
+ *   allowedExtraTags: {
+ *     script: false,
+ *     style: false,
+ *     mark: true
+ *   }
+ * }
  * ```
  * ///
  *
  * === User Events ===
  * @property {SunEditor.Event.Handlers} [events] - User event handlers configuration.
  * ```js
- * { events: { onChange: (content) => console.log(content), onImageUploadBefore: (files, info) => true } }
+ * {
+ *   events: {
+ *     onChange: (content) => console.log(content),
+ *     onImageUploadBefore: (files, info) => true
+ *   }
+ * }
  * ```
  * ///
  *
@@ -789,8 +839,10 @@ export type PrivateBaseOptions = {
 	 * - Plugin retain filter configuration. (Internal use primarily)
 	 * - You can turn it off/on globally with `true`/`false` or set it per plugin.
 	 * ```js
-	 * // __pluginRetainFilter - disable filter for table plugin only
-	 * { __pluginRetainFilter: { table: false } }
+	 * // disable filter for table plugin only
+	 * {
+	 * __pluginRetainFilter: { table: false }
+	 * }
 	 * ```
 	 */
 	__pluginRetainFilter?:
@@ -895,7 +947,16 @@ export type EditorBaseOptions = {
 	 * - `styleFilter`: Filters disallowed inline styles (`spanStyles`/`lineStyles`/`allUsedStyles`)
 	 * ```js
 	 * // disable only attribute and style filters
-	 * { strictMode: { tagFilter: true, formatFilter: true, classFilter: true, textStyleTagFilter: true, attrFilter: false, styleFilter: false } }
+	 * {
+	 * strictMode: {
+	 * tagFilter: true,
+	 * formatFilter: true,
+	 * classFilter: true,
+	 * textStyleTagFilter: true,
+	 * attrFilter: false,
+	 * styleFilter: false
+	 * }
+	 * }
 	 * ```
 	 */
 	strictMode?:
@@ -949,7 +1010,13 @@ export type EditorBaseOptions = {
 	 * - Specifies additional attributes to allow for each tag. `"*"` applies to all tags.
 	 * - Rules specified here will be merged into {@link PrivateBaseOptions.__defaultAttributeWhitelist}.
 	 * ```js
-	 * { attributeWhitelist: { a: 'href|target', img: 'src|alt', '*': 'id|data-*' } }
+	 * {
+	 * attributeWhitelist: {
+	 * a: 'href|target',
+	 * img: 'src|alt',
+	 * '*': 'id|data-*'
+	 * }
+	 * }
 	 * ```
 	 */
 	attributeWhitelist?: {
@@ -977,7 +1044,14 @@ export type EditorBaseOptions = {
 	/**
 	 * - Maps text styles to specific HTML tags.
 	 * ```js
-	 * { convertTextTags: { bold: 'b', italic: 'i', underline: 'u', strike: 's' } }
+	 * {
+	 * convertTextTags: {
+	 * bold: 'b',
+	 * italic: 'i',
+	 * underline: 'u',
+	 * strike: 's'
+	 * }
+	 * }
 	 * ```
 	 */
 	convertTextTags?: {
@@ -993,7 +1067,12 @@ export type EditorBaseOptions = {
 	/**
 	 * - Specifies allowed styles for HTML tags. Key is tag name(s), value is pipe-delimited allowed styles.
 	 * ```js
-	 * { tagStyles: { 'table|td': 'border|color|background-color', hr: 'border-top' } }
+	 * {
+	 * tagStyles: {
+	 * 'table|td': 'border|color|background-color',
+	 * hr: 'border-top'
+	 * }
+	 * }
 	 * ```
 	 */
 	tagStyles?: {
@@ -1145,11 +1224,16 @@ export type EditorBaseOptions = {
 	shortcutsDisable?: boolean;
 	/**
 	 * - Custom keyboard shortcuts.
-	 * Keys starting with `_` are user-defined custom shortcuts. Each value is an array of `[keyCombo, hintLabel]` pairs.
-	 * Key combos use `c` (Ctrl/Cmd), `s` (Shift), and `KeyEvent.code` values joined by `+`.
-	 * Use `$~pluginName.method` to call a specific plugin method.
+	 * - Keys starting with `_` are user-defined custom shortcuts. Each value is an array of `[keyCombo, hintLabel]` pairs.
+	 * - Key combos use `c` (Ctrl/Cmd), `s` (Shift), and `KeyEvent.code` values joined by `+`.
+	 * - Use `$~pluginName.method` to call a specific plugin method.
 	 * ```js
-	 * { shortcuts: { bold: ['c+KeyB', 'B'], _h1: ['c+s+Digit1+$~blockStyle.applyHeaderByShortcut', ''] } }
+	 * {
+	 * shortcuts: {
+	 * bold: ['c+KeyB', 'B'],
+	 * _h1: ['c+s+Digit1+$~blockStyle.applyHeaderByShortcut', '']
+	 * }
+	 * }
 	 * ```
 	 * ///
 	 *
@@ -1221,7 +1305,12 @@ export type EditorBaseOptions = {
 	/**
 	 * - External libraries like CodeMirror, KaTeX, or MathJax.
 	 * - See {@link https://github.com/ARA-developer/suneditor/blob/develop/guide/external-libraries.md External Libraries Guide}```js
-	 * { externalLibs: { katex: window.katex, codeMirror: { src: CodeMirror } } }
+	 * {
+	 * externalLibs: {
+	 * katex: window.katex,
+	 * codeMirror: { src: CodeMirror }
+	 * }
+	 * }
 	 * ```
 	 */
 	externalLibs?: {
@@ -1230,7 +1319,13 @@ export type EditorBaseOptions = {
 	/**
 	 * - Specifies extra allowed or disallowed tags. `true` to allow, `false` to disallow.
 	 * - The default follows {@link DEFAULTS.EXTRA_TAG_MAP}```js
-	 * { allowedExtraTags: { script: false, style: false, mark: true } }
+	 * {
+	 * allowedExtraTags: {
+	 * script: false,
+	 * style: false,
+	 * mark: true
+	 * }
+	 * }
 	 * ```
 	 * ///
 	 *
@@ -1242,7 +1337,12 @@ export type EditorBaseOptions = {
 	/**
 	 * - User event handlers configuration.
 	 * ```js
-	 * { events: { onChange: (content) => console.log(content), onImageUploadBefore: (files, info) => true } }
+	 * {
+	 * events: {
+	 * onChange: (content) => console.log(content),
+	 * onImageUploadBefore: (files, info) => true
+	 * }
+	 * }
 	 * ```
 	 * ///
 	 *
