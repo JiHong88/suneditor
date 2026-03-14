@@ -3,6 +3,7 @@
 	/** --------------------------- content - [colors] ----------- */
 	/* caret and placeholder */
 	--se-caret-color: #333;
+	--se-drag-caret-color: #4592ff;
 	--se-placeholder-color: #bbb;
 
 	/* editable text tones */
