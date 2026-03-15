@@ -27,6 +27,7 @@ export type VideoPluginOptions = {
 	createFileInput?: boolean;
 	/**
 	 * - Whether to create a URL input element for video embedding.
+	 * - Defaults to `true`. Always `true` when `createFileInput` is `false`.
 	 */
 	createUrlInput?: boolean;
 	/**
@@ -151,7 +152,8 @@ export type VideoState = {
  * @property {string} [defaultHeight] - The default height of the video element. If a number is provided, `"px"` will be appended.
  * @property {boolean} [percentageOnlySize=false] - Whether to allow only percentage-based sizing.
  * @property {boolean} [createFileInput=false] - Whether to create a file input element for video uploads.
- * @property {boolean} [createUrlInput=true] - Whether to create a URL input element for video embedding.
+ * @property {boolean} [createUrlInput] - Whether to create a URL input element for video embedding.
+ * - Defaults to `true`. Always `true` when `createFileInput` is `false`.
  * @property {string} [uploadUrl] - The URL endpoint for video file uploads.
  * @property {Object<string, string>} [uploadHeaders] - Additional headers to include in the video upload request.
  * @property {number} [uploadSizeLimit] - The total upload size limit for videos in bytes.

@@ -19,7 +19,8 @@ const { NO_EVENT } = env;
  * @property {string} [defaultHeight="auto"] - The default height of the image. If a number is provided, `"px"` will be appended.
  * @property {boolean} [percentageOnlySize=false] - Whether to allow only percentage-based sizing.
  * @property {boolean} [createFileInput=true] - Whether to create a file input element for image uploads.
- * @property {boolean} [createUrlInput=true] - Whether to create a URL input element for image insertion.
+ * @property {boolean} [createUrlInput] - Whether to create a URL input element for image insertion.
+ * - Defaults to `true`. Always `true` when `createFileInput` is `false`.
  * @property {string} [uploadUrl] - The URL endpoint for image file uploads.
  * @property {Object<string, string>} [uploadHeaders] - Additional headers to include in the file upload request.
  * ```js

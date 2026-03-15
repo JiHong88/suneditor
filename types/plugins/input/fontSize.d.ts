@@ -13,10 +13,12 @@ export type FontSizePluginOptions = {
 	showDefaultSizeLabel?: boolean;
 	/**
 	 * - When `true`, displays increase and decrease buttons for font size adjustments.
+	 * - Defaults to `false`. Always `false` when `sizeUnit` is `'text'` (ignored).
 	 */
 	showIncDecControls?: boolean;
 	/**
 	 * - When `true`, disables the direct font size input box.
+	 * - Defaults to `true` when `sizeUnit` is `'text'`, otherwise `false`.
 	 */
 	disableInput?: boolean;
 	/**
@@ -43,8 +45,10 @@ export type FontSizePluginOptions = {
  * - Accepted values include: `'px'`, `'pt'`, `'em'`, `'rem'`, `'vw'`, `'vh'`, `'%'` or `'text'`.
  * - If `'text'` is used, a text-based font size list is applied.
  * @property {boolean} [showDefaultSizeLabel=true] - Determines whether the default size label is displayed in the dropdown menu.
- * @property {boolean} [showIncDecControls=false] - When `true`, displays increase and decrease buttons for font size adjustments.
- * @property {boolean} [disableInput=true] - When `true`, disables the direct font size input box.
+ * @property {boolean} [showIncDecControls] - When `true`, displays increase and decrease buttons for font size adjustments.
+ * - Defaults to `false`. Always `false` when `sizeUnit` is `'text'` (ignored).
+ * @property {boolean} [disableInput] - When `true`, disables the direct font size input box.
+ * - Defaults to `true` when `sizeUnit` is `'text'`, otherwise `false`.
  * @property {Object<string, {default: number, inc: number, min: number, max: number, list: Array<number>}>} [unitMap={}] - Override or extend the default unit mapping for font sizes.
  * Each key is a unit name (e.g., `'px'`, `'em'`). `default`: initial size, `inc`: step for inc/dec buttons, `min`/`max`: range limits, `list`: dropdown values.
  * When `sizeUnit` is `'text'`, list items use `{title: string, size: string}` instead of numbers.

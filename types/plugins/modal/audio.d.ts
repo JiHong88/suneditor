@@ -14,7 +14,8 @@ export type AudioPluginOptions = {
 	 */
 	createFileInput?: boolean;
 	/**
-	 * - Whether to create a URL input element (default is `true` if file input is not created).
+	 * - Whether to create a URL input element.
+	 * - Defaults to `true`. Always `true` when `createFileInput` is `false`.
 	 */
 	createUrlInput?: boolean;
 	/**
@@ -67,7 +68,8 @@ export type AudioPluginOptions = {
  * @property {string} [defaultWidth="300px"] - The default width of the `AUDIO` tag.
  * @property {string} [defaultHeight="150px"] - The default height of the `AUDIO` tag.
  * @property {boolean} [createFileInput] - Whether to create a file input element.
- * @property {boolean} [createUrlInput] - Whether to create a URL input element (default is `true` if file input is not created).
+ * @property {boolean} [createUrlInput] - Whether to create a URL input element.
+ * - Defaults to `true`. Always `true` when `createFileInput` is `false`.
  * @property {string} [uploadUrl] - The URL to which files will be uploaded.
  * @property {Object<string, string>} [uploadHeaders] - Headers to include in the file upload request.
  * @property {number} [uploadSizeLimit] - The total upload size limit in bytes.
