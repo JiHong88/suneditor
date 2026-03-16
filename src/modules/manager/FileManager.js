@@ -35,7 +35,7 @@ class FileManager {
 		this.uploadFileLength = 0;
 		this.__updateTags = [];
 		// api manager
-		this.apiManager = new ApiManager(this, null);
+		this.apiManager = new ApiManager(this, $);
 
 		// se-ts-ignore - call by editor
 		void this._resetInfo;

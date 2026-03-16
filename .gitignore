@@ -16,6 +16,7 @@ node_modules/
 .git/
 /.vs
 .claude/
+.work.md
 
 #jest
 coverage/
