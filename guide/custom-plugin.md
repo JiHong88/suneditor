@@ -291,7 +291,7 @@ class CustomPicker extends PluginDropdownFree {
     this.$.menu.initDropdownTarget(CustomPicker, menu);
 
     // Attach your own event listeners
-    menu.addEventListener('click', this.#handleClick.bind(this));
+	this.$.eventManager.addEvent(menu, 'click', this.#handleClick.bind(this));
   }
 
   on(target) {
