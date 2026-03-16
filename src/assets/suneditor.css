@@ -1538,14 +1538,12 @@
 	position: relative;
 	margin-top: 14px;
 	height: 28px;
-	border-radius: 14px;
 	outline: 2px solid #fff;
 }
 
 .sun-editor .se-hue-gradient-container .se-hue-gradient {
 	cursor: pointer;
 	height: 28px;
-	border-radius: 14px;
 	background: linear-gradient(to right, #000, #fff);
 	position: relative;
 }
