@@ -14,6 +14,7 @@ declare namespace _default {
 	export let expansion: string;
 	export let reduction: string;
 	export let code_view: string;
+	export let markdown_view: string;
 	export let preview: string;
 	export let print: string;
 	export let template: string;

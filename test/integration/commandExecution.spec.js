@@ -17,7 +17,7 @@ describe('Command execution integration tests', () => {
 
 		editor = createTestEditor({
 			element: container,
-			buttonList: [],
+			buttonList: [['codeView']],
 			width: '100%',
 			height: 'auto'
 		});

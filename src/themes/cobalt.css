@@ -38,15 +38,19 @@
 	--se-edit-outline: #444;
 
 	/** --------------------------- layout - [colors] ----------- */
-	/* main shell and typography */
-	--se-main-font-family: Helvetica Neue;
 	--se-main-out-color: #444;
 	--se-main-color: #ccc;
 	--se-main-color-lighter: #aaa;
 	--se-main-background-color: #0f1828;
-	--se-code-view-color: #030712;
+	--se-code-view-color: #ccc;
 	--se-main-font-color: #ccc;
-	--se-code-view-background-color: #ddd;
+	--se-code-view-background-color: #0d1520;
+	--se-code-view-line-color: #8899aa;
+	--se-code-view-line-background-color: #0f1828;
+	--se-markdown-view-color: #ccc;
+	--se-markdown-view-background-color: #0d1520;
+	--se-markdown-view-line-color: #8899aa;
+	--se-markdown-view-line-background-color: #0f1828;
 	--se-main-divider-color: #555;
 	--se-main-border-color: #666;
 	--se-main-outline-color: #444;

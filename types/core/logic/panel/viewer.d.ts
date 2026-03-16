@@ -15,6 +15,11 @@ declare class Viewer {
 	 */
 	codeView(value?: boolean): void;
 	/**
+	 * @description Changes to markdown view or wysiwyg view
+	 * @param {boolean} [value] `true`/`false`, If `undefined` toggle the `markdownView` mode.
+	 */
+	markdownView(value?: boolean): void;
+	/**
 	 * @description Changes to full screen or default screen
 	 * @param {boolean} [value] `true`/`false`, If `undefined` toggle the `fullScreen` mode.
 	 */
@@ -67,11 +72,11 @@ declare class Viewer {
 	 * @internal
 	 * @description Adjusts the height of the code view area.
 	 * - Ensures the code block `auto`-resizes based on its content.
-	 * @param {HTMLElement} code - Code area
+	 * @param {HTMLTextAreaElement} code - Code area
 	 * @param {HTMLTextAreaElement} codeNumbers - Code numbers area
 	 * @param {boolean} isAuto - `auto` height option
 	 */
-	_codeViewAutoHeight(code: HTMLElement, codeNumbers: HTMLTextAreaElement, isAuto: boolean): void;
+	_codeViewAutoHeight(code: HTMLTextAreaElement, codeNumbers: HTMLTextAreaElement, isAuto: boolean): void;
 	/**
 	 * @internal
 	 * @this {HTMLElement} Code numbers area
@@ -80,6 +85,21 @@ declare class Viewer {
 	 * @param {HTMLTextAreaElement} codeNumbers - Code numbers textarea
 	 */
 	_scrollLineNumbers(this: HTMLElement, codeNumbers: HTMLTextAreaElement): void;
+	/**
+	 * @internal
+	 * @description Adjusts the height of the markdown view area.
+	 * @param {HTMLTextAreaElement} md - Markdown area
+	 * @param {HTMLTextAreaElement} mdNumbers - Markdown numbers area
+	 * @param {boolean} isAuto - `auto` height option
+	 */
+	_markdownViewAutoHeight(md: HTMLTextAreaElement, mdNumbers: HTMLTextAreaElement, isAuto: boolean): void;
+	/**
+	 * @internal
+	 * @this {HTMLElement} Markdown numbers area
+	 * @description Synchronizes scrolling of line numbers with the markdown editor.
+	 * @param {HTMLTextAreaElement} mdNumbers - Markdown numbers textarea
+	 */
+	_scrollMarkdownLineNumbers(this: HTMLElement, mdNumbers: HTMLTextAreaElement): void;
 	/**
 	 * @internal
 	 * @description Destroy the Viewer instance and release memory

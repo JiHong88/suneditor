@@ -78,7 +78,7 @@ const bl = [
 	'|',
 	['fileUpload', 'template', 'layout'],
 	'|',
-	['fullScreen', 'showBlocks', 'codeView'],
+	['fullScreen', 'showBlocks', 'codeView', 'markdownView'],
 	'|',
 	['pageBreak', 'pageNavigator', 'pageUp', 'pageDown'],
 	'|',
@@ -107,7 +107,7 @@ const bl = [
 			'|',
 			['fileUpload', 'template', 'layout'],
 			'|',
-			['fullScreen', 'showBlocks', 'codeView'],
+			['fullScreen', 'showBlocks', 'codeView', 'markdownView'],
 			'|',
 			['pageBreak', 'pageNavigator', 'pageUp', 'pageDown'],
 			'|',
@@ -132,7 +132,7 @@ const bl = [
 			[':Media-default.more_media', 'image', 'drawing', 'video', 'audio', 'embed'],
 			[':Galleries-default.more_gallery', 'imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser'],
 			[':File-default.more_file', 'fileUpload', 'template', 'layout'],
-			['-right', ':View-default.more_view', 'preview', 'print', 'fullScreen', 'showBlocks', 'codeView'],
+			['-right', ':View-default.more_view', 'preview', 'print', 'fullScreen', 'showBlocks', 'codeView', 'markdownView'],
 		],
 	],
 	// (min-width: 768)
@@ -154,7 +154,7 @@ const bl = [
 			[':File-default.more_file', 'fileUpload', 'template', 'layout'],
 			'|',
 			['-right', ':Pages-default.more_page', 'pageBreak', 'pageNavigator', 'pageUp', 'pageDown'],
-			['-right', ':View-default.more_view', 'preview', 'print', 'exportPDF', 'fullScreen', 'showBlocks', 'codeView'],
+			['-right', ':View-default.more_view', 'preview', 'print', 'exportPDF', 'fullScreen', 'showBlocks', 'codeView', 'markdownView'],
 		],
 	],
 	// (min-width: 525)
@@ -170,7 +170,7 @@ const bl = [
 			[':Lists & Align-default.more_list', 'align', 'lineHeight', 'list_numbered', 'list_bulleted'],
 			[':Media-default.more_media', 'image', 'drawing', 'video', 'audio', 'embed'],
 			[':Galleries & File-default.more_gallery', 'imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser', '|', 'fileUpload', 'template', 'layout'],
-			[':View & Pages-default.more_view', 'preview', 'print', 'exportPDF', 'fullScreen', 'showBlocks', 'codeView', '|', 'pageBreak', 'pageNavigator', 'pageUp', 'pageDown'],
+			[':View & Pages-default.more_view', 'preview', 'print', 'exportPDF', 'fullScreen', 'showBlocks', 'codeView', 'markdownView', '|', 'pageBreak', 'pageNavigator', 'pageUp', 'pageDown'],
 		],
 	],
 ];
@@ -188,7 +188,7 @@ const bb = [
 	['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
 	['table', 'link', 'image', 'video', 'embed', 'audio', 'math'],
 	['imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser'],
-	['fullScreen', 'showBlocks', 'codeView', 'copy'],
+	['fullScreen', 'showBlocks', 'codeView', 'markdownView', 'copy'],
 	['preview', 'print', 'exportPDF'],
 	['save', 'template', 'layout', 'fileUpload', 'mention'],
 ];
@@ -766,7 +766,7 @@ const options1 = {
 	// iframe_attributes: { aaa: true },
 	type: 'document:header,page',
 	externalLibs: {
-		codeMirror: { src: CodeMirror },
+		// codeMirror: { src: CodeMirror },
 		// katex: {
 		// 	src: Katex
 		// },

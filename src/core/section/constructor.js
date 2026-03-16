@@ -180,20 +180,36 @@ function Constructor(editorTargets, options) {
 		// root key
 		const key = editTarget.key || null;
 
-		// code view - wrapper
-		const codeWrapper = dom.utils.createElement('DIV', { class: 'se-code-wrapper' }, textarea);
-		codeWrapper.style.setProperty('display', 'none', 'important');
-		editor_div.appendChild(codeWrapper);
+		// code view - wrapper (only created when codeView button exists)
+		let codeWrapper = null;
+		if (o.get('buttons').has('codeView')) {
+			codeWrapper = dom.utils.createElement('DIV', { class: 'se-code-wrapper' }, textarea);
+			codeWrapper.style.setProperty('display', 'none', 'important');
+			editor_div.appendChild(codeWrapper);
 
-		// check code mirror
-		const codeMirrorEl = _checkCodeMirror(o, to, textarea);
-		// not used code mirror
-		if (textarea === codeMirrorEl) {
-			// add line nubers
-			const codeNumbers = dom.utils.createElement('TEXTAREA', { class: 'se-code-view-line', readonly: 'true' }, null);
-			codeWrapper.insertBefore(codeNumbers, textarea);
-		} else {
-			textarea = codeMirrorEl;
+			// check code mirror
+			const codeMirrorEl = _checkCodeMirror(o, to, textarea);
+			// not used code mirror
+			if (textarea === codeMirrorEl) {
+				// add line nubers
+				const codeNumbers = dom.utils.createElement('TEXTAREA', { class: 'se-code-view-line', readonly: 'true' }, null);
+				codeWrapper.insertBefore(codeNumbers, textarea);
+			} else {
+				textarea = codeMirrorEl;
+			}
+		}
+
+		// markdown view - wrapper (only created when markdownView button exists)
+		let markdownWrapper = null;
+		let markdownTextarea = null;
+		if (o.get('buttons').has('markdownView')) {
+			markdownTextarea = initElements.markdownView;
+			const markdownNumbers = dom.utils.createElement('TEXTAREA', { class: 'se-markdown-view-line', readonly: 'true' }, null);
+			markdownWrapper = dom.utils.createElement('DIV', { class: 'se-markdown-wrapper' });
+			markdownWrapper.appendChild(markdownNumbers);
+			markdownWrapper.appendChild(markdownTextarea);
+			markdownWrapper.style.setProperty('display', 'none', 'important');
+			editor_div.appendChild(markdownWrapper);
 		}
 
 		// document type
@@ -216,7 +232,10 @@ function Constructor(editorTargets, options) {
 		// set container
 		top_div.appendChild(container);
 		rootKeys.push(key);
-		frameRoots.set(key, CreateFrameContext({ target: editTarget.target, key: editTarget.key, options: to }, top_div, wysiwyg_div, codeWrapper, textarea, default_status_bar || statusbar, documentTypeInner, key));
+		frameRoots.set(
+			key,
+			CreateFrameContext({ target: editTarget.target, key: editTarget.key, options: to }, top_div, wysiwyg_div, codeWrapper, textarea, markdownWrapper, markdownTextarea, default_status_bar || statusbar, documentTypeInner, key),
+		);
 	}
 	/** frame - root set - end -------------------------------------------------------------- */
 
@@ -844,7 +863,7 @@ function InitFrameOptions(o, origin) {
  * @param {Map<string, *>} options - Options
  * @param {HTMLElement} topDiv - Top div
  * @param {SunEditor.FrameOptions} targetOptions - `editor.frameOptions`
- * @returns {{bottomBar: ReturnType<CreateStatusbar>, wysiwygFrame: HTMLElement, codeView: HTMLElement, placeholder: HTMLElement}}
+ * @returns {{bottomBar: ReturnType<CreateStatusbar>, wysiwygFrame: HTMLElement, codeView: HTMLElement, markdownView: HTMLElement, placeholder: HTMLElement}}
  */
 function _initTargetElements(key, options, topDiv, targetOptions) {
 	const editorStyles = targetOptions.get('_defaultStyles');
@@ -900,6 +919,10 @@ function _initTargetElements(key, options, topDiv, targetOptions) {
 
 	// textarea for code view
 	const textarea = dom.utils.createElement('TEXTAREA', { class: 'se-wrapper-inner se-code-viewer', style: editorStyles.frame });
+
+	// textarea for markdown view
+	const markdownTextarea = dom.utils.createElement('TEXTAREA', { class: 'se-wrapper-inner se-markdown-viewer', style: editorStyles.frame });
+
 	const placeholder = dom.utils.createElement('SPAN', { class: 'se-placeholder' });
 	if (targetOptions.get('placeholder')) {
 		placeholder.textContent = targetOptions.get('placeholder');
@@ -909,6 +932,7 @@ function _initTargetElements(key, options, topDiv, targetOptions) {
 		bottomBar: CreateStatusbar(targetOptions, null),
 		wysiwygFrame: wysiwygDiv,
 		codeView: textarea,
+		markdownView: markdownTextarea,
 		placeholder: placeholder,
 	};
 }
@@ -929,7 +953,7 @@ function _checkCodeMirror(options, targetOptions, textarea) {
 				mode: 'htmlmixed',
 				htmlMode: true,
 				lineNumbers: true,
-				lineWrapping: true,
+				lineWrapping: false,
 			},
 			codeMirror.options || {},
 		].reduce((init, option) => {
@@ -1038,6 +1062,7 @@ function _defaultButtons(isRTL, icons, lang) {
 		fullScreen: ['se-code-view-enabled se-component-enabled', lang.fullScreen, 'fullScreen', '', icons.expansion],
 		showBlocks: ['', lang.showBlocks, 'showBlocks', '', icons.show_blocks],
 		codeView: ['se-code-view-enabled se-component-enabled', lang.codeView, 'codeView', '', icons.code_view],
+		markdownView: ['se-code-view-enabled se-component-enabled', lang.markdownView, 'markdownView', '', icons.markdown_view],
 		undo: ['se-component-enabled', lang.undo, 'undo', '', icons.undo],
 		redo: ['se-component-enabled', lang.redo, 'redo', '', icons.redo],
 		preview: ['se-component-enabled', lang.preview, 'preview', '', icons.preview],

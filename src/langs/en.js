@@ -125,6 +125,7 @@
 		link_modal_url: 'URL to link',
 		link_modal_relAttribute: 'Rel attribute',
 		list: 'List',
+		markdownView: 'Markdown view',
 		math: 'Math',
 		math_modal_fontSizeLabel: 'Font Size',
 		math_modal_inputLabel: 'Mathematical Notation',

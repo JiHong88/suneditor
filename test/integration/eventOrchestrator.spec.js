@@ -59,7 +59,7 @@ describe('EventOrchestrator Integration Tests', () => {
 
 	beforeEach(async () => {
 		editor = createTestEditor({
-			buttonList: [['bold', 'italic', 'underline']],
+			buttonList: [['bold', 'italic', 'underline', 'codeView']],
 		});
 		await waitForEditorReady(editor);
 		wysiwyg = editor.$.frameContext.get('wysiwyg');
@@ -2696,7 +2696,7 @@ describe('EventOrchestrator #resetFrameStatus branches', () => {
 
 	beforeEach(async () => {
 		editor = createTestEditor({
-			buttonList: [['bold']],
+			buttonList: [['bold', 'codeView']],
 		});
 		await waitForEditorReady(editor);
 		wysiwyg = editor.$.frameContext.get('wysiwyg');
@@ -2743,7 +2743,7 @@ describe('EventOrchestrator #resetFrameStatus inline mode branches', () => {
 
 	beforeEach(async () => {
 		editor = createTestEditor({
-			buttonList: [['bold']],
+			buttonList: [['bold', 'codeView']],
 			mode: 'inline',
 		});
 		await waitForEditorReady(editor);
@@ -2984,7 +2984,7 @@ describe('EventOrchestrator #OnFocus_code', () => {
 
 	beforeEach(async () => {
 		editor = createTestEditor({
-			buttonList: [['bold']],
+			buttonList: [['bold', 'codeView']],
 		});
 		await waitForEditorReady(editor);
 		wysiwyg = editor.$.frameContext.get('wysiwyg');

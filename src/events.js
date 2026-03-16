@@ -314,6 +314,17 @@ function onToggleCodeView(params) {}
 
 /**
  * @callback
+ * @description Fired when the editor switches between WYSIWYG view and markdown view.
+ * The `is` parameter indicates whether markdown view is now active (`true`) or WYSIWYG view is active (`false`).
+ * @param {Object} params
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
+ * @param {SunEditor.FrameContext} params.frameContext - frame context
+ * @param {boolean} params.is - markdown view status
+ */
+function onToggleMarkdownView(params) {}
+
+/**
+ * @callback
  * @description Fired when the editor enters or exits fullscreen mode.
  * The `is` parameter indicates whether fullscreen mode is now active (`true`) or normal mode is active (`false`).
  * @param {Object} params
@@ -859,6 +870,7 @@ function onEmbedDeleteBefore(params) {
  * @property {?onShowController} [onShowController]
  * @property {?onBeforeShowController} [onBeforeShowController]
  * @property {?onToggleCodeView} [onToggleCodeView]
+ * @property {?onToggleMarkdownView} [onToggleMarkdownView]
  * @property {?onToggleFullScreen} [onToggleFullScreen]
  * @property {?onResizeEditor} [onResizeEditor]
  * @property {?onSetToolbarButtons} [onSetToolbarButtons]

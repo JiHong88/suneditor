@@ -39,15 +39,19 @@
 	--se-edit-outline: #3b4048;
 
 	/** --------------------------- layout - [colors] ----------- */
-	/* main shell and typography */
-	--se-main-font-family: Helvetica Neue;
 	--se-main-out-color: #21252b;
 	--se-main-color: #d7dae0;
 	--se-main-color-lighter: #abb2bf;
 	--se-main-background-color: #282c34;
-	--se-code-view-color: #181a1f;
+	--se-code-view-color: #d7dae0;
 	--se-main-font-color: #d7dae0;
-	--se-code-view-background-color: #d7dae0;
+	--se-code-view-background-color: #1e2127;
+	--se-code-view-line-color: #abb2bf;
+	--se-code-view-line-background-color: #282c34;
+	--se-markdown-view-color: #d7dae0;
+	--se-markdown-view-background-color: #1e2127;
+	--se-markdown-view-line-color: #abb2bf;
+	--se-markdown-view-line-background-color: #282c34;
 	--se-main-divider-color: #3b4048;
 	--se-main-border-color: #3e4451;
 	--se-main-outline-color: #2f333d;

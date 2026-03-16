@@ -279,6 +279,7 @@ declare global {
 				| 'fullScreen'
 				| 'showBlocks'
 				| 'codeView'
+				| 'markdownView'
 				| 'undo'
 				| 'redo'
 				| 'preview'

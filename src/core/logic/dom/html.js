@@ -1,4 +1,4 @@
-import { dom, converter, numbers, unicode, clipboard, env } from '../../../helper';
+import { dom, converter, markdown, numbers, unicode, clipboard, env } from '../../../helper';
 
 const { _d } = env;
 const REQUIRED_DATA_ATTRS = 'data-se-[^\\s]+';
@@ -1188,7 +1188,10 @@ class HTML {
 		for (let i = 0; i < rootKey.length; i++) {
 			this.#$.facade.changeFrameContext(rootKey[i]);
 
-			if (!this.#frameContext.get('isCodeView')) {
+			if (this.#frameContext.get('isMarkdownView')) {
+				const json = converter.htmlToJson(convertValue);
+				this.#frameContext.get('markdown').value = markdown.jsonToMarkdown(json);
+			} else if (!this.#frameContext.get('isCodeView')) {
 				this.#frameContext.get('wysiwyg').innerHTML = convertValue;
 				this.#$.pluginManager.resetFileInfo();
 				this.#$.history.push(false, rootKey[i]);
@@ -1215,7 +1218,10 @@ class HTML {
 			this.#$.facade.changeFrameContext(rootKey[i]);
 			const convertValue = this.clean(html, { forceFormat: true, whitelist: null, blacklist: null });
 
-			if (!this.#frameContext.get('isCodeView')) {
+			if (this.#frameContext.get('isMarkdownView')) {
+				const json = converter.htmlToJson(convertValue);
+				this.#frameContext.get('markdown').value += '\n' + markdown.jsonToMarkdown(json);
+			} else if (!this.#frameContext.get('isCodeView')) {
 				const temp = dom.utils.createElement('DIV', null, convertValue);
 				const children = Array.from(temp.children);
 				for (let j = 0, jLen = children.length; j < jLen; j++) {

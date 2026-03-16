@@ -16,7 +16,7 @@ const ACTIVE_EVENT_COMMANDS = ['bold', 'underline', 'italic', 'strike', 'subscri
  * - such as undo, redo, saving, full-screen toggle, and text direction commands.
  * @constant {string[]}
  */
-const BASIC_COMMANDS = ACTIVE_EVENT_COMMANDS.concat(['undo', 'redo', 'save', 'fullScreen', 'showBlocks', 'codeView', 'dir', 'dir_ltr', 'dir_rtl']);
+const BASIC_COMMANDS = ACTIVE_EVENT_COMMANDS.concat(['undo', 'redo', 'save', 'fullScreen', 'showBlocks', 'codeView', 'markdownView', 'dir', 'dir_ltr', 'dir_rtl']);
 
 /**
  * @description Routes toolbar button commands to their handlers and manages active button states.

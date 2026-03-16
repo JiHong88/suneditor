@@ -359,7 +359,7 @@ describe('Viewer', () => {
 			it('should add active class to codeView button and wrapper', () => {
 				viewer.codeView(true);
 				expect(env.mockCodeViewBtn.classList.contains('active')).toBe(true);
-				expect(env.mockWrapper.classList.contains('se-code-view-status')).toBe(true);
+				expect(env.mockWrapper.classList.contains('se-source-view-status')).toBe(true);
 			});
 
 			it('should focus the code area', () => {
@@ -465,10 +465,10 @@ describe('Viewer', () => {
 
 			it('should remove active class from codeView button and wrapper', () => {
 				env.mockCodeViewBtn.classList.add('active');
-				env.mockWrapper.classList.add('se-code-view-status');
+				env.mockWrapper.classList.add('se-source-view-status');
 				viewer.codeView(false);
 				expect(env.mockCodeViewBtn.classList.contains('active')).toBe(false);
-				expect(env.mockWrapper.classList.contains('se-code-view-status')).toBe(false);
+				expect(env.mockWrapper.classList.contains('se-source-view-status')).toBe(false);
 			});
 
 			it('should set wysiwygFrame scrollTop to 0', () => {
@@ -1593,16 +1593,16 @@ describe('Viewer', () => {
 	});
 
 	// ======================================================================
-	// Additional edge cases for GetLineHeight fallback
+	// Line number generation based on actual newline count
 	// ======================================================================
 	describe('line number generation edge cases', () => {
-		it('should handle codeNumbers with existing line numbers (numberOfLinesNeeded <= currentLineCount)', () => {
-			// Pre-populate codeNumbers with many lines so no new lines need to be added
+		it('should update line numbers based on actual newline count in content', () => {
+			// Content has 3 lines (2 newlines + 1)
+			env.mockCodeArea.value = 'line1\nline2\nline3';
 			env.mockCodeNumbers.value = '1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n';
-			// scrollHeight is 100, lineHeight is 20 -> 5 lines needed, but we already have 10
 			viewer._codeViewAutoHeight(env.mockCodeArea, env.mockCodeNumbers, false);
-			// No new lines should be appended
-			expect(env.mockCodeNumbers.value).toBe('1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n');
+			// Should shrink to match actual line count
+			expect(env.mockCodeNumbers.value).toBe('1\n2\n3\n');
 		});
 	});
 });

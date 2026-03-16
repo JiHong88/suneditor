@@ -29,6 +29,9 @@ import type {} from '../../typedef';
  * @property {HTMLElement} codeWrapper - Wrapper element for the code-view mode.
  * @property {HTMLElement & HTMLTextAreaElement} code - Code view editing element (a <textarea> or <pre>).
  * @property {HTMLTextAreaElement} codeNumbers - Element displaying line numbers in code view mode.
+ * @property {HTMLElement} markdownWrapper - Wrapper element for the markdown-view mode.
+ * @property {HTMLTextAreaElement} markdown - Markdown view editing element (a <textarea>).
+ * @property {HTMLTextAreaElement} markdownNumbers - Element displaying line numbers in markdown view mode.
  * @property {HTMLElement} placeholder - Placeholder element shown when the editor is empty.
  * @property {HTMLElement} statusbar - Editor status bar element (for resizing, info, etc.).
  * @property {HTMLElement} navigation - Navigation element (e.g., for outline or bookmarks).
@@ -46,6 +49,7 @@ import type {} from '../../typedef';
  *
  * === State Flags ===
  * @property {boolean} isCodeView - Whether the editor is currently in code view mode.
+ * @property {boolean} isMarkdownView - Whether the editor is currently in markdown view mode.
  * @property {boolean} isFullScreen - Whether the editor is currently in fullscreen mode.
  * @property {boolean} isReadOnly - Whether the editor is set to readonly mode.
  * @property {boolean} isDisabled - Whether the editor is currently disabled.
@@ -97,6 +101,8 @@ export function CreateFrameContext(
 	wwFrame: HTMLElement,
 	codeWrapper: HTMLElement,
 	codeFrame: HTMLElement,
+	markdownWrapper: any,
+	markdownFrame: any,
 	statusbar: HTMLElement | null,
 	documentTypeInner: {
 		inner: HTMLElement;
@@ -178,6 +184,18 @@ export type FrameContextStore = {
 	 */
 	codeNumbers: HTMLTextAreaElement;
 	/**
+	 * - Wrapper element for the markdown-view mode.
+	 */
+	markdownWrapper: HTMLElement;
+	/**
+	 * - Markdown view editing element (a <textarea>).
+	 */
+	markdown: HTMLTextAreaElement;
+	/**
+	 * - Element displaying line numbers in markdown view mode.
+	 */
+	markdownNumbers: HTMLTextAreaElement;
+	/**
 	 * - Placeholder element shown when the editor is empty.
 	 */
 	placeholder: HTMLElement;
@@ -238,6 +256,10 @@ export type FrameContextStore = {
 	 * - Whether the editor is currently in code view mode.
 	 */
 	isCodeView: boolean;
+	/**
+	 * - Whether the editor is currently in markdown view mode.
+	 */
+	isMarkdownView: boolean;
 	/**
 	 * - Whether the editor is currently in fullscreen mode.
 	 */

@@ -7,7 +7,12 @@
 	/** --------------------------- layout - [typography] ----------- */
 	/* main */
 	--se-main-font-family: Helvetica Neue;
+	--se-content-font-family: Helvetica Neue;
 	--se-main-font-size: 13px;
+
+	/* codeview, markdown font */
+	--se-markdown-font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+	--se-codeview-font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
 
 	/* button */
 	--se-btn-font-size: 12px;

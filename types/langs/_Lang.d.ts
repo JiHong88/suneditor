@@ -110,6 +110,7 @@ export type _Lang = {
 	link_modal_url: string;
 	link_modal_relAttribute: string;
 	list: string;
+	markdownView: string;
 	math: string;
 	math_modal_fontSizeLabel: string;
 	math_modal_inputLabel: string;

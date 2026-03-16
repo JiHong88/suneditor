@@ -239,6 +239,7 @@ export type EventHandlers = {
 	onShowController?: typeof onShowController | null;
 	onBeforeShowController?: typeof onBeforeShowController | null;
 	onToggleCodeView?: typeof onToggleCodeView | null;
+	onToggleMarkdownView?: typeof onToggleMarkdownView | null;
 	onToggleFullScreen?: typeof onToggleFullScreen | null;
 	onResizeEditor?: typeof onResizeEditor | null;
 	onSetToolbarButtons?: typeof onSetToolbarButtons | null;
@@ -554,6 +555,16 @@ declare function onBeforeShowController(params: { $: SunEditor.Deps; frameContex
  * @param {boolean} params.is - code view status
  */
 declare function onToggleCodeView(params: { $: SunEditor.Deps; frameContext: SunEditor.FrameContext; is: boolean }): void;
+/**
+ * @callback
+ * @description Fired when the editor switches between WYSIWYG view and markdown view.
+ * The `is` parameter indicates whether markdown view is now active (`true`) or WYSIWYG view is active (`false`).
+ * @param {Object} params
+ * @param {SunEditor.Deps} params.$ - Kernel dependencies
+ * @param {SunEditor.FrameContext} params.frameContext - frame context
+ * @param {boolean} params.is - markdown view status
+ */
+declare function onToggleMarkdownView(params: { $: SunEditor.Deps; frameContext: SunEditor.FrameContext; is: boolean }): void;
 /**
  * @callback
  * @description Fired when the editor enters or exits fullscreen mode.

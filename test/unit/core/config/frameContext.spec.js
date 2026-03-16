@@ -41,6 +41,8 @@ describe('Core Config - Frame Context', () => {
             wwFrame: document.createElement('div'),
             codeWrapper: document.createElement('div'),
             codeFrame: document.createElement('textarea'),
+            markdownWrapper: document.createElement('div'),
+            markdownFrame: document.createElement('textarea'),
             statusbar: document.createElement('div'),
             documentTypeInner: {
                 inner: document.createElement('div'),
@@ -94,6 +96,8 @@ describe('Core Config - Frame Context', () => {
                 mockDOM.wwFrame,
                 mockDOM.codeWrapper,
                 mockDOM.codeFrame,
+                mockDOM.markdownWrapper,
+                mockDOM.markdownFrame,
                 mockDOM.statusbar,
                 mockDOM.documentTypeInner,
                 'testKey'
@@ -115,6 +119,8 @@ describe('Core Config - Frame Context', () => {
                 mockDOM.wwFrame,
                 mockDOM.codeWrapper,
                 mockDOM.codeFrame,
+                mockDOM.markdownWrapper,
+                mockDOM.markdownFrame,
                 mockDOM.statusbar,
                 mockDOM.documentTypeInner,
                 'testKey'
@@ -145,6 +151,8 @@ describe('Core Config - Frame Context', () => {
                 mockDOM.wwFrame,
                 mockDOM.codeWrapper,
                 mockDOM.codeFrame,
+                mockDOM.markdownWrapper,
+                mockDOM.markdownFrame,
                 mockDOM.statusbar,
                 mockDOM.documentTypeInner,
                 'testKey'
@@ -169,6 +177,8 @@ describe('Core Config - Frame Context', () => {
                 mockDOM.wwFrame,
                 mockDOM.codeWrapper,
                 mockDOM.codeFrame,
+                mockDOM.markdownWrapper,
+                mockDOM.markdownFrame,
                 mockDOM.statusbar,
                 mockDOM.documentTypeInner,
                 'testKey'
@@ -186,6 +196,8 @@ describe('Core Config - Frame Context', () => {
                 mockDOM.wwFrame,
                 mockDOM.codeWrapper,
                 mockDOM.codeFrame,
+                mockDOM.markdownWrapper,
+                mockDOM.markdownFrame,
                 mockDOM.statusbar,
                 mockDOM.documentTypeInner,
                 'testKey'
@@ -202,6 +214,8 @@ describe('Core Config - Frame Context', () => {
                 mockDOM.wwFrame,
                 mockDOM.codeWrapper,
                 mockDOM.codeFrame,
+                mockDOM.markdownWrapper,
+                mockDOM.markdownFrame,
                 mockDOM.statusbar,
                 mockDOM.documentTypeInner,
                 'testKey'
@@ -221,6 +235,8 @@ describe('Core Config - Frame Context', () => {
                 mockDOM.wwFrame,
                 mockDOM.codeWrapper,
                 mockDOM.codeFrame,
+                mockDOM.markdownWrapper,
+                mockDOM.markdownFrame,
                 mockDOM.statusbar,
                 mockDOM.documentTypeInner,
                 'testKey'
@@ -236,6 +252,8 @@ describe('Core Config - Frame Context', () => {
                 mockDOM.wwFrame,
                 mockDOM.codeWrapper,
                 mockDOM.codeFrame,
+                mockDOM.markdownWrapper,
+                mockDOM.markdownFrame,
                 null,
                 mockDOM.documentTypeInner,
                 'testKey'

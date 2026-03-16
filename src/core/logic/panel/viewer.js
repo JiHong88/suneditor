@@ -1,4 +1,4 @@
-import { dom, env, converter, numbers } from '../../../helper';
+import { dom, env, converter, markdown } from '../../../helper';
 
 const { _w, _d } = env;
 
@@ -27,6 +27,9 @@ class Viewer {
 	#codeWrapperOriginCssText = '';
 	#codeOriginCssText = '';
 	#codeNumberOriginCssText = '';
+	#markdownWrapperOriginCssText = '';
+	#markdownOriginCssText = '';
+	#markdownNumberOriginCssText = '';
 	#toolbarOriginCssText = '';
 	#arrowOriginCssText = '';
 	#fullScreenInnerHeight = 0;
@@ -64,8 +67,14 @@ class Viewer {
 	 */
 	codeView(value) {
 		const fc = this.#frameContext;
+		if (!fc.get('codeWrapper')) return;
 		if (value === undefined) value = !fc.get('isCodeView');
 		if (value === fc.get('isCodeView')) return;
+
+		// Mutual exclusivity with markdown view
+		if (value && fc.get('isMarkdownView')) {
+			this.markdownView(false);
+		}
 
 		fc.set('isCodeView', value);
 		this.#$.ui.offCurrentController();
@@ -111,7 +120,7 @@ class Viewer {
 			this.#store.set('_range', null);
 			codeFrame.focus();
 			dom.utils.addClass(this.#$.commandDispatcher.targets.get('codeView'), 'active');
-			dom.utils.addClass(wrapper, 'se-code-view-status');
+			dom.utils.addClass(wrapper, 'se-source-view-status');
 		} else {
 			if (!dom.check.isNonEditable(wysiwygFrame)) this.#setCodeDataToEditor();
 			wysiwygFrame.scrollTop = 0;
@@ -137,7 +146,7 @@ class Viewer {
 				this.#$.history.push(false);
 				this.#$.history.resetButtons(fc.get('key'), null);
 			}
-			dom.utils.removeClass(wrapper, 'se-code-view-status');
+			dom.utils.removeClass(wrapper, 'se-source-view-status');
 		}
 
 		this.#$.ui._updatePlaceholder(fc);
@@ -158,6 +167,107 @@ class Viewer {
 	}
 
 	/**
+	 * @description Changes to markdown view or wysiwyg view
+	 * @param {boolean} [value] `true`/`false`, If `undefined` toggle the `markdownView` mode.
+	 */
+	markdownView(value) {
+		const fc = this.#frameContext;
+		if (!fc.get('markdownWrapper')) return;
+		if (value === undefined) value = !fc.get('isMarkdownView');
+		if (value === fc.get('isMarkdownView')) return;
+
+		// Mutual exclusivity with code view
+		if (value && fc.get('isCodeView')) {
+			this.codeView(false);
+		}
+
+		fc.set('isMarkdownView', value);
+		this.#$.ui.offCurrentController();
+		this.#$.ui.offCurrentModal();
+
+		const markdownWrapper = fc.get('markdownWrapper');
+		const markdownFrame = fc.get('markdown');
+		const wysiwygFrame = fc.get('wysiwygFrame');
+		const wrapper = fc.get('wrapper');
+
+		if (value) {
+			this.#setEditorDataToMarkdownView();
+			markdownWrapper.style.setProperty('display', 'flex', 'important');
+			wysiwygFrame.style.display = 'none';
+
+			if (fc.get('isFullScreen')) {
+				markdownFrame.style.height = '100%';
+			} else if (this.#frameOptions.get('height') === 'auto') {
+				markdownFrame.style.height = markdownFrame.scrollHeight > 0 ? markdownFrame.scrollHeight + 'px' : 'auto';
+			}
+
+			if (!fc.get('isFullScreen')) {
+				this.#$.ui.preventToolbarHide(true);
+				if (this.#store.mode.isBalloon) {
+					this.#context.get('toolbar_arrow').style.display = 'none';
+					this.#context.get('toolbar_main').style.left = '';
+					this.#store.mode.isInline = this.#$.toolbar.isInlineMode = true;
+					this.#store.mode.isBalloon = this.#$.toolbar.isBalloonMode = false;
+					this.#$.toolbar._showInline();
+				}
+			}
+
+			if (this.#store.mode.isBalloon) {
+				this.#$.subToolbar.hide();
+			}
+
+			CreateLineNumbers(fc, 'markdown');
+
+			this.#store.set('_range', null);
+			markdownFrame.focus();
+			dom.utils.addClass(this.#$.commandDispatcher.targets.get('markdownView'), 'active');
+			dom.utils.addClass(wrapper, 'se-source-view-status');
+		} else {
+			if (!dom.check.isNonEditable(wysiwygFrame)) this.#setMarkdownDataToEditor();
+			wysiwygFrame.scrollTop = 0;
+			markdownWrapper.style.setProperty('display', 'none', 'important');
+			wysiwygFrame.style.display = 'block';
+
+			if (this.#frameOptions.get('height') === 'auto') markdownFrame.style.height = '0px';
+
+			if (!fc.get('isFullScreen')) {
+				this.#$.ui.preventToolbarHide(false);
+				if (/balloon/.test(this.#options.get('mode'))) {
+					this.#context.get('toolbar_arrow').style.display = '';
+					this.#store.mode.isInline = this.#$.toolbar.isInlineMode = false;
+					this.#store.mode.isBalloon = this.#$.toolbar.isBalloonMode = true;
+					this.#kernel._eventOrchestrator._hideToolbar();
+				}
+			}
+
+			this.#$.focusManager.nativeFocus();
+			dom.utils.removeClass(this.#$.commandDispatcher.targets.get('markdownView'), 'active');
+
+			if (!dom.check.isNonEditable(wysiwygFrame)) {
+				this.#$.history.push(false);
+				this.#$.history.resetButtons(fc.get('key'), null);
+			}
+			dom.utils.removeClass(wrapper, 'se-source-view-status');
+		}
+
+		this.#$.ui._updatePlaceholder(fc);
+		this.#$.ui._toggleCodeViewButtons(value);
+
+		// document type
+		if (fc.has('documentType_use_header')) {
+			if (value) {
+				fc.get('documentTypeInner').style.display = 'none';
+			} else {
+				fc.get('documentTypeInner').style.display = '';
+				fc.get('documentType').reHeader();
+			}
+		}
+
+		// user event
+		this.#eventManager.triggerEvent('onToggleMarkdownView', { frameContext: fc, is: fc.get('isMarkdownView') });
+	}
+
+	/**
 	 * @description Changes to full screen or default screen
 	 * @param {boolean} [value] `true`/`false`, If `undefined` toggle the `fullScreen` mode.
 	 */
@@ -174,7 +284,11 @@ class Viewer {
 		const codeWrapper = fc.get('codeWrapper');
 		const code = fc.get('code');
 		const codeNumbers = fc.get('codeNumbers');
+		const markdownWrapper = fc.get('markdownWrapper');
+		const markdownFrame = fc.get('markdown');
+		const markdownNumbers = fc.get('markdownNumbers');
 		const isCodeView = this.#frameContext.get('isCodeView');
+		const isMarkdownView = this.#frameContext.get('isMarkdownView');
 		const arrow = this.#context.get('toolbar_arrow');
 
 		this.#$.ui.offCurrentController();
@@ -187,6 +301,9 @@ class Viewer {
 			this.#codeWrapperOriginCssText = codeWrapper.style.cssText;
 			this.#codeOriginCssText = code.style.cssText;
 			this.#codeNumberOriginCssText = codeNumbers?.style.cssText;
+			this.#markdownWrapperOriginCssText = markdownWrapper?.style.cssText;
+			this.#markdownOriginCssText = markdownFrame?.style.cssText;
+			this.#markdownNumberOriginCssText = markdownNumbers?.style.cssText;
 			this.#toolbarOriginCssText = toolbar.style.cssText;
 			if (arrow) this.#arrowOriginCssText = arrow.style.cssText;
 
@@ -222,15 +339,23 @@ class Viewer {
 
 			// frame
 			editorArea.style.cssText = toolbar.style.cssText = '';
-			wysiwygFrame.style.cssText = (wysiwygFrame.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0] + this.#frameOptions.get('_defaultStyles').editor + (isCodeView ? 'display: none;' : '');
+			wysiwygFrame.style.cssText = (wysiwygFrame.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0] + this.#frameOptions.get('_defaultStyles').editor + (isCodeView || isMarkdownView ? 'display: none;' : '');
 
 			// code wrapper
 			codeWrapper.style.cssText = (codeWrapper.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0] + `display: ${!isCodeView ? 'none' : 'flex'} !important;`;
 			codeWrapper.style.overflow = 'auto';
 			codeWrapper.style.height = '100%';
 
+			// markdown wrapper
+			if (markdownWrapper) {
+				markdownWrapper.style.cssText = (markdownWrapper.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0] + `display: ${!isMarkdownView ? 'none' : 'flex'} !important;`;
+				markdownWrapper.style.overflow = 'auto';
+				markdownWrapper.style.height = '100%';
+			}
+
 			// code
 			code.style.height = '';
+			if (markdownFrame) markdownFrame.style.height = '';
 
 			// toolbar, editor area
 			toolbar.style.width = wysiwygFrame.style.height = '100%';
@@ -254,7 +379,7 @@ class Viewer {
 			});
 		} else {
 			// frame
-			wysiwygFrame.style.cssText = this.#wysiwygOriginCssText.replace(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/, '') + (isCodeView ? 'display: none;' : '');
+			wysiwygFrame.style.cssText = this.#wysiwygOriginCssText.replace(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/, '') + (isCodeView || isMarkdownView ? 'display: none;' : '');
 
 			// code wrapper
 			codeWrapper.style.cssText = this.#codeWrapperOriginCssText.replace(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/, '') + `display: ${!isCodeView ? 'none' : 'flex'} !important;`;
@@ -262,6 +387,13 @@ class Viewer {
 			// code
 			code.style.cssText = this.#codeOriginCssText;
 			if (codeNumbers) codeNumbers.style.cssText = this.#codeNumberOriginCssText;
+
+			// markdown wrapper
+			if (markdownWrapper) {
+				markdownWrapper.style.cssText = this.#markdownWrapperOriginCssText.replace(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/, '') + `display: ${!isMarkdownView ? 'none' : 'flex'} !important;`;
+			}
+			if (markdownFrame) markdownFrame.style.cssText = this.#markdownOriginCssText;
+			if (markdownNumbers) markdownNumbers.style.cssText = this.#markdownNumberOriginCssText;
 
 			// toolbar, editor area
 			toolbar.style.cssText = this.#toolbarOriginCssText;
@@ -304,7 +436,7 @@ class Viewer {
 			});
 		}
 
-		if (wasToolbarHidden && !fc.get('isCodeView')) this.#$.toolbar.hide();
+		if (wasToolbarHidden && !fc.get('isCodeView') && !fc.get('isMarkdownView')) this.#$.toolbar.hide();
 
 		// user event
 		this.#eventManager.triggerEvent('onToggleFullScreen', { frameContext: fc, is: fc.get('isFullScreen') });
@@ -357,6 +489,13 @@ class Viewer {
 				dom.utils.changeElement(e.firstElementChild, expansionIcon);
 				dom.utils.removeClass(e, 'active');
 			});
+		}
+
+		// markdownView
+		if (fc.get('isMarkdownView')) {
+			dom.utils.addClass(this.#$.commandDispatcher.targets.get('markdownView'), 'active');
+		} else {
+			dom.utils.removeClass(this.#$.commandDispatcher.targets.get('markdownView'), 'active');
 		}
 
 		// showBlocks
@@ -582,7 +721,7 @@ class Viewer {
 	 * @internal
 	 * @description Adjusts the height of the code view area.
 	 * - Ensures the code block `auto`-resizes based on its content.
-	 * @param {HTMLElement} code - Code area
+	 * @param {HTMLTextAreaElement} code - Code area
 	 * @param {HTMLTextAreaElement} codeNumbers - Code numbers area
 	 * @param {boolean} isAuto - `auto` height option
 	 */
@@ -601,6 +740,29 @@ class Viewer {
 	_scrollLineNumbers(codeNumbers) {
 		codeNumbers.scrollTop = this.scrollTop;
 		codeNumbers.scrollLeft = this.scrollLeft;
+	}
+
+	/**
+	 * @internal
+	 * @description Adjusts the height of the markdown view area.
+	 * @param {HTMLTextAreaElement} md - Markdown area
+	 * @param {HTMLTextAreaElement} mdNumbers - Markdown numbers area
+	 * @param {boolean} isAuto - `auto` height option
+	 */
+	_markdownViewAutoHeight(md, mdNumbers, isAuto) {
+		if (isAuto) md.style.height = md.scrollHeight + 'px';
+		this.#updateLineNumbers(mdNumbers, md);
+	}
+
+	/**
+	 * @internal
+	 * @this {HTMLElement} Markdown numbers area
+	 * @description Synchronizes scrolling of line numbers with the markdown editor.
+	 * @param {HTMLTextAreaElement} mdNumbers - Markdown numbers textarea
+	 */
+	_scrollMarkdownLineNumbers(mdNumbers) {
+		mdNumbers.scrollTop = this.scrollTop;
+		mdNumbers.scrollLeft = this.scrollLeft;
 	}
 
 	/**
@@ -669,24 +831,43 @@ class Viewer {
 	}
 
 	/**
+	 * @description Convert the data of the `WYSIWYG` area and put it in the markdown view area.
+	 */
+	#setEditorDataToMarkdownView() {
+		const json = converter.htmlToJson(this.#frameContext.get('wysiwyg').innerHTML);
+		const md = markdown.jsonToMarkdown(json);
+		this.#frameContext.get('markdown').value = md;
+	}
+
+	/**
+	 * @description Convert the data of the markdown view and put it in the `WYSIWYG` area.
+	 */
+	#setMarkdownDataToEditor() {
+		const md = this.#frameContext.get('markdown').value;
+		const html = markdown.markdownToHtml(md, this.#options.get('defaultLine'));
+
+		this.#frameContext.get('wysiwyg').innerHTML =
+			html.length > 0 ? this.#$.html.clean(html, { forceFormat: true, whitelist: null, blacklist: null }) : '<' + this.#options.get('defaultLine') + '><br></' + this.#options.get('defaultLine') + '>';
+	}
+
+	/**
 	 * @description Updates the line numbers for the code editor.
 	 * - Dynamically adjusts line numbers as content grows.
 	 * @param {HTMLTextAreaElement} lineNumbers - Code numbers area
-	 * @param {HTMLElement} code - Code area
+	 * @param {HTMLTextAreaElement} code - Code area
 	 */
 	#updateLineNumbers(lineNumbers, code) {
 		if (!lineNumbers) return;
 
-		const lineHeight = GetLineHeight(lineNumbers);
-		const numberOfLinesNeeded = Math.ceil(code.scrollHeight / lineHeight);
-
+		const numberOfLinesNeeded = (code.value.match(/\n/g) || []).length + 1;
 		const currentLineCount = (lineNumbers.value.match(/\n/g) || []).length;
-		if (numberOfLinesNeeded > currentLineCount) {
+
+		if (numberOfLinesNeeded !== currentLineCount) {
 			let n = '';
-			for (let i = currentLineCount + 1; i <= numberOfLinesNeeded; i++) {
+			for (let i = 1; i <= numberOfLinesNeeded; i++) {
 				n += `${i}\n`;
 			}
-			lineNumbers.value += n;
+			lineNumbers.value = n;
 		}
 	}
 
@@ -700,44 +881,32 @@ class Viewer {
 }
 
 /**
- * @description Create line numbers for the code view area
+ * @description Create line numbers for the code/markdown view area
  * @param {SunEditor.FrameContext} fc - Frame context
+ * @param {"code"|"markdown"} [type="code"] - View type
  */
-function CreateLineNumbers(fc) {
-	const codeNumbers = fc.get('codeNumbers');
-	if (!codeNumbers) return;
+function CreateLineNumbers(fc, type) {
+	const numbersKey = type === 'markdown' ? 'markdownNumbers' : 'codeNumbers';
+	const contentKey = type === 'markdown' ? 'markdown' : 'code';
+	const lineNumbers = fc.get(numbersKey);
+	if (!lineNumbers) return;
 
-	const lineHeight = GetLineHeight(codeNumbers);
-	const numberOfLines = fc.get('code').scrollHeight / lineHeight;
+	const content = fc.get(contentKey);
+	const numberOfLines = (content.value.match(/\n/g) || []).length + 1;
 
 	let n = '';
 	for (let i = 1; i <= numberOfLines; i++) {
 		n += `${i}\n`;
 	}
 
-	const { padding, margin } = _w.getComputedStyle(fc.get('code'));
-	codeNumbers.value = n;
-	codeNumbers.style.padding = padding || '';
-	codeNumbers.style.margin = margin || '';
-}
-
-/**
- * @description Get the `line-height` of the textarea
- * @param {HTMLTextAreaElement} textarea Textarea element
- * @returns {number}
- */
-function GetLineHeight(textarea) {
-	const lineHeight = _w.getComputedStyle(textarea).lineHeight;
-	let lineHeightMatch;
-
-	if (!numbers.is(lineHeight)) {
-		const fontSize = _w.getComputedStyle(textarea).fontSize;
-		lineHeightMatch = numbers.get(fontSize) * 1.2;
-	} else {
-		lineHeightMatch = numbers.get(lineHeight);
-	}
-
-	return lineHeightMatch;
+	// Sync font and line-height for accurate scroll alignment
+	const contentStyle = _w.getComputedStyle(content);
+	lineNumbers.style.lineHeight = contentStyle.lineHeight;
+	lineNumbers.style.fontSize = contentStyle.fontSize;
+	lineNumbers.style.fontFamily = contentStyle.fontFamily;
+	lineNumbers.style.paddingTop = contentStyle.paddingTop;
+	lineNumbers.style.paddingBottom = contentStyle.paddingBottom;
+	lineNumbers.value = n;
 }
 
 export default Viewer;

@@ -557,7 +557,6 @@ export namespace DEFAULTS {
  * @property {*} [codeMirror] - CodeMirror configuration object from `externalLibs.codeMirror`.
  * @property {boolean} [codeMirrorEditor] - Whether CodeMirror is available (base-level flag). Frame-level stores the actual CM instance.
  * @property {boolean} [hasCodeMirror] - Uses CodeMirror for code view.
- *
  * @property {Set<string>} [allUsedStyles] - Processed set of all allowed CSS styles.
  * - Converted from user's `string` input ("|" delimited) to `Set<string>` in constructor.
  */

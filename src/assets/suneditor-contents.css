@@ -3,7 +3,7 @@
 /* suneditor content */
 .sun-editor-editable {
 	box-sizing: border-box;
-	font-family: Helvetica Neue;
+	font-family: var(--se-content-font-family);
 	font-size: var(--se-edit-font-size);
 	color: var(--se-edit-font-color);
 	background-color: var(--se-edit-background-color);

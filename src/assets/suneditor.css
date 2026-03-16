@@ -1691,28 +1691,71 @@
 
 .sun-editor .se-wrapper .se-code-wrapper {
 	width: 100%;
+	overflow: hidden;
 }
 .sun-editor .se-wrapper .se-code-wrapper > div {
-	width: 100%;
+	flex: 1;
+	min-width: 0;
 }
 .sun-editor .se-wrapper .se-code-wrapper .se-code-view-line {
-	background-color: var(--se-code-view-color);
-	color: var(--se-code-view-background-color);
+	background-color: var(--se-code-view-line-background-color);
+	color: var(--se-code-view-line-color);
 	text-align: right;
 	width: 50px;
 	font-size: var(--se-main-font-size);
-	padding-right: 6px;
+	line-height: 1.5;
+	padding: 4px 6px;
 	overflow: hidden;
+	resize: none !important;
 }
 
 .sun-editor .se-wrapper .se-code-viewer {
+	flex: 1;
+	min-width: 0;
 	background-color: var(--se-code-view-background-color);
 	color: var(--se-code-view-color);
+	font-family: var(--se-codeview-font-family);
 	font-size: var(--se-main-font-size);
-	word-break: break-all;
+	line-height: 1.5;
 	padding: 4px;
 	margin: 0;
+	tab-size: 4;
 	resize: none !important;
+	overflow-x: auto;
+	white-space: pre;
+	word-wrap: normal;
+}
+
+.sun-editor .se-wrapper .se-markdown-wrapper {
+	width: 100%;
+	overflow: hidden;
+}
+.sun-editor .se-wrapper .se-markdown-wrapper .se-markdown-view-line {
+	background-color: var(--se-markdown-view-line-background-color);
+	color: var(--se-markdown-view-line-color);
+	text-align: right;
+	width: 50px;
+	font-size: var(--se-main-font-size);
+	line-height: 1.5;
+	padding: 4px 6px;
+	overflow: hidden;
+	resize: none !important;
+}
+.sun-editor .se-wrapper .se-markdown-viewer {
+	flex: 1;
+	min-width: 0;
+	background-color: var(--se-markdown-view-background-color);
+	color: var(--se-markdown-view-color);
+	font-size: var(--se-main-font-size);
+	font-family: var(--se-markdown-font-family);
+	line-height: 1.5;
+	padding: 4px;
+	margin: 0;
+	tab-size: 4;
+	resize: none !important;
+	overflow-x: auto;
+	white-space: pre;
+	word-wrap: normal;
 }
 
 .sun-editor .se-wrapper .se-wrapper-wysiwyg {
@@ -3959,12 +4002,12 @@
 	float: right;
 }
 
-/** document-type codeView --------------------------------------------- */
-.sun-editor .se-wrapper.se-type-document.se-code-view-status {
+/** document-type codeView, markdownView --------------------------------------------- */
+.sun-editor .se-wrapper.se-type-document.se-source-view-status {
 	padding: 0;
 }
-.sun-editor .se-wrapper.se-type-document.se-code-view-status .se-document-lines,
-.sun-editor .se-wrapper.se-type-document.se-code-view-status .se-document-pages {
+.sun-editor .se-wrapper.se-type-document.se-source-view-status .se-document-lines,
+.sun-editor .se-wrapper.se-type-document.se-source-view-status .se-document-pages {
 	display: none;
 }
 

@@ -170,6 +170,10 @@ export const keyCodeMap: {
 export const clipboard: {
 	write: typeof import('./clipboard').write;
 };
+export const markdown: {
+	jsonToMarkdown: typeof import('./markdown').jsonToMarkdown;
+	markdownToHtml: typeof import('./markdown').markdownToHtml;
+};
 declare namespace _default {
 	export { env };
 	export { unicode };
@@ -178,5 +182,6 @@ declare namespace _default {
 	export { numbers };
 	export { keyCodeMap };
 	export { clipboard };
+	export { markdown };
 }
 export default _default;

@@ -71,7 +71,7 @@ describe('Core - Editor', () => {
 		let editor;
 
 		beforeEach(async () => {
-			editor = createTestEditor();
+			editor = createTestEditor({ buttonList: [['codeView']] });
 			await waitForEditorReady(editor);
 
 			// Mock UI methods to prevent side effects during cleanup
@@ -1800,7 +1800,7 @@ describe('Core - Editor', () => {
 		let editor;
 
 		beforeEach(async () => {
-			editor = createTestEditor();
+			editor = createTestEditor({ buttonList: [['codeView']] });
 			await waitForEditorReady(editor);
 		});
 

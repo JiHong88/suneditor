@@ -57,17 +57,17 @@ describe('Viewer Integration Tests', () => {
 			expect(codeWrapper.style.display).not.toBe('none');
 		});
 
-		it('should add se-code-view-status class to wrapper when on', () => {
+		it('should add se-source-view-status class to wrapper when on', () => {
 			editor.$.viewer.codeView(true);
 			const wrapper = editor.$.frameContext.get('wrapper');
-			expect(wrapper.classList.contains('se-code-view-status')).toBe(true);
+			expect(wrapper.classList.contains('se-source-view-status')).toBe(true);
 		});
 
-		it('should remove se-code-view-status class from wrapper when off', () => {
+		it('should remove se-source-view-status class from wrapper when off', () => {
 			editor.$.viewer.codeView(true);
 			editor.$.viewer.codeView(false);
 			const wrapper = editor.$.frameContext.get('wrapper');
-			expect(wrapper.classList.contains('se-code-view-status')).toBe(false);
+			expect(wrapper.classList.contains('se-source-view-status')).toBe(false);
 		});
 
 		it('should show wysiwyg and hide code when code view turns off', () => {

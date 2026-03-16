@@ -446,8 +446,33 @@ class EventOrchestrator extends KernelInjector {
 			this.#eventManager.addEvent(codeArea, 'keyup', cvAuthHeight, false);
 			this.#eventManager.addEvent(codeArea, 'paste', cvAuthHeight, false);
 
+			/** code view tab key */
+			if (!this.#options.get('tabDisable')) {
+				this.#eventManager.addEvent(codeArea, 'keydown', InsertTab, false);
+			}
+
 			/** code view numbers */
 			if (codeNumbers) this.#eventManager.addEvent(codeArea, 'scroll', this.$.viewer._scrollLineNumbers.bind(codeArea, codeNumbers), false);
+		}
+
+		/** markdown view area */
+		const markdownArea = fc.get('markdown');
+		if (markdownArea) {
+			this.#eventManager.addEvent(markdownArea, 'mousedown', this.#OnFocus_markdown.bind(this, fc), false);
+
+			const mdNumbers = fc.get('markdownNumbers');
+			const mdAutoHeight = this.$.viewer._markdownViewAutoHeight.bind(this.$.viewer, markdownArea, mdNumbers, this.$.frameOptions.get('height') === 'auto');
+
+			this.#eventManager.addEvent(markdownArea, 'keydown', mdAutoHeight, false);
+			this.#eventManager.addEvent(markdownArea, 'keyup', mdAutoHeight, false);
+			this.#eventManager.addEvent(markdownArea, 'paste', mdAutoHeight, false);
+
+			/** markdown view tab key */
+			if (!this.#options.get('tabDisable')) {
+				this.#eventManager.addEvent(markdownArea, 'keydown', InsertTab, false);
+			}
+
+			if (mdNumbers) this.#eventManager.addEvent(markdownArea, 'scroll', this.$.viewer._scrollMarkdownLineNumbers.bind(markdownArea, mdNumbers), false);
 		}
 
 		if (fc.has('statusbar')) this.__addStatusbarEvent(fc, fc.get('options'));
@@ -942,6 +967,31 @@ class EventOrchestrator extends KernelInjector {
 		dom.utils.addClass(this.$.commandDispatcher.targets.get('codeView'), 'active');
 		this.#ui._toggleCodeViewButtons(true);
 	}
+
+	/**
+	 * @param {SunEditor.FrameContext} frameContext - frame context object
+	 */
+	#OnFocus_markdown(frameContext) {
+		this.$.facade.changeFrameContext(frameContext.get('key'));
+		dom.utils.addClass(this.$.commandDispatcher.targets.get('markdownView'), 'active');
+		this.#ui._toggleCodeViewButtons(true);
+	}
+}
+
+/**
+ * @description Inserts a tab character at the cursor position in a textarea
+ * @param {KeyboardEvent} e
+ */
+function InsertTab(e) {
+	if (e.key !== 'Tab') return;
+	e.preventDefault();
+
+	const textarea = /** @type {HTMLTextAreaElement} */ (e.target);
+	const start = textarea.selectionStart;
+	const end = textarea.selectionEnd;
+
+	textarea.value = textarea.value.substring(0, start) + '\t' + textarea.value.substring(end);
+	textarea.selectionStart = textarea.selectionEnd = start + 1;
 }
 
 export default EventOrchestrator;

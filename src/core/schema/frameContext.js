@@ -30,6 +30,9 @@ import { get as getNumber } from '../../helper/numbers';
  * @property {HTMLElement} codeWrapper - Wrapper element for the code-view mode.
  * @property {HTMLElement & HTMLTextAreaElement} code - Code view editing element (a <textarea> or <pre>).
  * @property {HTMLTextAreaElement} codeNumbers - Element displaying line numbers in code view mode.
+ * @property {HTMLElement} markdownWrapper - Wrapper element for the markdown-view mode.
+ * @property {HTMLTextAreaElement} markdown - Markdown view editing element (a <textarea>).
+ * @property {HTMLTextAreaElement} markdownNumbers - Element displaying line numbers in markdown view mode.
  * @property {HTMLElement} placeholder - Placeholder element shown when the editor is empty.
  * @property {HTMLElement} statusbar - Editor status bar element (for resizing, info, etc.).
  * @property {HTMLElement} navigation - Navigation element (e.g., for outline or bookmarks).
@@ -47,6 +50,7 @@ import { get as getNumber } from '../../helper/numbers';
  *
  * === State Flags ===
  * @property {boolean} isCodeView - Whether the editor is currently in code view mode.
+ * @property {boolean} isMarkdownView - Whether the editor is currently in markdown view mode.
  * @property {boolean} isFullScreen - Whether the editor is currently in fullscreen mode.
  * @property {boolean} isReadOnly - Whether the editor is set to readonly mode.
  * @property {boolean} isDisabled - Whether the editor is currently disabled.
@@ -90,7 +94,7 @@ import { get as getNumber } from '../../helper/numbers';
  * @param {*} key root key
  * @returns {FrameContexType}
  */
-export function CreateFrameContext(editorTarget, top, wwFrame, codeWrapper, codeFrame, statusbar, documentTypeInner, key) {
+export function CreateFrameContext(editorTarget, top, wwFrame, codeWrapper, codeFrame, markdownWrapper, markdownFrame, statusbar, documentTypeInner, key) {
 	const m = /** @type {FrameContexType} */ (
 		new Map([
 			['key', key],
@@ -101,21 +105,31 @@ export function CreateFrameContext(editorTarget, top, wwFrame, codeWrapper, code
 			['wrapper', top.querySelector('.se-wrapper')],
 			['wysiwygFrame', wwFrame],
 			['wysiwyg', wwFrame], // options.iframe ? wwFrame.contentDocument.body : wwFrame
+			// codeview
 			['codeWrapper', codeWrapper],
 			['code', codeFrame],
 			['codeNumbers', /** @type {HTMLTextAreaElement} */ (codeWrapper?.querySelector('.se-code-view-line'))],
+			// markdown
+			['markdownWrapper', markdownWrapper],
+			['markdown', markdownFrame],
+			['markdownNumbers', /** @type {HTMLTextAreaElement} */ (markdownWrapper?.querySelector('.se-markdown-view-line'))],
+			// linebreak, toolbar internal
 			['lineBreaker_t', top.querySelector('.se-line-breaker-component-t')],
 			['lineBreaker_b', top.querySelector('.se-line-breaker-component-b')],
 			['_stickyDummy', top.querySelector('.se-toolbar-sticky-dummy')],
 			['_toolbarShadow', top.querySelector('.se-toolbar-shadow')],
 			['_minHeight', getNumber(wwFrame.style.minHeight || '65', 0)],
+			// is
 			['isCodeView', false],
+			['isMarkdownView', false],
 			['isFullScreen', false],
 			['isReadOnly', false],
 			['isDisabled', false],
 			['isChanged', false],
+			// index
 			['historyIndex', -1],
 			['savedIndex', -1],
+			// document type
 			['documentTypeInner', documentTypeInner.inner],
 			['documentTypePage', documentTypeInner.page],
 			['documentTypePageMirror', documentTypeInner.pageMirror],

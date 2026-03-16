@@ -14,7 +14,7 @@ describe('Core - Editor workflow Tests', () => {
 		container.id = 'w-editor-container';
 		document.body.appendChild(container);
 
-		editor = createTestEditor({ element: container });
+		editor = createTestEditor({ element: container, buttonList: [['codeView']] });
 		await waitForEditorReady(editor);
 
 		if (editor.$.ui) {

@@ -40,9 +40,15 @@
 	--se-main-color: #000;
 	--se-main-color-lighter: #4c4c4d;
 	--se-main-background-color: #fff;
-	--se-code-view-color: #f5f5f5;
+	--se-code-view-color: #24292f;
 	--se-main-font-color: #333;
-	--se-code-view-background-color: #222;
+	--se-code-view-background-color: #fff;
+	--se-code-view-line-color: #57606a;
+	--se-code-view-line-background-color: #f6f8fa;
+	--se-markdown-view-color: #24292f;
+	--se-markdown-view-background-color: #fff;
+	--se-markdown-view-line-color: #57606a;
+	--se-markdown-view-line-background-color: #f6f8fa;
 	--se-main-divider-color: #e1e1e1;
 	--se-main-border-color: #d1d1d1;
 	--se-main-outline-color: #b1b1b1;

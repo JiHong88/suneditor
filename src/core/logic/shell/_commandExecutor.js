@@ -59,7 +59,7 @@ export default class CommandExecutor {
 	 * @description Execute default command of command button
 	 */
 	async execute(command, button) {
-		if (this.#frameContext.get('isReadOnly') && !/copy|cut|selectAll|codeView|fullScreen|print|preview|showBlocks/.test(command)) return;
+		if (this.#frameContext.get('isReadOnly') && !/copy|cut|selectAll|codeView|markdownView|fullScreen|print|preview|showBlocks/.test(command)) return;
 
 		switch (command) {
 			case 'selectAll':
@@ -85,6 +85,9 @@ export default class CommandExecutor {
 				break;
 			case 'codeView':
 				this.#$.viewer.codeView(!this.#frameContext.get('isCodeView'));
+				break;
+			case 'markdownView':
+				this.#$.viewer.markdownView(!this.#frameContext.get('isMarkdownView'));
 				break;
 			case 'fullScreen':
 				this.#$.viewer.fullScreen(!this.#frameContext.get('isFullScreen'));
