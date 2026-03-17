@@ -18,6 +18,8 @@ class Menu {
 	#bindClose_dropdown_mouse = null;
 	#bindClose_dropdown_key = null;
 	#bindClose_cons_mouse = null;
+	#bindMenu_mousemove = null;
+	#bindMenu_mouseout = null;
 	#menuBtn = null;
 	#menuContainer = null;
 
@@ -114,8 +116,8 @@ class Menu {
 			this.menus = converter.nodeListToArray(menu.querySelectorAll('[data-command]'));
 			if (this.menus.length > 0) {
 				this.#bindClose_dropdown_key = this.#eventManager.addGlobalEvent('keydown', this.#globalEventHandler.keydown, false);
-				menu.addEventListener('mousemove', this.#globalEventHandler.mousemove, false);
-				menu.addEventListener('mouseout', this.#globalEventHandler.mouseout, false);
+				this.#bindMenu_mousemove = this.#eventManager.addEvent(menu, 'mousemove', this.#globalEventHandler.mousemove, false);
+				this.#bindMenu_mouseout = this.#eventManager.addEvent(menu, 'mouseout', this.#globalEventHandler.mouseout, false);
 			}
 		}
 
@@ -293,10 +295,10 @@ class Menu {
 		this.#bindClose_cons_mouse &&= this.#eventManager.removeGlobalEvent(this.#bindClose_cons_mouse);
 		if (this.#bindClose_dropdown_key) {
 			this.#bindClose_dropdown_key = this.#eventManager.removeGlobalEvent(this.#bindClose_dropdown_key);
+			this.#bindMenu_mousemove &&= this.#eventManager.removeEvent(this.#bindMenu_mousemove);
+			this.#bindMenu_mouseout &&= this.#eventManager.removeEvent(this.#bindMenu_mouseout);
 			dom.utils.removeClass(this.menus, 'on');
 			dom.utils.removeClass(this.currentDropdown, 'se-select-menu-key-action|se-select-menu-mouse-move');
-			this.currentDropdown.removeEventListener('mousemove', this.#globalEventHandler.mousemove, false);
-			this.currentDropdown.removeEventListener('mouseout', this.#globalEventHandler.mouseout, false);
 		}
 	}
 

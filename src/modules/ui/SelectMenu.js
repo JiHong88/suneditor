@@ -407,11 +407,12 @@ class SelectMenu {
 	 */
 	#addEvents() {
 		this.#removeEvents();
-		this.#events = this.#eventHandlers;
-		this.form.addEventListener('mousedown', this.#events.mousedown);
-		this.form.addEventListener('mousemove', this.#events.mousemove);
-		this.form.addEventListener('click', this.#events.click);
-		this.#keydownTarget.addEventListener('keydown', this.#events.keydown);
+		this.#events = {
+			mousedown: this.#$.eventManager.addEvent(this.form, 'mousedown', this.#eventHandlers.mousedown),
+			mousemove: this.#$.eventManager.addEvent(this.form, 'mousemove', this.#eventHandlers.mousemove),
+			click: this.#$.eventManager.addEvent(this.form, 'click', this.#eventHandlers.click),
+			keydown: this.#$.eventManager.addEvent(this.#keydownTarget, 'keydown', this.#eventHandlers.keydown),
+		};
 	}
 
 	/**
@@ -419,10 +420,10 @@ class SelectMenu {
 	 */
 	#removeEvents() {
 		if (!this.#events) return;
-		this.form.removeEventListener('mousedown', this.#events.mousedown);
-		this.form.removeEventListener('mousemove', this.#events.mousemove);
-		this.form.removeEventListener('click', this.#events.click);
-		this.#keydownTarget.removeEventListener('keydown', this.#events.keydown);
+		this.#$.eventManager.removeEvent(this.#events.mousedown);
+		this.#$.eventManager.removeEvent(this.#events.mousemove);
+		this.#$.eventManager.removeEvent(this.#events.click);
+		this.#$.eventManager.removeEvent(this.#events.keydown);
 		this.#events = null;
 	}
 

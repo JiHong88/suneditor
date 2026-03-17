@@ -26,11 +26,11 @@ declare class EventManager {
 	 * - Only events registered with this method are unregistered or re-registered when methods such as 'setOptions', 'destroy' are called.
 	 * @param {*} target Target element
 	 * @param {string} type Event type
-	 * @param {EventListenerOrEventListenerObject} listener Event handler
+	 * @param {*} listener Event handler
 	 * @param {boolean|AddEventListenerOptions} [useCapture] Event useCapture option
 	 * @return {?SunEditor.Event.Info} Registered event information
 	 */
-	addEvent(target: any, type: string, listener: EventListenerOrEventListenerObject, useCapture?: boolean | AddEventListenerOptions): SunEditor.Event.Info | null;
+	addEvent(target: any, type: string, listener: any, useCapture?: boolean | AddEventListenerOptions): SunEditor.Event.Info | null;
 	/**
 	 * @description Remove event
 	 * @param {SunEditor.Event.Info} params event info = this.addEvent()

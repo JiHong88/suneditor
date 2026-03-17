@@ -179,7 +179,7 @@ declare global {
 				/**
 				 * Event listener
 				 */
-				listener: EventListenerOrEventListenerObject;
+				listener: any;
 				/**
 				 * Event useCapture option
 				 */

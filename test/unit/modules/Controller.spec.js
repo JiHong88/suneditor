@@ -1301,10 +1301,10 @@ describe('Modules - Controller', () => {
 			await ctrl.open(target, target, {});
 			await new Promise((r) => setTimeout(r, 0));
 
-			const removeEventSpy = jest.spyOn(el, 'removeEventListener');
+			$.eventManager.removeEvent.mockClear();
 			$.ui.currentControllerName = 'testController';
 			ctrl.close();
-			expect(removeEventSpy).toHaveBeenCalledWith('mousedown', expect.any(Function));
+			expect($.eventManager.removeEvent).toHaveBeenCalled();
 			$.contextProvider.shadowRoot = null;
 		});
 

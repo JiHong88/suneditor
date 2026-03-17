@@ -49,8 +49,7 @@ class Controller {
 	#addOffset = { left: 0, top: 0 };
 	#reserveIndex = false;
 	#preventClose = false;
-	#shadowRootEventForm = null;
-	#shadowRootEventListener = null;
+	#bindShadowRootEvent = null;
 	#bindClose_key = null;
 	#bindClose_mouse = null;
 
@@ -363,9 +362,7 @@ class Controller {
 
 		form.style.display = 'block';
 		if (this.#$.contextProvider.shadowRoot) {
-			this.#shadowRootEventForm = form;
-			this.#shadowRootEventListener = (e) => e.stopPropagation();
-			form.addEventListener('mousedown', this.#shadowRootEventListener);
+			this.#bindShadowRootEvent = this.#$.eventManager.addEvent(form, 'mousedown', (e) => e.stopPropagation());
 		}
 
 		this.#$.ui.onControllerContext();
@@ -401,10 +398,7 @@ class Controller {
 		_w.setTimeout(() => {
 			this.#$.store.set('controlActive', false);
 		}, 0);
-		if (this.#shadowRootEventForm) {
-			this.#shadowRootEventForm.removeEventListener('mousedown', this.#shadowRootEventListener);
-			this.#shadowRootEventForm = this.#shadowRootEventListener = null;
-		}
+		this.#bindShadowRootEvent &&= this.#$.eventManager.removeEvent(this.#bindShadowRootEvent);
 	}
 
 	/**

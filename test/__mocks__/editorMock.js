@@ -706,8 +706,16 @@ export function createMockEditor(customOptions = {}) {
 
 	const eventManager = {
 		applyTagEffect: jest.fn(),
-		addEvent: jest.fn().mockReturnValue({ target: null, type: '', listener: null }),
-		removeEvent: jest.fn(),
+		addEvent: jest.fn().mockImplementation((target, type, listener, useCapture) => {
+			if (target && target.addEventListener) target.addEventListener(type, listener, useCapture);
+			return { target, type, listener, useCapture };
+		}),
+		removeEvent: jest.fn().mockImplementation((params) => {
+			if (!params) return;
+			const { target, type, listener, useCapture } = params;
+			if (target && target.removeEventListener) target.removeEventListener(type, listener, useCapture);
+			return null;
+		}),
 		addGlobalEvent: jest.fn().mockReturnValue({ target: null, type: '', listener: null }),
 		removeGlobalEvent: jest.fn(),
 		triggerEvent: jest.fn().mockResolvedValue(undefined),
