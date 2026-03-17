@@ -2262,21 +2262,21 @@ describe('UIManager (real instance)', () => {
 			ctx.$.eventManager.addEvent.mockReturnValue(null);
 			ui.init(); // sets closeSignal = !null = true
 
-			const addListenerSpy = jest.spyOn(ctx.elements.alertInner, 'addEventListener');
+			ctx.$.eventManager.addEvent.mockReturnValue({ id: 'alert-click' });
+			ctx.$.eventManager.addEvent.mockClear();
 			ui.alertOpen('Test', '');
-			expect(addListenerSpy).toHaveBeenCalledWith('click', expect.any(Function));
-			addListenerSpy.mockRestore();
+			expect(ctx.$.eventManager.addEvent).toHaveBeenCalledWith(ctx.elements.alertInner, 'click', expect.any(Function));
 		});
 
 		it('should remove click listener from alertInner on alertClose when closeSignal is true', () => {
 			ctx.$.eventManager.addEvent.mockReturnValue(null);
 			ui.init();
 
+			ctx.$.eventManager.addEvent.mockReturnValue({ id: 'alert-click' });
 			ui.alertOpen('Test', '');
-			const removeListenerSpy = jest.spyOn(ctx.elements.alertInner, 'removeEventListener');
+			ctx.$.eventManager.removeEvent.mockClear();
 			ui.alertClose();
-			expect(removeListenerSpy).toHaveBeenCalledWith('click', expect.any(Function));
-			removeListenerSpy.mockRestore();
+			expect(ctx.$.eventManager.removeEvent).toHaveBeenCalled();
 		});
 
 		it('should not add click listener when closeSignal is false', () => {
@@ -2588,25 +2588,27 @@ describe('UIManager (real instance)', () => {
 	// _destroy with closeSignal active
 	// -------------------------------------------------------------------
 	describe('_destroy with closeSignal', () => {
-		it('should remove click listener from alertInner when closeSignal is true during destroy', () => {
+		it('should call removeEvent for alert click listener when closeSignal is true during destroy', () => {
 			// Set closeSignal to true
 			ctx.$.eventManager.addEvent.mockReturnValue(null);
 			ui.init(); // closeSignal = !null = true
 
-			const removeListenerSpy = jest.spyOn(ctx.elements.alertInner, 'removeEventListener');
+			// Open alert to register the click event via addEvent
+			ctx.$.eventManager.addEvent.mockReturnValue({ id: 'alert-click' });
+			ui.alertOpen('test', '');
+			ctx.$.eventManager.removeEvent.mockClear();
+
 			ui._destroy();
-			expect(removeListenerSpy).toHaveBeenCalledWith('click', expect.any(Function));
-			removeListenerSpy.mockRestore();
+			expect(ctx.$.eventManager.removeEvent).toHaveBeenCalled();
 		});
 
-		it('should not remove click listener from alertInner when closeSignal is false', () => {
+		it('should not call removeEvent for alert click when closeSignal is false', () => {
 			ctx.$.eventManager.addEvent.mockReturnValue({ id: 'event' });
 			ui.init(); // closeSignal = false
 
-			const removeListenerSpy = jest.spyOn(ctx.elements.alertInner, 'removeEventListener');
+			ctx.$.eventManager.removeEvent.mockClear();
 			ui._destroy();
-			expect(removeListenerSpy).not.toHaveBeenCalled();
-			removeListenerSpy.mockRestore();
+			expect(ctx.$.eventManager.removeEvent).not.toHaveBeenCalled();
 		});
 	});
 

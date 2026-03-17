@@ -1,4 +1,4 @@
-import { dom, numbers, env } from '../../helper';
+import { dom, env } from '../../helper';
 import { _DragHandle } from '../../modules/ui';
 
 const { _w, _d, NO_EVENT } = env;
@@ -61,7 +61,7 @@ class EventManager {
 	 * - Only events registered with this method are unregistered or re-registered when methods such as 'setOptions', 'destroy' are called.
 	 * @param {*} target Target element
 	 * @param {string} type Event type
-	 * @param {EventListenerOrEventListenerObject} listener Event handler
+	 * @param {*} listener Event handler
 	 * @param {boolean|AddEventListenerOptions} [useCapture] Event useCapture option
 	 * @return {?SunEditor.Event.Info} Registered event information
 	 */
@@ -82,7 +82,7 @@ class EventManager {
 		}
 
 		return {
-			target: len > 1 ? target : target[0],
+			target,
 			type,
 			listener,
 			useCapture,
@@ -103,7 +103,7 @@ class EventManager {
 		const useCapture = params.useCapture;
 
 		if (!target) return;
-		if (!numbers.is(target.length) || target.nodeName || (!Array.isArray(target) && target.length < 1)) target = /** @type {Array<Element>} */ ([target]);
+		if (target === _w || target === _d || typeof target.length !== 'number' || target.nodeType || (!Array.isArray(target) && target.length < 1)) target = [target];
 		if (target.length === 0) return;
 
 		for (let i = 0, len = target.length; i < len; i++) {

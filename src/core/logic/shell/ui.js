@@ -28,6 +28,7 @@ class UIManager {
 	#alertInner;
 	#closeListener;
 	#closeSignal;
+	#bindAlertClick = null;
 	#backWrapper;
 
 	#controllerOnBtnDisabled = false;
@@ -97,7 +98,7 @@ class UIManager {
 		this.#alertArea = /** @type {HTMLElement} */ (this.#carrierWrapper.querySelector('.se-alert'));
 		this.#alertInner = /** @type {HTMLElement} */ (this.#carrierWrapper.querySelector('.se-alert .se-modal-inner'));
 		this.#alertInner.appendChild(alertModal);
-		this.#closeListener = [CloseListener.bind(this), OnClick_alert.bind(this)];
+		this.#closeListener = [this.#OnCloseListener.bind(this), this.#OnClick_alert.bind(this)];
 		this.#closeSignal = false;
 		this.#backWrapper = /** @type {HTMLElement} */ (this.#carrierWrapper.querySelector('.se-back-wrapper'));
 
@@ -393,7 +394,7 @@ class UIManager {
 		dom.utils.removeClass(this.alertModal, 'se-alert-error|se-alert-success');
 		if (type) dom.utils.addClass(this.alertModal, `se-alert-${type}`);
 
-		if (this.#closeSignal) this.#alertInner.addEventListener('click', this.#closeListener[1]);
+		if (this.#closeSignal) this.#bindAlertClick = this.#eventManager.addEvent(this.#alertInner, 'click', this.#closeListener[1]);
 		this.#bindClose &&= this.#eventManager.removeGlobalEvent(this.#bindClose);
 		this.#bindClose = this.#eventManager.addGlobalEvent('keydown', this.#closeListener[0]);
 
@@ -408,7 +409,7 @@ class UIManager {
 		dom.utils.removeClass(this.alertModal, 'se-modal-show');
 		dom.utils.removeClass(this.alertModal, 'se-alert-*');
 		this.#alertArea.style.display = 'none';
-		if (this.#closeSignal) this.#alertInner.removeEventListener('click', this.#closeListener[1]);
+		this.#bindAlertClick &&= this.#eventManager.removeEvent(this.#bindAlertClick);
 		this.#bindClose &&= this.#eventManager.removeGlobalEvent(this.#bindClose);
 	}
 
@@ -856,6 +857,24 @@ class UIManager {
 	}
 
 	/**
+	 * @param {MouseEvent} e - Event object
+	 */
+	#OnClick_alert(e) {
+		const eventTarget = dom.query.getEventTarget(e);
+		if (/close/.test(eventTarget.getAttribute('data-command')) || eventTarget === this.#alertInner) {
+			this.alertClose();
+		}
+	}
+
+	/**
+	 * @param {KeyboardEvent} e - Event object
+	 */
+	#OnCloseListener(e) {
+		if (!keyCodeMap.isEsc(e.code)) return;
+		this.alertClose();
+	}
+
+	/**
 	 * @internal
 	 * @description Destroy the UI instance and release memory
 	 */
@@ -869,9 +888,7 @@ class UIManager {
 		this.#bindClose &&= this.#eventManager.removeGlobalEvent(this.#bindClose);
 
 		// Remove alert click event listener
-		if (this.#closeSignal && this.#alertInner) {
-			this.#alertInner.removeEventListener('click', this.#closeListener[1]);
-		}
+		this.#bindAlertClick &&= this.#eventManager.removeEvent(this.#bindAlertClick);
 
 		this.opendModal = null;
 		this.opendBrowser = null;
@@ -880,24 +897,6 @@ class UIManager {
 		this.#controllerOnDisabledButtons = null;
 		this.#codeViewDisabledButtons = null;
 	}
-}
-
-/**
- * @param {MouseEvent} e - Event object
- */
-function OnClick_alert(e) {
-	const eventTarget = dom.query.getEventTarget(e);
-	if (/close/.test(eventTarget.getAttribute('data-command')) || eventTarget === this._alertInner) {
-		this.alertClose();
-	}
-}
-
-/**
- * @param {KeyboardEvent} e - Event object
- */
-function CloseListener(e) {
-	if (!keyCodeMap.isEsc(e.code)) return;
-	this.alertClose();
 }
 
 function CreateAlertHTML({ lang, icons }) {

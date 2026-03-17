@@ -195,7 +195,7 @@
  * @typedef {Object} SunEditor.Event.Info
  * @property {*} target Target element
  * @property {string} type Event type
- * @property {EventListenerOrEventListenerObject} listener Event listener
+ * @property {*} listener Event listener
  * @property {boolean|AddEventListenerOptions} [useCapture] Event useCapture option
  */
 
