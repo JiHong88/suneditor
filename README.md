@@ -32,7 +32,8 @@ It's easy to integrate, highly customizable, and built for modern web applicatio
 - **Feature-rich plugin ecosystem**, including:
     - @Mentions with autocomplete
     - Advanced table editing & custom layouts
-    - Math (LaTeX), drawing, and code block support
+    - Math (LaTeX), drawing, and code block support (with language selector)
+    - Markdown view mode (GFM) — edit content as Markdown
     - Built-in media galleries (image, video, audio, file)
     - PDF export, templates, and embedded content (audio/video/iframe)
 

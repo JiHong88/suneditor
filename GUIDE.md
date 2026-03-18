@@ -16,6 +16,8 @@
 - [Modules](#modules-srcmodules)
 - [Essential Commands](#essential-commands)
 - [Testing Strategy](#testing-strategy)
+- [Markdown View](#markdown-view)
+- [Code Language Selector](#code-language-selector)
 - Supplementary Guides
     - [External Libraries](./guide/external-libraries.md) - CodeMirror, KaTeX, MathJax
 
@@ -88,7 +90,7 @@ suneditor/
 │   │   │   └── panel/       # Panel UI
 │   │   │       ├── toolbar.js       # Toolbar rendering & positioning
 │   │   │       ├── menu.js          # Dropdown menu management
-│   │   │       └── viewer.js        # View modes (code view, fullscreen, preview)
+│   │   │       └── viewer.js        # View modes (code view, markdown view, fullscreen, preview)
 │   │   ├── event/           # L4: Event orchestration (Redux-like)
 │   │   │   ├── eventOrchestrator.js # Internal DOM event processing, handler binding
 │   │   │   ├── executor.js          # Action dispatcher → maps actions to effects
@@ -105,6 +107,7 @@ suneditor/
 │   │   │   └── options.js       # Options schema (base + frame)
 │   │   └── section/         # DOM construction
 │   │       ├── constructor.js   # Editor DOM structure builder
+│   │       ├── codeLang.js      # Code language selector UI for <pre> blocks
 │   │       └── documentType.js  # Document type handler (pagination)
 │   ├── plugins/             # Modular features
 │   │   ├── command/         # Direct actions (blockquote, list_bulleted, list_numbered, exportPDF, fileUpload)
@@ -370,17 +373,18 @@ Plugin hooks are organized into four categories:
 
 **Helper Modules:**
 
-| Module                | Key Functions                                                     | Purpose                        |
-| --------------------- | ----------------------------------------------------------------- | ------------------------------ |
-| **`converter.js`**    | `htmlToEntity`, `htmlToJson`, `debounce`, `toFontUnit`, `rgb2hex` | String/HTML conversion         |
-| **`env.js`**          | `isMobile`, `isOSX_IOS`, `isClipboardSupported`, `_w`, `_d`       | Browser/device detection       |
-| **`keyCodeMap.js`**   | `isEnter`, `isCtrl`, `isArrow`, `isComposing`                     | Keyboard event checking        |
-| **`numbers.js`**      | `is`, `get`, `isEven`, `isOdd`                                    | Number validation              |
-| **`unicode.js`**      | `zeroWidthSpace`, `escapeStringRegexp`                            | Special characters             |
-| **`clipboard.js`**    | `write`                                                           | Clipboard with iframe handling |
-| **`dom/domCheck.js`** | `isElement`, `isText`, `isWysiwygFrame`, `isComponentContainer`   | Node type checking             |
-| **`dom/domQuery.js`** | `getParentElement`, `getChildNode`, `getNodePath`                 | DOM tree navigation            |
-| **`dom/domUtils.js`** | `addClass`, `createElement`, `setStyle`, `removeItem`             | DOM operations                 |
+| Module                | Key Functions                                                     | Purpose                           |
+| --------------------- | ----------------------------------------------------------------- | --------------------------------- |
+| **`markdown.js`**     | `jsonToMarkdown`, `markdownToHtml`                                | Markdown ↔ HTML conversion (GFM) |
+| **`converter.js`**    | `htmlToEntity`, `htmlToJson`, `debounce`, `toFontUnit`, `rgb2hex` | String/HTML conversion            |
+| **`env.js`**          | `isMobile`, `isOSX_IOS`, `isClipboardSupported`, `_w`, `_d`       | Browser/device detection          |
+| **`keyCodeMap.js`**   | `isEnter`, `isCtrl`, `isArrow`, `isComposing`                     | Keyboard event checking           |
+| **`numbers.js`**      | `is`, `get`, `isEven`, `isOdd`                                    | Number validation                 |
+| **`unicode.js`**      | `zeroWidthSpace`, `escapeStringRegexp`                            | Special characters                |
+| **`clipboard.js`**    | `write`                                                           | Clipboard with iframe handling    |
+| **`dom/domCheck.js`** | `isElement`, `isText`, `isWysiwygFrame`, `isComponentContainer`   | Node type checking                |
+| **`dom/domQuery.js`** | `getParentElement`, `getChildNode`, `getNodePath`                 | DOM tree navigation               |
+| **`dom/domUtils.js`** | `addClass`, `createElement`, `setStyle`, `removeItem`             | DOM operations                    |
 
 ---
 
@@ -676,6 +680,57 @@ SUNEDITOR.create('#editor', {
 ```
 
 **SSR frameworks (Next.js/Nuxt):** Use dynamic import with `ssr: false` to avoid `contentDocument is null` errors.
+
+---
+
+## Markdown View
+
+SunEditor supports a **Markdown View** mode alongside the existing Code View and WYSIWYG modes. The markdown view converts editor content to GitHub Flavored Markdown (GFM) for editing and converts back to HTML on exit.
+
+**Toggle:** Use the `markdownView` button in the toolbar or call `editor.viewer.markdownView()` programmatically.
+
+**Supported GFM Syntax:**
+
+- Headings (`#` ~ `######`), paragraphs, line breaks
+- **Bold**, _italic_, ~~strikethrough~~, `inline code`, ==highlight==
+- Ordered/unordered lists, task lists (`- [x]`)
+- Blockquotes (`>`), fenced code blocks (` ``` `), horizontal rules (`---`)
+- Links, images, tables (pipe syntax with alignment)
+
+**How it works:**
+
+1. **WYSIWYG → Markdown**: `converter.htmlToJson()` → `markdown.jsonToMarkdown()` — converts the editor's HTML to a JSON tree, then to GFM string
+2. **Markdown → WYSIWYG**: `markdown.markdownToHtml()` — parses GFM back to HTML
+
+**Key files:**
+
+- `src/helper/markdown.js` — Markdown ↔ HTML converter (GFM)
+- `src/core/logic/panel/viewer.js` — View mode management (code view, markdown view, fullscreen, preview)
+
+**Mutual exclusivity:** Code View and Markdown View are mutually exclusive — activating one automatically deactivates the other.
+
+---
+
+## Code Language Selector
+
+The `<pre>` code block language selector (`codeLang.js`) provides a UI for selecting programming languages on code blocks.
+
+**Option:** `codeLangs`
+
+```javascript
+suneditor.create('#editor', {
+	codeLangs: ['javascript', 'python', 'html', 'css', 'json'],
+});
+```
+
+- A language selector button appears on hover over `<pre>` elements
+- Defaults to common languages (javascript, typescript, html, css, json, python, java, etc.)
+- Set to `[]` to disable the feature
+- Selected language is stored as `class="language-{lang}"` on the `<pre>` element
+
+**Key files:**
+
+- `src/core/section/codeLang.js` — CodeLang class (Controller + SelectMenu UI)
 
 ---
 
