@@ -1,4 +1,5 @@
 import { dom, converter, markdown, numbers, unicode, clipboard, env } from '../../../helper';
+import CodeLang from '../../section/codeLang';
 
 const { _d } = env;
 const REQUIRED_DATA_ATTRS = 'data-se-[^\\s]+';
@@ -1149,6 +1150,12 @@ class HTML {
 				emptyCells[j].innerHTML = '<br>';
 			}
 
+			// output: wrap code blocks <pre class="language-xxx"> → <pre><code class="language-xxx">
+			const preEls = renderHTML.querySelectorAll('pre[class*="language-"]');
+			for (let j = 0, jlen = preEls.length; j < jlen; j++) {
+				CodeLang.wrapCode(preEls[j]);
+			}
+
 			const content = renderHTML.innerHTML;
 			if (this.#frameOptions.get('iframe_fullPage')) {
 				if (includeFullPage) {
@@ -1525,6 +1532,11 @@ class HTML {
 						removeTags.push(current);
 						return false;
 					}
+				}
+
+				// code block: unwrap <pre><code class="language-xxx"> → <pre class="language-xxx">
+				if (current.nodeName === 'PRE') {
+					CodeLang.unwrapCode(current);
 				}
 
 				const nrtag = !dom.query.getParentElement(current, dom.check.isExcludeFormat);

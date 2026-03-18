@@ -126,6 +126,7 @@
 		link_modal_url: 'Saites URL',
 		link_modal_relAttribute: 'Rel atribūts',
 		list: 'Saraksts',
+		markdownView: 'Markdown skats',
 		math: 'Matemātika',
 		math_modal_fontSizeLabel: 'Fonta lielums',
 		math_modal_inputLabel: 'Matemātiskā notācija',
@@ -205,6 +206,8 @@
 		video_modal_title: 'Ievietot video',
 		video_modal_url: 'Multivides iegulšanas URL, YouTube/Vimeo',
 		width: 'Platums',
+		codeLanguage: 'Valoda',
+		codeLanguage_none: 'Neviens',
 		message_copy_success: 'Kopēts starpliktuvē',
 		message_copy_fail: 'Kopēšana neizdevās. Lūdzu, kopējiet manuāli.',
 	};

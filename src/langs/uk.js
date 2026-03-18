@@ -126,6 +126,7 @@
 		link_modal_url: 'Посилання',
 		link_modal_relAttribute: 'Атрибут rel',
 		list: 'Список',
+		markdownView: 'Перегляд Markdown',
 		math: 'Формула',
 		math_modal_fontSizeLabel: 'Розмір шрифту',
 		math_modal_inputLabel: 'Математична запис',
@@ -205,6 +206,8 @@
 		video_modal_title: 'Вставити відео',
 		video_modal_url: 'Посилання на відео, Youtube, Vimeo',
 		width: 'Ширина',
+		codeLanguage: 'Мова',
+		codeLanguage_none: 'Жоден',
 		message_copy_success: 'Скопійовано в буфер обміну',
 		message_copy_fail: 'Не вдалося скопіювати. Будь ласка, скопіюйте вручну.',
 	};

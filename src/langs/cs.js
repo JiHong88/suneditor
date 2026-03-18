@@ -126,6 +126,7 @@
 		link_modal_url: 'URL pro odkaz',
 		link_modal_relAttribute: 'Atribut Rel',
 		list: 'Seznam',
+		markdownView: 'Zobrazení Markdownu',
 		math: 'Matematika',
 		math_modal_fontSizeLabel: 'Velikost písma',
 		math_modal_inputLabel: 'Matematická notace',
@@ -205,6 +206,8 @@
 		video_modal_title: 'Vložit video',
 		video_modal_url: 'URL pro vložení médií, YouTube/Vimeo',
 		width: 'Šířka',
+		codeLanguage: 'Jazyk',
+		codeLanguage_none: 'Žádný',
 		message_copy_success: 'Zkopírováno do schránky',
 		message_copy_fail: 'Kopírování selhalo. Zkopírujte prosím ručně.',
 	};

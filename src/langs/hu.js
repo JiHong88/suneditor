@@ -126,6 +126,7 @@
 		link_modal_url: 'Link URL',
 		link_modal_relAttribute: 'Rel attribútum',
 		list: 'Lista',
+		markdownView: 'Markdown nézet',
 		math: 'Matematika',
 		math_modal_fontSizeLabel: 'Betűméret',
 		math_modal_inputLabel: 'Matematikai jelölések',
@@ -205,6 +206,8 @@
 		video_modal_title: 'Videó beszúrása',
 		video_modal_url: 'Beágyazható URL, YouTube/Vimeo',
 		width: 'Szélesség',
+		codeLanguage: 'Nyelv',
+		codeLanguage_none: 'Egyik sem',
 		message_copy_success: 'Vágólapra másolva',
 		message_copy_fail: 'A másolás sikertelen. Kérjük, másolja kézzel.',
 	};

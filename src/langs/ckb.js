@@ -126,6 +126,7 @@
 		link_modal_url: 'به‌سته‌ر',
 		link_modal_relAttribute: 'سیفەتی Rel',
 		list: 'لیست',
+		markdownView: 'دیمەنی مارکداون',
 		math: 'بیركاری',
 		math_modal_fontSizeLabel: 'قه‌باره‌ی فۆنت',
 		math_modal_inputLabel: 'نیشانه‌كانی بیركاری',
@@ -205,6 +206,8 @@
 		video_modal_title: 'ڤیدیۆیه‌ك دابنێ',
 		video_modal_url: 'YouTube/Vimeo به‌سته‌ری له‌ناودانان وه‌ك ',
 		width: 'پانی',
+		codeLanguage: 'زمان',
+		codeLanguage_none: 'هیچ',
 		message_copy_success: 'لە پەڕگەی لەبەرگرتووەدا هاوپەڕ کرا',
 		message_copy_fail: 'هاوپەڕکردن سەرکەوتوو نەبوو. تکایە بەدەست هاوپەڕ بکە.',
 	};

@@ -126,6 +126,7 @@
 		link_modal_url: 'Adres URL',
 		link_modal_relAttribute: 'Atrybut rel',
 		list: 'Lista',
+		markdownView: 'Widok Markdown',
 		math: 'Matematyczne',
 		math_modal_fontSizeLabel: 'Rozmiar czcionki',
 		math_modal_inputLabel: 'Zapis matematyczny',
@@ -205,6 +206,8 @@
 		video_modal_title: 'Wstaw wideo',
 		video_modal_url: 'Adres URL video, np. YouTube/Vimeo',
 		width: 'Szerokość',
+		codeLanguage: 'Język',
+		codeLanguage_none: 'Nic',
 		message_copy_success: 'Skopiowano do schowka',
 		message_copy_fail: 'Nie udało się skopiować. Skopiuj ręcznie.',
 	};

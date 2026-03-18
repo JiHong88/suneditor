@@ -126,6 +126,7 @@
 		link_modal_url: "Bağlantı URL'si",
 		link_modal_relAttribute: 'Rel niteliği',
 		list: 'Liste',
+		markdownView: 'Markdown görünümü',
 		math: 'Matematik',
 		math_modal_fontSizeLabel: 'Yazı Tipi Boyutu',
 		math_modal_inputLabel: 'Matematiksel Simgeler',
@@ -205,6 +206,8 @@
 		video_modal_title: 'Video Ekle',
 		video_modal_url: "Medya Ekleme URL'si (YouTube/Vimeo)",
 		width: 'Genişlik',
+		codeLanguage: 'Dil',
+		codeLanguage_none: 'Hiçbiri',
 		message_copy_success: 'Panoya kopyalandı',
 		message_copy_fail: 'Kopyalama başarısız oldu. Lütfen manuel olarak kopyalayın.',
 	};

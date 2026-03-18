@@ -126,6 +126,7 @@
 		link_modal_url: 'Endereço do link',
 		link_modal_relAttribute: 'Atributo rel',
 		list: 'Lista',
+		markdownView: 'Visualização em Markdown',
 		math: 'Matemática',
 		math_modal_fontSizeLabel: 'Tamanho',
 		math_modal_inputLabel: 'Notação matemática',
@@ -205,6 +206,8 @@
 		video_modal_title: 'Inserir vídeo',
 		video_modal_url: 'URL do YouTube/Vimeo',
 		width: 'Largura',
+		codeLanguage: 'Linguagem',
+		codeLanguage_none: 'Nenhum',
 		message_copy_success: 'Copiado para a área de transferência',
 		message_copy_fail: 'Falha ao copiar. Copie manualmente, por favor.',
 	};

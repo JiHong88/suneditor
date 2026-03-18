@@ -190,6 +190,8 @@ export type _Lang = {
 	video_modal_title: string;
 	video_modal_url: string;
 	width: string;
+	codeLanguage: string;
+	codeLanguage_none: string;
 	message_copy_success: string;
 	message_copy_fail: string;
 };

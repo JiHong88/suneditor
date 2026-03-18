@@ -16,6 +16,8 @@ const MENU_MIN_HEIGHT = 38;
  * @property {number} [splitNum=0] Optional split number for horizontal positioning; defines how many items per row
  * @property {() => void} [openMethod] Optional method to call when the menu is opened
  * @property {() => void} [closeMethod] Optional method to call when the menu is closed
+ * @property {string} [maxHeight] Optional max-height CSS value (e.g. `"200px"`). Enables scrolling when items exceed this height.
+ * @property {string} [minWidth] Optional min-width CSS value (e.g. `"130px"`).
  */
 
 /**
@@ -64,6 +66,8 @@ class SelectMenu {
 		this.horizontal = !!this.splitNum;
 		this.openMethod = params.openMethod;
 		this.closeMethod = params.closeMethod;
+		this.maxHeight = params.maxHeight || '';
+		this.minWidth = params.minWidth || '';
 
 		this.#dirPosition = /^(left|right)$/.test(this.position) ? (this.position === 'left' ? 'right' : 'left') : this.position;
 		this.#dirSubPosition = /^(left|right)$/.test(this.subPosition) ? (this.subPosition === 'left' ? 'right' : 'left') : this.subPosition;
@@ -117,14 +121,20 @@ class SelectMenu {
 		this.#refer = /** @type {HTMLElement} */ (referElement);
 		this.#keydownTarget = dom.check.isInputElement(referElement) ? referElement : this.#$.frameContext.get('_ww');
 		this.#selectMethod = selectMethod;
+
+		let innerStyle = '';
+		if (this.maxHeight) innerStyle += 'max-height:' + this.maxHeight + ';overflow-y:auto;';
+		if (this.minWidth) innerStyle += 'min-width:' + this.minWidth + ';';
+
 		this.form = dom.utils.createElement(
 			'DIV',
 			{
 				class: 'se-select-menu' + (attr.class ? ' ' + attr.class : ''),
 				style: attr.style || '',
 			},
-			'<div class="se-list-inner"></div>',
+			'<div class="se-list-inner"' + (innerStyle ? ' style="' + innerStyle + '"' : '') + '></div>',
 		);
+
 		referElement.parentNode.insertBefore(this.form, referElement);
 	}
 
@@ -548,7 +558,7 @@ class SelectMenu {
 	#CloseListener_mousedown(e) {
 		const eventTarget = dom.query.getEventTarget(e);
 		if (this.form.contains(eventTarget)) return;
-		if (e.target !== this.#refer) {
+		if (!this.#refer.contains(eventTarget)) {
 			this.close();
 		} else if (!dom.check.isInputElement(eventTarget)) {
 			this.#bindClose_click = this.#$.eventManager.addGlobalEvent('click', this.#globalEventHandlers.click, true);

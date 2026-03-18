@@ -126,6 +126,7 @@
 		link_modal_url: '网址',
 		link_modal_relAttribute: 'Rel 属性',
 		list: '列表',
+		markdownView: 'Markdown视图',
 		math: '数学',
 		math_modal_fontSizeLabel: '字号',
 		math_modal_inputLabel: '数学符号',
@@ -205,6 +206,8 @@
 		video_modal_title: '插入视频',
 		video_modal_url: '嵌入网址, Youtube,Vimeo',
 		width: '宽度',
+		codeLanguage: '语言',
+		codeLanguage_none: '没有任何',
 		message_copy_success: '已复制到剪贴板',
 		message_copy_fail: '复制失败，请手动复制。',
 	};

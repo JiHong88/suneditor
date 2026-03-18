@@ -126,6 +126,7 @@
 		link_modal_url: 'כתובת קשור',
 		link_modal_relAttribute: 'תכונת Rel',
 		list: 'רשימה',
+		markdownView: 'תצוגת סימון למטה',
 		math: 'מתמטיקה',
 		math_modal_fontSizeLabel: 'גודל גופן',
 		math_modal_inputLabel: 'סימנים מתמטים',
@@ -205,6 +206,8 @@
 		video_modal_title: 'הכנס סרטון',
 		video_modal_url: 'כתובת הטמעה YouTube/Vimeo',
 		width: 'רוחב',
+		codeLanguage: 'שָׂפָה',
+		codeLanguage_none: 'אַף לֹא אֶחָד',
 		message_copy_success: 'הועתק ללוח',
 		message_copy_fail: 'ההעתקה נכשלה. נא להעתיק ידנית.',
 	};

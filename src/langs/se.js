@@ -126,6 +126,7 @@
 		link_modal_url: 'URL till länk',
 		link_modal_relAttribute: 'Rel attribut',
 		list: 'Listor',
+		markdownView: 'Markdown-vy',
 		math: 'Math',
 		math_modal_fontSizeLabel: 'Textstorlek',
 		math_modal_inputLabel: 'Matematisk notation',
@@ -205,6 +206,8 @@
 		video_modal_title: 'Lägg till video',
 		video_modal_url: 'Bädda in video / YouTube,Vimeo',
 		width: 'Bredd',
+		codeLanguage: 'Språk',
+		codeLanguage_none: 'Ingen',
 		message_copy_success: 'Kopierat till urklipp',
 		message_copy_fail: 'Kopieringen misslyckades. Kopiera manuellt.',
 	};

@@ -196,7 +196,7 @@ declare global {
 				/**
 				 * Event listener
 				 */
-				listener: (...args: any) => any;
+				listener: any;
 				/**
 				 * Use event capture
 				 */

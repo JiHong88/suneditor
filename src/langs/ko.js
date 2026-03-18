@@ -125,6 +125,7 @@
 		link_modal_url: '인터넷 주소',
 		link_modal_relAttribute: 'Rel 속성',
 		list: '리스트',
+		markdownView: '마크다운 보기',
 		math: '수식',
 		math_modal_fontSizeLabel: '글자 크기',
 		math_modal_inputLabel: '수학적 표기법',
@@ -204,6 +205,8 @@
 		video_modal_title: '동영상 삽입',
 		video_modal_url: '미디어 임베드 주소, 유튜브/비메오',
 		width: '가로',
+		codeLanguage: '언어',
+		codeLanguage_none: '없음',
 		message_copy_success: '클립보드에 복사되었습니다',
 		message_copy_fail: '복사에 실패했습니다. 수동으로 복사해주세요.',
 	};

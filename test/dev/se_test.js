@@ -765,6 +765,7 @@ const options1 = {
 	// height: 1500,
 	// iframe_attributes: { aaa: true },
 	type: 'document:header,page',
+	// codeLangs: [],
 	externalLibs: {
 		// codeMirror: { src: CodeMirror },
 		// katex: {

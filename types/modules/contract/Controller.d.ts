@@ -152,7 +152,7 @@ declare class Controller {
 	 * @param {boolean} [params.isWWTarget] If the controller is in the WYSIWYG area, set it to `true`.
 	 * @param {() => void} [params.initMethod] Method to be called when the controller is closed.
 	 * @param {boolean} [params.disabled] If `true`, When the `controller` is opened, buttons without the `se-component-enabled` class are disabled. (default: `this.disabled`)
-	 * @param {{left?: number, top?: number}} [params.addOffset] Additional offset values
+	 * @param {{left?: number, right?:number, top?: number}} [params.addOffset] Additional offset values
 	 * @example
 	 * // Open controller on a target element with default options
 	 * this.controller.open(target);
@@ -177,6 +177,7 @@ declare class Controller {
 			disabled?: boolean;
 			addOffset?: {
 				left?: number;
+				right?: number;
 				top?: number;
 			};
 		},

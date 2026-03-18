@@ -126,6 +126,7 @@
 		link_modal_url: 'URL til link',
 		link_modal_relAttribute: 'Rel attribut',
 		list: 'Lister',
+		markdownView: 'Markdown-visning',
 		math: 'Math',
 		math_modal_fontSizeLabel: 'Skriftstørrelse',
 		math_modal_inputLabel: 'Matematisk notation',
@@ -205,6 +206,8 @@
 		video_modal_title: 'Indsæt Video',
 		video_modal_url: 'Indlejr video / YouTube,Vimeo',
 		width: 'Bredde',
+		codeLanguage: 'Sprog',
+		codeLanguage_none: 'Ingen',
 		message_copy_success: 'Kopieret til udklipsholderen',
 		message_copy_fail: 'Kopiering mislykkedes. Kopiér venligst manuelt.',
 	};

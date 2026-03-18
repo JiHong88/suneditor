@@ -126,6 +126,7 @@
 		link_modal_url: 'Adresse URL du lien',
 		link_modal_relAttribute: 'Attribut Rel',
 		list: 'Liste',
+		markdownView: 'Vue Markdown',
 		math: 'Math',
 		math_modal_fontSizeLabel: 'Taille',
 		math_modal_inputLabel: 'Notation mathématique',
@@ -205,6 +206,8 @@
 		video_modal_title: 'Insérer une vidéo',
 		video_modal_url: 'URL d’intégration du média, YouTube/Vimeo',
 		width: 'Largeur',
+		codeLanguage: 'Langue',
+		codeLanguage_none: 'Aucun',
 		message_copy_success: 'Copié dans le presse-papiers',
 		message_copy_fail: 'Échec de la copie. Veuillez copier manuellement.',
 	};

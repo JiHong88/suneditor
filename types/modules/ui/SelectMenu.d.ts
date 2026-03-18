@@ -30,6 +30,14 @@ export type SelectMenuParams = {
 	 * Optional method to call when the menu is closed
 	 */
 	closeMethod?: () => void;
+	/**
+	 * Optional max-height CSS value (e.g. `"200px"`). Enables scrolling when items exceed this height.
+	 */
+	maxHeight?: string;
+	/**
+	 * Optional min-width CSS value (e.g. `"130px"`).
+	 */
+	minWidth?: string;
 };
 /**
  * @typedef {Object} SelectMenuParams
@@ -44,6 +52,8 @@ export type SelectMenuParams = {
  * @property {number} [splitNum=0] Optional split number for horizontal positioning; defines how many items per row
  * @property {() => void} [openMethod] Optional method to call when the menu is opened
  * @property {() => void} [closeMethod] Optional method to call when the menu is closed
+ * @property {string} [maxHeight] Optional max-height CSS value (e.g. `"200px"`). Enables scrolling when items exceed this height.
+ * @property {string} [minWidth] Optional min-width CSS value (e.g. `"130px"`).
  */
 /**
  * @class
@@ -71,6 +81,8 @@ declare class SelectMenu {
 	horizontal: boolean;
 	openMethod: () => void;
 	closeMethod: () => void;
+	maxHeight: string;
+	minWidth: string;
 	/**
 	 * @description Creates the select menu items.
 	 * @param {Array<string>|SunEditor.NodeCollection} items - Command list of selectable items.

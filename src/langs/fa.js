@@ -126,6 +126,7 @@
 		link_modal_url: 'آدرس لینک',
 		link_modal_relAttribute: 'ویژگی Rel',
 		list: 'لیست',
+		markdownView: 'نمای نشانه‌گذاری شده',
 		math: 'درج فرمول ریاضی',
 		math_modal_fontSizeLabel: 'اندازه‌ی فونت',
 		math_modal_inputLabel: 'تعریف فرمول',
@@ -205,6 +206,8 @@
 		video_modal_title: 'درج ویدئو',
 		video_modal_url: 'آدرس Url ویدئو, YouTube/Vimeo',
 		width: 'پهنا',
+		codeLanguage: 'زبان',
+		codeLanguage_none: 'هیچکدام',
 		message_copy_success: 'در کلیپ‌بورد کپی شد',
 		message_copy_fail: 'کپی انجام نشد. لطفاً به صورت دستی کپی کنید.',
 	};

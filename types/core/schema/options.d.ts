@@ -456,6 +456,16 @@ export namespace DEFAULTS {
  * @property {Object<"copy", number>} [toastMessageTime={copy: 1500}] - Duration for displaying toast messages (ms).
  * @property {boolean} [freeCodeViewMode=false] - Enables free code view mode.
  *
+ * === Code Block ===
+ * @property {?Array<string>} [codeLangs] - List of selectable programming languages for `<pre>` code blocks.
+ * - A language selector UI appears on hover over `<pre>` elements.
+ * - Defaults to common languages (javascript, typescript, html, css, json, python, java, c, cpp, csharp, go, rust, ruby, php, swift, kotlin, sql, bash, markdown, xml, yaml).
+ * - Set to empty array `[]` to disable the feature.
+ * ```js
+ * { codeLangs: ['javascript', 'python', 'html', 'css'] }
+ * ```
+ * ///
+ *
  * === Dynamic Options ===
  * @property {Object<string, *>} [externalLibs] - External libraries like CodeMirror, KaTeX, or MathJax.
  * - See {@link https://github.com/ARA-developer/suneditor/blob/develop/guide/external-libraries.md External Libraries Guide}
@@ -1298,9 +1308,22 @@ export type EditorBaseOptions = {
 	/**
 	 * - Enables free code view mode.
 	 *
-	 * === Dynamic Options ===
+	 * === Code Block ===
 	 */
 	freeCodeViewMode?: boolean;
+	/**
+	 * - List of selectable programming languages for `<pre>` code blocks.
+	 * - A language selector UI appears on hover over `<pre>` elements.
+	 * - Defaults to common languages (javascript, typescript, html, css, json, python, java, c, cpp, csharp, go, rust, ruby, php, swift, kotlin, sql, bash, markdown, xml, yaml).
+	 * - Set to empty array `[]` to disable the feature.
+	 * ```js
+	 * { codeLangs: ['javascript', 'python', 'html', 'css'] }
+	 * ```
+	 * ///
+	 *
+	 * === Dynamic Options ===
+	 */
+	codeLangs?: Array<string> | null;
 	/**
 	 * - External libraries like CodeMirror, KaTeX, or MathJax.
 	 * - See {@link https://github.com/ARA-developer/suneditor/blob/develop/guide/external-libraries.md External Libraries Guide}```js

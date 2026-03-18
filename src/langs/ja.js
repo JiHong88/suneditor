@@ -125,6 +125,7 @@
 		link_modal_url: 'インターネットアドレス',
 		link_modal_relAttribute: 'Rel 属性',
 		list: 'リスト',
+		markdownView: 'マークダウン表示',
 		math: '数学',
 		math_modal_fontSizeLabel: 'サイズ',
 		math_modal_inputLabel: '数学表記',
@@ -204,6 +205,8 @@
 		video_modal_title: '動画を挿入',
 		video_modal_url: 'メディア埋め込みアドレス, YouTube/Vimeo',
 		width: '横',
+		codeLanguage: '言語',
+		codeLanguage_none: 'なし',
 		message_copy_success: 'クリップボードにコピーしました',
 		message_copy_fail: 'コピーに失敗しました。手動でコピーしてください。',
 	};

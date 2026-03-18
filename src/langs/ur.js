@@ -126,6 +126,7 @@
 		link_modal_url: 'لنک کرنے کے لیے URL',
 		link_modal_relAttribute: 'Rel وصف',
 		list: 'فہرست',
+		markdownView: 'مارک ڈاؤن منظر',
 		math: 'ریاضی',
 		math_modal_fontSizeLabel: 'حرف کا سائز',
 		math_modal_inputLabel: 'ریاضیاتی اشارے',
@@ -205,6 +206,8 @@
 		video_modal_title: 'ویڈیو داخل کریں',
 		video_modal_url: 'ذرائع ابلاغ کا یو آر ایل، یوٹیوب/ویمیو',
 		width: 'چوڑائی',
+		codeLanguage: 'زبان',
+		codeLanguage_none: 'کوئی نہیں۔',
 		message_copy_success: 'کلپ بورڈ میں کاپی ہو گیا',
 		message_copy_fail: 'کاپی ناکام۔ براہ کرم دستی طور پر کاپی کریں۔',
 	};

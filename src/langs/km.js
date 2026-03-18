@@ -125,6 +125,7 @@
 		link_modal_url: 'URL តំណ',
 		link_modal_relAttribute: 'លក្ខណៈ Rel',
 		list: 'បញ្ជី',
+		markdownView: 'ទិដ្ឋភាព​សម្គាល់​',
 		math: 'គណិត',
 		math_modal_fontSizeLabel: 'ទំហំពុម្ព',
 		math_modal_inputLabel: 'សញ្ញាណគណិត',
@@ -204,6 +205,8 @@
 		video_modal_title: 'បញ្ចូលវីដេអូ',
 		video_modal_url: 'URL បង្កប់មេឌៀ, YouTube/Vimeo',
 		width: 'ទទឹង',
+		codeLanguage: 'ភាសា',
+		codeLanguage_none: 'គ្មាន',
 		message_copy_success: 'បានចម្លងទៅក្តារចម្លង',
 		message_copy_fail: 'ការចម្លងបរាជ័យ។ សូមចម្លងដោយដៃ។',
 	};

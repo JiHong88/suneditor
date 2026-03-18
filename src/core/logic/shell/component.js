@@ -1,4 +1,4 @@
-import { dom, env, numbers, unicode, keyCodeMap, converter } from '../../../helper';
+import { dom, env, numbers, unicode, keyCodeMap } from '../../../helper';
 import { Figure } from '../../../modules/contract';
 import { _DragHandle } from '../../../modules/ui';
 
@@ -339,11 +339,8 @@ class Component {
 			_DragHandle.set('__overInfo', __overInfo === ON_OVER_COMPONENT ? undefined : false);
 			if (__overInfo !== ON_OVER_COMPONENT) this.#addGlobalEvent();
 			if (!info.isFile) this.#addNotFileGlobalEvent();
-		}, 0);
-
-		converter.debounce(() => {
 			dom.utils.addClass(info.container, 'se-component-selected');
-		}, 0)();
+		}, 0);
 
 		if (notOver && !this.#store.get('hasFocus') && !this.#store.get('_preventFocus')) {
 			this.#kernel._eventOrchestrator.__postFocusEvent(this.#frameContext, null);
@@ -513,10 +510,11 @@ class Component {
 		if (this.currentInfo) {
 			const infoContainer = this.currentInfo.container;
 			const infoCover = this.currentInfo.cover;
-			converter.debounce(() => {
+
+			_w.setTimeout(() => {
 				RemoveSelectedClass(infoContainer);
 				dom.utils.removeClass(infoCover, 'se-figure-over-selected');
-			}, 0)();
+			}, 0);
 		}
 
 		if (this.#frameContext.get('lineBreaker_t')) {

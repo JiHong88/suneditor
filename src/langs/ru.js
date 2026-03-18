@@ -126,6 +126,7 @@
 		link_modal_url: 'Ссылка',
 		link_modal_relAttribute: 'Атрибут Rel',
 		list: 'Списки',
+		markdownView: 'Просмотр в формате Markdown',
 		math: 'математический',
 		math_modal_fontSizeLabel: 'Кегль',
 		math_modal_inputLabel: 'Математическая запись',
@@ -205,6 +206,8 @@
 		video_modal_title: 'Вставить видео',
 		video_modal_url: 'Ссылка на видео, Youtube,Vimeo',
 		width: 'Ширина',
+		codeLanguage: 'Язык',
+		codeLanguage_none: 'Никто',
 		message_copy_success: 'Скопировано в буфер обмена',
 		message_copy_fail: 'Не удалось скопировать. Пожалуйста, скопируйте вручную.',
 	};

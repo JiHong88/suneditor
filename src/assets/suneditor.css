@@ -2922,6 +2922,7 @@
 	margin: 0;
 }
 
+.sun-editor .se-select-menu .se-select-item.se-select-on,
 .sun-editor .se-select-menu .se-select-item *.se-select-on {
 	color: var(--se-active-dark3-color);
 }
@@ -3612,6 +3613,65 @@
 .sun-editor-editable[contenteditable='true'] table th.se-selected-cell-focus {
 	outline: 2px dashed var(--se-active-dark3-color);
 	z-index: 1;
+}
+
+/** ---pre code lang */
+/* ---pre - language label */
+.sun-editor-editable pre[data-se-lang] {
+	position: relative;
+}
+.sun-editor-editable pre[data-se-lang]::before {
+	content: attr(data-se-lang);
+	position: absolute;
+	top: 0;
+	right: 0;
+	padding: 2px 8px;
+	font-size: 11px;
+	color: var(--se-secondary-color);
+	opacity: 0.7;
+	pointer-events: none;
+}
+.sun-editor-editable pre[data-se-lang].se-pre-code-focus::before {
+	display: none;
+}
+.sun-editor-editable.se-rtl pre[data-se-lang]::before {
+	right: auto;
+	left: 0;
+}
+
+/* ---pre language selector */
+.sun-editor .se-code-lang {
+	position: absolute;
+	display: none;
+	padding: 0;
+}
+.sun-editor .se-code-lang-button {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	cursor: pointer;
+	margin: 0;
+	padding: 4px;
+	font-size: 11px;
+	font-family: monospace;
+	line-height: 1.4;
+	border-radius: var(--se-border-radius);
+	background-color: var(--se-edit-background-pre, #f9f9f9);
+	border: 1px solid var(--se-border-color);
+	color: var(--se-edit-font-pre, #666);
+	opacity: 0.75;
+	transition: opacity 0.15s;
+	white-space: nowrap;
+	box-shadow: 0;
+}
+.sun-editor .se-code-lang-button:hover {
+	opacity: 1;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+.sun-editor .se-code-lang-icon {
+	font-weight: 700;
+	font-size: 10px;
+	opacity: 0.5;
 }
 
 /** --- RTL start -------------------------------------------------------------------------------------------------------------------------------------------------- */

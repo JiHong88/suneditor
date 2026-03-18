@@ -46,7 +46,7 @@ class Controller {
 	#initMethod;
 	#globalEventHandlers;
 
-	#addOffset = { left: 0, top: 0 };
+	#addOffset = null;
 	#reserveIndex = false;
 	#preventClose = false;
 	#bindShadowRootEvent = null;
@@ -125,7 +125,7 @@ class Controller {
 	 * @param {boolean} [params.isWWTarget] If the controller is in the WYSIWYG area, set it to `true`.
 	 * @param {() => void} [params.initMethod] Method to be called when the controller is closed.
 	 * @param {boolean} [params.disabled] If `true`, When the `controller` is opened, buttons without the `se-component-enabled` class are disabled. (default: `this.disabled`)
-	 * @param {{left?: number, top?: number}} [params.addOffset] Additional offset values
+	 * @param {{left?: number, right?:number, top?: number}} [params.addOffset] Additional offset values
 	 * @example
 	 * // Open controller on a target element with default options
 	 * this.controller.open(target);
@@ -166,8 +166,7 @@ class Controller {
 		if (typeof initMethod === 'function') this.#initMethod = initMethod;
 		this.#$.ui.currentControllerName = this.kind;
 
-		this.#addOffset = { left: 0, top: 0 };
-		if (addOffset) this.#addOffset = { ...this.#addOffset, ...addOffset };
+		this.#addOffset = { left: 0, right: 0, top: 0, ...addOffset };
 
 		const parents = this.isOutsideForm ? this.parentsForm : [];
 		this.#$.ui.opendControllers?.forEach((e) => {
@@ -215,7 +214,7 @@ class Controller {
 		this.isOpen = false;
 		this.#preventClose = false;
 		this.__offset = {};
-		this.#addOffset = { left: 0, top: 0 };
+		this.#addOffset = null;
 
 		this.#removeGlobalEvent();
 

@@ -126,6 +126,7 @@
 		link_modal_url: 'URL',
 		link_modal_relAttribute: 'Rel-attribuut',
 		list: 'Lijst',
+		markdownView: 'Markdown-weergave',
 		math: 'Wiskunde',
 		math_modal_fontSizeLabel: 'Lettergrootte',
 		math_modal_inputLabel: 'Wiskundige notatie',
@@ -205,6 +206,8 @@
 		video_modal_title: 'Video invoegen',
 		video_modal_url: 'Embedded URL (YouTube/Vimeo)',
 		width: 'Breedte',
+		codeLanguage: 'Taal',
+		codeLanguage_none: 'Geen',
 		message_copy_success: 'Gekopieerd naar klembord',
 		message_copy_fail: 'Kopiëren mislukt. Kopieer handmatig.',
 	};

@@ -126,6 +126,7 @@
 		link_modal_url: 'Adresă link',
 		link_modal_relAttribute: 'Atributul rel',
 		list: 'Listă',
+		markdownView: 'Vizualizare Markdown',
 		math: 'Matematică',
 		math_modal_fontSizeLabel: 'Dimensiune font',
 		math_modal_inputLabel: 'Notație matematică',
@@ -205,6 +206,8 @@
 		video_modal_title: 'Inserează video',
 		video_modal_url: 'Include URL, youtube/vimeo',
 		width: 'Lățime',
+		codeLanguage: 'Limbă',
+		codeLanguage_none: 'Nici unul',
 		message_copy_success: 'Copiat în clipboard',
 		message_copy_fail: 'Copiere eșuată. Vă rugăm să copiați manual.',
 	};

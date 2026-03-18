@@ -426,14 +426,14 @@ class Offset {
 	 * @param {HTMLElement} target Target element
 	 * @param {Object} params Position parameters
 	 * @param {boolean} [params.isWWTarget=false] Whether the target is within the editor's WYSIWYG area
-	 * @param {{left:number, top:number}} [params.addOffset={left:0, top:0}] Additional offset
+	 * @param {{left:number, right:number, top:number}} [params.addOffset={left:0, right:0, top:0}] Additional offset
 	 * @param {"bottom"|"top"} [params.position="bottom"] Position ('bottom'|'top')
 	 * @param {*} params.inst Instance object of caller
 	 * @param {HTMLElement} [params.sibling=null] The sibling controller element
 	 * @returns {{position: "top" | "bottom"} | undefined} Success -> {position: current position}
 	 * @example
 	 * const result = editor.$.offset.setAbsPosition(controller, targetElement, {
-	 *   position: 'bottom', inst: this, addOffset: { left: 0, top: 0 }
+	 *   position: 'bottom', inst: this, addOffset: { left: 0, right: 0, top: 0 }
 	 * });
 	 */
 	setAbsPosition(element, target, params) {
@@ -541,7 +541,7 @@ class Offset {
 			arrow.style.right = '';
 		}
 
-		let l = addOffset.left;
+		let l = addOffset.left || addOffset.right ? (isLTR ? addOffset.right - element.offsetWidth : element.offsetWidth - addOffset.right) : 0;
 		let x = 0;
 		let ax = 0;
 		let awLimit = 0;

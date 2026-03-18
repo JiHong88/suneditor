@@ -205,6 +205,8 @@
 		video_modal_title: 'Insert Video',
 		video_modal_url: 'Media embed URL, YouTube/Vimeo',
 		width: 'Width',
+		codeLanguage: 'Language',
+		codeLanguage_none: 'None',
 		message_copy_success: 'Copied to clipboard',
 		message_copy_fail: 'Copy failed. Please copy manually.',
 	};

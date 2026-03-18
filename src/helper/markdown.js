@@ -1,7 +1,5 @@
 /**
  * @fileoverview Markdown converter module
- * - jsonToMarkdown: Converts JSON tree (from htmlToJson) to Markdown string
- * - markdownToHtml: Parses Markdown string to HTML string
  * - Supports GitHub Flavored Markdown (GFM) syntax
  */
 
@@ -303,7 +301,6 @@ function nodeToMarkdown(node, indent, isBlock) {
 		return `${prefix} ${childrenToInline(children).trim()}\n\n`;
 	}
 
-	// Paragraph
 	if (tag === 'p') {
 		const content = childrenToInline(children);
 		// Empty paragraph
@@ -311,12 +308,10 @@ function nodeToMarkdown(node, indent, isBlock) {
 		return `${content.trim()}\n\n`;
 	}
 
-	// Line break
 	if (tag === 'br') {
 		return '\n';
 	}
 
-	// Horizontal rule
 	if (tag === 'hr') {
 		return '---\n\n';
 	}
@@ -354,7 +349,6 @@ function nodeToMarkdown(node, indent, isBlock) {
 		return `<sup>${content}</sup>`;
 	}
 
-	// Link
 	if (tag === 'a') {
 		const href = attributes.href || '';
 		const text = childrenToInline(children);
@@ -363,14 +357,12 @@ function nodeToMarkdown(node, indent, isBlock) {
 		return `[${text}](${href})`;
 	}
 
-	// Image
 	if (tag === 'img') {
 		const src = attributes.src || '';
 		const alt = attributes.alt || '';
 		return `![${alt}](${src})`;
 	}
 
-	// Blockquote
 	if (tag === 'blockquote') {
 		const inner = children.map((c) => nodeToMarkdown(c, '', true)).join('');
 		// Prefix each line with >
@@ -389,6 +381,8 @@ function nodeToMarkdown(node, indent, isBlock) {
 			lang = (codeChild.attributes?.class || '').replace(/^language-/, '');
 			codeContent = getTextContent(codeChild);
 		} else {
+			// Also check pre's own class for language- (editor internal format)
+			lang = (node.attributes?.class || '').match(/language-(\S+)/)?.[1] || '';
 			codeContent = getTextContent({ children });
 		}
 
@@ -412,12 +406,10 @@ function nodeToMarkdown(node, indent, isBlock) {
 		return listToMarkdown(node, indent, true) + '\n';
 	}
 
-	// Table
 	if (tag === 'table') {
 		return tableToMarkdown(node) + '\n';
 	}
 
-	// Definition list
 	if (tag === 'dl') {
 		let result = '';
 		for (const child of children) {
@@ -473,7 +465,7 @@ function nodeToMarkdown(node, indent, isBlock) {
 		return nodeToHtmlFallback(node);
 	}
 
-	// HTML fallback for unsupported elements
+	// HTML fallback
 	return nodeToHtmlFallback(node);
 }
 

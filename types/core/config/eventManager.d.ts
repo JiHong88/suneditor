@@ -41,20 +41,20 @@ declare class EventManager {
 	 * @description Add an event to document.
 	 * - When created as an Iframe, the same event is added to the document in the Iframe.
 	 * @param {string} type Event type
-	 * @param {(...args: *) => *} listener Event listener
+	 * @param {*} listener Event listener
 	 * @param {boolean|AddEventListenerOptions} [useCapture] Use event capture
 	 * @return {SunEditor.Event.GlobalInfo} Registered event information
 	 */
-	addGlobalEvent(type: string, listener: (...args: any) => any, useCapture?: boolean | AddEventListenerOptions): SunEditor.Event.GlobalInfo;
+	addGlobalEvent(type: string, listener: any, useCapture?: boolean | AddEventListenerOptions): SunEditor.Event.GlobalInfo;
 	/**
 	 * @description Remove events from document.
 	 * - When created as an Iframe, the event of the document inside the Iframe is also removed.
 	 * @param {string|SunEditor.Event.GlobalInfo} type Event type or (Event info = this.addGlobalEvent())
-	 * @param {(...args: *) => *} [listener] Event listener
+	 * @param {*} [listener] Event listener
 	 * @param {boolean|AddEventListenerOptions} [useCapture] Use event capture
 	 * @returns {undefined|null} Success: `null`, Not found: `undefined`
 	 */
-	removeGlobalEvent(type: string | SunEditor.Event.GlobalInfo, listener?: (...args: any) => any, useCapture?: boolean | AddEventListenerOptions): undefined | null;
+	removeGlobalEvent(type: string | SunEditor.Event.GlobalInfo, listener?: any, useCapture?: boolean | AddEventListenerOptions): undefined | null;
 	/**
 	 * @internal
 	 * @description Gives an active effect when the mouse down event is blocked. (Used when "env.isGecko" is `true`)

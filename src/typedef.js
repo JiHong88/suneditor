@@ -203,7 +203,7 @@
  * EventManager global event information
  * @typedef {Object} SunEditor.Event.GlobalInfo
  * @property {string} type Event type
- * @property {(...args: *) => *} listener Event listener
+ * @property {*} listener Event listener
  * @property {boolean|AddEventListenerOptions} [useCapture] Use event capture
  */
 

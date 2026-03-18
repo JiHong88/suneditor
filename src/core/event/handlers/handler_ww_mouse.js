@@ -89,11 +89,19 @@ export async function OnClick_wysiwyg(fc, e) {
 	// plugin event
 	if ((await this._callPluginEventAsync('onClick', { frameContext: fc, event: e })) === false) return;
 
+	// component
 	const componentInfo = this.$.component.get(eventTarget);
 	if (componentInfo) {
 		e.preventDefault();
 		this.$.component.select(componentInfo.target, componentInfo.pluginName);
 		return;
+	}
+
+	// code lang selector
+	if (this.codeLang) {
+		if (this.codeLang.isOpen()) {
+			this.codeLang.close();
+		}
 	}
 
 	this.$.selection.init();
@@ -148,6 +156,14 @@ export function OnMouseMove_wysiwyg(fc, e) {
 	// over component
 	if (_DragHandle.get('__overInfo') !== false) {
 		this.$.component.hoverSelect(eventTarget);
+	}
+
+	// code lang selector
+	if (this.codeLang) {
+		const pre = eventTarget.closest('pre');
+		if (pre && !this.codeLang.isOpen() && this.$.ui.opendControllers.length === 0) {
+			this.codeLang.show(pre);
+		}
 	}
 
 	this._callPluginEvent('onMouseMove', { frameContext: fc, event: e });

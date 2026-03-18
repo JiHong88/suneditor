@@ -689,6 +689,14 @@ export function InitOptions(options, editorTargets, plugins) {
 	/** Private options */
 	o.set('__listCommonStyle', options.__listCommonStyle || ['fontSize', 'color', 'fontFamily', 'fontWeight', 'fontStyle']);
 
+	/** Code languages */
+	o.set(
+		'codeLangs',
+		Array.isArray(options.codeLangs)
+			? options.codeLangs
+			: ['javascript', 'typescript', 'html', 'css', 'json', 'python', 'java', 'c', 'cpp', 'csharp', 'go', 'rust', 'ruby', 'php', 'swift', 'kotlin', 'sql', 'bash', 'markdown', 'xml', 'yaml'],
+	);
+
 	/** --- Icons ------------------------------------------------------------------------------------------ */
 	const icons =
 		!options.icons || typeof options.icons !== 'object'

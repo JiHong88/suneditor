@@ -43,7 +43,7 @@ export const DEFAULTS = {
 
 	SIZE_UNITS: ['px', 'pt', 'em', 'rem'],
 
-	CLASS_NAME: '^__se__|^se-|^katex|^MathJax',
+	CLASS_NAME: '^__se__|^se-|^katex|^MathJax|^language-',
 	CLASS_MJX: 'mjx-container|mjx-math|mjx-mrow|mjx-mi|mjx-mo|mjx-mn|mjx-msup|mjx-mfrac|mjx-munderover',
 	EXTRA_TAG_MAP: { script: false, style: false, meta: false, link: false, '[a-z]+:[a-z]+': false },
 
@@ -510,6 +510,16 @@ export const DEFAULTS = {
  * @property {Object<"copy", number>} [toastMessageTime={copy: 1500}] - Duration for displaying toast messages (ms).
  * @property {boolean} [freeCodeViewMode=false] - Enables free code view mode.
  *
+ * === Code Block ===
+ * @property {?Array<string>} [codeLangs] - List of selectable programming languages for `<pre>` code blocks.
+ * - A language selector UI appears on hover over `<pre>` elements.
+ * - Defaults to common languages (javascript, typescript, html, css, json, python, java, c, cpp, csharp, go, rust, ruby, php, swift, kotlin, sql, bash, markdown, xml, yaml).
+ * - Set to empty array `[]` to disable the feature.
+ * ```js
+ * { codeLangs: ['javascript', 'python', 'html', 'css'] }
+ * ```
+ * ///
+ *
  * === Dynamic Options ===
  * @property {Object<string, *>} [externalLibs] - External libraries like CodeMirror, KaTeX, or MathJax.
  * - See {@link https://github.com/ARA-developer/suneditor/blob/develop/guide/external-libraries.md External Libraries Guide}
@@ -741,6 +751,7 @@ export const OPTION_FIXED_FLAG = {
 	__pluginRetainFilter: true,
 	__listCommonStyle: 'fixed',
 	externalLibs: 'fixed',
+	codeLangs: 'fixed',
 };
 
 /**
