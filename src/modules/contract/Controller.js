@@ -6,6 +6,7 @@ const INDEX_00 = '2147483646';
 const INDEX_0 = '2147483645';
 const INDEX_S_1 = '2147483642';
 const INDEX_1 = '2147483641';
+const ADD_OFFSET_VALUE = { left: 0, right: 0, top: 0 };
 
 /**
  * Controller information object
@@ -46,7 +47,7 @@ class Controller {
 	#initMethod;
 	#globalEventHandlers;
 
-	#addOffset = null;
+	#addOffset = ADD_OFFSET_VALUE;
 	#reserveIndex = false;
 	#preventClose = false;
 	#bindShadowRootEvent = null;
@@ -214,7 +215,7 @@ class Controller {
 		this.isOpen = false;
 		this.#preventClose = false;
 		this.__offset = {};
-		this.#addOffset = null;
+		this.#addOffset = ADD_OFFSET_VALUE;
 
 		this.#removeGlobalEvent();
 

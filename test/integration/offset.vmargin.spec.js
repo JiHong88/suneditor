@@ -1544,7 +1544,7 @@ describe('Offset setAbsPosition — return value and inst.__offset', () => {
 		const target = createExternalTarget({ top: 200, left: 200 });
 		const el = createControllerElement();
 		const inst = { __offset: null };
-		const addOffset = { left: 20, top: 15 };
+		const addOffset = { left: 20, top: 15, right: 0 };
 
 		try {
 			editor.$.offset.setAbsPosition(el, target, {

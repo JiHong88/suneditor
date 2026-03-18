@@ -439,6 +439,7 @@ class Offset {
 	setAbsPosition(element, target, params) {
 		const addOffset = {
 			left: 0,
+			right: 0,
 			top: 0,
 			...params.addOffset,
 		};
@@ -541,7 +542,7 @@ class Offset {
 			arrow.style.right = '';
 		}
 
-		let l = addOffset.left || addOffset.right ? (isLTR ? addOffset.right - element.offsetWidth : element.offsetWidth - addOffset.right) : 0;
+		let l = addOffset.left || (addOffset.right ? (isLTR ? addOffset.right - element.offsetWidth : element.offsetWidth - addOffset.right) : 0);
 		let x = 0;
 		let ax = 0;
 		let awLimit = 0;

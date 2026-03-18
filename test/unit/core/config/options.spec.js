@@ -2,6 +2,8 @@
  * @fileoverview Unit tests for core/config/options.js
  */
 
+import fs from 'fs';
+import path from 'path';
 import {
     DEFAULTS,
     OPTION_FRAME_FIXED_FLAG,
@@ -9,7 +11,43 @@ import {
     // FrameOptionsMap, BaseOptionsMap moved to optionProvider service
 } from '../../../../src/core/schema/options';
 
+const constructorSrc = fs.readFileSync(path.resolve(__dirname, '../../../../src/core/section/constructor.js'), 'utf-8');
+
+/**
+ * @description Extracts user input option keys (`options.xxx`) from a function body in constructor.js
+ * @param {string} src Full source code
+ * @param {RegExp} regionRegex Regex to extract target function body
+ * @returns {string[]} Extracted public keys (excluding `_` prefixed internal keys)
+ */
+function extractInputKeys(src, regionRegex) {
+    const body = src.match(regionRegex)?.[0] || '';
+    const regex = /options\.([a-zA-Z]\w*)/g;
+    const keys = new Set();
+    let m;
+    while ((m = regex.exec(body)) !== null) {
+        keys.add(m[1]);
+    }
+    return [...keys];
+}
+
+const allFlags = { ...OPTION_FIXED_FLAG, ...OPTION_FRAME_FIXED_FLAG };
+
 describe('Core Config - Options', () => {
+    describe('OPTION flags - every user input option must be registered', () => {
+        const inputKeys = extractInputKeys(constructorSrc, /export function InitOptions[\s\S]+?^}/m);
+        const frameInputKeys = extractInputKeys(constructorSrc, /function InitFrameOptions[\s\S]+?^}/m);
+
+        it('Every user input option in InitOptions must be registered in OPTION_FIXED_FLAG or OPTION_FRAME_FIXED_FLAG', () => {
+            const missing = inputKeys.filter(k => !(k in allFlags));
+            expect(missing).toEqual([]);
+        });
+
+        it('Every user input option in InitFrameOptions must be registered in OPTION_FRAME_FIXED_FLAG', () => {
+            const missing = frameInputKeys.filter(k => !(k in OPTION_FRAME_FIXED_FLAG));
+            expect(missing).toEqual([]);
+        });
+    });
+
     describe('DEFAULTS constant', () => {
 
         it('should have valid BUTTON_LIST structure', () => {

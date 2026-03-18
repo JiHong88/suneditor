@@ -1239,7 +1239,7 @@ describe('Offset — Numerical Verification (non-zero layout)', () => {
 			});
 
 			expect(inst.__offset).toBeDefined();
-			expect(inst.__offset.addOffset).toEqual({ left: 25, top: 30 });
+			expect(inst.__offset.addOffset).toEqual({ left: 25, top: 30, right: 0 });
 			expect(typeof inst.__offset.left).toBe('number');
 			expect(typeof inst.__offset.top).toBe('number');
 
