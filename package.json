@@ -132,7 +132,7 @@
 		"chrome >= 119",
 		"edge >= 119",
 		"firefox >= 121",
-		"safari >= 17",
+		"safari >= 17.2",
 		"opera >= 105",
 		"samsung >= 23",
 		"Firefox ESR",
