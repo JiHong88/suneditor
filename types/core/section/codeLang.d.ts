@@ -24,6 +24,11 @@ declare class CodeLang {
 	constructor($: SunEditor.Deps, langs: Array<string>);
 	controller: Controller;
 	/**
+	 * @description Whether the selector UI is currently visible (button or menu open).
+	 * @returns {boolean}
+	 */
+	get isOpen(): boolean;
+	/**
 	 * @description Shows the language selector over the given pre element.
 	 * @param {HTMLElement} preElement The `<pre>` element
 	 */
@@ -36,11 +41,6 @@ declare class CodeLang {
 	 * @description Force close the language selector and selectMenu.
 	 */
 	close(): void;
-	/**
-	 * @description Whether the selector UI is currently visible (button or menu open).
-	 * @returns {boolean}
-	 */
-	isOpen(): boolean;
 	/**
 	 * @hook Module.Controller
 	 * @description Called when the controller is closed.

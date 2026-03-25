@@ -40,7 +40,6 @@ declare class Toolbar {
 	 */
 	keyName: any;
 	currentMoreLayerActiveButton: HTMLButtonElement;
-	isSticky: boolean;
 	isBalloonMode: boolean;
 	isInlineMode: boolean;
 	isBalloonAlwaysMode: boolean;
@@ -53,6 +52,19 @@ declare class Toolbar {
 		top: number;
 		left: number;
 	};
+	/**
+	 * @description Whether the toolbar is currently in a sticky (fixed) state.
+	 * For CSS sticky mode, computed from the element's viewport position.
+	 * For JS sticky mode (toolbar_container), uses a manual flag.
+	 * @type {boolean}
+	 */
+	get isSticky(): boolean;
+	/**
+	 * @description Whether the toolbar uses native CSS `position: sticky`.
+	 * - When `false`, the JS-based sticky fallback (`position: fixed`) is active.
+	 * @type {boolean}
+	 */
+	get isCSSSticky(): boolean;
 	/**
 	 * @description Disables all toolbar buttons.
 	 */

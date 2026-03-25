@@ -150,6 +150,10 @@ declare class Controller {
 	 * @param {Node} [positionTarget] Position target element
 	 * @param {Object} [params={}] params
 	 * @param {boolean} [params.isWWTarget] If the controller is in the WYSIWYG area, set it to `true`.
+	 * @param {boolean} [params.passive] If `true`, opens the controller visually without affecting editor state
+	 * - (`_preventBlur`, `controlActive`, `onControllerContext`, `opendControllers`).
+	 * - Used for lightweight, non-intrusive display such as hover-triggered UI (e.g., codeLang selector on `<pre>` hover).
+	 * - Automatically set to `true` when opened during component hover selection (`ON_OVER_COMPONENT`).
 	 * @param {() => void} [params.initMethod] Method to be called when the controller is closed.
 	 * @param {boolean} [params.disabled] If `true`, When the `controller` is opened, buttons without the `se-component-enabled` class are disabled. (default: `this.disabled`)
 	 * @param {{left?: number, right?:number, top?: number}} [params.addOffset] Additional offset values
@@ -168,11 +172,13 @@ declare class Controller {
 		positionTarget?: Node,
 		{
 			isWWTarget,
+			passive,
 			initMethod,
 			disabled,
 			addOffset,
 		}?: {
 			isWWTarget?: boolean;
+			passive?: boolean;
 			initMethod?: () => void;
 			disabled?: boolean;
 			addOffset?: {

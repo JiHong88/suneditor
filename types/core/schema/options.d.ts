@@ -438,6 +438,7 @@ export namespace DEFAULTS {
  * - Default: `Boolean(plugins.link)` — determined by whether the `link` plugin is enabled.
  * @property {Array<string>} [autoStyleify=["bold", "underline", "italic", "strike"]] - Styles applied automatically on text input.
  * @property {number} [historyStackDelayTime=400] - Delay time for history stack updates (ms).
+ * @property {number} [historyStackSize=100] - Maximum number of history entries per root frame. Oldest entries are discarded when exceeded.
  * @property {string} [printClass=""] - Class name for printing.
  * @property {number} [fullScreenOffset=0] - Offset applied when entering fullscreen mode.
  * @property {?string} [previewTemplate=null] - Custom HTML template for preview mode. Use `{{ contents }}` as a placeholder for editor content.
@@ -455,6 +456,9 @@ export namespace DEFAULTS {
  * @property {?string} [defaultUrlProtocol=null] - Default URL protocol for links.
  * @property {Object<"copy", number>} [toastMessageTime={copy: 1500}] - Duration for displaying toast messages (ms).
  * @property {boolean} [freeCodeViewMode=false] - Enables free code view mode.
+ * @property {boolean} [finder_panel=true] - Shows the built-in Find/Replace panel UI.
+ * - The finder is always created internally; this option controls whether the panel is visible to users (Ctrl+F / Ctrl+H).
+ * @property {boolean} [finder_liveSearch=true] - Searches instantly as you type (debounced). When false, search runs only on Enter.
  *
  * === Code Block ===
  * @property {?Array<string>} [codeLangs] - List of selectable programming languages for `<pre>` code blocks.
@@ -1269,6 +1273,10 @@ export type EditorBaseOptions = {
 	 */
 	historyStackDelayTime?: number;
 	/**
+	 * - Maximum number of history entries per root frame. Oldest entries are discarded when exceeded.
+	 */
+	historyStackSize?: number;
+	/**
 	 * - Class name for printing.
 	 */
 	printClass?: string;
@@ -1307,10 +1315,19 @@ export type EditorBaseOptions = {
 	toastMessageTime?: any;
 	/**
 	 * - Enables free code view mode.
+	 */
+	freeCodeViewMode?: boolean;
+	/**
+	 * - Shows the built-in Find/Replace panel UI.
+	 * - The finder is always created internally; this option controls whether the panel is visible to users (Ctrl+F / Ctrl+H).
+	 */
+	finder_panel?: boolean;
+	/**
+	 * - Searches instantly as you type (debounced). When false, search runs only on Enter.
 	 *
 	 * === Code Block ===
 	 */
-	freeCodeViewMode?: boolean;
+	finder_liveSearch?: boolean;
 	/**
 	 * - List of selectable programming languages for `<pre>` code blocks.
 	 * - A language selector UI appears on hover over `<pre>` elements.

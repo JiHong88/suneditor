@@ -545,7 +545,7 @@
 .sun-editor .se-btn:disabled,
 .sun-editor button:disabled,
 .sun-editor input:disabled {
-	cursor: not-allowed;
+	cursor: default;
 	color: var(--se-input-btn-disabled-color);
 }
 
@@ -851,7 +851,8 @@
 /** --- toolbar ---------------------------------------------------------- */
 .sun-editor .se-toolbar {
 	display: block;
-	position: relative;
+	position: sticky;
+	top: 0;
 	height: auto;
 	width: 100%;
 	overflow: visible;
@@ -881,8 +882,6 @@
 .sun-editor .se-toolbar.se-toolbar-inline {
 	display: none;
 	position: absolute;
-	box-shadow: 0 3px 9px var(--se-shadow-layer-color);
-	-webkit-box-shadow: 0 3px 9px var(--se-shadow-layer-color);
 }
 
 /* balloon toolbar */
@@ -895,7 +894,13 @@
 	-webkit-box-shadow: 0 3px 9px var(--se-shadow-layer-color);
 }
 
-/* sticky toolbar */
+/* JS fallback: initial state — override CSS sticky */
+.sun-editor .se-toolbar.se-toolbar-relative {
+	position: relative;
+	top: auto;
+}
+
+/* JS fallback: sticky active — overrides both default and relative */
 .sun-editor .se-toolbar.se-toolbar-sticky {
 	position: fixed;
 	top: 0px;
@@ -3615,7 +3620,7 @@
 	z-index: 1;
 }
 
-/** ---pre code lang */
+/** --- pre code lang --- */
 /* ---pre - language label */
 .sun-editor-editable pre[data-se-lang] {
 	position: relative;
@@ -3630,6 +3635,10 @@
 	color: var(--se-secondary-color);
 	opacity: 0.7;
 	pointer-events: none;
+}
+.sun-editor-editable[contenteditable='true'] pre.se-pre-code-focus {
+	outline: 2px solid var(--se-active-color);
+	outline-offset: -2px;
 }
 .sun-editor-editable pre[data-se-lang].se-pre-code-focus::before {
 	display: none;
@@ -3674,6 +3683,150 @@
 	opacity: 0.5;
 }
 
+/* --- Finder ---------------------------------------------------------- */
+.sun-editor .se-find-replace {
+	position: sticky;
+	z-index: 6;
+	display: none;
+	flex-direction: column;
+	margin-left: auto;
+	width: fit-content;
+	max-width: 100%;
+	background-color: var(--se-main-background-color);
+	border: 1px solid var(--se-main-border-color);
+	border-top: none;
+	border-right: none;
+	border-radius: 0 0 0 var(--se-border-radius);
+	box-shadow: -2px 2px 6px rgba(0, 0, 0, 0.1);
+	padding: 6px 8px;
+	gap: 4px;
+}
+.sun-editor .se-find-replace.se-find-replace-open {
+	display: flex;
+}
+
+.sun-editor .se-find-replace-row {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	align-items: center;
+	gap: 4px;
+}
+.sun-editor .se-find-replace-row-replace {
+	display: flex;
+	justify-content: flex-start;
+}
+
+/* Finder - input */
+.sun-editor .se-find-replace .se-find-input-wrapper {
+	position: relative;
+	flex: 1 1 180px;
+	max-width: 420px;
+}
+
+.sun-editor .se-find-replace .se-find-replace-input {
+	width: 100%;
+	height: 26px;
+	padding: 2px 100px 2px 6px;
+	border: 1px solid var(--se-main-border-color);
+	border-radius: var(--se-border-radius);
+	background-color: var(--se-main-background-color);
+	color: var(--se-main-color);
+	font-size: 13px;
+	outline: none;
+	box-sizing: border-box;
+}
+.sun-editor .se-find-replace .se-find-replace-input:focus {
+	border-color: var(--se-active-color);
+	box-shadow: 0 0 0 1px var(--se-active-color);
+}
+.sun-editor .se-find-replace .se-find-replace-input.se-find-no-match {
+	background-color: var(--se-find-no-match-color, rgba(255, 80, 80, 0.12));
+}
+
+/* Finder - toggle button group */
+.sun-editor .se-find-replace .se-find-replace-toggle {
+	position: absolute;
+	right: 1px;
+	top: 50%;
+	transform: translateY(-50%);
+	font-size: 11px;
+	color: var(--se-main-color-lighter);
+	white-space: nowrap;
+	background-color: transparent;
+}
+.sun-editor .se-find-replace .se-find-replace-toggle > * {
+	display: flex;
+	float: left;
+	align-items: center;
+	justify-content: center;
+	height: 24px;
+	margin: 0;
+}
+.sun-editor .se-find-replace .se-find-replace-toggle .se-find-replace-info {
+	padding: 0 2px;
+}
+.sun-editor .se-find-replace .se-find-replace-toggle .se-find-replace-info .se-find-replace-count {
+	color: var(--se-main-color-lighter);
+}
+.sun-editor .se-find-replace .se-find-replace-toggle > button.on {
+	border: none;
+}
+
+/* Finder - buttons */
+.sun-editor .se-find-replace .se-find-replace-buttons {
+	display: flex;
+	gap: 1px;
+	flex-shrink: 0;
+}
+
+.sun-editor .se-find-replace .se-find-replace-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	border: 1px solid transparent;
+	transition:
+		opacity 0.15s,
+		background-color 0.15s;
+	font-size: 11px;
+}
+
+.sun-editor .se-find-replace .se-find-replace-row .se-find-replace-btn {
+	background-color: transparent;
+}
+
+.sun-editor .se-find-replace .se-find-replace-btn svg {
+	width: 16px;
+	height: 16px;
+	fill: currentColor;
+}
+
+/* Finter - Mark element fallback highlights */
+.sun-editor mark.se-find-mark,
+.sun-editor-editable mark.se-find-mark {
+	background-color: var(--se-find-match-color, rgba(255, 213, 0, 0.4));
+	color: inherit;
+	padding: 0;
+	margin: 0;
+	border-radius: 1px;
+}
+.sun-editor mark.se-find-mark.se-find-current,
+.sun-editor-editable mark.se-find-mark.se-find-current {
+	background-color: var(--se-find-current-color, rgba(255, 150, 50, 0.7));
+}
+
+/* Finter - CSS Custom Highlight API */
+::highlight(se-find-match) {
+	background-color: var(--se-find-match-color, rgba(255, 213, 0, 0.4));
+	color: inherit;
+}
+::highlight(se-find-current) {
+	background-color: var(--se-find-current-color, rgba(255, 150, 50, 0.7));
+	color: inherit;
+}
+
 /** --- RTL start -------------------------------------------------------------------------------------------------------------------------------------------------- */
 /* icon */
 .sun-editor.se-rtl .se-icon-flip-rtl svg,
@@ -3687,6 +3840,19 @@
 
 .sun-editor.se-rtl .se-btn-select svg {
 	margin: auto 1px;
+}
+
+/* Finder */
+.sun-editor.se-rtl .se-find-replace {
+	margin-left: 0;
+	margin-right: auto;
+	border-right: 1px solid var(--se-main-border-color);
+	border-left: none;
+	border-radius: 0 0 var(--se-border-radius) 0;
+	box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+}
+.sun-editor.se-rtl .se-find-replace-row {
+	justify-content: flex-start;
 }
 
 /* statusbar */

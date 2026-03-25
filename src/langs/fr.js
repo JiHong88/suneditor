@@ -208,6 +208,11 @@
 		width: 'Largeur',
 		codeLanguage: 'Langue',
 		codeLanguage_none: 'Aucun',
+		finder_matchCase: "Boîte d'allumettes",
+		finder_wholeWord: 'Mot entier',
+		finder_regex: 'Expression régulière',
+		finder_prev: 'Match précédent',
+		finder_next: 'Prochain match',
 		message_copy_success: 'Copié dans le presse-papiers',
 		message_copy_fail: 'Échec de la copie. Veuillez copier manuellement.',
 	};

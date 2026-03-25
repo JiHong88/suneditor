@@ -58,6 +58,11 @@
 	--se-statusbar-font-color: #a1a1a1;
 	--se-overlay-background-color: rgba(0, 0, 0, 0.6);
 
+	/* finder */
+	--se-find-match-color: rgba(255, 213, 0, 0.3);
+	--se-find-current-color: rgba(255, 150, 50, 0.55);
+	--se-find-no-match-color: rgba(255, 80, 80, 0.2);
+
 	/* hover states */
 	--se-hover-color: #2f3f44;
 	--se-hover-dark-color: #4b6b72;

@@ -208,6 +208,11 @@
 		width: 'پهنا',
 		codeLanguage: 'زبان',
 		codeLanguage_none: 'هیچکدام',
+		finder_matchCase: 'مورد مطابقت',
+		finder_wholeWord: 'کل کلمه',
+		finder_regex: 'عبارت منظم',
+		finder_prev: 'مسابقه قبلی',
+		finder_next: 'مسابقه بعدی',
 		message_copy_success: 'در کلیپ‌بورد کپی شد',
 		message_copy_fail: 'کپی انجام نشد. لطفاً به صورت دستی کپی کنید.',
 	};

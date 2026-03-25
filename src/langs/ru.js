@@ -208,6 +208,11 @@
 		width: 'Ширина',
 		codeLanguage: 'Язык',
 		codeLanguage_none: 'Никто',
+		finder_matchCase: 'Спичечный коробок',
+		finder_wholeWord: 'Целое Слово',
+		finder_regex: 'Регулярное выражение',
+		finder_prev: 'Предыдущий матч',
+		finder_next: 'Следующий матч',
 		message_copy_success: 'Скопировано в буфер обмена',
 		message_copy_fail: 'Не удалось скопировать. Пожалуйста, скопируйте вручную.',
 	};

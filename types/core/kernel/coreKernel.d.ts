@@ -136,6 +136,10 @@ export type Deps = {
 	 * - L3: View mode handler
 	 */
 	viewer: import('../logic/panel/viewer').default;
+	/**
+	 * - L3: Finder handler
+	 */
+	finder: import('../logic/panel/finder').default;
 };
 /**
  * @typedef {import('../section/constructor').ConstructorReturnType} ProductType
@@ -180,6 +184,7 @@ export type Deps = {
  * @property {import('../logic/panel/toolbar').default} subToolbar - L3: Sub-toolbar renderer
  * @property {import('../logic/panel/menu').default} menu - L3: Menu renderer
  * @property {import('../logic/panel/viewer').default} viewer - L3: View mode handler
+ * @property {import('../logic/panel/finder').default} finder - L3: Finder handler
  */
 /**
  * @description Core dependency container for the editor.

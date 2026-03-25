@@ -207,6 +207,11 @@
 		width: '横',
 		codeLanguage: '言語',
 		codeLanguage_none: 'なし',
+		finder_matchCase: 'マッチケース',
+		finder_wholeWord: '単語全体',
+		finder_regex: '正規表現',
+		finder_prev: '前回の試合',
+		finder_next: '次の試合',
 		message_copy_success: 'クリップボードにコピーしました',
 		message_copy_fail: 'コピーに失敗しました。手動でコピーしてください。',
 	};

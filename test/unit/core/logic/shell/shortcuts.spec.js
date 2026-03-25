@@ -325,7 +325,7 @@ describe('Shortcuts', () => {
 			});
 			mockEditor.$.options.set('_reverseCommandArray', []);
 
-			shortcuts._registerCustomShortcuts();
+			shortcuts._registerShortcuts();
 			// Should complete without error
 			expect(shortcuts.keyMap).toBeDefined();
 		});
@@ -340,7 +340,7 @@ describe('Shortcuts', () => {
 			mockEditor.$.options.set('_reverseCommandArray', []);
 
 			const initialSize = shortcuts.keyMap.size;
-			shortcuts._registerCustomShortcuts();
+			shortcuts._registerShortcuts();
 
 			// Should register at least the custom ones
 			expect(shortcuts.keyMap.size).toBeGreaterThanOrEqual(initialSize);
@@ -356,7 +356,7 @@ describe('Shortcuts', () => {
 			shortcuts.keyMap.set('testKey', { command: 'test' });
 			const sizeBefore = shortcuts.keyMap.size;
 
-			shortcuts._registerCustomShortcuts();
+			shortcuts._registerShortcuts();
 
 			// keyMap should be reset and repopulated
 			expect(shortcuts.keyMap).toBeDefined();

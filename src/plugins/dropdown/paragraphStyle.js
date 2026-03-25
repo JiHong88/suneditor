@@ -76,9 +76,8 @@ class ParagraphStyle extends PluginDropdown {
 		}
 
 		// change format class
-		const toggleClass = dom.utils.hasClass(target, 'active') ? dom.utils.removeClass : dom.utils.addClass;
 		for (let i = 0, len = selectedFormsts.length; i < len; i++) {
-			toggleClass(selectedFormsts[i], value);
+			dom.utils.toggleClass(selectedFormsts[i], value);
 		}
 
 		this.$.menu.dropdownOff();

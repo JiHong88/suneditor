@@ -190,7 +190,7 @@ export function CreateHTML_controller_properties({ lang, icons, options }) {
 	const html = /*html*/ `
 		<div class="se-controller-content">
 			<div class="se-controller-header">
-				<button type="button" data-command="close_props" class="se-btn se-close-btn close" title="${lang.close}" aria-label="${lang.close}">${icons.cancel}</button>
+				<button type="button" data-command="close" class="se-btn se-close-btn close" title="${lang.close}" aria-label="${lang.close}">${icons.cancel}</button>
 				<span class="se-controller-title">${lang.tableProperties}</span>
 			</div>
 			<div class="se-controller-body">

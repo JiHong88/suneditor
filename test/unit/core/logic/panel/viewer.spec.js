@@ -242,6 +242,7 @@ function createViewerKernel(overrides = {}) {
 		history,
 		html,
 		commandDispatcher,
+		finder: { close: jest.fn(), isOpen: false },
 		...overrides,
 	};
 

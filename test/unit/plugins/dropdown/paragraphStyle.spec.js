@@ -45,6 +45,7 @@ jest.mock('../../../../src/helper', () => ({
             }),
             addClass: jest.fn(),
             removeClass: jest.fn(),
+            toggleClass: jest.fn(),
             hasClass: jest.fn()
         }
     }
@@ -182,37 +183,34 @@ describe('Plugins - Dropdown - ParagraphStyle', () => {
             kernel.$.format.getLines.mockReturnValue(mockFormats);
         });
 
-        it('should add class to selected formats when not active', () => {
+        it('should toggle class on selected formats when not active', () => {
             const { dom } = require('../../../../src/helper');
-            dom.utils.hasClass.mockReturnValue(false);
 
             paragraphStyle.action(mockTarget);
 
-            expect(dom.utils.addClass).toHaveBeenCalledWith(mockFormats[0], '__se__p-spaced');
-            expect(dom.utils.addClass).toHaveBeenCalledWith(mockFormats[1], '__se__p-spaced');
+            expect(dom.utils.toggleClass).toHaveBeenCalledWith(mockFormats[0], '__se__p-spaced');
+            expect(dom.utils.toggleClass).toHaveBeenCalledWith(mockFormats[1], '__se__p-spaced');
             expect(kernel.$.menu.dropdownOff).toHaveBeenCalled();
             expect(kernel.$.history.push).toHaveBeenCalledWith(false);
         });
 
-        it('should remove class from selected formats when active', () => {
+        it('should toggle class on selected formats when active', () => {
             const { dom } = require('../../../../src/helper');
-            dom.utils.hasClass.mockReturnValue(true);
 
             paragraphStyle.action(mockTarget);
 
-            expect(dom.utils.removeClass).toHaveBeenCalledWith(mockFormats[0], '__se__p-spaced');
-            expect(dom.utils.removeClass).toHaveBeenCalledWith(mockFormats[1], '__se__p-spaced');
+            expect(dom.utils.toggleClass).toHaveBeenCalledWith(mockFormats[0], '__se__p-spaced');
+            expect(dom.utils.toggleClass).toHaveBeenCalledWith(mockFormats[1], '__se__p-spaced');
         });
 
         it('should handle empty lines array by adding new line', () => {
             kernel.$.format.getLines.mockReturnValueOnce([]).mockReturnValueOnce(mockFormats);
             const { dom } = require('../../../../src/helper');
-            dom.utils.hasClass.mockReturnValue(false);
 
             paragraphStyle.action(mockTarget);
 
             expect(kernel.$.selection.getRangeAndAddLine).toHaveBeenCalled();
-            expect(dom.utils.addClass).toHaveBeenCalledWith(mockFormats[0], '__se__p-spaced');
+            expect(dom.utils.toggleClass).toHaveBeenCalledWith(mockFormats[0], '__se__p-spaced');
         });
 
         it('should return early if no formats after adding line', () => {
@@ -227,12 +225,11 @@ describe('Plugins - Dropdown - ParagraphStyle', () => {
         it('should handle null data-command attribute', () => {
             mockTarget.getAttribute.mockReturnValue(null);
             const { dom } = require('../../../../src/helper');
-            dom.utils.hasClass.mockReturnValue(false);
 
             paragraphStyle.action(mockTarget);
 
-            expect(dom.utils.addClass).toHaveBeenCalledWith(mockFormats[0], null);
-            expect(dom.utils.addClass).toHaveBeenCalledWith(mockFormats[1], null);
+            expect(dom.utils.toggleClass).toHaveBeenCalledWith(mockFormats[0], null);
+            expect(dom.utils.toggleClass).toHaveBeenCalledWith(mockFormats[1], null);
         });
 
         it('should apply to multiple formats', () => {
@@ -243,12 +240,11 @@ describe('Plugins - Dropdown - ParagraphStyle', () => {
             ];
             kernel.$.format.getLines.mockReturnValue(manyFormats);
             const { dom } = require('../../../../src/helper');
-            dom.utils.hasClass.mockReturnValue(false);
 
             paragraphStyle.action(mockTarget);
 
             manyFormats.forEach(format => {
-                expect(dom.utils.addClass).toHaveBeenCalledWith(format, '__se__p-spaced');
+                expect(dom.utils.toggleClass).toHaveBeenCalledWith(format, '__se__p-spaced');
             });
         });
     });

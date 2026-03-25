@@ -30,6 +30,7 @@ import History from '../logic/shell/history';
 import Toolbar from '../logic/panel/toolbar';
 import Menu from '../logic/panel/menu';
 import Viewer from '../logic/panel/viewer';
+import Finder from '../logic/panel/finder';
 
 // L4: event
 import EventOrchestrator from '../event/eventOrchestrator';
@@ -78,6 +79,7 @@ import EventOrchestrator from '../event/eventOrchestrator';
  * @property {import('../logic/panel/toolbar').default} subToolbar - L3: Sub-toolbar renderer
  * @property {import('../logic/panel/menu').default} menu - L3: Menu renderer
  * @property {import('../logic/panel/viewer').default} viewer - L3: View mode handler
+ * @property {import('../logic/panel/finder').default} finder - L3: Finder handler
  */
 
 /**
@@ -218,6 +220,7 @@ class CoreKernel {
 		}
 		this.#logic.set('menu', new Menu(this));
 		this.#logic.set('viewer', new Viewer(this));
+		this.#logic.set('finder', new Finder(this));
 
 		// history (last — closure captures all L3 modules above)
 		this.#logic.set('history', History(this));
@@ -268,6 +271,7 @@ class CoreKernel {
 			subToolbar: this.#logic.get('subToolbar'),
 			menu: this.#logic.get('menu'),
 			viewer: this.#logic.get('viewer'),
+			finder: this.#logic.get('finder'),
 		});
 	}
 

@@ -1555,11 +1555,13 @@ describe('UIManager (real instance)', () => {
 			ctx.$.toolbar.balloonOffset = { top: 100, left: 50 };
 
 			const toolbarMain = ctx.context.get('toolbar_main');
+			toolbarMain.style.display = 'block';
 			ui._syncScrollPosition({ scrollTop: 20, scrollLeft: 10 });
 
 			expect(toolbarMain.style.top).toBe('80px');
 			expect(toolbarMain.style.left).toBe('40px');
 
+			toolbarMain.style.display = '';
 			ctx.store.mode.isBalloon = false;
 		});
 
@@ -1568,11 +1570,13 @@ describe('UIManager (real instance)', () => {
 			ctx.$.subToolbar.balloonOffset = { top: 200, left: 100 };
 
 			const toolbarSubMain = ctx.context.get('toolbar_sub_main');
+			toolbarSubMain.style.display = 'block';
 			ui._syncScrollPosition({ scrollTop: 30, scrollLeft: 15 });
 
 			expect(toolbarSubMain.style.top).toBe('170px');
 			expect(toolbarSubMain.style.left).toBe('85px');
 
+			toolbarSubMain.style.display = '';
 			ctx.store.mode.isSubBalloon = false;
 		});
 
@@ -1594,11 +1598,13 @@ describe('UIManager (real instance)', () => {
 			ctx.$.toolbar.balloonOffset = { top: 100, left: 50 };
 
 			const toolbarMain = ctx.context.get('toolbar_main');
+			toolbarMain.style.display = 'block';
 			ui._syncScrollPosition({ scrollY: 20, scrollX: 10 });
 
 			expect(toolbarMain.style.top).toBe('80px');
 			expect(toolbarMain.style.left).toBe('40px');
 
+			toolbarMain.style.display = '';
 			ctx.store.mode.isBalloon = false;
 		});
 
@@ -1607,11 +1613,13 @@ describe('UIManager (real instance)', () => {
 			ctx.$.toolbar.balloonOffset = { top: 100, left: 50 };
 
 			const toolbarMain = ctx.context.get('toolbar_main');
+			toolbarMain.style.display = 'block';
 			ui._syncScrollPosition({});
 
 			expect(toolbarMain.style.top).toBe('100px');
 			expect(toolbarMain.style.left).toBe('50px');
 
+			toolbarMain.style.display = '';
 			ctx.store.mode.isBalloon = false;
 		});
 	});

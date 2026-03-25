@@ -435,7 +435,10 @@ class Selection_ {
 		// --- When there is no upper scroll and it is an iframe ---
 		const PADDING = this.#scrollMargin;
 		const viewHeight = isAutoHeight ? viewportHeight : wwFrame.offsetHeight;
-		const elH = el.offsetHeight || 0;
+
+		// Use range rect for accurate height — el.offsetHeight includes nested children (e.g. nested lists)
+		const refRect = ref?.getBoundingClientRect?.();
+		const elH = (refRect?.height > 0 ? refRect.height : el.offsetHeight) || 0;
 
 		const behavior = scrollOption?.behavior;
 		if (isAutoHeight) {
@@ -463,10 +466,10 @@ class Selection_ {
 				});
 			}
 		} else {
-			// local scroll
-			const { rects } = this.getRects(el, 'start');
-			const { top } = this.#$.offset.getLocal(el);
-			const innerTop = top < 0 && rects.top < 0 ? top : rects.top;
+			// local scroll — use range rect for accurate position (el.getBoundingClientRect includes nested children)
+			const hasRefRect = refRect?.height > 0;
+			const targetTop = hasRefRect ? refRect.top : el.getBoundingClientRect().top;
+			const innerTop = isIframe ? targetTop : targetTop - wwFrame.getBoundingClientRect().top;
 
 			const keepLocalScroll = innerTop - PADDING > 0 && innerTop + PADDING <= viewHeight;
 			const rectScroll = innerTop - PADDING > 0 ? innerTop + PADDING - viewHeight : innerTop - (toolbarHeight + elH);

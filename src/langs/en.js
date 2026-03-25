@@ -207,6 +207,11 @@
 		width: 'Width',
 		codeLanguage: 'Language',
 		codeLanguage_none: 'None',
+		finder_matchCase: 'Match Case',
+		finder_wholeWord: 'Whole Word',
+		finder_regex: 'Regular Expression',
+		finder_prev: 'Previous Match',
+		finder_next: 'Next Match',
 		message_copy_success: 'Copied to clipboard',
 		message_copy_fail: 'Copy failed. Please copy manually.',
 	};

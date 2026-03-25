@@ -208,6 +208,11 @@
 		width: 'Platums',
 		codeLanguage: 'Valoda',
 		codeLanguage_none: 'Neviens',
+		finder_matchCase: 'Atbilstības gadījums',
+		finder_wholeWord: 'Viss vārds',
+		finder_regex: 'Regulārā izteiksme',
+		finder_prev: 'Iepriekšējā spēle',
+		finder_next: 'Nākamā spēle',
 		message_copy_success: 'Kopēts starpliktuvē',
 		message_copy_fail: 'Kopēšana neizdevās. Lūdzu, kopējiet manuāli.',
 	};

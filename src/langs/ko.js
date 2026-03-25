@@ -207,6 +207,11 @@
 		width: '가로',
 		codeLanguage: '언어',
 		codeLanguage_none: '없음',
+		finder_matchCase: '대소문자 구분',
+		finder_wholeWord: '단어 단위',
+		finder_regex: '정규 표현식',
+		finder_prev: '이전',
+		finder_next: '다음',
 		message_copy_success: '클립보드에 복사되었습니다',
 		message_copy_fail: '복사에 실패했습니다. 수동으로 복사해주세요.',
 	};

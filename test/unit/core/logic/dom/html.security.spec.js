@@ -145,6 +145,88 @@ describe('HTML Security - XSS Prevention', () => {
 		});
 	});
 
+	describe('Encoded whitespace protocol bypass (CVE report)', () => {
+		it('should block javascript: with tab entity &#x09;', () => {
+			const cleaned = editor.$.html.clean('<a href="java&#x09;script:alert(1)">link</a>');
+			expect(cleaned).not.toMatch(/href/i);
+		});
+
+		it('should block javascript: with decimal tab entity &#9;', () => {
+			const cleaned = editor.$.html.clean('<a href="java&#9;script:alert(1)">link</a>');
+			expect(cleaned).not.toMatch(/href/i);
+		});
+
+		it('should block javascript: with URL-encoded tab %09', () => {
+			const cleaned = editor.$.html.clean('<a href="java%09script:alert(1)">link</a>');
+			expect(cleaned).not.toMatch(/href/i);
+		});
+
+		it('should block javascript: with newline entity &#x0A;', () => {
+			const cleaned = editor.$.html.clean('<a href="java&#x0A;script:alert(1)">link</a>');
+			expect(cleaned).not.toMatch(/href/i);
+		});
+
+		it('should block javascript: with literal tab character', () => {
+			const cleaned = editor.$.html.clean('<a href="java\tscript:alert(1)">link</a>');
+			expect(cleaned).not.toMatch(/href/i);
+		});
+
+		it('should block javascript: with literal newline', () => {
+			const cleaned = editor.$.html.clean('<a href="java\nscript:alert(1)">link</a>');
+			expect(cleaned).not.toMatch(/href/i);
+		});
+
+		it('should block javascript: with spaces between characters', () => {
+			const cleaned = editor.$.html.clean('<a href="j a v a s c r i p t:alert(1)">link</a>');
+			expect(cleaned).not.toMatch(/href/i);
+		});
+
+		it('should block javascript: with leading space', () => {
+			const cleaned = editor.$.html.clean('<a href=" javascript:alert(1)">link</a>');
+			expect(cleaned).not.toMatch(/href/i);
+		});
+
+		it('should block javascript: with null byte prefix', () => {
+			const cleaned = editor.$.html.clean('<a href="\0javascript:alert(1)">link</a>');
+			expect(cleaned).not.toMatch(/href/i);
+		});
+
+		it('should block javascript: with hex entity for j &#x6a;', () => {
+			const cleaned = editor.$.html.clean('<a href="&#x6a;avascript:alert(1)">link</a>');
+			expect(cleaned).not.toMatch(/href/i);
+		});
+
+		it('should block javascript: with decimal entity for j &#106;', () => {
+			const cleaned = editor.$.html.clean('<a href="&#106;avascript:alert(1)">link</a>');
+			expect(cleaned).not.toMatch(/href/i);
+		});
+
+		it('should block mixed case JaVaScRiPt:', () => {
+			const cleaned = editor.$.html.clean('<a href="JaVaScRiPt:alert(1)">link</a>');
+			expect(cleaned).not.toMatch(/href/i);
+		});
+
+		it('should block vbscript: protocol', () => {
+			const cleaned = editor.$.html.clean('<a href="vbscript:msgbox(1)">link</a>');
+			expect(cleaned).not.toMatch(/href/i);
+		});
+
+		it('should block data:text/html', () => {
+			const cleaned = editor.$.html.clean('<a href="data:text/html,<script>alert(1)</script>">link</a>');
+			expect(cleaned).not.toMatch(/href/i);
+		});
+
+		it('should block iframe with encoded javascript: src', () => {
+			const cleaned = editor.$.html.clean('<iframe src="java&#x09;script:alert(1)"></iframe>');
+			expect(cleaned).not.toMatch(/javascript/i);
+		});
+
+		it('should block iframe with URL-encoded javascript: src', () => {
+			const cleaned = editor.$.html.clean('<iframe src="java%09script:alert(1)"></iframe>');
+			expect(cleaned).not.toMatch(/javascript/i);
+		});
+	});
+
 	describe('Script tag removal', () => {
 		it('should remove script tags', () => {
 			const cleaned = editor.$.html.clean('<p>safe</p><script>alert(1)</script>');

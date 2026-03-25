@@ -294,7 +294,7 @@ class HTML {
 			for (const [key, value] of Object.entries(attrs)) {
 				// Block event handler attributes and validate src protocol
 				if (/^on/i.test(key)) continue;
-				if (key === 'src' && !_SAFE_URL_PROTOCOL.test(String(value).replace(/[\s\r\n\t]+/g, ''))) continue;
+				if (key === 'src' && !_isSafeURL(String(value))) continue;
 				iframe.setAttribute(key, value);
 			}
 
@@ -2047,11 +2047,53 @@ const _RE_SPAN = /^span$/i;
 
 // _isSafeAttribute
 const _SAFE_URL_PROTOCOL = /^(?:https?|ftps?|mailto|tel|blob|sms|geo|webcal|callto):|^[#/]|^data:image\//i;
-const _URL_ATTR_PATTERN = /^(?:href|src)\s*=\s*(?:'|"|\s)*/i;
-const _RE_ATTR_VALUE = /=\s*(?:"|'|)\s*([^"'\s>]*)/;
-const _RE_WHITESPACE = /[\s\r\n\t]+/g;
-const _RE_HTML_ENTITY = /&(#x?[0-9a-f]+|[a-z]+);/gi;
+const _URL_ATTR_PATTERN = /^(?:href|src)\s*=/i;
+const _RE_ATTR_VALUE = /=\s*(?:"([^"]*)"|'([^']*)'|(\S+))/;
 const _RE_COLON = /:/i;
+
+/**
+ * @description Normalize a URL by decoding all HTML entities, URL-encoded characters,
+ * and stripping whitespace/control characters. Used to detect obfuscated dangerous protocols.
+ * e.g. `java&#x09;script:`, `java%09script:`, `&#106;avascript:`
+ * @param {string} url Raw URL string
+ * @returns {string} Normalized URL
+ */
+function _normalizeURL(url) {
+	// Decode HTML entities (&#x09; &#9; etc.) — repeat to handle nested encoding (e.g. &#38;#x6a; → &#x6a; → j)
+	let prev,
+		limit = 5;
+	do {
+		prev = url;
+		url = url.replace(/&(#x([0-9a-f]+)|#([0-9]+)|([a-z]+));/gi, (_, __, hex, dec) => {
+			if (hex) return String.fromCharCode(parseInt(hex, 16));
+			if (dec) return String.fromCharCode(parseInt(dec, 10));
+			return '';
+		});
+	} while (url !== prev && --limit);
+
+	// Decode URL-encoded characters (%09, %0a, etc.)
+	try {
+		url = decodeURIComponent(url);
+	} catch {
+		// malformed URI — keep as is
+	}
+
+	// Strip all whitespace and control characters (U+0000–U+0020)
+	// eslint-disable-next-line no-control-regex -- intentional: strip control chars used to bypass protocol detection
+	url = url.replace(/[\u0000-\u0020]+/g, '');
+
+	return url;
+}
+
+/**
+ * @description Check if a URL is safe (matches the allowed protocol whitelist).
+ * @param {string} url Raw URL string
+ * @returns {boolean}
+ */
+function _isSafeURL(url) {
+	const normalized = _normalizeURL(url);
+	return _SAFE_URL_PROTOCOL.test(normalized) || !_RE_COLON.test(normalized);
+}
 
 function _isSafeAttribute(attr) {
 	if (!_URL_ATTR_PATTERN.test(attr)) return true;
@@ -2059,8 +2101,8 @@ function _isSafeAttribute(attr) {
 	const urlMatch = attr.match(_RE_ATTR_VALUE);
 	if (!urlMatch) return true;
 
-	const url = urlMatch[1].replace(_RE_WHITESPACE, '').replace(_RE_HTML_ENTITY, '');
-	return _SAFE_URL_PROTOCOL.test(url) || !_RE_COLON.test(url);
+	const url = urlMatch[1] ?? urlMatch[2] ?? urlMatch[3] ?? '';
+	return _isSafeURL(url);
 }
 
 /**

@@ -208,6 +208,11 @@
 		width: 'רוחב',
 		codeLanguage: 'שָׂפָה',
 		codeLanguage_none: 'אַף לֹא אֶחָד',
+		finder_matchCase: 'מארז התאמה',
+		finder_wholeWord: 'מילה שלמה',
+		finder_regex: 'ביטוי רגולרי',
+		finder_prev: 'המשחק הקודם',
+		finder_next: 'המשחק הבא',
 		message_copy_success: 'הועתק ללוח',
 		message_copy_fail: 'ההעתקה נכשלה. נא להעתיק ידנית.',
 	};

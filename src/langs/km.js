@@ -207,6 +207,11 @@
 		width: 'ទទឹង',
 		codeLanguage: 'ភាសា',
 		codeLanguage_none: 'គ្មាន',
+		finder_matchCase: 'ករណីផ្គូផ្គង',
+		finder_wholeWord: 'ពាក្យទាំងមូល',
+		finder_regex: 'កន្សោមធម្មតា',
+		finder_prev: 'ការប្រកួតមុន',
+		finder_next: 'ការប្រកួតបន្ទាប់',
 		message_copy_success: 'បានចម្លងទៅក្តារចម្លង',
 		message_copy_fail: 'ការចម្លងបរាជ័យ។ សូមចម្លងដោយដៃ។',
 	};

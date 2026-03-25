@@ -26,6 +26,9 @@ class Toolbar {
 	#rButtonsInfo = null;
 	#rButtonsize = null;
 
+	#useCSSSticky = false;
+	#_isStickyFlag = false;
+
 	/**
 	 * @constructor
 	 * @param {SunEditor.Kernel} kernel
@@ -65,7 +68,6 @@ class Toolbar {
 		};
 
 		this.currentMoreLayerActiveButton = null;
-		this.isSticky = false;
 		this.isBalloonMode = balloon;
 		this.isInlineMode = inline;
 		this.isBalloonAlwaysMode = balloonAlways;
@@ -84,7 +86,53 @@ class Toolbar {
 		this.#rButtonArray = res;
 		this.#isViewPortSize = 'visualViewport' in _w;
 
+		// CSS sticky: non-balloon, non-inline, non-container, sticky enabled
+		const isStickyPosible = !this.isSub && !balloon && !inline;
+		const stickyTop = this.#options.get('toolbar_sticky');
+
+		this.#useCSSSticky = isStickyPosible && stickyTop >= 0 && !this.#options.get('toolbar_container') && typeof CSS !== 'undefined' && CSS.supports('position', 'sticky');
+
+		if (this.#useCSSSticky) {
+			// CSS sticky: browser handles positioning natively
+			const toolbar = this.#context.get(this.keyName.main);
+			if (stickyTop > 0) {
+				toolbar.style.top = stickyTop + 'px';
+			}
+		} else if (isStickyPosible) {
+			// JS fallback (toolbar_container) or sticky disabled (-1):
+			dom.utils.addClass(this.#context.get(this.keyName.main), 'se-toolbar-relative');
+		}
+
 		this._setResponsive();
+	}
+
+	/**
+	 * @description Whether the toolbar is currently in a sticky (fixed) state.
+	 * For CSS sticky mode, computed from the element's viewport position.
+	 * For JS sticky mode (toolbar_container), uses a manual flag.
+	 * @type {boolean}
+	 */
+	get isSticky() {
+		if (this.isSub) return false;
+		const stickyTop = this.#options.get('toolbar_sticky');
+		if (stickyTop < 0) return false;
+
+		if (this.#useCSSSticky) {
+			const toolbar = this.#context.get(this.keyName.main);
+			if (!toolbar || toolbar.offsetWidth === 0 || toolbar.style.display === 'none') return false;
+			return toolbar.getBoundingClientRect().top <= stickyTop + 1;
+		}
+
+		return this.#_isStickyFlag;
+	}
+
+	/**
+	 * @description Whether the toolbar uses native CSS `position: sticky`.
+	 * - When `false`, the JS-based sticky fallback (`position: fixed`) is active.
+	 * @type {boolean}
+	 */
+	get isCSSSticky() {
+		return this.#useCSSSticky;
 	}
 
 	/**
@@ -198,6 +246,8 @@ class Toolbar {
 	 * @description Reset the sticky toolbar position based on the editor state.
 	 */
 	_resetSticky() {
+		if (this.#useCSSSticky) return;
+
 		const wrapper = this.#frameContext.get('wrapper');
 		if (!wrapper) return;
 
@@ -229,7 +279,7 @@ class Toolbar {
 	 * @description Reset the common buttons info.
 	 */
 	#resetButtonInfo() {
-		this.#$.shortcuts._registerCustomShortcuts();
+		this.#$.shortcuts._registerShortcuts();
 		this.#$.commandDispatcher.resetTargets();
 		this.#$.ui._initToggleButtons();
 
@@ -407,7 +457,7 @@ class Toolbar {
 		toolbar.style.top = `${toolbarTopPosition}px`;
 		toolbar.style.width = this.isInlineMode ? this.inlineToolbarAttr.width : toolbar.offsetWidth + 'px';
 		dom.utils.addClass(toolbar, 'se-toolbar-sticky');
-		this.isSticky = true;
+		this.#_isStickyFlag = true;
 	}
 
 	/**
@@ -434,7 +484,7 @@ class Toolbar {
 		this.#frameContext.get('wrapper').style.marginTop = '';
 
 		dom.utils.removeClass(toolbar, 'se-toolbar-sticky');
-		this.isSticky = false;
+		this.#_isStickyFlag = false;
 	}
 
 	/**

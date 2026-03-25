@@ -670,7 +670,16 @@ class EventOrchestrator extends KernelInjector {
 	 * @param {FocusEvent} event - Focus event object
 	 */
 	__postBlurEvent(frameContext, event) {
-		if (this.#store.mode.isInline || this.#store.mode.isBalloon) this._hideToolbar();
+		if (this.#store.mode.isInline) {
+			// Defer hide — prevents race with deferred focus show (setTimeout in #OnFocus_wysiwyg)
+			_w.setTimeout(() => {
+				if (!this.#store.get('hasFocus')) {
+					this._hideToolbar();
+				}
+			}, 0);
+		} else if (this.#store.mode.isBalloon) {
+			this._hideToolbar();
+		}
 		if (this.#store.mode.isSubBalloon) this._hideToolbar_sub();
 
 		// user event
@@ -733,7 +742,9 @@ class EventOrchestrator extends KernelInjector {
 		this.#ui._iframeAutoHeight(fc);
 
 		if (this.#toolbar.isSticky) {
-			this.#context.get('toolbar_main').style.width = fc.get('topArea').offsetWidth - 2 + 'px';
+			if (!this.#toolbar.isCSSSticky) {
+				this.#context.get('toolbar_main').style.width = fc.get('topArea').offsetWidth - 2 + 'px';
+			}
 			this.#toolbar._resetSticky();
 		}
 	}

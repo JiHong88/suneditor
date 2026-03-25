@@ -208,6 +208,11 @@
 		width: 'Ширина',
 		codeLanguage: 'Мова',
 		codeLanguage_none: 'Жоден',
+		finder_matchCase: 'Зіставте регістр',
+		finder_wholeWord: 'Ціле слово',
+		finder_regex: 'Регулярний вираз',
+		finder_prev: 'Попередній матч',
+		finder_next: 'Наступний матч',
 		message_copy_success: 'Скопійовано в буфер обміну',
 		message_copy_fail: 'Не вдалося скопіювати. Будь ласка, скопіюйте вручну.',
 	};

@@ -421,25 +421,15 @@ export function removeClass(element, className) {
  * @description Argument value If there is no class name, insert it and delete the class name if it exists
  * @param {Node} element Element to replace class name
  * @param {string} className Class name to be change
- * @returns {boolean|undefined}
+ * @param {boolean} [force] If true, adds the class; if false, removes it.
  */
-export function toggleClass(element, className) {
+export function toggleClass(element, className, force) {
 	if (!element || element.nodeType !== 1) return;
 
 	const el = /** @type {HTMLElement} */ (element);
-
-	let result = false;
-	const valid = new RegExp(`(\\s|^)${className}(\\s|$)`);
-	if (valid.test(el.className)) {
-		el.className = el.className.replace(valid, ' ').trim();
-	} else {
-		el.className += ' ' + className;
-		result = true;
-	}
+	el.classList.toggle(className, force);
 
 	if (!el.className.trim()) el.removeAttribute('class');
-
-	return result;
 }
 
 /**

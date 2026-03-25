@@ -124,6 +124,10 @@ class Controller {
 	 * @param {Node} [positionTarget] Position target element
 	 * @param {Object} [params={}] params
 	 * @param {boolean} [params.isWWTarget] If the controller is in the WYSIWYG area, set it to `true`.
+	 * @param {boolean} [params.passive] If `true`, opens the controller visually without affecting editor state
+	 * - (`_preventBlur`, `controlActive`, `onControllerContext`, `opendControllers`).
+	 * - Used for lightweight, non-intrusive display such as hover-triggered UI (e.g., codeLang selector on `<pre>` hover).
+	 * - Automatically set to `true` when opened during component hover selection (`ON_OVER_COMPONENT`).
 	 * @param {() => void} [params.initMethod] Method to be called when the controller is closed.
 	 * @param {boolean} [params.disabled] If `true`, When the `controller` is opened, buttons without the `se-component-enabled` class are disabled. (default: `this.disabled`)
 	 * @param {{left?: number, right?:number, top?: number}} [params.addOffset] Additional offset values
@@ -137,9 +141,9 @@ class Controller {
 	 * // Open on a Range target (e.g., text selection)
 	 * this.controller.open(this.$.selection.getRange());
 	 */
-	open(target, positionTarget, { isWWTarget, initMethod, disabled, addOffset } = {}) {
+	open(target, positionTarget, { isWWTarget, passive, initMethod, disabled, addOffset } = {}) {
 		if (_DragHandle.get('__overInfo') === ON_OVER_COMPONENT) {
-			return;
+			passive = true;
 		}
 
 		if (!target) {
@@ -151,34 +155,38 @@ class Controller {
 		this.form.removeAttribute('data-se-hidden-by-children');
 		this.#__hiddenByParents__.clear();
 
-		if (this.#$.store.mode.isBalloon) this.#$.toolbar.hide();
-		else if (this.#$.store.mode.isSubBalloon) this.#$.subToolbar.hide();
+		if (!passive) {
+			if (this.#$.store.mode.isBalloon) this.#$.toolbar.hide();
+			else if (this.#$.store.mode.isSubBalloon) this.#$.subToolbar.hide();
 
-		if (!this.#$.store.get('hasFocus')) {
-			if (disabled ?? this.disabled) {
-				this.#$.ui.setControllerOnDisabledButtons(true);
-			} else {
-				this.#$.ui.setControllerOnDisabledButtons(false);
+			if (!this.#$.store.get('hasFocus')) {
+				if (disabled ?? this.disabled) {
+					this.#$.ui.setControllerOnDisabledButtons(true);
+				} else {
+					this.#$.ui.setControllerOnDisabledButtons(false);
+				}
 			}
 		}
 
 		this.currentPositionTarget = positionTarget || target;
 		this.isWWTarget = isWWTarget ?? this.isWWTarget;
 		if (typeof initMethod === 'function') this.#initMethod = initMethod;
-		this.#$.ui.currentControllerName = this.kind;
+		if (!passive) this.#$.ui.currentControllerName = this.kind;
 
 		this.#addOffset = { left: 0, right: 0, top: 0, ...addOffset };
 
-		const parents = this.isOutsideForm ? this.parentsForm : [];
-		this.#$.ui.opendControllers?.forEach((e) => {
-			if (!parents.includes(e.form)) e.form.style.zIndex = INDEX_1;
-		});
-
-		if (this.parentsHide) {
-			this.parentsForm.forEach((e) => {
-				e.style.display = 'none';
-				e.setAttribute('data-se-hidden-by-children', '1');
+		if (!passive) {
+			const parents = this.isOutsideForm ? this.parentsForm : [];
+			this.#$.ui.opendControllers?.forEach((e) => {
+				if (!parents.includes(e.form)) e.form.style.zIndex = INDEX_1;
 			});
+
+			if (this.parentsHide) {
+				this.parentsForm.forEach((e) => {
+					e.style.display = 'none';
+					e.setAttribute('data-se-hidden-by-children', '1');
+				});
+			}
 		}
 
 		this.#addGlobalEvent();
@@ -188,7 +196,7 @@ class Controller {
 
 		const isRangeTarget = this.#$.instanceCheck.isRange(target);
 		this.currentTarget = /** @type {HTMLElement} */ (isRangeTarget ? null : target);
-		this.#controllerOn(this.form, target, isRangeTarget);
+		this.#controllerOn(this.form, target, isRangeTarget, passive);
 		_w.setTimeout(() => _DragHandle.set('__overInfo', false), 0);
 	}
 
@@ -346,8 +354,9 @@ class Controller {
 	 * @param {HTMLFormElement} form Controller element
 	 * @param {Node|Range} target Controller target element
 	 * @param {boolean} isRangeTarget If the target is a `Range`, set it to `true`.
+	 * @param {boolean} [passive=false] If `true`, opens without affecting editor state (_preventBlur, controlActive, etc.)
 	 */
-	async #controllerOn(form, target, isRangeTarget) {
+	async #controllerOn(form, target, isRangeTarget, passive) {
 		/** @type {ControllerInfo} */
 		const info = {
 			position: this.position,
@@ -365,15 +374,18 @@ class Controller {
 			this.#bindShadowRootEvent = this.#$.eventManager.addEvent(form, 'mousedown', (e) => e.stopPropagation());
 		}
 
-		this.#$.ui.onControllerContext();
+		if (!passive) {
+			this.#$.ui.onControllerContext();
 
-		if (!this.isOpen) {
-			this.#$.ui.opendControllers.push(info);
+			if (!this.isOpen) {
+				this.#$.ui.opendControllers.push(info);
+			}
+
+			this.#$.store.set('_preventBlur', true);
+			this.#$.store.set('controlActive', true);
 		}
 
 		this.isOpen = true;
-		this.#$.store.set('_preventBlur', true);
-		this.#$.store.set('controlActive', true);
 
 		this.host.controllerOn?.(form, target);
 		this.#$.eventManager.triggerEvent('onShowController', { caller: this.kind, frameContext: this.#$.frameContext, info });
@@ -494,7 +506,7 @@ class Controller {
 
 	/**
 	 * @description Checks if the given target is within a form or controller.
-	 * @param {Node} target The target element.
+	 * @param {Element} target The target element.
 	 * @returns {boolean} `true` if the target is inside a form or controller.
 	 */
 	#checkForm(target) {
@@ -525,6 +537,11 @@ class Controller {
 
 		e.stopPropagation();
 		e.preventDefault();
+
+		if (target.getAttribute('data-command') === 'close') {
+			this.close();
+			return;
+		}
 
 		this.host.controllerAction(target);
 	}

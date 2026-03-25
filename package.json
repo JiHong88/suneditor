@@ -94,7 +94,6 @@
 		"babel-jest": "^30.2.0",
 		"babel-loader": "^10.0.0",
 		"barrelsby": "^2.8.1",
-		"baseline-browser-mapping": "^2.9.19",
 		"clean-webpack-plugin": "^4.0.0",
 		"codemirror": "^6.65.7",
 		"cross-env": "^7.0.3",
@@ -131,7 +130,7 @@
 	"browserslist": [
 		"chrome >= 119",
 		"edge >= 119",
-		"firefox >= 121",
+		"firefox >= 132",
 		"safari >= 17.2",
 		"opera >= 105",
 		"samsung >= 23",

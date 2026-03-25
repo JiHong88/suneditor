@@ -208,6 +208,11 @@
 		width: 'Lățime',
 		codeLanguage: 'Limbă',
 		codeLanguage_none: 'Nici unul',
+		finder_matchCase: 'Potrivire caz',
+		finder_wholeWord: 'Cuvânt întreg',
+		finder_regex: 'Expresie regulată',
+		finder_prev: 'Meciul precedent',
+		finder_next: 'Următorul meci',
 		message_copy_success: 'Copiat în clipboard',
 		message_copy_fail: 'Copiere eșuată. Vă rugăm să copiați manual.',
 	};

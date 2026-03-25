@@ -492,6 +492,7 @@ export const DEFAULTS = {
  * - Default: `Boolean(plugins.link)` — determined by whether the `link` plugin is enabled.
  * @property {Array<string>} [autoStyleify=["bold", "underline", "italic", "strike"]] - Styles applied automatically on text input.
  * @property {number} [historyStackDelayTime=400] - Delay time for history stack updates (ms).
+ * @property {number} [historyStackSize=100] - Maximum number of history entries per root frame. Oldest entries are discarded when exceeded.
  * @property {string} [printClass=""] - Class name for printing.
  * @property {number} [fullScreenOffset=0] - Offset applied when entering fullscreen mode.
  * @property {?string} [previewTemplate=null] - Custom HTML template for preview mode. Use `{{ contents }}` as a placeholder for editor content.
@@ -509,6 +510,9 @@ export const DEFAULTS = {
  * @property {?string} [defaultUrlProtocol=null] - Default URL protocol for links.
  * @property {Object<"copy", number>} [toastMessageTime={copy: 1500}] - Duration for displaying toast messages (ms).
  * @property {boolean} [freeCodeViewMode=false] - Enables free code view mode.
+ * @property {boolean} [finder_panel=true] - Shows the built-in Find/Replace panel UI.
+ * - The finder is always created internally; this option controls whether the panel is visible to users (Ctrl+F / Ctrl+H).
+ * @property {boolean} [finder_liveSearch=true] - Searches instantly as you type (debounced). When false, search runs only on Enter.
  *
  * === Code Block ===
  * @property {?Array<string>} [codeLangs] - List of selectable programming languages for `<pre>` code blocks.
@@ -707,6 +711,7 @@ export const OPTION_FIXED_FLAG = {
 	textDirection: true,
 	reverseButtons: 'fixed',
 	historyStackDelayTime: true,
+	historyStackSize: 'fixed',
 	lineAttrReset: true,
 	printClass: true,
 	defaultLine: 'fixed',
@@ -747,6 +752,8 @@ export const OPTION_FIXED_FLAG = {
 	toastMessageTime: true,
 	icons: 'fixed',
 	freeCodeViewMode: true,
+	finder_panel: 'fixed',
+	finder_liveSearch: true,
 	__lineFormatFilter: true,
 	__pluginRetainFilter: true,
 	__listCommonStyle: 'fixed',

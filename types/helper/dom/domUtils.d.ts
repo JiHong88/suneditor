@@ -176,9 +176,9 @@ export function removeClass(element: Node | SunEditor.NodeCollection, className:
  * @description Argument value If there is no class name, insert it and delete the class name if it exists
  * @param {Node} element Element to replace class name
  * @param {string} className Class name to be change
- * @returns {boolean|undefined}
+ * @param {boolean} [force] If true, adds the class; if false, removes it.
  */
-export function toggleClass(element: Node, className: string): boolean | undefined;
+export function toggleClass(element: Node, className: string, force?: boolean): void;
 /**
  * @description Flash the class name of the argument value element for a certain time
  * @param {Node} element Element to flash class name

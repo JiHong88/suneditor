@@ -208,6 +208,11 @@
 		width: 'پانی',
 		codeLanguage: 'زمان',
 		codeLanguage_none: 'هیچ',
+		finder_matchCase: 'کەیسی یارییەکە',
+		finder_wholeWord: 'تەواوی وشە',
+		finder_regex: 'دەربڕینی ئاسایی',
+		finder_prev: 'یاری پێشوو',
+		finder_next: 'یاری داهاتوو',
 		message_copy_success: 'لە پەڕگەی لەبەرگرتووەدا هاوپەڕ کرا',
 		message_copy_fail: 'هاوپەڕکردن سەرکەوتوو نەبوو. تکایە بەدەست هاوپەڕ بکە.',
 	};

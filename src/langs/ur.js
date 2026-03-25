@@ -208,6 +208,11 @@
 		width: 'چوڑائی',
 		codeLanguage: 'زبان',
 		codeLanguage_none: 'کوئی نہیں۔',
+		finder_matchCase: 'میچ کیس',
+		finder_wholeWord: 'پورا کلام',
+		finder_regex: 'باقاعدہ اظہار',
+		finder_prev: 'پچھلا میچ',
+		finder_next: 'اگلا میچ',
 		message_copy_success: 'کلپ بورڈ میں کاپی ہو گیا',
 		message_copy_fail: 'کاپی ناکام۔ براہ کرم دستی طور پر کاپی کریں۔',
 	};

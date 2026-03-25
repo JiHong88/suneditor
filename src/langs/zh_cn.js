@@ -208,6 +208,11 @@
 		width: '宽度',
 		codeLanguage: '语言',
 		codeLanguage_none: '没有任何',
+		finder_matchCase: '火柴盒',
+		finder_wholeWord: '整个单词',
+		finder_regex: '正则表达式',
+		finder_prev: '上一场比赛',
+		finder_next: '下一场比赛',
 		message_copy_success: '已复制到剪贴板',
 		message_copy_fail: '复制失败，请手动复制。',
 	};

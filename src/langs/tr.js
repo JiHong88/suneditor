@@ -208,6 +208,11 @@
 		width: 'Genişlik',
 		codeLanguage: 'Dil',
 		codeLanguage_none: 'Hiçbiri',
+		finder_matchCase: 'Kibrit Kutusu',
+		finder_wholeWord: 'Tüm Kelime',
+		finder_regex: 'Düzenli İfade',
+		finder_prev: 'Önceki Maç',
+		finder_next: 'Sonraki Maç',
 		message_copy_success: 'Panoya kopyalandı',
 		message_copy_fail: 'Kopyalama başarısız oldu. Lütfen manuel olarak kopyalayın.',
 	};

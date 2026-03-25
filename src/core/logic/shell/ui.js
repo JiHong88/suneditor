@@ -581,10 +581,10 @@ class UIManager {
 		const y = eventWysiwyg.scrollTop || eventWysiwyg.scrollY || 0;
 		const x = eventWysiwyg.scrollLeft || eventWysiwyg.scrollX || 0;
 
-		if (this.#store.mode.isBalloon) {
+		if (this.#store.mode.isBalloon && this.#context.get('toolbar_main').style.display === 'block') {
 			this.#context.get('toolbar_main').style.top = this.#$.toolbar.balloonOffset.top - y + 'px';
 			this.#context.get('toolbar_main').style.left = this.#$.toolbar.balloonOffset.left - x + 'px';
-		} else if (this.#store.mode.isSubBalloon) {
+		} else if (this.#store.mode.isSubBalloon && this.#context.get('toolbar_sub_main').style.display === 'block') {
 			this.#context.get('toolbar_sub_main').style.top = this.#$.subToolbar.balloonOffset.top - y + 'px';
 			this.#context.get('toolbar_sub_main').style.left = this.#$.subToolbar.balloonOffset.left - x + 'px';
 		}

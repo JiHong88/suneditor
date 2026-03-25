@@ -106,14 +106,14 @@ class Shortcuts {
 	 * @description Registers custom shortcut keys (keys starting with `_`) into the shortcut map.
 	 * Called during initialization and when toolbar is reset.
 	 */
-	_registerCustomShortcuts() {
+	_registerShortcuts() {
 		const shortcuts = this.#options.get('shortcuts');
 		const reverseCommandArray = this.#options.get('_reverseCommandArray');
 		const keyMap = (this.keyMap = new Map());
 		const reverseKeys = this.reverseKeys;
 		for (const key of Object.keys(shortcuts)) {
-			if (!key.startsWith('_')) continue;
-			CreateShortcuts('', null, shortcuts[key], keyMap, reverseCommandArray, reverseKeys);
+			const command = key.startsWith('_') ? '' : key;
+			CreateShortcuts(command, null, shortcuts[key], keyMap, reverseCommandArray, reverseKeys);
 		}
 	}
 

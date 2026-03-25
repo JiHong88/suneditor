@@ -97,13 +97,6 @@ export async function OnClick_wysiwyg(fc, e) {
 		return;
 	}
 
-	// code lang selector
-	if (this.codeLang) {
-		if (this.codeLang.isOpen()) {
-			this.codeLang.close();
-		}
-	}
-
 	this.$.selection.init();
 
 	if (e.detail === 3) {
@@ -161,7 +154,7 @@ export function OnMouseMove_wysiwyg(fc, e) {
 	// code lang selector
 	if (this.codeLang) {
 		const pre = eventTarget.closest('pre');
-		if (pre && !this.codeLang.isOpen() && this.$.ui.opendControllers.length === 0) {
+		if (pre && !this.codeLang.isOpen && this.$.ui.opendControllers.length === 0) {
 			this.codeLang.show(pre);
 		}
 	}

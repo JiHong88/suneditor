@@ -208,6 +208,11 @@
 		width: 'Breite',
 		codeLanguage: 'Sprache',
 		codeLanguage_none: 'Keiner',
+		finder_matchCase: 'Streichholzschachtel',
+		finder_wholeWord: 'Ganzes Wort',
+		finder_regex: 'Regulärer Ausdruck',
+		finder_prev: 'Vorheriges Spiel',
+		finder_next: 'Nächstes Spiel',
 		message_copy_success: 'In die Zwischenablage kopiert',
 		message_copy_fail: 'Kopieren fehlgeschlagen. Bitte manuell kopieren.',
 	};

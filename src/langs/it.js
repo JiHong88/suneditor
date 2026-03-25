@@ -208,6 +208,11 @@
 		width: 'Larghezza',
 		codeLanguage: 'Lingua',
 		codeLanguage_none: 'Nessuno',
+		finder_matchCase: 'Scatola di fiammiferi',
+		finder_wholeWord: 'Parola intera',
+		finder_regex: 'Espressione regolare',
+		finder_prev: 'Partita precedente',
+		finder_next: 'Prossima partita',
 		message_copy_success: 'Copiato negli appunti',
 		message_copy_fail: 'Copia non riuscita. Copia manuale richiesta.',
 	};

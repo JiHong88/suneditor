@@ -60,7 +60,7 @@ It does not ship with polyfills by default, but you can add them if your project
 | ----------------------------------------------------------------------------------------------------------------------------------- | --------------- |
 | ![Chrome](https://img.shields.io/badge/-Chrome-4285F4?logo=GoogleChrome&logoColor=white&style=flat-square)                          | 119 (Oct 2023)  |
 | ![Edge](https://img.shields.io/badge/-Edge-0078D7?logo=MicrosoftEdge&logoColor=white&style=flat-square)                             | 119 (Nov 2023)  |
-| ![Firefox](https://img.shields.io/badge/-Firefox-FF7139?logo=FirefoxBrowser&logoColor=white&style=flat-square)                      | 121 (Dec 2023)  |
+| ![Firefox](https://img.shields.io/badge/-Firefox-FF7139?logo=FirefoxBrowser&logoColor=white&style=flat-square)                      | 132 (Dec 2024)  |
 | ![Safari (macOS, iOS)](https://img.shields.io/badge/-Safari-0D96F6?logo=Safari&logoColor=white&style=flat-square)                   | 17.2 (Dec 2023) |
 | ![Opera](https://img.shields.io/badge/-Opera-FF1B2D?logo=Opera&logoColor=white&style=flat-square)                                   | 105 (Nov 2023)  |
 | ![Android WebView](https://img.shields.io/badge/-Android%20WebView-3DDC84?logo=android&logoColor=white&style=flat-square)           | 119 (Oct 2023)  |

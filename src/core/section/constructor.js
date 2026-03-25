@@ -414,6 +414,8 @@ export function InitOptions(options, editorTargets, plugins) {
 		...(typeof options.strictMode === 'boolean' ? {} : options.strictMode),
 	});
 	o.set('freeCodeViewMode', !!options.freeCodeViewMode);
+	o.set('finder_panel', options.finder_panel !== false);
+	o.set('finder_liveSearch', options.finder_liveSearch !== false);
 	o.set('__lineFormatFilter', options.__lineFormatFilter ?? true);
 	o.set('__pluginRetainFilter', options.__pluginRetainFilter ?? true);
 	o.set('mode', options.mode || 'classic'); // classic, inline, balloon, balloon-always
@@ -525,6 +527,7 @@ export function InitOptions(options, editorTargets, plugins) {
 
 	// etc
 	o.set('historyStackDelayTime', typeof options.historyStackDelayTime === 'number' ? options.historyStackDelayTime : 400);
+	o.set('historyStackSize', typeof options.historyStackSize === 'number' && options.historyStackSize > 0 ? options.historyStackSize : 100);
 	o.set('_editableClass', 'sun-editor-editable' + o.get('_themeClass') + (o.get('_rtl') ? ' se-rtl' : '') + (o.get('type') === 'document' ? ' se-type-document-editable-a4' : ''));
 	o.set('lineAttrReset', ['id'].concat(options.lineAttrReset && typeof options.lineAttrReset === 'string' ? options.lineAttrReset.toLowerCase().split('|') : []));
 	o.set('printClass', typeof options.printClass === 'string' ? options.printClass + ' ' + o.get('_editableClass') : null);
@@ -643,6 +646,7 @@ export function InitOptions(options, editorTargets, plugins) {
 					indent: ['c+BracketRight', ']'],
 					outdent: ['c+BracketLeft', '['],
 					save: ['c+KeyS', 'S'],
+					...(o.get('finder_panel') ? { finder: ['c+KeyF', 'F'] } : {}),
 					// plugins
 					link: ['c+KeyK', 'K'],
 					hr: ['!+---+=+~shortcut', ''],
@@ -1079,6 +1083,7 @@ function _defaultButtons(isRTL, icons, lang) {
 		dir: ['', lang[isRTL ? 'dir_ltr' : 'dir_rtl'], 'dir', '', icons[isRTL ? 'dir_ltr' : 'dir_rtl']],
 		dir_ltr: ['', lang.dir_ltr, 'dir_ltr', '', icons.dir_ltr],
 		dir_rtl: ['', lang.dir_rtl, 'dir_rtl', '', icons.dir_rtl],
+		finder: ['se-component-enabled', lang.find, 'finder', '', icons.finder],
 		save: ['se-component-enabled', lang.save, 'save', '', icons.save],
 		newDocument: ['se-component-enabled', lang.newDocument, 'newDocument', '', icons.new_document],
 		selectAll: ['se-component-enabled', lang.selectAll, 'selectAll', '', icons.select_all],

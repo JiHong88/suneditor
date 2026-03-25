@@ -208,6 +208,11 @@
 		width: 'Szélesség',
 		codeLanguage: 'Nyelv',
 		codeLanguage_none: 'Egyik sem',
+		finder_matchCase: 'Gyufa tok',
+		finder_wholeWord: 'Egész szó',
+		finder_regex: 'Reguláris kifejezés',
+		finder_prev: 'Előző mérkőzés',
+		finder_next: 'Következő mérkőzés',
 		message_copy_success: 'Vágólapra másolva',
 		message_copy_fail: 'A másolás sikertelen. Kérjük, másolja kézzel.',
 	};

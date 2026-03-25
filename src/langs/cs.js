@@ -208,6 +208,11 @@
 		width: 'Šířka',
 		codeLanguage: 'Jazyk',
 		codeLanguage_none: 'Žádný',
+		finder_matchCase: 'Zápasová karta',
+		finder_wholeWord: 'Celé slovo',
+		finder_regex: 'Regulární výraz',
+		finder_prev: 'Předchozí zápas',
+		finder_next: 'Další zápas',
 		message_copy_success: 'Zkopírováno do schránky',
 		message_copy_fail: 'Kopírování selhalo. Zkopírujte prosím ručně.',
 	};

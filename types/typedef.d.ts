@@ -288,6 +288,7 @@ declare global {
 				| 'dir'
 				| 'dir_ltr'
 				| 'dir_rtl'
+				| 'finder'
 				| 'save'
 				| 'newDocument'
 				| 'selectAll'

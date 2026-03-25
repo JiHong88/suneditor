@@ -208,6 +208,11 @@
 		width: 'Bredd',
 		codeLanguage: 'Språk',
 		codeLanguage_none: 'Ingen',
+		finder_matchCase: 'Matchfodral',
+		finder_wholeWord: 'Hela ordet',
+		finder_regex: 'Reguljärt uttryck',
+		finder_prev: 'Föregående match',
+		finder_next: 'Nästa match',
 		message_copy_success: 'Kopierat till urklipp',
 		message_copy_fail: 'Kopieringen misslyckades. Kopiera manuellt.',
 	};

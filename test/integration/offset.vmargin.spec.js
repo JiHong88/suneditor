@@ -914,8 +914,8 @@ describe('Offset #getVMargin — sticky toolbar interaction', () => {
 
 	describe('setAbsPosition with sticky vs non-sticky toolbar', () => {
 		it('should handle non-sticky toolbar', () => {
-			// Ensure toolbar is not sticky
-			editor.$.toolbar.isSticky = false;
+			// isSticky is a getter — mock it via spyOn
+			const spy = jest.spyOn(Object.getPrototypeOf(editor.$.toolbar), 'isSticky', 'get').mockReturnValue(false);
 
 			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 			wysiwyg.innerHTML = '<p>Non-sticky toolbar test</p>';
@@ -935,13 +935,14 @@ describe('Offset #getVMargin — sticky toolbar interaction', () => {
 					expect(['top', 'bottom']).toContain(result.position);
 				}
 			} finally {
+				spy.mockRestore();
 				safeRemove(el);
 			}
 		});
 
 		it('should handle sticky toolbar affecting rmt and rt', () => {
-			// Simulate sticky toolbar
-			editor.$.toolbar.isSticky = true;
+			// isSticky is a getter — mock it via spyOn
+			const spy = jest.spyOn(Object.getPrototypeOf(editor.$.toolbar), 'isSticky', 'get').mockReturnValue(true);
 
 			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 			wysiwyg.innerHTML = '<p>Sticky toolbar test</p>';
@@ -962,13 +963,13 @@ describe('Offset #getVMargin — sticky toolbar interaction', () => {
 					expect(['top', 'bottom']).toContain(result.position);
 				}
 			} finally {
-				editor.$.toolbar.isSticky = false;
+				spy.mockRestore();
 				safeRemove(el);
 			}
 		});
 
 		it('should adjust top position offset when toolbar is sticky and position=top', () => {
-			editor.$.toolbar.isSticky = true;
+			const spy = jest.spyOn(Object.getPrototypeOf(editor.$.toolbar), 'isSticky', 'get').mockReturnValue(true);
 
 			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 			wysiwyg.innerHTML = '<p>Sticky top position test</p>';
@@ -987,7 +988,7 @@ describe('Offset #getVMargin — sticky toolbar interaction', () => {
 				// This is the isSticky-specific path at line 511
 				expect(el.style.top).toBeDefined();
 			} finally {
-				editor.$.toolbar.isSticky = false;
+				spy.mockRestore();
 				safeRemove(el);
 			}
 		});
@@ -1093,7 +1094,7 @@ describe('Offset #getVMargin — setRangePosition text selection path', () => {
 
 	describe('setRangePosition with various toolbar states', () => {
 		it('should handle when toolbar is sticky', () => {
-			editor.$.toolbar.isSticky = true;
+			const spy = jest.spyOn(Object.getPrototypeOf(editor.$.toolbar), 'isSticky', 'get').mockReturnValue(true);
 
 			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 			wysiwyg.innerHTML = '<p>Sticky range test</p>';
@@ -1112,13 +1113,13 @@ describe('Offset #getVMargin — setRangePosition text selection path', () => {
 					expect(el.style.visibility).toBe('');
 				}
 			} finally {
-				editor.$.toolbar.isSticky = false;
+				spy.mockRestore();
 				safeRemove(el);
 			}
 		});
 
 		it('should handle when toolbar is not sticky (classic mode)', () => {
-			editor.$.toolbar.isSticky = false;
+			const spy = jest.spyOn(Object.getPrototypeOf(editor.$.toolbar), 'isSticky', 'get').mockReturnValue(false);
 
 			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 			wysiwyg.innerHTML = '<p>Non-sticky range test</p>';
@@ -1136,6 +1137,7 @@ describe('Offset #getVMargin — setRangePosition text selection path', () => {
 					expect(el.style.visibility).toBe('');
 				}
 			} finally {
+				spy.mockRestore();
 				safeRemove(el);
 			}
 		});

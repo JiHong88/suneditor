@@ -208,6 +208,11 @@
 		width: 'Bredde',
 		codeLanguage: 'Sprog',
 		codeLanguage_none: 'Ingen',
+		finder_matchCase: 'Match-sag',
+		finder_wholeWord: 'Hele ordet',
+		finder_regex: 'Regulært udtryk',
+		finder_prev: 'Forrige kamp',
+		finder_next: 'Næste kamp',
 		message_copy_success: 'Kopieret til udklipsholderen',
 		message_copy_fail: 'Kopiering mislykkedes. Kopiér venligst manuelt.',
 	};

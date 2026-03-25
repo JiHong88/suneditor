@@ -17,6 +17,7 @@ export default function History(kernel) {
 	const frameContext = contextProvider.frameContext;
 
 	let delayTime = $.options.get('historyStackDelayTime');
+	const maxStackSize = $.options.get('historyStackSize');
 	let pushDelay = null;
 	let stackIndex, stack, rootStack, rootInitContents;
 	let waiting = false;
@@ -203,6 +204,29 @@ export default function History(kernel) {
 		if (root.value.length === 0) resetRoot(rootKey);
 
 		setStack(current, range, rootKey, 1);
+
+		// Enforce max stack size
+		if (root.value.length > maxStackSize) {
+			const overflow = root.value.length - maxStackSize;
+			root.value.splice(0, overflow);
+			root.index -= overflow;
+
+			// Remove corresponding global stack entries
+			let removed = 0;
+			for (let i = stack.length - 1; i >= 0 && removed < overflow; i--) {
+				if (stack[i] === rootKey) {
+					// find the oldest entry for this rootKey
+					for (let j = 0; j < stack.length; j++) {
+						if (stack[j] === rootKey) {
+							stack.splice(j, 1);
+							removed++;
+							break;
+						}
+					}
+				}
+			}
+			stackIndex -= overflow;
+		}
 
 		if (stackIndex === 1) {
 			$.commandDispatcher.applyTargets('undo', (e) => {

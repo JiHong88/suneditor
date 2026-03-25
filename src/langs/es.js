@@ -208,6 +208,11 @@
 		width: 'Ancho',
 		codeLanguage: 'Idioma',
 		codeLanguage_none: 'Ninguno',
+		finder_matchCase: 'Caja de cerillas',
+		finder_wholeWord: 'Palabra entera',
+		finder_regex: 'Expresión regular',
+		finder_prev: 'Partido anterior',
+		finder_next: 'Próximo partido',
 		message_copy_success: 'Copiado al portapapeles',
 		message_copy_fail: 'Error al copiar. Por favor, copie manualmente.',
 	};

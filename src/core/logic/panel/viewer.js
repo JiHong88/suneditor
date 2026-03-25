@@ -86,6 +86,7 @@ class Viewer {
 		const wrapper = fc.get('wrapper');
 
 		if (value) {
+			this.#$.finder.close();
 			this.#setEditorDataToCodeView();
 			codeWrapper.style.setProperty('display', 'flex', 'important');
 			wysiwygFrame.style.display = 'none';
@@ -191,6 +192,7 @@ class Viewer {
 		const wrapper = fc.get('wrapper');
 
 		if (value) {
+			this.#$.finder.close();
 			this.#setEditorDataToMarkdownView();
 			markdownWrapper.style.setProperty('display', 'flex', 'important');
 			wysiwygFrame.style.display = 'none';

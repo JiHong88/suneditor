@@ -208,6 +208,11 @@
 		width: 'Breedte',
 		codeLanguage: 'Taal',
 		codeLanguage_none: 'Geen',
+		finder_matchCase: 'Lucifersdoosje',
+		finder_wholeWord: 'Heel woord',
+		finder_regex: 'Reguliere expressie',
+		finder_prev: 'Vorige wedstrijd',
+		finder_next: 'Volgende wedstrijd',
 		message_copy_success: 'Gekopieerd naar klembord',
 		message_copy_fail: 'Kopiëren mislukt. Kopieer handmatig.',
 	};

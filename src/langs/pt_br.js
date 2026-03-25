@@ -208,6 +208,11 @@
 		width: 'Largura',
 		codeLanguage: 'Linguagem',
 		codeLanguage_none: 'Nenhum',
+		finder_matchCase: 'Caixa de fósforos',
+		finder_wholeWord: 'Palavra inteira',
+		finder_regex: 'Expressão regular',
+		finder_prev: 'Partida anterior',
+		finder_next: 'Próxima partida',
 		message_copy_success: 'Copiado para a área de transferência',
 		message_copy_fail: 'Falha ao copiar. Copie manualmente, por favor.',
 	};

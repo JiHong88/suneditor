@@ -55,7 +55,7 @@ import { getClientSize } from '../../src/helper/dom/domUtils';
 // , 'dir_ltr', 'dir_rtl', 'list'
 const bl = [
 	// full size
-	['undo', 'redo', '|', 'dir', 'newDocument', 'selectAll', 'save', 'preview', 'print', 'exportPDF'],
+	['finder', 'undo', 'redo', '|', 'dir', 'newDocument', 'selectAll', 'save', 'preview', 'print', 'exportPDF'],
 	'|',
 	['blockquote', '|', 'blockStyle', 'font', 'fontSize', '|', 'paragraphStyle', 'textStyle'],
 	'|',
@@ -87,7 +87,7 @@ const bl = [
 	[
 		'%1200',
 		[
-			['undo', 'redo', '|', 'dir', 'newDocument', 'selectAll', 'save', 'preview', 'print', 'exportPDF'],
+			['finder', 'undo', 'redo', '|', 'dir', 'newDocument', 'selectAll', 'save', 'preview', 'print', 'exportPDF'],
 			'|',
 			[':Paragraph-default.more_paragraph', 'blockquote', '|', 'blockStyle', 'font', 'fontSize', '|', 'paragraphStyle'],
 			'|',
@@ -118,7 +118,7 @@ const bl = [
 	[
 		'%992',
 		[
-			['undo', 'redo', '|', 'dir', 'newDocument', 'selectAll', 'save', 'preview', 'print', 'exportPDF'],
+			['finder', 'undo', 'redo', '|', 'dir', 'newDocument', 'selectAll', 'save', 'preview', 'print', 'exportPDF'],
 			'|',
 			[':Paragraph-default.more_paragraph', 'blockquote', '|', 'blockStyle', 'font', 'fontSize', '|', 'paragraphStyle'],
 			'|',
@@ -139,7 +139,7 @@ const bl = [
 	[
 		'%768',
 		[
-			['undo', 'redo'],
+			['finder', 'undo', 'redo'],
 			'|',
 			[':Docs-default.more_horizontal', 'dir', 'newDocument', 'selectAll'],
 			['save'],
@@ -161,7 +161,7 @@ const bl = [
 	[
 		'%576',
 		[
-			['undo', 'redo'],
+			['finder', 'undo', 'redo'],
 			'|',
 			[':Docs-default.more_horizontal', 'dir', 'newDocument', 'selectAll', 'save'],
 			[':Paragraph-default.more_paragraph', 'outdent', 'indent', '|', 'blockquote', '|', 'blockStyle', 'font', 'fontSize', '|', 'paragraphStyle'],
@@ -176,7 +176,7 @@ const bl = [
 ];
 
 const bb = [
-	['anchor', 'newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak', 'dir'],
+	['anchor', 'newDocument', 'selectAll', 'finder', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak', 'dir'],
 	['dir_ltr', 'dir_rtl'],
 	['font', 'fontSize', 'blockStyle'],
 	['paragraphStyle', 'blockquote'],
@@ -337,9 +337,9 @@ const options1 = {
 	events: {
 		onChange() {},
 	},
-	image: {
-		uploadSizeLimit: '1a',
-	},
+	// image: {
+	// 	uploadSizeLimit: '1a',
+	// },
 	previewTemplate: `
                 <div style="width:auto; max-width:1136px; min-height:400px; margin:auto;">
                 {{ contents }}
@@ -579,7 +579,7 @@ const options1 = {
 	buttonList: bl,
 	// tableCellControllerPosition: 'cell',
 	// buttonList: [
-	// 	['newDocument', 'selectAll', 'undo', 'redo', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
+	// 	['newDocument', 'selectAll', 'finder', 'undo', 'redo', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
 	// 	'|',
 	// 	[':문단&글꼴-default.more_paragraph', 'font', 'fontSize', 'blockStyle', '|', 'paragraphStyle', 'blockquote'],
 	// 	'|',
@@ -602,13 +602,14 @@ const options1 = {
 		width: 'auto',
 		mode: 'balloon', // balloon, balloon-always, balloon-block
 	},
-	shortcuts: {
-		// bold: ['s75', 'K'],
-		italic: [],
-		image: ['c+73', 'I'],
-		list: ['c+76', 'L'],
-	},
+	// shortcuts: {
+	// 	// bold: ['s75', 'K'],
+	// 	italic: [],
+	// 	image: ['c+73', 'I'],
+	// 	list: ['c+76', 'L'],
+	// },
 	// theme: 'dark',
+	height: 'auto',
 	math: {
 		// katex: {
 		// 	src: Katex
@@ -822,15 +823,15 @@ const options1 = {
 		// ],
 		url: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo',
 	},
-	image: {
-		// canResize: false,
-		uploadUrl: 'http://localhost:3000/editor/upload',
-		linkEnableFileUpload: true,
-		allowMultiple: true,
-		useFormatType: true,
-		defaultFormatType: 'block',
-		// percentageOnlySize: true
-	},
+	// image: {
+	// 	// canResize: false,
+	// 	uploadUrl: 'http://localhost:3000/editor/upload',
+	// 	linkEnableFileUpload: true,
+	// 	allowMultiple: true,
+	// 	useFormatType: true,
+	// 	defaultFormatType: 'block',
+	// 	// percentageOnlySize: true
+	// },
 	audio: {
 		allowMultiple: true,
 		uploadUrl: 'http://localhost:3000/editor/upload',
@@ -1240,7 +1241,9 @@ const options1 = {
 	// value: '<ol><li></li></ol>',
 	// charCounter_max: 26,
 	placeholder: 'Start typing here...',
+	// historyStackSize: 5,
 	// defaultLineBreakFormat: 'br',
+	shortcutsHint: true,
 	events: {
 		// onFileAction: (data) => {
 		// 	// console.log('fileaa', data);
@@ -1301,9 +1304,12 @@ const options1 = {
 		// },
 	},
 	// iframe: true,
-	maxHeight: 600,
+	// maxHeight: 600,
 	toolbar_sticky: 50,
 	iframe_attributes: { frameborder: '1' },
+	// mode: 'inline',
+	type: '',
+	// textDirection: 'rtl',
 	value: `<pre style="line-height: 1.45;margin: 0px 0px 10px">
 ​dsadsa</pre>
 
@@ -2042,10 +2048,10 @@ const options_test = {
 	statusbar_container: null,
 	shortcutsHint: true,
 	shortcutsDisable: false,
-	shortcuts: {
-		bold: ['ctrl+b', 'cmd+b'],
-		save: ['ctrl+s', 'cmd+s'],
-	},
+	// shortcuts: {
+	// 	bold: ['ctrl+b', 'cmd+b'],
+	// 	save: ['ctrl+s', 'cmd+s'],
+	// },
 
 	// Advanced Features
 	copyFormatKeepOn: false,

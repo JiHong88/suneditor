@@ -208,6 +208,11 @@
 		width: 'Szerokość',
 		codeLanguage: 'Język',
 		codeLanguage_none: 'Nic',
+		finder_matchCase: 'Etui na zapałki',
+		finder_wholeWord: 'Całe słowo',
+		finder_regex: 'Wyrażenie regularne',
+		finder_prev: 'Poprzedni mecz',
+		finder_next: 'Następny mecz',
 		message_copy_success: 'Skopiowano do schowka',
 		message_copy_fail: 'Nie udało się skopiować. Skopiuj ręcznie.',
 	};

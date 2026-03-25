@@ -192,6 +192,11 @@ export type _Lang = {
 	width: string;
 	codeLanguage: string;
 	codeLanguage_none: string;
+	finder_matchCase: string;
+	finder_wholeWord: string;
+	finder_regex: string;
+	finder_prev: string;
+	finder_next: string;
 	message_copy_success: string;
 	message_copy_fail: string;
 };

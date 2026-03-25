@@ -121,7 +121,7 @@ declare class Shortcuts {
 	 * @description Registers custom shortcut keys (keys starting with `_`) into the shortcut map.
 	 * Called during initialization and when toolbar is reset.
 	 */
-	_registerCustomShortcuts(): void;
+	_registerShortcuts(): void;
 	/**
 	 * @internal
 	 * @description Destroy the Shortcuts instance and release memory

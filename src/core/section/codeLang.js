@@ -1,4 +1,4 @@
-import { converter, dom } from '../../helper';
+import { dom } from '../../helper';
 import { Controller } from '../../modules/contract';
 import { SelectMenu } from '../../modules/ui';
 
@@ -33,7 +33,7 @@ class CodeLang {
 		this.#updateButtonText('');
 
 		// code lang selector - remove event
-		this.#removeEventFunc = converter.debounce((e) => {
+		this.#removeEventFunc = (e) => {
 			this.#mouseLeaveEvent = this.#$.eventManager.removeEvent(this.#mouseLeaveEvent);
 
 			if (e && containerEl.contains(e.relatedTarget)) {
@@ -41,7 +41,7 @@ class CodeLang {
 			} else {
 				this.hide();
 			}
-		}, 150);
+		};
 
 		// controller
 		containerEl.appendChild(this.#button);
@@ -75,6 +75,14 @@ class CodeLang {
 	}
 
 	/**
+	 * @description Whether the selector UI is currently visible (button or menu open).
+	 * @returns {boolean}
+	 */
+	get isOpen() {
+		return this.#selectMenu.isOpen || this.controller.isOpen;
+	}
+
+	/**
 	 * @description Shows the language selector over the given pre element.
 	 * @param {HTMLElement} preElement The `<pre>` element
 	 */
@@ -87,7 +95,7 @@ class CodeLang {
 		this.#currentPre = preElement;
 		dom.utils.addClass(preElement, 'se-pre-code-focus');
 
-		this.controller.open(preElement, null, { addOffset: { right: preElement.offsetWidth, top: 1 } });
+		this.controller.open(preElement, null, { passive: true, addOffset: { right: preElement.offsetWidth, top: 1 } });
 		this.#updateButtonText(this.#getCurrentLang());
 
 		this.#addPreLeaveEvent();
@@ -108,14 +116,6 @@ class CodeLang {
 		if (this.#selectMenu.isOpen) this.#selectMenu.close();
 		dom.utils.removeClass(this.#currentPre, 'se-pre-code-focus');
 		this.controller.close(true);
-	}
-
-	/**
-	 * @description Whether the selector UI is currently visible (button or menu open).
-	 * @returns {boolean}
-	 */
-	isOpen() {
-		return this.#selectMenu.isOpen || this.controller.isOpen;
 	}
 
 	/**
@@ -155,7 +155,7 @@ class CodeLang {
 	 * @param {string} lang Language string
 	 */
 	#updateButtonText(lang) {
-		this.#button.innerHTML = '<span class="se-code-lang-icon">&lt;/&gt;</span><span class="se-code-lang-text">' + (lang || this.#$.lang.codeLanguage || 'Language') + '</span>';
+		this.#button.innerHTML = /* html */ `<span class="se-code-lang-icon">&lt;/&gt;</span><span class="se-code-lang-text">${lang || this.#$.lang.codeLanguage || 'Language'}</span>`;
 	}
 
 	/**
