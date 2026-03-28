@@ -188,6 +188,7 @@
 		tableProperties: 'Tabulas īpašības',
 		tags: 'Tagi',
 		tag_blockquote: 'Citāts',
+		codeBlock: 'Koda bloks',
 		tag_div: 'Normāli (DIV)',
 		tag_h: 'Galvene',
 		tag_p: 'Paragrāfs',

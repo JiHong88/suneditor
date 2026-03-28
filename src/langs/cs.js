@@ -188,6 +188,7 @@
 		tableProperties: 'Vlastnosti tabulky',
 		tags: 'Štítky',
 		tag_blockquote: 'Citovat',
+		codeBlock: 'Blok kódu',
 		tag_div: 'Normální (DIV)',
 		tag_h: 'Záhlaví',
 		tag_p: 'Odstavec',

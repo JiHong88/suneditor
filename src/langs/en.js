@@ -187,6 +187,7 @@
 		tableProperties: 'Table properties',
 		tags: 'Tags',
 		tag_blockquote: 'Quote',
+		codeBlock: 'Code Block',
 		tag_div: 'Normal (DIV)',
 		tag_h: 'Header',
 		tag_p: 'Paragraph',

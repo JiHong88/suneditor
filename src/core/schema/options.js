@@ -279,7 +279,7 @@ export const DEFAULTS = {
  *
  * === Modes & Themes ===
  * @property {boolean} [v2Migration=false] - Enables migration mode for SunEditor v2.
- * @property {"classic"|"inline"|"balloon"|"balloon-always"} [mode="classic"] - Toolbar mode: `classic`, `inline`, `balloon`, `balloon-always`.
+ * @property {"classic"|"inline"|"balloon"|"balloon-always"|"classic:bottom"|"inline:bottom"} [mode="classic"] - Toolbar mode: `classic`, `inline`, `balloon`, `balloon-always`. Append `:bottom` to place toolbar at the bottom (e.g. `classic:bottom`, `inline:bottom`).
  * @property {string} [type=""] - Editor type. Use `"document"` for a document-style layout, with optional sub-types after `:`.
  * ```js
  * // type
@@ -514,14 +514,6 @@ export const DEFAULTS = {
  * - The finder is always created internally; this option controls whether the panel is visible to users (Ctrl+F / Ctrl+H).
  * @property {boolean} [finder_liveSearch=true] - Searches instantly as you type (debounced). When false, search runs only on Enter.
  *
- * === Code Block ===
- * @property {?Array<string>} [codeLangs] - List of selectable programming languages for `<pre>` code blocks.
- * - A language selector UI appears on hover over `<pre>` elements.
- * - Defaults to common languages (javascript, typescript, html, css, json, python, java, c, cpp, csharp, go, rust, ruby, php, swift, kotlin, sql, bash, markdown, xml, yaml).
- * - Set to empty array `[]` to disable the feature.
- * ```js
- * { codeLangs: ['javascript', 'python', 'html', 'css'] }
- * ```
  * ///
  *
  * === Dynamic Options ===
@@ -567,6 +559,7 @@ export const DEFAULTS = {
  * @property {import('../../plugins/browser/audioGallery.js').AudioGalleryPluginOptions} [audioGallery]
  * @property {import('../../plugins/dropdown/backgroundColor.js').BackgroundColorPluginOptions} [backgroundColor]
  * @property {import('../../plugins/dropdown/blockStyle.js').BlockStylePluginOptions} [blockStyle]
+ * @property {import('../../plugins/command/codeBlock.js').CodeBlockPluginOptions} [codeBlock]
  * @property {import('../../plugins/modal/drawing.js').DrawingPluginOptions} [drawing]
  * @property {import('../../plugins/modal/embed.js').EmbedPluginOptions} [embed]
  * @property {import('../../plugins/command/exportPDF.js').ExportPDFPluginOptions} [exportPDF]
@@ -758,7 +751,6 @@ export const OPTION_FIXED_FLAG = {
 	__pluginRetainFilter: true,
 	__listCommonStyle: 'fixed',
 	externalLibs: 'fixed',
-	codeLangs: 'fixed',
 };
 
 /**

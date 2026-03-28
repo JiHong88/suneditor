@@ -188,6 +188,7 @@
 		tableProperties: 'Tabellegenskaper',
 		tags: 'Tags',
 		tag_blockquote: 'Citer',
+		codeBlock: 'Kodblock',
 		tag_div: 'Normal (DIV)',
 		tag_h: 'Rubrik',
 		tag_p: 'Paragraf',

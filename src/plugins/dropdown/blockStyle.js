@@ -139,7 +139,7 @@ class BlockStyle extends PluginDropdown {
  * @returns {HTMLElement}
  */
 function CreateHTML({ lang }, items) {
-	const defaultFormats = ['p', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+	const defaultFormats = ['p', 'blockquote', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
 	const formatList = !items || items.length === 0 ? defaultFormats : items;
 
 	let list = /*html*/ `

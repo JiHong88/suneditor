@@ -489,7 +489,7 @@ class DocumentType {
 				if (!force) this.#selection.setRange(c, 0, c, 0);
 				const scrollTop = i === 0 && isScrollable ? 0 : c.offsetTop - this.#page.offsetTop - c.offsetHeight + globalTop;
 				this._applyPageScroll(scrollTop, () => {
-					if (this.#toolbar.isSticky) {
+					if (this.#toolbar.isSticky && !this.#store.mode.isBottom) {
 						this._getDisplayPage().scrollTo({ top: scrollTop - this.#context.get('toolbar_main').offsetHeight, behavior: 'smooth' });
 					}
 				});

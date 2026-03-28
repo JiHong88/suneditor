@@ -188,6 +188,7 @@
 		tableProperties: 'Propiedades de la tabla',
 		tags: 'Etiquetas',
 		tag_blockquote: 'Cita',
+		codeBlock: 'Bloque de código',
 		tag_div: 'Normal (DIV)',
 		tag_h: 'Título',
 		tag_p: 'Párrafo',

@@ -13,6 +13,7 @@ declare namespace _default {
 	export let outdent: string;
 	export let expansion: string;
 	export let reduction: string;
+	export let code_block: string;
 	export let code_view: string;
 	export let markdown_view: string;
 	export let preview: string;

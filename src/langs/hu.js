@@ -188,6 +188,7 @@
 		tableProperties: 'Táblázat tulajdonságok',
 		tags: 'Címkék',
 		tag_blockquote: 'Idézet',
+		codeBlock: 'Kódblokk',
 		tag_div: 'Normál (DIV)',
 		tag_h: 'Fejléc',
 		tag_p: 'Bekezdés',

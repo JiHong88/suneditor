@@ -1,5 +1,6 @@
 // command
 import blockquote from './command/blockquote';
+import codeBlock from './command/codeBlock';
 import exportPDF from './command/exportPDF';
 import fileUpload from './command/fileUpload';
 import list_bulleted from './command/list_bulleted';
@@ -48,6 +49,7 @@ import anchor from './popup/anchor';
 
 export {
 	blockquote,
+	codeBlock,
 	exportPDF,
 	fileUpload,
 	list_bulleted,
@@ -84,6 +86,7 @@ export {
 };
 export default {
 	blockquote,
+	codeBlock,
 	exportPDF,
 	fileUpload,
 	list_bulleted,

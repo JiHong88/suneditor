@@ -16,8 +16,6 @@ declare class EventOrchestrator extends KernelInjector {
 	scrollparents: Array<Element>;
 	defaultLineManager: DefaultLineManager;
 	selectionState: SelectionState;
-	/** @type {?CodeLang} */
-	codeLang: CodeLang | null;
 	/** @internal @type {boolean} */
 	_onShortcutKey: boolean;
 	/** @internal @type {boolean} */
@@ -192,4 +190,3 @@ declare class EventOrchestrator extends KernelInjector {
 import DefaultLineManager from '../event/support/defaultLineManager';
 import SelectionState from '../event/support/selectionState';
 import KernelInjector from '../kernel/kernelInjector';
-import CodeLang from '../section/codeLang';

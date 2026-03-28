@@ -151,14 +151,6 @@ export function OnMouseMove_wysiwyg(fc, e) {
 		this.$.component.hoverSelect(eventTarget);
 	}
 
-	// code lang selector
-	if (this.codeLang) {
-		const pre = eventTarget.closest('pre');
-		if (pre && !this.codeLang.isOpen && this.$.ui.opendControllers.length === 0) {
-			this.codeLang.show(pre);
-		}
-	}
-
 	this._callPluginEvent('onMouseMove', { frameContext: fc, event: e });
 }
 

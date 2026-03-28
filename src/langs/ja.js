@@ -187,6 +187,7 @@
 		tableProperties: '表のプロパティ',
 		tags: 'タグ',
 		tag_blockquote: '引用',
+		codeBlock: 'コードブロック',
 		tag_div: '基本（DIV）',
 		tag_h: 'タイトル',
 		tag_p: '本文',

@@ -188,6 +188,7 @@
 		tableProperties: 'خواص جدول',
 		tags: 'تگ‌ها',
 		tag_blockquote: 'نقل قول',
+		codeBlock: 'بلوک کد',
 		tag_div: 'عادی (DIV)',
 		tag_h: 'هدر',
 		tag_p: 'پاراگراف',

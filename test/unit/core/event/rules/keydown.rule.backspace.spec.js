@@ -469,4 +469,89 @@ describe('Backspace Rule', () => {
 
 		expect(result).toBe(true);
 	});
+
+	describe('brLine strip (PRE at start)', () => {
+		let preEl;
+
+		beforeEach(() => {
+			preEl = document.createElement('pre');
+			preEl.innerHTML = 'line1<br>line2';
+			wysiwygDiv.innerHTML = '';
+			wysiwygDiv.classList.add('se-wrapper-wysiwyg');
+			wysiwygDiv.appendChild(preEl);
+
+			mockCtx.formatEl = preEl;
+			mockCtx.selectionNode = preEl.firstChild;
+
+			const newRange = document.createRange();
+			newRange.setStart(preEl.firstChild, 0);
+			newRange.setEnd(preEl.firstChild, 0);
+			mockCtx.range = newRange;
+
+			mockPorts.format.isLine.mockReturnValue(true);
+			mockPorts.format.isBrLine.mockReturnValue(true);
+			mockPorts.format.isClosureBrLine.mockReturnValue(false);
+			mockPorts.format.isNormalLine.mockReturnValue(false);
+		});
+
+		it('should dispatch brLineStrip when PRE is first child of wysiwyg', () => {
+			const result = reduceBackspaceDown(actions, mockPorts, mockCtx);
+
+			const stripAction = actions.find((a) => a.t === 'backspace.brline.strip');
+			expect(stripAction).toBeDefined();
+			expect(stripAction.p.formatEl).toBe(preEl);
+			expect(result).toBe(false);
+		});
+
+		it('should dispatch preventStop before brLineStrip', () => {
+			reduceBackspaceDown(actions, mockPorts, mockCtx);
+
+			const preventIdx = actions.findIndex((a) => a.t === 'prevent.stop');
+			const stripIdx = actions.findIndex((a) => a.t === 'backspace.brline.strip');
+			expect(preventIdx).toBeLessThan(stripIdx);
+		});
+
+		it('should dispatch historyPush after brLineStrip', () => {
+			reduceBackspaceDown(actions, mockPorts, mockCtx);
+
+			const stripIdx = actions.findIndex((a) => a.t === 'backspace.brline.strip');
+			const historyIdx = actions.findIndex((a) => a.t === 'history.push');
+			expect(historyIdx).toBeGreaterThan(stripIdx);
+		});
+
+		it('should NOT dispatch brLineStrip when PRE has previous sibling', () => {
+			const prevP = document.createElement('p');
+			prevP.textContent = 'before';
+			wysiwygDiv.insertBefore(prevP, preEl);
+
+			const result = reduceBackspaceDown(actions, mockPorts, mockCtx);
+
+			const stripAction = actions.find((a) => a.t === 'backspace.brline.strip');
+			expect(stripAction).toBeUndefined();
+			expect(result).toBe(true);
+		});
+
+		it('should NOT dispatch brLineStrip when PRE is inside a block (not wysiwyg direct child)', () => {
+			const blockquote = document.createElement('blockquote');
+			blockquote.appendChild(preEl);
+			wysiwygDiv.innerHTML = '';
+			wysiwygDiv.appendChild(blockquote);
+
+			const result = reduceBackspaceDown(actions, mockPorts, mockCtx);
+
+			const stripAction = actions.find((a) => a.t === 'backspace.brline.strip');
+			expect(stripAction).toBeUndefined();
+		});
+
+		it('should still handle closureBrLine normally', () => {
+			mockPorts.format.isClosureBrLine.mockReturnValue(true);
+			mockPorts.format.isClosureBlock.mockReturnValue(true);
+
+			const result = reduceBackspaceDown(actions, mockPorts, mockCtx);
+
+			const stripAction = actions.find((a) => a.t === 'backspace.brline.strip');
+			expect(stripAction).toBeUndefined();
+			expect(result).toBe(false);
+		});
+	});
 });

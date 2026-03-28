@@ -912,6 +912,36 @@
 	z-index: -1;
 }
 
+/* Bottom toolbar: sticky from bottom */
+.sun-editor .se-toolbar.se-toolbar-bottom {
+	top: auto;
+	bottom: 0;
+	outline-offset: -1px;
+}
+
+/* Bottom toolbar: more layer opens above buttons */
+.sun-editor .se-toolbar.se-toolbar-bottom .se-btn-tray {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.sun-editor .se-toolbar.se-toolbar-bottom .se-btn-tray > .se-toolbar-more-layer {
+	order: -1;
+	width: 100%;
+	border-top: none;
+}
+
+.sun-editor .se-toolbar.se-toolbar-bottom .se-toolbar-more-layer .se-more-layer {
+	border-top: none;
+	border-bottom: 1px solid var(--se-main-divider-color);
+}
+
+/* JS fallback sticky for bottom */
+.sun-editor .se-toolbar.se-toolbar-sticky.se-toolbar-bottom {
+	top: auto;
+	bottom: 0px;
+}
+
 /* toolbar arrow up */
 .sun-editor .se-toolbar .se-arrow.se-arrow-up {
 	border-bottom-color: var(--se-main-divider-color);
@@ -1185,6 +1215,12 @@
 .sun-editor .se-list-layer.se-list-font-size {
 	min-width: 140px;
 	max-height: 300px;
+}
+
+/* dropdown layer - code block */
+.sun-editor .se-list-layer.se-list-code-block {
+	min-width: 140px;
+	max-height: 310px;
 }
 
 /* dropdown layer - font family */

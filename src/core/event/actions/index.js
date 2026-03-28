@@ -92,6 +92,11 @@ export const A = {
 	 */
 	backspaceFormatMaintain: (formatEl) => ({ t: 'backspace.format.maintain', p: { formatEl } }),
 	/**
+	 * @param {Element} formatEl - brLine element (e.g. PRE) to strip
+	 * @returns {Action}
+	 */
+	backspaceBrLineStrip: (formatEl) => ({ t: 'backspace.brline.strip', p: { formatEl } }),
+	/**
 	 * @param {Node} selectionNode
 	 * @param {Range} range
 	 * @param {SunEditor.ComponentInfo} fileComponentInfo

@@ -188,6 +188,7 @@
 		tableProperties: 'Tabel egenskaber',
 		tags: 'Tags',
 		tag_blockquote: 'Citer',
+		codeBlock: 'Kodeblok',
 		tag_div: 'Normal (DIV)',
 		tag_h: 'Overskrift',
 		tag_p: 'Paragraph',

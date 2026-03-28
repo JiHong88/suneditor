@@ -59,11 +59,19 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 		!selectionNode.previousSibling &&
 		!dom.check.isListCell(formatEl) &&
 		format.isLine(formatEl) &&
-		(!format.isBrLine(formatEl) || format.isClosureBrLine(formatEl))
+		(!format.isBrLine(formatEl) || format.isClosureBrLine(formatEl) || dom.check.isWysiwygFrame(formatEl.parentNode))
 	) {
 		// closure range
 		if (format.isClosureBlock(formatEl.parentNode)) {
 			actions.push(A.preventStop());
+			return false;
+		}
+
+		// brLine (pre): strip tag to default line(s)
+		if (format.isBrLine(formatEl) && dom.check.isWysiwygFrame(formatEl.parentNode)) {
+			actions.push(A.preventStop());
+			actions.push(A.backspaceBrLineStrip(formatEl));
+			actions.push(A.historyPush(true));
 			return false;
 		}
 

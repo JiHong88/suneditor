@@ -172,6 +172,7 @@ export type _Lang = {
 	tableProperties: string;
 	tags: string;
 	tag_blockquote: string;
+	codeBlock: string;
 	tag_div: string;
 	tag_h: string;
 	tag_p: string;

@@ -1089,6 +1089,74 @@ describe('keydown.registry effects', () => {
 			expect(callArgs[1]).toBe(1);
 		});
 	});
+
+	describe('backspace.brline.strip', () => {
+		it('should extract first line from PRE into a default line', () => {
+			const parent = document.createElement('div');
+			const pre = document.createElement('pre');
+			pre.innerHTML = 'line1<br>line2<br>line3';
+			parent.appendChild(pre);
+
+			effects['backspace.brline.strip']({ ctx: mockCtx, ports: mockPorts }, { formatEl: pre });
+
+			const newLine = parent.firstChild;
+			expect(newLine.nodeName).toBe('P');
+			expect(newLine.textContent).toBe('line1');
+			expect(parent.children.length).toBe(2);
+			expect(parent.lastChild.nodeName).toBe('PRE');
+		});
+
+		it('should set cursor to start of extracted line', () => {
+			const parent = document.createElement('div');
+			const pre = document.createElement('pre');
+			pre.innerHTML = 'hello<br>world';
+			parent.appendChild(pre);
+
+			effects['backspace.brline.strip']({ ctx: mockCtx, ports: mockPorts }, { formatEl: pre });
+
+			expect(mockPorts.selection.setRange).toHaveBeenCalledWith(
+				expect.anything(), 0, expect.anything(), 0,
+			);
+		});
+
+		it('should remove PRE when only one line remains', () => {
+			const parent = document.createElement('div');
+			const pre = document.createElement('pre');
+			pre.textContent = 'only line';
+			parent.appendChild(pre);
+
+			effects['backspace.brline.strip']({ ctx: mockCtx, ports: mockPorts }, { formatEl: pre });
+
+			expect(parent.children.length).toBe(1);
+			expect(parent.firstChild.nodeName).toBe('P');
+			expect(parent.firstChild.textContent).toBe('only line');
+		});
+
+		it('should handle empty PRE', () => {
+			const parent = document.createElement('div');
+			const pre = document.createElement('pre');
+			parent.appendChild(pre);
+
+			effects['backspace.brline.strip']({ ctx: mockCtx, ports: mockPorts }, { formatEl: pre });
+
+			expect(parent.firstChild.nodeName).toBe('P');
+			expect(parent.firstChild.innerHTML).toBe('<br>');
+		});
+
+		it('should handle PRE starting with BR (empty first line)', () => {
+			const parent = document.createElement('div');
+			const pre = document.createElement('pre');
+			pre.innerHTML = '<br>second line';
+			parent.appendChild(pre);
+
+			effects['backspace.brline.strip']({ ctx: mockCtx, ports: mockPorts }, { formatEl: pre });
+
+			expect(parent.firstChild.nodeName).toBe('P');
+			expect(parent.firstChild.innerHTML).toBe('<br>');
+			expect(parent.lastChild.nodeName).toBe('PRE');
+			expect(parent.lastChild.textContent).toBe('second line');
+		});
+	});
 });
 
 describe('LineDelete_next', () => {

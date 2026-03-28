@@ -222,7 +222,7 @@ class Menu {
 	 * @param {HTMLElement} menu Menu element
 	 */
 	__resetMenuPosition(element, menu) {
-		this.#$.offset.setRelPosition(menu, this.#contextProvider.carrierWrapper, element.parentElement, dom.query.getParentElement(element, '.se-toolbar'));
+		this.#$.offset.setRelPosition(menu, this.#contextProvider.carrierWrapper, element.parentElement, dom.query.getParentElement(element, '.se-toolbar'), { preferUp: this.#store.mode.isBottom });
 	}
 
 	/**
@@ -245,7 +245,7 @@ class Menu {
 		menu.style.height = '';
 		dom.utils.addClass(element.parentElement.children, 'on');
 
-		this.#$.offset.setRelPosition(menu, this.#contextProvider.carrierWrapper, element.parentElement, dom.query.getParentElement(element, '.se-toolbar'));
+		this.#$.offset.setRelPosition(menu, this.#contextProvider.carrierWrapper, element.parentElement, dom.query.getParentElement(element, '.se-toolbar'), { preferUp: this.#store.mode.isBottom });
 
 		menu.style.visibility = '';
 

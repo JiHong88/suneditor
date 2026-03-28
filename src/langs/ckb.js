@@ -188,6 +188,7 @@
 		tableProperties: 'تایبەتمەندیەکانی خشتەکان',
 		tags: 'تاگه‌كان',
 		tag_blockquote: 'ده‌ق',
+		codeBlock: 'کۆد بلۆک',
 		tag_div: 'ی ئاسایی (DIV)',
 		tag_h: 'سەرپەڕە',
 		tag_p: 'په‌ره‌گراف',

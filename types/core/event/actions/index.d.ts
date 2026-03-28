@@ -15,6 +15,7 @@ export namespace A {
 	function selectComponentFallback(cmponentInfo: SunEditor.ComponentInfo): Action;
 	function delFormatRemoveAndMove(container: Node, formatEl: Element): Action;
 	function backspaceFormatMaintain(formatEl: Element): Action;
+	function backspaceBrLineStrip(formatEl: Element): Action;
 	function backspaceComponentSelect(selectionNode: Node, range: Range, fileComponentInfo: SunEditor.ComponentInfo): Action;
 	function backspaceComponentRemove(isList: boolean, sel: Node, formatEl: Element, fileComponentInfo: SunEditor.ComponentInfo): Action;
 	function backspaceListMergePrev(prev: Element, formatEl: Element, rangeEl: Element): Action;

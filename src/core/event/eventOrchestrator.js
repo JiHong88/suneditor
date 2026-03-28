@@ -13,7 +13,6 @@ import { OnDragOver_wysiwyg, OnDragEnd_wysiwyg, OnDrop_wysiwyg } from '../event/
 // logic
 import DefaultLineManager from '../event/support/defaultLineManager';
 import SelectionState from '../event/support/selectionState';
-import CodeLang from '../section/codeLang';
 
 const { _w, isMobile, isTouchDevice } = env;
 
@@ -70,11 +69,6 @@ class EventOrchestrator extends KernelInjector {
 		// logic services (internal - receive EventManager reference)
 		this.defaultLineManager = new DefaultLineManager(this);
 		this.selectionState = new SelectionState(this);
-
-		// code language selector
-		const codeLangs = this.$.options.get('codeLangs');
-		/** @type {?CodeLang} */
-		this.codeLang = codeLangs?.length ? new CodeLang(this.$, codeLangs) : null;
 
 		// internal members
 		/** @internal @type {boolean} */
@@ -755,7 +749,6 @@ class EventOrchestrator extends KernelInjector {
 	 * @param {Event} e - Event object
 	 */
 	#OnScroll_wysiwyg(frameContext, eventWysiwyg, e) {
-		// this.codeLang?.close();
 		this.#ui._syncScrollPosition(eventWysiwyg);
 		this.#scrollContainer();
 
@@ -923,7 +916,6 @@ class EventOrchestrator extends KernelInjector {
 	}
 
 	#OnScroll_window() {
-		// this.codeLang?.close();
 		if (this.#options.get('toolbar_sticky') > -1) {
 			this.#toolbar._resetSticky();
 		}

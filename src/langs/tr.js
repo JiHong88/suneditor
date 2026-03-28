@@ -188,6 +188,7 @@
 		tableProperties: 'Tablo özellikleri',
 		tags: 'Etiketler',
 		tag_blockquote: 'Alıntı',
+		codeBlock: 'Kod Bloğu',
 		tag_div: 'Normal (DIV)',
 		tag_h: 'Başlık',
 		tag_p: 'Paragraf',

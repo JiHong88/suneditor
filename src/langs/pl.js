@@ -188,6 +188,7 @@
 		tableProperties: 'Właściwości tabeli',
 		tags: 'Tagi',
 		tag_blockquote: 'Cytat',
+		codeBlock: 'Blok kodu',
 		tag_div: 'Blok (DIV)',
 		tag_h: 'Nagłówek H',
 		tag_p: 'Akapit',

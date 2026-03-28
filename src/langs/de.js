@@ -188,6 +188,7 @@
 		tableProperties: 'Tabelleneigenschaften',
 		tags: 'Stichworte',
 		tag_blockquote: 'Zitat',
+		codeBlock: 'Codeblock',
 		tag_div: 'Normal (DIV)',
 		tag_h: 'Header',
 		tag_p: 'Absatz',

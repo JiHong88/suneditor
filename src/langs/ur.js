@@ -188,6 +188,7 @@
 		tableProperties: 'ٹیبل کی خصوصیات',
 		tags: 'ٹیگز',
 		tag_blockquote: 'اقتباس',
+		codeBlock: 'کوڈ بلاک',
 		tag_div: 'عام (div)',
 		tag_h: 'ہیڈر',
 		tag_p: 'پیراگراف',

@@ -60,6 +60,7 @@ describe('Toolbar', () => {
 				isBalloon: false,
 				isInline: false,
 				isBalloonAlways: false,
+				isBottom: false,
 			},
 		};
 
@@ -202,6 +203,38 @@ describe('Toolbar', () => {
 			});
 			expect(inlineToolbar.isInlineMode).toBe(true);
 			expect(inlineToolbar.isBalloonMode).toBe(false);
+		});
+	});
+
+	describe('bottom mode', () => {
+		it('should set isBottomMode to false when store.mode.isBottom is false', () => {
+			expect(toolbar.isBottomMode).toBe(false);
+		});
+
+		it('should set isBottomMode to true when store.mode.isBottom is true', () => {
+			mockStore.mode.isBottom = true;
+			const bottomToolbar = new Toolbar(mockKernel, {
+				keyName: 'toolbar',
+				balloon: false,
+				inline: false,
+				balloonAlways: false,
+				res: [],
+			});
+			expect(bottomToolbar.isBottomMode).toBe(true);
+			mockStore.mode.isBottom = false;
+		});
+
+		it('isSticky should return false for sub toolbar regardless of bottom mode', () => {
+			mockStore.mode.isBottom = true;
+			const subToolbar = new Toolbar(mockKernel, {
+				keyName: 'toolbar_sub',
+				balloon: false,
+				inline: false,
+				balloonAlways: false,
+				res: [],
+			});
+			expect(subToolbar.isSticky).toBe(false);
+			mockStore.mode.isBottom = false;
 		});
 	});
 });

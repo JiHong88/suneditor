@@ -55,7 +55,7 @@ import { getClientSize } from '../../src/helper/dom/domUtils';
 // , 'dir_ltr', 'dir_rtl', 'list'
 const bl = [
 	// full size
-	['finder', 'undo', 'redo', '|', 'dir', 'newDocument', 'selectAll', 'save', 'preview', 'print', 'exportPDF'],
+	['codeBlock', 'finder', 'undo', 'redo', '|', 'dir', 'newDocument', 'selectAll', 'save', 'preview', 'print', 'exportPDF'],
 	'|',
 	['blockquote', '|', 'blockStyle', 'font', 'fontSize', '|', 'paragraphStyle', 'textStyle'],
 	'|',
@@ -87,7 +87,7 @@ const bl = [
 	[
 		'%1200',
 		[
-			['finder', 'undo', 'redo', '|', 'dir', 'newDocument', 'selectAll', 'save', 'preview', 'print', 'exportPDF'],
+			['codeBlock', 'finder', 'undo', 'redo', '|', 'dir', 'newDocument', 'selectAll', 'save', 'preview', 'print', 'exportPDF'],
 			'|',
 			[':Paragraph-default.more_paragraph', 'blockquote', '|', 'blockStyle', 'font', 'fontSize', '|', 'paragraphStyle'],
 			'|',
@@ -118,7 +118,7 @@ const bl = [
 	[
 		'%992',
 		[
-			['finder', 'undo', 'redo', '|', 'dir', 'newDocument', 'selectAll', 'save', 'preview', 'print', 'exportPDF'],
+			['codeBlock', 'finder', 'undo', 'redo', '|', 'dir', 'newDocument', 'selectAll', 'save', 'preview', 'print', 'exportPDF'],
 			'|',
 			[':Paragraph-default.more_paragraph', 'blockquote', '|', 'blockStyle', 'font', 'fontSize', '|', 'paragraphStyle'],
 			'|',
@@ -139,7 +139,7 @@ const bl = [
 	[
 		'%768',
 		[
-			['finder', 'undo', 'redo'],
+			['codeBlock', 'finder', 'undo', 'redo'],
 			'|',
 			[':Docs-default.more_horizontal', 'dir', 'newDocument', 'selectAll'],
 			['save'],
@@ -161,7 +161,7 @@ const bl = [
 	[
 		'%576',
 		[
-			['finder', 'undo', 'redo'],
+			['codeBlock', 'finder', 'undo', 'redo'],
 			'|',
 			[':Docs-default.more_horizontal', 'dir', 'newDocument', 'selectAll', 'save'],
 			[':Paragraph-default.more_paragraph', 'outdent', 'indent', '|', 'blockquote', '|', 'blockStyle', 'font', 'fontSize', '|', 'paragraphStyle'],
@@ -176,7 +176,7 @@ const bl = [
 ];
 
 const bb = [
-	['anchor', 'newDocument', 'selectAll', 'finder', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak', 'dir'],
+	['anchor', 'newDocument', 'selectAll', 'codeBlock', 'finder', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak', 'dir'],
 	['dir_ltr', 'dir_rtl'],
 	['font', 'fontSize', 'blockStyle'],
 	['paragraphStyle', 'blockquote'],
@@ -579,7 +579,7 @@ const options1 = {
 	buttonList: bl,
 	// tableCellControllerPosition: 'cell',
 	// buttonList: [
-	// 	['newDocument', 'selectAll', 'finder', 'undo', 'redo', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
+	// 	['newDocument', 'selectAll', 'codeBlock', 'finder', 'undo', 'redo', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
 	// 	'|',
 	// 	[':문단&글꼴-default.more_paragraph', 'font', 'fontSize', 'blockStyle', '|', 'paragraphStyle', 'blockquote'],
 	// 	'|',
@@ -1307,7 +1307,7 @@ const options1 = {
 	// maxHeight: 600,
 	toolbar_sticky: 50,
 	iframe_attributes: { frameborder: '1' },
-	// mode: 'inline',
+	// mode: 'inline:bottom',
 	type: '',
 	// textDirection: 'rtl',
 	value: `<pre style="line-height: 1.45;margin: 0px 0px 10px">

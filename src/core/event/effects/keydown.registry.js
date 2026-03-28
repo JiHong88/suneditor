@@ -30,6 +30,31 @@ export default {
 
 	/** [backspace]  */
 
+	/** @action backspaceBrLineStrip — extract first line from brLine (PRE) */
+	'backspace.brline.strip': ({ ctx, ports }, { formatEl }) => {
+		const defaultTag = ctx.options.get('defaultLine');
+		const parent = formatEl.parentNode;
+		const newLine = dom.utils.createElement(defaultTag);
+
+		while (formatEl.firstChild && !dom.check.isBreak(formatEl.firstChild)) {
+			newLine.appendChild(formatEl.firstChild);
+		}
+
+		if (formatEl.firstChild && dom.check.isBreak(formatEl.firstChild)) {
+			formatEl.removeChild(formatEl.firstChild);
+		}
+
+		if (!newLine.firstChild) newLine.innerHTML = '<br>';
+		parent.insertBefore(newLine, formatEl);
+
+		if (!formatEl.firstChild || (!formatEl.textContent.trim() && !formatEl.querySelector('br'))) {
+			parent.removeChild(formatEl);
+		}
+
+		const focusNode = newLine.firstChild;
+		ports.selection.setRange(focusNode, 0, focusNode, 0);
+	},
+
 	/** @action backspaceFormatMaintain */
 	'backspace.format.maintain': ({ ctx }, { formatEl }) => {
 		if (formatEl.nodeName.toUpperCase() === ctx.options.get('defaultLine').toUpperCase()) {

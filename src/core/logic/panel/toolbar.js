@@ -92,10 +92,15 @@ class Toolbar {
 
 		this.#useCSSSticky = isStickyPosible && stickyTop >= 0 && !this.#options.get('toolbar_container') && typeof CSS !== 'undefined' && CSS.supports('position', 'sticky');
 
+		this.isBottomMode = this.#store.mode.isBottom;
+
 		if (this.#useCSSSticky) {
 			// CSS sticky: browser handles positioning natively
 			const toolbar = this.#context.get(this.keyName.main);
-			if (stickyTop > 0) {
+			if (this.isBottomMode) {
+				toolbar.style.bottom = stickyTop + 'px';
+				toolbar.style.top = 'auto';
+			} else if (stickyTop > 0) {
 				toolbar.style.top = stickyTop + 'px';
 			}
 		} else if (isStickyPosible) {
@@ -120,6 +125,9 @@ class Toolbar {
 		if (this.#useCSSSticky) {
 			const toolbar = this.#context.get(this.keyName.main);
 			if (!toolbar || toolbar.offsetWidth === 0 || toolbar.style.display === 'none') return false;
+			if (this.isBottomMode) {
+				return toolbar.getBoundingClientRect().bottom >= _w.innerHeight - stickyTop - 1;
+			}
 			return toolbar.getBoundingClientRect().top <= stickyTop + 1;
 		}
 
@@ -260,18 +268,36 @@ class Toolbar {
 		const minHeight = this.#frameContext.get('_minHeight');
 		const editorHeight = wrapper.offsetHeight;
 		const editorOffset = this.#$.offset.getGlobal(this.#frameContext.get('topArea'));
-		const y = currentScrollY + stickyTop;
-		const t = (this.isBalloonMode || this.isInlineMode ? editorOffset.top : this.#$.offset.getGlobal(this.#options.get('toolbar_container')).top) - (this.isInlineMode ? toolbar.offsetHeight : 0);
 		const inlineOffset = 1;
 
-		const offSticky = !this.#options.get('toolbar_container') ? editorHeight + t + stickyTop - y - minHeight : editorOffset.top - currentScrollY + editorHeight - minHeight - stickyTop - toolbar.offsetHeight;
-		if (y < t) {
-			this.#offSticky();
-		} else if (offSticky < 0) {
-			if (!this.isSticky) this.#onSticky(inlineOffset);
-			toolbar.style.top = inlineOffset + offSticky + this.#getViewportTop() + 'px';
+		if (this.isBottomMode) {
+			const viewportBottom = currentScrollY + _w.innerHeight;
+			const editorBottom = editorOffset.top + editorHeight;
+			const y = viewportBottom - stickyTop;
+
+			const offSticky = !this.#options.get('toolbar_container') ? y - editorOffset.top - minHeight : viewportBottom - stickyTop - editorOffset.top - minHeight - toolbar.offsetHeight;
+			if (y > editorBottom) {
+				this.#offSticky();
+			} else if (offSticky < 0) {
+				if (!this.isSticky) this.#onSticky(inlineOffset);
+				toolbar.style.bottom = inlineOffset + offSticky + this.#getViewportTop() + 'px';
+				toolbar.style.top = 'auto';
+			} else {
+				this.#onSticky(inlineOffset);
+			}
 		} else {
-			this.#onSticky(inlineOffset);
+			const y = currentScrollY + stickyTop;
+			const t = (this.isBalloonMode || this.isInlineMode ? editorOffset.top : this.#$.offset.getGlobal(this.#options.get('toolbar_container')).top) - (this.isInlineMode ? toolbar.offsetHeight : 0);
+
+			const offSticky = !this.#options.get('toolbar_container') ? editorHeight + t + stickyTop - y - minHeight : editorOffset.top - currentScrollY + editorHeight - minHeight - stickyTop - toolbar.offsetHeight;
+			if (y < t) {
+				this.#offSticky();
+			} else if (offSticky < 0) {
+				if (!this.isSticky) this.#onSticky(inlineOffset);
+				toolbar.style.top = inlineOffset + offSticky + this.#getViewportTop() + 'px';
+			} else {
+				this.#onSticky(inlineOffset);
+			}
 		}
 	}
 
@@ -405,7 +431,12 @@ class Toolbar {
 		toolbar.style.display = 'block';
 		toolbar.style.top = '0px';
 		this.inlineToolbarAttr.width = toolbar.style.width = this.#options.get(this.keyName.width);
-		this.inlineToolbarAttr.top = toolbar.style.top = -1 + (this.#$.offset.getGlobal(this.#frameContext.get('topArea')).top - this.#$.offset.getGlobal(toolbar).top - toolbar.offsetHeight) + 'px';
+		if (this.isBottomMode) {
+			const topArea = this.#frameContext.get('topArea');
+			this.inlineToolbarAttr.top = toolbar.style.top = this.#$.offset.getGlobal(topArea).top + topArea.offsetHeight - this.#$.offset.getGlobal(toolbar).top + 'px';
+		} else {
+			this.inlineToolbarAttr.top = toolbar.style.top = -1 + (this.#$.offset.getGlobal(this.#frameContext.get('topArea')).top - this.#$.offset.getGlobal(toolbar).top - toolbar.offsetHeight) + 'px';
+		}
 
 		this._resetSticky();
 		this.inlineToolbarAttr.isShow = true;
@@ -453,8 +484,14 @@ class Toolbar {
 			stickyDummy.style.display = 'block';
 		}
 
-		const toolbarTopPosition = this.#options.get('toolbar_sticky') + inlineOffset + this.#getViewportTop();
-		toolbar.style.top = `${toolbarTopPosition}px`;
+		if (this.isBottomMode) {
+			const toolbarBottomPosition = this.#options.get('toolbar_sticky') + this.#getViewportTop();
+			toolbar.style.bottom = `${toolbarBottomPosition}px`;
+			toolbar.style.top = 'auto';
+		} else {
+			const toolbarTopPosition = this.#options.get('toolbar_sticky') + inlineOffset + this.#getViewportTop();
+			toolbar.style.top = `${toolbarTopPosition}px`;
+		}
 		toolbar.style.width = this.isInlineMode ? this.inlineToolbarAttr.width : toolbar.offsetWidth + 'px';
 		dom.utils.addClass(toolbar, 'se-toolbar-sticky');
 		this.#_isStickyFlag = true;
@@ -479,9 +516,15 @@ class Toolbar {
 		stickyDummy.style.display = 'none';
 
 		const toolbar = this.#context.get(this.keyName.main);
-		toolbar.style.top = this.isInlineMode ? this.inlineToolbarAttr.top : '';
+		if (this.isBottomMode) {
+			toolbar.style.bottom = '';
+			toolbar.style.top = 'auto';
+			this.#frameContext.get('wrapper').style.marginBottom = '';
+		} else {
+			toolbar.style.top = this.isInlineMode ? this.inlineToolbarAttr.top : '';
+			this.#frameContext.get('wrapper').style.marginTop = '';
+		}
 		toolbar.style.width = this.isInlineMode ? this.inlineToolbarAttr.width : '';
-		this.#frameContext.get('wrapper').style.marginTop = '';
 
 		dom.utils.removeClass(toolbar, 'se-toolbar-sticky');
 		this.#_isStickyFlag = false;

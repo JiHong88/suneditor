@@ -524,8 +524,6 @@ describe('Plugins - Dropdown - blockStyle', () => {
             expect(createCallArgs[2]).toContain('data-value="h2"');
             expect(createCallArgs[2]).toContain('data-command="block"');
             expect(createCallArgs[2]).toContain('data-value="blockquote"');
-            expect(createCallArgs[2]).toContain('data-command="br-line"');
-            expect(createCallArgs[2]).toContain('data-value="pre"');
         });
 
         it('should include default formats when no items provided', () => {
@@ -540,7 +538,6 @@ describe('Plugins - Dropdown - blockStyle', () => {
 
             expect(createCallArgs[2]).toContain('data-value="p"');
             expect(createCallArgs[2]).toContain('data-value="blockquote"');
-            expect(createCallArgs[2]).toContain('data-value="pre"');
             expect(createCallArgs[2]).toContain('data-value="h1"');
             expect(createCallArgs[2]).toContain('data-value="h2"');
             expect(createCallArgs[2]).toContain('data-value="h3"');

@@ -188,6 +188,7 @@
 		tableProperties: 'Propriétés du tableau',
 		tags: 'Mots clés',
 		tag_blockquote: 'Citation',
+		codeBlock: 'Bloc de code',
 		tag_div: 'Normal (DIV)',
 		tag_h: 'Titre',
 		tag_p: 'Paragraphe',

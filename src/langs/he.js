@@ -188,6 +188,7 @@
 		tableProperties: 'מאפייני טבלה',
 		tags: 'תג',
 		tag_blockquote: 'ציטוט',
+		codeBlock: 'בלוק קוד',
 		tag_div: 'רגילה (DIV)',
 		tag_h: 'כותרת',
 		tag_p: 'פסקה',

@@ -314,6 +314,29 @@ describe('Toolbar and Menu Integration Tests', () => {
 		});
 	});
 
+	describe('Top toolbar mode (default)', () => {
+		it('store.mode.isBottom should be false', () => {
+			expect(editor.$.store.mode.isBottom).toBe(false);
+		});
+
+		it('toolbar.isBottomMode should be false', () => {
+			expect(editor.$.toolbar.isBottomMode).toBe(false);
+		});
+
+		it('toolbar element should NOT have se-toolbar-bottom class', () => {
+			const toolbar = editor.$.context.get('toolbar_main');
+			expect(toolbar.classList.contains('se-toolbar-bottom')).toBe(false);
+		});
+
+		it('toolbar should be before wrapper in DOM', () => {
+			const rootFc = editor.$.frameRoots.values().next().value;
+			const container = rootFc.get('container');
+			const toolbar = editor.$.context.get('toolbar_main');
+			const wrapper = container.querySelector('.se-wrapper');
+			expect(toolbar.compareDocumentPosition(wrapper) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+		});
+	});
+
 	describe('Offset module', () => {
 		it('should have offset module accessible', () => {
 			expect(editor.$.offset).toBeDefined();
@@ -385,5 +408,201 @@ describe('Toolbar and Menu Integration Tests', () => {
 
 			document.body.removeChild(menuEl);
 		});
+	});
+});
+
+describe('Toolbar Bottom Mode (classic:bottom)', () => {
+	let editor;
+
+	beforeEach(async () => {
+		editor = createTestEditor({
+			plugins: { font, fontSize },
+			buttonList: [['bold', 'italic', 'font', 'fontSize']],
+			mode: 'classic:bottom',
+		});
+		await waitForEditorReady(editor);
+	});
+
+	afterEach(() => {
+		destroyTestEditor(editor);
+	});
+
+	describe('Mode flags', () => {
+		it('store.mode.isBottom should be true', () => {
+			expect(editor.$.store.mode.isBottom).toBe(true);
+		});
+
+		it('store.mode.isClassic should be true', () => {
+			expect(editor.$.store.mode.isClassic).toBe(true);
+		});
+
+		it('toolbar.isBottomMode should be true', () => {
+			expect(editor.$.toolbar.isBottomMode).toBe(true);
+		});
+
+		it('should not be balloon or inline', () => {
+			expect(editor.$.toolbar.isBalloonMode).toBe(false);
+			expect(editor.$.toolbar.isInlineMode).toBe(false);
+		});
+	});
+
+	describe('DOM structure', () => {
+		it('toolbar element should have se-toolbar-bottom class', () => {
+			const toolbar = editor.$.context.get('toolbar_main');
+			expect(toolbar.classList.contains('se-toolbar-bottom')).toBe(true);
+		});
+
+		it('toolbar should be after wrapper in DOM (bottom position)', () => {
+			const rootFc = editor.$.frameRoots.values().next().value;
+			const container = rootFc.get('container');
+			const toolbar = editor.$.context.get('toolbar_main');
+			const wrapper = container.querySelector('.se-wrapper');
+			// toolbar should come AFTER wrapper
+			expect(toolbar.compareDocumentPosition(wrapper) & Node.DOCUMENT_POSITION_PRECEDING).toBeTruthy();
+		});
+
+		it('toolbar should be before statusbar in DOM', () => {
+			const rootFc = editor.$.frameRoots.values().next().value;
+			const container = rootFc.get('container');
+			const toolbar = editor.$.context.get('toolbar_main');
+			const statusbar = container.querySelector('.se-statusbar');
+			if (statusbar) {
+				expect(toolbar.compareDocumentPosition(statusbar) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+			}
+		});
+	});
+
+	describe('Sticky behavior', () => {
+		it('should not be sticky initially', () => {
+			expect(editor.$.toolbar.isSticky).toBe(false);
+		});
+
+		it('_resetSticky should not throw', () => {
+			expect(() => editor.$.toolbar._resetSticky()).not.toThrow();
+		});
+	});
+
+	describe('Toolbar operations', () => {
+		it('show/hide should work in bottom mode', () => {
+			editor.$.toolbar.hide();
+			const toolbarMain = editor.$.context.get('toolbar_main');
+			expect(toolbarMain.style.display).toBe('none');
+
+			editor.$.toolbar.show();
+			expect(toolbarMain.style.display).not.toBe('none');
+		});
+
+		it('disable/enable should work in bottom mode', () => {
+			editor.$.toolbar.disable();
+			const buttonTray = editor.$.context.get('toolbar_buttonTray');
+			const buttons = buttonTray.querySelectorAll('.se-toolbar-btn[data-type]');
+			let hasDisabled = false;
+			buttons.forEach((btn) => {
+				if (btn.disabled) hasDisabled = true;
+			});
+			expect(hasDisabled).toBe(true);
+
+			editor.$.toolbar.enable();
+			let allEnabled = true;
+			buttons.forEach((btn) => {
+				if (btn.disabled) allEnabled = false;
+			});
+			expect(allEnabled).toBe(true);
+		});
+
+		it('setButtons should work in bottom mode', () => {
+			expect(() => editor.$.toolbar.setButtons([['bold']])).not.toThrow();
+			const newButtonTray = editor.$.context.get('toolbar_buttonTray');
+			expect(newButtonTray).toBeTruthy();
+		});
+
+		it('resetResponsiveToolbar should not throw in bottom mode', () => {
+			expect(() => editor.$.toolbar.resetResponsiveToolbar()).not.toThrow();
+		});
+	});
+
+	describe('Menu dropdown in bottom mode', () => {
+		it('should open dropdown', () => {
+			const buttonTray = editor.$.context.get('toolbar_buttonTray');
+			const fontBtn = buttonTray.querySelector('[data-command="font"]');
+			if (fontBtn) {
+				editor.$.menu.dropdownOn(fontBtn);
+				expect(editor.$.menu.currentDropdown).toBeTruthy();
+				expect(editor.$.menu.currentDropdownName).toBe('font');
+				editor.$.menu.dropdownOff();
+			}
+		});
+
+		it('should close dropdown cleanly', () => {
+			const buttonTray = editor.$.context.get('toolbar_buttonTray');
+			const fontBtn = buttonTray.querySelector('[data-command="font"]');
+			if (fontBtn) {
+				editor.$.menu.dropdownOn(fontBtn);
+				editor.$.menu.dropdownOff();
+				expect(editor.$.menu.currentDropdown).toBeNull();
+			}
+		});
+	});
+});
+
+describe('Toolbar Bottom Mode — balloon should ignore :bottom', () => {
+	let editor;
+
+	beforeEach(async () => {
+		editor = createTestEditor({
+			buttonList: [['bold']],
+			mode: 'balloon:bottom',
+		});
+		await waitForEditorReady(editor);
+	});
+
+	afterEach(() => {
+		destroyTestEditor(editor);
+	});
+
+	it('isBottom should be false for balloon:bottom', () => {
+		expect(editor.$.store.mode.isBottom).toBe(false);
+	});
+
+	it('isBalloon should be true', () => {
+		expect(editor.$.store.mode.isBalloon).toBe(true);
+	});
+});
+
+describe('Toolbar Bottom Mode (inline:bottom)', () => {
+	let editor;
+
+	beforeEach(async () => {
+		editor = createTestEditor({
+			buttonList: [['bold', 'italic']],
+			mode: 'inline:bottom',
+		});
+		await waitForEditorReady(editor);
+	});
+
+	afterEach(() => {
+		destroyTestEditor(editor);
+	});
+
+	it('store.mode.isBottom should be true', () => {
+		expect(editor.$.store.mode.isBottom).toBe(true);
+	});
+
+	it('store.mode.isInline should be true', () => {
+		expect(editor.$.store.mode.isInline).toBe(true);
+	});
+
+	it('toolbar.isBottomMode should be true', () => {
+		expect(editor.$.toolbar.isBottomMode).toBe(true);
+	});
+
+	it('toolbar should have se-toolbar-bottom class', () => {
+		const toolbar = editor.$.context.get('toolbar_main');
+		expect(toolbar.classList.contains('se-toolbar-bottom')).toBe(true);
+	});
+
+	it('toolbar should also have se-toolbar-inline class', () => {
+		const toolbar = editor.$.context.get('toolbar_main');
+		expect(toolbar.classList.contains('se-toolbar-inline')).toBe(true);
 	});
 });

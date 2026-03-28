@@ -4,6 +4,8 @@ declare const _default: {
 	/** @action delFormatRemoveAndMove */
 	'del.format.removeAndMove': ({ ports }: EffectContext_keydown, { container, formatEl }: any) => void;
 	/** [backspace]  */
+	/** @action backspaceBrLineStrip — extract first line from brLine (PRE) */
+	'backspace.brline.strip': ({ ctx, ports }: EffectContext_keydown, { formatEl }: any) => void;
 	/** @action backspaceFormatMaintain */
 	'backspace.format.maintain': ({ ctx }: EffectContext_keydown, { formatEl }: any) => void;
 	/** @action backspaceComponentSelect */

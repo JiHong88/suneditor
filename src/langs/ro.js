@@ -188,6 +188,7 @@
 		tableProperties: 'Proprietățile tabelului',
 		tags: 'Etichete',
 		tag_blockquote: 'Quote',
+		codeBlock: 'Bloc de cod',
 		tag_div: 'Normal (DIV)',
 		tag_h: 'Antet',
 		tag_p: 'Paragraf',

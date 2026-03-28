@@ -188,6 +188,7 @@
 		tableProperties: 'Властивості таблиці',
 		tags: 'Теги',
 		tag_blockquote: 'Цитата',
+		codeBlock: 'Блок коду',
 		tag_div: 'Базовий',
 		tag_h: 'Заголовок',
 		tag_p: 'Абзац',

@@ -77,8 +77,13 @@ class Finder {
 			// Append panel to root container (between toolbar and wrapper)
 			const rootFc = this.#$.frameRoots.values().next().value;
 			const container = rootFc.get('container');
-			const wrapper = container.querySelector('.se-wrapper');
-			container.insertBefore(this.#panel, wrapper);
+			if (this.#store.mode.isBottom) {
+				const toolbar = this.#$.context.get('toolbar_main');
+				container.insertBefore(this.#panel, toolbar);
+			} else {
+				const wrapper = container.querySelector('.se-wrapper');
+				container.insertBefore(this.#panel, wrapper);
+			}
 
 			// Update sticky top (responsive resize, more layer, etc.)
 			if (env.isResizeObserverSupported) {
@@ -138,7 +143,12 @@ class Finder {
 	#updateStickyTop() {
 		if (!this.#isOpen || !this.#panel) return;
 		const stickyTop = this.#$.options.get('toolbar_sticky');
-		this.#panel.style.top = stickyTop >= 0 ? stickyTop + this.#$.context.get('toolbar_main').offsetHeight + 'px' : '0px';
+		if (this.#store.mode.isBottom) {
+			this.#panel.style.top = 'auto';
+			this.#panel.style.bottom = stickyTop >= 0 ? stickyTop + this.#$.context.get('toolbar_main').offsetHeight + 'px' : '0px';
+		} else {
+			this.#panel.style.top = stickyTop >= 0 ? stickyTop + this.#$.context.get('toolbar_main').offsetHeight + 'px' : '0px';
+		}
 	}
 
 	/**

@@ -1,5 +1,4 @@
 import { dom, converter, markdown, numbers, unicode, clipboard, env } from '../../../helper';
-import CodeLang from '../../section/codeLang';
 
 const { _d } = env;
 const REQUIRED_DATA_ATTRS = 'data-se-[^\\s]+';
@@ -1151,10 +1150,7 @@ class HTML {
 			}
 
 			// output: wrap code blocks <pre class="language-xxx"> → <pre><code class="language-xxx">
-			const preEls = renderHTML.querySelectorAll('pre[class*="language-"]');
-			for (let j = 0, jlen = preEls.length; j < jlen; j++) {
-				CodeLang.wrapCode(preEls[j]);
-			}
+			this.#wrapPreCode(renderHTML);
 
 			const content = renderHTML.innerHTML;
 			if (this.#frameOptions.get('iframe_fullPage')) {
@@ -1535,9 +1531,7 @@ class HTML {
 				}
 
 				// code block: unwrap <pre><code class="language-xxx"> → <pre class="language-xxx">
-				if (current.nodeName === 'PRE') {
-					CodeLang.unwrapCode(current);
-				}
+				if (current.nodeName === 'PRE') this.#unwrapPreCode(current);
 
 				const nrtag = !dom.query.getParentElement(current, dom.check.isExcludeFormat);
 
@@ -2016,6 +2010,51 @@ class HTML {
 		// Clear Map
 		if (this.#cleanStyleRegExpMap) {
 			this.#cleanStyleRegExpMap.clear();
+		}
+	}
+
+	/**
+	 * @description Input: unwrap `<pre><code class="language-xxx">` → `<pre class="language-xxx">`
+	 * @param {HTMLElement} pre
+	 */
+	#unwrapPreCode(pre) {
+		if (pre.children.length !== 1 || pre.firstElementChild?.nodeName !== 'CODE') return;
+
+		const codeEl = pre.firstElementChild;
+		const langMatch = (codeEl.className || '').match(/language-(\S+)/);
+
+		if (langMatch) {
+			dom.utils.addClass(pre, 'language-' + langMatch[1]);
+			pre.setAttribute('data-se-lang', langMatch[1]);
+		}
+
+		while (codeEl.firstChild) {
+			pre.insertBefore(codeEl.firstChild, codeEl);
+		}
+
+		pre.removeChild(codeEl);
+	}
+
+	/**
+	 * @description Output: wrap `<pre class="language-xxx">` → `<pre><code class="language-xxx">`
+	 * @param {HTMLElement} container
+	 */
+	#wrapPreCode(container) {
+		const preEls = container.querySelectorAll('pre[class*="language-"]');
+
+		for (let j = 0, jlen = preEls.length, pre, lang, codeEl; j < jlen; j++) {
+			pre = preEls[j];
+			lang = (pre.className.match(/language-(\S+)/) || [])[1];
+			if (!lang) continue;
+
+			codeEl = dom.utils.createElement('CODE', { class: 'language-' + lang });
+			while (pre.firstChild) {
+				codeEl.appendChild(pre.firstChild);
+			}
+
+			pre.appendChild(codeEl);
+			pre.className = pre.className.replace(/\s*language-\S+/g, '').trim();
+			pre.removeAttribute('data-se-lang');
 		}
 	}
 }

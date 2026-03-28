@@ -187,6 +187,7 @@
 		tableProperties: 'លក្ខណៈតារាង',
 		tags: 'ស្លាក',
 		tag_blockquote: 'សម្រង់',
+		codeBlock: 'ប្លុកកូដ',
 		tag_div: 'ធម្មតា (DIV)',
 		tag_h: 'ក្បាល',
 		tag_p: 'កថាខណ្ឌ',

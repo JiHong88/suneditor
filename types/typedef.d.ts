@@ -301,6 +301,7 @@ declare global {
 			 */
 			type ButtonPlugin =
 				| 'blockquote'
+				| 'codeBlock'
 				| 'exportPDF'
 				| 'fileUpload'
 				| 'list_bulleted'

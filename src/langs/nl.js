@@ -188,6 +188,7 @@
 		tableProperties: 'Tabeleigenschappen',
 		tags: 'Tags',
 		tag_blockquote: 'Citaat',
+		codeBlock: 'Codeblok',
 		tag_div: 'Normaal (div)',
 		tag_h: 'Kop',
 		tag_p: 'Alinea',

@@ -358,15 +358,21 @@ class Offset {
 	 * @param {HTMLElement} e_container Element's root container
 	 * @param {HTMLElement} target Target element to position against
 	 * @param {HTMLElement} t_container Target's root container
+	 * @param {Object} [opts] Options
+	 * @param {boolean} [opts.preferUp=false] Open upward by default (for bottom toolbar)
 	 */
-	setRelPosition(element, e_container, target, t_container) {
+	setRelPosition(element, e_container, target, t_container, { preferUp } = {}) {
 		const isFixedContainer = /^fixed$/i.test(_w.getComputedStyle(t_container).position);
 		const tGlobal = this.getGlobal(target);
 
 		// top
 		if (isFixedContainer) {
 			element.style.position = 'fixed';
-			element.style.top = `${tGlobal.fixedTop + tGlobal.height}px`;
+			if (preferUp) {
+				element.style.top = `${tGlobal.fixedTop - element.offsetHeight}px`;
+			} else {
+				element.style.top = `${tGlobal.fixedTop + tGlobal.height}px`;
+			}
 		} else {
 			element.style.position = '';
 
@@ -376,23 +382,43 @@ class Offset {
 			const scrollTop = _w.scrollY;
 			const bt = tGlobal.top;
 
-			const menuHeight_bottom = getClientSize(_d).h - (containerTop - scrollTop + bt + target.offsetHeight);
-			if (menuHeight_bottom < elHeight) {
-				let menuTop = -1 * (elHeight - bt + 3);
-				const insTop = containerTop - scrollTop + menuTop;
-				const menuHeight_top = elHeight + (insTop < 0 ? insTop : 0);
-
-				if (menuHeight_top > menuHeight_bottom) {
-					element.style.height = `${menuHeight_top}px`;
-					menuTop = -1 * (menuHeight_top - bt + 3);
+			if (preferUp) {
+				// Try to open above
+				const menuHeight_top = containerTop - scrollTop + bt;
+				if (menuHeight_top < elHeight) {
+					// Not enough space above — try below
+					const menuHeight_bottom = getClientSize(_d).h - (containerTop - scrollTop + bt + target.offsetHeight);
+					if (menuHeight_bottom >= elHeight) {
+						element.style.top = `${bt + target.offsetHeight}px`;
+					} else if (menuHeight_bottom > menuHeight_top) {
+						element.style.height = `${menuHeight_bottom}px`;
+						element.style.top = `${bt + target.offsetHeight}px`;
+					} else {
+						element.style.height = `${menuHeight_top}px`;
+						element.style.top = `${-1 * (menuHeight_top - bt + 3)}px`;
+					}
 				} else {
-					element.style.height = `${menuHeight_bottom}px`;
-					menuTop = bt + target.offsetHeight;
+					element.style.top = `${bt - elHeight}px`;
 				}
-
-				element.style.top = `${menuTop}px`;
 			} else {
-				element.style.top = `${bt + target.offsetHeight}px`;
+				const menuHeight_bottom = getClientSize(_d).h - (containerTop - scrollTop + bt + target.offsetHeight);
+				if (menuHeight_bottom < elHeight) {
+					let menuTop = -1 * (elHeight - bt + 3);
+					const insTop = containerTop - scrollTop + menuTop;
+					const menuHeight_top = elHeight + (insTop < 0 ? insTop : 0);
+
+					if (menuHeight_top > menuHeight_bottom) {
+						element.style.height = `${menuHeight_top}px`;
+						menuTop = -1 * (menuHeight_top - bt + 3);
+					} else {
+						element.style.height = `${menuHeight_bottom}px`;
+						menuTop = bt + target.offsetHeight;
+					}
+
+					element.style.top = `${menuTop}px`;
+				} else {
+					element.style.top = `${bt + target.offsetHeight}px`;
+				}
 			}
 		}
 
@@ -484,7 +510,11 @@ class Offset {
 		const { rmt, rmb, bMargin, rt } = this.#getVMargin(tmtw, tmbw, toolbarH, clientSize, targetRect, isTextSelection, isToolbarTarget);
 		if ((isWWTarget && (rmb - statusBarH + targetH <= 0 || rmt + rt + targetH - (this.#$.toolbar.isSticky && isInlineTarget ? toolbarH : 0) <= 0)) || rmt + targetH < 0) return;
 
-		const isSticky = this.#$.toolbar.isSticky && this.#context.get('toolbar_main').style.display !== 'none' && (!headLess || this.#frameContext.get('topArea').getBoundingClientRect().top <= th);
+		const topAreaRect = this.#frameContext.get('topArea').getBoundingClientRect();
+		const isStickyVisible = this.#store.mode.isBottom
+			? topAreaRect.bottom >= _w.innerHeight - th
+			: topAreaRect.top <= th;
+		const isSticky = this.#$.toolbar.isSticky && this.#context.get('toolbar_main').style.display !== 'none' && (!headLess || isStickyVisible);
 		let t = addOffset.top;
 		let y = 0;
 		let arrowDir = '';
@@ -510,7 +540,7 @@ class Offset {
 		else {
 			arrowDir = 'down';
 			t += targetRect.top - elH - ah + wScrollY;
-			y = (isSticky ? targetRect.top - toolbarH : rmt) - elH - ah;
+			y = (isSticky && !this.#store.mode.isBottom ? targetRect.top - toolbarH : rmt) - elH - ah;
 			// change to [bottom] position
 			if (y - siblingH < 0) {
 				arrowDir = 'up';
@@ -743,33 +773,58 @@ class Offset {
 		bMargin = clientSize.h - targetRect.bottom;
 		const editorOffset = this.getGlobal();
 
+		const isBottom = this.#store.mode.isBottom;
 		if (!isTextSelection) {
 			const emt = editorOffset.fixedTop > 0 ? editorOffset.fixedTop : 0;
 			const emb = _w.innerHeight - (editorOffset.fixedTop + editorOffset.height);
 			rt = !isToolbarTarget && (this.#$.toolbar.isSticky || !this.#$.toolbar.isBalloonMode) ? toolbarH : 0;
-			rmt = tMargin - (!isToolbarTarget ? emt : 0) - rt;
-			rmb = bMargin - (emb > 0 ? emb : 0);
+			if (isBottom) {
+				rmt = tMargin - (!isToolbarTarget ? emt : 0);
+				rmb = bMargin - (emb > 0 ? emb : 0) - rt;
+			} else {
+				rmt = tMargin - (!isToolbarTarget ? emt : 0) - rt;
+				rmb = bMargin - (emb > 0 ? emb : 0);
+			}
 		} else {
 			rt = !isToolbarTarget && !this.#$.toolbar.isSticky && !this.#options.get('toolbar_container') ? toolbarH : 0;
 			const wst = !isIframe ? editorOffset.top - _w.scrollY + rt : 0;
 			const wsb = !isIframe ? this.#store.get('currentViewportHeight') - (editorOffset.top + editorOffset.height - _w.scrollY) : 0;
 			let st = wst;
-			if (toolbarH > wst) {
-				if (this.#$.toolbar.isSticky) {
-					st = toolbarH;
+			let sb = wsb;
+			if (isBottom) {
+				if (toolbarH > wsb) {
+					if (this.#$.toolbar.isSticky) {
+						sb = toolbarH;
+					} else {
+						sb = wsb + toolbarH;
+					}
+				} else if (this.#options.get('toolbar_container') && !this.#$.toolbar.isSticky) {
+					toolbarH = 0;
+				} else {
+					sb = wsb + toolbarH;
+				}
+
+				rmt = targetRect.top - (wwRects.top - wst);
+				rmb = wwRects.bottom - (targetRect.bottom - sb) + toolbarH;
+				rmb = rmb > 0 ? rmb : rmb - toolbarH;
+			} else {
+				if (toolbarH > wst) {
+					if (this.#$.toolbar.isSticky) {
+						st = toolbarH;
+					} else {
+						st = wst + toolbarH;
+					}
+				} else if (this.#options.get('toolbar_container') && !this.#$.toolbar.isSticky) {
+					toolbarH = 0;
 				} else {
 					st = wst + toolbarH;
 				}
-			} else if (this.#options.get('toolbar_container') && !this.#$.toolbar.isSticky) {
-				toolbarH = 0;
-			} else {
-				st = wst + toolbarH;
-			}
 
-			rmt = targetRect.top - (wwRects.top - st) + toolbarH;
-			rmb = wwRects.bottom - (targetRect.bottom - wsb);
-			// display margin
-			rmt = rmt > 0 ? rmt : rmt - toolbarH;
+				rmt = targetRect.top - (wwRects.top - st) + toolbarH;
+				rmb = wwRects.bottom - (targetRect.bottom - wsb);
+				// display margin
+				rmt = rmt > 0 ? rmt : rmt - toolbarH;
+			}
 		}
 
 		return {

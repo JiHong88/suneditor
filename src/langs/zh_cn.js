@@ -188,6 +188,7 @@
 		tableProperties: '表格属性',
 		tags: '标签',
 		tag_blockquote: '引用',
+		codeBlock: '代码块',
 		tag_div: '正文 (DIV)',
 		tag_h: '标题',
 		tag_p: '段落',

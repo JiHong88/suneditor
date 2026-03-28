@@ -187,6 +187,7 @@
 		tableProperties: '테이블 속성',
 		tags: '태그',
 		tag_blockquote: '인용문',
+		codeBlock: '코드 블록',
 		tag_div: '기본 (DIV)',
 		tag_h: '제목',
 		tag_p: '본문',

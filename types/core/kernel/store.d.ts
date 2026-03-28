@@ -94,6 +94,10 @@ export type StoreMode = {
 	 * - Whether the sub-toolbar is in `balloon-always` mode.
 	 */
 	isSubBalloonAlways: boolean;
+	/**
+	 * - Whether the toolbar is placed at the bottom of the editor (`classic:bottom`, `inline:bottom`).
+	 */
+	isBottom: boolean;
 };
 /**
  * @typedef {Object} StoreState
@@ -122,6 +126,7 @@ export type StoreMode = {
  * @property {boolean} isBalloonAlways - Whether the toolbar is in `balloon-always` mode (always visible as floating).
  * @property {boolean} isSubBalloon - Whether the sub-toolbar is in `balloon` mode.
  * @property {boolean} isSubBalloonAlways - Whether the sub-toolbar is in `balloon-always` mode.
+ * @property {boolean} isBottom - Whether the toolbar is placed at the bottom of the editor (`classic:bottom`, `inline:bottom`).
  */
 /**
  * @description Central runtime state management for the editor.

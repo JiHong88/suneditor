@@ -413,6 +413,7 @@ class Selection_ {
 		const isAutoHeight = !this.#store.get('isScrollable')(this.#frameContext);
 		const viewportHeight = this.#store.get('currentViewportHeight');
 		const scrollY = isAutoHeight ? _w.scrollY : isIframe ? ww.scrollY : wwFrame.scrollTop;
+		const isBottom = this.#store.mode.isBottom;
 		const realToolbarHeight = this.#context.get('toolbar_main').offsetHeight;
 		const toolbarHeight = this.#$.toolbar.isSticky ? realToolbarHeight : 0;
 		const positionToolbarHeight = this.#$.toolbar.isSticky ? toolbarHeight + this.#options.get('toolbar_sticky') : toolbarHeight;
@@ -423,7 +424,7 @@ class Selection_ {
 
 			if (scrollOption?.behavior === 'auto' && scrollY !== _w.scrollY) {
 				if (positionToolbarHeight && scrollY > _w.scrollY) {
-					_w.scrollBy(0, -positionToolbarHeight);
+					_w.scrollBy(0, isBottom ? positionToolbarHeight : -positionToolbarHeight);
 				} else if (isAutoHeight) {
 					_w.scrollBy(0, statusbarHeight);
 				}
@@ -441,16 +442,19 @@ class Selection_ {
 		const elH = (refRect?.height > 0 ? refRect.height : el.offsetHeight) || 0;
 
 		const behavior = scrollOption?.behavior;
+		// bottom toolbar: toolbar covers the bottom, so swap where positionToolbarHeight is applied
+		const topToolbarH = isBottom ? 0 : positionToolbarHeight;
+		const bottomToolbarH = isBottom ? positionToolbarHeight : 0;
 		if (isAutoHeight) {
 			if (isIframe) {
 				const rect = this.getRects(ref, 'end').rects;
-				const topMargin = rect.top + elH - positionToolbarHeight;
-				const bottomMargin = viewHeight - PADDING - (rect.top + elH);
+				const topMargin = rect.top + elH - topToolbarH;
+				const bottomMargin = viewHeight - PADDING - (rect.top + elH) - bottomToolbarH;
 				if (topMargin >= 0 && bottomMargin >= 0) return;
 
 				const newScrollTop = scrollY - (topMargin < 0 ? -(topMargin - PADDING) : bottomMargin);
 				_w.scrollTo({
-					top: newScrollTop < scrollY ? newScrollTop - positionToolbarHeight : newScrollTop,
+					top: newScrollTop < scrollY ? newScrollTop - topToolbarH : newScrollTop + bottomToolbarH,
 					behavior,
 				});
 			} else {
@@ -461,7 +465,7 @@ class Selection_ {
 
 				const newScrollTop = scrollMargin <= PADDING ? scrollY - scrollMargin + PADDING + statusbarHeight : scrollY - scrollMargin + (viewHeight - elH - PADDING);
 				_w.scrollTo({
-					top: newScrollTop < scrollY ? newScrollTop - positionToolbarHeight : newScrollTop,
+					top: newScrollTop < scrollY ? newScrollTop - topToolbarH : newScrollTop + bottomToolbarH,
 					behavior,
 				});
 			}
@@ -472,20 +476,24 @@ class Selection_ {
 			const innerTop = isIframe ? targetTop : targetTop - wwFrame.getBoundingClientRect().top;
 
 			const keepLocalScroll = innerTop - PADDING > 0 && innerTop + PADDING <= viewHeight;
-			const rectScroll = innerTop - PADDING > 0 ? innerTop + PADDING - viewHeight : innerTop - (toolbarHeight + elH);
+			const rectScroll = isBottom
+				? (innerTop - PADDING > 0 ? innerTop + PADDING - viewHeight + toolbarHeight : innerTop - elH)
+				: (innerTop - PADDING > 0 ? innerTop + PADDING - viewHeight : innerTop - (toolbarHeight + elH));
 			let newScrollTop = scrollY + rectScroll;
 
 			// frame scroll
 			const gy = _w.scrollY;
 			const globalRect = this.#$.offset.getGlobal();
-			const topMargin = gy - globalRect.top + realToolbarHeight;
-			const bottomMargin = globalRect.top + globalRect.height - (gy + viewportHeight) + realToolbarHeight;
+			const topToolbarFrame = isBottom ? 0 : realToolbarHeight;
+			const bottomToolbarFrame = isBottom ? realToolbarHeight : 0;
+			const topMargin = gy - globalRect.top + topToolbarFrame;
+			const bottomMargin = globalRect.top + globalRect.height - (gy + viewportHeight) + bottomToolbarFrame;
 
 			// set frame scroll
 			if (topMargin > 0) {
 				const newFrameY = (keepLocalScroll ? innerTop : innerTop + scrollY - newScrollTop) - elH - PADDING - topMargin;
 				if (newFrameY < 0) {
-					newScrollTop += realToolbarHeight;
+					newScrollTop += topToolbarFrame;
 					_w.scrollTo({
 						top: gy + newFrameY,
 						behavior: 'smooth',
@@ -495,7 +503,7 @@ class Selection_ {
 			if (bottomMargin > 0) {
 				const newFrameY = (keepLocalScroll ? innerTop : innerTop + scrollY - newScrollTop) + elH + PADDING - (globalRect.height - bottomMargin);
 				if (newFrameY > 0) {
-					newScrollTop += statusbarHeight;
+					newScrollTop += isBottom ? bottomToolbarFrame : statusbarHeight;
 					_w.scrollTo({
 						top: gy + newFrameY,
 						behavior: 'smooth',

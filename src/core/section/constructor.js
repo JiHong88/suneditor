@@ -115,6 +115,9 @@ function Constructor(editorTargets, options) {
 		toolbar.style.width = o.get('toolbar_width');
 		toolbar.appendChild(dom.utils.createElement('DIV', { class: 'se-arrow' }));
 	}
+	if (o.get('_toolbar_bottom')) {
+		toolbar.className += ' se-toolbar-bottom';
+	}
 
 	/** --- subToolbar --------------------------------------------------------------- */
 	if (optionMap.subButtons) {
@@ -251,8 +254,14 @@ function Constructor(editorTargets, options) {
 		toolbar_container.appendChild(dom.utils.createElement('DIV', { class: 'se-toolbar-sticky-dummy' }));
 	} else {
 		const rootContainer = frameRoots.get(rootId).get('container');
-		rootContainer.insertBefore(toolbar, rootContainer.firstElementChild);
-		if (subbar) rootContainer.insertBefore(subbar, rootContainer.firstElementChild);
+		if (o.get('_toolbar_bottom')) {
+			const statusbar = rootContainer.querySelector('.se-statusbar');
+			rootContainer.insertBefore(toolbar, statusbar);
+			if (subbar) rootContainer.insertBefore(subbar, toolbar);
+		} else {
+			rootContainer.insertBefore(toolbar, rootContainer.firstElementChild);
+			if (subbar) rootContainer.insertBefore(subbar, rootContainer.firstElementChild);
+		}
 	}
 
 	return {
@@ -418,7 +427,9 @@ export function InitOptions(options, editorTargets, plugins) {
 	o.set('finder_liveSearch', options.finder_liveSearch !== false);
 	o.set('__lineFormatFilter', options.__lineFormatFilter ?? true);
 	o.set('__pluginRetainFilter', options.__pluginRetainFilter ?? true);
-	o.set('mode', options.mode || 'classic'); // classic, inline, balloon, balloon-always
+	const [modeBase, modePart] = (options.mode || 'classic').split(':');
+	o.set('mode', modeBase); // classic, inline, balloon, balloon-always
+	o.set('_toolbar_bottom', modePart === 'bottom' && /^(classic|inline)$/i.test(modeBase));
 	o.set('type', options.type?.split(':')[0] || ''); // document:header,page
 	o.set('theme', options.theme || '');
 	o.set('_themeClass', options.theme ? ` se-theme-${options.theme}` : '');
@@ -692,14 +703,6 @@ export function InitOptions(options, editorTargets, plugins) {
 
 	/** Private options */
 	o.set('__listCommonStyle', options.__listCommonStyle || ['fontSize', 'color', 'fontFamily', 'fontWeight', 'fontStyle']);
-
-	/** Code languages */
-	o.set(
-		'codeLangs',
-		Array.isArray(options.codeLangs)
-			? options.codeLangs
-			: ['javascript', 'typescript', 'html', 'css', 'json', 'python', 'java', 'c', 'cpp', 'csharp', 'go', 'rust', 'ruby', 'php', 'swift', 'kotlin', 'sql', 'bash', 'markdown', 'xml', 'yaml'],
-	);
 
 	/** --- Icons ------------------------------------------------------------------------------------------ */
 	const icons =

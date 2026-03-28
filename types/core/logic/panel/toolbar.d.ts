@@ -52,6 +52,7 @@ declare class Toolbar {
 		top: number;
 		left: number;
 	};
+	isBottomMode: boolean;
 	/**
 	 * @description Whether the toolbar is currently in a sticky (fixed) state.
 	 * For CSS sticky mode, computed from the element's viewport position.

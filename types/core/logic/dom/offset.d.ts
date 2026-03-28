@@ -279,8 +279,20 @@ declare class Offset {
 	 * @param {HTMLElement} e_container Element's root container
 	 * @param {HTMLElement} target Target element to position against
 	 * @param {HTMLElement} t_container Target's root container
+	 * @param {Object} [opts] Options
+	 * @param {boolean} [opts.preferUp=false] Open upward by default (for bottom toolbar)
 	 */
-	setRelPosition(element: HTMLElement, e_container: HTMLElement, target: HTMLElement, t_container: HTMLElement): void;
+	setRelPosition(
+		element: HTMLElement,
+		e_container: HTMLElement,
+		target: HTMLElement,
+		t_container: HTMLElement,
+		{
+			preferUp,
+		}?: {
+			preferUp?: boolean;
+		},
+	): void;
 	/**
 	 * @description Sets the absolute position of an element
 	 * @param {HTMLElement} element Element to position

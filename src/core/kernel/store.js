@@ -28,6 +28,7 @@ import { numbers } from '../../helper';
  * @property {boolean} isBalloonAlways - Whether the toolbar is in `balloon-always` mode (always visible as floating).
  * @property {boolean} isSubBalloon - Whether the sub-toolbar is in `balloon` mode.
  * @property {boolean} isSubBalloonAlways - Whether the sub-toolbar is in `balloon-always` mode.
+ * @property {boolean} isBottom - Whether the toolbar is placed at the bottom of the editor (`classic:bottom`, `inline:bottom`).
  */
 
 /**
@@ -64,6 +65,7 @@ class Store {
 			isBalloonAlways: /balloon-always/i.test(mode),
 			isSubBalloon: /balloon/i.test(subMode),
 			isSubBalloonAlways: /balloon-always/i.test(subMode),
+			isBottom: !!options.get('_toolbar_bottom'),
 		};
 
 		this.#state = {

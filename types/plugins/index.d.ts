@@ -1,6 +1,7 @@
 import type {} from '../typedef';
 declare namespace _default {
 	export { blockquote };
+	export { codeBlock };
 	export { exportPDF };
 	export { fileUpload };
 	export { list_bulleted };
@@ -42,6 +43,7 @@ import fileGallery from './browser/fileGallery';
 import imageGallery from './browser/imageGallery';
 import videoGallery from './browser/videoGallery';
 import blockquote from './command/blockquote';
+import codeBlock from './command/codeBlock';
 import exportPDF from './command/exportPDF';
 import fileUpload from './command/fileUpload';
 import list_bulleted from './command/list_bulleted';
@@ -78,6 +80,7 @@ export {
 	backgroundColor,
 	blockquote,
 	blockStyle,
+	codeBlock,
 	drawing,
 	embed,
 	exportPDF,
