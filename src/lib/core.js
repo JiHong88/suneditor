@@ -5356,7 +5356,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             // blacklist
             const bAttr = this._attributesTagsBlacklist[tagName];
-            m = m.replace(/\s(?:on[a-z]+)\s*=\s*(")[^"]*\1/ig, '');
+            m = m.replace(/\s(?:on[a-z]+)\s*=\s*(?:(["'])[^"']*\1|\S+)/gi, '');
             if (bAttr) m = m.replace(bAttr, '');
             else m = m.replace(this._attributesBlacklistRegExp, '');
 
@@ -5398,7 +5398,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (v) {
                 for (let i = 0, len = v.length, a; i < len; i++) {
                     // if (lowLevelCheck && /^class="(?!(__se__|se-|katex))/.test(v[i].trim())) continue;
-                    a = (/^(?:href|src)\s*=\s*('|"|\s)*javascript\s*\:/i.test(v[i].trim()) ? '' : v[i]);
+                    a = (_isSafeAttribute(v[i].trim()) ? v[i] : '');
                     t += (/^\s/.test(a) ? '' : ' ') + a;
                 }
             }
@@ -9452,4 +9452,56 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
     }
 
     return functions;
+}
+
+/** @description Safe URL protocol whitelist */
+const _SAFE_URL_PROTOCOL = /^(?:https?|ftps?|mailto|tel|blob|sms|geo|webcal|callto):|^[#/]|^data:image\//i;
+const _URL_ATTR_PATTERN = /^(?:href|src)\s*=/i;
+const _RE_ATTR_VALUE = /=\s*(?:"([^"]*)"|'([^']*)'|(\S+))/;
+const _RE_COLON = /:/i;
+
+/**
+ * @description Normalize a URL by decoding HTML entities, URL-encoded characters,
+ * and stripping whitespace/control characters. Detects obfuscated dangerous protocols.
+ * @param {string} url
+ * @returns {string}
+ */
+function _normalizeURL(url) {
+    let prev, limit = 5;
+    do {
+        prev = url;
+        url = url.replace(/&(#x([0-9a-f]+)|#([0-9]+)|([a-z]+));/gi, function (_, __, hex, dec) {
+            if (hex) return String.fromCharCode(parseInt(hex, 16));
+            if (dec) return String.fromCharCode(parseInt(dec, 10));
+            return '';
+        });
+    } while (url !== prev && --limit);
+
+    try { url = decodeURIComponent(url); } catch (e) { /* malformed URI */ }
+
+    url = url.replace(/[\u0000-\u0020]+/g, '');
+    return url;
+}
+
+/**
+ * @description Check if a URL is safe (matches the allowed protocol whitelist).
+ * @param {string} url
+ * @returns {boolean}
+ */
+function _isSafeURL(url) {
+    var normalized = _normalizeURL(url);
+    return _SAFE_URL_PROTOCOL.test(normalized) || !_RE_COLON.test(normalized);
+}
+
+/**
+ * @description Check if an attribute string (e.g. 'href="..."') contains a safe URL.
+ * @param {string} attr
+ * @returns {boolean}
+ */
+function _isSafeAttribute(attr) {
+    if (!_URL_ATTR_PATTERN.test(attr)) return true;
+    var urlMatch = attr.match(_RE_ATTR_VALUE);
+    if (!urlMatch) return true;
+    var url = urlMatch[1] || urlMatch[2] || urlMatch[3] || '';
+    return _isSafeURL(url);
 }
