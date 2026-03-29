@@ -4,6 +4,9 @@ export default Finder;
  * @description Find/Replace feature
  */
 declare class Finder {
+	/** @description Inject ::highlight() styles at runtime (avoids PostCSS parse errors). */
+	static #highlightStyleInjected: boolean;
+	static #injectHighlightStyles(): void;
 	/**
 	 * @constructor
 	 * @param {SunEditor.Kernel} kernel

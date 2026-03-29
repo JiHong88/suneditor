@@ -63,12 +63,17 @@ class ExportPDF extends PluginCommand {
 
 		try {
 			const standardWW = this.$.frameContext.get('documentTypePageMirror') || this.$.frameContext.get('wysiwygFrame');
-			const editableDiv = dom.utils.createElement('div', { class: standardWW.className }, standardWW.innerHTML);
+
+			// Strip theme class so getComputedStyle resolves default (light) colors for borders, shadows, etc.
+			const themeClass = (this.$.options.get('_themeClass') || '').trim();
+			const wwClassName = themeClass ? standardWW.className.replace(themeClass, '').trim() : standardWW.className;
+			const editableDiv = dom.utils.createElement('div', { class: wwClassName }, standardWW.innerHTML);
 			ww = dom.utils.createElement('div', { style: `position: absolute; top: -10000px; left: -10000px; width: 21cm; columns: 21cm; height: auto;` }, editableDiv);
 
 			const innerPadding = _w.getComputedStyle(standardWW).padding;
 			const inlineWW = dom.utils.applyInlineStylesAll(editableDiv, true, this.$.options.get('allUsedStyles'));
 			inlineWW.style.padding = inlineWW.style.paddingTop = inlineWW.style.paddingBottom = inlineWW.style.paddingLeft = inlineWW.style.paddingRight = '0';
+
 			ww.innerHTML = `
 				<style>
 					@page {
@@ -109,8 +114,15 @@ class ExportPDF extends PluginCommand {
 		const xhr = await this.apiManager.asyncCall({ data: JSON.stringify(data) });
 
 		if (xhr.status !== 200) {
-			const res = !xhr.responseText ? xhr : JSON.parse(xhr.responseText);
-			throw Error(`[SUNEDITOR.plugins.exportPDF.error] ${res.errorMessage}`);
+			let errorMessage;
+
+			try {
+				errorMessage = JSON.parse(xhr.responseText).errorMessage;
+			} catch {
+				// ignore
+			}
+
+			throw Error(`[SUNEDITOR.plugins.exportPDF.error] ${errorMessage || xhr.statusText}`);
 		}
 
 		const blob = new Blob([xhr.response], { type: 'application/pdf' });

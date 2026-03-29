@@ -44,7 +44,19 @@ class Finder {
 	#searchTimer = null;
 	#resizeObserver = null;
 	#bindCloseKey = null;
-	#bindContentInput = null;
+	#contentObserver = null;
+	#internalUpdate = false;
+
+	/** @description Inject ::highlight() styles at runtime (avoids PostCSS parse errors). */
+	static #highlightStyleInjected = false;
+	static #injectHighlightStyles() {
+		if (Finder.#highlightStyleInjected) return;
+		Finder.#highlightStyleInjected = true;
+		const style = _d.createElement('style');
+		style.textContent =
+			'::highlight(se-find-match){background-color:var(--se-find-match-color,rgba(255,213,0,.4));color:inherit}' + '::highlight(se-find-current){background-color:var(--se-find-current-color,rgba(255,150,50,.7));color:inherit}';
+		_d.head.appendChild(style);
+	}
 
 	/**
 	 * @constructor
@@ -242,7 +254,11 @@ class Finder {
 	 * @description Re-run search with current term (debounced 300ms). Called on wysiwyg content change.
 	 */
 	refresh() {
-		if (!this.#isOpen || !this.#searchTerm) return;
+		if (!this.#isOpen || !this.#searchTerm || this.#internalUpdate) return;
+		this.#internalUpdate = true;
+		this.#removeMarkElements();
+		this.#markElements = [];
+		this.#internalUpdate = false;
 		clearTimeout(this.#searchTimer);
 		this.#searchTimer = setTimeout(() => this.#doSearch(), 300);
 	}
@@ -275,11 +291,15 @@ class Finder {
 	#addContentInputListener() {
 		this.#removeContentInputListener();
 		const wysiwyg = this.#$.frameContext.get('wysiwyg');
-		this.#bindContentInput = this.#$.eventManager.addEvent(wysiwyg, 'input', () => this.refresh());
+		this.#contentObserver = new MutationObserver(() => this.refresh());
+		this.#contentObserver.observe(wysiwyg, { childList: true, subtree: true, characterData: true });
 	}
 
 	#removeContentInputListener() {
-		this.#bindContentInput &&= this.#$.eventManager.removeEvent(this.#bindContentInput);
+		if (this.#contentObserver) {
+			this.#contentObserver.disconnect();
+			this.#contentObserver = null;
+		}
 	}
 
 	/** @description Bind panel UI events (input, click delegation, tab navigation, blur prevention). Panel-only. */
@@ -419,6 +439,7 @@ class Finder {
 	/** @description Core search — clear previous, find matches, highlight, update count. */
 	#doSearch() {
 		const term = this.#findInput ? this.#findInput.value : this.#searchTerm;
+		this.#internalUpdate = true;
 		this.#clearHighlights();
 		this.#matches = [];
 		this.#currentIndex = -1;
@@ -445,6 +466,7 @@ class Finder {
 		}
 
 		this.#updateCount();
+		this.#internalUpdate = false;
 	}
 
 	/**
@@ -488,7 +510,7 @@ class Finder {
 			if (prevLine && line !== prevLine) fullText += '\n';
 			prevLine = line;
 			textNodes.push({ node: tn, start: fullText.length });
-			fullText += tn.textContent;
+			fullText += tn.textContent.replace(/\u00A0/g, ' ');
 		}
 
 		if (!fullText) return matches;
@@ -546,6 +568,7 @@ class Finder {
 
 	/** @description Apply CSS Custom Highlight API highlights. */
 	#applyNativeHighlight() {
+		Finder.#injectHighlightStyles();
 		// eslint-disable-next-line
 		const allRanges = new Highlight(...this.#matches);
 		CSS.highlights.set('se-find-match', allRanges);
@@ -571,28 +594,9 @@ class Finder {
 		// Process matches in reverse to preserve earlier Range positions
 		for (let i = this.#matches.length - 1; i >= 0; i--) {
 			const range = this.#matches[i];
-
-			try {
-				const mark = doc.createElement('mark');
-				mark.className = 'se-find-mark';
-				mark.setAttribute('data-se-find-idx', String(i));
-
-				range.surroundContents(mark);
-				this.#markElements.push(mark);
-			} catch {
-				// Range spans multiple nodes — handle with extractContents
-				try {
-					const mark = doc.createElement('mark');
-					mark.className = 'se-find-mark';
-					mark.setAttribute('data-se-find-idx', String(i));
-
-					const fragment = range.extractContents();
-					mark.appendChild(fragment);
-					range.insertNode(mark);
-					this.#markElements.push(mark);
-				} catch (err) {
-					console.warn('[SUNEDITOR.warn.finder] ' + err);
-				}
+			const marks = this.#wrapRangeTextNodes(doc, range, i);
+			for (let m = 0; m < marks.length; m++) {
+				this.#markElements.push(marks[m]);
 			}
 		}
 
@@ -600,13 +604,101 @@ class Finder {
 		this.#updateCurrentMarkHighlight();
 	}
 
+	/**
+	 * @description Wrap each text node segment within a Range with a `<mark>`, without extractContents.
+	 * @param {Document} doc
+	 * @param {Range} range
+	 * @param {number} idx - match index
+	 * @returns {HTMLElement[]} created mark elements
+	 */
+	#wrapRangeTextNodes(doc, range, idx) {
+		const sc = /** @type {Text} */ (range.startContainer);
+		const ec = /** @type {Text} */ (range.endContainer);
+		const marks = [];
+
+		if (sc === ec) {
+			// Single text node — most common case
+			marks.push(this.#wrapTextSegment(doc, sc, range.startOffset, range.endOffset, idx));
+		} else {
+			// Cross-node: collect text nodes between start and end containers
+			const textNodes = [sc];
+			let node = sc;
+			while (node && node !== ec) {
+				node = this.#nextTextNode(node, range.commonAncestorContainer);
+				if (node) textNodes.push(node);
+			}
+
+			// Wrap in reverse to preserve offsets
+			for (let i = textNodes.length - 1; i >= 0; i--) {
+				const tn = textNodes[i];
+				const start = tn === sc ? range.startOffset : 0;
+				const end = tn === ec ? range.endOffset : tn.textContent.length;
+				if (start >= end) continue;
+				marks.push(this.#wrapTextSegment(doc, tn, start, end, idx));
+			}
+		}
+
+		return marks;
+	}
+
+	/**
+	 * @description Wrap a portion of a text node with a `<mark>`.
+	 * @param {Document} doc
+	 * @param {Text} textNode
+	 * @param {number} start
+	 * @param {number} end
+	 * @param {number} idx
+	 * @returns {HTMLElement}
+	 */
+	#wrapTextSegment(doc, textNode, start, end, idx) {
+		const matchNode = start > 0 ? textNode.splitText(start) : textNode;
+		if (end - start < matchNode.textContent.length) {
+			matchNode.splitText(end - start);
+		}
+
+		const mark = doc.createElement('mark');
+		mark.className = 'se-find-mark';
+		mark.setAttribute('data-se-find-idx', String(idx));
+		matchNode.parentNode.insertBefore(mark, matchNode);
+		mark.appendChild(matchNode);
+		return mark;
+	}
+
+	/**
+	 * @description Get the next text node in document order within a boundary.
+	 * @param {Node} node
+	 * @param {Node} boundary
+	 * @returns {Text|null}
+	 */
+	#nextTextNode(node, boundary) {
+		let n = node;
+		while (n) {
+			if (n.firstChild) {
+				n = n.firstChild;
+			} else {
+				while (n && !n.nextSibling) {
+					n = n.parentNode;
+					if (n === boundary) return null;
+				}
+				if (!n) return null;
+				n = n.nextSibling;
+			}
+			if (n.nodeType === 3) return /** @type {Text} */ (n);
+		}
+		return null;
+	}
+
 	/** @description Update the "current match" mark element class. */
 	#updateCurrentMarkHighlight() {
 		for (const m of this.#markElements) {
 			dom.utils.removeClass(m, 'se-find-current');
 		}
-		if (this.#currentIndex >= 0 && this.#currentIndex < this.#markElements.length) {
-			dom.utils.addClass(this.#markElements[this.#currentIndex], 'se-find-current');
+		if (this.#currentIndex >= 0) {
+			for (const m of this.#markElements) {
+				if (m.getAttribute('data-se-find-idx') === String(this.#currentIndex)) {
+					dom.utils.addClass(m, 'se-find-current');
+				}
+			}
 		}
 	}
 
@@ -624,9 +716,11 @@ class Finder {
 
 	/** @description Unwrap all `<mark>` elements and normalize text nodes. */
 	#removeMarkElements() {
-		if (this.#markElements.length === 0) return;
+		const wysiwyg = this.#$.frameContext.get('wysiwyg');
+		const marks = wysiwyg.querySelectorAll('mark.se-find-mark');
+		if (marks.length === 0) return;
 
-		for (const mark of this.#markElements) {
+		for (const mark of marks) {
 			const parent = mark.parentNode;
 			if (!parent) continue;
 			while (mark.firstChild) {
@@ -659,8 +753,9 @@ class Finder {
 			// Mark fallback: update active mark
 			this.#updateCurrentMarkHighlight();
 
-			if (this.#markElements[this.#currentIndex]) {
-				this.#markElements[this.#currentIndex].scrollIntoView({ block: 'center', behavior: 'smooth' });
+			const currentMark = this.#markElements.find((m) => m.getAttribute('data-se-find-idx') === String(this.#currentIndex));
+			if (currentMark) {
+				this.#$.selection.scrollTo(currentMark, { behavior: 'auto', noFocus: true });
 			}
 		}
 
@@ -793,6 +888,7 @@ class Finder {
 	/** @internal */
 	_destroy() {
 		this.#removeGlobalCloseEvent();
+		this.#removeContentInputListener();
 		this.#resizeObserver &&= this.#resizeObserver.disconnect();
 		clearTimeout(this.#searchTimer);
 	}

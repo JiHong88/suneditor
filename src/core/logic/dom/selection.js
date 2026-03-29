@@ -378,7 +378,7 @@ class Selection_ {
 	/**
 	 * @description Scroll to the corresponding selection or range position.
 	 * @param {Selection|Range|Node} ref selection or range object
-	 * @param {Object<string, *>} [scrollOption] option of scrollTo
+	 * @param {ScrollIntoViewOptions & {noFocus?: boolean}} [scrollOption] Scroll options. Extends `ScrollIntoViewOptions` (`behavior`, `block`, `inline`) with `noFocus` to prevent focus change.
 	 * @example
 	 * // Scroll to current selection smoothly
 	 * editor.selection.scrollTo(editor.selection.get());
@@ -394,10 +394,18 @@ class Selection_ {
 	 * });
 	 */
 	scrollTo(ref, scrollOption) {
+		const noFocus = scrollOption?.noFocus;
+
 		if (this.#instanceCheck.isSelection(ref)) {
 			ref = ref.getRangeAt(0);
 		} else if (this.#instanceCheck.isNode(ref)) {
-			ref = this.setRange(ref, 1, ref, 1);
+			if (noFocus) {
+				const range = this.#frameContext.get('_wd').createRange();
+				range.selectNodeContents(ref);
+				ref = range;
+			} else {
+				ref = this.setRange(ref, 1, ref, 1);
+			}
 		} else if (typeof ref?.startContainer === 'undefined') {
 			console.warn('[SUNEDITOR.html.scrollTo.warn] "selectionRange" must be Selection or Range or Node object.', ref);
 		}
@@ -406,6 +414,7 @@ class Selection_ {
 		if (!el) return;
 
 		scrollOption = { behavior: 'smooth', block: 'nearest', inline: 'nearest', ...scrollOption };
+		delete scrollOption.noFocus;
 
 		const ww = this.#frameContext.get('_ww');
 		const wwFrame = this.#frameContext.get('wysiwygFrame');
@@ -476,9 +485,7 @@ class Selection_ {
 			const innerTop = isIframe ? targetTop : targetTop - wwFrame.getBoundingClientRect().top;
 
 			const keepLocalScroll = innerTop - PADDING > 0 && innerTop + PADDING <= viewHeight;
-			const rectScroll = isBottom
-				? (innerTop - PADDING > 0 ? innerTop + PADDING - viewHeight + toolbarHeight : innerTop - elH)
-				: (innerTop - PADDING > 0 ? innerTop + PADDING - viewHeight : innerTop - (toolbarHeight + elH));
+			const rectScroll = isBottom ? (innerTop - PADDING > 0 ? innerTop + PADDING - viewHeight + toolbarHeight : innerTop - elH) : innerTop - PADDING > 0 ? innerTop + PADDING - viewHeight : innerTop - (toolbarHeight + elH);
 			let newScrollTop = scrollY + rectScroll;
 
 			// frame scroll

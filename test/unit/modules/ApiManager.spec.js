@@ -525,9 +525,9 @@ describe('Modules - ApiManager', () => {
 
 			await mockCapturedXhr.onreadystatechange();
 
-			// message is empty, errorMessage is undefined, so falls back to responseText
+			// message is empty, errorMessage is undefined, so falls back to JSON stringified response
 			expect(mockDeps.ui.alertOpen).toHaveBeenCalledWith(
-				expect.stringContaining(mockCapturedXhr.responseText),
+				expect.stringContaining('{"someField":"value"}'),
 				'error'
 			);
 		});
@@ -704,7 +704,7 @@ describe('Modules - ApiManager', () => {
 			mockCapturedXhr.responseText = '';
 			mockCapturedXhr.onload();
 
-			await expect(promise).rejects.toBe(mockCapturedXhr);
+			await expect(promise).rejects.toBe('status 500');
 		});
 
 		it('should reject with parsed JSON when status!=200 and responseText exists', async () => {

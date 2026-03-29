@@ -127,7 +127,7 @@ declare class Selection_ {
 	/**
 	 * @description Scroll to the corresponding selection or range position.
 	 * @param {Selection|Range|Node} ref selection or range object
-	 * @param {Object<string, *>} [scrollOption] option of scrollTo
+	 * @param {ScrollIntoViewOptions & {noFocus?: boolean}} [scrollOption] Scroll options. Extends `ScrollIntoViewOptions` (`behavior`, `block`, `inline`) with `noFocus` to prevent focus change.
 	 * @example
 	 * // Scroll to current selection smoothly
 	 * editor.selection.scrollTo(editor.selection.get());
@@ -144,8 +144,8 @@ declare class Selection_ {
 	 */
 	scrollTo(
 		ref: Selection | Range | Node,
-		scrollOption?: {
-			[x: string]: any;
+		scrollOption?: ScrollIntoViewOptions & {
+			noFocus?: boolean;
 		},
 	): void;
 	/**

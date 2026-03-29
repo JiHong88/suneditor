@@ -144,9 +144,9 @@ class ApiManager {
 						this.#$.ui.hideLoading();
 					}
 				} else {
+					console.error(`[SUNEDITOR.ApiManager[${this.kind}].upload.serverException]`, xhr);
 					try {
-						const res = !xhr.responseText ? xhr : JSON.parse(xhr.responseText);
-						reject(res);
+						reject(_parseErrorResponse(xhr));
 					} finally {
 						this.#$.ui.hideLoading();
 					}
@@ -203,12 +203,12 @@ class ApiManager {
 				// exception
 				console.error(`[SUNEDITOR.ApiManager[${this.kind}].upload.serverException]`, xmlHttp);
 				try {
-					const res = !xmlHttp.responseText ? xmlHttp : JSON.parse(xmlHttp.responseText);
+					const res = _parseErrorResponse(xmlHttp);
 					let message = '';
 					if (typeof errorCallBack === 'function') {
 						message = await errorCallBack(res, xmlHttp);
 					}
-					const err = `[SUNEDITOR.ApiManager[${this.kind}].upload.serverException] status: ${xmlHttp.status}, response: ${message || res.errorMessage || xmlHttp.responseText}`;
+					const err = `[SUNEDITOR.ApiManager[${this.kind}].upload.serverException] status: ${xmlHttp.status}, response: ${message || res.errorMessage || (typeof res === 'string' ? res : JSON.stringify(res))}`;
 					this.#$.ui.alertOpen(err, 'error');
 				} catch (error) {
 					throw Error(`[SUNEDITOR.ApiManager[${this.kind}].upload.errorCallBack.fail] ${error.message}`);
@@ -217,6 +217,29 @@ class ApiManager {
 				}
 			}
 		}
+	}
+}
+
+/**
+ * @description Parses error response from XMLHttpRequest.
+ * Safely handles non-text responseTypes (blob, arraybuffer, etc.) where accessing responseText throws.
+ * @param {XMLHttpRequest} xhr
+ * @returns {Object|string} Parsed JSON object, raw text, or status string as fallback
+ */
+function _parseErrorResponse(xhr) {
+	let text;
+	try {
+		text = xhr.responseText;
+	} catch {
+		return `status ${xhr.status}`;
+	}
+
+	if (!text) return `status ${xhr.status}`;
+
+	try {
+		return JSON.parse(text);
+	} catch {
+		return text;
 	}
 }
 
