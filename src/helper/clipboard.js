@@ -43,6 +43,7 @@ export async function write(content) {
 
 	try {
 		await navigator.clipboard.write([
+			// eslint-disable-next-line compat/compat
 			new ClipboardItem({
 				'text/html': new Blob([htmlString], { type: 'text/html' }),
 				'text/plain': new Blob([plainText], { type: 'text/plain' }),
