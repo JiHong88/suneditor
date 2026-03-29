@@ -2063,7 +2063,7 @@ class HTML {
 // #CleanElements
 const _RE_XML_NS_TAG = /^<[a-z0-9]+:[a-z0-9]+/i;
 const _RE_TAG_NAME = /(?!<)[a-zA-Z0-9-]+/;
-const _RE_ON_HANDLER = /\s(?:on[a-z]+)\s*=\s*(")[^"]*\1/gi;
+const _RE_ON_HANDLER = /\s(?:on[a-z]+)\s*=\s*(?:(["'])[^"']*\1|\S+)/gi;
 const _RE_STYLE_EQ = /style=/i;
 const _RE_STYLE_ATTR = /style\s*=\s*(?:"|')[^"']*(?:"|')/;
 const _RE_LEADING_SPACE = /^\s/;

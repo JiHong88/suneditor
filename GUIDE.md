@@ -745,6 +745,39 @@ The `dist/` folder is NOT tracked in git and is built via CI/CD.
 
 ---
 
+## Changes Log
+
+When making code changes (bug fixes, new features, improvements, security patches, etc.), **always update `changes.md`** in the project root.
+This file is used to generate the demo site's changelog. Keep entries concise and user-facing.
+
+**Format:**
+
+```markdown
+## [Category] - YYYY-MM-DD
+
+- **tag:** Short description of the change
+```
+
+**Categories:** `Fix`, `Feature`, `Improvement`, `Security`, `Breaking`\
+**Tags (examples):** `html`, `toolbar`, `plugin:image`, `selection`, `clipboard`, `core`, `api`, etc.
+
+**Example:**
+
+```markdown
+## Security - 2026-03-29
+
+- **html:** Block obfuscated `javascript:` protocol in href/src attributes (entity/URL-encoded whitespace bypass)
+```
+
+**Rules:**
+
+- Append new entries at the **top** of the file (newest first)
+- One bullet per logical change
+- Do not include internal refactors that have no user-visible effect
+- If `changes.md` does not exist yet, create it
+
+---
+
 ## Supplementary Guides
 
 - [Custom Plugin Guide](./guide/custom-plugin.md) - Creating custom plugins
