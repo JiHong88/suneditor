@@ -3173,7 +3173,7 @@
 
 .sun-editor .se-browser .se-browser-tags a {
 	display: inline-block;
-	background-color: var(--se-code-view-color);
+	background-color: var(--se-main-divider-color);
 	padding: 6px 12px;
 	margin: 8px 0 8px 8px;
 	color: var(--se-main-font-color);

@@ -311,15 +311,23 @@ export class TableGridService {
 			if (remove) {
 				dom.utils.removeItem(cols[insertIndex]);
 			} else {
-				let totalW = 0;
-				for (let i = 0, len = cols.length, w; i < len; i++) {
-					w = numbers.get(cols[i].style.width);
-					w -= Math.round((w * len * 0.1) / 2);
-					totalW += w;
-					cols[i].style.width = `${w}%`;
+				const isAutoLayout = !dom.utils.hasClass(this.#main._element, 'se-table-layout-fixed') && this.#main._element.style.tableLayout !== 'fixed';
+				const hasWidth = !isAutoLayout && Array.prototype.some.call(cols, (col) => numbers.get(col.style.width) > 0);
+
+				if (hasWidth) {
+					let totalW = 0;
+					for (let i = 0, len = cols.length, w; i < len; i++) {
+						w = numbers.get(cols[i].style.width);
+						w -= Math.round((w * len * 0.1) / 2);
+						totalW += w;
+						cols[i].style.width = `${w}%`;
+					}
+					const newCol = dom.utils.createElement('col', { style: `width:${100 - totalW}%` });
+					colgroup.insertBefore(newCol, cols[insertIndex]);
+				} else {
+					// auto layout or no explicit widths — add bare col, let browser distribute
+					colgroup.insertBefore(dom.utils.createElement('col'), cols[insertIndex] || null);
 				}
-				const newCol = dom.utils.createElement('col', { style: `width:${100 - totalW}%` });
-				colgroup.insertBefore(newCol, cols[insertIndex]);
 			}
 		}
 

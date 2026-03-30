@@ -511,9 +511,7 @@ class Offset {
 		if ((isWWTarget && (rmb - statusBarH + targetH <= 0 || rmt + rt + targetH - (this.#$.toolbar.isSticky && isInlineTarget ? toolbarH : 0) <= 0)) || rmt + targetH < 0) return;
 
 		const topAreaRect = this.#frameContext.get('topArea').getBoundingClientRect();
-		const isStickyVisible = this.#store.mode.isBottom
-			? topAreaRect.bottom >= _w.innerHeight - th
-			: topAreaRect.top <= th;
+		const isStickyVisible = this.#store.mode.isBottom ? topAreaRect.bottom >= _w.innerHeight - th : topAreaRect.top <= th;
 		const isSticky = this.#$.toolbar.isSticky && this.#context.get('toolbar_main').style.display !== 'none' && (!headLess || isStickyVisible);
 		let t = addOffset.top;
 		let y = 0;
