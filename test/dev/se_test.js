@@ -1307,7 +1307,9 @@ const options1 = {
 	// maxHeight: 600,
 	toolbar_sticky: 50,
 	iframe_attributes: { frameborder: '1' },
-	// mode: 'inline:bottom',
+	mode: 'inline:bottom',
+	// mode: 'classic:bottom',
+	// maxHeight: 400,
 	type: '',
 	// textDirection: 'rtl',
 	value: `<pre style="line-height: 1.45;margin: 0px 0px 10px">

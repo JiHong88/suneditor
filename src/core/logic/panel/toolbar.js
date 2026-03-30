@@ -273,7 +273,7 @@ class Toolbar {
 		if (this.isBottomMode) {
 			const viewportBottom = currentScrollY + _w.innerHeight;
 			const editorBottom = editorOffset.top + editorHeight;
-			const y = viewportBottom - stickyTop;
+			const y = viewportBottom - stickyTop - (this.isInlineMode ? toolbar.offsetHeight : 0);
 
 			const offSticky = !this.#options.get('toolbar_container') ? y - editorOffset.top - minHeight : viewportBottom - stickyTop - editorOffset.top - minHeight - toolbar.offsetHeight;
 			if (y > editorBottom) {
@@ -426,9 +426,9 @@ class Toolbar {
 
 		const toolbar = this.#context.get(this.keyName.main);
 		toolbar.style.visibility = 'hidden';
+		toolbar.style.display = 'block';
 		this.#offSticky();
 
-		toolbar.style.display = 'block';
 		toolbar.style.top = '0px';
 		this.inlineToolbarAttr.width = toolbar.style.width = this.#options.get(this.keyName.width);
 		if (this.isBottomMode) {
@@ -517,7 +517,7 @@ class Toolbar {
 
 		const toolbar = this.#context.get(this.keyName.main);
 		if (this.isBottomMode) {
-			toolbar.style.bottom = '';
+			toolbar.style.bottom = this.isInlineMode ? `${-toolbar.offsetHeight}px` : '';
 			toolbar.style.top = 'auto';
 			this.#frameContext.get('wrapper').style.marginBottom = '';
 		} else {

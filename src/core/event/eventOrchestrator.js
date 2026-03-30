@@ -346,6 +346,9 @@ class EventOrchestrator extends KernelInjector {
 					entries.forEach((e) => {
 						this.#ui._emitResizeEvent(this.$.frameRoots.get(e.target.getAttribute('data-root-key')), -1, e);
 					});
+					if (this.#store.mode.isInline && this.#store.mode.isBottom) {
+						this.#toolbar._resetSticky();
+					}
 				}, 0);
 			});
 		}
