@@ -1,7 +1,7 @@
 const { Octokit } = require('@octokit/rest');
 
 const octokit = new Octokit({
-	auth: process.env.GITHUB_TOKEN
+	auth: process.env.GITHUB_TOKEN,
 });
 
 async function closeIssuesForMilestone() {
@@ -18,7 +18,7 @@ async function closeIssuesForMilestone() {
 		const milestones = await octokit.rest.issues.listMilestones({
 			owner,
 			repo,
-			state: 'open'
+			state: 'open',
 		});
 
 		const milestone = milestones.data.find((m) => m.title === versionName);
@@ -27,15 +27,15 @@ async function closeIssuesForMilestone() {
 			return;
 		}
 
-		const issues = await octokit.issues.listForRepo({
+		const issues = await octokit.paginate(octokit.issues.listForRepo, {
 			owner,
 			repo,
 			state: 'open',
-			milestone: milestone.number
+			milestone: milestone.number,
 		});
 
-		issues.data.forEach(async (issue) => {
-			const comment = {
+		for (const issue of issues) {
+			await octokit.issues.createComment({
 				owner,
 				repo,
 				issue_number: issue.number,
@@ -45,17 +45,16 @@ async function closeIssuesForMilestone() {
 					versionName +
 					'.\n' +
 					'If the problem persists or if you believe this issue is still relevant,\n' +
-					'please open a new issue referencing this one.'
-			};
-			await octokit.issues.createComment(comment);
+					'please open a new issue referencing this one.',
+			});
 
 			await octokit.issues.update({
 				owner,
 				repo,
 				issue_number: issue.number,
-				state: 'closed'
+				state: 'closed',
 			});
-		});
+		}
 	} catch (error) {
 		console.error(`Error while processing issues for milestone: ${error}`);
 	}

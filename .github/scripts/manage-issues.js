@@ -1,23 +1,23 @@
 const { Octokit } = require('@octokit/rest');
 
 const octokit = new Octokit({
-	auth: process.env.GITHUB_TOKEN // 직접 환경 변수 사용
+	auth: process.env.GITHUB_TOKEN, // 직접 환경 변수 사용
 });
 
 async function closeOldIssues() {
 	try {
 		const owner = 'jihong88';
 		const repo = 'suneditor';
-		const issues = await octokit.issues.listForRepo({
+		const issues = await octokit.paginate(octokit.issues.listForRepo, {
 			owner,
 			repo,
-			state: 'open'
+			state: 'open',
 		});
 
 		const sixWeeksAgo = new Date();
 		sixWeeksAgo.setDate(sixWeeksAgo.getDate() - 42); // 6 weeks
 
-		for (const issue of issues.data) {
+		for (const issue of issues) {
 			const lastUpdated = new Date(issue.updated_at);
 			if (lastUpdated < sixWeeksAgo) {
 				const comment = {
@@ -31,7 +31,7 @@ async function closeOldIssues() {
 						'If a new version has been released recently, please test your scenario with that version to see if the issue persists.\n' +
 						'If the problem still exists or if you believe this issue is still relevant, \n' +
 						'feel free to reopen it and provide additional comments.\n\n' +
-						'I truly appreciate your continuous interest and support for the project. Your feedback is crucial in improving its quality.'
+						'I truly appreciate your continuous interest and support for the project. Your feedback is crucial in improving its quality.',
 				};
 				await octokit.issues.createComment(comment);
 
@@ -39,7 +39,7 @@ async function closeOldIssues() {
 					owner,
 					repo,
 					issue_number: issue.number,
-					state: 'closed'
+					state: 'closed',
 				});
 			}
 		}
