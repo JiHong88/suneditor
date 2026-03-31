@@ -5,6 +5,12 @@
   "author": "JiHong.Lee",
   "license": "MIT",
   "main": "src/suneditor.js",
+  "publishConfig": {
+    "tag": "legacy"
+  },
+  "engines": {
+    "node": "<13.0.0"
+  },
   "sideEffects": [
     "./src/assets/css/*.css"
   ],
