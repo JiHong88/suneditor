@@ -8,35 +8,39 @@ on:
 jobs:
     deploy:
         runs-on: ubuntu-latest
+        # OIDC 인증
+        permissions:
+            contents: write
+            id-token: write
+
         steps:
             # 1) 소스 체크아웃
             - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0 # 태그 비교를 위해 전체 기록을 가져옵니다.
 
             # 2) Node.js 세팅
             - name: Setup Node.js
               uses: actions/setup-node@v4
               with:
-                  node-version: '22'
+                  node-version: '24'
                   cache: 'npm'
                   registry-url: 'https://registry.npmjs.org/'
 
-            # 3) package.json 버전이 기존 태그와 다른지 확인
+            # 3) package.json 버전 확인
             - name: Check if version has been updated
               id: check-version
               run: |
                   PACKAGE_VERSION=$(node -p "require('./package.json').version")
-                  # 혹시 태그가 하나도 없을 경우 에러가 발생할 수 있으므로 || echo "v0.0.0" 추가
                   LAST_GIT_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
 
                   echo "현재 package.json 버전: v$PACKAGE_VERSION"
                   echo "가장 최근 태그: $LAST_GIT_TAG"
 
                   if [ "v$PACKAGE_VERSION" = "$LAST_GIT_TAG" ]; then
-                    echo "Package version ($PACKAGE_VERSION) has not been updated since the last tag ($LAST_GIT_TAG)."
+                    echo "Version has not been updated. Skipping deploy."
                     exit 1
                   else
-                    echo "Package version has been updated to $PACKAGE_VERSION."
-                    # GitHub Actions : $GITHUB_OUTPUT 파일에 기록
                     echo "package_version=$PACKAGE_VERSION" >> $GITHUB_OUTPUT
                   fi
 
@@ -48,11 +52,9 @@ jobs:
             - name: Build
               run: npm run build:prod
 
-            # 6) npm publish
+            # 6) npm publish (OIDC 방식)
             - name: Deploy
-              run: npm publish
-              env:
-                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }} # NPM 토큰
+              run: npm publish --provenance
 
             # 7) 스크립트 실행
             - name: Execute script for milestone
