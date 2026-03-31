@@ -1,0 +1,155 @@
+import { PluginDropdown } from '../../interfaces';
+import { dom } from '../../helper';
+
+/**
+ * @typedef {Object} FontPluginOptions
+ * @property {Array<string>} [items] - Font list
+ */
+
+/**
+ * @class
+ * @description Text font plugin
+ */
+class Font extends PluginDropdown {
+	static key = 'font';
+	static className = 'se-btn-select se-btn-tool-font';
+
+	#defaultValue;
+
+	/**
+	 * @constructor
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
+	 * @param {FontPluginOptions} pluginOptions - plugin options
+	 */
+	constructor(kernel, pluginOptions) {
+		super(kernel);
+		// plugin basic properties
+		this.title = this.$.lang.font;
+		this.inner = '<span class="se-txt">' + this.$.lang.font + '</span>' + this.$.icons.arrow_down;
+
+		// create HTML
+		const fontList = pluginOptions.items || ['Arial', 'Comic Sans MS', 'Courier New', 'Impact', 'Georgia', 'tahoma', 'Trebuchet MS', 'Verdana'];
+		const menu = CreateHTML(this.$, fontList);
+
+		// members
+		this.currentFont = '';
+		this.fontList = menu.querySelectorAll('ul li button');
+		this.fontArray = fontList;
+
+		this.#defaultValue = /** @type {HTMLSpanElement} */ (menu.querySelector('.se-sub-list span'));
+
+		// init
+		this.$.menu.initDropdownTarget(Font, menu);
+	}
+
+	/**
+	 * @hook Editor.EventManager
+	 * @type {SunEditor.Hook.Event.Active}
+	 */
+	active(element, target) {
+		const targetText = target.querySelector('.se-txt');
+		const tooltip = target.parentNode.querySelector('.se-tooltip-text');
+
+		let fontFamily = '';
+		if (!element) {
+			const font = this.$.store.get('hasFocus') ? this.$.frameContext.get('wwComputedStyle').fontFamily : this.$.lang.font;
+			dom.utils.changeTxt(targetText, font);
+			dom.utils.changeTxt(tooltip, this.$.store.get('hasFocus') ? this.$.lang.font + (font ? ' (' + font + ')' : '') : font);
+		} else if (this.$.format.isLine(element)) {
+			return undefined;
+		} else if ((fontFamily = dom.utils.getStyle(element, 'fontFamily'))) {
+			const selectFont = fontFamily.replace(/["']/g, '');
+			dom.utils.changeTxt(targetText, selectFont);
+			dom.utils.changeTxt(tooltip, this.$.lang.font + ' (' + selectFont + ')');
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * @override
+	 * @type {PluginDropdown['on']}
+	 */
+	on(target) {
+		const fontList = this.fontList;
+		const currentFont = target.querySelector('.se-txt').textContent;
+
+		if (currentFont !== this.currentFont) {
+			let found = false;
+			for (let i = 0, len = fontList.length; i < len; i++) {
+				if (currentFont === (fontList[i].getAttribute('data-command') || '').replace(/'|"/g, '')) {
+					dom.utils.addClass(fontList[i], 'active');
+					found = true;
+				} else {
+					dom.utils.removeClass(fontList[i], 'active');
+				}
+			}
+
+			this.currentFont = currentFont;
+
+			if (!found) {
+				this.#defaultValue.textContent = currentFont;
+				this.#defaultValue.style.display = 'block';
+			} else {
+				this.#defaultValue.style.display = 'none';
+			}
+		}
+	}
+
+	/**
+	 * @override
+	 * @type {PluginDropdown['action']}
+	 */
+	async action(target) {
+		let value = target.getAttribute('data-command');
+		if (value) {
+			if (/[\s\d\W]/.test(value) && !/^['"].*['"]$/.test(value)) {
+				value = `"${value}"`;
+			}
+
+			// before event
+			if ((await this.$.eventManager.triggerEvent('onFontActionBefore', { value })) === false) return;
+
+			const newNode = dom.utils.createElement('SPAN', { style: 'font-family: ' + value + ';' });
+			this.$.inline.apply(newNode, { stylesToModify: ['font-family'], nodesToRemove: null, strictRemove: null });
+		} else {
+			this.$.inline.apply(null, { stylesToModify: ['font-family'], nodesToRemove: ['span'], strictRemove: true });
+		}
+
+		this.$.menu.dropdownOff();
+	}
+}
+
+/**
+ * @param {SunEditor.Deps} $ - Kernel dependencies
+ * @param {string[]} fontList - Font name list
+ * @returns {HTMLElement}
+ */
+function CreateHTML({ lang }, fontList) {
+	let list = /*html*/ `
+	<div class="se-list-inner">
+		<ul class="se-list-basic">
+			<li>
+				<button type="button" class="se-btn se-btn-list default_value" data-command="" title="${lang.default}" aria-label="${lang.default}">
+					${lang.default}
+				</button>
+			</li>
+			<li class="se-btn-list se-sub-list"><span></span></li>`;
+
+	for (let i = 0, len = fontList.length, font, text; i < len; i++) {
+		font = fontList[i];
+		text = font.split(',')[0];
+		list += /*html*/ `
+			<li>
+				<button type="button" class="se-btn se-btn-list" data-command="${font}" data-txt="${text}" title="${text}" aria-label="${text}" style="font-family:${font};">${text}</button>
+			</li>`;
+	}
+	list += /*html*/ `
+		</ul>
+	</div>`;
+
+	return dom.utils.createElement('DIV', { class: 'se-dropdown se-list-layer se-list-font-family' }, list);
+}
+
+export default Font;

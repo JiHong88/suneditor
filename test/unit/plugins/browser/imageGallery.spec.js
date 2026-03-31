@@ -1,0 +1,241 @@
+/**
+ * @fileoverview Unit tests for plugins/browser/imageGallery.js
+ */
+
+import ImageGallery from '../../../../src/plugins/browser/imageGallery.js';
+import { createMockEditor } from '../../../../test/__mocks__/editorMock.js';
+
+// Mock Browser module
+const mockBrowser = {
+    open: jest.fn(),
+    close: jest.fn()
+};
+
+jest.mock('../../../../src/modules/contract', () => ({
+    Browser: jest.fn().mockImplementation(() => mockBrowser)
+}));
+
+describe('Plugins - Browser - ImageGallery', () => {
+    let kernel;
+    let imageGallery;
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+
+        kernel = createMockEditor();
+
+        const pluginOptions = {
+            data: [
+                { url: '/image1.jpg', name: 'image1.jpg' },
+                { url: '/image2.jpg', name: 'image2.jpg' }
+            ],
+            url: '/api/images',
+            headers: { 'Authorization': 'Bearer token' }
+        };
+
+        imageGallery = new ImageGallery(kernel, pluginOptions);
+    });
+
+    describe('Constructor', () => {
+        it('should create ImageGallery instance with required properties', () => {
+            expect(imageGallery).toBeInstanceOf(ImageGallery);
+            expect(imageGallery.title).toBe('Image Gallery');
+            expect(imageGallery.icon).toBe('image_gallery');
+            expect(imageGallery.browser).toBeDefined();
+            expect(imageGallery.onSelectfunction).toBeNull();
+        });
+
+        it('should initialize with plugin options', () => {
+            const pluginOptions = {
+                data: [{ url: '/test.jpg', name: 'test.jpg' }],
+                url: '/custom/api',
+                headers: { 'Custom-Header': 'value' }
+            };
+
+            const gallery = new ImageGallery(kernel, pluginOptions);
+            expect(gallery).toBeInstanceOf(ImageGallery);
+        });
+
+        it('should set default dimensions from image plugin options', () => {
+            expect(imageGallery.width).toBe('100%');
+            expect(imageGallery.height).toBe('');
+        });
+
+        it('should handle auto dimensions', () => {
+            kernel.plugins.image.pluginOptions.defaultWidth = 'auto';
+            kernel.plugins.image.pluginOptions.defaultHeight = 'auto';
+
+            const gallery = new ImageGallery(kernel, {});
+            expect(gallery.width).toBe('');
+            expect(gallery.height).toBe('');
+        });
+    });
+
+    describe('Public methods', () => {
+        describe('open', () => {
+            it('should open browser without onSelectfunction', () => {
+                imageGallery.open();
+
+                expect(imageGallery.onSelectfunction).toBeUndefined();
+                expect(mockBrowser.open).toHaveBeenCalled();
+            });
+
+            it('should open browser with custom onSelectfunction', () => {
+                const customHandler = jest.fn();
+                imageGallery.open(customHandler);
+
+                expect(imageGallery.onSelectfunction).toBe(customHandler);
+                expect(mockBrowser.open).toHaveBeenCalled();
+            });
+        });
+
+        describe('close', () => {
+            it('should close browser and reset onSelectfunction', () => {
+                const customHandler = jest.fn();
+                imageGallery.open(customHandler);
+
+                expect(imageGallery.onSelectfunction).toBe(customHandler);
+
+                imageGallery.close();
+
+                expect(imageGallery.onSelectfunction).toBeNull();
+                expect(mockBrowser.close).toHaveBeenCalled();
+            });
+        });
+    });
+
+    describe('Item selection handling', () => {
+        describe('with custom onSelectfunction', () => {
+            it('should call custom handler when item is selected', () => {
+                const customHandler = jest.fn();
+                const mockTarget = {
+                    getAttribute: jest.fn(),
+                    alt: 'Test image'
+                };
+
+                imageGallery.open(customHandler);
+
+                // Simulate item selection by calling the internal handler
+                // We need to access the private method indirectly
+                const browserConstructorCall = require('../../../../src/modules/contract').Browser.mock.calls[0];
+                const browserOptions = browserConstructorCall[2];
+                const selectorHandler = browserOptions.selectorHandler;
+
+                selectorHandler(mockTarget);
+
+                expect(customHandler).toHaveBeenCalledWith(mockTarget);
+                expect(kernel.plugins.image.modalInit).not.toHaveBeenCalled();
+            });
+        });
+
+        describe('without custom onSelectfunction', () => {
+            it('should use default image creation when no custom handler', () => {
+                const mockTarget = {
+                    getAttribute: jest.fn((attr) => {
+                        if (attr === 'data-name') return 'test-image.jpg';
+                        if (attr === 'data-command') return '/path/to/image.jpg';
+                        return '';
+                    }),
+                    alt: 'Test image'
+                };
+
+                imageGallery.open();
+
+                // Get the selectorHandler from Browser constructor
+                const browserConstructorCall = require('../../../../src/modules/contract').Browser.mock.calls[0];
+                const browserOptions = browserConstructorCall[2];
+                const selectorHandler = browserOptions.selectorHandler;
+
+                selectorHandler(mockTarget);
+
+                expect(kernel.plugins.image.modalInit).toHaveBeenCalled();
+                expect(kernel.plugins.image.create).toHaveBeenCalledWith(
+                    '/path/to/image.jpg',
+                    null,
+                    '100%',
+                    '',
+                    'none',
+                    { name: 'test-image.jpg', size: 0 },
+                    'Test image',
+                    true
+                );
+            });
+        });
+    });
+
+    describe('Browser integration', () => {
+        it('should create Browser with correct options', () => {
+            const { Browser } = require('../../../../src/modules/contract');
+            const constructorCall = Browser.mock.calls[0];
+
+            expect(constructorCall[0]).toBe(imageGallery); // instance
+            expect(constructorCall[2]).toMatchObject({
+                title: 'Image Gallery',
+                columnSize: 4,
+                className: 'se-image-gallery'
+            });
+            expect(constructorCall[2].selectorHandler).toBeInstanceOf(Function);
+        });
+
+        it('should pass plugin options to Browser', () => {
+            const pluginOptions = {
+                data: [{ url: '/test.jpg' }],
+                url: '/api/test',
+                headers: { 'Test-Header': 'test' }
+            };
+
+            new ImageGallery(kernel, pluginOptions);
+
+            const { Browser } = require('../../../../src/modules/contract');
+            const lastCall = Browser.mock.calls[Browser.mock.calls.length - 1];
+            const browserOptions = lastCall[2];
+
+            expect(browserOptions.data).toEqual(pluginOptions.data);
+            expect(browserOptions.url).toBe(pluginOptions.url);
+            expect(browserOptions.headers).toEqual(pluginOptions.headers);
+        });
+    });
+
+    describe('Error handling', () => {
+        it('should handle missing plugin options gracefully', () => {
+            expect(() => {
+                new ImageGallery(kernel, {});
+            }).not.toThrow();
+        });
+
+        it('should handle missing image plugin gracefully', () => {
+            kernel.plugins.image = {
+                pluginOptions: {
+                    defaultWidth: 'auto',
+                    defaultHeight: 'auto'
+                }
+            };
+
+            expect(() => {
+                new ImageGallery(kernel, {});
+            }).not.toThrow();
+        });
+
+        it('should handle item selection with missing data attributes', () => {
+            const mockTarget = {
+                getAttribute: jest.fn().mockReturnValue(null),
+                alt: 'Test image'
+            };
+
+            imageGallery.open();
+
+            const { Browser } = require('../../../../src/modules/contract');
+            const browserOptions = Browser.mock.calls[0][2];
+            const selectorHandler = browserOptions.selectorHandler;
+
+            expect(() => {
+                selectorHandler(mockTarget);
+            }).not.toThrow();
+
+            expect(kernel.plugins.image.create).toHaveBeenCalledWith(
+                null, null, '100%', '', 'none',
+                { name: null, size: 0 }, 'Test image', true
+            );
+        });
+    });
+});

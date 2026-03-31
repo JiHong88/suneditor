@@ -1,0 +1,344 @@
+import ApiManager from './ApiManager';
+
+/**
+ * @typedef {Object} FileManagerParams
+ * @property {string} query The query selector used to find file elements in the editor
+ * @property {string} loadEventName Event name for file load (e.g., `'onImageLoad'`)
+ * @property {string} actionEventName Event name for file action (e.g., `'onImageAction'`)
+ */
+
+/**
+ * @class
+ * @description This module manages the file information of the editor.
+ */
+class FileManager {
+	#$;
+
+	/**
+	 * @constructor
+	 * @param {*} inst The instance object that called the constructor.
+	 * @param {SunEditor.Deps} $ Kernel dependencies
+	 * @param {FileManagerParams} params FileManager options
+	 */
+	constructor(inst, $, params) {
+		this.#$ = $;
+
+		// members
+		inst.__fileManagement = this;
+		this.kind = inst.constructor.key || inst.constructor.name;
+		this.inst = inst;
+		this.query = params.query;
+		this.loadEventName = params.loadEventName;
+		this.actionEventName = params.actionEventName;
+		this.infoList = [];
+		this.infoIndex = 0;
+		this.uploadFileLength = 0;
+		this.__updateTags = [];
+		// api manager
+		this.apiManager = new ApiManager(this, $);
+
+		// se-ts-ignore - call by editor
+		void this._resetInfo;
+		void this._checkInfo;
+	}
+
+	/**
+	 * @description Upload the file to the server.
+	 * @param {string} uploadUrl Upload server url
+	 * @param {?Object<string, string>} uploadHeader Request header
+	 * @param {FileList|File[]|{formData: FormData, size: number}} data FormData in body or Files array
+	 * @param {?(xmlHttp: XMLHttpRequest) => boolean} [callBack] Success call back function
+	 * @param {?(res: *, xmlHttp: XMLHttpRequest) => string} [errorCallBack] Error call back function
+	 * @example
+	 * // Upload with a File array
+	 * const files = [new File(['content'], 'photo.jpg', { type: 'image/jpeg' })];
+	 * fileManager.upload('/api/upload', { Authorization: 'Bearer token' }, files, onSuccess, onError);
+	 *
+	 * // Upload with a pre-built FormData
+	 * const formData = new FormData();
+	 * formData.append('file-0', myFile);
+	 * fileManager.upload('/api/upload', null, { formData, size: 1 }, onSuccess, onError);
+	 */
+	upload(uploadUrl, uploadHeader, data, callBack, errorCallBack) {
+		this.#$.ui.showLoading();
+
+		let formData = null;
+		// create formData
+		if ('length' in data) {
+			formData = new FormData();
+			for (let i = 0, len = data.length; i < len; i++) {
+				formData.append('file-' + i, data[i]);
+			}
+			this.uploadFileLength = data.length;
+		} else {
+			formData = data.formData;
+			this.uploadFileLength = data.size;
+		}
+
+		this.apiManager.call({ method: 'POST', url: uploadUrl, headers: uploadHeader, data: formData, callBack, errorCallBack });
+	}
+
+	/**
+	 * @description Upload the file to the server.
+	 * @param {string} uploadUrl Upload server url
+	 * @param {?Object<string, string>} uploadHeader Request header
+	 * @param {FileList|File[]|{formData: FormData, size: number}} data FormData in body or Files array
+	 * @returns {Promise<XMLHttpRequest>}
+	 * @example
+	 * const files = [new File(['content'], 'photo.jpg')];
+	 * const xmlHttp = await fileManager.asyncUpload('/api/upload', { Authorization: 'Bearer token' }, files);
+	 * const response = JSON.parse(xmlHttp.responseText);
+	 */
+	async asyncUpload(uploadUrl, uploadHeader, data) {
+		this.#$.ui.showLoading();
+
+		let formData = null;
+		// create formData
+		if ('length' in data) {
+			formData = new FormData();
+			for (let i = 0, len = data.length; i < len; i++) {
+				formData.append('file-' + i, data[i]);
+			}
+			this.uploadFileLength = data.length;
+		} else {
+			formData = data.formData;
+			this.uploadFileLength = data.size;
+		}
+
+		return await this.apiManager.asyncCall({ method: 'POST', url: uploadUrl, headers: uploadHeader, data: formData });
+	}
+
+	/**
+	 * @description Set the file information to the element.
+	 * @param {Node} element File information element
+	 * @param {Object} params
+	 * @param {string} params.name File name
+	 * @param {number} params.size File size
+	 * @returns
+	 * @example
+	 * const imgElement = document.createElement('img');
+	 * imgElement.src = 'https://example.com/photo.jpg';
+	 * fileManager.setFileData(imgElement, { name: 'photo.jpg', size: 2048 });
+	 */
+	setFileData(element, { name, size }) {
+		if (!element) return;
+		/** @type {Element} */ (element).setAttribute('data-se-file-name', name);
+		/** @type {Element} */ (element).setAttribute('data-se-file-size', size + '');
+	}
+
+	/**
+	 * @description Gets the sum of the sizes of the currently saved files.
+	 * @returns {number} Size
+	 */
+	getSize() {
+		let size = 0;
+		for (let i = 0, len = this.infoList.length; i < len; i++) {
+			size += this.infoList[i].size * 1;
+		}
+		return size;
+	}
+
+	/**
+	 * @internal
+	 * @description Checke the file's information and modify the tag that does not fit the format.
+	 * @param {boolean} loaded Whether the editor is loaded
+	 */
+	_checkInfo(loaded) {
+		const tags = [].slice.call(this.#$.frameContext.get('wysiwyg').querySelectorAll(this.query));
+		const infoList = this.infoList;
+		if (tags.length === infoList.length) {
+			// reset
+			let infoUpdate = false;
+			for (let i = 0, len = infoList.length, info; i < len; i++) {
+				info = infoList[i];
+				if (
+					tags.filter(function (t) {
+						return info.src === t.src && info.index.toString() === GetAttr(t, 'index');
+					}).length === 0
+				) {
+					infoUpdate = true;
+					break;
+				}
+			}
+			// pass
+			if (!infoUpdate) return;
+		}
+
+		// check
+		const currentTags = [];
+		const infoIndex = [];
+		for (let i = 0, len = infoList.length; i < len; i++) {
+			infoIndex[i] = infoList[i].index;
+		}
+
+		this.__updateTags = tags;
+
+		while (tags.length > 0) {
+			const tag = tags.shift();
+			if (!GetAttr(tag, 'index') || !infoIndex.includes(Number(GetAttr(tag, 'index')))) {
+				currentTags.push(this.infoIndex);
+				tag.removeAttribute('data-se-index');
+				this.#setInfo(tag, null);
+			} else {
+				currentTags.push(Number(GetAttr(tag, 'index')));
+			}
+		}
+
+		// editor load
+		if (loaded && this.loadEventName) {
+			this.#$.eventManager.triggerEvent(this.loadEventName, { infoList });
+			return;
+		}
+
+		for (let i = 0, dataIndex; i < infoList.length; i++) {
+			dataIndex = infoList[i].index;
+			if (currentTags.includes(dataIndex)) continue;
+
+			infoList.splice(i, 1);
+
+			const params = { element: null, index: dataIndex, state: 'delete', info: null, remainingFilesCount: 0, pluginName: this.kind };
+			if (this.actionEventName) {
+				this.#$.eventManager.triggerEvent(this.actionEventName, params);
+			}
+			this.#$.eventManager.triggerEvent('onFileManagerAction', { ...params, pluginName: this.kind });
+
+			i--;
+		}
+	}
+
+	/**
+	 * @internal
+	 * @description Reset info object and `infoList = []`, `infoIndex = 0`
+	 */
+	_resetInfo() {
+		const params = { element: null, state: 'delete', info: null, remainingFilesCount: 0, pluginName: this.kind };
+		for (let i = 0, len = this.infoList.length; i < len; i++) {
+			if (this.actionEventName) {
+				this.#$.eventManager.triggerEvent(this.actionEventName, { ...params, index: this.infoList[i].index, pluginName: this.kind });
+			}
+			this.#$.eventManager.triggerEvent('onFileManagerAction', { ...params, index: this.infoList[i].index, pluginName: this.kind });
+		}
+
+		this.infoList = [];
+		this.infoIndex = 0;
+	}
+
+	/**
+	 * @description Delete info object at `infoList`
+	 * @param {number} index index of info object infoList[].index)
+	 */
+	#deleteInfo(index) {
+		if (index >= 0) {
+			for (let i = 0, len = this.infoList.length; i < len; i++) {
+				if (index === this.infoList[i].index) {
+					this.infoList.splice(i, 1);
+					if (this.actionEventName) {
+						this.#$.eventManager.triggerEvent(this.actionEventName, { element: null, index, state: 'delete', info: null, remainingFilesCount: 0, pluginName: this.kind });
+					}
+					return;
+				}
+			}
+		}
+	}
+
+	/**
+	 * @description Create info object of file and add it to `infoList`
+	 * @param {HTMLMediaElement} element
+	 * @param {{name: string, size: number}|null} file File information
+	 */
+	#setInfo(element, file) {
+		let dataIndex = Number(GetAttr(element, 'index'));
+		let info = null;
+		let state = '';
+
+		file ||= {
+			name: GetAttr(element, 'file-name') || (typeof element.src === 'string' ? element.src.split('/').pop() : ''),
+			size: Number(GetAttr(element, 'file-size')) || 0,
+		};
+
+		// create
+		if (!dataIndex || !this.#$.store._editorInitFinished) {
+			state = 'create';
+			dataIndex = this.infoIndex++;
+
+			element.setAttribute('data-se-index', dataIndex + '');
+			element.setAttribute('data-se-file-name', file.name);
+			element.setAttribute('data-se-file-size', file.size + '');
+
+			info = {
+				src: element.src,
+				index: dataIndex,
+				name: file.name,
+				size: file.size,
+			};
+
+			this.infoList.push(info);
+		} else {
+			// update
+			state = 'update';
+			dataIndex *= 1;
+
+			for (let i = 0, len = this.infoList.length; i < len; i++) {
+				if (dataIndex === this.infoList[i].index) {
+					info = this.infoList[i];
+					break;
+				}
+			}
+
+			if (!info) {
+				dataIndex = this.infoIndex++;
+				info = {
+					index: dataIndex,
+				};
+				this.infoList.push(info);
+			}
+
+			info.src = element.src;
+			info.name = GetAttr(element, 'file-name');
+			info.size = Number(GetAttr(element, 'file-size'));
+		}
+
+		// method bind
+		info.element = element;
+
+		info.delete = function (deleteCallback, el) {
+			this.inst.componentDestroy?.(el);
+			deleteCallback(Number(GetAttr(el, 'index')));
+		}.bind(this, this.#deleteInfo.bind(this), element);
+
+		info.select = function (component, el) {
+			el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+			const comp = component.get(el);
+			if (comp) {
+				component.select(comp.target, comp.pluginName);
+			} else {
+				this.inst.componentSelect?.(el);
+			}
+		}.bind(this, this.#$.component, element);
+
+		const params = { element, index: dataIndex, state, info, remainingFilesCount: --this.uploadFileLength < 0 ? 0 : this.uploadFileLength, pluginName: this.kind };
+		if (this.actionEventName) {
+			this.#$.eventManager.triggerEvent(this.actionEventName, params);
+		}
+		this.#$.eventManager.triggerEvent('onFileManagerAction', { ...params, pluginName: this.kind });
+	}
+}
+
+/**
+ * @param {Element} element - Element
+ * @param {string} name - Attribute name
+ * @returns {string|null}
+ */
+function GetAttr(element, name) {
+	const seAttr = element.getAttribute(`data-se-${name}`);
+	if (seAttr) return seAttr;
+
+	// v2-migration
+	const v2SeAttr = element.getAttribute(`data-${name}`);
+	if (!v2SeAttr) return null;
+	element.removeAttribute(`data-${name}`);
+	element.setAttribute(`data-se-${name}`, v2SeAttr);
+	return v2SeAttr;
+}
+
+export default FileManager;

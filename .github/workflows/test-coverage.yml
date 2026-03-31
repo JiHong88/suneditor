@@ -1,0 +1,81 @@
+name: Test & Coverage
+
+on:
+    push:
+        branches: [master, develop]
+        paths-ignore:
+            - '**/*.md'
+            - '**/*.css'
+            - 'docs/**'
+            - '.github/**'
+            - 'guide/**'
+            - 'scripts/**'
+            - 'webpack/**'
+            - 'src/assets/**'
+            - 'src/themes/**'
+            - 'test/dev/**'
+            - '.barrelsby.json'
+            - '.dependency-cruiser.js'
+            - '.editorconfig'
+            - '.gitattributes'
+            - '.gitignore'
+            - '.prettierrc'
+            - 'codecov.yml'
+            - 'eslint.config.mjs'
+            - 'playwright.config.js'
+            - 'LICENSE.txt'
+    pull_request:
+        branches: [master, develop]
+        paths-ignore:
+            - '**/*.md'
+            - '**/*.css'
+            - 'docs/**'
+            - '.github/**'
+            - 'guide/**'
+            - 'scripts/**'
+            - 'webpack/**'
+            - 'src/assets/**'
+            - 'src/themes/**'
+            - 'test/dev/**'
+            - '.barrelsby.json'
+            - '.dependency-cruiser.js'
+            - '.editorconfig'
+            - '.gitattributes'
+            - '.gitignore'
+            - '.prettierrc'
+            - 'codecov.yml'
+            - 'eslint.config.mjs'
+            - 'playwright.config.js'
+            - 'LICENSE.txt'
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  persist-credentials: false
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '22'
+                  cache: 'npm'
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Lint & Check architecture
+              run: npm run lint
+
+            - name: Run tests with coverage
+              run: npm run test:coverage
+
+            - name: Upload coverage to Codecov
+              if: always()
+              uses: codecov/codecov-action@v5
+              with:
+                  token: ${{ secrets.CODECOV_TOKEN }}
+                  fail_ci_if_error: false

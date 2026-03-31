@@ -1,0 +1,4517 @@
+@import url('design/index.css');
+
+/** --- suneditor main */
+.sun-editor {
+	width: auto;
+	height: auto;
+	box-sizing: border-box;
+	font-family: var(--se-main-font-family);
+	border: 1px solid var(--se-main-out-color);
+	background-color: var(--se-main-background-color);
+	color: var(--se-main-color);
+	font-size: var(--se-main-font-size);
+}
+
+.sun-editor * {
+	box-sizing: border-box;
+	overflow: visible;
+}
+
+.sun-editor-common body,
+.sun-editor-common div,
+.sun-editor-common dl,
+.sun-editor-common dt,
+.sun-editor-common dd,
+.sun-editor-common ul,
+.sun-editor-common ol,
+.sun-editor-common li,
+.sun-editor-common h1,
+.sun-editor-common h2,
+.sun-editor-common h3,
+.sun-editor-common h4,
+.sun-editor-common h5,
+.sun-editor-common h6,
+.sun-editor-common pre,
+.sun-editor-common code,
+.sun-editor-common form,
+.sun-editor-common fieldset,
+.sun-editor-common legend,
+.sun-editor-common p,
+.sun-editor-common blockquote,
+.sun-editor-common th,
+.sun-editor-common td,
+.sun-editor-common input,
+.sun-editor-common select,
+.sun-editor-common textarea,
+.sun-editor-common button {
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+.sun-editor-common input,
+.sun-editor-common select,
+.sun-editor-common textarea {
+	background-color: inherit;
+}
+
+.sun-editor-common dl,
+.sun-editor-common ul,
+.sun-editor-common ol,
+.sun-editor-common menu {
+	list-style: none;
+}
+
+.sun-editor-common hr {
+	margin: 6px 0 6px 0 !important;
+}
+
+.sun-editor textarea {
+	resize: none;
+	border: 0;
+	padding: 0;
+}
+
+.sun-editor button {
+	border: 0 none;
+	background-color: transparent;
+	touch-action: manipulation;
+	cursor: pointer;
+	outline: none;
+}
+
+.sun-editor input,
+.sun-editor select,
+.sun-editor textarea,
+.sun-editor button {
+	vertical-align: middle;
+}
+
+.sun-editor button span {
+	display: block;
+	margin: 0;
+	padding: 0;
+}
+
+.sun-editor button .se-txt {
+	display: block;
+	margin-top: 0;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	line-height: 2;
+	max-height: 24px;
+}
+
+/** --- se-type-document ---------------------------------------------------------- */
+.sun-editor .se-wrapper.se-type-document {
+	padding: clamp(var(--se-doc-min-padding), var(--se-doc-min-padding) + calc(var(--se-doc-padding-factor) * 1vw), var(--se-doc-max-padding));
+	background-color: var(--se-doc-background);
+	box-shadow: inset 0 4px 4px rgba(0, 0, 0, 0.1);
+}
+.sun-editor .se-wrapper.se-type-document > .se-wrapper-inner {
+	box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+/* se-type-document - header */
+.sun-editor .se-wrapper.se-type-document .se-document-lines {
+	width: var(--se-doc-info-width);
+	min-width: var(--se-doc-info-min-width);
+	font-size: var(--se-doc-info-font-size);
+	overflow-y: auto;
+	overflow-x: hidden;
+	background-color: transparent;
+	z-index: 1;
+}
+.sun-editor .se-wrapper.se-type-document .se-document-lines.se-document-responsible {
+	min-width: unset !important;
+}
+
+.sun-editor .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner {
+	padding: var(--se-doc-info-inner-padding);
+	padding-right: var(--se-doc-info-inner-line-padding);
+}
+.sun-editor .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner > div.se-doc-item {
+	color: var(--se-doc-info-font-color);
+	width: 100%;
+	padding: var(--se-doc-info-inner-line-padding);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: inline-block;
+	cursor: pointer;
+}
+.sun-editor .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner > div.se-doc-item:hover {
+	text-decoration: underline;
+}
+.sun-editor .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner > div.se-doc-item.active {
+	color: var(--se-doc-info-active-color);
+}
+
+.sun-editor .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner > div.se-doc-h1 {
+	font-weight: var(--se-doc-info-inner-line-weight-h1);
+	padding-left: var(--se-doc-info-inner-line-indent-h1);
+}
+.sun-editor .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner > div.se-doc-h2 {
+	font-weight: var(--se-doc-info-inner-line-weight-h2);
+	padding-left: var(--se-doc-info-inner-line-indent-h2);
+}
+.sun-editor .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner > div.se-doc-h3 {
+	font-weight: var(--se-doc-info-inner-line-weight-h3);
+	padding-left: var(--se-doc-info-inner-line-indent-h3);
+}
+.sun-editor .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner > div.se-doc-h4 {
+	font-weight: var(--se-doc-info-inner-line-weight-h4);
+	padding-left: var(--se-doc-info-inner-line-indent-h4);
+}
+.sun-editor .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner > div.se-doc-h5 {
+	font-weight: var(--se-doc-info-inner-line-weight-h5);
+	padding-left: var(--se-doc-info-inner-line-indent-h5);
+}
+.sun-editor .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner > div.se-doc-h6 {
+	font-weight: var(--se-doc-info-inner-line-weight-h6);
+	padding-left: var(--se-doc-info-inner-line-indent-h6);
+}
+/* se-type-document - page */
+.sun-editor .se-wrapper.se-type-document .se-document-page {
+	position: relative;
+	text-align: center;
+	pointer-events: none;
+}
+
+.sun-editor .se-wrapper.se-type-document .se-document-page > div {
+	position: absolute;
+	width: var(--se-doc-info-page-width);
+	color: var(--se-doc-info-page-font-color);
+	background-color: var(--se-doc-info-page-background-color);
+	font-size: inherit;
+	left: 0px;
+	padding: 1px 0;
+	margin-left: 1px;
+}
+.sun-editor .se-wrapper.se-type-document .se-document-page > div > div.se-document-page-line {
+	position: absolute;
+	display: block;
+	height: 0px;
+	border-bottom: 1px dashed var(--se-doc-info-page-background-color);
+	top: 0px;
+	right: 100%;
+}
+
+/* se-type-document - placeholder position set */
+.sun-editor .se-wrapper.se-type-document .se-placeholder {
+	top: clamp(var(--se-doc-min-padding));
+	left: clamp(var(--se-doc-min-padding));
+	right: clamp(var(--se-doc-min-padding));
+	padding: var(--se-edit-inner-padding-doc-type);
+}
+.sun-editor .se-wrapper.se-type-document.se-type-document-header .se-placeholder {
+	margin-left: max(var(--se-doc-info-min-width), var(--se-doc-info-width));
+	margin-right: max(var(--se-doc-info-min-width), var(--se-doc-info-width));
+}
+/** --- se-type-document end ---------------------------------------------------------- */
+
+.sun-editor .se-wrapper .se-code-viewer-mirror,
+.sun-editor .se-wrapper .cm-editor,
+.sun-editor .se-wrapper .CodeMirror {
+	font-size: var(--se-main-font-size);
+}
+
+/* button children are pointer event none */
+.sun-editor button * {
+	pointer-events: none;
+	backface-visibility: hidden;
+	-webkit-backface-visibility: hidden;
+	-moz-backface-visibility: hidden;
+}
+
+/** button */
+.sun-editor button {
+	color: var(--se-main-color);
+}
+
+/** --- se buttons ---------------------------------------------------------- */
+/** --- se-btn */
+.sun-editor .se-btn {
+	float: left;
+	width: var(--se-input-btn-size);
+	height: var(--se-input-btn-size);
+	margin: 1px;
+	padding: 0;
+	font-size: var(--se-btn-font-size);
+	line-height: 1.8;
+	border-width: 0;
+	border-style: solid;
+	border-color: var(--se-input-btn-border-color);
+	border-radius: var(--se-border-radius);
+	transition:
+		border-color 0.3s ease,
+		background-color 0.3s ease,
+		color 0.3s ease;
+}
+
+.sun-editor .se-form-group button.se-btn {
+	border-width: 1px;
+}
+
+.sun-editor .se-btn:not(.on):not(.active):enabled:hover,
+.sun-editor .se-btn:not(.on):not(.active):enabled:focus {
+	color: var(--se-hover-color);
+	background-color: var(--se-hover-light-color);
+	border-color: var(--se-hover-dark-color);
+}
+
+.sun-editor .se-btn:not(.on):not(.active):enabled:active,
+.sun-editor .se-btn:not(.on):not(.active):enabled.__se__active {
+	background-color: var(--se-hover-light2-color);
+	border-color: var(--se-hover-dark2-color) !important;
+	outline: 1px solid var(--se-hover-dark3-color) !important;
+	box-shadow: 0 0 0 0.3rem var(--se-hover-light2-color);
+	transition: box-shadow 0.1s ease-in-out;
+}
+
+/*  after, before button : hover */
+.sun-editor .se-menu-list li:hover .se-side-btn-a:not(.on):not(.active):enabled,
+.sun-editor .se-menu-list li:hover .se-side-btn-b:not(.on):not(.active):enabled,
+.sun-editor .se-menu-list li:hover .se-side-btn-after:not(.on):not(.active):enabled,
+.sun-editor .se-menu-list li:hover .se-side-btn-before:not(.on):not(.active):enabled,
+.sun-editor .se-menu-list li:hover .se-btn-input input:enabled {
+	border-width: 1px;
+	border-style: solid;
+	border-color: var(--se-hover-dark-color);
+}
+
+/* after, before button - on, active */
+.sun-editor .se-menu-list li .se-side-btn-after.on:enabled,
+.sun-editor .se-menu-list li .se-side-btn-before.on:enabled,
+.sun-editor .se-menu-list li .se-side-btn-after.active:enabled,
+.sun-editor .se-menu-list li .se-side-btn-before.active:enabled,
+.sun-editor .se-menu-list li .se-btn-input.on input:enabled,
+.sun-editor .se-menu-list li .se-btn-input.active input:enabled {
+	border-color: var(--se-active-dark3-color);
+}
+
+/* after, before button : hover - on, active - border */
+.sun-editor .se-menu-list li .se-side-btn-after.on:enabled,
+.sun-editor .se-menu-list li .se-side-btn-after.active:enabled {
+	border-right: 0;
+	border-left: 1px solid;
+}
+.sun-editor .se-menu-list li .se-side-btn-before.on:enabled,
+.sun-editor .se-menu-list li .se-side-btn-before.active:enabled {
+	border-left: 0;
+	border-right: 1px solid;
+}
+.sun-editor .se-menu-list li .se-btn-input.on input:enabled,
+.sun-editor .se-menu-list li .se-btn-input.active input:enabled {
+	border-width: 1px;
+	border-style: solid;
+}
+
+/* after, before button : hover - on, active */
+.sun-editor .se-menu-list li:hover .se-side-btn-after.on:enabled,
+.sun-editor .se-menu-list li:hover .se-side-btn-before.on:enabled,
+.sun-editor .se-menu-list li:hover .se-side-btn-after.active:enabled,
+.sun-editor .se-menu-list li:hover .se-side-btn-before.active:enabled,
+.sun-editor .se-menu-list li:hover .se-btn-input.on input:enabled,
+.sun-editor .se-menu-list li:hover .se-btn-input.active input:enabled {
+	border-color: var(--se-active-dark4-color);
+}
+
+/* se-btn.on */
+.sun-editor .se-btn:enabled.on {
+	background-color: var(--se-active-light2-color);
+	color: var(--se-active-dark3-color);
+	border-color: var(--se-active-light5-color);
+}
+
+.sun-editor .se-btn:enabled.on:hover,
+.sun-editor .se-btn:enabled.on:focus {
+	background-color: var(--se-active-light3-color);
+	color: var(--se-active-hover-color);
+	border-color: var(--se-active-light5-color);
+}
+
+.sun-editor .se-btn:enabled.on:active,
+.sun-editor .se-btn:enabled.on.__se__active {
+	background-color: var(--se-active-light3-color);
+	color: var(--se-active-color);
+	border-color: var(--se-active-light3-color) !important;
+	outline: 1px solid var(--se-active-color) !important;
+	color: 1px solid var(--se-active-color);
+	box-shadow: 0 0 0 0.3rem var(--se-active-light3-color);
+	transition: box-shadow 0.1s ease-in-out;
+}
+
+/* se-btn.active */
+.sun-editor .se-btn:enabled.active {
+	background-color: var(--se-active-light4-color);
+	color: var(--se-active-dark3-color);
+	border-color: var(--se-active-dark-color);
+}
+
+.sun-editor .se-btn:enabled.active:hover,
+.sun-editor .se-btn:enabled.active:focus {
+	background-color: var(--se-active-light5-color);
+	color: var(--se-active-hover-color);
+	border-color: var(--se-active-dark4-color);
+}
+
+.sun-editor .se-btn:enabled.active:active,
+.sun-editor .se-btn:enabled.active.__se__active {
+	background-color: var(--se-active-light5-color);
+	color: var(--se-active-hover-color);
+	border-color: var(--se-active-dark5-color) !important;
+	outline: 1px solid var(--se-active-dark5-color) !important;
+	box-shadow: 0 0 0 0.3rem var(--se-active-light5-color);
+	transition: box-shadow 0.1s ease-in-out;
+	z-index: 1;
+}
+
+/** --- primary button */
+.sun-editor .se-btn-primary {
+	background-color: var(--se-active-light2-color);
+	border: 1px solid var(--se-active-dark5-color);
+	border-radius: var(--se-border-radius);
+	outline: 0 none;
+	transition:
+		border-color 0.3s ease,
+		background-color 0.3s ease,
+		color 0.3s ease;
+}
+
+.sun-editor .se-btn-primary:hover,
+.sun-editor .se-btn-primary:focus {
+	background-color: var(--se-active-light5-color);
+}
+
+.sun-editor .se-btn-primary:active,
+.sun-editor .se-btn-primary.__se__active {
+	background-color: var(--se-active-light2-color);
+	border-color: var(--se-active-light2-color) !important;
+	outline: 1px solid var(--se-active-dark5-color) !important;
+	box-shadow: 0 0 0 0.3rem var(--se-active-light2-color);
+	transition: box-shadow 0.1s ease-in-out;
+}
+
+/* --- se-btn.success */
+.sun-editor .se-btn.se-btn-success {
+	color: var(--se-success-color);
+	border-color: var(--se-success-light5-color);
+}
+
+.sun-editor .se-btn.se-btn-success:not(.on):not(.active):enabled:hover,
+.sun-editor .se-btn.se-btn-success:not(.on):not(.active):enabled:focus {
+	background-color: var(--se-success-light-color);
+	border-color: var(--se-success-light5-color);
+}
+.sun-editor .se-btn.se-btn-success:not(.on):not(.active):enabled:active,
+.sun-editor .se-btn.se-btn-success:not(.on):not(.active):enabled.__se__active {
+	background-color: var(--se-success-light-color);
+	border-color: var(--se-success-light-color) !important;
+	outline: 1px solid var(--se-success-light5-color) !important;
+	box-shadow: 0 0 0 0.3rem var(--se-success-light-color);
+	transition: box-shadow 0.1s ease-in-out;
+}
+
+/* se-btn.success.on */
+.sun-editor .se-btn.se-btn-success:enabled.on {
+	background-color: var(--se-success-light-color);
+	color: var(--se-success-color);
+	border-color: var(--se-success-light5-color);
+}
+
+.sun-editor .se-btn.se-btn-success:enabled.on:hover,
+.sun-editor .se-btn.se-btn-success:enabled.on:focus {
+	background-color: var(--se-success-light2-color);
+	color: var(--se-success-color);
+	border-color: var(--se-success-light4-color);
+}
+
+.sun-editor .se-btn.se-btn-success:enabled.on:active,
+.sun-editor .se-btn.se-btn-success:enabled.on.__se__active {
+	background-color: var(--se-success-light2-color);
+	color: var(--se-success-color);
+	border-color: var(--se-success-light2-color) !important;
+	outline: 1px solid var(--se-success-dark-color) !important;
+	color: 1px solid var(--se-success-color);
+	box-shadow: 0 0 0 0.3rem var(--se-success-light2-color);
+	transition: box-shadow 0.1s ease-in-out;
+}
+
+/* se-btn.success.active */
+.sun-editor .se-btn.se-btn-success:enabled.active {
+	background-color: var(--se-success-light2-color);
+	color: var(--se-success-color);
+	border-color: var(--se-success-dark2-color);
+}
+
+.sun-editor .se-btn.se-btn-success:enabled.active:hover,
+.sun-editor .se-btn.se-btn-success:enabled.active:focus {
+	background-color: var(--se-success-light3-color);
+	color: var(--se-success-dark3-color);
+	border-color: var(--se-success-dark2-color);
+}
+
+.sun-editor .se-btn.se-btn-success:enabled.active:active,
+.sun-editor .se-btn.se-btn-success:enabled.active.__se__active {
+	background-color: var(--se-success-light3-color);
+	color: var(--se-success-dark3-color);
+	border-color: var(--se-success-light3-color) !important;
+	outline: 1px solid var(--se-success-dark2-color) !important;
+	box-shadow: 0 0 0 0.3rem var(--se-success-light3-color);
+	transition: box-shadow 0.1s ease-in-out;
+}
+
+/* --- se-btn.danger */
+.sun-editor .se-btn.se-btn-danger {
+	color: var(--se-error-color);
+	border-color: var(--se-error-dark-color);
+}
+
+.sun-editor .se-btn.se-btn-danger:not(.on):not(.active):enabled:hover,
+.sun-editor .se-btn.se-btn-danger:not(.on):not(.active):enabled:focus {
+	background-color: var(--se-error-light5-color);
+	border-color: var(--se-error-dark-color);
+}
+
+.sun-editor .se-btn.se-btn-danger:not(.on):not(.active):enabled:active,
+.sun-editor .se-btn.se-btn-danger:not(.on):not(.active):enabled.__se__active {
+	background-color: var(--se-error-light5-color);
+	border-color: var(--se-error-light5-color) !important;
+	outline: 1px solid var(--se-error-dark-color) !important;
+	box-shadow: 0 0 0 0.3rem var(--se-error-light5-color);
+	transition: box-shadow 0.1s ease-in-out;
+}
+
+/* se-btn.danger.on */
+.sun-editor .se-btn.se-btn-danger:enabled.on {
+	background-color: var(--se-error-light5-color);
+	color: var(--se-error-color);
+	border-color: var(--se-error-dark-color);
+}
+
+.sun-editor .se-btn.se-btn-danger:enabled.on:hover,
+.sun-editor .se-btn.se-btn-danger:enabled.on:focus {
+	background-color: var(--se-error-light4-color);
+	color: var(--se-error-color);
+	border-color: var(--se-error-dark-color);
+}
+
+.sun-editor .se-btn.se-btn-danger:enabled.on:active,
+.sun-editor .se-btn.se-btn-danger:enabled.on.__se__active {
+	background-color: var(--se-error-light-color);
+	color: var(--se-error-color);
+	border-color: var(--se-error-light-color) !important;
+	outline: 1px solid var(--se-error-dark3-color) !important;
+	box-shadow: 0 0 0 0.3rem var(--se-error-light4-color);
+	transition: box-shadow 0.1s ease-in-out;
+}
+
+/* se-btn.danger.active */
+.sun-editor .se-btn.se-btn-danger:enabled.active {
+	background-color: var(--se-error-light4-color);
+	color: var(--se-error-color);
+	border-color: var(--se-error-dark3-color);
+}
+
+.sun-editor .se-btn.se-btn-danger:enabled.active:hover,
+.sun-editor .se-btn.se-btn-danger:enabled.active:focus {
+	background-color: var(--se-error-light-color);
+	color: var(--se-error-color);
+	border-color: var(--se-error-dark3-color);
+}
+
+.sun-editor .se-btn.se-btn-danger:enabled.active:active,
+.sun-editor .se-btn.se-btn-danger:enabled.active.__se__active {
+	background-color: var(--se-error-light-color);
+	color: var(--se-error-color);
+	border-color: var(--se-error-light-color) !important;
+	outline: 1px solid var(--se-error-dark3-color) !important;
+	box-shadow: 0 0 0 0.3rem var(--se-error-light-color);
+	transition: box-shadow 0.1s ease-in-out;
+}
+
+/** --- Input */
+.sun-editor input,
+.sun-editor select,
+.sun-editor textarea {
+	color: var(--se-main-color);
+	border: 1px solid var(--se-input-btn-border-color);
+	border-radius: var(--se-border-radius);
+}
+
+/* disabled buttons, icon blur */
+.sun-editor .se-btn:disabled,
+.sun-editor button:disabled,
+.sun-editor input:disabled {
+	cursor: default;
+	color: var(--se-input-btn-disabled-color);
+}
+
+/* dropdown layer - list button */
+.sun-editor .se-btn-list {
+	width: 100%;
+	height: auto;
+	min-height: 32px;
+	padding: 0 14px;
+	cursor: pointer;
+	font-size: var(--se-btn-font-size);
+	line-height: normal;
+	text-indent: 0;
+	text-decoration: none;
+	text-align: left;
+}
+
+.sun-editor .se-btn-list.default_value {
+	border: 1px dashed var(--se-main-outline-color);
+}
+
+.sun-editor .se-sub-list:has(:not([style*='display: none'])) {
+	font-size: 0.75rem;
+	letter-spacing: 0.25px;
+	color: color-mix(in srgb, currentColor 45%, transparent);
+	padding: 14px 14px 3px 14px;
+	cursor: auto;
+}
+
+.sun-editor .se-sub-list:has(:not([style*='display: none'])) {
+	border-bottom: 1px dashed var(--se-main-outline-color);
+}
+
+/* page navigator */
+.sun-editor .se-btn.se-btn-tool-pageNavigator > input {
+	width: var(--se-input-btn-size);
+	text-align: center;
+	color: var(--se-main-color-lighter);
+}
+.sun-editor .se-btn.se-btn-tool-pageNavigator > input[type='number'] {
+	-webkit-appearance: textfield;
+	-moz-appearance: textfield;
+	appearance: textfield;
+}
+.sun-editor .se-btn.se-btn-tool-pageNavigator > input[type='number']::-webkit-inner-spin-button,
+.sun-editor .se-btn.se-btn-tool-pageNavigator > input[type='number']::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	margin: 0;
+}
+.sun-editor .se-btn.se-btn-tool-pageNavigator ~ span {
+	text-align: center;
+	font-size: var(--se-main-font-size);
+	align-content: center;
+	margin-left: -10px;
+}
+.sun-editor .se-btn.se-btn-tool-pageNavigator ~ span::before {
+	content: '/';
+	margin: 0 0.6em;
+}
+
+/** --- Icons ---------------------------------------------------------- */
+/* default svg */
+.sun-editor svg {
+	fill: currentColor;
+	vertical-align: super;
+}
+
+.sun-editor button > svg,
+.sun-editor .se-svg {
+	width: 20px;
+	height: 20px;
+	margin: auto;
+	fill: currentColor;
+	display: block;
+	text-align: center;
+	float: none;
+}
+.sun-editor button > svg.se-ci {
+	width: 15px;
+	height: 15px;
+}
+.sun-editor .se-text-prefix-icon {
+	width: 20px;
+	height: 20px;
+	float: left;
+}
+.sun-editor .se-text-prefix-icon svg {
+	vertical-align: middle;
+}
+
+/* sub button size */
+.sun-editor button.se-sub-arrow-btn {
+	width: 18px;
+}
+.sun-editor button.se-sub-arrow-btn svg {
+	width: 8px;
+}
+.sun-editor button.se-sub-btn {
+	width: 24px;
+}
+.sun-editor button.se-sub-btn svg {
+	width: 12px;
+}
+
+/* side button */
+.sun-editor button.se-side-btn {
+	border-radius: 0;
+	margin-left: 0;
+	margin-right: 0;
+}
+.sun-editor button.se-side-btn-a {
+	float: left;
+	border-radius: var(--se-border-radius) 0 0 var(--se-border-radius);
+	margin-right: 0;
+}
+.sun-editor button.se-side-btn-b {
+	float: left;
+	border-radius: 0 var(--se-border-radius) var(--se-border-radius) 0;
+	margin-left: 0;
+}
+.sun-editor button.se-side-btn-before {
+	float: left;
+	margin-right: 0;
+	border-radius: var(--se-border-radius) 0 0 var(--se-border-radius);
+}
+.sun-editor button.se-side-btn-after {
+	margin-left: 0;
+	border-radius: 0 var(--se-border-radius) var(--se-border-radius) 0;
+}
+
+/* list button icons */
+.sun-editor button.se-btn-list > * li::before {
+	content: '';
+	display: inline-block;
+	width: 18px;
+	height: 13px;
+	background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTE5LDEzSDVWMTFIMTlWMTNaIiBmaWxsPSJibGFjayIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIxIiAvPjwvc3ZnPg==');
+	background-size: cover;
+	opacity: 0.5;
+}
+
+/* se-select-btn icon */
+.sun-editor .se-btn-select > svg {
+	float: right;
+	width: 8px !important;
+	height: 8px !important;
+}
+
+/* se-btn-list inner icon */
+.sun-editor .se-select-item .se-list-icon {
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	margin: 0 6px 6px 0;
+	vertical-align: middle;
+}
+
+/* select menu inner icon */
+.sun-editor .se-btn-list > .se-list-icon {
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	margin: -1px 10px 0 0;
+	vertical-align: middle;
+}
+
+/* icon class */
+.sun-editor button > i::before {
+	-moz-osx-font-smoothing: grayscale;
+	-webkit-font-smoothing: antialiased;
+	display: inline-block;
+	font-style: normal;
+	font-variant: normal;
+	text-rendering: auto;
+	font-size: var(--se-modal-title-font-size);
+	line-height: 2;
+}
+
+.sun-editor button > [class='se-icon-text'] {
+	font-size: 20px;
+	line-height: 1;
+}
+
+/** --- arrow icon ---------------------------------------------------------- */
+.sun-editor .se-arrow,
+.sun-editor .se-arrow::after {
+	position: absolute;
+	display: block;
+	width: 0;
+	height: 0;
+	border: 12px solid transparent;
+	margin-right: 0;
+	margin-left: -12px;
+}
+
+.sun-editor .se-controller .se-arrow {
+	left: 20px;
+	right: auto;
+	margin-left: -12px;
+	margin-right: 0;
+}
+
+/* arrow up */
+.sun-editor .se-arrow.se-arrow-up {
+	top: -12px;
+	border-top-width: 0;
+	border-bottom-color: var(--se-controller-border-color);
+}
+
+.sun-editor .se-arrow.se-arrow-up::after {
+	top: 1px;
+	content: ' ';
+	border-top-width: 0;
+	border-bottom-color: var(--se-main-background-color);
+}
+
+/* arrow down */
+.sun-editor .se-arrow.se-arrow-down {
+	bottom: -12px;
+	border-bottom-width: 0;
+	border-top-color: var(--se-controller-border-color);
+}
+
+.sun-editor .se-arrow.se-arrow-down::after {
+	top: -14px;
+	content: ' ';
+	border-bottom-width: 0;
+	border-top-color: var(--se-controller-background-color);
+}
+
+/** --- container */
+.sun-editor .se-container {
+	position: relative;
+	width: auto;
+	height: auto;
+}
+
+/** --- loading box */
+.sun-editor .se-loading-box {
+	position: fixed;
+	display: none;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	background-color: transparent;
+	z-index: 2147483647;
+}
+
+.sun-editor .se-container .se-loading-box {
+	position: absolute;
+}
+
+.sun-editor .se-loading-box .se-loading-effect {
+	position: absolute;
+	display: block;
+	top: 50%;
+	left: 50%;
+	height: 44px;
+	width: 44px;
+	border: 2px solid transparent;
+	border-top: 2px solid var(--se-loading-color);
+	border-right: 2px solid var(--se-loading-color);
+	border-radius: 50%;
+	-webkit-animation: spinner 0.8s linear infinite;
+	animation: spinner 0.8s linear infinite;
+	margin: -25px 0 0 -25px;
+}
+
+/** --- line breaker --- component - top, bottom */
+.sun-editor .se-line-breaker-component {
+	position: absolute;
+	display: none;
+	width: 24px;
+	height: 24px;
+	color: var(--se-drag-over-color);
+	background-color: var(--se-main-background-color);
+	border: 1px solid var(--se-drag-over-color);
+	opacity: 0.95;
+	border-radius: var(--se-border-radius);
+	cursor: pointer;
+	z-index: 2147483647;
+	transition:
+		opacity 0.3s ease,
+		color 0.3s ease,
+		background-color 0.3s ease;
+}
+.sun-editor .se-line-breaker-component.se-on-selected {
+	color: var(--se-active-color);
+	background-color: var(--se-main-background-color);
+	border: 1px solid var(--se-active-color);
+}
+
+.sun-editor .se-line-breaker-component:hover {
+	opacity: 0.9;
+	color: var(--se-main-background-color);
+	background-color: var(--se-active-dark3-color);
+	border-color: var(--se-active-color);
+}
+
+/** --- toolbar ---------------------------------------------------------- */
+.sun-editor .se-toolbar {
+	display: block;
+	position: sticky;
+	top: 0;
+	height: auto;
+	width: 100%;
+	overflow: visible;
+	padding: 0;
+	margin: 0;
+	background-color: var(--se-main-background-color);
+	outline: 1px solid var(--se-main-divider-color);
+	z-index: 7;
+}
+
+.sun-editor .se-toolbar-shadow {
+	display: block !important;
+	position: relative !important;
+	width: 100% !important;
+	height: 0px !important;
+	overflow: visible !important;
+	visibility: hidden !important;
+	padding: 0 !important;
+	margin: 0 !important;
+	background-color: transparent !important;
+	outline: none !important;
+	border: none !important;
+	z-index: 0 !important;
+}
+
+/* inline toolbar */
+.sun-editor .se-toolbar.se-toolbar-inline {
+	display: none;
+	position: absolute;
+}
+
+/* balloon toolbar */
+.sun-editor .se-toolbar.se-toolbar-balloon {
+	display: none;
+	position: absolute;
+	z-index: 2147483646;
+	width: auto;
+	box-shadow: 0 3px 9px var(--se-shadow-layer-color);
+	-webkit-box-shadow: 0 3px 9px var(--se-shadow-layer-color);
+}
+
+/* JS fallback: initial state — override CSS sticky */
+.sun-editor .se-toolbar.se-toolbar-relative {
+	position: relative;
+	top: auto;
+}
+
+/* JS fallback: sticky active — overrides both default and relative */
+.sun-editor .se-toolbar.se-toolbar-sticky {
+	position: fixed;
+	top: 0px;
+}
+
+.sun-editor .se-toolbar-sticky-dummy {
+	display: none;
+	position: static;
+	z-index: -1;
+}
+
+/* Bottom toolbar: sticky from bottom */
+.sun-editor .se-toolbar.se-toolbar-bottom {
+	top: auto;
+	bottom: 0;
+	outline-offset: -1px;
+}
+
+/* Bottom toolbar: more layer opens above buttons */
+.sun-editor .se-toolbar.se-toolbar-bottom .se-btn-tray {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.sun-editor .se-toolbar.se-toolbar-bottom .se-btn-tray > .se-toolbar-more-layer {
+	order: -1;
+	width: 100%;
+	border-top: none;
+}
+
+.sun-editor .se-toolbar.se-toolbar-bottom .se-toolbar-more-layer .se-more-layer {
+	border-top: none;
+	border-bottom: 1px solid var(--se-main-divider-color);
+}
+
+/* JS fallback sticky for bottom */
+.sun-editor .se-toolbar.se-toolbar-sticky.se-toolbar-bottom {
+	top: auto;
+	bottom: 0px;
+}
+
+/* toolbar arrow up */
+.sun-editor .se-toolbar .se-arrow.se-arrow-up {
+	border-bottom-color: var(--se-main-divider-color);
+}
+
+.sun-editor .se-toolbar .se-arrow.se-arrow-up::after {
+	border-bottom-color: var(--se-main-background-color);
+}
+
+/* toolbar arrow down */
+.sun-editor .se-toolbar .se-arrow.se-arrow-down {
+	border-top-color: var(--se-main-divider-color);
+}
+
+.sun-editor .se-toolbar .se-arrow.se-arrow-down::after {
+	border-top-color: var(--se-main-background-color);
+}
+
+/** --- tool bar --- module --- button, module, group ----------------------------------------------------------  */
+/* module */
+.sun-editor .se-btn-module {
+	display: inline-block;
+}
+
+/* button group */
+.sun-editor .se-btn-module-border {
+	border: 1px solid var(--se-main-divider-color);
+	border: none;
+	border-radius: var(--se-border-radius);
+	margin-left: 1px;
+	margin-right: 1px;
+}
+/* separator vertical */
+.sun-editor .se-toolbar-separator-vertical {
+	display: inline-block;
+	height: var(--se-input-btn-size);
+	width: 1px;
+	margin: 1px;
+	vertical-align: top;
+	background-color: var(--se-main-divider-color);
+}
+
+.sun-editor .se-btn-module-enter {
+	display: block;
+	width: 100%;
+	height: 0px;
+	margin: 0;
+	padding: 0;
+	background-color: transparent;
+}
+
+/* ---more - layer */
+.sun-editor .se-toolbar-more-layer {
+	margin: 0 -3px;
+	background-color: var(--se-main-background-color);
+}
+
+.sun-editor .se-toolbar-more-layer .se-more-layer {
+	display: none;
+	border-top: 1px solid var(--se-main-divider-color);
+}
+
+.sun-editor .se-toolbar-more-layer .se-more-layer .se-more-form {
+	display: inline-block;
+	width: 100%;
+	height: auto;
+	padding: 4px 3px 0 3px;
+}
+
+/* ---more - button */
+.sun-editor .se-btn-module .se-btn-more.se-btn-more-text {
+	width: auto;
+	padding: 0 4px;
+}
+
+/* innser ul */
+.sun-editor .se-menu-list {
+	float: left;
+	padding: 0;
+	margin: 0;
+}
+
+.sun-editor .se-menu-list li {
+	position: relative;
+	float: left;
+	padding: 0;
+	margin: 0;
+}
+
+.sun-editor .se-menu-list li.se-toolbar-hidden-btn {
+	display: none;
+}
+
+.sun-editor .se-menu-list li .se-toolbar-btn:not(input) {
+	border-color: transparent;
+}
+
+/* tool bar select button (font, fontSize, blockStyle) */
+.sun-editor .se-btn-select {
+	width: auto;
+	display: flex;
+	padding: 4px 6px;
+}
+
+.sun-editor .se-btn-select .se-txt {
+	flex: auto;
+	display: flex;
+	text-align: left;
+	margin-right: 4px;
+	align-items: center;
+}
+
+.sun-editor .se-btn-select .se-not-arrow-text {
+	flex: auto;
+	text-align: center;
+	margin: 0;
+}
+
+.sun-editor .se-btn-select.on .se-txt + svg {
+	transform: rotate(-180deg);
+}
+
+.sun-editor .se-btn-select.se-btn-tool-font {
+	width: 100px;
+}
+
+.sun-editor .se-btn-select.se-btn-tool-format {
+	width: 86px;
+}
+
+.sun-editor .se-btn-select.se-btn-tool-font-size .se-txt {
+	width: 66px;
+	margin: 0;
+}
+.sun-editor .se-btn-select.se-btn-tool-font-size .se-not-arrow-text {
+	width: 50px;
+}
+
+/* tool bar input button (fontSize) */
+.sun-editor .se-btn-input {
+	padding: 0 !important;
+	border: 0 !important;
+}
+.sun-editor .se-btn-input input {
+	font-size: var(--se-main-font-size);
+	height: var(--se-input-btn-size);
+	border: 0;
+}
+.sun-editor .se-btn-input input:hover {
+	border: 1px solid var(--se-main-border-color);
+}
+.sun-editor .se-btn-input input:focus {
+	border: 1px solid var(--se-active-color) !important;
+	outline: 0;
+}
+
+/** --- menu tray -------------------------------------------------------------- */
+.sun-editor .se-btn-tray {
+	position: relative;
+	width: 100%;
+	height: auto;
+	padding: 4px 3px 0 3px;
+	margin: 0;
+}
+
+.sun-editor .se-menu-tray {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 0px;
+	z-index: 2147483646;
+}
+
+/** --- dropdown layer ---------------------------------------------------------- */
+.sun-editor .se-dropdown {
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+.sun-editor .se-menu-container {
+	overflow-x: unset;
+	overflow-y: unset;
+}
+
+.sun-editor .se-list-layer {
+	display: none;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	height: auto;
+	z-index: 5;
+	border: 1px solid var(--se-main-divider-color);
+	border-radius: var(--se-border-radius);
+	padding: 4px;
+	background-color: var(--se-main-background-color);
+	box-shadow: 0 3px 9px var(--se-shadow-layer-color);
+	outline: 0 none;
+}
+
+.sun-editor .se-list-layer .se-list-inner {
+	padding: 0;
+	margin: 0;
+	overflow: visible;
+}
+
+.sun-editor .se-list-layer button {
+	margin: 0 0 2px 0;
+	width: 100%;
+}
+
+.sun-editor .se-list-inner ul {
+	width: 100%;
+	padding: 0;
+	margin: auto;
+}
+
+.sun-editor .se-list-inner :not(.se-list-horizontal) li > button {
+	min-width: 100%;
+	width: -webkit-max-content;
+	width: -moz-max-content;
+	width: max-content;
+}
+
+/* dropdown layer - basic list */
+.sun-editor .se-list-inner .se-list-basic li {
+	width: 100%;
+}
+.sun-editor .se-list-inner input {
+	border-radius: 0;
+}
+.sun-editor .se-list-inner ul.se-list-carrier {
+	width: 165px;
+	height: 52px;
+}
+.sun-editor .se-list-inner ul.se-list-carrier li button > ol,
+.sun-editor .se-list-inner ul.se-list-carrier li button > ul {
+	font-size: 10px;
+}
+
+/* dropdown layer - checked list */
+.sun-editor .se-list-inner .se-list-checked li .se-svg {
+	float: left;
+	padding: 6px 6px 0 0;
+}
+
+.sun-editor .se-list-inner .se-list-checked li .se-svg > svg {
+	display: none;
+}
+
+.sun-editor .se-list-inner .se-list-checked li.se-checked * {
+	color: var(--se-active-dark3-color);
+}
+
+.sun-editor .se-list-inner .se-list-checked li.se-checked .se-svg > svg {
+	display: block;
+}
+
+/* dropdown layer - se-list-horizontal */
+.sun-editor .se-list-inner .se-list-horizontal {
+	display: flex;
+	padding: 2px;
+}
+.sun-editor .se-list-inner .se-list-horizontal li {
+	padding: 0;
+	margin: 0 2px;
+}
+
+/** --- dropdown layer - se-list-inner > exception */
+/* dropdown layer - font size */
+.sun-editor .se-list-layer.se-list-font-size {
+	min-width: 140px;
+	max-height: 300px;
+}
+
+/* dropdown layer - code block */
+.sun-editor .se-list-layer.se-list-code-block {
+	min-width: 140px;
+	max-height: 310px;
+}
+
+/* dropdown layer - font family */
+.sun-editor .se-list-layer.se-list-font-family {
+	min-width: 156px;
+}
+
+.sun-editor .se-list-layer.se-list-font-family .default {
+	border-bottom: 1px solid var(--se-input-btn-border-color);
+}
+
+/* dropdown layer - hr */
+.sun-editor .se-list-layer.se-list-line {
+	width: 125px;
+}
+
+.sun-editor .se-list-layer.se-list-line hr {
+	border-width: 1px 0 0;
+	height: 1px;
+	border-color: var(--se-edit-hr-color);
+}
+
+/* dropdown layer - align */
+.sun-editor .se-list-layer.se-list-align .se-list-inner {
+	left: 9px;
+}
+
+/** dropdown layer - format block, paragraph style, text style */
+.sun-editor .se-list-layer.se-list-format {
+	min-width: 156px;
+}
+
+.sun-editor .se-list-layer.se-list-format li {
+	padding: 0;
+	width: 100%;
+}
+
+.sun-editor .se-list-layer.se-list-format ul .se-btn-list {
+	line-height: 100%;
+}
+
+.sun-editor .se-list-layer.se-list-format ul .se-btn-list[data-value='h1'] {
+	height: 40px;
+}
+
+.sun-editor .se-list-layer.se-list-format ul .se-btn-list[data-value='h2'] {
+	height: 34px;
+}
+
+.sun-editor .se-list-layer.se-list-format ul p {
+	font-size: var(--se-main-font-size);
+}
+
+.sun-editor .se-list-layer.se-list-format ul div {
+	font-size: var(--se-main-font-size);
+	padding: 4px 2px;
+}
+
+.sun-editor .se-list-layer.se-list-format ul h1 {
+	font-size: 2em;
+	font-weight: bold;
+}
+
+.sun-editor .se-list-layer.se-list-format ul h2 {
+	font-size: 1.5em;
+	font-weight: bold;
+}
+
+.sun-editor .se-list-layer.se-list-format ul h3 {
+	font-size: 1.17em;
+	font-weight: bold;
+}
+
+.sun-editor .se-list-layer.se-list-format ul h4 {
+	font-size: 1em;
+	font-weight: bold;
+}
+
+.sun-editor .se-list-layer.se-list-format ul h5 {
+	font-size: 0.83em;
+	font-weight: bold;
+}
+
+.sun-editor .se-list-layer.se-list-format ul h6 {
+	font-size: 0.67em;
+	font-weight: bold;
+}
+
+.sun-editor .se-list-layer.se-list-format ul blockquote {
+	font-size: var(--se-main-font-size);
+	color: var(--se-edit-font-quote);
+	height: 22px;
+	margin: 0;
+	background-color: transparent;
+	line-height: 1.5;
+	border-style: solid;
+	border-color: var(--se-edit-border-dark);
+	padding: 0 0 0 7px;
+	border-width: 0;
+	border-left-width: 5px;
+}
+
+.sun-editor .se-list-layer.se-list-format ul pre {
+	font-size: var(--se-main-font-size);
+	color: var(--se-edit-font-pre);
+	padding: 4px 11px;
+	margin: 0;
+	background-color: var(--se-edit-background-pre);
+	border: 1px solid var(--se-edit-border-light);
+	border-radius: var(--se-border-radius);
+}
+
+.sun-editor-editable[contenteditable='true'],
+.sun-editor-editable[contenteditable='true'] * {
+	scroll-margin: var(--se-edit-scroll-margin);
+}
+
+.sun-editor-editable[contenteditable='true'].se-copy-format-cursor {
+	cursor:
+		url('data:image/svg+xml;base64,PHN2ZwogIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICB3aWR0aD0iMjQiCiAgaGVpZ2h0PSIxNiIKICB2aWV3Qm94PSIwIDAgMjQgMTYiCj4KICA8ZGVmcz4KICAgIDxmaWx0ZXIgaWQ9IndoaXRlLW91dGxpbmUiIGNvbG9yLWludGVycG9sYXRpb24tZmlsdGVycz0ic1JHQiI+CiAgICAgIDxmZU1vcnBob2xvZ3kgaW49IlNvdXJjZUFscGhhIiByZXN1bHQ9ImRpbGF0ZWQiIG9wZXJhdG9yPSJkaWxhdGUiIHJhZGl1cz0iMSIvPgogICAgICA8ZmVGbG9vZCBmbG9vZC1jb2xvcj0id2hpdGUiIHJlc3VsdD0id2hpdGUiLz4KICAgICAgPGZlQ29tcG9zaXRlIGluPSJ3aGl0ZSIgaW4yPSJkaWxhdGVkIiBvcGVyYXRvcj0iaW4iIHJlc3VsdD0ib3V0bGluZSIvPgogICAgICA8ZmVNZXJnZT4KICAgICAgICA8ZmVNZXJnZU5vZGUgaW49Im91dGxpbmUiLz4KICAgICAgICA8ZmVNZXJnZU5vZGUgaW49IlNvdXJjZUdyYXBoaWMiLz4KICAgICAgPC9mZU1lcmdlPgogICAgPC9maWx0ZXI+CiAgPC9kZWZzPgogIDxnIGZpbHRlcj0idXJsKCN3aGl0ZS1vdXRsaW5lKSI+CiAgICA8cGF0aAogICAgICBkPSJNNC4zMzIgMTIuNjY4CiAgICAgICAgIEM0LjMzMiAxMy4wMzUgNC40ODQgMTMuMzMyIDQuNjY4IDEzLjMzMgogICAgICAgICBMNS4zMzIgMTMuMzMyCiAgICAgICAgIEw1LjMzMiAxNC42NjgKICAgICAgICAgTDQuNSAxNC42NjgKICAgICAgICAgQzQuMzE2IDE0LjY2OCA0IDE0LjM2NyA0IDE0CiAgICAgICAgIEM0IDE0LjM2NyAzLjY4NCAxNC42NjggMy41IDE0LjY2OAogICAgICAgICBMMi42NjggMTQuNjY4CiAgICAgICAgIEwyLjY2OCAxMy4zMzIKICAgICAgICAgTDMuMzMyIDEzLjMzMgogICAgICAgICBDMy41MTYgMTMuMzMyIDMuNjY4IDEzLjAzNSAzLjY2OCAxMi42NjgKICAgICAgICAgTDMuNjY4IDMuMzMyCiAgICAgICAgIEMzLjY2OCAyLjk2NSAzLjUxNiAyLjY2OCAzLjMzMiAyLjY2OAogICAgICAgICBMMi42NjggMi42NjgKICAgICAgICAgTDIuNjY4IDEuMzMyCiAgICAgICAgIEwzLjUgMS4zMzIKICAgICAgICAgQzMuNjg0IDEuMzMyIDQgMS42MzMgNCAyCiAgICAgICAgIEM0IDEuNjMzIDQuMzE2IDEuMzMyIDQuNSAxLjMzMgogICAgICAgICBMNS4zMzIgMS4zMzIKICAgICAgICAgTDUuMzMyIDIuNjY4CiAgICAgICAgIEw0LjY2OCAyLjY2OAogICAgICAgICBDNC40ODQgMi42NjggNC4zMzIgMi45NjUgNC4zMzIgMy4zMzIKICAgICAgICAgWiIKICAgICAgZmlsbD0iYmxhY2siCiAgICAvPgogICAgPHBhdGgKICAgICAgZD0iTTIwIDIuNjY4CiAgICAgICAgIEwyMCAyCiAgICAgICAgIEMyMCAxLjYzMyAxOS43MDMgMS4zMzIgMTkuMzMyIDEuMzMyCiAgICAgICAgIEwxMS4zMzIgMS4zMzIKICAgICAgICAgQzEwLjk2NSAxLjMzMiAxMC42NjggMS42MzMgMTAuNjY4IDIKICAgICAgICAgTDEwLjY2OCA0LjY2OAogICAgICAgICBDMTAuNjY4IDUuMDM1IDEwLjk2NSA1LjMzMiAxMS4zMzIgNS4zMzIKICAgICAgICAgTDE5LjMzMiA1LjMzMgogICAgICAgICBDMTkuNzAzIDUuMzMyIDIwIDUuMDM1IDIwIDQuNjY4CiAgICAgICAgIEwyMCA0CiAgICAgICAgIEwyMC42NjggNAogICAgICAgICBMMjAuNjY4IDYuNjY4CiAgICAgICAgIEwxNCA2LjY2OAogICAgICAgICBMMTQgMTQKICAgICAgICAgQzE0IDE0LjM2NyAxNC4yOTcgMTQuNjY4IDE0LjY2OCAxNC42NjgKICAgICAgICAgTDE2IDE0LjY2OAogICAgICAgICBDMTYuMzY3IDE0LjY2OCAxNi42NjggMTQuMzY3IDE2LjY2OCAxNAogICAgICAgICBMMTYuNjY4IDgKICAgICAgICAgTDIyIDgKICAgICAgICAgTDIyIDIuNjY4CiAgICAgICAgIFoiCiAgICAgIGZpbGw9ImJsYWNrIgogICAgLz4KICA8L2c+Cjwvc3ZnPgo=')
+			0 8,
+		text;
+}
+
+/* table resize */
+/* table resize - ew */
+.sun-editor-editable[contenteditable='true'] table th:not(.se-selected-table-cell):hover::before,
+.sun-editor-editable[contenteditable='true'] table td:not(.se-selected-table-cell):hover::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: -2px;
+	width: 4px;
+	height: 100%;
+	background-color: transparent;
+	cursor: ew-resize;
+}
+.sun-editor-editable[contenteditable='true'] table th:not(.se-selected-table-cell):hover::after,
+.sun-editor-editable[contenteditable='true'] table td:not(.se-selected-table-cell):hover::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	right: -2px;
+	width: 4px;
+	height: 100%;
+	background-color: transparent;
+	cursor: ew-resize;
+}
+
+/* table resize - lines */
+.sun-editor .se-table-resize-line {
+	position: absolute;
+	top: 0;
+	width: 6px;
+	height: 100%;
+	margin-left: -3px;
+	background-color: var(--se-active-dark-color);
+	opacity: 0.4;
+	pointer-events: none;
+	display: none;
+}
+
+/* table resize - row, cursor */
+.sun-editor .se-table-resize-row {
+	position: absolute;
+	left: 0;
+	width: 100%;
+	height: 6px;
+	margin-top: -3px;
+	background-color: var(--se-active-dark-color);
+	opacity: 0.4;
+	pointer-events: none;
+	display: none;
+}
+
+.sun-editor .se-table-resize-line-prev {
+	position: absolute;
+	top: 0;
+	width: 4px;
+	height: 100%;
+	margin-left: -1px;
+	border-left: 1px dashed var(--se-drag-over-color);
+	background-color: transparent;
+	opacity: 0.8;
+	pointer-events: none;
+	display: none;
+}
+.sun-editor .se-table-resize-row-prev {
+	position: absolute;
+	left: 0;
+	width: 100%;
+	height: 4px;
+	margin-top: -1px;
+	border-top: 1px dashed var(--se-drag-over-color);
+	background-color: transparent;
+	opacity: 0.8;
+	pointer-events: none;
+	display: none;
+}
+
+/* dropdown layer --- table selector */
+.sun-editor .se-selector-table {
+	display: none;
+	position: absolute;
+	overflow: hidden;
+	top: var(--se-input-btn-size);
+	left: 1px;
+	z-index: 5;
+	padding: 5px 0;
+	float: left;
+	margin: 2px 0 0;
+	font-size: var(--se-main-font-size);
+	text-align: left;
+	list-style: none;
+	background-color: var(--se-main-background-color);
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+	border: 1px solid var(--se-input-btn-border-color);
+	border-radius: var(--se-border-radius);
+	box-shadow: 0 6px 12px var(--se-shadow-layer-color);
+}
+
+.sun-editor .se-selector-table .se-table-size {
+	font-size: 18px;
+	padding: 0 5px;
+}
+
+/* When modifying the values ​​of this style, you must also adjust the values ​​of "table/index:#OnMouseMoveTablePicke()" */
+.sun-editor .se-selector-table .se-table-size-picker {
+	position: absolute !important;
+	z-index: 3;
+	font-size: 18px;
+	width: 10em;
+	height: 10em;
+	cursor: pointer;
+}
+
+.sun-editor .se-selector-table .se-table-size-highlighted {
+	position: absolute !important;
+	z-index: 2;
+	font-size: 18px;
+	width: 1em;
+	height: 1em;
+	background-color: var(--se-table-picker-highlight-color);
+	background-image: linear-gradient(to right, var(--se-table-picker-highlight-border-color) 1px, transparent 1px), linear-gradient(to bottom, var(--se-table-picker-highlight-border-color) 1px, transparent 1px);
+	background-size: 1em 1em;
+	border-right: 1px solid var(--se-table-picker-highlight-border-color);
+	border-bottom: 1px solid var(--se-table-picker-highlight-border-color);
+}
+
+.sun-editor .se-selector-table .se-table-size-unhighlighted {
+	position: relative !important;
+	z-index: 1;
+	font-size: 18px;
+	width: 5em;
+	height: 5em;
+	background-color: var(--se-table-picker-color);
+	background-image: linear-gradient(to right, var(--se-table-picker-border-color) 1px, transparent 1px), linear-gradient(to bottom, var(--se-table-picker-border-color) 1px, transparent 1px);
+	background-size: 1em 1em;
+	border-right: 1px solid var(--se-table-picker-border-color);
+	border-bottom: 1px solid var(--se-table-picker-border-color);
+}
+
+.sun-editor .se-selector-table .se-table-size-display {
+	padding-left: 5px;
+}
+
+.sun-editor .se-list-layer.se-table-split {
+	top: 36px;
+}
+
+/* dropdown layer --- color selector button */
+.sun-editor .se-list-layer .se-selector-color {
+	display: block;
+	width: -webkit-max-content;
+	width: -moz-max-content;
+	width: max-content;
+	max-width: 252px;
+	height: auto;
+	padding: 0;
+	margin: auto;
+}
+
+.sun-editor .se-list-layer .se-selector-color .se-color-pallet {
+	width: 100%;
+	height: 100%;
+	padding: 0;
+}
+
+.sun-editor .se-list-layer .se-selector-color .se-color-pallet li {
+	display: flex;
+	float: left;
+	position: relative;
+	margin: 0;
+}
+
+.sun-editor .se-list-layer .se-selector-color .se-color-pallet button {
+	display: block;
+	cursor: default;
+	width: 28px;
+	height: 28px;
+	margin: 0;
+	border-radius: 0;
+	border: 0;
+	text-indent: -9999px;
+	transition:
+		transform 0.2s,
+		box-shadow 0.2s;
+}
+
+.sun-editor .se-list-layer .se-selector-color .se-color-pallet button.active,
+.sun-editor .se-list-layer .se-selector-color .se-color-pallet button:hover {
+	box-shadow: 0 0 0 1px transparent inset;
+	transform: scale(0.8);
+}
+.sun-editor .se-list-layer .se-selector-color .se-color-pallet button.active > svg {
+	color: #fff;
+	stroke: #000;
+	stroke-width: 2px;
+}
+
+/* --- hue slider -------------------------------------------------------------- */
+.sun-editor .se-hue-slider {
+	padding: 14px;
+}
+
+.sun-editor .se-hue-slider-container {
+	position: relative;
+	width: auto;
+	height: auto;
+	border-radius: 50%;
+	outline: 2px solid #fff;
+}
+
+.sun-editor .se-hue-slider-container .se-hue-wheel {
+	cursor: pointer;
+	border-radius: 50%;
+}
+
+.sun-editor .se-hue-slider-container .se-hue-wheel-pointer {
+	position: absolute;
+	width: 10px;
+	height: 10px;
+	border: 2px solid #fff;
+	outline: 2px solid #000;
+	border-radius: 50%;
+	background-color: transparent;
+	box-shadow: 0 0 2px #000;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	pointer-events: none;
+}
+
+.sun-editor .se-hue-gradient-container {
+	position: relative;
+	margin-top: 14px;
+	height: 28px;
+	outline: 2px solid #fff;
+}
+
+.sun-editor .se-hue-gradient-container .se-hue-gradient {
+	cursor: pointer;
+	height: 28px;
+	background: linear-gradient(to right, #000, #fff);
+	position: relative;
+}
+
+.sun-editor .se-hue-gradient-container .se-hue-gradient-pointer {
+	position: absolute;
+	width: 14px;
+	height: 14px;
+	border: 2px solid #fff;
+	outline: 2px solid #000;
+	border-radius: 50%;
+	background-color: transparent;
+	box-shadow: 0 0 2px #000;
+	top: 14px;
+	left: calc(100% - 14px);
+	transform: translate(-50%, -50%);
+	pointer-events: none;
+}
+
+.sun-editor .se-hue-final-hex {
+	display: flex;
+	margin-top: 10px;
+}
+
+/** --- form group - input -------------------------------------------------------------- */
+.sun-editor .se-form-group {
+	display: flex;
+	width: 100%;
+	min-height: 40px;
+	height: auto;
+	padding: 4px;
+}
+
+.sun-editor .se-form-group.se-form-w0 {
+	padding-left: 0;
+	padding-right: 0;
+}
+
+.sun-editor .se-form-group.se-form-h0 {
+	padding-top: 0;
+	padding-bottom: 0;
+}
+
+.sun-editor .se-form-group input,
+.sun-editor .se-btn-group input {
+	flex: auto;
+	display: inline-block;
+	width: auto;
+	height: var(--se-input-btn-size);
+	font-size: var(--se-btn-font-size);
+	margin: 1px 0 1px 0;
+	padding: 0 4px;
+	/* border-radius: 0.25rem; */
+	border: 1px solid var(--se-input-btn-border-color);
+}
+
+.sun-editor .se-btn-group input {
+	margin: 1px 3px;
+}
+
+.sun-editor .se-form-group button,
+.sun-editor .se-dropdown-form-group button {
+	float: right;
+	width: var(--se-input-btn-size);
+	height: var(--se-input-btn-size);
+	margin: 1px;
+}
+
+.sun-editor .se-form-group.se-form-flex-btn button {
+	float: none;
+	flex: auto;
+}
+
+.sun-editor .se-form-group .se-group-item {
+	position: relative;
+}
+
+.sun-editor .se-form-group label {
+	display: inline-block;
+	max-width: 100%;
+	margin-bottom: 5px;
+	font-weight: bold;
+}
+
+/** --- form group - label -------------------------------------------------------------- */
+.sun-editor .se-form-group-label {
+	width: 100%;
+	height: auto;
+	padding: 0px 4px;
+}
+
+.sun-editor .se-form-group-label label {
+	font-size: var(--se-main-font-size);
+	font-weight: bold;
+}
+
+/** form group - dropdown input */
+.sun-editor .se-dropdown .se-form-group input {
+	height: var(--se-input-btn-size);
+	color: var(--se-dropdown-font-color);
+}
+
+.sun-editor .se-dropdown .se-form-group .se-color-input:focus {
+	border-bottom: 3px solid var(--se-main-outline-color);
+}
+
+/** --- editor area */
+.sun-editor .se-wrapper {
+	display: flex;
+	position: relative !important;
+	width: 100%;
+	height: auto;
+	overflow: hidden;
+	z-index: 1;
+}
+
+/* [editable - no iframe], codeview */
+.sun-editor .se-wrapper .se-wrapper-inner {
+	height: 100%;
+	min-height: var(--se-min-height);
+}
+
+/* [editable - common], codeview */
+.sun-editor .se-wrapper .se-wrapper-inner,
+.sun-editor body.sun-editor-editable {
+	width: 100%;
+	max-width: 100%;
+	overflow-y: auto;
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+	user-select: auto;
+	-o-user-select: auto;
+	-moz-user-select: auto;
+	-khtml-user-select: auto;
+	-webkit-user-select: auto;
+	-ms-user-select: auto;
+}
+
+.sun-editor .se-wrapper .se-wrapper-inner:focus,
+.sun-editor body.sun-editor-editable:focus {
+	outline: none;
+}
+
+.sun-editor .se-wrapper .se-code-wrapper {
+	width: 100%;
+	overflow: hidden;
+}
+.sun-editor .se-wrapper .se-code-wrapper > div {
+	flex: 1;
+	min-width: 0;
+}
+.sun-editor .se-wrapper .se-code-wrapper .se-code-view-line {
+	background-color: var(--se-code-view-line-background-color);
+	color: var(--se-code-view-line-color);
+	text-align: right;
+	width: 50px;
+	font-size: var(--se-main-font-size);
+	line-height: 1.5;
+	padding: 4px 6px;
+	overflow: hidden;
+	resize: none !important;
+}
+
+.sun-editor .se-wrapper .se-code-viewer {
+	flex: 1;
+	min-width: 0;
+	background-color: var(--se-code-view-background-color);
+	color: var(--se-code-view-color);
+	font-family: var(--se-codeview-font-family);
+	font-size: var(--se-main-font-size);
+	line-height: 1.5;
+	padding: 4px;
+	margin: 0;
+	tab-size: 4;
+	resize: none !important;
+	overflow-x: auto;
+	white-space: pre;
+	word-wrap: normal;
+}
+
+.sun-editor .se-wrapper .se-markdown-wrapper {
+	width: 100%;
+	overflow: hidden;
+}
+.sun-editor .se-wrapper .se-markdown-wrapper .se-markdown-view-line {
+	background-color: var(--se-markdown-view-line-background-color);
+	color: var(--se-markdown-view-line-color);
+	text-align: right;
+	width: 50px;
+	font-size: var(--se-main-font-size);
+	line-height: 1.5;
+	padding: 4px 6px;
+	overflow: hidden;
+	resize: none !important;
+}
+.sun-editor .se-wrapper .se-markdown-viewer {
+	flex: 1;
+	min-width: 0;
+	background-color: var(--se-markdown-view-background-color);
+	color: var(--se-markdown-view-color);
+	font-size: var(--se-main-font-size);
+	font-family: var(--se-markdown-font-family);
+	line-height: 1.5;
+	padding: 4px;
+	margin: 0;
+	tab-size: 4;
+	resize: none !important;
+	overflow-x: auto;
+	white-space: pre;
+	word-wrap: normal;
+}
+
+.sun-editor .se-wrapper .se-wrapper-wysiwyg {
+	display: block;
+	position: relative;
+	caret-color: var(--se-caret-color);
+}
+
+.sun-editor-editable[contenteditable='true'] .se-disable-pointer *,
+.sun-editor-editable[contenteditable='true'] .se-math *,
+.sun-editor-editable[contenteditable='true'] .katex * {
+	pointer-events: none;
+}
+
+/** --- placeholder */
+.sun-editor .se-wrapper .se-placeholder {
+	position: absolute;
+	display: none;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	z-index: 1;
+	color: var(--se-main-outline-color);
+	font-size: var(--se-main-font-size);
+	line-height: 1.5;
+	top: 0;
+	left: 0;
+	right: 0;
+	overflow: hidden;
+	padding: var(--se-edit-inner-padding);
+	margin: 0;
+	pointer-events: none;
+	backface-visibility: hidden;
+	-webkit-backface-visibility: hidden;
+	-moz-backface-visibility: hidden;
+}
+
+/** --- status bar */
+.sun-editor .se-status-bar {
+	display: flex;
+	width: auto;
+	height: auto;
+	min-height: 18px;
+	border-top: 1px solid var(--se-main-divider-color);
+	padding: 0 4px;
+	background-color: var(--se-main-background-color);
+	cursor: ns-resize;
+}
+
+.sun-editor .se-status-bar.se-resizing-none {
+	cursor: default;
+}
+
+.sun-editor .se-back-wrapper {
+	position: fixed;
+	display: none;
+	cursor: default;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	user-select: none;
+	-o-user-select: none;
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	z-index: 2147483647;
+	background-color: transparent;
+}
+
+/** status bar - nabigation */
+.sun-editor .se-status-bar .se-navigation {
+	flex: auto;
+	position: relative;
+	width: auto;
+	height: auto;
+	color: var(--se-statusbar-font-color);
+	margin: 0;
+	padding: 0;
+	font-size: var(--se-statusbar-font-size);
+	line-height: 1.5;
+	background: transparent;
+}
+
+/** status bar - charCounter */
+.sun-editor .se-status-bar .se-char-counter-wrapper {
+	flex: none;
+	position: relative;
+	display: block;
+	width: auto;
+	height: auto;
+	margin: 0;
+	padding: 0;
+	color: var(--se-statusbar-font-color);
+	font-size: var(--se-main-font-size);
+	background: transparent;
+}
+
+.sun-editor .se-status-bar .se-char-counter-wrapper.se-blink {
+	color: var(--se-error-color);
+	-webkit-animation: blinker 0.2s linear infinite;
+	animation: blinker 0.2s linear infinite;
+}
+
+.sun-editor .se-status-bar .se-char-counter-wrapper .se-char-label {
+	margin-right: 4px;
+}
+
+/* --- modal ---------------------------------------------------------- */
+.sun-editor .se-modal-area {
+	position: fixed;
+	display: none;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 2147483646;
+}
+.sun-editor .se-modal-area.se-backdrop-show {
+	display: block;
+}
+
+.sun-editor .se-modal-area label,
+.sun-editor .se-modal-area input,
+.sun-editor .se-modal-area button {
+	font-size: var(--se-modal-input-font-size);
+	line-height: 1.5;
+	color: var(--se-main-color);
+	margin: 0;
+}
+
+.sun-editor .se-modal-area .se-modal-back {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	background-color: var(--se-overlay-background-color);
+	opacity: 0.5;
+}
+
+/* modal - modal */
+.sun-editor .se-modal-area .se-modal-inner {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-content {
+	position: relative;
+	display: none;
+	width: auto;
+	max-width: 500px;
+	margin: 1.75rem auto;
+	background-color: var(--se-modal-background-color);
+	color: var(--se-modal-color);
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	border-radius: var(--se-border-radius);
+	outline: 0;
+	box-shadow: 0 3px 9px var(--se-shadow-layer-color);
+}
+.sun-editor .se-modal-area .se-modal-inner .se-modal-content.se-modal-show {
+	display: block;
+}
+
+/* modal - resize handle */
+/* modal - resize handle - w */
+.sun-editor .se-modal-area .se-modal-inner .se-modal-content .se-modal-resize-handle-w {
+	position: relative;
+	display: block;
+	width: 100%;
+	height: 10px;
+	cursor: ns-resize;
+	bottom: 0;
+	margin: 0;
+}
+.sun-editor .se-modal-area .se-modal-inner .se-modal-content .se-modal-resize-handle-w::before {
+	content: '';
+	position: relative;
+	display: block;
+	width: 100%;
+	height: 1px;
+	background-color: var(--se-main-outline-color);
+	margin: 1px 0;
+}
+
+/* modal - resize handle - h */
+.sun-editor .se-modal-area .se-modal-inner .se-modal-content .se-modal-resize-handle-h {
+	position: absolute;
+	display: block;
+	width: 10px;
+	top: 15px;
+	height: calc(100% - 27px);
+	cursor: ew-resize;
+	right: 0;
+}
+.sun-editor .se-modal-area .se-modal-inner .se-modal-content .se-modal-resize-handle-h::before {
+	content: '';
+	position: relative;
+	display: block;
+	width: 1px;
+	height: 100%;
+	background-color: var(--se-main-outline-color);
+	margin: 0 1px;
+}
+
+/* modal - resize handle - c */
+.sun-editor .se-modal-area .se-modal-inner .se-modal-content .se-modal-resize-handle-c {
+	position: absolute;
+	display: block;
+	width: 9px;
+	height: 9px;
+	cursor: nwse-resize;
+	right: 4px;
+	bottom: 1px;
+}
+.sun-editor .se-modal-area .se-modal-inner .se-modal-content .se-modal-resize-handle-c::before,
+.sun-editor .se-modal-area .se-modal-inner .se-modal-content .se-modal-resize-handle-c::after {
+	content: '';
+	position: absolute;
+	display: block;
+	background-color: var(--se-main-outline-color);
+}
+.sun-editor .se-modal-area .se-modal-inner .se-modal-content .se-modal-resize-handle-c::before {
+	width: 100%;
+	height: 2px;
+	top: 50%;
+	left: 0;
+	transform: translateY(-50%);
+}
+.sun-editor .se-modal-area .se-modal-inner .se-modal-content .se-modal-resize-handle-c::after {
+	width: 2px;
+	height: 100%;
+	left: 50%;
+	top: 0;
+	transform: translateX(-50%);
+}
+
+/* modal - resize handle - hover, active */
+.sun-editor .se-modal-area .se-modal-inner .se-modal-content .se-modal-resize-handle-w:hover::before,
+.sun-editor .se-modal-area .se-modal-inner .se-modal-content .se-modal-resize-handle-w.active::before,
+.sun-editor .se-modal-area .se-modal-inner .se-modal-content .se-modal-resize-handle-h:hover::before,
+.sun-editor .se-modal-area .se-modal-inner .se-modal-content .se-modal-resize-handle-h.active::before,
+.sun-editor .se-modal-area .se-modal-inner .se-modal-content .se-modal-resize-handle-c:hover::before,
+.sun-editor .se-modal-area .se-modal-inner .se-modal-content .se-modal-resize-handle-c:hover::after,
+.sun-editor .se-modal-area .se-modal-inner .se-modal-content .se-modal-resize-handle-c.active::before,
+.sun-editor .se-modal-area .se-modal-inner .se-modal-content .se-modal-resize-handle-c.active::after {
+	background-color: var(--se-active-dark4-color);
+}
+
+/* modal - large */
+.sun-editor .se-modal-area .se-modal-inner .se-modal-content.se-modal-large {
+	max-width: 750px;
+	width: 100%;
+}
+.sun-editor .se-modal-area .se-modal-inner .se-modal-content.se-modal-large .se-modal-body {
+	height: 50vh;
+}
+
+/* modal - responsive */
+.sun-editor .se-modal-area .se-modal-inner .se-modal-content.se-modal-responsive {
+	width: -webkit-max-content;
+	width: -moz-max-content;
+	width: max-content;
+	height: -webkit-max-content;
+	height: -moz-max-content;
+	height: max-content;
+	max-width: 100%;
+	max-height: 90vh;
+}
+
+@media screen and (max-width: 509px) {
+	.sun-editor .se-modal-area .se-modal-inner .se-modal-content {
+		width: 100% !important;
+		min-width: 100% !important;
+		max-width: 100% !important;
+	}
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-content.se-modal-responsive .se-modal-resize-form {
+	max-width: 100%;
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-content label {
+	display: inline-block;
+	max-width: 100%;
+	margin-bottom: 5px;
+	font-weight: bold;
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-content .se-btn-primary {
+	display: inline-block;
+	padding: 5px 11px;
+	margin: 0 0 10px 0 !important;
+	font-size: var(--se-modal-input-font-size);
+	font-weight: normal;
+	line-height: 1.4;
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: middle;
+	touch-action: manipulation;
+	border-radius: var(--se-border-radius);
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-header {
+	height: 50px;
+	padding: 6px 15px;
+	border-bottom: 1px solid var(--se-modal-border-color);
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-header .se-close-btn {
+	float: right;
+	font-weight: bold;
+	text-shadow: 0 1px 0 var(--se-main-background-color);
+	filter: alpha(opacity=100);
+	opacity: 1;
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-header .se-modal-title {
+	float: left;
+	font-size: var(--se-modal-title-font-size);
+	font-weight: bold;
+	margin: 0;
+	padding: 0;
+	line-height: 2.5;
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-body {
+	position: relative;
+	padding: 15px 15px 10px 15px;
+}
+.sun-editor .se-modal-area .se-modal-inner .se-modal-body-top {
+	position: relative;
+	padding: 0px 15px 5px 15px;
+}
+.sun-editor .se-modal-area .se-modal-inner .se-modal-body-bottom {
+	position: relative;
+	padding: 5px 15px 0px 15px;
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-hr {
+	border-bottom: 1px dashed var(--se-modal-color);
+	margin-bottom: 6px;
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-form {
+	margin-bottom: 10px;
+}
+.sun-editor .se-modal-area .se-modal-inner .se-modal-form .se-modal-flex-form {
+	position: relative;
+	display: flex;
+}
+.sun-editor .se-modal-area .se-modal-inner .se-modal-form .se-modal-flex-form .se-modal-flex-group {
+	border: 1px dashed var(--se-modal-border-color);
+	padding: 4px;
+	padding-right: 0;
+	margin-right: 4px;
+}
+.sun-editor .se-modal-area .se-modal-inner .se-modal-form .se-modal-flex-form .se-btn {
+	margin-right: 4px;
+	margin-left: 0;
+	border: 1px solid var(--se-input-btn-border-color);
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-form-footer {
+	margin-top: 10px;
+	margin-bottom: 0;
+}
+
+.sun-editor .se-modal-area .se-modal-inner input:disabled {
+	background-color: var(--se-modal-input-disabled-background-color);
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-size-text {
+	width: 100%;
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-size-text .size-w {
+	width: var(--se-modal-input-width);
+	text-align: center;
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-size-text .size-h {
+	width: var(--se-modal-input-width);
+	text-align: center;
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-size-x {
+	margin: 0 8px 0 8px;
+	width: 25px;
+	text-align: center;
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-footer {
+	height: auto;
+	min-height: 55px;
+	padding: 10px 15px 0px 15px;
+	text-align: right;
+	border-top: 1px solid var(--se-modal-border-color);
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-footer .se-btn {
+	float: left;
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-footer > div {
+	float: left;
+	line-height: 1.7;
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-footer > div > label {
+	margin: 0 5px 0 0;
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-btn-radio {
+	margin-left: 12px;
+	margin-right: 6px;
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-btn-check {
+	margin-left: 12px;
+	margin-right: 4px;
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-btn-check:disabled + span {
+	color: var(--se-modal-input-disabled-color);
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-form-footer .se-modal-btn-check {
+	margin-left: 0;
+	margin-right: 4px;
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-form-footer label:first-child {
+	margin-right: 16px;
+	margin-left: 0px;
+}
+
+/* modal - modal - form - files */
+.sun-editor .se-modal-area .se-modal-inner .se-modal-form .se-modal-form-files {
+	position: relative;
+	display: flex;
+	align-items: center;
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-form .se-modal-form-files > input {
+	flex: auto;
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-form .se-modal-form-files .se-modal-files-edge-button {
+	flex: none;
+	opacity: 0.8;
+	border: 1px solid var(--se-input-btn-border-color);
+	margin-left: 1px;
+}
+
+/* modal - modal - input */
+.sun-editor .se-modal-area .se-modal-inner .se-modal-form .se-input-select {
+	display: inline-block;
+	width: auto;
+	height: var(--se-input-btn-size);
+	font-size: var(--se-modal-input-font-size);
+	text-align: center;
+	line-height: 1.4;
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-form .se-input-control {
+	display: inline-block;
+	width: var(--se-modal-input-width);
+	height: var(--se-input-btn-size);
+	font-size: var(--se-modal-input-font-size);
+	text-align: center;
+	line-height: 1.4;
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-form .se-flex-input-wrapper {
+	display: block;
+	position: relative;
+	width: 100%;
+	height: auto;
+	padding: 0;
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-form .se-flex-input-wrapper > .se-input-form-abs {
+	display: block;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	padding: 0;
+	margin: 0;
+	background-color: var(--se-modal-file-input-background-color);
+	border: 2px dashed var(--se-input-btn-border-color);
+	pointer-events: none;
+}
+.sun-editor .se-modal-area .se-modal-inner .se-modal-form .se-flex-input-wrapper > .se-input-form-abs * {
+	pointer-events: none;
+	vertical-align: middle;
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-form .se-flex-input-wrapper > .se-input-form-abs > div {
+	display: block;
+	position: relative;
+	padding-top: 3px;
+	width: 100%;
+	height: 100%;
+	margin: auto;
+}
+.sun-editor .se-modal-area .se-modal-inner .se-modal-form .se-flex-input-wrapper > .se-input-form-abs > div .se-input-file-w {
+	width: -webkit-max-content;
+	width: -moz-max-content;
+	width: max-content;
+	max-width: 100%;
+	margin: auto;
+	padding: 0 4px;
+}
+.sun-editor .se-modal-area .se-modal-inner .se-modal-form .se-flex-input-wrapper > .se-input-form-abs > div .se-input-file-icon-up,
+.sun-editor .se-modal-area .se-modal-inner .se-modal-form .se-flex-input-wrapper > .se-input-form-abs > div .se-input-file-icon-files {
+	display: inline-block;
+	width: 20px;
+}
+.sun-editor .se-modal-area .se-modal-inner .se-modal-form .se-flex-input-wrapper > .se-input-form-abs > div .se-input-file-icon-files {
+	display: none;
+}
+.sun-editor .se-modal-area .se-modal-inner .se-modal-form .se-flex-input-wrapper > .se-input-form-abs > div .se-input-file-cnt {
+	display: inline;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-form .se-input-form {
+	display: block;
+	width: 100%;
+	height: var(--se-input-btn-size);
+	font-size: var(--se-modal-input-font-size);
+	line-height: 1.4;
+	padding: 0 4px;
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-form .se-input-form.se-input-url {
+	direction: ltr;
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-form .se-input-form.se-input-url:disabled {
+	text-decoration: line-through;
+	color: var(--se-modal-input-disabled-color);
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-form .se-modal-ratio {
+	width: var(--se-modal-input-width);
+	margin-left: 4px;
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-form a {
+	color: var(--se-modal-anchor-color);
+}
+
+/* modal - revert button */
+.sun-editor .se-modal-area .se-modal-inner .se-modal-btn-revert {
+	float: right;
+	border: 1px solid var(--se-input-btn-border-color);
+}
+
+/* modal - inner tab */
+.sun-editor .se-modal-tabs {
+	width: 100%;
+	height: 25px;
+	border-bottom: 1px solid var(--se-modal-border-color);
+}
+
+.sun-editor .se-modal-tabs button {
+	background-color: var(--se-modal-border-color);
+	border-right: 1px solid var(--se-modal-border-color);
+	float: left;
+	outline: none;
+	padding: 2px 13px;
+	transition: 0.3s;
+}
+
+.sun-editor .se-modal-tabs button:hover {
+	background-color: var(--se-main-background-color);
+}
+
+.sun-editor .se-modal-tabs button.active {
+	background-color: var(--se-main-background-color);
+	border-bottom: 0;
+}
+
+/* modal - modal - math */
+.sun-editor .se-modal-area .se-modal-inner .se-modal-form .se-input-form.se-math-exp {
+	border: 1px solid var(--se-active-dark4-color);
+	font-size: var(--se-main-font-size);
+	padding: 4px;
+	direction: ltr;
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-form .se-input-select.se-math-size {
+	width: 6em;
+	height: 28px;
+	margin-left: 1em;
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-form .se-math-preview {
+	font-size: var(--se-main-font-size);
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-form .se-math-preview > span {
+	display: inline-block;
+	box-shadow: 0 0 0 0.1rem var(--se-active-light3-color);
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-form .se-math-preview > span * {
+	direction: ltr;
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-form .se-math-preview > .se-math-error {
+	color: var(--se-error-color);
+	box-shadow: 0 0 0 0.1rem var(--se-error-light3-color);
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-form .se-math-preview > .se-math-error svg {
+	width: auto;
+	height: 30px;
+	color: var(--se-error-color);
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-modal-form .se-math-preview .MathJax {
+	margin: 0.5em 0 !important;
+}
+
+/* modal - modal - link preview */
+.sun-editor .se-modal-area .se-modal-inner .se-link-preview {
+	display: block;
+	height: auto;
+	padding-top: 4px;
+	font-size: var(--se-main-font-size);
+	font-weight: normal;
+	font-family: inherit;
+	color: var(--se-modal-preview-color);
+	background-color: transparent;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	word-break: break-all;
+	white-space: pre;
+	max-height: none;
+}
+
+/* modal - modal - anchor module */
+.sun-editor .se-modal-area .se-modal-inner .se-anchor-preview-form {
+	width: 100%;
+	display: flex;
+	margin-top: 4px;
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-anchor-preview-form .se-svg.se-anchor-preview-icon {
+	flex: unset;
+	display: none;
+	line-height: 1;
+	margin: 2px;
+	color: var(--se-active-dark3-color);
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-anchor-preview-form .se-link-preview {
+	flex: 1;
+	margin: 0;
+}
+
+/* modal - modal - anchor module - rel select */
+.sun-editor .se-modal-area .se-modal-inner .se-anchor-rel {
+	position: relative;
+	height: var(--se-input-btn-size);
+}
+.sun-editor .se-modal-area .se-modal-inner .se-anchor-rel-btn {
+	border-width: 1px;
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-anchor-rel-wrapper {
+	display: flex;
+	height: var(--se-input-btn-size);
+	line-height: 1;
+	padding: 0 6px;
+	align-items: center;
+}
+
+.sun-editor .se-modal-area .se-modal-inner .se-anchor-rel-preview {
+	word-break: break-word;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+	text-align: left;
+}
+
+/* modal - modal - canvas */
+.sun-editor .se-modal-area .se-modal-inner .se-modal-body .se-drawing-canvas {
+	outline: 1px solid var(--se-main-outline-color);
+}
+
+/** --- controller ---------------------------------------------------------- */
+.sun-editor .se-controller {
+	position: absolute;
+	display: none;
+	overflow: visible;
+	z-index: 2147483646;
+	padding: 2px 2px 0 2px;
+	margin: 0;
+	border: 1px solid var(--se-controller-border-color);
+	text-align: start;
+	text-decoration: none;
+	text-shadow: none;
+	text-transform: none;
+	letter-spacing: normal;
+	word-break: normal;
+	word-spacing: normal;
+	word-wrap: normal;
+	white-space: normal;
+	background-color: var(--se-controller-background-color);
+	color: var(--se-controller-color);
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+	line-break: auto;
+}
+
+.sun-editor .se-controller.se-empty-controller {
+	border: none;
+	padding: 0;
+}
+.sun-editor .se-controller.se-controller-simple-input {
+	padding: 4px 3px 0 3px;
+}
+
+.sun-editor .se-controller:not(.se-resizing-container) {
+	box-shadow: 0 5px 10px var(--se-shadow-controller-color);
+}
+
+.sun-editor-editable[contenteditable='true'] figure a,
+.sun-editor-editable[contenteditable='true'] figure img,
+.sun-editor-editable[contenteditable='true'] figure iframe,
+.sun-editor-editable[contenteditable='true'] figure video {
+	z-index: 0;
+}
+
+.sun-editor-editable[contenteditable='true'] figure figcaption {
+	display: block;
+	z-index: 2;
+}
+
+.sun-editor-editable[contenteditable='true']:not(.se-read-only) figure:not(.se-input-component)::after {
+	position: absolute;
+	content: '';
+	z-index: 1;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	cursor: default;
+	display: block;
+	background: rgba(0, 0, 0, 0);
+}
+
+.sun-editor-editable[contenteditable='true'] .se-component {
+	outline: 1px dashed var(--se-main-divider-color);
+}
+
+.sun-editor-editable[contenteditable='true'] figure,
+.sun-editor-editable[contenteditable='true'] hr {
+	outline: 2px solid transparent;
+}
+
+.sun-editor-editable[contenteditable='true'] .se-component:not(:has(figure)).se-component-selected,
+.sun-editor-editable[contenteditable='true'] figure.se-component-selected,
+.sun-editor-editable[contenteditable='true'] .se-component.se-component-selected > figure {
+	outline: 2px solid var(--se-active-dark-color);
+	transition:
+		outline-color 0.2s ease-in-out,
+		outline-width 0.2s ease-in-out;
+}
+
+.sun-editor-editable[contenteditable='true'] .se-component figure.se-figure-selected:not(.se-figure-over-selected)::after {
+	pointer-events: none;
+}
+
+.sun-editor-editable[contenteditable='true'] .se-copy {
+	background-color: var(--se-main-border-color);
+	opacity: 0.3;
+	box-shadow: 0 0 0 0.25rem var(--se-active-dark5-color);
+	transition: box-shadow 0.15s ease-in-out;
+}
+
+.sun-editor-editable[contenteditable='true'] .se-component:not(:has(figure)).se-component-selected.se-drag-over,
+.sun-editor-editable[contenteditable='true'] .se-figure-selected.se-drag-over,
+.sun-editor-editable[contenteditable='true'] hr.se-component-selected.se-drag-over {
+	outline: 3px solid var(--se-drag-over-color) !important;
+}
+.sun-editor-editable[contenteditable='true'] figure.se-drag-over > iframe {
+	pointer-events: none;
+}
+
+/* controller - display span */
+.sun-editor .se-controller .se-controller-display {
+	padding: 0 10px;
+	margin: 4px 0;
+	font-size: var(--se-main-font-size);
+}
+
+/* controller - button group */
+.sun-editor .se-controller .se-btn-group {
+	position: relative;
+	display: flex;
+	padding: 0 0 2px 0;
+	margin: 0;
+	top: 0;
+	left: 0;
+}
+
+.sun-editor .se-controller .se-btn-group .se-btn-group-sub {
+	left: 50%;
+	min-width: auto;
+	width: -webkit-max-content;
+	width: -moz-max-content;
+	width: max-content;
+	display: none;
+}
+
+.sun-editor .se-controller .se-btn-group .se-btn-group-sub button {
+	margin: 0;
+	min-width: 72px;
+}
+
+.sun-editor .se-controller .se-btn-group button {
+	position: relative;
+	min-height: var(--se-input-btn-size);
+	height: auto;
+	border: none;
+	border-radius: var(--se-border-radius);
+	margin: 1px;
+	font-size: var(--se-btn-font-size);
+	line-height: 1.5;
+	display: inline-block;
+	font-weight: normal;
+	text-align: center;
+	white-space: nowrap;
+	touch-action: manipulation;
+}
+
+/* controller - controller-content */
+.sun-editor .se-controller .se-controller-content {
+	position: relative;
+	padding: 0 0 2px 0;
+	margin: 0;
+	top: 0;
+	left: 0;
+}
+
+/* controller - controller-content - header */
+.sun-editor .se-controller .se-controller-header {
+	width: 100%;
+	height: 38px;
+	padding: 4px;
+	border-bottom: 1px solid var(--se-modal-border-color);
+}
+
+/* controller - controller-content - body */
+.sun-editor .se-controller .se-controller-body {
+	position: relative;
+	font-size: var(--se-main-font-size);
+	width: 100%;
+	padding: 4px 4px 1px 4px;
+}
+
+.sun-editor .se-controller .se-controller-body .se-btn:disabled,
+.sun-editor .se-controller .se-controller-body button:disabled,
+.sun-editor .se-controller .se-controller-body input:disabled {
+	background-color: var(--se-main-shadow-color);
+}
+
+.sun-editor .se-controller .se-controller-header .se-close-btn {
+	width: 28px;
+	height: 28px;
+	min-height: 28px;
+	float: right;
+	font-weight: bold;
+	text-shadow: 0 1px 0 var(--se-main-background-color);
+	filter: alpha(opacity=100);
+	opacity: 1;
+}
+
+.sun-editor .se-controller .se-controller-header .se-controller-title {
+	float: left;
+	font-size: var(--se-main-font-size);
+	font-weight: bold;
+	margin: 0;
+	padding: 0;
+	line-height: 2.2;
+}
+
+/* controller - resizing(image, iframe) */
+.sun-editor .se-controller-resizing {
+	font-size: var(--se-controller-font-size);
+	font-style: normal;
+	font-weight: normal;
+	line-height: 1.4;
+}
+
+.sun-editor .se-resizing-container {
+	position: absolute;
+	display: none;
+	outline: none;
+	pointer-events: none;
+	border: 0;
+	padding: 0;
+	z-index: 6;
+	background-color: transparent !important;
+	backface-visibility: hidden;
+	-webkit-backface-visibility: hidden;
+	-moz-backface-visibility: hidden;
+}
+
+.sun-editor .se-drag-handle {
+	position: absolute;
+	z-index: 2147483646;
+	display: none;
+	pointer-events: auto;
+	cursor: move;
+	width: 20px;
+	height: 20px;
+	background-color: var(--se-active-dark-color);
+	border: 0;
+	padding: 1px;
+	color: var(--se-main-background-color);
+	outline: 2px solid transparent;
+}
+.sun-editor .se-drag-handle.se-drag-handle-full {
+	cursor: default;
+}
+.sun-editor .se-drag-handle > svg {
+	pointer-events: none;
+	max-width: 100%;
+	max-height: 100%;
+}
+.sun-editor .se-drag-handle:hover {
+	background-color: var(--se-drag-over-color);
+}
+.sun-editor .se-drag-handle.se-dragging {
+	opacity: 0;
+}
+
+.sun-editor .se-resizing-container .se-resize-dot {
+	position: absolute;
+	display: inline-block;
+	outline: 2px solid var(--se-active-dark-color);
+	border: 0;
+	padding: 0;
+}
+
+.sun-editor .se-resizing-container.se-resize-ing .se-resize-dot {
+	outline: 2px solid var(--se-active-dark3-color);
+}
+
+.sun-editor .se-resizing-container .se-resize-dot > span {
+	position: absolute;
+	pointer-events: auto;
+	width: 7px;
+	height: 7px;
+	border-radius: 1px;
+	background-color: var(--se-active-dark3-color);
+	border: 1px solid var(--se-active-dark3-color);
+}
+
+.sun-editor .se-resizing-container .se-resize-dot > span.tl {
+	top: -6px;
+	left: -6px;
+	border-radius: 4px;
+	cursor: nwse-resize;
+}
+
+.sun-editor .se-resizing-container .se-resize-dot > span.tr {
+	top: -6px;
+	right: -6px;
+	border-radius: 4px;
+	cursor: nesw-resize;
+}
+
+.sun-editor .se-resizing-container .se-resize-dot > span.bl {
+	bottom: -6px;
+	left: -6px;
+	border-radius: 4px;
+	cursor: nesw-resize;
+}
+
+.sun-editor .se-resizing-container .se-resize-dot > span.br {
+	right: -6px;
+	bottom: -6px;
+	border-radius: 4px;
+	cursor: nwse-resize;
+}
+
+.sun-editor .se-resizing-container .se-resize-dot > span.lw {
+	left: -7px;
+	width: 5px;
+	bottom: calc(50% - 4px);
+	cursor: ew-resize;
+}
+
+.sun-editor .se-resizing-container .se-resize-dot > span.th {
+	left: calc(50% - 4px);
+	top: -7px;
+	height: 5px;
+	cursor: ns-resize;
+}
+
+.sun-editor .se-resizing-container .se-resize-dot > span.rw {
+	right: -7px;
+	width: 5px;
+	bottom: calc(50% - 4px);
+	cursor: ew-resize;
+}
+
+.sun-editor .se-resizing-container .se-resize-dot > span.bh {
+	right: calc(50% - 4px);
+	bottom: -7px;
+	height: 5px;
+	cursor: ns-resize;
+}
+
+.sun-editor .se-resizing-container .se-resize-display {
+	position: absolute;
+	pointer-events: none;
+	right: 0;
+	left: auto;
+	bottom: 0;
+	padding: 5px;
+	margin: 2px;
+	font-size: var(--se-btn-font-size);
+	color: var(--se-main-background-color);
+	background-color: var(--se-main-font-color);
+	border-radius: var(--se-border-radius);
+	opacity: 0.75;
+}
+
+.sun-editor .se-resizing-container.se-resize-ing .se-resize-display {
+	opacity: 1;
+}
+
+/* controller - table */
+.sun-editor .se-controller-table {
+	width: auto;
+	font-size: var(--se-controller-font-size);
+	font-style: normal;
+	font-weight: normal;
+	line-height: 1.4;
+}
+
+.sun-editor .se-controller-table-cell {
+	width: auto;
+	font-size: var(--se-controller-font-size);
+	font-style: normal;
+	font-weight: normal;
+	line-height: 1.4;
+}
+
+/* controller - table - props */
+.sun-editor .se-controller.se-table-props .se-color-input,
+.sun-editor .se-controller.se-table-props .se-border-style {
+	width: var(--se-modal-input-width);
+}
+.sun-editor .se-controller.se-table-props .__se__border_size {
+	width: 52px;
+}
+.sun-editor .se-controller.se-table-props .se-table-props-align li {
+	margin-right: 2px;
+}
+.sun-editor .se-controller.se-table-props .se-table-props-align .se-form-group div:last-child {
+	flex: auto;
+	margin: 0 8px;
+}
+
+/* controller - link */
+.sun-editor .se-controller-link {
+	font-size: var(--se-controller-font-size);
+	font-style: normal;
+	font-weight: normal;
+	line-height: 1.4;
+}
+
+.sun-editor .se-controller-link::before,
+.sun-editor .se-controller-link::after {
+	box-sizing: border-box;
+}
+
+.sun-editor .se-controller-link .link-content {
+	padding: 0;
+	margin: 0;
+}
+
+.sun-editor .se-controller-link .link-content a {
+	display: inline-block;
+	color: var(--se-active-dark3-color);
+	max-width: 200px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	vertical-align: middle;
+	margin-left: 5px;
+}
+
+/* --- select menu ---------------------------------------------------------- */
+.sun-editor .se-select-menu {
+	position: absolute;
+	min-width: auto;
+	top: 0px;
+	left: 0px;
+	z-index: 2147483646;
+	display: none;
+	width: -webkit-max-content;
+	width: -moz-max-content;
+	width: max-content;
+	height: auto;
+	overflow-y: visible;
+	overflow-x: visible;
+	overflow: visible;
+	background-color: var(--se-main-background-color);
+	border-radius: var(--se-border-radius);
+	padding: 2px 0;
+	margin: 0;
+	border: 1px solid var(--se-main-outline-color);
+	box-shadow: 0 3px 9px var(--se-shadow-layer-color);
+	outline: 0 none;
+}
+
+.sun-editor .se-select-menu.se-select-menu-scroll {
+	overflow-y: auto;
+}
+
+.sun-editor .se-select-menu ul {
+	padding: 0;
+	margin: 0;
+	word-break: break-all;
+	width: auto;
+	max-width: 100%;
+	min-width: -moz-max-content;
+	min-width: -webkit-max-content;
+	min-width: -o-max-content;
+	min-width: -ms-max-content;
+}
+
+.sun-editor .se-select-menu .se-select-item {
+	list-style: none;
+	line-height: 28px;
+	min-height: 28px;
+	font-size: var(--se-btn-font-size);
+	padding: 0 6px;
+	margin: 2px 0;
+	cursor: pointer;
+}
+
+.sun-editor .se-select-menu .se-select-item button {
+	padding: 0;
+	margin: 0;
+	min-height: 28px;
+}
+.sun-editor .se-select-menu .se-select-item button span {
+	padding: 0;
+	margin: 0;
+}
+
+.sun-editor .se-select-menu .se-select-item.se-select-on,
+.sun-editor .se-select-menu .se-select-item *.se-select-on {
+	color: var(--se-active-dark3-color);
+}
+
+.sun-editor .se-select-menu.se-select-menu-mouse-move .se-select-item:hover,
+.sun-editor .se-select-menu:not(.se-select-menu-mouse-move) .se-select-item.active {
+	border-color: var(--se-active-light3-color) !important;
+	outline: 1px solid var(--se-active-color) !important;
+	box-shadow: 0 0 0 0.3rem var(--se-active-light3-color);
+	transition: box-shadow 0.1s ease-in-out;
+}
+
+.sun-editor .se-select-menu.se-select-menu-mouse-move .se-select-item:active,
+.sun-editor .se-select-menu.se-select-menu-mouse-move .se-select-item.__se__active {
+	background-color: var(--se-active-light4-color);
+	border-color: var(--se-active-light4-color) !important;
+	outline: 1px solid var(--se-active-color) !important;
+	box-shadow: none;
+	transition:
+		background-color 0.1s ease-in-out,
+		box-shadow 0.1s ease-in-out;
+}
+
+.sun-editor .se-modal-form-files .se-select-menu {
+	width: 100%;
+	height: auto;
+}
+
+.sun-editor .se-select-menu.se-figure-select-list {
+	width: 74px;
+}
+
+/* --- browser ---------------------------------------------------------- */
+.sun-editor .se-browser {
+	position: fixed;
+	display: none;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 2147483646;
+}
+
+.sun-editor .se-browser label,
+.sun-editor .se-browser input,
+.sun-editor .se-browser button {
+	font-size: var(--se-modal-input-font-size);
+	line-height: 1.5;
+	color: var(--se-main-color);
+	margin: 0;
+}
+
+.sun-editor .se-browser .se-browser-back {
+	position: absolute;
+	display: block;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	background-color: var(--se-overlay-background-color);
+	opacity: 0.5;
+}
+
+.sun-editor .se-browser .se-browser-inner {
+	position: absolute;
+	display: block;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+}
+
+.sun-editor .se-browser .se-browser-inner .se-browser-content {
+	position: relative;
+	width: 1024px;
+	max-width: 100%;
+	margin: 20px auto;
+	background-color: var(--se-main-background-color);
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	border-radius: var(--se-border-radius);
+	outline: 0;
+	box-shadow: 0 3px 9px var(--se-shadow-layer-color);
+}
+
+/* --- browser - header */
+.sun-editor .se-browser .se-browser-header {
+	height: auto;
+	min-height: 50px;
+	padding: 6px 15px 6px 15px;
+	border-bottom: 1px solid var(--se-modal-border-color);
+}
+
+.sun-editor .se-browser .se-browser-header .se-browser-close {
+	float: right;
+	font-weight: bold;
+	text-shadow: 0 1px 0 var(--se-main-background-color);
+	filter: alpha(opacity=100);
+	opacity: 1;
+}
+
+.sun-editor .se-browser .se-browser-header .se-browser-title {
+	font-size: var(--se-browser-title-font-size);
+	font-weight: bold;
+	margin: 0;
+	padding: 0;
+	line-height: 2.2;
+}
+
+/* --- browser - main wrapper */
+.sun-editor .se-browser .se-browser-wrapper {
+	display: flex;
+	position: relative;
+}
+
+/* --- browser - main */
+.sun-editor .se-browser .se-browser-main {
+	flex: auto;
+}
+
+/* --- browser - bar */
+.sun-editor .se-browser .se-browser-bar {
+	height: auto;
+	padding: 0px 15px;
+	border-bottom: 1px solid var(--se-modal-border-color);
+}
+
+/* --- browser - side */
+.sun-editor .se-browser .se-browser-side > div {
+	overflow-y: auto;
+}
+.sun-editor .se-browser .se-browser-side > div:not(.se-side-open-btn) {
+	height: 100%;
+	padding: 4px;
+	border-right: 1px solid var(--se-modal-border-color);
+	min-width: 220px;
+	flex-direction: row;
+	color: var(--se-edit-font-color);
+	line-height: 1.5;
+}
+.sun-editor .se-browser .se-browser-side .se-menu-icon {
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	margin: -1px 10px 0 0;
+	vertical-align: middle;
+}
+.sun-editor .se-browser .se-browser-search .se-side-open-btn {
+	display: none;
+	margin: 8px 0 0 8px;
+	opacity: 0.8;
+	border: 1px solid var(--se-input-btn-border-color);
+	color: var(--se-edit-font-color);
+}
+.sun-editor .se-browser .se-browser-side.se-side-show > div {
+	display: block !important;
+}
+.sun-editor .se-browser .se-browser-side > div .se-menu-hidden {
+	display: none;
+}
+.sun-editor .se-browser .se-menu-folder {
+	cursor: pointer;
+}
+.sun-editor .se-browser .se-menu-folder > div:not(.se-menu-child) {
+	display: flex;
+	padding: 8px 10px 8px 20px;
+}
+.sun-editor .se-browser .se-menu-folder > div > button {
+	margin-left: -20px;
+}
+.sun-editor .se-browser .se-menu-folder .se-menu-folder-item {
+	padding: 8px 8px 8px 24px;
+}
+.sun-editor .se-browser .se-menu-folder > div:not(.se-menu-child) > .se-menu-icon > * {
+	padding-top: 3px;
+}
+.sun-editor .se-browser .se-menu-folder .se-menu-folder-item > .se-menu-icon > * {
+	margin-top: -1px;
+}
+.sun-editor .se-browser .se-menu-folder div:not(.se-menu-child):not(.active):hover {
+	background-color: var(--se-main-divider-color);
+	border-color: var(--se-main-border-color);
+}
+.sun-editor .se-browser .se-menu-folder div.active > button {
+	color: var(--se-active-dark5-color);
+}
+.sun-editor .se-browser .se-menu-folder div.active,
+.sun-editor .se-browser .se-browser-search .se-side-open-btn.active {
+	background-color: var(--se-active-light2-color);
+	color: var(--se-active-dark5-color);
+}
+.sun-editor .se-browser .se-menu-folder.active {
+	border-left: 2px solid var(--se-active-dark4-color);
+	margin-left: -2px;
+}
+
+/* --- browser - tags */
+.sun-editor .se-browser .se-browser-tags {
+	display: block;
+	font-size: var(--se-main-font-size);
+	width: 100%;
+	padding: 0;
+	text-align: left;
+	margin-top: -5px;
+}
+
+.sun-editor .se-browser .se-browser-tags a {
+	display: inline-block;
+	background-color: var(--se-main-divider-color);
+	padding: 6px 12px;
+	margin: 8px 0 8px 8px;
+	color: var(--se-main-font-color);
+	text-decoration: none;
+	border-radius: 32px;
+	-moz-border-radius: 32px;
+	-webkit-border-radius: 32px;
+	-moz-background-clip: padding;
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+	cursor: pointer;
+}
+
+/* --- browser - header - search */
+.sun-editor .se-browser .se-browser-search {
+	display: flex;
+	font-size: var(--se-main-font-size);
+	width: 100%;
+	height: 48px;
+	padding: 0;
+	text-align: left;
+	margin: 0 -15px;
+}
+
+.sun-editor .se-browser .se-browser-search .se-browser-search-form {
+	width: 400px;
+	max-width: 100%;
+	display: flex;
+	flex-direction: row;
+}
+.sun-editor .se-browser .se-browser-search .se-browser-search-form > * {
+	margin: 8px;
+}
+.sun-editor .se-browser .se-browser-search .se-browser-search-form > .se-btn {
+	margin-left: 0;
+	margin-right: 0;
+}
+
+.sun-editor .se-browser .se-browser-search input {
+	flex: auto;
+	background-color: transparent;
+	padding: 3px 6px;
+	color: var(--se-main-font-color);
+	text-decoration: none;
+	border-radius: var(--se-border-radius);
+	-moz-border-radius: var(--se-border-radius);
+	-webkit-border-radius: var(--se-border-radius);
+	-moz-background-clip: padding;
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+}
+
+.sun-editor .se-browser .se-browser-search button {
+	float: none;
+}
+
+.sun-editor .se-browser .se-browser-tags a:hover {
+	background-color: var(--se-main-divider-color);
+	transition: background-color 0.2s ease-in-out;
+}
+
+.sun-editor .se-browser .se-browser-tags a:active {
+	background-color: var(--se-main-border-color);
+}
+
+.sun-editor .se-browser .se-browser-tags a.on {
+	background-color: var(--se-active-light3-color);
+	color: var(--se-active-dark3-color);
+}
+
+.sun-editor .se-browser .se-browser-tags a.on:hover {
+	background-color: var(--se-active-light5-color);
+	transition: background-color 0.2s ease-in-out;
+}
+
+.sun-editor .se-browser .se-browser-tags a.on:active {
+	background-color: var(--se-active-light5-color);
+}
+
+/* --- browser - body */
+.sun-editor .se-browser .se-browser-body {
+	position: relative;
+	height: auto;
+	min-height: 350px;
+	padding: 10px;
+	overflow-y: auto;
+}
+
+.sun-editor .se-browser .se-browser-body .se-browser-list {
+	position: relative;
+	width: 100%;
+}
+
+@media screen and (max-width: 992px) {
+	.sun-editor .se-browser .se-browser-inner .se-browser-content {
+		width: 748px;
+	}
+	.sun-editor .se-browser .se-browser-side > div:not(.se-side-open-btn) {
+		min-width: 180px;
+	}
+}
+
+@media screen and (max-width: 768px) {
+	.sun-editor .se-browser .se-browser-inner .se-browser-content {
+		width: 600px;
+	}
+	.sun-editor .se-browser .se-browser-side > div:not(.se-side-open-btn) {
+		min-width: 150px;
+	}
+}
+
+@media screen and (max-width: 552px) {
+	.sun-editor .se-browser .se-browser-side > div:not(.se-side-open-btn) {
+		display: none;
+	}
+	.sun-editor .se-browser .se-browser-search .se-side-open-btn {
+		display: block;
+	}
+	.sun-editor .se-browser .se-browser-side {
+		position: absolute;
+		height: calc(100% - 49px);
+		top: 49px;
+		z-index: 2;
+		background-color: var(--se-main-background-color);
+		opacity: 0.95;
+	}
+}
+
+/* --- browser - column */
+.sun-editor .se-browser .se-browser-list .se-file-item-column {
+	position: relative;
+	display: block;
+	height: auto;
+	float: left;
+}
+
+.sun-editor .se-browser .se-browser-list.se-preview-list .se-file-item-column {
+	width: calc(25% - 20px);
+	margin: 0 10px;
+}
+
+@media screen and (max-width: 992px) {
+	.sun-editor .se-browser .se-browser-list.se-preview-list .se-file-item-column {
+		width: calc(33% - 20px);
+	}
+}
+
+@media screen and (max-width: 768px) {
+	.sun-editor .se-browser .se-browser-list.se-preview-list .se-file-item-column {
+		width: calc(50% - 20px);
+	}
+}
+
+/* --- browser --- item */
+.sun-editor .se-browser .se-browser-list.se-preview-list .se-file-item-img {
+	position: relative;
+	display: block;
+	cursor: pointer;
+	width: 100%;
+	height: auto;
+	border-radius: var(--se-border-radius);
+	outline: 0;
+	margin: 10px 0;
+}
+
+.sun-editor .se-browser .se-browser-list.se-preview-list .se-file-item-img:hover {
+	opacity: 0.8;
+	box-shadow: 0 0 0 0.2rem var(--se-active-color);
+	transition: box-shadow 0.1s ease-in-out;
+}
+
+.sun-editor .se-browser .se-browser-list.se-preview-list .se-file-item-img > img {
+	position: relative;
+	display: block;
+	width: 100%;
+	border-radius: var(--se-border-radius);
+	outline: 0;
+	height: auto;
+}
+
+.sun-editor .se-browser .se-browser-list.se-preview-list .se-file-item-img > .se-file-name-image {
+	position: absolute;
+	z-index: 1;
+	font-size: var(--se-main-font-size);
+	color: var(--se-main-background-color);
+	left: 0px;
+	bottom: 0;
+	padding: 5px 10px;
+	background-color: transparent;
+	width: 100%;
+	height: 30px;
+	border-bottom-right-radius: var(--se-border-radius);
+	border-bottom-left-radius: var(--se-border-radius);
+	pointer-events: none;
+}
+
+.sun-editor .se-browser .se-browser-list.se-preview-list .se-file-item-img > .se-file-name-image.se-file-name-back {
+	background-color: var(--se-main-font-color);
+	opacity: 0.6;
+	pointer-events: none;
+}
+
+.sun-editor .se-browser .se-browser-list.se-preview-list .se-file-item-img > * {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+/* --- browser - empty-thumbnail */
+.sun-editor .se-browser .se-browser-list.se-preview-list .se-file-item-img > .se-browser-empty-thumbnail {
+	width: 100%;
+	height: 170px;
+	max-height: 100%;
+	background-color: var(--se-active-light-color);
+	border-radius: var(--se-border-radius);
+}
+.sun-editor .se-browser .se-browser-list.se-preview-list .se-file-item-img > .se-browser-empty-thumbnail > svg {
+	width: 90px;
+	max-width: 100%;
+	height: auto;
+	margin-bottom: 30px;
+	color: var(--se-active-color);
+}
+
+/** --- alert */
+.sun-editor .se-alert-content {
+	position: relative;
+	z-index: 7;
+	max-width: 500px;
+	width: auto;
+	height: auto;
+	margin: auto;
+	top: 35%;
+	border-radius: var(--se-border-radius);
+	box-shadow: 0 3px 9px var(--se-shadow-layer-color);
+	word-break: break-all;
+	background-color: var(--se-main-background-color);
+	padding: 15px;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	opacity: 0;
+	visibility: hidden;
+	transform: scale(0.9);
+	transition:
+		opacity 0.25s ease,
+		transform 0.25s ease;
+}
+.sun-editor .se-alert-content.se-modal-show {
+	opacity: 1;
+	visibility: visible;
+	transform: scale(1);
+	animation: se-alert-in 0.25s ease forwards;
+}
+
+.sun-editor .se-alert-content button {
+	float: right;
+	padding: 0;
+}
+
+/** --- alert - success */
+.sun-editor .se-alert-content.se-alert-success {
+	color: var(--se-success-color);
+	border-color: var(--se-success-light4-color);
+}
+
+/** --- alert - error */
+.sun-editor .se-alert-content.se-alert-error {
+	color: var(--se-error-color);
+	border-color: var(--se-error-light4-color);
+}
+
+/** --- toast */
+.sun-editor .se-toast {
+	background: transparent;
+	position: fixed;
+	display: none;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 2147483646;
+	pointer-events: none;
+}
+
+.sun-editor .se-toast .se-toast-container {
+	position: relative;
+	max-width: 100%;
+	width: max-content;
+	height: max-content;
+	margin: auto;
+	top: 35%;
+	border-radius: var(--se-border-radius);
+	box-shadow: 0 3px 9px var(--se-shadow-layer-color);
+	word-break: break-all;
+	background-color: var(--se-main-font-color);
+	color: var(--se-main-background-color);
+	text-align: center;
+	line-height: unset;
+	font-size: 0.9em;
+	padding: 7px;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	opacity: 0;
+	transform: scale(0.9);
+	transition:
+		opacity 0.25s ease,
+		transform 0.25s ease;
+	opacity: 0;
+	transform: translateY(20px);
+}
+.sun-editor .se-toast .se-toast-container.se-toast-show {
+	opacity: 1;
+	animation:
+		toast-in 0.3s ease-out forwards,
+		toast-out 0.3s ease-in forwards 3s;
+}
+
+/** --- toast - success */
+.sun-editor .se-toast.se-toast-success .se-toast-container {
+	background-color: var(--se-success-color);
+	border-color: var(--se-success-light4-color);
+}
+
+/** --- toast - error */
+.sun-editor .se-toast.se-toast-error .se-toast-container {
+	background-color: var(--se-error-color);
+	border-color: var(--se-error-light3-color);
+}
+
+/* --- Input focus */
+.sun-editor input:not(.se-toolbar-btn):focus,
+.sun-editor select:focus,
+.sun-editor textarea:focus {
+	border-color: var(--se-active-dark-color);
+	outline: 0;
+	box-shadow: 0 0 0 0.2rem var(--se-active-light3-color);
+	transition:
+		border-color 0.15s ease-in-out,
+		box-shadow 0.15s ease-in-out;
+}
+
+/** --- tooltip */
+.sun-editor .se-tooltip {
+	position: relative;
+	overflow: visible;
+	font-size: var(--se-main-font-size);
+}
+
+.sun-editor .se-tooltip .se-tooltip-inner {
+	visibility: hidden;
+	position: absolute;
+	display: block;
+	width: auto;
+	height: auto;
+	top: 120%;
+	left: 50%;
+	background: transparent;
+	opacity: 0;
+	z-index: 1;
+	line-height: 1.5;
+	transition: opacity 0.5s;
+	margin: 0;
+	padding: 0;
+	bottom: auto;
+	float: none;
+	pointer-events: none;
+	backface-visibility: hidden;
+	-webkit-backface-visibility: hidden;
+	-moz-backface-visibility: hidden;
+}
+
+.sun-editor .se-tooltip .se-tooltip-inner .se-tooltip-text {
+	position: relative;
+	display: inline-block;
+	width: auto;
+	height: auto;
+	left: -50%;
+	font-size: 0.9em;
+	margin: 0;
+	padding: 4px 6px;
+	border-radius: var(--se-border-radius);
+	background-color: var(--se-main-font-color);
+	color: var(--se-main-background-color);
+	text-align: center;
+	line-height: unset;
+	white-space: nowrap;
+	cursor: auto;
+}
+
+.sun-editor .se-tooltip .se-tooltip-inner .se-tooltip-text::after {
+	content: '';
+	position: absolute;
+	bottom: 100%;
+	left: 50%;
+	margin-left: -5px;
+	border-width: 5px;
+	border-style: solid;
+	border-color: transparent transparent var(--se-main-font-color) transparent;
+}
+
+.sun-editor .se-tooltip:hover .se-tooltip-inner {
+	visibility: visible;
+	opacity: 1;
+}
+
+.sun-editor :not(.se-shortcut-hide) .se-tooltip .se-tooltip-inner .se-tooltip-text .se-shortcut {
+	display: block !important;
+}
+
+.sun-editor .se-shortcut-hide .se-tooltip .se-tooltip-inner .se-tooltip-text .se-shortcut {
+	display: none !important;
+}
+
+.sun-editor .se-tooltip .se-tooltip-inner .se-tooltip-text .se-shortcut > .se-shortcut-key {
+	display: inline;
+	font-weight: bold;
+}
+
+/* -- color input */
+.sun-editor input.se-color-input {
+	width: 72px;
+	margin: 0 2px;
+	border-top: 0;
+	border-left: 0;
+	border-right: 0;
+	border-radius: 0;
+	border-bottom: 2px solid var(--se-main-outline-color);
+	outline: none;
+	text-transform: uppercase;
+}
+.sun-editor input.se-color-input::-webkit-input-placeholder {
+	font-size: 0.9em;
+	text-transform: none;
+}
+.sun-editor input.se-color-input::-moz-placeholder {
+	font-size: 0.9em;
+	text-transform: none;
+}
+.sun-editor input.se-color-input:-ms-input-placeholder {
+	font-size: 0.9em;
+	text-transform: none;
+}
+.sun-editor input.se-color-input::-ms-input-placeholder {
+	font-size: 0.9em;
+	text-transform: none;
+}
+.sun-editor input.se-color-input::placeholder {
+	font-size: 0.9em;
+	text-transform: none;
+}
+.sun-editor input.se-color-input::-webkit-search-cancel-button {
+	-webkit-appearance: none;
+	height: 15px;
+	width: 15px;
+	background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEzLjQ2LDEyTDE5LDE3LjU0VjE5SDE3LjU0TDEyLDEzLjQ2TDYuNDYsMTlINVYxNy41NEwxMC41NCwxMkw1LDYuNDZWNUg2LjQ2TDEyLDEwLjU0TDE3LjU0LDVIMTlWNi40NkwxMy40NiwxMloiIC8+PC9zdmc+')
+		no-repeat center center;
+	background-size: cover;
+}
+
+.sun-editor .se-visible-hidden {
+	visibility: hidden;
+}
+
+/** --- selected class */
+/* -- table */
+.sun-editor-editable table td.se-selected-table-cell::after,
+.sun-editor-editable table th.se-selected-table-cell::after {
+	position: absolute;
+	content: '';
+	background-color: var(--se-active-light3-color);
+	opacity: 0.3;
+	width: 100%;
+	height: 100%;
+	bottom: -1px;
+	left: -1px;
+	right: -1px;
+	top: -1px;
+}
+.sun-editor-editable[contenteditable='true'] table td.se-selected-cell-focus,
+.sun-editor-editable[contenteditable='true'] table th.se-selected-cell-focus {
+	outline: 2px dashed var(--se-active-dark3-color);
+	z-index: 1;
+}
+
+/** --- pre code lang --- */
+/* ---pre - language label */
+.sun-editor-editable pre[data-se-lang] {
+	position: relative;
+}
+.sun-editor-editable pre[data-se-lang]::before {
+	content: attr(data-se-lang);
+	position: absolute;
+	top: 0;
+	right: 0;
+	padding: 2px 8px;
+	font-size: 11px;
+	color: var(--se-secondary-color);
+	opacity: 0.7;
+	pointer-events: none;
+}
+.sun-editor-editable[contenteditable='true'] pre.se-pre-code-focus {
+	outline: 2px solid var(--se-active-color);
+	outline-offset: -2px;
+}
+.sun-editor-editable pre[data-se-lang].se-pre-code-focus::before {
+	display: none;
+}
+.sun-editor-editable.se-rtl pre[data-se-lang]::before {
+	right: auto;
+	left: 0;
+}
+
+/* ---pre language selector */
+.sun-editor .se-code-lang {
+	position: absolute;
+	display: none;
+	padding: 0;
+}
+.sun-editor .se-code-lang-button {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	cursor: pointer;
+	margin: 0;
+	padding: 4px;
+	font-size: 11px;
+	font-family: monospace;
+	line-height: 1.4;
+	border-radius: var(--se-border-radius);
+	background-color: var(--se-edit-background-pre, #f9f9f9);
+	border: 1px solid var(--se-border-color);
+	color: var(--se-edit-font-pre, #666);
+	opacity: 0.75;
+	transition: opacity 0.15s;
+	white-space: nowrap;
+	box-shadow: 0;
+}
+.sun-editor .se-code-lang-button:hover {
+	opacity: 1;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+.sun-editor .se-code-lang-icon {
+	font-weight: 700;
+	font-size: 10px;
+	opacity: 0.5;
+}
+
+/* --- Finder ---------------------------------------------------------- */
+.sun-editor .se-find-replace {
+	position: sticky;
+	z-index: 6;
+	display: none;
+	flex-direction: column;
+	margin-left: auto;
+	width: fit-content;
+	max-width: 100%;
+	background-color: var(--se-main-background-color);
+	border: 1px solid var(--se-main-border-color);
+	border-top: none;
+	border-right: none;
+	border-radius: 0 0 0 var(--se-border-radius);
+	box-shadow: -2px 2px 6px rgba(0, 0, 0, 0.1);
+	padding: 6px 8px;
+	gap: 4px;
+}
+.sun-editor .se-find-replace.se-find-replace-open {
+	display: flex;
+}
+
+.sun-editor .se-find-replace-row {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	align-items: center;
+	gap: 4px;
+}
+.sun-editor .se-find-replace-row-replace {
+	display: flex;
+	justify-content: flex-start;
+}
+
+/* Finder - input */
+.sun-editor .se-find-replace .se-find-input-wrapper {
+	position: relative;
+	flex: 1 1 180px;
+	max-width: 420px;
+}
+
+.sun-editor .se-find-replace .se-find-replace-input {
+	width: 100%;
+	height: 26px;
+	padding: 2px 100px 2px 6px;
+	border: 1px solid var(--se-main-border-color);
+	border-radius: var(--se-border-radius);
+	background-color: var(--se-main-background-color);
+	color: var(--se-main-color);
+	font-size: 13px;
+	outline: none;
+	box-sizing: border-box;
+}
+.sun-editor .se-find-replace .se-find-replace-input:focus {
+	border-color: var(--se-active-color);
+	box-shadow: 0 0 0 1px var(--se-active-color);
+}
+.sun-editor .se-find-replace .se-find-replace-input.se-find-no-match {
+	background-color: var(--se-find-no-match-color, rgba(255, 80, 80, 0.12));
+}
+
+/* Finder - toggle button group */
+.sun-editor .se-find-replace .se-find-replace-toggle {
+	position: absolute;
+	right: 1px;
+	top: 50%;
+	transform: translateY(-50%);
+	font-size: 11px;
+	color: var(--se-main-color-lighter);
+	white-space: nowrap;
+	background-color: transparent;
+}
+.sun-editor .se-find-replace .se-find-replace-toggle > * {
+	display: flex;
+	float: left;
+	align-items: center;
+	justify-content: center;
+	height: 24px;
+	margin: 0;
+}
+.sun-editor .se-find-replace .se-find-replace-toggle .se-find-replace-info {
+	padding: 0 2px;
+}
+.sun-editor .se-find-replace .se-find-replace-toggle .se-find-replace-info .se-find-replace-count {
+	color: var(--se-main-color-lighter);
+}
+.sun-editor .se-find-replace .se-find-replace-toggle > button.on {
+	border: none;
+}
+
+/* Finder - buttons */
+.sun-editor .se-find-replace .se-find-replace-buttons {
+	display: flex;
+	gap: 1px;
+	flex-shrink: 0;
+}
+
+.sun-editor .se-find-replace .se-find-replace-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	border: 1px solid transparent;
+	transition:
+		opacity 0.15s,
+		background-color 0.15s;
+	font-size: 11px;
+}
+
+.sun-editor .se-find-replace .se-find-replace-row .se-find-replace-btn {
+	background-color: transparent;
+}
+
+.sun-editor .se-find-replace .se-find-replace-btn svg {
+	width: 16px;
+	height: 16px;
+	fill: currentColor;
+}
+
+/* Finder - CSS Custom Highlight API: injected at runtime via JS (PostCSS cannot parse ::highlight) */
+/* Finter - Mark element fallback highlights */
+.sun-editor mark.se-find-mark,
+.sun-editor-editable mark.se-find-mark {
+	background-color: var(--se-find-match-color, rgba(255, 213, 0, 0.4));
+	color: inherit;
+	padding: 0;
+	margin: 0;
+	border-radius: 1px;
+}
+.sun-editor mark.se-find-mark.se-find-current,
+.sun-editor-editable mark.se-find-mark.se-find-current {
+	background-color: var(--se-find-current-color, rgba(255, 150, 50, 0.7));
+}
+
+/** --- RTL start -------------------------------------------------------------------------------------------------------------------------------------------------- */
+/* icon */
+.sun-editor.se-rtl .se-icon-flip-rtl svg,
+.sun-editor.se-rtl .se-icon-flip-rtl .se-svg {
+	transform: scaleX(-1);
+}
+
+.sun-editor.se-rtl .se-text-prefix-icon {
+	float: right;
+}
+
+.sun-editor.se-rtl .se-btn-select svg {
+	margin: auto 1px;
+}
+
+/* Finder */
+.sun-editor.se-rtl .se-find-replace {
+	margin-left: 0;
+	margin-right: auto;
+	border-right: 1px solid var(--se-main-border-color);
+	border-left: none;
+	border-radius: 0 0 var(--se-border-radius) 0;
+	box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+}
+.sun-editor.se-rtl .se-find-replace-row {
+	justify-content: flex-start;
+}
+
+/* statusbar */
+.sun-editor.se-rtl .se-status-bar .se-navigation {
+	direction: rtl;
+}
+
+/* button--- */
+/* button - select text */
+.sun-editor.se-rtl .se-btn-select .se-txt {
+	flex: auto;
+	text-align: right;
+	direction: rtl;
+	margin-left: 4px;
+}
+
+/* side button */
+.sun-editor.se-rtl button.se-side-btn {
+	float: right;
+}
+.sun-editor.se-rtl button.se-side-btn-b {
+	float: right;
+	margin-right: 0;
+	border-radius: var(--se-border-radius) 0 0 var(--se-border-radius);
+}
+.sun-editor.se-rtl button.se-side-btn-a {
+	float: right;
+	margin-left: 0;
+	border-radius: 0 var(--se-border-radius) var(--se-border-radius) 0;
+}
+.sun-editor.se-rtl button.se-side-btn-after {
+	margin-right: 0;
+	border-radius: var(--se-border-radius) 0 0 var(--se-border-radius);
+}
+.sun-editor.se-rtl button.se-side-btn-before {
+	float: right;
+	margin-left: 0;
+	border-radius: 0 var(--se-border-radius) var(--se-border-radius) 0;
+}
+
+/* after, before button:hover - on, active - border */
+.sun-editor.se-rtl .se-menu-list li .se-side-btn-after.on:enabled,
+.sun-editor.se-rtl .se-menu-list li .se-side-btn-after.active:enabled {
+	border-left: 0;
+	border-right: 1px solid;
+}
+.sun-editor.se-rtl .se-menu-list li .se-side-btn-before.on:enabled,
+.sun-editor.se-rtl .se-menu-list li .se-side-btn-before.active:enabled {
+	border-right: 0;
+	border-left: 1px solid;
+}
+
+/* button - se-menu-list */
+.sun-editor.se-rtl .se-btn-list {
+	text-align: right;
+}
+
+.sun-editor.se-rtl .se-btn-list > .se-list-icon {
+	margin: -1px 0 0 10px;
+}
+
+/* button - se-menu-list - li */
+.sun-editor.se-rtl .se-menu-list:not(.se-menu-dir-fix) {
+	float: right;
+}
+
+.sun-editor.se-rtl .se-menu-list:not(.se-menu-dir-fix) li {
+	float: right;
+}
+
+/* menu list--- */
+.sun-editor.se-rtl .se-list-layer * {
+	direction: rtl;
+}
+
+/* menu list - format block */
+.sun-editor.se-rtl .se-list-layer.se-list-format ul blockquote {
+	padding: 0 7px 0 0;
+	border-right-width: 5px;
+	border-left-width: 0;
+	border-top: 0;
+	border-bottom: 0;
+}
+
+/* select menu inner icon */
+.sun-editor.se-rtl .se-select-item .se-list-icon {
+	margin: 0 0 6px 6px;
+}
+
+/* menu list - color picker */
+.sun-editor.se-rtl .se-list-layer .se-selector-color .se-color-pallet li {
+	float: right;
+}
+
+/* dropdown layer - checked list */
+.sun-editor.se-rtl .se-list-inner .se-list-checked li button > .se-svg {
+	float: right;
+	padding: 6px 0 0 6px;
+}
+
+/* placeholder */
+.sun-editor.se-rtl .se-wrapper .se-placeholder {
+	direction: rtl;
+}
+
+/* tooltip */
+.sun-editor.se-rtl .se-tooltip .se-tooltip-inner .se-tooltip-text {
+	direction: rtl;
+}
+
+.sun-editor.se-rtl .se-tooltip .se-tooltip-inner .se-tooltip-text .se-shortcut {
+	direction: ltr;
+}
+
+/* modal--- */
+.sun-editor.se-rtl .se-modal-area * {
+	direction: rtl;
+}
+
+.sun-editor.se-rtl .se-modal-area .se-modal-inner .se-modal-form .se-modal-ratio {
+	margin-left: 0;
+	margin-right: 4px;
+}
+
+/* modal - header */
+.sun-editor.se-rtl .se-modal-area .se-modal-inner .se-modal-header .se-close-btn {
+	float: left;
+}
+
+.sun-editor.se-rtl .se-modal-area .se-modal-inner .se-modal-header .se-modal-title {
+	float: right;
+}
+
+/* modal - edge button */
+.sun-editor.se-rtl .se-modal-area .se-modal-inner .se-modal-form .se-modal-form-files .se-modal-files-edge-button {
+	margin-left: 0;
+	margin-right: 1px;
+}
+
+/* modal - rel button */
+.sun-editor.se-rtl .se-modal-area .se-modal-inner .se-modal-form .se-modal-flex-form .se-btn {
+	margin-right: 0;
+	margin-left: 4px;
+}
+
+/* modal - tabs */
+.sun-editor.se-rtl .se-modal-tabs button {
+	float: right;
+}
+
+.sun-editor.se-rtl .se-modal-area .se-modal-inner .se-modal-size-text {
+	padding-right: var(--se-input-btn-size);
+}
+
+/* modal - flex-group */
+.sun-editor.se-rtl .se-modal-area .se-modal-inner .se-modal-form .se-modal-flex-form .se-modal-flex-group {
+	margin-right: 0;
+	margin-left: 4px;
+	padding-right: 4px;
+	padding-left: 0;
+}
+
+/* modal - footer */
+.sun-editor.se-rtl .se-modal-area .se-modal-inner .se-modal-footer .se-btn-primary {
+	float: left;
+}
+
+.sun-editor.se-rtl .se-modal-area .se-modal-inner .se-modal-footer > div {
+	float: right;
+}
+
+.sun-editor.se-rtl .se-modal-area .se-modal-inner .se-modal-footer > div > label {
+	margin: 0 0 0 5px;
+}
+
+.sun-editor.se-rtl .se-modal-area .se-modal-inner .se-modal-form-footer label:first-child {
+	margin-left: 16px;
+	margin-right: 0px;
+}
+
+/* modal - footer - link preview*/
+.sun-editor.se-rtl .se-modal-area .se-modal-inner .se-anchor-rel-preview {
+	margin-left: 4px;
+	text-align: right;
+}
+
+/* modal - revert button */
+.sun-editor.se-rtl .se-modal-area .se-modal-inner .se-modal-btn-revert {
+	float: left;
+}
+
+/* anchor module */
+.sun-editor.se-rtl .se-modal-area .se-modal-inner .se-anchor-rel-btn {
+	float: right;
+}
+
+/* Browser--- */
+.sun-editor.se-rtl .se-browser * {
+	direction: rtl;
+}
+
+/* Browser - tags */
+.sun-editor.se-rtl .se-browser .se-browser-tags {
+	text-align: right;
+}
+
+.sun-editor.se-rtl .se-browser .se-browser-tags a {
+	margin: 8px 8px 0 8px;
+}
+
+.sun-editor.se-rtl .se-browser .se-browser-header .se-browser-close {
+	float: left;
+}
+
+/* Browser - side */
+.sun-editor.se-rtl .se-browser .se-browser-side > div {
+	flex-direction: row-reverse;
+	border-right: none;
+	border-left: 1px solid var(--se-modal-border-color);
+}
+.sun-editor.se-rtl .se-browser .se-menu-folder > div:not(.se-menu-child) {
+	padding: 8px 20px 8px 10px;
+}
+.sun-editor.se-rtl .se-browser .se-menu-folder > div > button {
+	margin-left: 0;
+	margin-right: -20px;
+}
+.sun-editor.se-rtl .se-browser .se-menu-folder.active {
+	border-left: none;
+	margin-left: 0;
+	border-right: 2px solid var(--se-active-dark4-color);
+	margin-right: -2px;
+}
+.sun-editor.se-rtl .se-browser .se-browser-search .se-browser-search-form {
+	margin: 2px 8px;
+	flex-direction: row-reverse;
+}
+.sun-editor.se-rtl .se-browser .se-browser-side .se-menu-icon {
+	margin: 0 0 0 10px;
+}
+.sun-editor.se-rtl .se-browser .se-browser-search .se-side-open-btn {
+	margin: 8px 8px 0 0;
+}
+
+/** controller--- */
+.sun-editor.se-rtl .se-controller .se-btn-group {
+	direction: rtl;
+}
+
+.sun-editor.se-rtl .se-controller .se-controller-body {
+	direction: rtl;
+}
+
+.sun-editor.se-rtl .se-resizing-container .se-resize-display {
+	direction: rtl;
+	right: auto;
+	left: 0;
+}
+
+/* controller - header */
+.sun-editor.se-rtl .se-controller .se-controller-header .se-close-btn {
+	float: left;
+}
+
+.sun-editor.se-rtl .se-controller .se-controller-header .se-controller-title {
+	float: right;
+}
+
+/* controller - table - props */
+.sun-editor.se-rtl .se-controller.se-table-props .se-table-props-align li {
+	margin-right: 0;
+	margin-left: 2px;
+}
+
+/** arrow--- */
+.sun-editor.se-rtl .se-controller .se-arrow {
+	right: 20px;
+	left: auto;
+	margin-right: -11px;
+	margin-left: 0;
+}
+
+.sun-editor-editable.se-rtl[contenteditable='true'].se-copy-format-cursor {
+	cursor:
+		url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDE2Ij4KICA8ZGVmcz4KICAgIDxmaWx0ZXIgaWQ9IndoaXRlLW91dGxpbmUiIGNvbG9yLWludGVycG9sYXRpb24tZmlsdGVycz0ic1JHQiI+CiAgICAgIDxmZU1vcnBob2xvZ3kgaW49IlNvdXJjZUFscGhhIiByZXN1bHQ9ImRpbGF0ZWQiIG9wZXJhdG9yPSJkaWxhdGUiIHJhZGl1cz0iMSIvPgogICAgICA8ZmVGbG9vZCBmbG9vZC1jb2xvcj0id2hpdGUiIHJlc3VsdD0id2hpdGUiLz4KICAgICAgPGZlQ29tcG9zaXRlIGluPSJ3aGl0ZSIgaW4yPSJkaWxhdGVkIiBvcGVyYXRvcj0iaW4iIHJlc3VsdD0ib3V0bGluZSIvPgogICAgICA8ZmVNZXJnZT4KICAgICAgICA8ZmVNZXJnZU5vZGUgaW49Im91dGxpbmUiLz4KICAgICAgICA8ZmVNZXJnZU5vZGUgaW49IlNvdXJjZUdyYXBoaWMiLz4KICAgICAgPC9mZU1lcmdlPgogICAgPC9maWx0ZXI+CiAgPC9kZWZzPgogIDxnIGZpbHRlcj0idXJsKCN3aGl0ZS1vdXRsaW5lKSIgdHJhbnNmb3JtPSJzY2FsZSgtMSwxKSB0cmFuc2xhdGUoLTI0LDApIj4KICAgIDxwYXRoCiAgICAgIGQ9Ik00LjMzMiAxMi42NjgKICAgICAgICAgQzQuMzMyIDEzLjAzNSA0LjQ4NCAxMy4zMzIgNC42NjggMTMuMzMyCiAgICAgICAgIEw1LjMzMiAxMy4zMzIKICAgICAgICAgTDUuMzMyIDE0LjY2OAogICAgICAgICBMNC41IDE0LjY2OAogICAgICAgICBDNC4zMTYgMTQuNjY4IDQgMTQuMzY3IDQgMTQKICAgICAgICAgQzQgMTQuMzY3IDMuNjg0IDE0LjY2OCAzLjUgMTQuNjY4CiAgICAgICAgIEwyLjY2OCAxNC42NjgKICAgICAgICAgTDIuNjY4IDEzLjMzMgogICAgICAgICBMMy4zMzIgMTMuMzMyCiAgICAgICAgIEMzLjUxNiAxMy4zMzIgMy42NjggMTMuMDM1IDMuNjY4IDEyLjY2OAogICAgICAgICBMMy42NjggMy4zMzIKICAgICAgICAgQzMuNjY4IDIuOTY1IDMuNTE2IDIuNjY4IDMuMzMyIDIuNjY4CiAgICAgICAgIEwyLjY2OCAyLjY2OAogICAgICAgICBMMi42NjggMS4zMzIKICAgICAgICAgTDMuNSAxLjMzMgogICAgICAgICBDMy42ODQgMS4zMzIgNCAxLjYzMyA0IDIKICAgICAgICAgQzQgMS42MzMgNC4zMTYgMS4zMzIgNC41IDEuMzMyCiAgICAgICAgIEw1LjMzMiAxLjMzMgogICAgICAgICBMNS4zMzIgMi42NjgKICAgICAgICAgTDQuNjY4IDIuNjY4CiAgICAgICAgIEM0LjQ4NCAyLjY2OCA0LjMzMiAyLjk2NSA0LjMzMiAzLjMzMgogICAgICAgICBaIgogICAgICBmaWxsPSJibGFjayIKICAgIC8+CiAgICA8cGF0aAogICAgICBkPSJNMjAgMi42NjgKICAgICAgICAgTDIwIDIKICAgICAgICAgQzIwIDEuNjMzIDE5LjcwMyAxLjMzMiAxOS4zMzIgMS4zMzIKICAgICAgICAgTDExLjMzMiAxLjMzMgogICAgICAgICBDMTAuOTY1IDEuMzMyIDEwLjY2OCAxLjYzMyAxMC42NjggMgogICAgICAgICBMMTAuNjY4IDQuNjY4CiAgICAgICAgIEMxMC42NjggNS4wMzUgMTAuOTY1IDUuMzMyIDExLjMzMiA1LjMzMgogICAgICAgICBMMTkuMzMyIDUuMzMyCiAgICAgICAgIEMxOS43MDMgNS4zMzIgMjAgNS4wMzUgMjAgNC42NjgKICAgICAgICAgTDIwIDQKICAgICAgICAgTDIwLjY2OCA0CiAgICAgICAgIEwyMC42NjggNi42NjgKICAgICAgICAgTDE0IDYuNjY4CiAgICAgICAgIEwxNCAxNAogICAgICAgICBDMTQgMTQuMzY3IDE0LjI5NyAxNC42NjggMTQuNjY4IDE0LjY2OAogICAgICAgICBMMTYgMTQuNjY4CiAgICAgICAgIEMxNi4zNjcgMTQuNjY4IDE2LjY2OCAxNC4zNjcgMTYuNjY4IDE0CiAgICAgICAgIEwxNi42NjggOAogICAgICAgICBMMjIgOAogICAgICAgICBMMjIgMi42NjgKICAgICAgICAgWiIKICAgICAgZmlsbD0iYmxhY2siCiAgICAvPgogIDwvZz4KPC9zdmc+Cg==')
+			24 0,
+		text;
+}
+
+/** se-type-document - header  */
+.sun-editor.se-rtl .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner {
+	padding-left: var(--se-doc-info-inner-line-padding);
+	padding-right: var(--se-doc-info-inner-padding);
+	direction: rtl;
+}
+.sun-editor.se-rtl .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner > div.se-doc-h1 {
+	padding-left: var(--se-doc-info-inner-line-padding);
+	padding-right: var(--se-doc-info-inner-line-indent-h1);
+}
+.sun-editor.se-rtl .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner > div.se-doc-h2 {
+	padding-left: var(--se-doc-info-inner-line-padding);
+	padding-right: var(--se-doc-info-inner-line-indent-h2);
+}
+.sun-editor.se-rtl .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner > div.se-doc-h3 {
+	padding-left: var(--se-doc-info-inner-line-padding);
+	padding-right: var(--se-doc-info-inner-line-indent-h3);
+}
+.sun-editor.se-rtl .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner > div.se-doc-h4 {
+	padding-left: var(--se-doc-info-inner-line-padding);
+	padding-right: var(--se-doc-info-inner-line-indent-h4);
+}
+.sun-editor.se-rtl .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner > div.se-doc-h5 {
+	padding-left: var(--se-doc-info-inner-line-padding);
+	padding-right: var(--se-doc-info-inner-line-indent-h5);
+}
+.sun-editor.se-rtl .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner > div.se-doc-h6 {
+	padding-left: var(--se-doc-info-inner-line-padding);
+	padding-right: var(--se-doc-info-inner-line-indent-h6);
+}
+/* se-type-document - page */
+.sun-editor.se-rtl .se-wrapper.se-type-document .se-document-page {
+	direction: rtl;
+}
+.sun-editor.se-rtl .se-wrapper.se-type-document .se-document-page > div {
+	right: 0px;
+	margin-left: 0;
+	margin-right: 1px;
+}
+.sun-editor.se-rtl .se-wrapper.se-type-document .se-document-page > div > div.se-document-page-line {
+	right: unset;
+	left: 100%;
+	z-index: 1;
+}
+
+/* modal - footer */
+.sun-editor.se-rtl .se-modal-area .se-modal-inner .se-modal-footer .se-btn {
+	float: right;
+}
+
+/* modal - resize handle */
+/* modal - resize handle - h */
+.sun-editor.se-rtl .se-modal-area .se-modal-inner .se-modal-content .se-modal-resize-handle-h {
+	left: 0;
+	right: unset;
+}
+/* modal - resize handle - c */
+.sun-editor.se-rtl .se-modal-area .se-modal-inner .se-modal-content .se-modal-resize-handle-c {
+	cursor: nesw-resize;
+	left: 4px;
+	right: unset;
+}
+
+/* table picker */
+.sun-editor.se-rtl .se-selector-table .se-table-size-picker,
+.sun-editor.se-rtl .se-selector-table .se-table-size-unhighlighted {
+	right: 0;
+}
+.sun-editor.se-rtl .se-selector-table .se-table-size-highlighted {
+	/* .se-table-size : padding - 5px*/
+	right: 5px;
+}
+
+/** --- RTL end -------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+/** button module float --------------------------------------------- */
+.sun-editor .se-btn-module-border.module-float-left {
+	float: left;
+}
+
+.sun-editor .se-btn-module-border.module-float-right {
+	float: right;
+}
+
+/** document-type codeView, markdownView --------------------------------------------- */
+.sun-editor .se-wrapper.se-type-document.se-source-view-status {
+	padding: 0;
+}
+.sun-editor .se-wrapper.se-type-document.se-source-view-status .se-document-lines,
+.sun-editor .se-wrapper.se-type-document.se-source-view-status .se-document-pages {
+	display: none;
+}
+
+/** --- error ---------------------------------------------------------- */
+.sun-editor .se-error {
+	color: var(--se-error-color);
+}
+
+.sun-editor input.se-error,
+.sun-editor select.se-error,
+.sun-editor textarea.se-error {
+	border: 1px solid var(--se-error-dark2-color) !important;
+}
+
+.sun-editor input.se-error:focus,
+.sun-editor select.se-error:focus,
+.sun-editor textarea.se-error:focus {
+	border: 1px solid var(--se-error-color) !important;
+	outline: 0;
+	box-shadow: 0 0 0 0.2rem var(--se-error-light2-color);
+	transition:
+		border-color 0.15s ease-in-out,
+		box-shadow 0.15s ease-in-out;
+}
+
+/** ---------------------------------------------------------- menu items ---------------------------------------------------------- */
+/** hr menu items */
+.sun-editor hr.__se__solid {
+	border-style: solid none none;
+}
+
+.sun-editor hr.__se__dotted {
+	border-style: dotted none none;
+}
+
+.sun-editor hr.__se__dashed {
+	border-style: dashed none none;
+}
+
+/** mention  */
+.sun-editor .se-select-menu .se-select-item .se-mention-item span + span {
+	margin: 0 4px;
+	opacity: 0.5;
+}
+
+/** ---------------------------------------------------------- show blocks mode ----------------------------------------------------- */
+.sun-editor-editable.se-show-block p,
+.sun-editor-editable.se-show-block div,
+.sun-editor-editable.se-show-block h1,
+.sun-editor-editable.se-show-block h2,
+.sun-editor-editable.se-show-block h3,
+.sun-editor-editable.se-show-block h4,
+.sun-editor-editable.se-show-block h5,
+.sun-editor-editable.se-show-block h6,
+.sun-editor-editable.se-show-block li,
+.sun-editor-editable.se-show-block ol,
+.sun-editor-editable.se-show-block ul,
+.sun-editor-editable.se-show-block pre {
+	border: 1px dashed var(--se-show-blocks-color) !important;
+	padding: 14px 8px 8px 8px !important;
+}
+
+.sun-editor-editable.se-show-block ol,
+.sun-editor-editable.se-show-block ul {
+	border: 1px dashed var(--se-show-blocks-li-color) !important;
+}
+
+.sun-editor-editable.se-show-block pre {
+	border: 1px dashed var(--se-show-blocks-pre-color) !important;
+}
+
+.sun-editor-editable.se-show-block div.se-component {
+	border: 1px dashed var(--se-show-blocks-component-color) !important;
+	padding: 1px !important;
+}
+
+.sun-editor-editable.se-show-block p {
+	background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAPAQMAAAAF7dc0AAAABlBMVEWAgID////n1o2sAAAAAnRSTlP/AOW3MEoAAAAaSURBVAjXY/j/gwGCPvxg+F4BQiAGDP1HQQByxxw0gqOzIwAAAABJRU5ErkJggg==') no-repeat;
+}
+
+.sun-editor-editable.se-show-block div:not(.se-component) {
+	background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAPAQMAAAAxlBYoAAAABlBMVEWAgID////n1o2sAAAAAnRSTlP/AOW3MEoAAAAmSURBVAjXY/j//wcDDH+8XsHwDYi/hwNx1A8w/nYLKH4XoQYJAwCXnSgcl2MOPgAAAABJRU5ErkJggg==') no-repeat;
+}
+
+.sun-editor-editable.se-show-block h1 {
+	background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAPAQMAAAA4f7ZSAAAABlBMVEWAgID////n1o2sAAAAAnRSTlP/AOW3MEoAAAAfSURBVAjXY/j/v4EBhr+9B+LzEPrDeygfhI8j1CBhAEhmJGY4Rf6uAAAAAElFTkSuQmCC') no-repeat;
+}
+
+.sun-editor-editable.se-show-block h2 {
+	background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAPAQMAAAA4f7ZSAAAABlBMVEWAgID////n1o2sAAAAAnRSTlP/AOW3MEoAAAAmSURBVAjXY/j/v4EBhr+dB+LtQPy9geEDEH97D8T3gbgdoQYJAwA51iPuD2haEAAAAABJRU5ErkJggg==') no-repeat;
+}
+
+.sun-editor-editable.se-show-block h3 {
+	background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAPAQMAAAA4f7ZSAAAABlBMVEWAgID////n1o2sAAAAAnRSTlP/AOW3MEoAAAAiSURBVAjXY/j/v4EBhr+dB+LtQPy9geHDeQgN5p9HqEHCADeWI+69VG2MAAAAAElFTkSuQmCC') no-repeat;
+}
+
+.sun-editor-editable.se-show-block h4 {
+	background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAAPAQMAAADTSA1RAAAABlBMVEWAgID////n1o2sAAAAAnRSTlP/AOW3MEoAAAAiSURBVAjXY/j//wADDH97DsTXIfjDdiDdDMTfIRhZHRQDAKJOJ6L+K3y7AAAAAElFTkSuQmCC') no-repeat;
+}
+
+.sun-editor-editable.se-show-block h5 {
+	background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAPAQMAAAA4f7ZSAAAABlBMVEWAgID////n1o2sAAAAAnRSTlP/AOW3MEoAAAAlSURBVAjXY/j/v4EBhr+1A/F+IO5vYPiwHUh/B2IQfR6hBgkDABlWIy5uM+9GAAAAAElFTkSuQmCC') no-repeat;
+}
+
+.sun-editor-editable.se-show-block h6 {
+	background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAPAQMAAAA4f7ZSAAAABlBMVEWAgID////n1o2sAAAAAnRSTlP/AOW3MEoAAAAiSURBVAjXY/j/v4EBhr+dB+LtQLy/geFDP5S9HSKOrA6KAR9GIza1ptJnAAAAAElFTkSuQmCC') no-repeat;
+}
+
+.sun-editor-editable.se-show-block li {
+	background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAPCAYAAADkmO9VAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAA7SURBVDhPYxgFcNDQ0PAfykQBIHEYhgoRB/BpwCfHBKWpBkaggYxQGgOgBzyQD1aLLA4TGwWDGjAwAACR3RcEU9Ui+wAAAABJRU5ErkJggg==')
+		no-repeat;
+}
+
+.sun-editor-editable.se-show-block ol {
+	background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAMCAYAAABiDJ37AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABHSURBVDhPYxgFcNDQ0PAfhKFcFIBLHCdA1oBNM0kGEmMAPgOZoDTVANUNxAqQvURMECADRiiNAWCagDSGGhyW4DRrMAEGBgAu0SX6WpGgjAAAAABJRU5ErkJggg==')
+		no-repeat;
+}
+
+.sun-editor-editable.se-show-block ul {
+	background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAMCAYAAABiDJ37AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAA1SURBVDhPYxgFDA0NDf+hTBSALI5LDQgwQWmqgVEDKQcsUBoF4ItFGEBXA+QzQpmDGjAwAAA8DQ4Lni6gdAAAAABJRU5ErkJggg==')
+		no-repeat;
+}
+
+/** --- controller wrapper ---------------------------------------------------------- */
+.sun-editor.sun-editor-carrier-wrapper {
+	position: static !important;
+	display: block !important;
+	width: 0 !important;
+	height: 0 !important;
+	border: none !important;
+	outline: none !important;
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
+/* drag cursor */
+.sun-editor.sun-editor-carrier-wrapper .se-drag-cursor {
+	position: absolute;
+	display: none;
+	pointer-events: none;
+	width: 2px;
+	background-color: var(--se-drag-caret-color);
+	z-index: 2147483646;
+}
+.sun-editor.sun-editor-carrier-wrapper .se-drag-cursor::before {
+	content: '';
+	top: -3px;
+	position: absolute;
+	background-color: transparent;
+	width: 0;
+	height: 0;
+	border: 0px solid transparent;
+	margin-right: 0;
+	margin-left: -4px;
+	border-width: 6px 5px 0 5px;
+	border-color: var(--se-drag-caret-color) transparent transparent transparent;
+}
+.sun-editor.sun-editor-carrier-wrapper .se-drag-cursor::after {
+	content: '';
+	bottom: -3px;
+	position: absolute;
+	background-color: transparent;
+	width: 0;
+	height: 0;
+	border: 0px solid transparent;
+	margin-right: 0;
+	margin-left: -4px;
+	border-width: 0 5px 5px 5px;
+	border-color: transparent transparent var(--se-drag-caret-color) transparent;
+}
+
+/** page break */
+.sun-editor-editable[contenteditable='true'] .se-page-break {
+	display: flex;
+	visibility: visible !important;
+	position: relative;
+	align-items: center;
+	justify-content: center;
+	clear: both;
+	width: 100%;
+	height: 24px;
+	margin: 0;
+	padding: 0;
+	z-index: 1;
+}
+
+.sun-editor-editable[contenteditable='true'] .se-page-break::after {
+	content: '⎯⎯⎯⎯⎯⎯';
+	position: absolute;
+	top: 1px;
+	background: var(--se-main-background-color);
+	padding: 0 5px;
+	color: var(--se-doc-info-page-background-color);
+	font-size: var(--se-main-font-size);
+}
+
+/** animation */
+@-webkit-keyframes blinker {
+	50% {
+		opacity: 0;
+	}
+}
+
+@keyframes blinker {
+	50% {
+		opacity: 0;
+	}
+}
+
+@-webkit-keyframes spinner {
+	to {
+		transform: rotate(361deg);
+	}
+}
+
+@keyframes spinner {
+	to {
+		transform: rotate(361deg);
+	}
+}
+
+@keyframes toast-in {
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes toast-out {
+	to {
+		opacity: 0;
+		transform: translateY(-10px);
+	}
+}
+
+@keyframes se-alert-in {
+	from {
+		opacity: 0;
+		transform: scale(0.9);
+	}
+	to {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+@keyframes se-alert-out {
+	from {
+		opacity: 1;
+		transform: scale(1);
+	}
+	to {
+		opacity: 0;
+		transform: scale(0.95);
+	}
+}

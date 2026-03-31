@@ -1,0 +1,37 @@
+.sun-editor,
+.sun-editor-editable {
+	/** --------------------------- content - [size] ----------- */
+	/* main */
+	--se-edit-inner-padding: 1.5em 1.5em;
+	--se-edit-inner-padding-doc-type: 2.5rem 2.5rem;
+	--se-edit-scroll-margin: 3em;
+
+	/** --------------------------- layout - [size] ----------- */
+	/** main, common */
+	--se-border-radius: 2px;
+	--se-min-height: 65px;
+	--se-scroll-padding: 2em;
+
+	/* modal */
+	--se-modal-input-width: 70px;
+
+	/* input:btn */
+	--se-input-btn-size: 32px;
+
+	/* document type */
+	--se-doc-min-padding: 1rem;
+	--se-doc-max-padding: 1.5rem;
+	--se-doc-padding-factor: 0.5;
+	--se-doc-info-width: 18%;
+	--se-doc-info-min-width: 16ch;
+	--se-doc-info-inner-padding: 2ch;
+	--se-doc-info-inner-line-padding: 0.5ch;
+	--se-doc-info-page-width: 16px;
+	/* document type indent - padding */
+	--se-doc-info-inner-line-indent-h1: 0em;
+	--se-doc-info-inner-line-indent-h2: 0.4em;
+	--se-doc-info-inner-line-indent-h3: 0.8em;
+	--se-doc-info-inner-line-indent-h4: 1.2em;
+	--se-doc-info-inner-line-indent-h5: 1.6em;
+	--se-doc-info-inner-line-indent-h6: 2em;
+}
