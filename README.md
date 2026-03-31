@@ -5,9 +5,9 @@ Coded based on ES5 in supported by IE11.
 
 > **⚠️ SunEditor 3.0.0 Released!**  
 > The latest version **3.x** is now available with major improvements.  
-> If you're using **2.x (legacy version)**, see [v2-legacy branch](https://github.com/JiHong88/SunEditor/tree/v2-legacy).
+> see [suneditor-v3](https://github.com/JiHong88/suneditor).
 
-#### Demo : <a href="http://suneditor.com" target="_blank">suneditor.com</a>
+#### Demo : <a href="https://legacy.suneditor.com" target="_blank">suneditor.com</a>
 
 [![GitHub](https://img.shields.io/github/license/jihong88/suneditor.svg?style=flat-square)](https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt)
 [![GitHub release](https://img.shields.io/github/release/jihong88/suneditor.svg?style=flat-square)](https://github.com/JiHong88/SunEditor/releases)
@@ -471,7 +471,7 @@ iframeCSSFileName : Name or Array of the CSS file to apply inside the iframe.
                     You can also use regular expressions.
                     Applied by searching by filename in the link tag of document,
                     or put the URL value (".css" can be omitted).   default: 'suneditor' {Array|String}
-                    ex) '.+' or ['suneditor', 'http://suneditor.com/sample/css/sample.css', '.+\\.min\\.css']
+                    ex) '.+' or ['suneditor', 'https://legacy.suneditor.com/sample/css/sample.css', '.+\\.min\\.css']
 previewTemplate : A template of the "preview".
                   The {{contents}} part in the HTML string is replaced with the contents of the editor. default: null {String}
                   ex) "<div style='width:auto; max-width:1080px; margin:auto;'><h1>Preview Template</h1> {{contents}} <div>_Footer_</div></div>"
@@ -1109,7 +1109,7 @@ editor.insertImage(FileList);
  * @param {Boolean} notCleaningData If true, inserts the HTML string without refining it with core.cleanHTML.
  * @param {Boolean} checkCharCount If true, if "options.maxCharCount" is exceeded when "element" is added, null is returned without addition.
  */
-editor.insertHTML('<img src="http://suneditor.com/sample/img/sunset.jpg">', true, true);
+editor.insertHTML('<img src="https://suneditor-files.s3.ap-northeast-2.amazonaws.com/sample/v2/docs/ara.jpg">', true, true);
 
 // Change the contents of the suneditor
 editor.setContents('set contents');
@@ -1592,16 +1592,16 @@ editor.showController = function (name, controllers, core) {
 </table>
 
 ## Examples
-[Examples](http://suneditor.com/sample/html/examples.html)
+[Examples](https://legacy.suneditor.com/sample/html/examples.html)
 
 ## Options template
-[Options template](http://suneditor.com/sample/html/options.html)
+[Options template](https://legacy.suneditor.com/sample/html/options.html)
 
 ## Custom plugins
-[Custom plugins](http://suneditor.com/sample/html/customPlugins.html)
+[Custom plugins](https://legacy.suneditor.com/sample/html/customPlugins.html)
 
 ## Document
-[Document](http://suneditor.com/sample/html/document.html)
+[Document](https://legacy.suneditor.com/sample/html/document.html)
 
 ## Other libraries using SunEditor
 <a id="lib-suneditor-emojis"></a>[suneditor-emojis](https://github.com/davidkonrad/suneditor-emojis) ([@davidkonrad](https://suneditor-emojis.github.io/)) - Emojis plugin for SunEditor.

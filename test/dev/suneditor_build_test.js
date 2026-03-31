@@ -549,7 +549,7 @@ const complexEditor = [
 //             html: `
 //             <div class="__se__tag" style="display: flex; max-width: 480px;">
 //                 <div class="__se__format__range_div" style="flex: 2; border: 1px solid #5f5f5f; background: #d2e2f1; border-right: none; padding: 5px;">
-//                     <img src="http://suneditor.com/ks/test_img.png" data-align="center" class="__se__uneditable"/>
+//                     <img src="https://suneditor-files.s3.ap-northeast-2.amazonaws.com/sample/v2/docs/ara.jpg" data-align="center" class="__se__uneditable"/>
 //                 </div>
 //                 <div style="flex: 4; background: #b7b7b7;">
 //                     <div
