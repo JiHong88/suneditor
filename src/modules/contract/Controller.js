@@ -1,0 +1,627 @@
+import { dom, env, keyCodeMap } from '../../helper';
+import { _DragHandle } from '../ui/_DragHandle';
+
+const { _w, isMobile, ON_OVER_COMPONENT } = env;
+const INDEX_00 = '2147483646';
+const INDEX_0 = '2147483645';
+const INDEX_S_1 = '2147483642';
+const INDEX_1 = '2147483641';
+const ADD_OFFSET_VALUE = { left: 0, right: 0, top: 0 };
+
+/**
+ * Controller information object
+ * @typedef {Object} ControllerInfo
+ * @property {*} inst - The controller instance
+ * @property {string} [position="bottom"] - The controller position (`"bottom"`|`"top"`)
+ * @property {HTMLElement} [form=null] - The controller element
+ * @property {HTMLElement|Range} [target=null] - The controller target element
+ * @property {boolean} [notInCarrier=false] - If the controller is not in the `carrierWrapper`, set it to `true`.
+ * @property {boolean} [isRangeTarget=false] - If the target is a `Range`, set it to `true`.
+ * @property {boolean} [fixed=false] - If the controller is fixed and should not be closed, set it to `true`.
+ */
+
+/**
+ * @typedef {Object} ControllerParams
+ * @property {"top"|"bottom"} [position="bottom"] Controller position
+ * @property {boolean} [isWWTarget=true] If the controller is in the WYSIWYG area, set it to `true`.
+ * @property {() => void} [initMethod=null] Method to be called when the controller is closed.
+ * @property {boolean} [disabled=false] If `true`, When the `controller` is opened, buttons without the `se-component-enabled` class are disabled.
+ * @property {Array<Controller|HTMLElement>} [parents=[]] The parent `controller` instance array when `controller` is opened nested.
+ * @property {boolean} [parentsHide=false] If `true`, the parent element is hidden when the controller is opened.
+ * @property {HTMLElement} [sibling=null] The related sibling controller element that this controller is positioned relative to.
+ * - e.g.) table plugin :: 118
+ * @property {boolean} [siblingMain=false] If `true`, This sibling controller is the main controller.
+ * - You must specify this option, if use `sibling`
+ * @property {boolean} [isInsideForm=false] If the controller is inside a form, set it to `true`.
+ * @property {boolean} [isOutsideForm=false] If the controller is outside a form, set it to `true`.
+ */
+
+/**
+ * @class
+ * @description Controller module class that handles the UI and interaction logic for a specific editor controller element.
+ * @see EditorComponent for `inst._element` requirement
+ */
+class Controller {
+	#$;
+
+	#initMethod;
+	#globalEventHandlers;
+
+	#addOffset = ADD_OFFSET_VALUE;
+	#reserveIndex = false;
+	#preventClose = false;
+	#bindShadowRootEvent = null;
+	#bindClose_key = null;
+	#bindClose_mouse = null;
+
+	/**
+	 * @type {Array<Controller>}
+	 * @description Child controllers opened by this controller
+	 */
+	#__childrenControllers__ = [];
+	/**
+	 * @type {Map<Controller, boolean>}
+	 * @description Track each parent's desired visibility state: `true` = wants hidden, `false` = wants visible
+	 */
+	#__hiddenByParents__ = new Map();
+
+	/**
+	 * @constructor
+	 * @param {*} host The instance object that called the constructor.
+	 * @param {SunEditor.Deps} $ Kernel dependencies
+	 * @param {Node} element Controller element
+	 * @param {ControllerParams} params Controller options
+	 * @param {?string} [_name] An optional name for the controller key.
+	 */
+	constructor(host, $, element, params, _name) {
+		this.#$ = $;
+
+		// members
+		this.kind = _name || host.constructor['key'] || host.constructor.name;
+		this.host = host;
+		this.form = /** @type {HTMLFormElement} */ (element);
+		this.isOpen = false;
+		this.currentTarget = null;
+		this.currentPositionTarget = null;
+		this.isWWTarget = params.isWWTarget ?? true;
+		this.position = params.position || 'bottom';
+		this.disabled = !!params.disabled;
+		this.parents = params.parents || [];
+		this.parentsForm = [];
+		this.parentsHide = !!params.parentsHide;
+		this.sibling = /** @type {HTMLElement} */ (params.sibling || null);
+		this.siblingMain = !!params.siblingMain;
+		this.isInsideForm = !!params.isInsideForm;
+		this.isOutsideForm = !!params.isOutsideForm;
+		this.toTop = false;
+		/** @type {{left?: number, top?: number, addOfffset?: {left?: number, top?: number}}} */
+		this.__offset = {};
+
+		this.#initMethod = typeof params.initMethod === 'function' ? params.initMethod : null;
+		this.#globalEventHandlers = { keydown: this.#CloseListener_keydown.bind(this), mousedown: this.#CloseListener_mousedown.bind(this) };
+
+		for (const parent of this.parents) {
+			if (dom.check.isElement(parent)) {
+				this.parentsForm.push(parent);
+				continue;
+			}
+			parent.#__childrenControllers__.push(this);
+			this.parentsForm.push(parent.form);
+		}
+
+		// add element
+		this.#$.contextProvider.carrierWrapper.appendChild(element);
+
+		// init
+		this.#$.eventManager.addEvent(element, 'click', this.#Action.bind(this));
+		this.#$.eventManager.addEvent(element, 'mouseenter', this.#MouseEnter.bind(this));
+		this.#$.eventManager.addEvent(element, 'mouseleave', this.#MouseLeave.bind(this));
+	}
+
+	/**
+	 * @description Open a modal plugin
+	 * @param {Node|Range} target Target element
+	 * @param {Node} [positionTarget] Position target element
+	 * @param {Object} [params={}] params
+	 * @param {boolean} [params.isWWTarget] If the controller is in the WYSIWYG area, set it to `true`.
+	 * @param {boolean} [params.passive] If `true`, opens the controller visually without affecting editor state
+	 * - (`_preventBlur`, `controlActive`, `onControllerContext`, `opendControllers`).
+	 * - Used for lightweight, non-intrusive display such as hover-triggered UI (e.g., codeLang selector on `<pre>` hover).
+	 * - Automatically set to `true` when opened during component hover selection (`ON_OVER_COMPONENT`).
+	 * @param {() => void} [params.initMethod] Method to be called when the controller is closed.
+	 * @param {boolean} [params.disabled] If `true`, When the `controller` is opened, buttons without the `se-component-enabled` class are disabled. (default: `this.disabled`)
+	 * @param {{left?: number, right?:number, top?: number}} [params.addOffset] Additional offset values
+	 * @example
+	 * // Open controller on a target element with default options
+	 * this.controller.open(target);
+	 *
+	 * // Open with explicit options and additional offset
+	 * this.controller.open(target, null, { isWWTarget: false, initMethod: null, addOffset: null });
+	 *
+	 * // Open on a Range target (e.g., text selection)
+	 * this.controller.open(this.$.selection.getRange());
+	 */
+	open(target, positionTarget, { isWWTarget, passive, initMethod, disabled, addOffset } = {}) {
+		if (_DragHandle.get('__overInfo') === ON_OVER_COMPONENT) {
+			passive = true;
+		}
+
+		if (!target) {
+			console.warn('[SUNEDITOR.Controller.open.fail] The target element is required.');
+			return;
+		}
+
+		this.form.removeAttribute('data-se-hidden-by-parent');
+		this.form.removeAttribute('data-se-hidden-by-children');
+		this.#__hiddenByParents__.clear();
+
+		if (!passive) {
+			if (this.#$.store.mode.isBalloon) this.#$.toolbar.hide();
+			else if (this.#$.store.mode.isSubBalloon) this.#$.subToolbar.hide();
+
+			if (!this.#$.store.get('hasFocus')) {
+				if (disabled ?? this.disabled) {
+					this.#$.ui.setControllerOnDisabledButtons(true);
+				} else {
+					this.#$.ui.setControllerOnDisabledButtons(false);
+				}
+			}
+		}
+
+		this.currentPositionTarget = positionTarget || target;
+		this.isWWTarget = isWWTarget ?? this.isWWTarget;
+		if (typeof initMethod === 'function') this.#initMethod = initMethod;
+		if (!passive) this.#$.ui.currentControllerName = this.kind;
+
+		this.#addOffset = { left: 0, right: 0, top: 0, ...addOffset };
+
+		if (!passive) {
+			const parents = this.isOutsideForm ? this.parentsForm : [];
+			this.#$.ui.opendControllers?.forEach((e) => {
+				if (!parents.includes(e.form)) e.form.style.zIndex = INDEX_1;
+			});
+
+			if (this.parentsHide) {
+				this.parentsForm.forEach((e) => {
+					e.style.display = 'none';
+					e.setAttribute('data-se-hidden-by-children', '1');
+				});
+			}
+		}
+
+		this.#addGlobalEvent();
+
+		// display controller
+		this.#setControllerPosition(this.form, this.currentPositionTarget, false);
+
+		const isRangeTarget = this.#$.instanceCheck.isRange(target);
+		this.currentTarget = /** @type {HTMLElement} */ (isRangeTarget ? null : target);
+		this.#controllerOn(this.form, target, isRangeTarget, passive);
+		_w.setTimeout(() => _DragHandle.set('__overInfo', false), 0);
+	}
+
+	/**
+	 * @description Close a modal plugin
+	 * - The plugin's `init` method is called.
+	 * @param {boolean} [force] If `true`, parent controllers are forcibly closed.
+	 * @example
+	 * // Close the controller (skips if not open or preventClose is set)
+	 * this.controller.close();
+	 *
+	 * // Force close, also closing parent controllers in the hierarchy
+	 * this.controller.close(true);
+	 */
+	close(force) {
+		if (!force && (!this.isOpen || this.#preventClose)) return;
+
+		this.form.removeAttribute('data-se-hidden-by-parent');
+		this.form.removeAttribute('data-se-hidden-by-children');
+		this.#__hiddenByParents__.clear();
+		this.#childrenSync('close');
+
+		this.toTop = false;
+		this.isOpen = false;
+		this.#preventClose = false;
+		this.__offset = {};
+		this.#addOffset = ADD_OFFSET_VALUE;
+
+		this.#removeGlobalEvent();
+
+		this.#initMethod?.();
+		this.#controllerOff();
+
+		if (this.parentsHide && !force) {
+			this.parentsForm.forEach((e) => {
+				e.style.display = 'block';
+				e.removeAttribute('data-se-hidden-by-children');
+			});
+		}
+
+		this.host.controllerClose?.();
+
+		if (this.parentsForm.length > 0) return;
+
+		this.#$.component.deselect();
+	}
+
+	/**
+	 * @description Hide controller
+	 */
+	hide() {
+		this.#childrenSync('hide');
+		this.form.style.display = 'none';
+	}
+
+	/**
+	 * @description Show controller
+	 */
+	show() {
+		this.#setControllerPosition(this.form, this.currentPositionTarget, false);
+	}
+
+	/**
+	 * @description Sets whether the element (form) should be brought to the top based on `z-index`.
+	 * @param {boolean} value - `true`: `'2147483646'`, `false`: `'2147483645'`.
+	 * @example
+	 * // Bring controller to the highest z-index layer (2147483646)
+	 * this.controller_cell.bringToTop(true);
+	 *
+	 * // Restore to the default top z-index (2147483645)
+	 * this.controller_cell.bringToTop(false);
+	 */
+	bringToTop(value) {
+		this.toTop = value;
+		this.form.style.zIndex = value ? INDEX_00 : INDEX_0;
+	}
+
+	/**
+	 * @description Reset controller position
+	 * @param {Node} [target]
+	 * @example
+	 * // Reposition using a new target element
+	 * this.controller_cell.resetPosition(tdElement);
+	 *
+	 * // Reposition using the previously set target
+	 * this.controller.resetPosition();
+	 */
+	resetPosition(target) {
+		this.#setControllerPosition(this.form, target || this.currentPositionTarget, true);
+	}
+
+	/**
+	 * @description Reposition controller on scroll event
+	 */
+	_scrollReposition() {
+		if (this.form.hasAttribute('data-se-hidden-by-parent') || this.form.hasAttribute('data-se-hidden-by-children')) return;
+		if (this.#setControllerPosition(this.form, this.currentPositionTarget, false)) {
+			_w.setTimeout(() => {
+				this.#childrenSync('show');
+			}, 0);
+		}
+	}
+
+	/**
+	 * @description Synchronously all child controllers.
+	 * @param {"show"|"hide"|"close"} state - State to apply to child controllers.
+	 */
+	#childrenSync(state) {
+		for (const children of this.#__childrenControllers__) {
+			if (state === 'hide' && children.form.style.display !== 'none') {
+				const wasHidden = this.#calculateShouldBeHidden(children);
+				children.#__hiddenByParents__.set(this, true);
+				const shouldBeHidden = this.#calculateShouldBeHidden(children);
+
+				// Only hide if state changed from visible to hidden
+				if (!wasHidden && shouldBeHidden) {
+					children.form.setAttribute('data-se-hidden-by-parent', '1');
+					children.hide();
+				}
+			} else if (state === 'show') {
+				if (children.form.hasAttribute('data-se-hidden-by-children')) {
+					children.#childrenSync('show');
+					continue;
+				}
+
+				const wasHidden = this.#calculateShouldBeHidden(children);
+				children.#__hiddenByParents__.set(this, false);
+				const shouldBeHidden = this.#calculateShouldBeHidden(children);
+
+				// Only show if state changed from hidden to visible
+				if (wasHidden && !shouldBeHidden) {
+					children.form.removeAttribute('data-se-hidden-by-parent');
+					children.show();
+				}
+			} else {
+				children[state]?.(true);
+			}
+		}
+	}
+
+	/**
+	 * @description Calculate if a child controller should be hidden based on all parent states
+	 * @param {Controller} children - The child controller
+	 * @returns {boolean} `true` if any parent wants it hidden
+	 */
+	#calculateShouldBeHidden(children) {
+		for (const wantsHidden of children.#__hiddenByParents__.values()) {
+			if (wantsHidden === true) return true;
+		}
+		return false;
+	}
+
+	/**
+	 * @description Show controller at editor area (controller elements, function, `controller target element(@Required)`, `controller name(@Required)`, etc..)
+	 * @param {HTMLFormElement} form Controller element
+	 * @param {Node|Range} target Controller target element
+	 * @param {boolean} isRangeTarget If the target is a `Range`, set it to `true`.
+	 * @param {boolean} [passive=false] If `true`, opens without affecting editor state (_preventBlur, controlActive, etc.)
+	 */
+	async #controllerOn(form, target, isRangeTarget, passive) {
+		/** @type {ControllerInfo} */
+		const info = {
+			position: this.position,
+			inst: this,
+			form: /** @type {HTMLElement} */ (form),
+			target: /** @type {HTMLElement} */ (target),
+			isRangeTarget,
+			notInCarrier: !this.#$.contextProvider.carrierWrapper.contains(form),
+		};
+
+		if ((await this.#$.eventManager.triggerEvent('onBeforeShowController', { caller: this.kind, frameContext: this.#$.frameContext, info })) === false) return;
+
+		form.style.display = 'block';
+		if (this.#$.contextProvider.shadowRoot) {
+			this.#bindShadowRootEvent = this.#$.eventManager.addEvent(form, 'mousedown', (e) => e.stopPropagation());
+		}
+
+		if (!passive) {
+			this.#$.ui.onControllerContext();
+			this.#$.store.set('controlActive', true);
+		}
+
+		if (!this.isOpen) {
+			this.#$.ui.opendControllers.push(info);
+		}
+
+		this.#$.store.set('_preventBlur', true);
+
+		this.isOpen = true;
+
+		this.host.controllerOn?.(form, target);
+		this.#$.eventManager.triggerEvent('onShowController', { caller: this.kind, frameContext: this.#$.frameContext, info });
+	}
+
+	/**
+	 * @description Hide controller at editor area (link button, image resize button..)
+	 */
+	#controllerOff() {
+		this.form.style.display = 'none';
+		this.#$.ui.opendControllers = this.#$.ui.opendControllers.filter((v) => v.form !== this.form);
+		if (this.#$.ui.currentControllerName !== this.kind && this.#$.ui.opendControllers.length > 0) return;
+
+		this.#$.ui.setControllerOnDisabledButtons(false);
+		this.#$.ui.offControllerContext();
+
+		this.#$.frameContext.get('lineBreaker_t').style.display = this.#$.frameContext.get('lineBreaker_b').style.display = 'none';
+		this.#$.store.set('_lastSelectionNode', null);
+		this.#$.ui.currentControllerName = '';
+		this.#$.store.set('_preventBlur', false);
+
+		_w.setTimeout(() => {
+			this.#$.store.set('controlActive', false);
+		}, 0);
+		this.#bindShadowRootEvent &&= this.#$.eventManager.removeEvent(this.#bindShadowRootEvent);
+	}
+
+	/**
+	 * @description Specify the position of the controller.
+	 * @param {HTMLElement} controller Controller element.
+	 * @param {Node|Range} refer Element or `Range` that is the basis of the controller's position.
+	 * @param {boolean} [skipAutoReposition=false] If `true`, skips scroll/resize-based automatic positioning logic.
+	 * @returns {boolean} - view : `true` || hide : `false`
+	 */
+	#setControllerPosition(controller, refer, skipAutoReposition) {
+		if (!refer) return false;
+
+		controller.style.visibility = 'hidden';
+		controller.style.display = 'block';
+
+		if (this.sibling && this.sibling.style.display !== 'block') {
+			this.sibling.style.visibility = 'hidden';
+			this.sibling.style.display = 'block';
+		}
+
+		if (this.#$.selection.isRange(refer)) {
+			if (!this.#$.offset.setRangePosition(this.form, /** @type {Range} */ (refer), { position: 'bottom' })) {
+				this.hide();
+				return false;
+			}
+		} else {
+			const positionResult = this.#$.offset.setAbsPosition(controller, /** @type {HTMLElement} */ (refer), {
+				addOffset: this.#addOffset,
+				position: this.position,
+				isWWTarget: this.isWWTarget,
+				inst: this,
+				sibling: this.sibling,
+			});
+			if (!positionResult) {
+				this.hide();
+				return false;
+			}
+
+			if (!skipAutoReposition && this.sibling && !this.siblingMain) {
+				const resetPosition = controller.offsetTop - this.#addOffset.top;
+				if (positionResult.position === 'bottom') {
+					this.#reserveIndex = true;
+					controller.style.top = resetPosition + this.sibling.offsetHeight - 1 + 'px';
+				} else {
+					this.#reserveIndex = false;
+					controller.style.top = resetPosition - this.sibling.offsetHeight + 2 + 'px';
+				}
+			} else {
+				this.#reserveIndex = false;
+			}
+		}
+
+		controller.style.zIndex = this.toTop ? INDEX_0 : this.#reserveIndex ? INDEX_S_1 : INDEX_1;
+		controller.style.visibility = '';
+		return true;
+	}
+
+	/**
+	 * @description Adds global event listeners.
+	 * - When the controller is opened
+	 */
+	#addGlobalEvent() {
+		this.#removeGlobalEvent();
+		this.#bindClose_key = this.#$.eventManager.addGlobalEvent('keydown', this.#globalEventHandlers.keydown, true);
+		this.#bindClose_mouse = this.#$.eventManager.addGlobalEvent(isMobile ? 'click' : 'mousedown', this.#globalEventHandlers.mousedown, true);
+	}
+
+	/**
+	 * @description Removes global event listeners.
+	 * - When the ESC key is pressed, the controller is closed.
+	 */
+	#removeGlobalEvent() {
+		this.#$.component.__removeGlobalEvent();
+		this.#bindClose_key &&= this.#$.eventManager.removeGlobalEvent(this.#bindClose_key);
+		this.#bindClose_mouse &&= this.#$.eventManager.removeGlobalEvent(this.#bindClose_mouse);
+	}
+
+	/**
+	 * @description Checks if the controller is fixed and should not be closed.
+	 * @returns {boolean} `true` if the controller is fixed.
+	 */
+	#checkFixed() {
+		if (this.#$.ui.selectMenuOn) return true;
+
+		const cont = this.#$.ui.opendControllers;
+		for (let i = 0; i < cont.length; i++) {
+			if (cont[i].inst === this && cont[i].fixed) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * @description Checks if the given target is within a form or controller.
+	 * @param {Element} target The target element.
+	 * @returns {boolean} `true` if the target is inside a form or controller.
+	 */
+	#checkForm(target) {
+		if (dom.check.isWysiwygFrame(target) || target.contains(this.form)) return false;
+		if (dom.utils.hasClass(target, 'se-drag-handle')) return true;
+
+		let isParentForm = false;
+		if (this.isInsideForm && this.parentsForm?.length > 0) {
+			this.parentsForm.some((e) => {
+				if (e.contains(target)) {
+					isParentForm = true;
+					return true;
+				}
+			});
+		}
+
+		const _element = this.host._element;
+		return !isParentForm && (!!dom.query.getParentElement(target, '.se-controller') || (this.#$.component.isInline(_element) ? target === _element : target?.contains(_element)));
+	}
+
+	/**
+	 * @param {MouseEvent} e - Event object
+	 */
+	#Action(e) {
+		const eventTarget = dom.query.getEventTarget(e);
+		const target = dom.query.getCommandTarget(eventTarget);
+		if (!target) return;
+
+		e.stopPropagation();
+		e.preventDefault();
+
+		if (target.getAttribute('data-command') === 'close') {
+			this.close();
+			return;
+		}
+
+		this.host.controllerAction(target);
+	}
+
+	/**
+	 * @param {MouseEvent} e - Event object
+	 */
+	#MouseEnter(e) {
+		this.#$.ui.currentControllerName = this.kind;
+		if (this.parentsForm.length > 0 && this.isInsideForm) return;
+
+		const eventTarget = dom.query.getEventTarget(e);
+		eventTarget.style.zIndex = this.toTop ? INDEX_00 : INDEX_0;
+	}
+
+	/**
+	 * @param {MouseEvent} e - Event object
+	 */
+	#MouseLeave(e) {
+		if (this.parentsForm.length > 0 && this.isInsideForm) return;
+
+		const eventTarget = dom.query.getEventTarget(e);
+		eventTarget.style.zIndex = this.toTop ? INDEX_0 : this.#reserveIndex ? INDEX_S_1 : INDEX_1;
+	}
+
+	/**
+	 * @param {KeyboardEvent} e - Event object
+	 */
+	#CloseListener_keydown(e) {
+		if (this.#checkFixed()) return;
+		const keyCode = e.code;
+		const ctrl = keyCodeMap.isCtrl(e);
+		if (ctrl || !keyCodeMap.isNonResponseKey(keyCode)) return;
+
+		const eventTarget = dom.query.getEventTarget(e);
+		if (!keyCodeMap.isEsc(keyCode)) {
+			if (this.form.contains(eventTarget) || this.#checkForm(eventTarget)) return;
+			if (this.#$.pluginManager.fileInfo.pluginRegExp.test(this.kind)) return;
+		} else {
+			if (this.#__childrenControllers__.some(({ isOpen }) => isOpen)) return;
+		}
+
+		this.#PostCloseEvent(eventTarget);
+		this.close();
+	}
+
+	/**
+	 * @param {KeyboardEvent} e - Event object
+	 */
+	#CloseListener_mousedown(e) {
+		const eventTarget = dom.query.getEventTarget(e);
+		if (this.host?._element?.contains(eventTarget)) {
+			this.#preventClose = true;
+			return;
+		}
+
+		this.#preventClose = false;
+		if (
+			eventTarget === this.host._element ||
+			eventTarget === this.currentTarget ||
+			this.#checkFixed() ||
+			this.form.contains(eventTarget) ||
+			this.#checkForm(eventTarget) ||
+			dom.query.getParentElement(eventTarget, '.se-line-breaker-component')
+		) {
+			return;
+		}
+
+		this.#PostCloseEvent(eventTarget);
+		this.close(true);
+	}
+
+	/**
+	 * @param {HTMLElement} eventTarget - The target element that triggered the event.
+	 */
+	#PostCloseEvent(eventTarget) {
+		if (!this.#$.frameContext.get('wysiwyg').contains(eventTarget)) {
+			this.#$.component.__prevent = false;
+		}
+	}
+}
+
+export default Controller;

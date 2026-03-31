@@ -1,0 +1,153 @@
+import { PluginCommand, PluginDropdown } from '../../interfaces';
+import { dom } from '../../helper';
+
+void PluginDropdown;
+
+const DEFAULT_TYPE = 'disc';
+
+/**
+ * @class
+ * @implements {PluginDropdown}
+ * @description List bulleted plugin, Several types of lists are provided.
+ */
+class List_bulleted extends PluginCommand {
+	static key = 'list_bulleted';
+	static className = 'se-icon-flip-rtl';
+
+	#listItems;
+
+	/**
+	 * @constructor
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
+	 */
+	constructor(kernel) {
+		// plugin bisic properties
+		super(kernel);
+		this.title = this.$.lang.bulletedList;
+		this.icon = 'list_bulleted';
+		this.afterItem = dom.utils.createElement(
+			'button',
+			{ class: 'se-btn se-tooltip se-sub-arrow-btn', 'data-command': List_bulleted.key, 'data-type': 'dropdown' },
+			`${this.$.icons.arrow_down}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.$.lang.bulletedList}</span></span>`,
+		);
+
+		// create HTML
+		const menu = CreateHTML();
+
+		// members
+		this.#listItems = menu.querySelectorAll('li button ul');
+
+		// init
+		this.$.menu.initDropdownTarget({ key: List_bulleted.key, type: 'dropdown' }, menu);
+	}
+
+	/**
+	 * @hook Editor.EventManager
+	 * @type {SunEditor.Hook.Event.Active}
+	 */
+	active(element, target) {
+		if (dom.check.isListCell(element) && /^UL$/i.test(element.parentElement.nodeName)) {
+			dom.utils.addClass(target, 'active');
+			return true;
+		}
+
+		dom.utils.removeClass(target, 'active');
+		return false;
+	}
+
+	/**
+	 * @override
+	 * @type {PluginCommand['action']}
+	 */
+	action(target) {
+		const el = this.$.format.getBlock(this.$.selection.getNode());
+		const type = target?.querySelector('ul')?.style.listStyleType;
+
+		if (dom.check.isList(el) && type) {
+			el.style.listStyleType = type;
+		} else {
+			this.submit(type);
+		}
+
+		this.$.menu.dropdownOff();
+	}
+
+	/**
+	 * @impl Dropdown
+	 * @type {PluginDropdown['on']}
+	 */
+	on() {
+		const list = this.#listItems;
+		const el = this.$.format.getBlock(this.$.selection.getNode());
+		const type = el?.style ? el.style.listStyleType || DEFAULT_TYPE : '';
+
+		for (let i = 0, len = list.length, l; i < len; i++) {
+			l = /** @type {HTMLElement} */ (list[i]);
+			if (type === l.style.listStyleType) {
+				dom.utils.addClass(l.parentElement, 'active');
+			} else {
+				dom.utils.removeClass(l.parentElement, 'active');
+			}
+		}
+	}
+
+	/**
+	 * @hook Editor.Core
+	 * @type {SunEditor.Hook.Core.Shortcut}
+	 */
+	shortcut({ range, info }) {
+		const { startContainer } = range;
+		if (dom.check.isText(startContainer)) {
+			const newText = startContainer.substringData(info.key.length, startContainer.textContent.length - 1);
+			startContainer.textContent = newText;
+		}
+		this.submit();
+	}
+
+	/**
+	 * @description Add a bulleted list
+	 * @param {string} [type=""] List type
+	 */
+	submit(type) {
+		const range = this.$.listFormat.apply(`ul:${type || ''}`, null, false);
+		if (range) this.$.selection.setRange(range.sc, range.so, range.ec, range.eo);
+		this.$.focusManager.focus();
+		this.$.history.push(false);
+	}
+}
+
+/**
+ * @returns {HTMLElement}
+ */
+function CreateHTML() {
+	const html = /*html*/ `
+	<div class="se-list-inner">
+		<ul class="se-list-basic se-list-horizontal se-list-carrier">
+			${_CreateLI(['disc', 'circle', 'square'])}
+		</ul>
+	</div>`;
+
+	return dom.utils.createElement('DIV', { class: 'se-dropdown se-list-layer' }, html);
+}
+
+/**
+ * @param {string[]} types - List style types
+ * @returns {string} HTML string
+ */
+function _CreateLI(types) {
+	return types
+		.map((v) => {
+			return /*html*/ `
+			<li>
+				<button type="button" class="se-btn se-btn-list se-icon-flip-rtl" data-command="${v}" title="${v}" aria-label="${v}">
+					<ul style="list-style-type: ${v};">
+						<li></li><li></li><li></li>
+					</ul>
+				</button>
+			</li>
+		`;
+		})
+		.join('');
+}
+
+export default List_bulleted;

@@ -1,71 +1,170 @@
 {
-  "name": "suneditor",
-  "version": "2.47.4",
-  "description": "Vanilla javascript based WYSIWYG web editor, with no dependencies",
-  "author": "JiHong.Lee",
-  "license": "MIT",
-  "main": "src/suneditor.js",
-  "sideEffects": [
-    "./src/assets/css/*.css"
-  ],
-  "scripts": {
-    "dev": "webpack-dev-server --config webpack.dev.js",
-    "start": "npm run dev",
-    "build": "webpack --config webpack.prod.js",
-    "lint": "jshint src",
-    "test": "karma start"
-  },
-  "bugs": {
-    "url": "https://github.com/JiHong88/SunEditor/issues"
-  },
-  "homepage": "http://suneditor.com",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/JiHong88/SunEditor.git"
-  },
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components"
-  ],
-  "devDependencies": {
-    "@babel/core": "~7.21.3",
-    "@octokit/rest": "~20.1.0",
-    "@webpack-cli/init": "~1.1.3",
-    "babel-loader": "~8.1.0",
-    "clean-webpack-plugin": "~0.1.19",
-    "codemirror": "~5.61.0",
-    "css-loader": "~1.0.1",
-    "csstype": "~2.6.13",
-    "file-loader": "~2.0.0",
-    "html-webpack-plugin": "~3.2.0",
-    "jasmine": "~2.99.0",
-    "jasmine-core": "~2.99.1",
-    "jshint": "~2.13.4",
-    "karma": "~6.3.19",
-    "karma-chrome-launcher": "~2.2.0",
-    "karma-jasmine": "~1.1.2",
-    "katex": "^0.16.21",
-    "mini-css-extract-plugin": "~0.4.5",
-    "optimize-css-assets-webpack-plugin": "~5.0.4",
-    "url-loader": "~1.1.2",
-    "webpack": "~4.44.1",
-    "webpack-cli": "~3.3.12",
-    "webpack-dev-server": "~3.11.0",
-    "webpack-merge": "~4.2.2"
-  },
-  "keywords": [
-    "wysiwyg",
-    "wysiwyg editor",
-    "wysiwyg html editor",
-    "rich text",
-    "rich editor",
-    "rich text editor",
-    "html",
-    "text",
-    "editor",
-    "contenteditable",
-    "javascript",
-    "vanillajs"
-  ]
+	"name": "suneditor",
+	"version": "3.0.0-rc.5",
+	"description": "Vanilla JavaScript based WYSIWYG web editor",
+	"author": "Yi JiHong",
+	"license": "MIT",
+	"main": "src/suneditor.js",
+	"module": "src/suneditor.js",
+	"types": "types/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./types/index.d.ts",
+			"default": "./src/suneditor.js"
+		},
+		"./types": {
+			"types": "./types/typedef.d.ts"
+		},
+		"./plugins": {
+			"types": "./types/plugins/index.d.ts",
+			"default": "./src/plugins/index.js"
+		},
+		"./langs/*": {
+			"types": "./types/langs/*.d.ts",
+			"default": "./src/langs/*.js"
+		},
+		"./css/editor": {
+			"types": "./types/assets/suneditor.css.d.ts",
+			"default": "./src/assets/suneditor.css"
+		},
+		"./css/contents": {
+			"types": "./types/assets/suneditor-contents.css.d.ts",
+			"default": "./src/assets/suneditor-contents.css"
+		},
+		"./interfaces": {
+			"types": "./types/interfaces/index.d.ts",
+			"default": "./src/interfaces/index.js"
+		},
+		"./src/*.css": "./src/*.css",
+		"./src/*.js": {
+			"types": "./types/*.d.ts",
+			"default": "./src/*"
+		},
+		"./package.json": "./package.json"
+	},
+	"sideEffects": [
+		"./src/assets/*.css",
+		"./src/themes/*.css"
+	],
+	"engines": {
+		"node": ">=14.0.0"
+	},
+	"scripts": {
+		"dev": "webpack-dev-server --config webpack/dev.js",
+		"start": "npm run dev",
+		"build:dev": "cross-env NODE_ENV=development webpack --config webpack/builder.js && cross-env NODE_ENV=development webpack --config webpack/builder-contents.js && rm -f dist/_suneditor-contents.js",
+		"build:prod": "cross-env NODE_ENV=production webpack --config webpack/builder.js && cross-env NODE_ENV=production webpack --config webpack/builder-contents.js && rm -f dist/_suneditor-contents.js",
+		"lint:type": "npx tsc --noEmit",
+		"lint:fix-js": "npx eslint \"src/**/*.js\" --fix",
+		"lint:fix-ts": "npx eslint types/ --fix",
+		"lint:fix-all": "npx eslint \"src/**/*.js\" types/ --fix",
+		"lint": "npx eslint \"src/**/*.js\" types/ && npm run lint:type && npm run check:arch",
+		"ts-build": "npm run check:inject && (npx tsc || true) && barrelsby --config .barrelsby.json && node scripts/ts-build/format-index.cjs && node scripts/ts-build/fix-langs.cjs && node scripts/ts-build/wrap-dts.cjs && node scripts/ts-build/rename-index.cjs && node scripts/ts-build/interfaces-convert.cjs && node scripts/ts-build/gen-options-dts.cjs && node scripts/ts-build/gen-css-dts.cjs && node scripts/ts-build/inject-typedef-import.cjs && npm run lint:fix-ts",
+		"test": "jest --silent",
+		"test:watch": "jest --watch",
+		"test:coverage": "jest --coverage",
+		"test:e2e": "playwright test",
+		"test:e2e:ui": "playwright test --ui",
+		"test:e2e:headed": "playwright test --headed",
+		"test:all": "jest --silent && playwright test",
+		"check": "npm run check:arch && npm run check:exports && npm run check:inject && npm run check:langs",
+		"check:arch": "dependency-cruiser --config .dependency-cruiser.js src",
+		"check:exports": "node scripts/check/check-exports-sync.cjs",
+		"check:inject": "node scripts/check/gen-button-types.cjs && node scripts/check/inject-plugin-jsdoc.cjs",
+		"check:langs": "cross-env GOOGLE_APPLICATION_CREDENTIALS=./.env/google-api-service-account.json node scripts/check/langs-sync.cjs --auto-translate && npx eslint \"src/langs/*.js\" --fix && npx eslint \"types/langs/_Lang.d.ts\" --fix",
+		"update-browserslist": "npx browserslist@latest --update-db"
+	},
+	"bugs": {
+		"url": "https://github.com/JiHong88/SunEditor/issues"
+	},
+	"homepage": "https://suneditor.com",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/JiHong88/SunEditor.git"
+	},
+	"devDependencies": {
+		"@babel/core": "^7.28.4",
+		"@babel/preset-env": "^7.28.3",
+		"@google-cloud/translate": "^9.3.0",
+		"@octokit/rest": "^21.1.1",
+		"@playwright/test": "^1.56.0",
+		"@typescript-eslint/eslint-plugin": "^8.45.0",
+		"@typescript-eslint/parser": "^8.45.0",
+		"@webpack-cli/serve": "^3.0.1",
+		"babel-jest": "^30.2.0",
+		"babel-loader": "^10.0.0",
+		"barrelsby": "^2.8.1",
+		"clean-webpack-plugin": "^4.0.0",
+		"codemirror": "^6.65.7",
+		"cross-env": "^7.0.3",
+		"css-loader": "^7.1.2",
+		"css-minimizer-webpack-plugin": "^8.0.0",
+		"csstype": "^3.1.3",
+		"dependency-cruiser": "^17.1.0",
+		"eslint": "^9.36.0",
+		"eslint-config-prettier": "^10.1.8",
+		"eslint-plugin-compat": "^6.0.2",
+		"eslint-plugin-prettier": "^5.5.4",
+		"eslint-plugin-simple-import-sort": "^12.1.1",
+		"file-loader": "^6.2.0",
+		"glob": "^11.0.3",
+		"html-webpack-plugin": "^5.6.4",
+		"http-server": "^14.1.1",
+		"jest": "^30.2.0",
+		"jest-environment-jsdom": "^30.2.0",
+		"jsdoc": "^4.0.4",
+		"jsdom": "^27.0.0",
+		"katex": "^0.16.22",
+		"mathjax-full": "^3.2.2",
+		"mini-css-extract-plugin": "^2.9.4",
+		"prettier": "^3.6.2",
+		"terser-webpack-plugin": "^5.3.14",
+		"typescript": "^5.9.2",
+		"url-loader": "^4.1.1",
+		"webpack": "^5.102.0",
+		"webpack-bundle-analyzer": "^4.10.2",
+		"webpack-cli": "^6.0.1",
+		"webpack-dev-server": "^5.2.2",
+		"webpack-merge": "^6.0.1"
+	},
+	"browserslist": [
+		"chrome >= 119",
+		"edge >= 119",
+		"firefox >= 121",
+		"safari >= 17.2",
+		"opera >= 105",
+		"samsung >= 23",
+		"Firefox ESR",
+		"not dead",
+		"not IE 11",
+		"not op_mini all"
+	],
+	"files": [
+		"src",
+		"types",
+		"dist",
+		"README.md",
+		"LICENSE.txt"
+	],
+	"keywords": [
+		"suneditor",
+		"wysiwyg",
+		"wysiwyg editor",
+		"wysiwyg html editor",
+		"rich text",
+		"rich text editor",
+		"rich editor",
+		"html editor",
+		"html5 editor",
+		"javascript editor",
+		"javascript rich text editor",
+		"vanilla javascript",
+		"contenteditable",
+		"lightweight editor",
+		"lightweight rich text editor",
+		"open source editor",
+		"text formatting",
+		"web editor",
+		"browser editor"
+	]
 }

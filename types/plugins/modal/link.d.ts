@@ -1,0 +1,113 @@
+import type {} from '../../typedef';
+export default Link;
+export type LinkOptions = {
+	/**
+	 * - The URL endpoint for file uploads.
+	 */
+	uploadUrl?: string;
+	/**
+	 * - Additional headers for file upload requests.
+	 */
+	uploadHeaders?: {
+		[x: string]: string;
+	};
+	/**
+	 * - The total file upload size limit in bytes.
+	 */
+	uploadSizeLimit?: number;
+	/**
+	 * - The single file upload size limit in bytes.
+	 */
+	uploadSingleSizeLimit?: number;
+	/**
+	 * - Accepted file formats for link uploads.
+	 */
+	acceptedFormats?: string;
+};
+export type LinkPluginOptions = Omit<LinkOptions & import('../../modules/ui/ModalAnchorEditor').ModalAnchorEditorParams, ''>;
+/**
+ * @typedef {Object} LinkOptions
+ * @property {string} [uploadUrl] - The URL endpoint for file uploads.
+ * @property {Object<string, string>} [uploadHeaders] - Additional headers for file upload requests.
+ * @property {number} [uploadSizeLimit] - The total file upload size limit in bytes.
+ * @property {number} [uploadSingleSizeLimit] - The single file upload size limit in bytes.
+ * @property {string} [acceptedFormats] - Accepted file formats for link uploads.
+ */
+/**
+ * @typedef {Omit<LinkOptions & import('../../modules/ui/ModalAnchorEditor').ModalAnchorEditorParams, ''>} LinkPluginOptions
+ */
+/**
+ * @class
+ * @description Link plugin.
+ * - This plugin provides link insertion and editing functionality within the editor.
+ * - It also supports file uploads if an upload URL is provided.
+ */
+declare class Link extends PluginModal {
+	/**
+	 * @constructor
+	 * @param {SunEditor.Kernel} kernel - The Kernel instance
+	 * @param {LinkPluginOptions} pluginOptions
+	 */
+	constructor(kernel: SunEditor.Kernel, pluginOptions: LinkPluginOptions);
+	title: any;
+	target: HTMLAnchorElement;
+	isUpdateState: boolean;
+	pluginOptions: {
+		uploadUrl: string;
+		uploadHeaders: {
+			[x: string]: string;
+		} & {
+			[x: string]: string;
+		};
+		uploadSizeLimit: number;
+		uploadSingleSizeLimit: number;
+		acceptedFormats: string;
+		enableFileUpload: boolean;
+		/**
+		 * - Modal title display.
+		 */
+		title?: boolean;
+		/**
+		 * - Create Text to display input.
+		 */
+		textToDisplay?: boolean;
+		/**
+		 * - Default checked value of the "Open in new window" checkbox.
+		 */
+		openNewWindow?: boolean;
+		/**
+		 * - If `true`, disables the automatic prefixing of the host URL to the value of the link.
+		 */
+		noAutoPrefix?: boolean;
+		/**
+		 * - Available `rel` attribute values shown as checkboxes in the link modal.
+		 */
+		relList?: Array<string>;
+		/**
+		 * - Default `rel` values auto-applied by condition.
+		 * `default` is always applied, `check_new_window` when "Open in new window" is checked, `check_bookmark` for bookmark links.
+		 * ```js
+		 * { relList: ['nofollow', 'noreferrer', 'noopener'], defaultRel: { default: 'noopener', check_new_window: 'noreferrer' } }
+		 * ```
+		 */
+		defaultRel?: {
+			default?: string;
+			check_new_window?: string;
+			check_bookmark?: string;
+		};
+	};
+	anchor: ModalAnchorEditor;
+	modal: Modal;
+	controller: Controller;
+	active(element: HTMLElement | null, target: HTMLElement | null): boolean | void;
+	modalOn(isUpdate: boolean): void;
+	modalAction(): Promise<boolean>;
+	modalInit(): void;
+	controllerAction(target: HTMLButtonElement): void;
+	controllerClose(): void;
+	#private;
+}
+import { PluginModal } from '../../interfaces';
+import { Modal } from '../../modules/contract';
+import { Controller } from '../../modules/contract';
+import { ModalAnchorEditor } from '../../modules/ui';

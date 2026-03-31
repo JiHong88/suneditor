@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SunEditor E2E Test</title>
+    <link rel="stylesheet" href="../../src/assets/suneditor.css">
+    <style>
+        body {
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        #editor {
+            width: 100%;
+            height: 500px;
+        }
+    </style>
+</head>
+<body>
+    <h1>SunEditor E2E Test Page</h1>
+    <textarea id="editor"></textarea>
+
+    <script type="module">
+        import suneditor from '../../src/suneditor.js';
+        import plugins from '../../src/plugins/index.js';
+
+        const editor = suneditor.create('editor', {
+            plugins: plugins,
+            buttonList: [
+                ['undo', 'redo'],
+                ['font', 'fontSize', 'blockStyle'],
+                ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+                ['fontColor', 'hiliteColor'],
+                ['removeFormat'],
+                ['outdent', 'indent'],
+                ['align', 'horizontalRule', 'list', 'lineHeight'],
+                ['table', 'link', 'image', 'video', 'audio'],
+                ['fullScreen', 'showBlocks', 'codeView'],
+                ['preview', 'print']
+            ],
+            width: '100%',
+            height: 'auto',
+            minHeight: '400px'
+        });
+
+        // Expose editor globally for Playwright tests
+        window.suneditor = editor;
+    </script>
+</body>
+</html>

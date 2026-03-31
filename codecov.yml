@@ -1,0 +1,37 @@
+coverage:
+    precision: 2
+    round: down
+    range: '50...100'
+
+    status:
+        project:
+            default:
+                target: 70%
+                threshold: 2%
+
+        # new
+        patch:
+            default:
+                target: 75%
+                threshold: 5%
+                informational: true
+
+# PR
+comment:
+    layout: 'header, diff, files'
+    behavior: default
+    require_changes: false
+
+ignore:
+    - 'src/assets/icons/defaultIcons.js'
+    - 'src/langs/*.js'
+    - 'src/plugins/index.js'
+    - 'src/events.js'
+    - 'src/typedef.js'
+    - 'test/**'
+    - '**/*.spec.js'
+    - '**/*.integration.spec.js'
+    - 'dist/**'
+    - 'build/**'
+    - 'coverage/**'
+    - '**/node_modules/**'

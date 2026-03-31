@@ -1,0 +1,13 @@
+{
+  "directory": "types",
+  "delete": true,
+  "exclude": [
+    "typedef.d.ts"
+  ],
+  "location": "top",
+  "structure": "flat",
+  "exportDefault": true,
+  "singleQuotes": true,
+  "noHeader": false,
+  "baseUrl": null
+}
