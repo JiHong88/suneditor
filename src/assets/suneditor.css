@@ -1836,7 +1836,7 @@
 	display: flex;
 	width: auto;
 	height: auto;
-	min-height: 16px;
+	min-height: 18px;
 	border-top: 1px solid var(--se-main-divider-color);
 	padding: 0 4px;
 	background-color: var(--se-main-background-color);
