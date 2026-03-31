@@ -24,7 +24,7 @@ Coded based on ES5 in supported by IE11.
 > - Can use CodeMirror, KaTeX.
 > - And.. many other features :)
 
-![WYSIWYG HTML Editor](http://suneditor.com/docs/screen-main-w.png?v=2700)
+![WYSIWYG HTML Editor](https://suneditor-files.s3.ap-northeast-2.amazonaws.com/sample/v2/docs/screen-main-w.png?v=2700)
 
 ## Table of contents
 - [Browser Support](#browser-support)
@@ -57,7 +57,7 @@ Coded based on ES5 in supported by IE11.
 
 #### Browser Support
 
-| <img src="http://suneditor.com/docs/chrome-64.png" alt="Chrome" width="16px" height="16px" /> Chrome | <img src="http://suneditor.com/docs/mozilla-64.png" alt="Firefox" width="16px" height="16px" /> Firefox | <img src="http://suneditor.com/docs/opera-64.png" alt="Opera" width="16px" height="16px" /> Opera | <img src="http://suneditor.com/docs/safari-64.png" alt="Safari" width="16px" height="16px" /> Safari | <img src="http://suneditor.com/docs/edge-64.png" alt="Edge" width="16px" height="16px" /> Edge | <img src="http://suneditor.com/docs/explorer-64.png" alt="Explorer" width="16px" height="16px" /> Internet Explorer |
+| <img src="https://suneditor-files.s3.ap-northeast-2.amazonaws.com/sample/v2/docs/chrome-64.png" alt="Chrome" width="16px" height="16px" /> Chrome | <img src="https://suneditor-files.s3.ap-northeast-2.amazonaws.com/sample/v2/docs/mozilla-64.png" alt="Firefox" width="16px" height="16px" /> Firefox | <img src="https://suneditor-files.s3.ap-northeast-2.amazonaws.com/sample/v2/docs/opera-64.png" alt="Opera" width="16px" height="16px" /> Opera | <img src="https://suneditor-files.s3.ap-northeast-2.amazonaws.com/sample/v2/docs/safari-64.png" alt="Safari" width="16px" height="16px" /> Safari | <img src="https://suneditor-files.s3.ap-northeast-2.amazonaws.com/sample/v2/docs/edge-64.png" alt="Edge" width="16px" height="16px" /> Edge | <img src="https://suneditor-files.s3.ap-northeast-2.amazonaws.com/sample/v2/docs/explorer-64.png" alt="Explorer" width="16px" height="16px" /> Internet Explorer |
 |:---:|:---:|:---:|:---:|:---:|:---:|
 | Yes | Yes | Yes | Yes | Yes | 11+ |
 
@@ -784,7 +784,7 @@ videoUploadSizeLimit: The size of the total uploadable videos (in bytes).
                       Invokes the "onVideoUploadError" method.  default: null {Number}
 videoMultipleFile: If true, multiple videos can be selected.    default: false {Boolean}
 videoTagAttrs    : Define "Attributes" of the video tag.                      default: null {Object} 
-                   ex) { poster: "http://suneditor.com/docs/loading.gif", autoplay: true }
+                   ex) { poster: "https://suneditor-files.s3.ap-northeast-2.amazonaws.com/sample/v2/docs/loading.gif", autoplay: true }
 videoIframeAttrs : Define "Attributes" of the iframe tag. (Youtube, Vimeo).   default: null {Object}
                    ex) { style: "border: 2px solid red;" }
 videoAccept      : Define the "accept" attribute of the input.  default: "*" {String}

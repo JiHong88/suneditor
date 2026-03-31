@@ -264,7 +264,7 @@ const complexEditor = [
 
 // // ssss.disable();
 
-// // ssss.setContents(`<p><br /></p><div class="se-component se-image-container __se__float-none"><img src="http://suneditor.com/docs/cat.jpg" alt="" style="" /></div><p><br /></p>`)
+// // ssss.setContents(`<p><br /></p><div class="se-component se-image-container __se__float-none"><img src="https://suneditor-files.s3.ap-northeast-2.amazonaws.com/sample/v2/docs/cat.jpg" alt="" style="" /></div><p><br /></p>`)
 
 
 // suneditor.create('scrolleditor', {
@@ -517,7 +517,7 @@ const complexEditor = [
 //     //     controlslist: "nodownload",
 //     // },
 //     // videoTagAttrs: {
-//     //     poster: "http://suneditor.com/docs/loading.gif",
+//     //     poster: "https://suneditor-files.s3.ap-northeast-2.amazonaws.com/sample/v2/docs/loading.gif",
 //     //     autoplay: true
 //     // },
 //     // videoIframeAttrs: {
@@ -730,7 +730,7 @@ const complexEditor = [
 // //     console.log("infoinfoinfo", info);
 // //     info.alt = "test-123";
 // //     const response = { // Same format as "videoUploadUrl" response
-// //         "result": [ { "url": "http://suneditor.com/docs/cat.jpg", "name": "test", "size": "0" }, ]
+// //         "result": [ { "url": "https://suneditor-files.s3.ap-northeast-2.amazonaws.com/sample/v2/docs/cat.jpg", "name": "test", "size": "0" }, ]
 // //     };
 // //     uploadHandler(response);
 // // }
@@ -827,11 +827,11 @@ const complexEditor = [
 // window.sun_noticeClose = function () {
 //     // ss.core.setContents(window.abc);
 //     // ss.noticeClose();
-//     // ss.setContents('<div class="se-component se-image-container __se__float-none" contenteditable="false"><figure style="margin: 0px;"><img src="http://suneditor.com/docs/cat.jpg" alt="Tabby" data-rotate="" data-proportion="true" data-rotatex="" data-rotatey="" data-size="," data-align="none" data-percentage="auto,auto" data-index="0" data-file-name="Tabby" data-file-size="0" origin-size="640,404" data-origin="," style=""></figure></div>')
+//     // ss.setContents('<div class="se-component se-image-container __se__float-none" contenteditable="false"><figure style="margin: 0px;"><img src="https://suneditor-files.s3.ap-northeast-2.amazonaws.com/sample/v2/docs/cat.jpg" alt="Tabby" data-rotate="" data-proportion="true" data-rotatex="" data-rotatey="" data-size="," data-align="none" data-percentage="auto,auto" data-index="0" data-file-name="Tabby" data-file-size="0" origin-size="640,404" data-origin="," style=""></figure></div>')
 //     // ss.setContents('<span class="__se__katex katex" data-exp="\\\\tilde{a}" data-font-size="1em" style="font-size: 1em;" contenteditable="false"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>a</mi><mo>~</mo></mover></mrow><annotation encoding="application/x-tex">\\tilde{a}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6678599999999999em;vertical-align:0em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6678599999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault">a</span></span></span><span style="top:-3.35em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">~</span></span></span></span></span></span></span></span></span></span>​​')
-//     // ss.core.plugins.image.onRender_imgUrl.call(ss.core, 'http://suneditor.com/docs/cat.jpg');
-//     // ss.core.plugins.video.setup_url.call(ss.core, 'http://suneditor.com/docs/cat.jpg');
-//     ss.core.plugins.audio.setupUrl.call(ss.core, 'http://suneditor.com/docs/cat.jpg');
+//     // ss.core.plugins.image.onRender_imgUrl.call(ss.core, 'https://suneditor-files.s3.ap-northeast-2.amazonaws.com/sample/v2/docs/cat.jpg');
+//     // ss.core.plugins.video.setup_url.call(ss.core, 'https://suneditor-files.s3.ap-northeast-2.amazonaws.com/sample/v2/docs/cat.jpg');
+//     ss.core.plugins.audio.setupUrl.call(ss.core, 'https://suneditor-files.s3.ap-northeast-2.amazonaws.com/sample/v2/docs/cat.jpg');
 // }
 
 // // window.sun_save = function () {
@@ -849,7 +849,7 @@ const complexEditor = [
 // // }
 
 // window.sun_insertHTML = function (html) {
-//     // ss.insertHTML('<img style="height:100px; width:100px;" src="http://suneditor.com/docs/cat.jpg" /><p>fdafds</p>', true, true, false);
+//     // ss.insertHTML('<img style="height:100px; width:100px;" src="https://suneditor-files.s3.ap-northeast-2.amazonaws.com/sample/v2/docs/cat.jpg" /><p>fdafds</p>', true, true, false);
 //     ss.setContents("");
 //     ss.setOptions({
 //         mathFontSize: [
@@ -1035,19 +1035,19 @@ let s2 = window.s2 = suneditor.create(document.getElementById('editor2'), {
     imageGalleryUrl: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo',
     imageGalleryData: [
         {
-          "src": "http://suneditor.com/docs/cat.jpg",
+          "src": "https://suneditor-files.s3.ap-northeast-2.amazonaws.com/sample/v2/docs/cat.jpg",
           "name": "Tabby",
           "alt": "Tabby",
           "tag": "Cat"
         },
         {
-          "src": "http://suneditor.com/docs/cat1.jpg",
+          "src": "https://suneditor-files.s3.ap-northeast-2.amazonaws.com/sample/v2/docs/cat1.jpg",
           "name": "Cat paw",
           "alt": "Cat paw",
           "tag": "Cat"
         },
         {
-          "src": "http://suneditor.com/docs/cat2.jpg",
+          "src": "https://suneditor-files.s3.ap-northeast-2.amazonaws.com/sample/v2/docs/cat2.jpg",
           "name": "Cat",
           "alt": "Cat",
           "tag": "Cat"
@@ -1097,7 +1097,7 @@ let s2 = window.s2 = suneditor.create(document.getElementById('editor2'), {
 
 <div class="se-component se-image-container __se__float-none">
       <figure>
-        <img src="http://suneditor.com/docs/cat.jpg" alt="Tabby" data-rotate="" data-proportion="true" data-rotatex="" data-rotatey="" width="" height="" data-size="," data-align="none" data-percentage="auto,auto" style="" data-index="0" data-file-name="cat.jpg" data-file-size="0" origin-size="640,404" data-origin=",">
+        <img src="https://suneditor-files.s3.ap-northeast-2.amazonaws.com/sample/v2/docs/cat.jpg" alt="Tabby" data-rotate="" data-proportion="true" data-rotatex="" data-rotatey="" width="" height="" data-size="," data-align="none" data-percentage="auto,auto" style="" data-index="0" data-file-name="cat.jpg" data-file-size="0" origin-size="640,404" data-origin=",">
       </figure>
 </div>
 <br>
@@ -1105,7 +1105,7 @@ let s2 = window.s2 = suneditor.create(document.getElementById('editor2'), {
 </ol>
 <div class="se-component se-image-container __se__float-none">
       <figure>
-        <img src="http://suneditor.com/docs/cat.jpg" alt="Tabby" data-rotate="" data-proportion="true" data-rotatex="" data-rotatey="" width="" height="" data-size="," data-align="none" data-percentage="auto,auto" style="" data-index="0" data-file-name="cat.jpg" data-file-size="0" origin-size="640,404" data-origin=",">
+        <img src="https://suneditor-files.s3.ap-northeast-2.amazonaws.com/sample/v2/docs/cat.jpg" alt="Tabby" data-rotate="" data-proportion="true" data-rotatex="" data-rotatey="" width="" height="" data-size="," data-align="none" data-percentage="auto,auto" style="" data-index="0" data-file-name="cat.jpg" data-file-size="0" origin-size="640,404" data-origin=",">
       </figure>
 </div>
 <p><br></p>

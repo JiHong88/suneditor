@@ -452,7 +452,7 @@ export interface SunEditorOptions {
     videoMultipleFile?: boolean;
     /**
      * Define "Attributes" of the video tag. 
-     * @example { poster: "http://suneditor.com/docs/loading.gif", autoplay: true }
+     * @example { poster: "https://suneditor-files.s3.ap-northeast-2.amazonaws.com/sample/v2/docs/loading.gif", autoplay: true }
      */
     videoTagAttrs?: Record<string, string | boolean>;
     /**
