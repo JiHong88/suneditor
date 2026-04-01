@@ -12,6 +12,7 @@ jobs:
         permissions:
             contents: write
             id-token: write
+            issues: write
 
         steps:
             # 1) 소스 체크아웃

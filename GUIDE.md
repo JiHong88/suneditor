@@ -17,7 +17,6 @@
 - [Essential Commands](#essential-commands)
 - [Testing Strategy](#testing-strategy)
 - [Markdown View](#markdown-view)
-- [Code Language Selector](#code-language-selector)
 - Supplementary Guides
     - [External Libraries](./guide/external-libraries.md) - CodeMirror, KaTeX, MathJax
     - [Changes Guide](./guide/changes-guide.md) - changes.md 작성 규칙 및 릴리즈 활용법
@@ -54,96 +53,46 @@ The editor supports a modular plugin architecture where features can be enabled/
 
 ```
 suneditor/
-├── src/                      # Source code
-│   ├── suneditor.js         # Factory entry point (create, init)
-│   ├── events.js            # User event definitions (onChange, onImageUpload, etc.)
-│   ├── typedef.js           # JSDoc type definitions
-│   ├── core/                # Editor core
-│   │   ├── editor.js        # Main Editor class (public API, plugin lifecycle, multi-root)
+├── src/
+│   ├── core/
 │   │   ├── kernel/          # L1: Dependency container & state
-│   │   │   ├── coreKernel.js    # CoreKernel - dependency container, orchestrates initialization
-│   │   │   ├── store.js         # Store - central runtime state (#state, mode)
-│   │   │   └── kernelInjector.js # KernelInjector - base class for kernel consumers
 │   │   ├── config/          # L2: Configuration & providers
-│   │   │   ├── contextProvider.js   # Context/FrameContext Map management
-│   │   │   ├── optionProvider.js    # Options/FrameOptions Map management
-│   │   │   ├── instanceCheck.js     # Iframe-safe instanceof checks
-│   │   │   └── eventManager.js      # Public event API (addEvent, removeEvent, triggerEvent)
-│   │   ├── logic/           # L3: Business logic
-│   │   │   ├── dom/         # DOM manipulation classes
-│   │   │   │   ├── selection.js     # Selection & range manipulation
-│   │   │   │   ├── html.js          # HTML get/set & sanitization
-│   │   │   │   ├── format.js        # Block-level formatting
-│   │   │   │   ├── inline.js        # Inline formatting (bold, italic, styles)
-│   │   │   │   ├── listFormat.js    # List operations (create, edit, nested)
-│   │   │   │   ├── nodeTransform.js # DOM node transformations
-│   │   │   │   ├── char.js          # Character counting & limits
-│   │   │   │   └── offset.js        # Position calculations
-│   │   │   ├── shell/       # Editor operations
-│   │   │   │   ├── component.js     # Component lifecycle (images, videos, etc.)
-│   │   │   │   ├── focusManager.js  # Focus/blur management
-│   │   │   │   ├── pluginManager.js # Plugin registry & lifecycle
-│   │   │   │   ├── ui.js            # UI state (loading, alerts, theme)
-│   │   │   │   ├── commandDispatcher.js # Command routing
-│   │   │   │   ├── _commandExecutor.js  # Command execution
-│   │   │   │   ├── history.js       # Undo/redo stack
-│   │   │   │   └── shortcuts.js     # Keyboard shortcut mapping
-│   │   │   └── panel/       # Panel UI
-│   │   │       ├── toolbar.js       # Toolbar rendering & positioning
-│   │   │       ├── menu.js          # Dropdown menu management
-│   │   │       └── viewer.js        # View modes (code view, markdown view, fullscreen, preview)
+│   │   ├── logic/
+│   │   │   ├── dom/         # DOM manipulation (selection, format, inline, html, ...)
+│   │   │   ├── shell/       # Editor operations (component, history, focus, ...)
+│   │   │   └── panel/       # Panel UI (toolbar, menu, viewer)
 │   │   ├── event/           # L4: Event orchestration (Redux-like)
-│   │   │   ├── eventOrchestrator.js # Internal DOM event processing, handler binding
-│   │   │   ├── executor.js          # Action dispatcher → maps actions to effects
-│   │   │   ├── ports.js             # Event type definitions and constants
-│   │   │   ├── actions/             # Action type definitions and creators
-│   │   │   ├── handlers/            # DOM event listeners
-│   │   │   ├── reducers/            # Event analyzers → return action lists
-│   │   │   ├── rules/               # Granular key rules (enter, backspace, delete, arrow, tab)
-│   │   │   ├── effects/             # Effect registries (common, keydown, ruleHelpers)
-│   │   │   └── support/             # Support classes (selectionState, defaultLineManager)
-│   │   ├── schema/          # Data definitions
-│   │   │   ├── context.js       # Global context schema
-│   │   │   ├── frameContext.js  # Per-frame context schema
-│   │   │   └── options.js       # Options schema (base + frame)
+│   │   │   ├── actions/
+│   │   │   ├── handlers/
+│   │   │   ├── reducers/
+│   │   │   ├── rules/
+│   │   │   ├── effects/
+│   │   │   └── support/
+│   │   ├── schema/          # Data definitions (context, options)
 │   │   └── section/         # DOM construction
-│   │       ├── constructor.js   # Editor DOM structure builder
-│   │       ├── codeLang.js      # Code language selector UI for <pre> blocks
-│   │       └── documentType.js  # Document type handler (pagination)
-│   ├── plugins/             # Modular features
-│   │   ├── command/         # Direct actions (blockquote, list_bulleted, list_numbered, exportPDF, fileUpload)
-│   │   ├── dropdown/        # Dropdown menus (align, font, fontColor, backgroundColor, blockStyle, textStyle, paragraphStyle, lineHeight, hr, layout, list, table/, template)
-│   │   ├── modal/           # Dialog plugins (image/, video/, link, math, audio, drawing, embed)
-│   │   ├── browser/         # Gallery plugins (imageGallery, videoGallery, audioGallery, fileGallery, fileBrowser)
-│   │   ├── field/           # Autocomplete (mention)
-│   │   ├── input/           # Toolbar inputs (fontSize, pageNavigator)
-│   │   └── popup/           # Inline controllers (anchor)
-│   ├── modules/             # UI components
-│   │   ├── contract/        # Module contracts (Modal, Controller, Figure, etc.)
+│   ├── plugins/
+│   │   ├── command/         # Direct actions
+│   │   ├── dropdown/        # Dropdown menus
+│   │   ├── modal/           # Dialog plugins
+│   │   ├── browser/         # Gallery plugins
+│   │   ├── field/           # Autocomplete
+│   │   ├── input/           # Toolbar inputs
+│   │   └── popup/           # Inline controllers
+│   ├── modules/
+│   │   ├── contract/        # Module contracts (Modal, Controller, Figure, ...)
 │   │   ├── manager/         # Managers (FileManager, ApiManager)
 │   │   └── ui/              # UI utilities (SelectMenu, ModalAnchorEditor)
 │   ├── hooks/               # Hook interface definitions
-│   │   ├── base.js          # Base hooks (Event, Component, Core)
-│   │   └── params.js        # Hook parameter type definitions
 │   ├── interfaces/          # Plugin base classes & contracts
-│   │   ├── plugins.js       # Plugin type classes (PluginCommand, PluginModal, etc.)
-│   │   ├── contracts.js     # Contract interfaces (ModuleModal, EditorComponent, etc.)
-│   │   └── index.js         # Interface exports
 │   ├── helper/              # Pure utility functions
-│   │   ├── converter.js     # String/HTML conversion
-│   │   ├── env.js           # Browser/device detection
-│   │   ├── keyCodeMap.js    # Keyboard event checking
-│   │   ├── numbers.js       # Number validation
-│   │   ├── unicode.js       # Special characters
-│   │   ├── clipboard.js     # Clipboard API
-│   │   └── dom/             # DOM utilities (check, query, utils)
+│   │   └── dom/             # DOM utilities
 │   ├── assets/              # Static assets (icons, CSS, design)
 │   ├── langs/               # i18n language files
 │   └── themes/              # CSS theme files
-├── test/                    # Test suites
-│   ├── unit/                # Jest unit tests
-│   ├── integration/         # Jest integration tests
-│   └── e2e/                 # Playwright E2E tests
+├── test/
+│   ├── unit/
+│   ├── integration/
+│   └── e2e/
 ├── types/                   # Generated TypeScript definitions
 ├── webpack/                 # Build configuration
 └── dist/                    # Built bundles (not tracked in git)
@@ -709,29 +658,6 @@ SunEditor supports a **Markdown View** mode alongside the existing Code View and
 - `src/core/logic/panel/viewer.js` — View mode management (code view, markdown view, fullscreen, preview)
 
 **Mutual exclusivity:** Code View and Markdown View are mutually exclusive — activating one automatically deactivates the other.
-
----
-
-## Code Language Selector
-
-The `<pre>` code block language selector (`codeLang.js`) provides a UI for selecting programming languages on code blocks.
-
-**Option:** `codeLangs`
-
-```javascript
-suneditor.create('#editor', {
-	codeLangs: ['javascript', 'python', 'html', 'css', 'json'],
-});
-```
-
-- A language selector button appears on hover over `<pre>` elements
-- Defaults to common languages (javascript, typescript, html, css, json, python, java, etc.)
-- Set to `[]` to disable the feature
-- Selected language is stored as `class="language-{lang}"` on the `<pre>` element
-
-**Key files:**
-
-- `src/core/section/codeLang.js` — CodeLang class (Controller + SelectMenu UI)
 
 ---
 
