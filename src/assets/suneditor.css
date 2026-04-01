@@ -1836,7 +1836,7 @@
 	display: flex;
 	width: auto;
 	height: auto;
-	min-height: 18px;
+	min-height: 20px;
 	border-top: 1px solid var(--se-main-divider-color);
 	padding: 0 4px;
 	background-color: var(--se-main-background-color);
@@ -3768,7 +3768,7 @@
 	border-radius: var(--se-border-radius);
 	background-color: var(--se-main-background-color);
 	color: var(--se-main-color);
-	font-size: 13px;
+	font-size: var(--se-main-font-size);
 	outline: none;
 	box-sizing: border-box;
 }

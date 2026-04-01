@@ -1,24 +1,24 @@
 .sun-editor,
 .sun-editor-editable {
 	/** --------------------------- content - [typography] ----------- */
-	--se-edit-font-size: 13px;
+	--se-edit-font-size: 16px;
 	--se-edit-line-height: 1.5em;
 
 	/** --------------------------- layout - [typography] ----------- */
 	/* main */
 	--se-main-font-family: Helvetica Neue;
 	--se-content-font-family: Helvetica Neue;
-	--se-main-font-size: 13px;
+	--se-main-font-size: 14px;
 
 	/* codeview, markdown font */
 	--se-markdown-font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
 	--se-codeview-font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
 
 	/* button */
-	--se-btn-font-size: 12px;
+	--se-btn-font-size: 14px;
 
 	/* status */
-	--se-statusbar-font-size: 10px;
+	--se-statusbar-font-size: 12px;
 
 	/* modal */
 	--se-modal-title-font-size: 15px;
