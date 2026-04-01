@@ -1,0 +1,15 @@
+{
+	"include": [
+		"src/**/*.js",
+		"types/**/*.d.ts",
+		"GUIDE.md",
+		"ARCHITECTURE.md"
+	],
+	"ignore": {
+		"customPatterns": [
+			"src/langs/!(en).js",
+			"src/assets/**",
+			"src/themes/**"
+		]
+	}
+}

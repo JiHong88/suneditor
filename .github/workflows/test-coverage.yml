@@ -2,7 +2,7 @@ name: Test & Coverage
 
 on:
     push:
-        branches: [master, develop]
+        branches: [master]
         paths-ignore:
             - '**/*.md'
             - '**/*.css'
@@ -25,7 +25,7 @@ on:
             - 'playwright.config.js'
             - 'LICENSE.txt'
     pull_request:
-        branches: [master, develop]
+        branches: [master]
         paths-ignore:
             - '**/*.md'
             - '**/*.css'

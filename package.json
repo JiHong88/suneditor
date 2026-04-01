@@ -1,6 +1,6 @@
 {
 	"name": "suneditor",
-	"version": "3.0.0",
+	"version": "3.0.1",
 	"description": "Vanilla JavaScript based WYSIWYG web editor",
 	"author": "Yi JiHong",
 	"license": "MIT",
@@ -72,6 +72,7 @@
 		"check:exports": "node scripts/check/check-exports-sync.cjs",
 		"check:inject": "node scripts/check/gen-button-types.cjs && node scripts/check/inject-plugin-jsdoc.cjs",
 		"check:langs": "cross-env GOOGLE_APPLICATION_CREDENTIALS=./.env/google-api-service-account.json node scripts/check/langs-sync.cjs --auto-translate && npx eslint \"src/langs/*.js\" --fix && npx eslint \"types/langs/_Lang.d.ts\" --fix",
+		"repomix": "npx repomix",
 		"update-browserslist": "npx browserslist@latest --update-db"
 	},
 	"bugs": {
