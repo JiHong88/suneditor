@@ -642,7 +642,7 @@ export function InitOptions(options, editorTargets, plugins) {
 	/** Key actions */
 	o.set('tabDisable', !!options.tabDisable);
 	o.set('shortcutsHint', options.shortcutsHint === undefined ? true : !!options.shortcutsHint);
-	const shortcuts = !(options.shortcutsDisable === undefined ? true : !!options.shortcutsDisable)
+	const shortcuts = (options.shortcutsDisable === undefined ? false : !!options.shortcutsDisable)
 		? {}
 		: [
 				{
