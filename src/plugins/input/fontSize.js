@@ -6,7 +6,7 @@ void PluginDropdown;
 
 const DEFAULT_UNIT_MAP = {
 	text: {
-		default: '13px',
+		default: '16px',
 		list: [
 			{
 				title: 'XX-Small',
