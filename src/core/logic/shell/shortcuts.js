@@ -112,6 +112,8 @@ class Shortcuts {
 		const keyMap = (this.keyMap = new Map());
 		const reverseKeys = this.reverseKeys;
 		for (const key of Object.keys(shortcuts)) {
+			// Plugin shortcuts are registered in commandDispatcher.#saveCommandButtons.
+			if (this.#$.plugins[key]) continue;
 			const command = key.startsWith('_') ? '' : key;
 			CreateShortcuts(command, null, shortcuts[key], keyMap, reverseCommandArray, reverseKeys);
 		}
