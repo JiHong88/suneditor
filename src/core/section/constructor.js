@@ -616,7 +616,20 @@ export function InitOptions(options, editorTargets, plugins) {
 	/** Toolbar */
 	o.set('toolbar_width', options.toolbar_width ? (numbers.is(options.toolbar_width) ? options.toolbar_width + 'px' : options.toolbar_width) : 'auto');
 	o.set('toolbar_container', options.toolbar_container && !/inline/i.test(o.get('mode')) ? (typeof options.toolbar_container === 'string' ? _d.querySelector(options.toolbar_container) : options.toolbar_container) : null);
-	o.set('toolbar_sticky', /balloon/i.test(o.get('mode')) ? -1 : options.toolbar_sticky === undefined ? 0 : numbers.is(options.toolbar_sticky) ? numbers.get(options.toolbar_sticky, 0) : -1);
+
+	const _stickyOpt = options.toolbar_sticky;
+	const _isBalloon = /balloon/i.test(o.get('mode'));
+	if (_isBalloon) {
+		o.set('_toolbar_sticky', -1);
+		o.set('_toolbar_sticky_offset', 0);
+	} else if (_stickyOpt !== null && typeof _stickyOpt === 'object') {
+		o.set('_toolbar_sticky', numbers.get(_stickyOpt.top, 0));
+		o.set('_toolbar_sticky_offset', numbers.get(_stickyOpt.offset, 0));
+	} else {
+		o.set('_toolbar_sticky', _stickyOpt === undefined ? 0 : numbers.is(_stickyOpt) ? _stickyOpt : -1);
+		o.set('_toolbar_sticky_offset', 0);
+	}
+
 	o.set('toolbar_hide', !!options.toolbar_hide);
 
 	/** subToolbar */

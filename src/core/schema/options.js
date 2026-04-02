@@ -460,7 +460,22 @@ export const DEFAULTS = {
  * @property {boolean} [tabDisable=false] - Disables tab key input.
  * @property {string} [toolbar_width="auto"] - Toolbar width.
  * @property {?HTMLElement} [toolbar_container] - Container element for the toolbar.
- * @property {number} [toolbar_sticky=0] - Enables sticky toolbar with optional offset.
+ * @property {number|{top: number, offset: number}} [toolbar_sticky=0] - Enables sticky toolbar.
+ * - `number`: Sets the sticky top position (px). Use `-1` to disable sticky.
+ * - `{top, offset}`: `top` is the sticky position when the page header is visible.
+ * - `offset` is the sticky position when a virtual keyboard shifts the viewport (e.g., on tablets, touch devices).
+ * - When the virtual keyboard is active, `offset` replaces `top` so the toolbar doesn't leave a gap
+ * - for a page header that has scrolled out of view. Default `offset` is `0`.
+ * ```js
+ * // Basic usage — sticky at top with 0px offset
+ * toolbar_sticky: 0
+ *
+ * // Account for a 92px fixed/sticky site header
+ * toolbar_sticky: 92
+ *
+ * // 92px header on desktop, but 0px when virtual keyboard pushes the viewport
+ * toolbar_sticky: { top: 92, offset: 0 }
+ * ```
  * @property {boolean} [toolbar_hide=false] - Hides toolbar initially.
  * @property {Object} [subToolbar={}] - Sub-toolbar configuration. A secondary toolbar that appears on text selection.
  * @property {SunEditor.UI.ButtonList} [subToolbar.buttonList] - List of Sub-toolbar buttons, grouped by sub-arrays.
@@ -754,7 +769,7 @@ export const OPTION_FIXED_FLAG = {
 };
 
 /**
- * @typedef {'formatClosureBrLine' | 'formatBrLine' | 'formatLine' | 'formatClosureBlock' | 'formatBlock' | 'toolbar_width' | 'toolbar_container' | 'toolbar_sticky' | 'strictMode' | 'lineAttrReset'} TransformedOptionKeys
+ * @typedef {'formatClosureBrLine' | 'formatBrLine' | 'formatLine' | 'formatClosureBlock' | 'formatBlock' | 'toolbar_width' | 'toolbar_container' | '_toolbar_sticky' | '_toolbar_sticky_offset' | 'strictMode' | 'lineAttrReset'} TransformedOptionKeys
  */
 
 /**
@@ -776,7 +791,8 @@ export const OPTION_FIXED_FLAG = {
  * @property {{ reg: RegExp, str: string }} formatBlock
  * @property {string} toolbar_width
  * @property {HTMLElement|null} toolbar_container
- * @property {number} toolbar_sticky
+ * @property {number} _toolbar_sticky
+ * @property {number} _toolbar_sticky_offset
  * @property {StrictModeOptions} strictMode
  * @property {string[]} lineAttrReset
  */

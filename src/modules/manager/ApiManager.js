@@ -180,6 +180,7 @@ class ApiManager {
 	 * @returns
 	 */
 	#normalizeUrl(url) {
+		if (!url) return '';
 		return url.replace(/([^:])\/+/g, '$1/').replace(/\/(\?|#|$)/, '$1');
 	}
 

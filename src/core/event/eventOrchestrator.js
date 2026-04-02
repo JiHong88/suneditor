@@ -139,6 +139,21 @@ class EventOrchestrator extends KernelInjector {
 	}
 
 	/**
+	 * @description Toggle toolbar-balloon with delay (debounced for selectionchange).
+	 */
+	#toggleToolbarBalloonDelay() {
+		if (this.#balloonDelay) {
+			_w.clearTimeout(this.#balloonDelay);
+		}
+
+		this.#balloonDelay = _w.setTimeout(() => {
+			_w.clearTimeout(this.#balloonDelay);
+			this.#balloonDelay = null;
+			this._toggleToolbarBalloon();
+		}, 250);
+	}
+
+	/**
 	 * @internal
 	 * @description Show or hide the toolbar-balloon.
 	 */
@@ -909,7 +924,7 @@ class EventOrchestrator extends KernelInjector {
 	}
 
 	#OnResize_viewport() {
-		if (isMobile && this.#options.get('toolbar_sticky') > -1) {
+		if (isMobile && this.#options.get('_toolbar_sticky') > -1) {
 			this.#toolbar._resetSticky();
 			this.#menu.__restoreMenuPosition();
 		}
@@ -919,7 +934,7 @@ class EventOrchestrator extends KernelInjector {
 	}
 
 	#OnScroll_window() {
-		if (this.#options.get('toolbar_sticky') > -1) {
+		if (this.#options.get('_toolbar_sticky') > -1) {
 			this.#toolbar._resetSticky();
 		}
 
@@ -938,7 +953,7 @@ class EventOrchestrator extends KernelInjector {
 	}
 
 	#OnMobileScroll_viewport() {
-		if (this.#options.get('toolbar_sticky') > -1) {
+		if (this.#options.get('_toolbar_sticky') > -1) {
 			this.#toolbar._resetSticky();
 			this.#menu.__restoreMenuPosition();
 		}
@@ -958,6 +973,11 @@ class EventOrchestrator extends KernelInjector {
 				anchorNode = null;
 				this.$.selection.init();
 				this.applyTagEffect();
+
+				// balloon toolbar - touch devices
+				if (isTouchDevice && (this.#store.mode.isBalloon || this.#store.mode.isSubBalloon)) {
+					this.#toggleToolbarBalloonDelay();
+				}
 
 				// document type
 				if (root.has('documentType_use_header')) {

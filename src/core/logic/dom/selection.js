@@ -425,7 +425,7 @@ class Selection_ {
 		const isBottom = this.#store.mode.isBottom;
 		const realToolbarHeight = this.#context.get('toolbar_main').offsetHeight;
 		const toolbarHeight = this.#$.toolbar.isSticky ? realToolbarHeight : 0;
-		const positionToolbarHeight = this.#$.toolbar.isSticky ? toolbarHeight + this.#options.get('toolbar_sticky') : toolbarHeight;
+		const positionToolbarHeight = this.#$.toolbar.isSticky ? toolbarHeight + this.#options.get('_toolbar_sticky') : toolbarHeight;
 		const statusbarHeight = this.#frameContext.get('statusbar')?.offsetHeight || 0;
 
 		if (this.#hasScrollParents) {

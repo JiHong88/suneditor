@@ -58,6 +58,8 @@ export default class FocusManager {
 		}
 
 		if (this.#store.mode.isBalloon) this.#kernel._eventOrchestrator._toggleToolbarBalloon();
+
+		this.#$.selection.scrollTo(this.#$.selection.getRange(), { behavior: 'auto', block: 'nearest', inline: 'nearest' });
 	}
 
 	/**

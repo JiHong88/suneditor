@@ -28,6 +28,7 @@ class Toolbar {
 
 	#useCSSSticky = false;
 	#_isStickyFlag = false;
+	#_cssStickyShifted = false;
 
 	/**
 	 * @constructor
@@ -88,7 +89,7 @@ class Toolbar {
 
 		// CSS sticky: non-balloon, non-inline, non-container, sticky enabled
 		const isStickyPosible = !this.isSub && !balloon && !inline;
-		const stickyTop = this.#options.get('toolbar_sticky');
+		const stickyTop = this.#options.get('_toolbar_sticky');
 
 		this.#useCSSSticky = isStickyPosible && stickyTop >= 0 && !this.#options.get('toolbar_container') && typeof CSS !== 'undefined' && CSS.supports('position', 'sticky');
 
@@ -119,14 +120,15 @@ class Toolbar {
 	 */
 	get isSticky() {
 		if (this.isSub) return false;
-		const stickyTop = this.#options.get('toolbar_sticky');
+		const stickyTop = this.#options.get('_toolbar_sticky');
 		if (stickyTop < 0) return false;
 
 		if (this.#useCSSSticky) {
 			const toolbar = this.#context.get(this.keyName.main);
 			if (!toolbar || toolbar.offsetWidth === 0 || toolbar.style.display === 'none') return false;
 			if (this.isBottomMode) {
-				return toolbar.getBoundingClientRect().bottom >= _w.innerHeight - stickyTop - 1;
+				const viewportHeight = this.#isViewPortSize ? _w.visualViewport.height : _w.innerHeight;
+				return toolbar.getBoundingClientRect().bottom >= viewportHeight - stickyTop - 1;
 			}
 			return toolbar.getBoundingClientRect().top <= stickyTop + 1;
 		}
@@ -254,13 +256,16 @@ class Toolbar {
 	 * @description Reset the sticky toolbar position based on the editor state.
 	 */
 	_resetSticky() {
-		if (this.#useCSSSticky) return;
+		if (this.#useCSSSticky) {
+			this.#resetCSSStickyOffset();
+			return;
+		}
 
 		const wrapper = this.#frameContext.get('wrapper');
 		if (!wrapper) return;
 
 		const toolbar = this.#context.get(this.keyName.main);
-		const stickyTop = this.#options.get('toolbar_sticky');
+		const stickyTop = this.#options.get('_toolbar_sticky');
 		if (this.#frameContext.get('isFullScreen') || toolbar.offsetWidth === 0 || stickyTop < 0) return;
 
 		const currentScrollY = this.#isViewPortSize ? _w.visualViewport.pageTop : _w.scrollY;
@@ -485,11 +490,11 @@ class Toolbar {
 		}
 
 		if (this.isBottomMode) {
-			const toolbarBottomPosition = this.#options.get('toolbar_sticky') + this.#getViewportTop();
+			const toolbarBottomPosition = this.#options.get('_toolbar_sticky') + this.#getViewportTop();
 			toolbar.style.bottom = `${toolbarBottomPosition}px`;
 			toolbar.style.top = 'auto';
 		} else {
-			const toolbarTopPosition = this.#options.get('toolbar_sticky') + inlineOffset + this.#getViewportTop();
+			const toolbarTopPosition = this.#options.get('_toolbar_sticky') + inlineOffset + this.#getViewportTop();
 			toolbar.style.top = `${toolbarTopPosition}px`;
 		}
 		toolbar.style.width = this.isInlineMode ? this.inlineToolbarAttr.width : toolbar.offsetWidth + 'px';
@@ -506,6 +511,40 @@ class Toolbar {
 			return _w.visualViewport.offsetTop;
 		}
 		return 0;
+	}
+
+	/**
+	 * @description Adjust CSS sticky toolbar position when the mobile virtual keyboard changes the visual viewport.
+	 */
+	#resetCSSStickyOffset() {
+		if (!this.#isViewPortSize) return;
+
+		const viewportOffset = Math.round(_w.visualViewport.offsetTop);
+		if (viewportOffset === 0 && !this.#_cssStickyShifted) return;
+
+		const toolbar = this.#context.get(this.keyName.main);
+		const stickyOffset = this.#options.get('_toolbar_sticky_offset');
+
+		if (viewportOffset > 0) {
+			this.#_cssStickyShifted = true;
+			if (this.isBottomMode) {
+				const viewportBottom = Math.round(_w.innerHeight - _w.visualViewport.height - viewportOffset);
+				toolbar.style.bottom = stickyOffset + viewportBottom + 'px';
+				toolbar.style.top = 'auto';
+			} else {
+				toolbar.style.top = stickyOffset + viewportOffset + 'px';
+			}
+		} else {
+			// restore original CSS sticky value
+			this.#_cssStickyShifted = false;
+			const stickyTop = this.#options.get('_toolbar_sticky');
+			if (this.isBottomMode) {
+				toolbar.style.bottom = stickyTop + 'px';
+				toolbar.style.top = 'auto';
+			} else {
+				toolbar.style.top = stickyTop > 0 ? stickyTop + 'px' : '';
+			}
+		}
 	}
 
 	/**

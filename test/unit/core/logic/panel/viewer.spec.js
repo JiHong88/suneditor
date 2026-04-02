@@ -124,6 +124,8 @@ function createViewerKernel(overrides = {}) {
 		['mode', 'classic'],
 		['toolbar_container', null],
 		['toolbar_sticky', 0],
+		['_toolbar_sticky', 0],
+		['_toolbar_sticky_offset', 0],
 		['fullScreenOffset', 0],
 		['_rtl', false],
 		['_editableClass', 'sun-editor-editable'],
@@ -795,14 +797,14 @@ describe('Viewer', () => {
 
 			// branch: toolbar_sticky > -1
 			it('should remove se-toolbar-sticky class when toolbar_sticky >= 0', () => {
-				env.options.set('toolbar_sticky', 0);
+				env.options.set('_toolbar_sticky', 0);
 				env.mockToolbarMain.classList.add('se-toolbar-sticky');
 				viewer.fullScreen(false);
 				expect(env.mockToolbarMain.classList.contains('se-toolbar-sticky')).toBe(false);
 			});
 
 			it('should NOT remove se-toolbar-sticky when toolbar_sticky is -1', () => {
-				env.options.set('toolbar_sticky', -1);
+				env.options.set('_toolbar_sticky', -1);
 				env.mockToolbarMain.classList.add('se-toolbar-sticky');
 				viewer.fullScreen(false);
 				expect(env.mockToolbarMain.classList.contains('se-toolbar-sticky')).toBe(true);

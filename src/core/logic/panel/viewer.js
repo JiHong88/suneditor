@@ -411,7 +411,7 @@ class Viewer {
 				this.#toolbarParent = null;
 			}
 
-			if (this.#options.get('toolbar_sticky') > -1) {
+			if (this.#options.get('_toolbar_sticky') > -1) {
 				dom.utils.removeClass(toolbar, 'se-toolbar-sticky');
 			}
 

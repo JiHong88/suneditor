@@ -44,6 +44,8 @@ describe('Toolbar', () => {
 		const mockOptions = new Map([
 			['toolbar_width', 'auto'],
 			['toolbar_sticky', 0],
+			['_toolbar_sticky', 0],
+			['_toolbar_sticky_offset', 0],
 			['toolbar_container', null],
 		]);
 
