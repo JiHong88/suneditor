@@ -482,7 +482,7 @@ describe('makePorts', () => {
 			});
 		});
 
-		it('returns early on mobile when scrollparents has entries (does not call scrollTo)', () => {
+		it('calls selection.scrollTo on mobile even when scrollparents has entries', () => {
 			mockIsMobileValue = true;
 			inst.scrollparents = [document.createElement('div')];
 			ports = makePorts(inst, { _styleNodes: styleNodes });
@@ -490,19 +490,7 @@ describe('makePorts', () => {
 			const mockRange = document.createRange();
 			ports.enterScrollTo(mockRange);
 
-			// ui._iframeAutoHeight should still be called (it runs before the mobile check)
 			expect(inst.$.ui._iframeAutoHeight).toHaveBeenCalledWith(inst.$.frameContext);
-			// selection.scrollTo should NOT be called
-			expect(inst.$.selection.scrollTo).not.toHaveBeenCalled();
-		});
-
-		it('calls selection.scrollTo on mobile when scrollparents is empty', () => {
-			mockIsMobileValue = true;
-			inst.scrollparents = [];
-			ports = makePorts(inst, { _styleNodes: styleNodes });
-
-			const mockRange = document.createRange();
-			ports.enterScrollTo(mockRange);
 			expect(inst.$.selection.scrollTo).toHaveBeenCalledWith(mockRange, {
 				behavior: 'auto',
 				block: 'nearest',
