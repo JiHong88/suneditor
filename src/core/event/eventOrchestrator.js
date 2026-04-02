@@ -930,7 +930,13 @@ class EventOrchestrator extends KernelInjector {
 		}
 
 		this.#scrollContainer();
+
+		const prevHeight = this.#store.get('currentViewportHeight');
 		this.__setViewportSize();
+
+		if (isMobile && prevHeight > 0 && prevHeight - _w.visualViewport.height > 100 && this.#store.get('hasFocus')) {
+			this.$.selection.scrollTo(this.$.selection.getRange(), { behavior: 'auto', block: 'nearest', inline: 'nearest' });
+		}
 	}
 
 	#OnScroll_window() {

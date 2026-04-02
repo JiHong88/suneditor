@@ -518,6 +518,9 @@ class Toolbar {
 	 */
 	#resetCSSStickyOffset() {
 		if (!this.#isViewPortSize) return;
+		// When the editor is inside a scrollable container (e.g., modal),
+		// position:sticky is relative to that container, not the viewport.
+		if (this.#kernel._eventOrchestrator.scrollparents.length > 0) return;
 
 		const viewportOffset = Math.round(_w.visualViewport.offsetTop);
 		if (viewportOffset === 0 && !this.#_cssStickyShifted) return;

@@ -12,3 +12,6 @@
 - Fix CSS sticky toolbar not adjusting for mobile virtual keyboard (`toolbar.js`)
 - Fix balloon toolbar not showing on touch devices when selecting text (`eventOrchestrator.js`)
 - Fix bottom toolbar missing padding and more-layer spacing (`suneditor.css`)
+- Fix sticky toolbar shifting down when virtual keyboard opens inside a scrollable container (e.g., modal) (`toolbar.js`)
+- Fix mobile not scrolling to cursor when virtual keyboard reopens after toolbar menu interaction (`eventOrchestrator.js`)
+- Fix Enter key not scrolling to cursor on mobile in fixed-height editor with scroll parents (`ports.js`)
