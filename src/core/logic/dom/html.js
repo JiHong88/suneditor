@@ -2134,6 +2134,14 @@ function _isSafeURL(url) {
 	return _SAFE_URL_PROTOCOL.test(normalized) || !_RE_COLON.test(normalized);
 }
 
+/**
+ * @description Checks whether an HTML attribute string is safe from XSS injection.
+ * - Non-URL attributes (anything other than `href` or `src`) are always safe.
+ * - For URL attributes, extracts the URL value and delegates to {@link _isSafeURL}
+ *   to verify the protocol against the allowed whitelist.
+ * @param {string} attr A single attribute string (e.g. `href="https://example.com"`, `class="foo"`)
+ * @returns {boolean} `true` if the attribute is safe, `false` if it contains a dangerous URL protocol.
+ */
 function _isSafeAttribute(attr) {
 	if (!_URL_ATTR_PATTERN.test(attr)) return true;
 

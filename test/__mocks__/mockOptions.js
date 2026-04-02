@@ -110,6 +110,8 @@ export const mockOptions = {
 	toolbar_width: 'auto',
 	toolbar_container: null,
 	toolbar_sticky: 0,
+	_toolbar_sticky: 0,
+	_toolbar_sticky_offset: 0,
 	toolbar_hide: false,
 	subToolbar: {
 		buttonList: [['bold', 'italic', 'underline', 'strike']],

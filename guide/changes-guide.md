@@ -68,10 +68,25 @@
 
 ## Agent 지침
 
-Claude Agent가 코드 수정 후 `changes.md`를 업데이트할 때:
+### Agent가 직접 코드를 수정한 경우
 
-1. 현재 `changes.md`를 읽고 `[Unreleased]` 섹션 확인
+수정 완료 후 `changes.md`를 업데이트:
+
+1. 현재 `changes.md`를 읽는다
 2. 해당 커밋 타입 그룹(`feat`/`fix`/`change`/`breaking`)에 항목 추가
 3. 그룹이 없으면 새로 생성
 4. 중복 항목 확인 — 이미 기록된 내용은 추가하지 않음
 5. `style`, `docs`, `test`, `chore`, `ci`, `build` 타입은 기록하지 않음
+
+### 사용자가 직접 수정 후 changes.md 업데이트를 요청한 경우
+
+1. `git diff` (staged + unstaged)를 실행하여 변경된 코드를 확인한다
+2. 변경 없으면 `git diff HEAD~1`로 최근 커밋의 변경사항을 확인한다
+3. diff 내용을 분석하여 사용자에게 영향이 있는 변경사항을 판별한다
+    - 새 기능, 옵션 추가 → `feat`
+    - 버그 수정 → `fix`
+    - 기존 동작 변경, 스타일 변경 등 사용자 체감 변화 → `change`
+    - API/옵션 호환성 깨짐 → `breaking`
+    - 내부 리팩토링, 테스트, 문서, CI 등 → **기록하지 않음**
+4. 현재 `changes.md`를 읽고, 중복되지 않는 항목만 적절한 그룹에 추가한다
+5. 판단이 애매한 변경은 사용자에게 확인 후 추가한다

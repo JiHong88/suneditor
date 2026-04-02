@@ -154,7 +154,7 @@ class Finder {
 	 */
 	#updateStickyTop() {
 		if (!this.#isOpen || !this.#panel) return;
-		const stickyTop = this.#$.options.get('toolbar_sticky');
+		const stickyTop = this.#$.options.get('_toolbar_sticky');
 		if (this.#store.mode.isBottom) {
 			this.#panel.style.top = 'auto';
 			this.#panel.style.bottom = stickyTop >= 0 ? stickyTop + this.#$.context.get('toolbar_main').offsetHeight + 'px' : '0px';

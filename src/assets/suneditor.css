@@ -916,13 +916,13 @@
 .sun-editor .se-toolbar.se-toolbar-bottom {
 	top: auto;
 	bottom: 0;
-	outline-offset: -1px;
 }
 
 /* Bottom toolbar: more layer opens above buttons */
 .sun-editor .se-toolbar.se-toolbar-bottom .se-btn-tray {
 	display: flex;
 	flex-wrap: wrap;
+	padding: 4px 3px;
 }
 
 .sun-editor .se-toolbar.se-toolbar-bottom .se-btn-tray > .se-toolbar-more-layer {
@@ -934,6 +934,7 @@
 .sun-editor .se-toolbar.se-toolbar-bottom .se-toolbar-more-layer .se-more-layer {
 	border-top: none;
 	border-bottom: 1px solid var(--se-main-divider-color);
+	margin-bottom: 4px;
 }
 
 /* JS fallback sticky for bottom */

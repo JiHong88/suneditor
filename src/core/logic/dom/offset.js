@@ -503,7 +503,7 @@ class Offset {
 		const th = this.#context.get('toolbar_main').offsetHeight;
 		const containerToolbar = this.#options.get('toolbar_container');
 		const headLess = this.#store.mode.isBalloon || this.#store.mode.isInline || containerToolbar;
-		const toolbarH = (containerToolbar && globalTop - wScrollY - th > 0) || (!this.#$.toolbar.isSticky && headLess) ? 0 : th + (this.#$.toolbar.isSticky ? this.#options.get('toolbar_sticky') : 0);
+		const toolbarH = (containerToolbar && globalTop - wScrollY - th > 0) || (!this.#$.toolbar.isSticky && headLess) ? 0 : th + (this.#$.toolbar.isSticky ? this.#options.get('_toolbar_sticky') : 0);
 		const statusBarH = this.#frameContext.get('statusbar')?.offsetHeight || 0;
 
 		// check margin

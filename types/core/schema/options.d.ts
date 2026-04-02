@@ -406,7 +406,22 @@ export namespace DEFAULTS {
  * @property {boolean} [tabDisable=false] - Disables tab key input.
  * @property {string} [toolbar_width="auto"] - Toolbar width.
  * @property {?HTMLElement} [toolbar_container] - Container element for the toolbar.
- * @property {number} [toolbar_sticky=0] - Enables sticky toolbar with optional offset.
+ * @property {number|{top: number, offset: number}} [toolbar_sticky=0] - Enables sticky toolbar.
+ * - `number`: Sets the sticky top position (px). Use `-1` to disable sticky.
+ * - `{top, offset}`: `top` is the sticky position when the page header is visible.
+ * - `offset` is the sticky position when a virtual keyboard shifts the viewport (e.g., on tablets, touch devices).
+ * - When the virtual keyboard is active, `offset` replaces `top` so the toolbar doesn't leave a gap
+ * - for a page header that has scrolled out of view. Default `offset` is `0`.
+ * ```js
+ * // Basic usage — sticky at top with 0px offset
+ * toolbar_sticky: 0
+ *
+ * // Account for a 92px fixed/sticky site header
+ * toolbar_sticky: 92
+ *
+ * // 92px header on desktop, but 0px when virtual keyboard pushes the viewport
+ * toolbar_sticky: { top: 92, offset: 0 }
+ * ```
  * @property {boolean} [toolbar_hide=false] - Hides toolbar initially.
  * @property {Object} [subToolbar={}] - Sub-toolbar configuration. A secondary toolbar that appears on text selection.
  * @property {SunEditor.UI.ButtonList} [subToolbar.buttonList] - List of Sub-toolbar buttons, grouped by sub-arrays.
@@ -1201,9 +1216,29 @@ export type EditorBaseOptions = {
 	 */
 	toolbar_container?: HTMLElement | null;
 	/**
-	 * - Enables sticky toolbar with optional offset.
+	 * - Enables sticky toolbar.
+	 * - `number`: Sets the sticky top position (px). Use `-1` to disable sticky.
+	 * - `{top, offset}`: `top` is the sticky position when the page header is visible.
+	 * - `offset` is the sticky position when a virtual keyboard shifts the viewport (e.g., on tablets, touch devices).
+	 * - When the virtual keyboard is active, `offset` replaces `top` so the toolbar doesn't leave a gap
+	 * - for a page header that has scrolled out of view. Default `offset` is `0`.
+	 * ```js
+	 * // Basic usage — sticky at top with 0px offset
+	 * toolbar_sticky: 0
+	 *
+	 * // Account for a 92px fixed/sticky site header
+	 * toolbar_sticky: 92
+	 *
+	 * // 92px header on desktop, but 0px when virtual keyboard pushes the viewport
+	 * toolbar_sticky: { top: 92, offset: 0 }
+	 * ```
 	 */
-	toolbar_sticky?: number;
+	toolbar_sticky?:
+		| number
+		| {
+				top: number;
+				offset: number;
+		  };
 	/**
 	 * - Hides toolbar initially.
 	 */
@@ -1513,7 +1548,18 @@ export type InternalBaseOptions = {
 };
 export type EditorInitOptions = EditorBaseOptions & PrivateBaseOptions & EditorFrameOptions;
 export type AllBaseOptions = EditorBaseOptions & PrivateBaseOptions & InternalBaseOptions;
-export type TransformedOptionKeys = 'formatClosureBrLine' | 'formatBrLine' | 'formatLine' | 'formatClosureBlock' | 'formatBlock' | 'toolbar_width' | 'toolbar_container' | 'toolbar_sticky' | 'strictMode' | 'lineAttrReset';
+export type TransformedOptionKeys =
+	| 'formatClosureBrLine'
+	| 'formatBrLine'
+	| 'formatLine'
+	| 'formatClosureBlock'
+	| 'formatBlock'
+	| 'toolbar_width'
+	| 'toolbar_container'
+	| '_toolbar_sticky'
+	| '_toolbar_sticky_offset'
+	| 'strictMode'
+	| 'lineAttrReset';
 export type StrictModeOptions = {
 	/**
 	 * - Filters disallowed HTML tags (`elementWhitelist`/`elementBlacklist`)
@@ -1563,7 +1609,8 @@ export type TransformedOptions = {
 	};
 	toolbar_width: string;
 	toolbar_container: HTMLElement | null;
-	toolbar_sticky: number;
+	_toolbar_sticky: number;
+	_toolbar_sticky_offset: number;
 	strictMode: StrictModeOptions;
 	lineAttrReset: string[];
 };

@@ -166,7 +166,7 @@ export function makePorts(
 	formatAttrsTempCache: (attrs: any) => any;
 	setOnShortcutKey: (v: any) => any;
 	/**
-	 * @description Scrolls the editor view to the caret position after pressing `Enter`. (Ignored on mobile devices)
+	 * @description Scrolls the editor view to the caret position after pressing `Enter`.
 	 * @param {Range} range Range object
 	 */
 	enterScrollTo(range: Range): void;

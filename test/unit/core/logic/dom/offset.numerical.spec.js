@@ -254,6 +254,8 @@ function buildKernel(dom, overrides = {}) {
 				_rtl: false,
 				toolbar_container: null,
 				toolbar_sticky: 0,
+				_toolbar_sticky: 0,
+				_toolbar_sticky_offset: 0,
 				...(overrides.optionValues || {}),
 			};
 			return map[key];
@@ -1186,6 +1188,8 @@ describe('Offset — Numerical Verification (non-zero layout)', () => {
 					_rtl: false,
 					toolbar_container: document.createElement('div'), // truthy
 					toolbar_sticky: 0,
+				_toolbar_sticky: 0,
+				_toolbar_sticky_offset: 0,
 				},
 			});
 			const containerOffset = new Offset(containerKernel);

@@ -158,14 +158,14 @@ export function makePorts(inst, { _styleNodes }) {
 
 		// === enter event specific ===
 		/**
-		 * @description Scrolls the editor view to the caret position after pressing `Enter`. (Ignored on mobile devices)
+		 * @description Scrolls the editor view to the caret position after pressing `Enter`.
 		 * @param {Range} range Range object
 		 */
 		enterScrollTo(range) {
 			ui._iframeAutoHeight(frameContext);
 
 			// scroll to
-			if (isMobile && inst.scrollparents.length > 0) return;
+			// if (isMobile && inst.scrollparents.length > 0) return;
 			selection.scrollTo(range, { behavior: 'auto', block: 'nearest', inline: 'nearest' });
 		},
 		/**
