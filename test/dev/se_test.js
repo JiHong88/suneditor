@@ -572,6 +572,10 @@ const options1 = {
 	retainStyleMode: 'none', // repeat, always, none
 	toolbar_sticky: 0,
 	lineAttrReset: 'id',
+	wordCounter: true,
+	wordCounter_label: 'Words :',
+	charCounter: true,
+	charCounter_label: 'Characters :',
 	// __pluginRetainFilter: { table: false },
 	// height: '600px',
 	// charCounter_max: 1400,

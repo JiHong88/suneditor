@@ -204,6 +204,8 @@ class Editor {
 
 		// char counter
 		if (e.has('charCounter')) e.get('charCounter').textContent = String(this.$.char.getLength());
+		// word counter
+		if (e.has('wordCounter')) e.get('wordCounter').textContent = String(this.$.char.getWordCount());
 
 		// document type init
 		if (this.$.options.get('type') === 'document') {

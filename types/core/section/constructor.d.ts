@@ -42,7 +42,7 @@ export function InitOptions(
  * @description Create a context object for the editor frame.
  * @param {SunEditor.FrameOptions} targetOptions - `editor.frameOptions`
  * @param {HTMLElement} statusbar - statusbar element
- * @returns {{statusbar: HTMLElement, navigation: HTMLElement, charWrapper: HTMLElement, charCounter: HTMLElement}}
+ * @returns {{statusbar: HTMLElement, navigation: HTMLElement, charWrapper: HTMLElement, charCounter: HTMLElement, wordWrapper: HTMLElement, wordCounter: HTMLElement}}
  */
 export function CreateStatusbar(
 	targetOptions: SunEditor.FrameOptions,
@@ -52,6 +52,8 @@ export function CreateStatusbar(
 	navigation: HTMLElement;
 	charWrapper: HTMLElement;
 	charCounter: HTMLElement;
+	wordWrapper: HTMLElement;
+	wordCounter: HTMLElement;
 };
 /**
  * @description Update a button state, attributes, and icons

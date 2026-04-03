@@ -37,6 +37,8 @@ import type {} from '../../typedef';
  * @property {HTMLElement} navigation - Navigation element (e.g., for outline or bookmarks).
  * @property {HTMLElement} charWrapper - Wrapper for the character counter element.
  * @property {HTMLElement} charCounter - Element showing the character counter.
+ * @property {HTMLElement} wordWrapper - Wrapper for the word counter element.
+ * @property {HTMLElement} wordCounter - Element showing the word counter.
  * @property {Window} [_ww] - The window object of the WYSIWYG frame (iframe window).
  * @property {Document} [_wd] - The document object of the WYSIWYG frame (iframe document).
  *
@@ -215,6 +217,14 @@ export type FrameContextStore = {
 	 * - Element showing the character counter.
 	 */
 	charCounter: HTMLElement;
+	/**
+	 * - Wrapper for the word counter element.
+	 */
+	wordWrapper: HTMLElement;
+	/**
+	 * - Element showing the word counter.
+	 */
+	wordCounter: HTMLElement;
 	/**
 	 * - The window object of the WYSIWYG frame (iframe window).
 	 */

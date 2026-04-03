@@ -38,6 +38,8 @@ import { get as getNumber } from '../../helper/numbers';
  * @property {HTMLElement} navigation - Navigation element (e.g., for outline or bookmarks).
  * @property {HTMLElement} charWrapper - Wrapper for the character counter element.
  * @property {HTMLElement} charCounter - Element showing the character counter.
+ * @property {HTMLElement} wordWrapper - Wrapper for the word counter element.
+ * @property {HTMLElement} wordCounter - Element showing the word counter.
  * @property {Window} [_ww] - The window object of the WYSIWYG frame (iframe window).
  * @property {Document} [_wd] - The document object of the WYSIWYG frame (iframe document).
  *
@@ -171,4 +173,8 @@ export function UpdateStatusbarContext(statusbar, mapper) {
 	navigation ? mapper.set('navigation', navigation) : mapper.delete('navigation');
 	charWrapper ? mapper.set('charWrapper', charWrapper) : mapper.delete('charWrapper');
 	charCounter ? mapper.set('charCounter', charCounter) : mapper.delete('charCounter');
+	const wordWrapper = statusbar ? statusbar.querySelector('.se-word-counter-wrapper') : null;
+	const wordCounter = statusbar ? statusbar.querySelector('.se-word-counter-wrapper .se-word-counter') : null;
+	wordWrapper ? mapper.set('wordWrapper', wordWrapper) : mapper.delete('wordWrapper');
+	wordCounter ? mapper.set('wordCounter', wordCounter) : mapper.delete('wordCounter');
 }

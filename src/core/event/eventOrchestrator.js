@@ -669,6 +669,9 @@ class EventOrchestrator extends KernelInjector {
 		if (this.#store.mode.isInline || this.#store.mode.isBalloonAlways) this.#toolbar.show();
 		if (this.#store.mode.isSubBalloonAlways) this.$.subToolbar.show();
 
+		// sticky
+		this.#toolbar._resetSticky();
+
 		// user event
 		this.#eventManager.triggerEvent('onFocus', { frameContext, event });
 		// plugin event

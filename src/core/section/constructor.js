@@ -772,12 +772,14 @@ export function InitOptions(options, editorTargets, plugins) {
  * @description Create a context object for the editor frame.
  * @param {SunEditor.FrameOptions} targetOptions - `editor.frameOptions`
  * @param {HTMLElement} statusbar - statusbar element
- * @returns {{statusbar: HTMLElement, navigation: HTMLElement, charWrapper: HTMLElement, charCounter: HTMLElement}}
+ * @returns {{statusbar: HTMLElement, navigation: HTMLElement, charWrapper: HTMLElement, charCounter: HTMLElement, wordWrapper: HTMLElement, wordCounter: HTMLElement}}
  */
 export function CreateStatusbar(targetOptions, statusbar) {
 	let navigation = null;
 	let charWrapper = null;
 	let charCounter = null;
+	let wordWrapper = null;
+	let wordCounter = null;
 
 	if (targetOptions.get('statusbar')) {
 		statusbar ||= dom.utils.createElement('DIV', { class: 'se-status-bar sun-editor-common' });
@@ -786,9 +788,30 @@ export function CreateStatusbar(targetOptions, statusbar) {
 		navigation = statusbar.querySelector('.se-navigation') || dom.utils.createElement('DIV', { class: 'se-navigation sun-editor-common' });
 		statusbar.appendChild(navigation);
 
-		/** char counter */
+		/** word counter (left) */
+		if (targetOptions.get('wordCounter')) {
+			wordWrapper = statusbar.querySelector('.se-word-counter-wrapper') || dom.utils.createElement('DIV', { class: 'se-word-counter-wrapper' });
+
+			if (targetOptions.get('wordCounter_label')) {
+				const wordLabel = wordWrapper.querySelector('.se-word-label') || dom.utils.createElement('SPAN', { class: 'se-word-label' });
+				wordLabel.textContent = targetOptions.get('wordCounter_label');
+				wordWrapper.appendChild(wordLabel);
+			}
+
+			wordCounter = wordWrapper.querySelector('.se-word-counter') || dom.utils.createElement('SPAN', { class: 'se-word-counter' });
+			wordCounter.textContent = '0';
+			wordWrapper.appendChild(wordCounter);
+
+			statusbar.appendChild(wordWrapper);
+		}
+
+		/** char counter (right) */
 		if (targetOptions.get('charCounter')) {
 			charWrapper = statusbar.querySelector('.se-char-counter-wrapper') || dom.utils.createElement('DIV', { class: 'se-char-counter-wrapper' });
+
+			if (targetOptions.get('wordCounter') && charWrapper.className.indexOf('se-with-word-counter') === -1) {
+				charWrapper.className += ' se-with-word-counter';
+			}
 
 			if (targetOptions.get('charCounter_label')) {
 				const charLabel = charWrapper.querySelector('.se-char-label') || dom.utils.createElement('SPAN', { class: 'se-char-label' });
@@ -815,6 +838,8 @@ export function CreateStatusbar(targetOptions, statusbar) {
 		navigation: /** @type {HTMLElement} */ (navigation),
 		charWrapper: /** @type {HTMLElement} */ (charWrapper),
 		charCounter: /** @type {HTMLElement} */ (charCounter),
+		wordWrapper: /** @type {HTMLElement} */ (wordWrapper),
+		wordCounter: /** @type {HTMLElement} */ (wordCounter),
 	};
 }
 
@@ -852,6 +877,8 @@ function InitFrameOptions(o, origin) {
 	const charCounter_max = barContainer || o.charCounter_max === undefined ? origin.charCounter_max : o.charCounter_max;
 	const charCounter_label = barContainer || o.charCounter_label === undefined ? origin.charCounter_label : o.charCounter_label;
 	const charCounter_type = barContainer || o.charCounter_type === undefined ? origin.charCounter_type : o.charCounter_type;
+	const wordCounter = barContainer || o.wordCounter === undefined ? origin.wordCounter : o.wordCounter;
+	const wordCounter_label = barContainer || o.wordCounter_label === undefined ? origin.wordCounter_label : o.wordCounter_label;
 
 	// value
 	fo.set('value', value);
@@ -881,6 +908,9 @@ function InitFrameOptions(o, origin) {
 	fo.set('charCounter_max', numbers.is(charCounter_max) && charCounter_max > -1 ? charCounter_max * 1 : null);
 	fo.set('charCounter_label', typeof charCounter_label === 'string' ? charCounter_label.trim() : null);
 	fo.set('charCounter_type', typeof charCounter_type === 'string' ? charCounter_type : 'char');
+	// status bar - word count
+	fo.set('wordCounter', typeof wordCounter === 'boolean' ? wordCounter : false);
+	fo.set('wordCounter_label', typeof wordCounter_label === 'string' ? wordCounter_label.trim() : null);
 
 	return fo;
 }
