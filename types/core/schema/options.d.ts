@@ -105,6 +105,13 @@ export namespace DEFAULTS {
  * - `char`: Characters length.
  * - `byte`: Binary data size of characters.
  * - `byte-html`: Binary data size of the full HTML string.
+ *
+ * === Word Counter ===
+ * @property {boolean} [wordCounter=false] - Shows the number of words in the editor.
+ * @property {?string} [wordCounter_label=null] - Text to be displayed in the `wordCounter` area of the bottom bar.
+ * ```js
+ * { wordCounter_label: 'Words :' }
+ * ```
  */
 /** ================================================================================================================================ */
 /**
@@ -729,8 +736,21 @@ export type EditorFrameOptions = {
 	 * - `char`: Characters length.
 	 * - `byte`: Binary data size of characters.
 	 * - `byte-html`: Binary data size of the full HTML string.
+	 *
+	 * === Word Counter ===
 	 */
 	charCounter_type?: 'char' | 'byte' | 'byte-html';
+	/**
+	 * - Shows the number of words in the editor.
+	 */
+	wordCounter?: boolean;
+	/**
+	 * - Text to be displayed in the `wordCounter` area of the bottom bar.
+	 * ```js
+	 * { wordCounter_label: 'Words :' }
+	 * ```
+	 */
+	wordCounter_label?: string | null;
 };
 export type OptionStyleResult = {
 	/**

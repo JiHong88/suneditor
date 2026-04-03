@@ -150,6 +150,13 @@ export const DEFAULTS = {
  * - `char`: Characters length.
  * - `byte`: Binary data size of characters.
  * - `byte-html`: Binary data size of the full HTML string.
+ *
+ * === Word Counter ===
+ * @property {boolean} [wordCounter=false] - Shows the number of words in the editor.
+ * @property {?string} [wordCounter_label=null] - Text to be displayed in the `wordCounter` area of the bottom bar.
+ * ```js
+ * { wordCounter_label: 'Words :' }
+ * ```
  */
 
 /** ================================================================================================================================ */
@@ -681,6 +688,8 @@ export const OPTION_FRAME_FIXED_FLAG = {
 	charCounter_max: true,
 	charCounter_label: true,
 	charCounter_type: true,
+	wordCounter: true,
+	wordCounter_label: true,
 };
 
 /**

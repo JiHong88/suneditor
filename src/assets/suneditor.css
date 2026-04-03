@@ -1066,11 +1066,11 @@
 }
 
 .sun-editor .se-btn-select.se-btn-tool-font {
-	width: 100px;
+	width: 128px;
 }
 
 .sun-editor .se-btn-select.se-btn-tool-format {
-	width: 86px;
+	width: 96px;
 }
 
 .sun-editor .se-btn-select.se-btn-tool-font-size .se-txt {
@@ -1880,7 +1880,27 @@
 	background: transparent;
 }
 
+/** status bar - wordCounter */
+.sun-editor .se-status-bar .se-word-counter-wrapper {
+	position: relative;
+	width: auto;
+	height: auto;
+	margin: 0;
+	padding: 0;
+	color: var(--se-statusbar-font-color);
+	font-size: var(--se-statusbar-font-size);
+	background: transparent;
+}
+
+.sun-editor .se-status-bar .se-word-counter-wrapper .se-word-label {
+	margin-right: 4px;
+}
+
 /** status bar - charCounter */
+.sun-editor .se-status-bar .se-char-counter-wrapper.se-with-word-counter {
+	margin-left: 0.6em;
+}
+
 .sun-editor .se-status-bar .se-char-counter-wrapper {
 	flex: none;
 	position: relative;
@@ -1890,7 +1910,7 @@
 	margin: 0;
 	padding: 0;
 	color: var(--se-statusbar-font-color);
-	font-size: var(--se-main-font-size);
+	font-size: var(--se-statusbar-font-size);
 	background: transparent;
 }
 
@@ -3884,8 +3904,18 @@
 }
 
 /* statusbar */
-.sun-editor.se-rtl .se-status-bar .se-navigation {
+.sun-editor.se-rtl .se-status-bar {
 	direction: rtl;
+}
+
+.sun-editor.se-rtl .se-status-bar .se-word-counter-wrapper .se-word-label {
+	margin-right: 0;
+	margin-left: 4px;
+}
+
+.sun-editor.se-rtl .se-status-bar .se-char-counter-wrapper.se-with-word-counter {
+	margin-left: 0;
+	margin-right: 0.6em;
 }
 
 /* button--- */

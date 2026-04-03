@@ -36,7 +36,16 @@ declare class Char {
 	 */
 	getByteLength(text: string): number;
 	/**
-	 * @description Set the char count to charCounter element textContent.
+	 * @description Get the number of words in the content.
+	 * - If [content] is `undefined`, get the current editor's word count.
+	 * @param {string} [content] Content to count. (default: wysiwyg textContent)
+	 * @returns {number}
+	 * const currentWords = editor.$.char.getWordCount();
+	 * const textWords = editor.$.char.getWordCount('Hello World');
+	 */
+	getWordCount(content?: string): number;
+	/**
+	 * @description Set the char count and word count to counter element textContent.
 	 * @param {?SunEditor.FrameContext} [fc] Frame context
 	 */
 	display(fc?: SunEditor.FrameContext | null): void;

@@ -92,15 +92,38 @@ class Char {
 	}
 
 	/**
-	 * @description Set the char count to charCounter element textContent.
+	 * @description Get the number of words in the content.
+	 * - If [content] is `undefined`, get the current editor's word count.
+	 * @param {string} [content] Content to count. (default: wysiwyg textContent)
+	 * @returns {number}
+	 * const currentWords = editor.$.char.getWordCount();
+	 * const textWords = editor.$.char.getWordCount('Hello World');
+	 */
+	getWordCount(content) {
+		if (typeof content !== 'string') {
+			content = this.#frameContext.get('wysiwyg').innerText;
+		}
+
+		const trimmed = content.trim();
+		if (!trimmed) return 0;
+
+		return trimmed.split(/\s+/).length;
+	}
+
+	/**
+	 * @description Set the char count and word count to counter element textContent.
 	 * @param {?SunEditor.FrameContext} [fc] Frame context
 	 */
 	display(fc) {
-		const charCounter = (fc || this.#frameContext).get('charCounter');
-		if (charCounter) {
+		const ctx = fc || this.#frameContext;
+		const charCounter = ctx.get('charCounter');
+		const wordCounter = ctx.get('wordCounter');
+
+		if (charCounter || wordCounter) {
 			// Defer count update — DOM content may still be mutating from the current input/paste action
 			_w.setTimeout(() => {
-				charCounter.textContent = String(this.getLength());
+				if (charCounter) charCounter.textContent = String(this.getLength());
+				if (wordCounter) wordCounter.textContent = String(this.getWordCount());
 			}, 0);
 		}
 	}

@@ -331,7 +331,7 @@ export default class OptionProvider {
 	}
 
 	#GetResetDiffKey(key) {
-		if (/^statusbar|^charCounter/.test(key)) return 'statusbar-changed';
+		if (/^statusbar|^charCounter|^wordCounter/.test(key)) return 'statusbar-changed';
 		return key;
 	}
 
