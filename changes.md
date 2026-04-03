@@ -1,9 +1,9 @@
-### feat
+### New Feature
 
-- `wordCounter` 옵션 추가 — 상태바에 단어 수 별도 표시 (`char.js`, `constructor.js`)
-- `wordCounter_label` 옵션 추가 — 단어 카운터 라벨 텍스트 설정
-- `editor.$.char.getWordCount()` API 추가 — 현재 에디터 또는 지정 텍스트의 단어 수 반환
+* A `wordCounter` option has been added — displays word count separately in the status bar
+* A `wordCounter_label` option has been added — sets the label text for the word counter
+* `editor.$.char.getWordCount()` API added — returns the word count of the current editor or specified text
 
-### change
+### Enhancement
 
-- 상태바 카운터 배치: 단어 수(왼쪽) | 글자 수(오른쪽), RTL에서는 자동 반전
+* Updated status bar counter layout: word count (left) | character count (right), automatically reversed in RTL

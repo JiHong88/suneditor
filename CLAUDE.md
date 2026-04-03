@@ -14,4 +14,9 @@ All authoritative content is maintained in `GUIDE.md`. Do not duplicate or summa
 ## changes.md Update
 
 After modifying code, you must update [changes.md](./changes.md).
-Refer to [guide/changes-guide.md](./guide/changes-guide.md) for formatting rules.
+Refer to [guide/changes-guide.md](./prompts/changes-guide.md) for formatting rules.
+
+## Release Note
+
+When asked to write a release note, read [changes.md](./changes.md) and rewrite its contents as a release note following the style and rules in [prompts/release-note.md](./prompts/release-note.md).
+Replace the entire contents of `changes.md` with the generated release note.
