@@ -377,13 +377,12 @@ class Controller {
 		if (!passive) {
 			this.#$.ui.onControllerContext();
 			this.#$.store.set('controlActive', true);
+			this.#$.store.set('_preventBlur', true);
 		}
 
 		if (!this.isOpen) {
 			this.#$.ui.opendControllers.push(info);
 		}
-
-		this.#$.store.set('_preventBlur', true);
 
 		this.isOpen = true;
 

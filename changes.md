@@ -1,3 +1,5 @@
 ### fix
 
-- Markdown 모드 전환 시 미디어 컴포넌트(image, video 등)의 정렬, 클래스, data 속성이 손실되는 문제 수정 (`helper/markdown.js`) issue num: (#1620)
+- 연속된 이미지/비디오 컴포넌트가 마크다운 변환 시 줄바꿈 없이 붙는 문제 수정 (`markdown.js`)
+- inline 모드에서 `pre` 태그에 바로 포커스 시 툴바가 표시되지 않는 문제 수정 (`Controller.js`)
+- 마크다운 뷰에서 돌아올 때 비디오 렌더링 에러 수정
