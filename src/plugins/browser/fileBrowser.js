@@ -5,6 +5,27 @@ import { Browser } from '../../modules/contract';
  * @typedef {Object} FileBrowserPluginOptions
  * @property {Object<string, *>|Array<*>} [data] - Direct data without server calls (bypasses URL fetch).
  * @property {string} [url] - Server request URL
+ * - The server must return a nested folder structure.
+ * - Each folder can contain `_data` (its own files) and child folders:
+ * ```js
+ * {
+ *   "result": {
+ *     "root": {
+ *       "name": "Root",
+ *       "default": true,
+ *       "_data": [
+ *         { "src": "https://example.com/file1.pdf", "name": "file1.pdf" }
+ *       ],
+ *       "documents": {
+ *         "name": "Documents",
+ *         "_data": [
+ *           { "src": "https://example.com/report.pdf", "name": "report.pdf" }
+ *         ]
+ *       }
+ *     }
+ *   }
+ * }
+ * ```
  * @property {Object<string, string>} [headers] - Server request headers
  * @property {string|((item: SunEditor.Module.Browser.File) => string)} [thumbnail] - Default thumbnail URL or a function that returns a thumbnail URL per item.
  * @property {Array<string>} [props] - Additional tag names

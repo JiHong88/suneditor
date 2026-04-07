@@ -27,6 +27,19 @@ import ApiManager from '../manager/ApiManager';
  * @property {(target: Node) => void} selectorHandler - Function that actions when an item is clicked. Required. Can be overridden in browser.
  * @property {boolean} [useSearch] - Whether to use the search function. Optional. Default: `true`.
  * @property {string} [searchUrl] - File server search url. Optional. Can be overridden in browser.
+ * - Requested as `searchUrl + '?keyword=' + keyword`. The server must return:
+ * ```js
+ * {
+ *   "result": [
+ *     {
+ *       "src": "https://example.com/file.jpg",
+ *       "name": "file.jpg",
+ *       "thumbnail": "https://example.com/file_thumb.jpg",
+ *       "tag": ["photo"]
+ *     }
+ *   ]
+ * }
+ * ```
  * @property {Object<string, string>} [searchUrlHeader] - File server search http header. Optional. Can be overridden in browser.
  * @property {string} [listClass] - Class name of list div. Required. Can be overridden in browser.
  * @property {(item: BrowserFile) => string} [drawItemHandler] - Function that returns HTML string for rendering each file item. Required. Can be overridden in browser.
@@ -50,6 +63,8 @@ class Browser {
 	#loading;
 	#globalEventHandler;
 
+	/** @type {Array<BrowserFile>} */
+	#allItems = [];
 	#closeSignal = false;
 	#bindClose = null;
 
@@ -195,6 +210,7 @@ class Browser {
 		this.area.style.display = 'none';
 		this.selectedTags = [];
 		this.items = [];
+		this.#allItems = [];
 		this.folders = {};
 		this.tree = {};
 		this.data = {};
@@ -216,8 +232,25 @@ class Browser {
 			this.#drawFileList(this.searchUrl + '?keyword=' + keyword, this.searchUrlHeader, false);
 		} else {
 			this.keyword = keyword.toLowerCase();
-			this.#drawListItem(this.items, false);
+			this.#drawListItem(this.#allItems.length > 0 ? this.#allItems : this.items, false);
 		}
+	}
+
+	/**
+	 * @description Collects all file items from every folder in `this.data`.
+	 * @returns {Array<BrowserFile>}
+	 */
+	#collectAllItems() {
+		const all = [];
+		for (const key in this.data) {
+			const items = this.data[key];
+			if (Array.isArray(items)) {
+				for (let i = 0; i < items.length; i++) {
+					all.push(items[i]);
+				}
+			}
+		}
+		return all;
 	}
 
 	/**
@@ -341,6 +374,7 @@ class Browser {
 		} else if (typeof data === 'object') {
 			this.sideOpenBtn.style.display = '';
 			this.#parseFolderData(data);
+			this.#allItems = this.#collectAllItems();
 
 			this.side.innerHTML = '';
 			const sideInner = (this.sideInner = dom.utils.createElement('div', null));
@@ -544,7 +578,7 @@ class Browser {
 		if (typeof data === 'string') {
 			this.#drawFileList(data, this.urlHeader, true);
 		} else {
-			this.#drawListItem(data, false);
+			this.#drawListItem(data, true);
 		}
 	}
 

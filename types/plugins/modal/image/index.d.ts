@@ -32,6 +32,18 @@ export type ImagePluginOptions = {
 	createUrlInput?: boolean;
 	/**
 	 * - The URL endpoint for image file uploads.
+	 * - The server must return:
+	 * ```js
+	 * {
+	 * "result": [
+	 * {
+	 * "url": "https://example.com/image.jpg",
+	 * "name": "image.jpg",
+	 * "size": 123456
+	 * }
+	 * ]
+	 * }
+	 * ```
 	 */
 	uploadUrl?: string;
 	/**
@@ -116,6 +128,18 @@ export type ImageState = {
  * @property {boolean} [createUrlInput] - Whether to create a URL input element for image insertion.
  * - Defaults to `true`. Always `true` when `createFileInput` is `false`.
  * @property {string} [uploadUrl] - The URL endpoint for image file uploads.
+ * - The server must return:
+ * ```js
+ * {
+ *   "result": [
+ *     {
+ *       "url": "https://example.com/image.jpg",
+ *       "name": "image.jpg",
+ *       "size": 123456
+ *     }
+ *   ]
+ * }
+ * ```
  * @property {Object<string, string>} [uploadHeaders] - Additional headers to include in the file upload request.
  * ```js
  * { uploadUrl: '/api/upload/image', uploadHeaders: { Authorization: 'Bearer token' } }

@@ -32,6 +32,18 @@ export type VideoPluginOptions = {
 	createUrlInput?: boolean;
 	/**
 	 * - The URL endpoint for video file uploads.
+	 * - The server must return:
+	 * ```js
+	 * {
+	 * "result": [
+	 * {
+	 * "url": "https://example.com/video.mp4",
+	 * "name": "video.mp4",
+	 * "size": 5242880
+	 * }
+	 * ]
+	 * }
+	 * ```
 	 */
 	uploadUrl?: string;
 	/**
@@ -155,6 +167,18 @@ export type VideoState = {
  * @property {boolean} [createUrlInput] - Whether to create a URL input element for video embedding.
  * - Defaults to `true`. Always `true` when `createFileInput` is `false`.
  * @property {string} [uploadUrl] - The URL endpoint for video file uploads.
+ * - The server must return:
+ * ```js
+ * {
+ *   "result": [
+ *     {
+ *       "url": "https://example.com/video.mp4",
+ *       "name": "video.mp4",
+ *       "size": 5242880
+ *     }
+ *   ]
+ * }
+ * ```
  * @property {Object<string, string>} [uploadHeaders] - Additional headers to include in the video upload request.
  * @property {number} [uploadSizeLimit] - The total upload size limit for videos in bytes.
  * @property {number} [uploadSingleSizeLimit] - The single file upload size limit for videos in bytes.

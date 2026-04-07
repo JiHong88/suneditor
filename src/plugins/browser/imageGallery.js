@@ -5,6 +5,20 @@ import { Browser } from '../../modules/contract';
  * @typedef ImageGalleryPluginOptions
  * @property {Array<*>} [data] - Direct data without server calls
  * @property {string} [url] - Server request URL
+ * - The server must return:
+ * ```js
+ * {
+ *   "result": [
+ *     {
+ *       "src": "https://example.com/img.jpg",
+ *       "name": "img.jpg",
+ *       "thumbnail": "https://example.com/img_thumb.jpg",
+ *       "alt": "description",
+ *       "tag": ["nature"]
+ *     }
+ *   ]
+ * }
+ * ```
  * @property {Object<string, string>} [headers] - Server request headers
  */
 
