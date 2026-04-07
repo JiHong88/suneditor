@@ -66,7 +66,7 @@ class CodeBlock extends PluginCommand {
 		// ───────────────── [[toolbar dropdown type]] ─────────────────
 		this.afterItem = dom.utils.createElement(
 			'button',
-			{ class: 'se-btn se-tooltip se-sub-arrow-btn', 'data-command': CodeBlock.key, 'data-type': 'dropdown' },
+			{ class: 'se-btn se-tooltip se-sub-arrow-btn', type: 'button', 'data-command': CodeBlock.key, 'data-type': 'dropdown' },
 			`${this.$.icons.arrow_down}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.$.lang.codeLanguage || 'Language'}</span></span>`,
 		);
 

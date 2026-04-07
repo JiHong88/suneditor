@@ -27,7 +27,7 @@ class List_bulleted extends PluginCommand {
 		this.icon = 'list_bulleted';
 		this.afterItem = dom.utils.createElement(
 			'button',
-			{ class: 'se-btn se-tooltip se-sub-arrow-btn', 'data-command': List_bulleted.key, 'data-type': 'dropdown' },
+			{ class: 'se-btn se-tooltip se-sub-arrow-btn', type: 'button', 'data-command': List_bulleted.key, 'data-type': 'dropdown' },
 			`${this.$.icons.arrow_down}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.$.lang.bulletedList}</span></span>`,
 		);
 

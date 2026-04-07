@@ -1,6 +1,21 @@
 /**
  * @fileoverview Markdown converter module
  * - Supports GitHub Flavored Markdown (GFM) syntax
+ *
+ * @description Limitations — Style loss during roundtrip
+ *
+ * Markdown syntax cannot represent HTML inline styles, classes, or data attributes.
+ * When switching between WYSIWYG and Markdown view, the following behavior applies:
+ *
+ * | Content type                        | Behavior                                    | Example                                              |
+ * |-------------------------------------|---------------------------------------------|------------------------------------------------------|
+ * | Media components (`div.se-component`) | Converted to markdown — styles are lost     | Image alignment, data-se-* attrs                     |
+ * | Styled `<span>` elements            | Preserved as raw HTML in markdown           | Font color, background, custom classes               |
+ * | Tables, figures                      | Converted to markdown — styles are lost     | Table cell styles, figure width, colgroup widths      |
+ * | General elements (p, h1, blockquote) | Converted to markdown — styles are lost     | text-align, color, font-size on paragraphs/headings  |
+ *
+ * This is a fundamental limitation of the Markdown format.
+ * To preserve all HTML attributes without loss, use Code View instead.
  */
 
 const VOID_ELEMENTS = /^(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)$/i;
@@ -439,16 +454,16 @@ function nodeToMarkdown(node, indent, isBlock) {
 
 	// Span - pass through as inline (may contain styles)
 	if (tag === 'span') {
-		// Check if it has meaningful attributes that need HTML fallback
 		if (attributes.style || attributes.class) {
 			return nodeToHtmlFallback(node);
 		}
 		return childrenToInline(children);
 	}
 
-	// Figure - process children (usually contains img or other media)
+	// Figure - process children (table, media)
 	if (tag === 'figure') {
-		return children.map((c) => nodeToMarkdown(c, indent, true)).join('');
+		const inner = children.map((c) => nodeToMarkdown(c, indent, true)).join('');
+		return /\n$/.test(inner) ? inner : inner + '\n\n';
 	}
 	if (tag === 'figcaption') {
 		const content = childrenToInline(children).trim();

@@ -152,25 +152,25 @@ class FontSize extends PluginInput {
 		if (showIncDec) {
 			this.beforeItem = dom.utils.createElement(
 				'button',
-				{ class: 'se-btn se-tooltip se-sub-btn', 'data-command': FontSize.key, 'data-type': 'command', 'data-value': 'dec' },
+				{ class: 'se-btn se-tooltip se-sub-btn', type: 'button', 'data-command': FontSize.key, 'data-type': 'command', 'data-value': 'dec' },
 				`${this.$.icons.minus}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.$.lang.decrease}</span></span>`,
 			);
 			this.afterItem = dom.utils.createElement(
 				'button',
-				{ class: 'se-btn se-tooltip se-sub-btn', 'data-command': FontSize.key, 'data-type': 'command', 'data-value': 'inc' },
+				{ class: 'se-btn se-tooltip se-sub-btn', type: 'button', 'data-command': FontSize.key, 'data-type': 'command', 'data-value': 'inc' },
 				`${this.$.icons.plus}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.$.lang.increase}</span></span>`,
 			);
 		} else if (!disableInput) {
 			this.afterItem = dom.utils.createElement(
 				'button',
-				{ class: 'se-btn se-tooltip se-sub-arrow-btn', 'data-command': FontSize.key, 'data-type': 'dropdown' },
+				{ class: 'se-btn se-tooltip se-sub-arrow-btn', type: 'button', 'data-command': FontSize.key, 'data-type': 'dropdown' },
 				`${this.$.icons.arrow_down}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.$.lang.fontSize}</span></span>`,
 			);
 			this.$.menu.initDropdownTarget({ key: FontSize.key, type: 'dropdown' }, menu);
 		} else if (disableInput && !showIncDec) {
 			this.replaceButton = dom.utils.createElement(
 				'button',
-				{ class: 'se-btn se-tooltip se-btn-select se-btn-tool-font-size', 'data-command': FontSize.key, 'data-type': 'dropdown' },
+				{ class: 'se-btn se-tooltip se-btn-select se-btn-tool-font-size', type: 'button', 'data-command': FontSize.key, 'data-type': 'dropdown' },
 				`<span class="se-txt __se__font_size">${this.$.lang.fontSize}</span>${this.$.icons.arrow_down}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.$.lang.fontSize}</span></span>`,
 			);
 			this.$.menu.initDropdownTarget({ key: FontSize.key, type: 'dropdown' }, menu);
