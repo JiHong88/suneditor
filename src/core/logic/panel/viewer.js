@@ -300,7 +300,7 @@ class Viewer {
 			this.#originCssText = topArea.style.cssText;
 			this.#editorAreaOriginCssText = editorArea.style.cssText;
 			this.#wysiwygOriginCssText = wysiwygFrame.style.cssText;
-			this.#codeWrapperOriginCssText = codeWrapper.style.cssText;
+			this.#codeWrapperOriginCssText = codeWrapper?.style.cssText;
 			this.#codeOriginCssText = code.style.cssText;
 			this.#codeNumberOriginCssText = codeNumbers?.style.cssText;
 			this.#markdownWrapperOriginCssText = markdownWrapper?.style.cssText;
@@ -344,9 +344,11 @@ class Viewer {
 			wysiwygFrame.style.cssText = (wysiwygFrame.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0] + this.#frameOptions.get('_defaultStyles').editor + (isCodeView || isMarkdownView ? 'display: none;' : '');
 
 			// code wrapper
-			codeWrapper.style.cssText = (codeWrapper.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0] + `display: ${!isCodeView ? 'none' : 'flex'} !important;`;
-			codeWrapper.style.overflow = 'auto';
-			codeWrapper.style.height = '100%';
+			if (codeWrapper) {
+				codeWrapper.style.cssText = (codeWrapper.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0] + `display: ${!isCodeView ? 'none' : 'flex'} !important;`;
+				codeWrapper.style.overflow = 'auto';
+				codeWrapper.style.height = '100%';
+			}
 
 			// markdown wrapper
 			if (markdownWrapper) {
@@ -384,7 +386,9 @@ class Viewer {
 			wysiwygFrame.style.cssText = this.#wysiwygOriginCssText.replace(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/, '') + (isCodeView || isMarkdownView ? 'display: none;' : '');
 
 			// code wrapper
-			codeWrapper.style.cssText = this.#codeWrapperOriginCssText.replace(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/, '') + `display: ${!isCodeView ? 'none' : 'flex'} !important;`;
+			if (codeWrapper) {
+				codeWrapper.style.cssText = this.#codeWrapperOriginCssText.replace(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/, '') + `display: ${!isCodeView ? 'none' : 'flex'} !important;`;
+			}
 
 			// code
 			code.style.cssText = this.#codeOriginCssText;
