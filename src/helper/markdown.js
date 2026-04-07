@@ -9,7 +9,7 @@
  *
  * | Content type                        | Behavior                                    | Example                                              |
  * |-------------------------------------|---------------------------------------------|------------------------------------------------------|
- * | Media components (`div.se-component`) | Preserved as raw HTML in markdown           | Image alignment, data-se-* attrs, video, audio       |
+ * | Media components (`div.se-component`) | Converted to markdown — styles are lost     | Image alignment, data-se-* attrs                     |
  * | Styled `<span>` elements            | Preserved as raw HTML in markdown           | Font color, background, custom classes               |
  * | Tables, figures                      | Converted to markdown — styles are lost     | Table cell styles, figure width, colgroup widths      |
  * | General elements (p, h1, blockquote) | Converted to markdown — styles are lost     | text-align, color, font-size on paragraphs/headings  |
@@ -443,9 +443,9 @@ function nodeToMarkdown(node, indent, isBlock) {
 
 	// Div - check for component containers, otherwise process children
 	if (tag === 'div') {
-		// Component containers (image, video, etc.) - preserve as HTML to retain alignment, data-se-* attrs
+		// Component containers - process inner content
 		if (attributes.class && /se-component/.test(attributes.class)) {
-			return nodeToHtmlFallback(node) + '\n\n';
+			return children.map((c) => nodeToMarkdown(c, indent, true)).join('');
 		}
 		const content = childrenToInline(children);
 		if (isBlock) return content + '\n\n';
@@ -462,7 +462,8 @@ function nodeToMarkdown(node, indent, isBlock) {
 
 	// Figure - process children (table, media)
 	if (tag === 'figure') {
-		return children.map((c) => nodeToMarkdown(c, indent, true)).join('');
+		const inner = children.map((c) => nodeToMarkdown(c, indent, true)).join('');
+		return /\n$/.test(inner) ? inner : inner + '\n\n';
 	}
 	if (tag === 'figcaption') {
 		const content = childrenToInline(children).trim();

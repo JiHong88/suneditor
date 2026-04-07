@@ -904,7 +904,7 @@ class Figure {
 	retainFigureFormat(container, originEl, anchorCover, fileManagerInst) {
 		const isInline = this.#$.component.isInline(container);
 		const originParent = originEl.parentNode;
-		let existElement = this.#$.format.isBlock(originParent) || dom.check.isWysiwygFrame(originParent) ? originEl : Figure.GetContainer(originEl)?.container || originParent || originEl;
+		let existElement = this.#$.format.isBlock(originParent) || dom.check.isWysiwygFrame(originParent) || originParent.nodeType >= 9 ? originEl : Figure.GetContainer(originEl)?.container || originParent || originEl;
 
 		if (dom.query.getParentElement(originEl, dom.check.isExcludeFormat)) {
 			existElement = anchorCover && anchorCover !== originEl ? anchorCover : originEl;
