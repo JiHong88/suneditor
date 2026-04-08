@@ -1132,7 +1132,7 @@ function _defaultButtons(isRTL, icons, lang) {
 		finder: ['se-component-enabled', lang.find, 'finder', '', icons.finder],
 		save: ['se-component-enabled', lang.save, 'save', '', icons.save],
 		newDocument: ['se-component-enabled', lang.newDocument, 'newDocument', '', icons.new_document],
-		selectAll: ['se-component-enabled', lang.selectAll, 'selectAll', '', icons.select_all],
+		selectAll: ['se-component-enabled', lang.selectAll, 'selectAll_full', '', icons.select_all],
 		pageBreak: ['se-component-enabled', lang.pageBreak, 'pageBreak', '', icons.page_break],
 		// document type buttons
 		pageUp: ['se-component-enabled', lang.pageUp, 'pageUp', '', icons.page_up],

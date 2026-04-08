@@ -38,6 +38,7 @@ export type _Lang = {
 	caption: string;
 	cellProperties: string;
 	center: string;
+	clear: string;
 	close: string;
 	codeView: string;
 	color: string;

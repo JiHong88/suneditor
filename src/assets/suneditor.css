@@ -368,6 +368,26 @@
 	z-index: 1;
 }
 
+/** -- plain text button */
+.sun-editor .se-btn.se-btn-plain {
+	background-color: transparent;
+	border-color: transparent;
+	box-shadow: none;
+}
+.sun-editor .se-btn.se-btn-plain:not(.on):not(.active):enabled:hover,
+.sun-editor .se-btn.se-btn-plain:not(.on):not(.active):enabled:focus {
+	background-color: transparent;
+	border-color: transparent;
+	box-shadow: none;
+}
+.sun-editor .se-btn.se-btn-plain:not(.on):not(.active):enabled:active,
+.sun-editor .se-btn.se-btn-plain:not(.on):not(.active):enabled.__se__active {
+	background-color: transparent;
+	border-color: transparent !important;
+	box-shadow: none;
+	outline: none !important;
+}
+
 /** --- primary button */
 .sun-editor .se-btn-primary {
 	background-color: var(--se-active-light2-color);
@@ -3232,11 +3252,14 @@
 	margin-left: 0;
 	margin-right: 0;
 }
-
-.sun-editor .se-browser .se-browser-search input {
+.sun-editor .se-browser .se-browser-search-input-wrap {
+	position: relative;
 	flex: auto;
+}
+.sun-editor .se-browser .se-browser-search-input-wrap input {
+	width: 100%;
+	padding: 3px 24px 3px 6px;
 	background-color: transparent;
-	padding: 3px 6px;
 	color: var(--se-main-font-color);
 	text-decoration: none;
 	border-radius: var(--se-border-radius);
@@ -3245,6 +3268,18 @@
 	-moz-background-clip: padding;
 	-webkit-background-clip: padding-box;
 	background-clip: padding-box;
+	box-sizing: border-box;
+}
+.sun-editor .se-browser .se-browser-search-clear {
+	position: absolute;
+	right: 2px;
+	top: 50%;
+	transform: translateY(-50%);
+	padding: 0 2px;
+	opacity: 0.35;
+}
+.sun-editor .se-browser .se-browser-search-clear:hover {
+	opacity: 0.8;
 }
 
 .sun-editor .se-browser .se-browser-search button {
@@ -3395,6 +3430,12 @@
 	background-color: var(--se-main-font-color);
 	opacity: 0.6;
 	pointer-events: none;
+}
+.sun-editor .se-browser .se-file-name-image mark {
+	background-color: var(--se-active-color);
+	color: var(--se-active-font-color);
+	padding: 0 1px;
+	border-radius: 2px;
 }
 
 .sun-editor .se-browser .se-browser-list.se-preview-list .se-file-item-img > * {
@@ -4147,6 +4188,13 @@
 .sun-editor.se-rtl .se-browser .se-browser-search .se-browser-search-form {
 	margin: 2px 8px;
 	flex-direction: row-reverse;
+}
+.sun-editor.se-rtl .se-browser .se-browser-search-input-wrap input {
+	padding: 3px 6px 3px 24px;
+}
+.sun-editor.se-rtl .se-browser .se-browser-search-clear {
+	right: auto;
+	left: 2px;
 }
 .sun-editor.se-rtl .se-browser .se-browser-side .se-menu-icon {
 	margin: 0 0 0 10px;

@@ -15,7 +15,7 @@ export type FileGalleryPluginOptions = {
 	 * "src": "https://example.com/doc.pdf",
 	 * "name": "doc.pdf",
 	 * "thumbnail": "https://example.com/pdf_icon.png",
-	 * "type": "file",
+	 * "type": "file", // video, image ..[plugin name]
 	 * "tag": ["document"]
 	 * }
 	 * ]
@@ -46,7 +46,7 @@ export type FileGalleryPluginOptions = {
  *       "src": "https://example.com/doc.pdf",
  *       "name": "doc.pdf",
  *       "thumbnail": "https://example.com/pdf_icon.png",
- *       "type": "file",
+ *       "type": "file", // video, image ..[plugin name]
  *       "tag": ["document"]
  *     }
  *   ]

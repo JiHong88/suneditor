@@ -50,6 +50,7 @@ import ApiManager from '../manager/ApiManager';
  * @property {Array<*>} [props] - `props` argument to `drawItemHandler` function. Optional. Can be overridden in browser.
  * @property {number} [columnSize] - Number of `div.se-file-item-column` to be created.
  * - Optional. Can be overridden in browser. Default: 4.
+ * @property {number} [expand=1] - Initial folder expand depth. `1` expands the first level, `Infinity` expands all. Default: `1`.
  * @property {((item: BrowserFile) => string)} [thumbnail] - Default thumbnail
  */
 
@@ -65,6 +66,8 @@ class Browser {
 
 	/** @type {Array<BrowserFile>} */
 	#allItems = [];
+	#searchInput;
+	#searchClearBtn;
 	#closeSignal = false;
 	#bindClose = null;
 
@@ -117,6 +120,7 @@ class Browser {
 		this.drawItemHandler = (params.drawItemHandler || DrawItems).bind({ thumbnail: params.thumbnail, props: params.props || [] });
 		this.selectorHandler = params.selectorHandler;
 		this.columnSize = params.columnSize || 4;
+		this.expand = params.expand ?? 1;
 		this.folderDefaultPath = '';
 		this.closeArrow = this.#$.icons.menu_arrow_right;
 		this.openArrow = this.#$.icons.menu_arrow_down;
@@ -154,9 +158,15 @@ class Browser {
 		this.#$.eventManager.addEvent(this.side, 'click', this.#OnClickSide.bind(this));
 		this.#$.eventManager.addEvent(content, 'mousedown', this.#OnMouseDown_browser.bind(this));
 		this.#$.eventManager.addEvent(content, 'click', this.#OnClick_browser.bind(this));
-		this.#$.eventManager.addEvent(browserFrame.querySelector('form.se-browser-search-form'), 'submit', this.#Search.bind(this));
 		this.#$.eventManager.addEvent((this.sideOpenBtn = /** @type {HTMLButtonElement} */ (browserFrame.querySelector('.se-side-open-btn'))), 'click', this.#SideOpen.bind(this));
 		this.#$.eventManager.addEvent([this.header, browserFrame.querySelector('.se-browser-main')], 'mousedown', this.#SideClose.bind(this));
+
+		// search
+		const searchForm = browserFrame.querySelector('form.se-browser-search-form');
+		this.#searchInput = /** @type {HTMLInputElement} */ (searchForm?.querySelector('input[type="text"]'));
+		this.#searchClearBtn = /** @type {HTMLButtonElement} */ (browserFrame.querySelector('.se-browser-search-clear'));
+		this.#$.eventManager.addEvent(searchForm, 'submit', this.#Search.bind(this));
+		this.#$.eventManager.addEvent(this.#searchClearBtn, 'click', this.#ClearSearch.bind(this));
 	}
 
 	/**
@@ -216,6 +226,10 @@ class Browser {
 		this.data = {};
 		this.keyword = '';
 		this.list.innerHTML = this.tagArea.innerHTML = this.titleArea.textContent = '';
+
+		if (this.#searchInput) this.#searchInput.value = '';
+		if (this.#searchClearBtn) this.#searchClearBtn.style.display = 'none';
+
 		this.#$.ui.opendBrowser = null;
 		this.sideInner = null;
 
@@ -339,6 +353,10 @@ class Browser {
 
 		this.list.innerHTML = listHTML;
 
+		if (keyword) {
+			this.#highlightKeyword(keyword);
+		}
+
 		if (update) {
 			this.items = items;
 			this.tagArea.innerHTML = tagsHTML;
@@ -446,8 +464,11 @@ class Browser {
 	 * @description Creates a nested folder list from parsed data.
 	 * @param {BrowserFile[]|BrowserFile} folderData - The structured folder data.
 	 * @param {HTMLElement} parentElement - The parent element to append folder structure to.
+	 * @param {number} [depth=0] - Current depth level.
 	 */
-	#createFolderList(folderData, parentElement) {
+	#createFolderList(folderData, parentElement, depth = 0) {
+		const expanded = depth < this.expand;
+
 		for (const key in folderData) {
 			const item = folderData[key];
 			if (!item) continue;
@@ -460,10 +481,10 @@ class Browser {
 				);
 				const folderDiv = dom.utils.createElement('div', { class: 'se-menu-folder' }, folderLabel);
 
-				folderLabel.insertBefore(dom.utils.createElement('button', null, this.closeArrow), folderLabel.firstElementChild);
+				folderLabel.insertBefore(dom.utils.createElement('button', null, expanded ? this.openArrow : this.closeArrow), folderLabel.firstElementChild);
 				const childContainer = document.createElement('div');
-				dom.utils.addClass(childContainer, 'se-menu-child|se-menu-hidden');
-				this.#createFolderList(item.children, childContainer);
+				dom.utils.addClass(childContainer, expanded ? 'se-menu-child' : 'se-menu-child|se-menu-hidden');
+				this.#createFolderList(item.children, childContainer, depth + 1);
 				folderDiv.appendChild(childContainer);
 
 				parentElement.appendChild(folderDiv);
@@ -610,9 +631,39 @@ class Browser {
 	 * @param {SubmitEvent} e - Event object
 	 */
 	#Search(e) {
-		const eventTarget = /** @type {HTMLElement} */ (e.currentTarget);
 		e.preventDefault();
-		this.search(/** @type {HTMLInputElement} */ (eventTarget.querySelector('input[type="text"]')).value);
+
+		const keyword = this.#searchInput.value;
+		this.search(keyword);
+
+		if (this.#searchClearBtn) this.#searchClearBtn.style.display = keyword ? '' : 'none';
+	}
+
+	/**
+	 * @description Clears the search keyword and restores the current folder's item list.
+	 */
+	#ClearSearch() {
+		if (this.#searchInput) this.#searchInput.value = '';
+		if (this.#searchClearBtn) this.#searchClearBtn.style.display = 'none';
+
+		this.keyword = '';
+		this.#drawListItem(this.items, false);
+	}
+
+	/**
+	 * @description Highlights the search keyword in file name elements.
+	 * @param {string} keyword - Lowercase keyword to highlight.
+	 */
+	#highlightKeyword(keyword) {
+		const nameEls = this.list.querySelectorAll('.se-file-name-image:not(.se-file-name-back)');
+		for (let i = 0; i < nameEls.length; i++) {
+			const el = nameEls[i];
+			const text = el.textContent;
+			const idx = text.toLowerCase().indexOf(keyword);
+			if (idx > -1) {
+				el.innerHTML = text.substring(0, idx) + '<mark>' + text.substring(idx, idx + keyword.length) + '</mark>' + text.substring(idx + keyword.length);
+			}
+		}
 	}
 
 	/**
@@ -667,7 +718,10 @@ function CreateHTMLInfos($, useSearch) {
 								useSearch
 									? /*html*/ `
 										<form class="se-browser-search-form">
-											<input type="text" class="se-input-form" placeholder="${lang.search}" aria-label="${lang.search}">
+											<div class="se-browser-search-input-wrap">
+												<input type="text" class="se-input-form" placeholder="${lang.search}" aria-label="${lang.search}">
+												<button type="button" class="se-btn se-btn-plain se-browser-search-clear" title="${lang.cancel}" aria-label="${lang.cancel}" style="display:none">${icons.cancel}</button>
+											</div>
 											<button type="submit" class="se-btn" title="${lang.search}" aria-label="${lang.search}">${icons.search}</button>
 										</form>`
 									: ''
