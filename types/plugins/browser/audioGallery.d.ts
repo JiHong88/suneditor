@@ -7,6 +7,19 @@ export type AudioGalleryPluginOptions = {
 	data?: Array<SunEditor.Module.Browser.File>;
 	/**
 	 * - Server request URL
+	 * - The server must return:
+	 * ```js
+	 * {
+	 * "result": [
+	 * {
+	 * "src": "https://example.com/audio.mp3",
+	 * "name": "audio.mp3",
+	 * "thumbnail": "https://example.com/audio_icon.png",
+	 * "tag": ["music"]
+	 * }
+	 * ]
+	 * }
+	 * ```
 	 */
 	url?: string;
 	/**
@@ -24,6 +37,19 @@ export type AudioGalleryPluginOptions = {
  * @typedef {Object} AudioGalleryPluginOptions
  * @property {Array<SunEditor.Module.Browser.File>} [data] - Direct data without server calls
  * @property {string} [url] - Server request URL
+ * - The server must return:
+ * ```js
+ * {
+ *   "result": [
+ *     {
+ *       "src": "https://example.com/audio.mp3",
+ *       "name": "audio.mp3",
+ *       "thumbnail": "https://example.com/audio_icon.png",
+ *       "tag": ["music"]
+ *     }
+ *   ]
+ * }
+ * ```
  * @property {Object<string, string>} [headers] - Server request headers
  * @property {string|((item: SunEditor.Module.Browser.File) => string)} [thumbnail] - Default thumbnail
  */

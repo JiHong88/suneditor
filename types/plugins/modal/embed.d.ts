@@ -23,6 +23,18 @@ export type EmbedPluginOptions = {
 	percentageOnlySize?: boolean;
 	/**
 	 * - The URL for file uploads.
+	 * - The server must return:
+	 * ```js
+	 * {
+	 * "result": [
+	 * {
+	 * "url": "https://example.com/embed.html",
+	 * "name": "embed.html",
+	 * "size": 2048
+	 * }
+	 * ]
+	 * }
+	 * ```
 	 */
 	uploadUrl?: string;
 	/**
@@ -110,6 +122,18 @@ export type EmbedPluginOptions = {
  * @property {string} [defaultHeight] - The default height of the embed element (numeric value or with unit).
  * @property {boolean} [percentageOnlySize=false] - Whether to allow only percentage-based sizing.
  * @property {string} [uploadUrl] - The URL for file uploads.
+ * - The server must return:
+ * ```js
+ * {
+ *   "result": [
+ *     {
+ *       "url": "https://example.com/embed.html",
+ *       "name": "embed.html",
+ *       "size": 2048
+ *     }
+ *   ]
+ * }
+ * ```
  * @property {Object<string, string>} [uploadHeaders] - Headers to include in file upload requests.
  * @property {number} [uploadSizeLimit] - The total file upload size limit in bytes.
  * @property {number} [uploadSingleSizeLimit] - The single file upload size limit in bytes.

@@ -5,8 +5,29 @@ import { Browser } from '../../modules/contract';
  * @typedef {Object} FileBrowserPluginOptions
  * @property {Object<string, *>|Array<*>} [data] - Direct data without server calls (bypasses URL fetch).
  * @property {string} [url] - Server request URL
+ * - The server must return a nested folder structure.
+ * - `_data`: array (inline) or string URL (lazy-loaded on folder click).
+ * - `"default": true` sets the initially selected folder.
+ * ```js
+ * {
+ *   "result": {
+ *     "root": {
+ *       "name": "Root",
+ *       "default": true,
+ *       "_data": [
+ *         { "src": "https://example.com/file1.pdf", "name": "file1.pdf" }
+ *       ],
+ *       "documents": {
+ *         "name": "Documents",
+ *         "_data": "https://api.example.com/files/documents"
+ *       }
+ *     }
+ *   }
+ * }
+ * ```
  * @property {Object<string, string>} [headers] - Server request headers
  * @property {string|((item: SunEditor.Module.Browser.File) => string)} [thumbnail] - Default thumbnail URL or a function that returns a thumbnail URL per item.
+ * @property {number} [expand=1] - Initial folder expand depth. `1` expands the first level, `Infinity` expands all. Default: `1`.
  * @property {Array<string>} [props] - Additional tag names
  * ```js
  * { url: '/api/files', headers: { Authorization: 'Bearer token' }, thumbnail: (item) => item.thumbUrl }
@@ -48,6 +69,7 @@ class FileBrowser extends PluginBrowser {
 			className: 'se-file-browser',
 			thumbnail: typeof pluginOptions.thumbnail === 'function' ? pluginOptions.thumbnail : (item) => thumbnail[item.type] || defaultThumbnail,
 			props: [...new Set((pluginOptions.props ?? []).concat(['frame']))],
+			expand: pluginOptions.expand,
 		});
 	}
 

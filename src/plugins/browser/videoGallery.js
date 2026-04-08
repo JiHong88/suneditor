@@ -5,6 +5,20 @@ import { Browser } from '../../modules/contract';
  * @typedef {Object} VideoGalleryPluginOptions
  * @property {Array<SunEditor.Module.Browser.File>} [data] - Direct data without server calls
  * @property {string} [url] - Server request URL
+ * - The server must return:
+ * ```js
+ * {
+ *   "result": [
+ *     {
+ *       "src": "https://example.com/video.mp4",
+ *       "name": "video.mp4",
+ *       "thumbnail": "https://example.com/video_thumb.jpg",
+ *       "frame": "video",
+ *       "tag": ["tutorial"]
+ *     }
+ *   ]
+ * }
+ * ```
  * @property {Object<string, string>} [headers] - Server request headers
  * @property {string|((item: SunEditor.Module.Browser.File) => string)} [thumbnail] - Default thumbnail
  */

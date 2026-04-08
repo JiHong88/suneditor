@@ -59,11 +59,14 @@ export default class CommandExecutor {
 	 * @description Execute default command of command button
 	 */
 	async execute(command, button) {
-		if (this.#frameContext.get('isReadOnly') && !/copy|cut|selectAll|codeView|markdownView|fullScreen|print|preview|showBlocks|finder/.test(command)) return;
+		if (this.#frameContext.get('isReadOnly') && !/copy|cut|selectAll|selectAll_full|codeView|markdownView|fullScreen|print|preview|showBlocks|finder/.test(command)) return;
 
 		switch (command) {
 			case 'selectAll':
 				this.#SELECT_ALL();
+				break;
+			case 'selectAll_full':
+				this.#SELECT_ALL_FULL();
 				break;
 			case 'copy': {
 				const range = this.#$.selection.getRange();
@@ -229,6 +232,40 @@ export default class CommandExecutor {
 			selectArea = selectArea.parentElement;
 			({ first, last } = __findFirstAndLast(dom.query.getParentElement(selectArea, (current) => scopeTagList.includes(current.nodeName?.toLowerCase())) || ww));
 		}
+
+		if (!first || !last) return;
+
+		let info = null;
+		if (dom.check.isMedia(first) || (info = this.#$.component.get(first)) || dom.check.isTableElements(first)) {
+			info ||= this.#$.component.get(first);
+			const br = dom.utils.createElement('BR');
+			const format = dom.utils.createElement(this.#options.get('defaultLine'), null, br);
+			first = info ? info.container || info.cover : first;
+			first.parentElement.insertBefore(format, first);
+			first = br;
+		}
+
+		if (dom.check.isMedia(last) || (info = this.#$.component.get(last)) || dom.check.isTableElements(last)) {
+			info ||= this.#$.component.get(last);
+			const br = dom.utils.createElement('BR');
+			const format = dom.utils.createElement(this.#options.get('defaultLine'), null, br);
+			last = info ? info.container || info.cover : last;
+			last.parentElement.appendChild(format);
+			last = br;
+		}
+
+		this.#$.toolbar._showBalloon(this.#$.selection.setRange(first, 0, last, last.textContent.length));
+	}
+
+	/**
+	 * @description Selects all content in the entire editor without scope stepping.
+	 */
+	#SELECT_ALL_FULL() {
+		this.#$.ui.offCurrentController();
+		this.#$.menu.containerOff();
+
+		const ww = this.#frameContext.get('wysiwyg');
+		let { first, last } = __findFirstAndLast(ww);
 
 		if (!first || !last) return;
 

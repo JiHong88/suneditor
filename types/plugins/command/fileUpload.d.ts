@@ -3,6 +3,18 @@ export default FileUpload;
 export type FileUploadPluginOptions = {
 	/**
 	 * - Server request URL for file upload
+	 * - The server must return:
+	 * ```js
+	 * {
+	 * "result": [
+	 * {
+	 * "url": "https://example.com/file.pdf",
+	 * "name": "file.pdf",
+	 * "size": 1048576
+	 * }
+	 * ]
+	 * }
+	 * ```
 	 */
 	uploadUrl: string;
 	/**
@@ -51,6 +63,18 @@ export type FileUploadPluginOptions = {
 /**
  * @typedef FileUploadPluginOptions
  * @property {string} uploadUrl - Server request URL for file upload
+ * - The server must return:
+ * ```js
+ * {
+ *   "result": [
+ *     {
+ *       "url": "https://example.com/file.pdf",
+ *       "name": "file.pdf",
+ *       "size": 1048576
+ *     }
+ *   ]
+ * }
+ * ```
  * @property {Object<string, string>} [uploadHeaders] - Server request headers
  * @property {number} [uploadSizeLimit] - Total upload size limit in bytes
  * @property {number} [uploadSingleSizeLimit] - Single file size limit in bytes

@@ -11,7 +11,7 @@ const { debounce } = converter;
  * @property {string} [triggerText="@"] - The character that triggers the mention list.
  * @property {number} [limitSize=5] - The number of items to display in the mention list
  * @property {number} [searchStartLength=0] - The number of characters to start searching for the mention list
- * @property {number} [delayTime=200] - The time to wait before displaying the mention list
+ * @property {number} [delayTime=120] - The time to wait before displaying the mention list
  * @property {Array<{key: string, name: string, url: string}>} [data] - Static mention data (used instead of API).
  * ```js
  * // data
@@ -54,7 +54,7 @@ class Mention extends PluginField {
 		this.triggerText = pluginOptions.triggerText || '@';
 		this.limitSize = pluginOptions.limitSize || 5;
 		this.searchStartLength = pluginOptions.searchStartLength || 0;
-		this.delayTime = typeof pluginOptions.delayTime === 'number' ? pluginOptions.delayTime : 200;
+		this.delayTime = typeof pluginOptions.delayTime === 'number' ? pluginOptions.delayTime : 120;
 		this.directData = pluginOptions.data;
 		this.apiUrl = pluginOptions.apiUrl?.replace(/\s/g, '').replace(/\{limitSize\}/i, String(this.limitSize)) || '';
 		// members - api, caching

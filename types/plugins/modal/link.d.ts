@@ -3,6 +3,18 @@ export default Link;
 export type LinkOptions = {
 	/**
 	 * - The URL endpoint for file uploads.
+	 * - The server must return:
+	 * ```js
+	 * {
+	 * "result": [
+	 * {
+	 * "url": "https://example.com/file.pdf",
+	 * "name": "file.pdf",
+	 * "size": 1048576
+	 * }
+	 * ]
+	 * }
+	 * ```
 	 */
 	uploadUrl?: string;
 	/**
@@ -28,6 +40,18 @@ export type LinkPluginOptions = Omit<LinkOptions & import('../../modules/ui/Moda
 /**
  * @typedef {Object} LinkOptions
  * @property {string} [uploadUrl] - The URL endpoint for file uploads.
+ * - The server must return:
+ * ```js
+ * {
+ *   "result": [
+ *     {
+ *       "url": "https://example.com/file.pdf",
+ *       "name": "file.pdf",
+ *       "size": 1048576
+ *     }
+ *   ]
+ * }
+ * ```
  * @property {Object<string, string>} [uploadHeaders] - Additional headers for file upload requests.
  * @property {number} [uploadSizeLimit] - The total file upload size limit in bytes.
  * @property {number} [uploadSingleSizeLimit] - The single file upload size limit in bytes.
@@ -87,7 +111,10 @@ declare class Link extends PluginModal {
 		 * - Default `rel` values auto-applied by condition.
 		 * `default` is always applied, `check_new_window` when "Open in new window" is checked, `check_bookmark` for bookmark links.
 		 * ```js
-		 * { relList: ['nofollow', 'noreferrer', 'noopener'], defaultRel: { default: 'noopener', check_new_window: 'noreferrer' } }
+		 * {
+		 * relList: ['nofollow', 'noreferrer', 'noopener'],
+		 * defaultRel: { default: 'noopener', check_new_window: 'noreferrer' }
+		 * }
 		 * ```
 		 */
 		defaultRel?: {

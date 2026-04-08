@@ -25,7 +25,10 @@ export type ModalAnchorEditorParams = {
 	 * - Default `rel` values auto-applied by condition.
 	 * `default` is always applied, `check_new_window` when "Open in new window" is checked, `check_bookmark` for bookmark links.
 	 * ```js
-	 * { relList: ['nofollow', 'noreferrer', 'noopener'], defaultRel: { default: 'noopener', check_new_window: 'noreferrer' } }
+	 * {
+	 * relList: ['nofollow', 'noreferrer', 'noopener'],
+	 * defaultRel: { default: 'noopener', check_new_window: 'noreferrer' }
+	 * }
 	 * ```
 	 */
 	defaultRel?: {
@@ -35,6 +38,18 @@ export type ModalAnchorEditorParams = {
 	};
 	/**
 	 * - File upload URL.
+	 * - The server must return:
+	 * ```js
+	 * {
+	 * "result": [
+	 * {
+	 * "url": "https://example.com/file.pdf",
+	 * "name": "file.pdf",
+	 * "size": 1048576
+	 * }
+	 * ]
+	 * }
+	 * ```
 	 */
 	uploadUrl?: string;
 	/**
@@ -70,9 +85,24 @@ export type ModalAnchorEditorParams = {
  * @property {{default?: string, check_new_window?: string, check_bookmark?: string}} [defaultRel={}] - Default `rel` values auto-applied by condition.
  * `default` is always applied, `check_new_window` when "Open in new window" is checked, `check_bookmark` for bookmark links.
  * ```js
- * { relList: ['nofollow', 'noreferrer', 'noopener'], defaultRel: { default: 'noopener', check_new_window: 'noreferrer' } }
+ * {
+ * 	  relList: ['nofollow', 'noreferrer', 'noopener'],
+ *    defaultRel: { default: 'noopener', check_new_window: 'noreferrer' }
+ * }
  * ```
  * @property {string} [uploadUrl] - File upload URL.
+ * - The server must return:
+ * ```js
+ * {
+ *   "result": [
+ *     {
+ *       "url": "https://example.com/file.pdf",
+ *       "name": "file.pdf",
+ *       "size": 1048576
+ *     }
+ *   ]
+ * }
+ * ```
  * @property {Object<string, string>} [uploadHeaders] - File upload headers.
  * @property {number} [uploadSizeLimit] - File upload size limit.
  * @property {number} [uploadSingleSizeLimit] - File upload single size limit.

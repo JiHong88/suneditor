@@ -84,6 +84,19 @@ export type BrowserParams = {
 	useSearch?: boolean;
 	/**
 	 * - File server search url. Optional. Can be overridden in browser.
+	 * - Requested as `searchUrl + '?keyword=' + keyword`. The server must return:
+	 * ```js
+	 * {
+	 * "result": [
+	 * {
+	 * "src": "https://example.com/file.jpg",
+	 * "name": "file.jpg",
+	 * "thumbnail": "https://example.com/file_thumb.jpg",
+	 * "tag": ["photo"]
+	 * }
+	 * ]
+	 * }
+	 * ```
 	 */
 	searchUrl?: string;
 	/**
@@ -114,6 +127,10 @@ export type BrowserParams = {
 	 */
 	columnSize?: number;
 	/**
+	 * - Initial folder expand depth. `1` expands the first level, `Infinity` expands all. Default: `1`.
+	 */
+	expand?: number;
+	/**
 	 * - Default thumbnail
 	 */
 	thumbnail?: (item: BrowserFile) => string;
@@ -142,6 +159,19 @@ export type BrowserParams = {
  * @property {(target: Node) => void} selectorHandler - Function that actions when an item is clicked. Required. Can be overridden in browser.
  * @property {boolean} [useSearch] - Whether to use the search function. Optional. Default: `true`.
  * @property {string} [searchUrl] - File server search url. Optional. Can be overridden in browser.
+ * - Requested as `searchUrl + '?keyword=' + keyword`. The server must return:
+ * ```js
+ * {
+ *   "result": [
+ *     {
+ *       "src": "https://example.com/file.jpg",
+ *       "name": "file.jpg",
+ *       "thumbnail": "https://example.com/file_thumb.jpg",
+ *       "tag": ["photo"]
+ *     }
+ *   ]
+ * }
+ * ```
  * @property {Object<string, string>} [searchUrlHeader] - File server search http header. Optional. Can be overridden in browser.
  * @property {string} [listClass] - Class name of list div. Required. Can be overridden in browser.
  * @property {(item: BrowserFile) => string} [drawItemHandler] - Function that returns HTML string for rendering each file item. Required. Can be overridden in browser.
@@ -152,6 +182,7 @@ export type BrowserParams = {
  * @property {Array<*>} [props] - `props` argument to `drawItemHandler` function. Optional. Can be overridden in browser.
  * @property {number} [columnSize] - Number of `div.se-file-item-column` to be created.
  * - Optional. Can be overridden in browser. Default: 4.
+ * @property {number} [expand=1] - Initial folder expand depth. `1` expands the first level, `Infinity` expands all. Default: `1`.
  * @property {((item: BrowserFile) => string)} [thumbnail] - Default thumbnail
  */
 /**
@@ -206,6 +237,7 @@ declare class Browser {
 	drawItemHandler: any;
 	selectorHandler: (target: Node) => void;
 	columnSize: number;
+	expand: number;
 	folderDefaultPath: string;
 	closeArrow: any;
 	openArrow: any;
