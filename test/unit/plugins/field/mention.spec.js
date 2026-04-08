@@ -256,10 +256,10 @@ describe('Mention Plugin', () => {
 			expect(mentionWithZeroDelay.delayTime).toBe(0);
 		});
 
-		it('should use default delayTime of 200 when not specified', () => {
+		it('should use default delayTime of 120 when not specified', () => {
 			const mentionDefault = new Mention(kernel, {});
 
-			expect(mentionDefault.delayTime).toBe(200);
+			expect(mentionDefault.delayTime).toBe(120);
 		});
 	});
 

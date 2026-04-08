@@ -96,6 +96,8 @@ function getEventHandlers(eventManager) {
                 handlers.clickFile = handler;
             } else if (targetStr.includes('se-browser-side')) {
                 handlers.clickSide = handler;
+            } else if (targetStr.includes('se-browser-search-clear')) {
+                handlers.clearSearch = handler;
             } else if (targetStr.includes('se-side-open-btn') || (target?.tagName === 'BUTTON')) {
                 handlers.sideOpen = handler;
             } else if (targetStr.includes('se-browser-inner')) {
@@ -1745,17 +1747,11 @@ describe('Modules - Browser', () => {
                 { src: 'b.jpg', name: 'Banana Photo', tag: [], type: 'image' }
             ];
 
-            // Create a form with an input
-            const form = document.createElement('form');
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.value = 'Apple';
-            form.appendChild(input);
+            // Set the value on the actual internal search input
+            const searchInput = browser.area.querySelector('input[type="text"]');
+            searchInput.value = 'Apple';
 
-            const e = {
-                currentTarget: form,
-                preventDefault: jest.fn()
-            };
+            const e = { preventDefault: jest.fn() };
 
             searchHandler(e);
 
