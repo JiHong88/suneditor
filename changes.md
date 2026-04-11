@@ -13,3 +13,4 @@
 ### Bugfix
 
 - Fixed a bug where switching folders in the file browser did not update the item list and tags, causing search and tag filters to operate on stale data
+- Fixed iframe mode not working in Firefox — content was empty and buttons non-functional due to Firefox firing double `load` events for sandboxed iframes (`editor.js`, `constructor.js`)
