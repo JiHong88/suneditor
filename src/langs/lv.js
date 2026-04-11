@@ -134,6 +134,7 @@
 		math_modal_title: 'Matemātika',
 		maxSize: 'Maksimālais izmērs',
 		mediaGallery: 'Mediju galerija',
+		autocomplete: 'Automātiskā pabeigšana',
 		mention: 'Pieminēt',
 		menu_bordered: 'Robežojās',
 		menu_code: 'Kods',

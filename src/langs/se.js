@@ -134,6 +134,7 @@
 		math_modal_title: 'Math',
 		maxSize: 'Maxstorlek',
 		mediaGallery: 'Rel attribut',
+		autocomplete: 'Autoslutför',
 		mention: 'Namn',
 		menu_bordered: 'Avgränsningslinje',
 		menu_code: 'Kod',

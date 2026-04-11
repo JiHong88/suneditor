@@ -133,6 +133,7 @@
 		math_modal_title: '수식',
 		maxSize: '최대화',
 		mediaGallery: '미디어 갤러리',
+		autocomplete: '자동 완성',
 		mention: '멘션',
 		menu_bordered: '경계선',
 		menu_code: '코드',

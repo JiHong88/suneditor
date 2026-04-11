@@ -133,6 +133,7 @@
 		math_modal_title: 'គណិត',
 		maxSize: 'ទំហំធំ',
 		mediaGallery: 'វិចិត្រសាលមេឌៀ',
+		autocomplete: 'បំពេញដោយស្វ័យប្រវត្តិ',
 		mention: 'លើកឡើង',
 		menu_bordered: 'មានស៊ុម',
 		menu_code: 'កូដ',

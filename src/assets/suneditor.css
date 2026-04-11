@@ -4377,8 +4377,8 @@
 	border-style: dashed none none;
 }
 
-/** mention  */
-.sun-editor .se-select-menu .se-select-item .se-mention-item span + span {
+/** autocomplete  */
+.sun-editor .se-select-menu .se-select-item .se-autocomplete-item span + span {
 	margin: 0 4px;
 	opacity: 0.5;
 }

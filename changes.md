@@ -1,3 +1,7 @@
+### breaking
+
+- ⚠️ `mention` 플러그인을 `autocomplete`로 대체 — 옵션 키: `mention` → `autocomplete`, 트리거별 독립 설정을 `triggers` 객체로 구성, `data-se-mention` → `data-se-autocomplete`, CSS `.se-mention-item` → `.se-autocomplete-item`
+
 ### feat
 
 - MS Office HTML 변환 헬퍼 추가 (`src/helper/msOffice.js`)

@@ -134,6 +134,7 @@
 		math_modal_title: 'ریاضی',
 		maxSize: 'زیادہ سے زیادہ سائز',
 		mediaGallery: 'میڈیا گیلری',
+		autocomplete: 'خود بخود مکمل',
 		mention: 'تذکرہ',
 		menu_bordered: 'سرحدی',
 		menu_code: 'کوڈ',
