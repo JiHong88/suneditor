@@ -20,6 +20,7 @@ jest.mock('../../../../src/helper', () => ({
 				innerHTML: html || '',
 				style: {},
 				classList: { add: jest.fn(), remove: jest.fn(), toggle: jest.fn() },
+				className: '',
 			})),
 			addClass: jest.fn(),
 			removeClass: jest.fn(),
@@ -38,7 +39,7 @@ jest.mock('../../../../src/helper', () => ({
 jest.mock('../../../../src/modules/contract', () => ({
 	Controller: jest.fn().mockImplementation(function () {
 		this.isOpen = false;
-		this.form = { parentNode: null, style: {} };
+		this.form = { parentNode: null, style: {}, contains: jest.fn().mockReturnValue(false) };
 		this.open = jest.fn(() => { this.isOpen = true; });
 		this.close = jest.fn(() => { this.isOpen = false; });
 	}),
@@ -84,6 +85,10 @@ describe('Plugins - Command - CodeBlock', () => {
 			expect(CodeBlock.key).toBe('codeBlock');
 		});
 
+		it('should have static className as empty string', () => {
+			expect(CodeBlock.className).toBe('');
+		});
+
 		it('should create afterItem when langs provided', () => {
 			expect(codeBlock.afterItem).toBeDefined();
 		});
@@ -103,6 +108,22 @@ describe('Plugins - Command - CodeBlock', () => {
 		it('should use default langs when pluginOptions.langs is undefined', () => {
 			const cb = new CodeBlock(kernel, {});
 			expect(cb.afterItem).toBeDefined();
+		});
+
+		it('should use default langs when pluginOptions is undefined', () => {
+			const cb = new CodeBlock(kernel, undefined);
+			expect(cb.afterItem).toBeDefined();
+		});
+
+		it('should use default langs when pluginOptions is null', () => {
+			const cb = new CodeBlock(kernel, null);
+			expect(cb.afterItem).toBeDefined();
+		});
+
+		it('should fallback title when lang.codeBlock is empty', () => {
+			kernel.$.lang.codeBlock = '';
+			const cb = new CodeBlock(kernel, { langs: [] });
+			expect(cb.title).toBe('Code Block');
 		});
 	});
 
@@ -128,9 +149,24 @@ describe('Plugins - Command - CodeBlock', () => {
 			expect(result).toBe(false);
 		});
 
+		it('should return false for undefined element', () => {
+			const result = codeBlock.active(undefined, mockTarget);
+			expect(result).toBe(false);
+		});
+
 		it('should be case insensitive', () => {
 			const result = codeBlock.active({ nodeName: 'pre' }, mockTarget);
 			expect(result).toBe(true);
+		});
+
+		it('should return false for DIV element', () => {
+			const result = codeBlock.active({ nodeName: 'DIV' }, mockTarget);
+			expect(result).toBe(false);
+		});
+
+		it('should return false for CODE element (not PRE)', () => {
+			const result = codeBlock.active({ nodeName: 'CODE' }, mockTarget);
+			expect(result).toBe(false);
 		});
 	});
 
@@ -170,6 +206,62 @@ describe('Plugins - Command - CodeBlock', () => {
 			expect(kernel.$.focusManager.focus).toHaveBeenCalled();
 			expect(kernel.$.history.push).toHaveBeenCalledWith(false);
 		});
+
+		it('should apply language when target has data-value', () => {
+			const { dom } = require('../../../../src/helper');
+			const target = { getAttribute: jest.fn().mockReturnValue('javascript') };
+			const pre = { nodeName: 'PRE', className: '', setAttribute: jest.fn(), removeAttribute: jest.fn() };
+
+			kernel.$.selection.getNode.mockReturnValue({ nodeName: 'P' });
+			dom.query.getParentElement
+				.mockReturnValueOnce(null) // first call: currentPre check
+				.mockReturnValueOnce(pre); // second call: get pre after setBrLine
+			kernel.$.format.setBrLine = jest.fn();
+
+			codeBlock.action(target);
+
+			expect(kernel.$.format.setBrLine).toHaveBeenCalled();
+			expect(kernel.$.history.push).toHaveBeenCalledWith(false);
+		});
+
+		it('should toggle off when inside PRE with empty data-value', () => {
+			const { dom } = require('../../../../src/helper');
+			const target = { getAttribute: jest.fn().mockReturnValue('') };
+			const pre = { nodeName: 'PRE' };
+			kernel.$.selection.getNode.mockReturnValue(pre);
+			dom.query.getParentElement.mockReturnValue(pre);
+			kernel.$.format.setLine = jest.fn();
+
+			codeBlock.action(target);
+
+			expect(kernel.$.format.setLine).toHaveBeenCalled();
+		});
+
+		it('should change language when inside PRE with new lang', () => {
+			const { dom } = require('../../../../src/helper');
+			const target = { getAttribute: jest.fn().mockReturnValue('python') };
+			const pre = { nodeName: 'PRE', className: 'language-javascript', setAttribute: jest.fn(), removeAttribute: jest.fn() };
+
+			kernel.$.selection.getNode.mockReturnValue(pre);
+			dom.query.getParentElement.mockReturnValue(pre);
+			kernel.$.format.setBrLine = jest.fn();
+
+			codeBlock.action(target);
+
+			// Should not toggle off (lang is provided), and should set new lang
+			expect(dom.utils.addClass).toHaveBeenCalled();
+		});
+
+		it('should handle action with target that has no data-value', () => {
+			const { dom } = require('../../../../src/helper');
+			dom.query.getParentElement.mockReturnValue(null);
+			kernel.$.selection.getNode.mockReturnValue({ nodeName: 'P' });
+			kernel.$.format.setBrLine = jest.fn();
+
+			const target = { getAttribute: jest.fn().mockReturnValue(null) };
+			expect(() => codeBlock.action(target)).not.toThrow();
+			expect(kernel.$.format.setBrLine).toHaveBeenCalled();
+		});
 	});
 
 	describe('on method (dropdown open)', () => {
@@ -179,12 +271,52 @@ describe('Plugins - Command - CodeBlock', () => {
 			kernel.$.selection.getNode.mockReturnValue({ nodeName: 'P', className: '' });
 			expect(() => codeBlock.on()).not.toThrow();
 		});
+
+		it('should not throw when no langItems (empty langs)', () => {
+			const cb = new CodeBlock(kernel, { langs: [] });
+			expect(() => cb.on()).not.toThrow();
+		});
 	});
 
 	describe('onMouseMove hook', () => {
 		it('should not throw with empty langs (no hover controller)', () => {
 			const cb = new CodeBlock(kernel, { langs: [] });
 			expect(() => cb.onMouseMove({ event: { target: {} } })).not.toThrow();
+		});
+
+		it('should not throw when event target is not inside PRE', () => {
+			const { dom } = require('../../../../src/helper');
+			const target = { closest: jest.fn().mockReturnValue(null) };
+			dom.query.getEventTarget.mockReturnValue(target);
+
+			expect(() => codeBlock.onMouseMove({ event: { target } })).not.toThrow();
+		});
+
+		it('should not throw when event target is inside PRE', () => {
+			const { dom } = require('../../../../src/helper');
+			const pre = { nodeName: 'PRE', className: '', offsetWidth: 200 };
+			const target = { closest: jest.fn().mockReturnValue(pre) };
+			dom.query.getEventTarget.mockReturnValue(target);
+			kernel.$.ui.opendControllers = [];
+
+			expect(() => codeBlock.onMouseMove({ event: { target } })).not.toThrow();
+		});
+	});
+
+	describe('destroy method', () => {
+		it('should not throw when called', () => {
+			expect(() => codeBlock.destroy()).not.toThrow();
+		});
+
+		it('should not throw when called on instance with empty langs', () => {
+			const cb = new CodeBlock(kernel, { langs: [] });
+			expect(() => cb.destroy()).not.toThrow();
+		});
+	});
+
+	describe('controllerClose hook', () => {
+		it('should not throw when called', () => {
+			expect(() => codeBlock.controllerClose()).not.toThrow();
 		});
 	});
 });

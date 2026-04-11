@@ -526,6 +526,8 @@ class Viewer {
 		const printDocument = dom.query.getIframeDocument(iframe);
 		const wDoc = this.#frameContext.get('_wd');
 		const rtlClass = this.#options.get('_rtl') ? ' se-rtl' : '';
+		const themeClass = (this.#options.get('_themeClass') || '').trim();
+		const stripTheme = (cls) => (themeClass ? cls.replace(themeClass, '').trim() : cls);
 		const pageCSS = /*html*/ `
 			<style>
 				@page {
@@ -536,10 +538,10 @@ class Viewer {
 
 		if (this.#frameOptions.get('iframe')) {
 			const arrts = this.#options.get('printClass')
-				? 'class="' + this.#options.get('printClass') + rtlClass + '"'
+				? 'class="' + stripTheme(this.#options.get('printClass')) + rtlClass + '"'
 				: this.#frameOptions.get('iframe_fullPage')
-					? dom.utils.getAttributesToString(wDoc.body, ['contenteditable'])
-					: 'class="' + this.#options.get('_editableClass') + rtlClass + '"';
+					? dom.utils.getAttributesToString(wDoc.body, ['contenteditable']).replace(themeClass, '')
+					: 'class="' + stripTheme(this.#options.get('_editableClass')) + rtlClass + '"';
 
 			printDocument.write(/*html*/ `
 				<!DOCTYPE html>
@@ -570,7 +572,7 @@ class Viewer {
 						${linkHTML}
 						${pageCSS}
 					</head>
-					<body class="${(this.#options.get('printClass') || this.#options.get('_editableClass')) + rtlClass}" style="padding: 0; padding-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0;">
+					<body class="${stripTheme(this.#options.get('printClass') || this.#options.get('_editableClass')) + rtlClass}" style="padding: 0; padding-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0;">
 						${contentHTML}
 					</body>
 				</html>`);

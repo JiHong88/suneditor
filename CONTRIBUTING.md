@@ -95,6 +95,17 @@ If you're contributing to framework integrations:
 
 [guide@Essential Command](./GUIDE.md#essential-commands)
 
+### Claude Code Skills
+
+This project includes slash commands for [Claude Code](https://claude.ai/claude-code) (`.claude/skills/`):
+
+| Command         | Description                                                      |
+| --------------- | ---------------------------------------------------------------- |
+| `/post-edit`    | Run post-edit pipeline: lint → ts-build → check → test           |
+| `/review`       | Code review for bugs, logic errors, dead code                    |
+| `/changes`      | Analyze git diff and update `changes.md` (for manual edits only) |
+| `/release-note` | Convert `changes.md` to release note format                      |
+
 ---
 
 ## 🤖 AI Plugin Helper

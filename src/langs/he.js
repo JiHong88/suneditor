@@ -134,6 +134,7 @@
 		math_modal_title: 'נוסחה',
 		maxSize: 'גודל מרבי',
 		mediaGallery: 'גלריית מדיה',
+		autocomplete: 'השלמה אוטומטית',
 		mention: 'הזכר',
 		menu_bordered: 'בעל מיתאר',
 		menu_code: 'קוד',

@@ -134,6 +134,7 @@
 		math_modal_title: '数学',
 		maxSize: '最大尺寸',
 		mediaGallery: '媒体库',
+		autocomplete: '自动完成',
 		mention: '提到',
 		menu_bordered: '边界线',
 		menu_code: '代码',

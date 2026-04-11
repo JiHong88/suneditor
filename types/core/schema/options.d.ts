@@ -525,6 +525,7 @@ export namespace DEFAULTS {
  * @property {import('../../plugins/dropdown/align.js').AlignPluginOptions} [align]
  * @property {import('../../plugins/modal/audio.js').AudioPluginOptions} [audio]
  * @property {import('../../plugins/browser/audioGallery.js').AudioGalleryPluginOptions} [audioGallery]
+ * @property {import('../../plugins/field/autocomplete.js').AutocompletePluginOptions} [autocomplete]
  * @property {import('../../plugins/dropdown/backgroundColor.js').BackgroundColorPluginOptions} [backgroundColor]
  * @property {import('../../plugins/dropdown/blockStyle.js').BlockStylePluginOptions} [blockStyle]
  * @property {import('../../plugins/command/codeBlock.js').CodeBlockPluginOptions} [codeBlock]
@@ -544,7 +545,6 @@ export namespace DEFAULTS {
  * @property {import('../../plugins/dropdown/lineHeight.js').LineHeightPluginOptions} [lineHeight]
  * @property {import('../../plugins/modal/link.js').LinkPluginOptions} [link]
  * @property {import('../../plugins/modal/math.js').MathPluginOptions} [math]
- * @property {import('../../plugins/field/mention.js').MentionPluginOptions} [mention]
  * @property {import('../../plugins/dropdown/paragraphStyle.js').ParagraphStylePluginOptions} [paragraphStyle]
  * @property {import('../../plugins/dropdown/table/index.js').TablePluginOptions} [table]
  * @property {import('../../plugins/dropdown/template.js').TemplatePluginOptions} [template]
@@ -1429,6 +1429,7 @@ export type EditorBaseOptions = {
 	align?: import('../../plugins/dropdown/align.js').AlignPluginOptions;
 	audio?: import('../../plugins/modal/audio.js').AudioPluginOptions;
 	audioGallery?: import('../../plugins/browser/audioGallery.js').AudioGalleryPluginOptions;
+	autocomplete?: import('../../plugins/field/autocomplete.js').AutocompletePluginOptions;
 	backgroundColor?: import('../../plugins/dropdown/backgroundColor.js').BackgroundColorPluginOptions;
 	blockStyle?: import('../../plugins/dropdown/blockStyle.js').BlockStylePluginOptions;
 	codeBlock?: import('../../plugins/command/codeBlock.js').CodeBlockPluginOptions;
@@ -1448,7 +1449,6 @@ export type EditorBaseOptions = {
 	lineHeight?: import('../../plugins/dropdown/lineHeight.js').LineHeightPluginOptions;
 	link?: import('../../plugins/modal/link.js').LinkPluginOptions;
 	math?: import('../../plugins/modal/math.js').MathPluginOptions;
-	mention?: import('../../plugins/field/mention.js').MentionPluginOptions;
 	paragraphStyle?: import('../../plugins/dropdown/paragraphStyle.js').ParagraphStylePluginOptions;
 	table?: import('../../plugins/dropdown/table/index.js').TablePluginOptions;
 	template?: import('../../plugins/dropdown/template.js').TemplatePluginOptions;

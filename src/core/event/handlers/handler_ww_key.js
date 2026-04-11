@@ -42,9 +42,9 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 	this.$.menu.dropdownOff();
 
 	if (this.$.store.mode.isBalloon) {
-		this._hideToolbar();
+		if (!this.$.store.mode.isBalloonAlways) this._hideToolbar();
 	} else if (this.$.store.mode.isSubBalloon) {
-		this._hideToolbar_sub();
+		if (!this.$.store.mode.isSubBalloonAlways) this._hideToolbar_sub();
 	}
 
 	// user event

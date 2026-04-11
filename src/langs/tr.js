@@ -134,6 +134,7 @@
 		math_modal_title: 'Matematik',
 		maxSize: 'En Büyük Boyut',
 		mediaGallery: 'Medya galerisi',
+		autocomplete: 'Otomatik Tamamlama',
 		mention: 'Belirtmek',
 		menu_bordered: 'Çerçeveli',
 		menu_code: 'Kod',

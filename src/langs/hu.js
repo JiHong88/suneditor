@@ -134,6 +134,7 @@
 		math_modal_title: 'Matematika',
 		maxSize: 'Maximális méret',
 		mediaGallery: 'Média galéria',
+		autocomplete: 'Automatikus kiegészítés',
 		mention: 'Említés',
 		menu_bordered: 'Keretezett',
 		menu_code: 'Kód',

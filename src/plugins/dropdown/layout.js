@@ -75,7 +75,7 @@ function CreateHTML(layoutList) {
 		t = layoutList[i];
 		list += /*html*/ `
 			<li>
-				<button type="button" class="se-btn se-btn-list" data-value="${i}" title="${t.name}" aria-label="${t.name}">
+				<button type="button" class="se-btn se-btn-list" data-command="layout" data-value="${i}" title="${t.name}" aria-label="${t.name}">
 					${t.name}
 				</button>
 			</li>`;

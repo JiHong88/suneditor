@@ -7,7 +7,7 @@ import list_bulleted from './command/list_bulleted';
 import list_numbered from './command/list_numbered';
 
 // field
-import mention from './field/mention';
+import autocomplete from './field/autocomplete';
 
 // dropdown
 import align from './dropdown/align';
@@ -54,7 +54,7 @@ export {
 	fileUpload,
 	list_bulleted,
 	list_numbered,
-	mention,
+	autocomplete,
 	align,
 	font,
 	fontColor,
@@ -91,7 +91,7 @@ export default {
 	fileUpload,
 	list_bulleted,
 	list_numbered,
-	mention,
+	autocomplete,
 	align,
 	font,
 	fontColor,

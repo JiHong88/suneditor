@@ -190,7 +190,7 @@ const bb = [
 	['imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser'],
 	['fullScreen', 'showBlocks', 'codeView', 'markdownView', 'copy'],
 	['preview', 'print', 'exportPDF'],
-	['save', 'template', 'layout', 'fileUpload', 'mention'],
+	['save', 'template', 'layout', 'fileUpload', 'autocomplete'],
 ];
 
 const begContent = `
@@ -872,10 +872,103 @@ const options1 = {
 		// sizeUnit: 'text',
 		// showDefaultSizeLabel:true
 	},
-	mention: {
-		// data: [{"key":"rwhilnj","name":"Riley White (Product Manager)","url":"https://74iuojmw16.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo/SunEditor-sample-mention/rwhilnj/info"},{"key":"mwil298","name":"Morgan Wilson (Project Manager)","url":"https://74iuojmw16.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo/SunEditor-sample-mention/mwil298/info"},{"key":"eand3d1","name":"Elliott Anderson (UX Designer)","url":"https://74iuojmw16.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo/SunEditor-sample-mention/eand3d1/info"},{"key":"ztaya65","name":"Zane Taylor (Project Manager)","url":"https://74iuojmw16.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo/SunEditor-sample-mention/ztaya65/info"},{"key":"stho9wt","name":"Sawyer Thomas (Product Manager)","url":"https://74iuojmw16.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo/SunEditor-sample-mention/stho9wt/info"}],
-		apiUrl: 'https://74iuojmw16.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo/SunEditor-sample-mention/{ key }?limit={limitSize}',
+	autocomplete: {
+		delayTime: 150,
+		limitSize: 8,
+		searchStartLength: 0,
+		useCachingData: true,
 		useCachingFieldData: true,
+		triggers: {
+			// ── @ Mention (API) ──
+			'@': {
+				limitSize: 5,
+				apiUrl: 'https://74iuojmw16.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo/SunEditor-sample-mention/{key}?limit={limitSize}',
+				// apiHeaders: { Authorization: 'Bearer ...' },
+				// transformResponse: (json, xhr) => json.data,
+				renderItem: (item) =>
+					`<div class="se-autocomplete-item">
+						<span>@${item.key}</span>
+						<span>${item.name}</span>
+					</div>`,
+				onSelect: (item, t) => ({
+					tag: 'a',
+					attrs: {
+						'data-se-autocomplete': t + item.key,
+						href: item.url,
+						title: item.name,
+						target: '_blank',
+					},
+					text: t + item.key,
+				}),
+			},
+			// ── : Emoji (static data) ──
+			':': {
+				searchStartLength: 2,
+				limitSize: 10,
+				useCachingFieldData: false,
+				data: [
+					{ key: 'smile', value: '😊' },
+					{ key: 'laugh', value: '😂' },
+					{ key: 'heart', value: '❤️' },
+					{ key: 'thumbsup', value: '👍' },
+					{ key: 'thumbsdown', value: '👎' },
+					{ key: 'fire', value: '🔥' },
+					{ key: 'star', value: '⭐' },
+					{ key: 'check', value: '✅' },
+					{ key: 'cross', value: '❌' },
+					{ key: 'warning', value: '⚠️' },
+					{ key: 'rocket', value: '🚀' },
+					{ key: 'eyes', value: '👀' },
+					{ key: 'clap', value: '👏' },
+					{ key: 'thinking', value: '🤔' },
+					{ key: 'wave', value: '👋' },
+					{ key: 'party', value: '🎉' },
+					{ key: 'cry', value: '😢' },
+					{ key: 'angry', value: '😡' },
+					{ key: 'cool', value: '😎' },
+					{ key: 'sleep', value: '😴' },
+				],
+				renderItem: (item) =>
+					`<div class="se-autocomplete-item">
+						<span style="font-size:1.2em">${item.value}</span>
+						<span>${item.key}</span>
+					</div>`,
+				onSelect: (item) => item.value,
+			},
+			// ── # Hashtag (static data) ──
+			'#': {
+				data: [
+					{ key: 'javascript', name: 'JavaScript' },
+					{ key: 'typescript', name: 'TypeScript' },
+					{ key: 'html', name: 'HTML' },
+					{ key: 'css', name: 'CSS' },
+					{ key: 'react', name: 'React' },
+					{ key: 'vue', name: 'Vue.js' },
+					{ key: 'angular', name: 'Angular' },
+					{ key: 'nodejs', name: 'Node.js' },
+					{ key: 'python', name: 'Python' },
+					{ key: 'suneditor', name: 'SunEditor' },
+					{ key: 'webdev', name: 'Web Development' },
+					{ key: 'frontend', name: 'Frontend' },
+					{ key: 'backend', name: 'Backend' },
+					{ key: 'database', name: 'Database' },
+					{ key: 'opensource', name: 'Open Source' },
+				],
+				renderItem: (item) =>
+					`<div class="se-autocomplete-item">
+						<span>#${item.key}</span>
+						<span>${item.name}</span>
+					</div>`,
+				onSelect: (item, t) => ({
+					tag: 'span',
+					attrs: {
+						'data-se-autocomplete': t + item.key,
+						style: 'color:#1a73e8;font-weight:500',
+					},
+					text: t + item.key,
+				}),
+			},
+		},
 	},
 	drawing: {
 		// size: 22,
@@ -1314,6 +1407,14 @@ const options1 = {
 	// mode: 'inline:bottom',
 	// mode: 'classic:bottom',
 	// maxHeight: 400,
+	subToolbar: {
+		buttonList: [['bold', 'italic', 'underline']],
+		mode: 'balloon-always',
+		width: 'auto',
+	},
+	layout: {
+		items: [{ name: 'Two Column', html: '<div style="display:flex;gap:1em"><div style="flex:1">Left</div><div style="flex:1">Right</div></div>' }],
+	},
 	type: '',
 	// textDirection: 'rtl',
 	value: `<pre style="line-height: 1.45;margin: 0px 0px 10px">
@@ -2247,11 +2348,15 @@ const options_test = {
 			tex: {},
 		},
 	},
-	mention: {
-		list: [
-			{ value: '@user1', label: 'User 1' },
-			{ value: '@user2', label: 'User 2' },
-		],
+	autocomplete: {
+		triggers: {
+			'@': {
+				data: [
+					{ key: 'user1', name: 'User 1' },
+					{ key: 'user2', name: 'User 2' },
+				],
+			},
+		},
 	},
 	paragraphStyle: {
 		_default: 'Default',

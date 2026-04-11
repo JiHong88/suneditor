@@ -6,7 +6,7 @@ declare namespace _default {
 	export { fileUpload };
 	export { list_bulleted };
 	export { list_numbered };
-	export { mention };
+	export { autocomplete };
 	export { align };
 	export { font };
 	export { fontColor };
@@ -61,7 +61,7 @@ import paragraphStyle from './dropdown/paragraphStyle';
 import table from './dropdown/table';
 import template from './dropdown/template';
 import textStyle from './dropdown/textStyle';
-import mention from './field/mention';
+import autocomplete from './field/autocomplete';
 import fontSize from './input/fontSize';
 import pageNavigator from './input/pageNavigator';
 import audio from './modal/audio';
@@ -77,6 +77,7 @@ export {
 	anchor,
 	audio,
 	audioGallery,
+	autocomplete,
 	backgroundColor,
 	blockquote,
 	blockStyle,
@@ -100,7 +101,6 @@ export {
 	list_bulleted,
 	list_numbered,
 	math,
-	mention,
 	pageNavigator,
 	paragraphStyle,
 	table,

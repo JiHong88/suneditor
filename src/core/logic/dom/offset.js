@@ -1,8 +1,9 @@
 import { getParentElement } from '../../../helper/dom/domQuery';
 import { isWysiwygFrame, isElement } from '../../../helper/dom/domCheck';
-import { hasClass, addClass, removeClass, getClientSize } from '../../../helper/dom/domUtils';
+import { hasClass, addClass, removeClass, getClientSize, createTextNode } from '../../../helper/dom/domUtils';
 import { numbers } from '../../../helper';
 import { _w, _d } from '../../../helper/env';
+import { zeroWidthSpace } from '../../../helper/unicode';
 
 /**
  * @typedef {Object} RectsInfo Bounding rectangle information of the selection range.
@@ -638,6 +639,28 @@ class Offset {
 		range ||= this.#$.selection.getRange();
 		const rectsObj = this.#$.selection.getRects(range, positionTop ? 'start' : 'end');
 		positionTop = rectsObj.position === 'start';
+
+		// fallback: when rects could not be obtained from the range (e.g. collapsed at <br>),
+		// insert a temporary zero-width space to get accurate viewport coordinates.
+		if (rectsObj.rects.noText) {
+			let refNode = range.startContainer;
+			if (refNode.nodeType === 1) refNode = refNode.childNodes[range.startOffset] || refNode;
+			const parentEl = refNode.parentNode;
+			if (parentEl) {
+				const zws = createTextNode(zeroWidthSpace);
+				parentEl.insertBefore(zws, refNode);
+				const tempRange = _d.createRange();
+				tempRange.setStart(zws, 1);
+				tempRange.setEnd(zws, 1);
+				const tempRects = tempRange.getClientRects()[0];
+				if (tempRects) {
+					rectsObj.rects = tempRects;
+					rectsObj.scrollLeft = _w.scrollX;
+					rectsObj.scrollTop = _w.scrollY;
+				}
+				parentEl.removeChild(zws);
+			}
+		}
 
 		const isFullScreen = this.#frameContext.get('isFullScreen');
 		const topArea = this.#frameContext.get('topArea');

@@ -174,6 +174,9 @@ export const markdown: {
 	jsonToMarkdown: typeof import('./markdown').jsonToMarkdown;
 	markdownToHtml: typeof import('./markdown').markdownToHtml;
 };
+export const msOffice: {
+	cleanHTML: typeof import('./msOffice').cleanHTML;
+};
 declare namespace _default {
 	export { env };
 	export { unicode };
@@ -183,5 +186,6 @@ declare namespace _default {
 	export { keyCodeMap };
 	export { clipboard };
 	export { markdown };
+	export { msOffice };
 }
 export default _default;

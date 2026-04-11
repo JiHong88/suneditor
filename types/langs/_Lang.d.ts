@@ -38,7 +38,6 @@ export type _Lang = {
 	caption: string;
 	cellProperties: string;
 	center: string;
-	clear: string;
 	close: string;
 	codeView: string;
 	color: string;
@@ -119,7 +118,7 @@ export type _Lang = {
 	math_modal_title: string;
 	maxSize: string;
 	mediaGallery: string;
-	mention: string;
+	autocomplete: string;
 	menu_bordered: string;
 	menu_code: string;
 	menu_neon: string;

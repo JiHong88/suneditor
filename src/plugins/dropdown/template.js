@@ -74,7 +74,8 @@ function CreateHTML(templateList) {
 		<li>
 			<button 
 				type="button" 
-				class="se-btn se-btn-list" 
+				class="se-btn se-btn-list"
+				data-command="template"
 				data-value="${i}" 
 				title="${t.name}" 
 				aria-label="${t.name}"

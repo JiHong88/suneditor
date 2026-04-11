@@ -15,7 +15,8 @@ node_modules/
 #dev
 .git/
 /.vs
-.claude/
+.claude/*
+!.claude/skills/
 .work.md
 
 #jest

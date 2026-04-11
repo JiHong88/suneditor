@@ -92,7 +92,7 @@ export class PluginDropdownFree extends Base {
  * These plugins typically respond to input events in the wysiwyg area
  *
  * **Commonly used hooks:**
- * - `onInput()` - Responds to input events in the editor (See: `mention` plugin)
+ * - `onInput()` - Responds to input events in the editor (See: `autocomplete` plugin)
  * - Other event hooks can be used as needed (`onKeydown`, `onClick`, etc.)
  *
  * Child classes MAY optionally implement event hook methods

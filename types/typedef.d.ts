@@ -306,7 +306,7 @@ declare global {
 				| 'fileUpload'
 				| 'list_bulleted'
 				| 'list_numbered'
-				| 'mention'
+				| 'autocomplete'
 				| 'align'
 				| 'font'
 				| 'fontColor'

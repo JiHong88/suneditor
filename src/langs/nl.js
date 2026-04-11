@@ -134,6 +134,7 @@
 		math_modal_title: 'Wiskunde',
 		maxSize: 'Maximale grootte',
 		mediaGallery: 'Mediagalerij',
+		autocomplete: 'Automatisch aanvullen',
 		mention: 'Vermelding',
 		menu_bordered: 'Omlijnd',
 		menu_code: 'Code',

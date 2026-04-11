@@ -54,7 +54,7 @@ export type ShortcutInfo = {
 	 */
 	r: Array<string>;
 	/**
-	 * - Whether the event was triggered by a text input (e.g., mention like
+	 * - Whether the event was triggered by a text input (e.g., autocomplete like
 	 */
 	textTrigger: string;
 };
@@ -73,7 +73,7 @@ export type ShortcutInfo = {
  * @property {string} type - Plugin's type. (`command`, `dropdown`, `modal`, `browser`, `input`, `field`, `popup`).
  * @property {Node} button - The plugin command button.
  * @property {Array<string>} r - An array of key codes generated with the reverseButtons option, used to reverse the action for a specific key combination.
- * @property {string} textTrigger - Whether the event was triggered by a text input (e.g., mention like @ab).
+ * @property {string} textTrigger - Whether the event was triggered by a text input (e.g., autocomplete like @ab).
  */
 /**
  * @description Shortcuts class
