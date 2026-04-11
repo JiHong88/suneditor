@@ -873,16 +873,23 @@ const options1 = {
 		// showDefaultSizeLabel:true
 	},
 	autocomplete: {
-		delayTime: 120,
-		limitSize: 5,
+		delayTime: 150,
+		limitSize: 8,
+		searchStartLength: 0,
+		useCachingData: true,
+		useCachingFieldData: true,
 		triggers: {
+			// ── @ Mention (API) ──
 			'@': {
+				limitSize: 5,
 				apiUrl: 'https://74iuojmw16.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo/SunEditor-sample-mention/{key}?limit={limitSize}',
+				// apiHeaders: { Authorization: 'Bearer ...' },
+				// transformResponse: (json, xhr) => json.data,
 				renderItem: (item) =>
 					`<div class="se-autocomplete-item">
-                      <span>@${item.key}</span>
-                      <span>${item.name}</span>
-                  </div>`,
+						<span>@${item.key}</span>
+						<span>${item.name}</span>
+					</div>`,
 				onSelect: (item, t) => ({
 					tag: 'a',
 					attrs: {
@@ -894,19 +901,22 @@ const options1 = {
 					text: t + item.key,
 				}),
 			},
+			// ── : Emoji (static data) ──
 			':': {
-				searchStartLength: 1,
+				searchStartLength: 2,
+				limitSize: 10,
+				useCachingFieldData: false,
 				data: [
 					{ key: 'smile', value: '😊' },
 					{ key: 'laugh', value: '😂' },
-					{ key: 'heart', value: '❤️ ' },
+					{ key: 'heart', value: '❤️' },
 					{ key: 'thumbsup', value: '👍' },
 					{ key: 'thumbsdown', value: '👎' },
 					{ key: 'fire', value: '🔥' },
 					{ key: 'star', value: '⭐' },
 					{ key: 'check', value: '✅' },
 					{ key: 'cross', value: '❌' },
-					{ key: 'warning', value: '⚠️ ' },
+					{ key: 'warning', value: '⚠️' },
 					{ key: 'rocket', value: '🚀' },
 					{ key: 'eyes', value: '👀' },
 					{ key: 'clap', value: '👏' },
@@ -920,11 +930,12 @@ const options1 = {
 				],
 				renderItem: (item) =>
 					`<div class="se-autocomplete-item">
-                      <span style="font-size:1.2em">${item.value}</span>
-                      <span>${item.key}</span>
-                  </div>`,
+						<span style="font-size:1.2em">${item.value}</span>
+						<span>${item.key}</span>
+					</div>`,
 				onSelect: (item) => item.value,
 			},
+			// ── # Hashtag (static data) ──
 			'#': {
 				data: [
 					{ key: 'javascript', name: 'JavaScript' },
@@ -945,9 +956,9 @@ const options1 = {
 				],
 				renderItem: (item) =>
 					`<div class="se-autocomplete-item">
-                      <span>#${item.key}</span>
-                      <span>${item.name}</span>
-                  </div>`,
+						<span>#${item.key}</span>
+						<span>${item.name}</span>
+					</div>`,
 				onSelect: (item, t) => ({
 					tag: 'span',
 					attrs: {
@@ -2338,10 +2349,14 @@ const options_test = {
 		},
 	},
 	autocomplete: {
-		list: [
-			{ value: '@user1', label: 'User 1' },
-			{ value: '@user2', label: 'User 2' },
-		],
+		triggers: {
+			'@': {
+				data: [
+					{ key: 'user1', name: 'User 1' },
+					{ key: 'user2', name: 'User 2' },
+				],
+			},
+		},
 	},
 	paragraphStyle: {
 		_default: 'Default',

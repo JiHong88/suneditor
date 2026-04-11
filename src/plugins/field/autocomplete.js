@@ -202,7 +202,7 @@ class Autocomplete extends PluginField {
 				}
 			}
 
-			return;
+			continue;
 		}
 
 		this.selectMenu.close();
@@ -259,19 +259,14 @@ class Autocomplete extends PluginField {
 			menus.push(ctx.renderItem(v, ctx.trigger));
 		}
 
-		if (list.length === 0) {
-			this.selectMenu.close();
-			return false;
-		} else {
-			// controller open
-			this.controller.open(targetNode, null, { isWWTarget: true, initMethod: null, addOffset: null });
-			// select menu create
-			this.selectMenu.create(list, menus);
-			this.selectMenu.open();
-			this.selectMenu.setItem(0);
-			if (ctx.cachingData) ctx.cachingData.set(value, list);
-			return true;
-		}
+		// controller open
+		this.controller.open(targetNode, null, { isWWTarget: true, initMethod: null, addOffset: null });
+		// select menu create
+		this.selectMenu.create(list, menus);
+		this.selectMenu.open();
+		this.selectMenu.setItem(0);
+		if (ctx.cachingData) ctx.cachingData.set(value, list);
+		return true;
 	}
 
 	/**
