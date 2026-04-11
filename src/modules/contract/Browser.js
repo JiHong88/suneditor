@@ -595,6 +595,7 @@ class Browser {
 		dom.utils.removeClass(this.side.querySelectorAll('.active'), 'active');
 		dom.utils.addClass([cmdTarget, dom.query.getParentElement(cmdTarget, '.se-menu-folder')], 'active');
 		this.tagArea.innerHTML = '';
+		this.selectedTags = [];
 
 		if (typeof data === 'string') {
 			this.#drawFileList(data, this.urlHeader, true);
