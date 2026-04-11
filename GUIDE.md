@@ -14,7 +14,7 @@
 - [Architecture](#architecture) (overview) | [ARCHITECTURE.md](./ARCHITECTURE.md) (deep dive)
 - [Plugin System](#plugin-system-srcplugins)
 - [Modules](#modules-srcmodules)
-- [Essential Commands](#essential-commands)
+- [Essential Commands](#essential-commands) | [Claude Code Skills](#claude-code-skills-claudeskills)
 - [Testing Strategy](#testing-strategy)
 - [Markdown View](#markdown-view)
 - Supplementary Guides
@@ -418,6 +418,17 @@ npm run ts-build        # Build TypeScript definitions from JSDoc
 npm run check:langs     # Sync language files (requires Google API credentials)
 npm run check:inject    # Inject plugin JSDoc types into options.js
 ```
+
+### Claude Code Skills (`.claude/skills/`)
+
+Project-specific slash commands for [Claude Code](https://claude.ai/claude-code). Type `/` to see the list.
+
+| Command         | Description                                                                              |
+| --------------- | ---------------------------------------------------------------------------------------- |
+| `/post-edit`    | Post-edit pipeline: `lint:fix-js` → `ts-build` → `check:arch` → `check:exports` → `test` |
+| `/review`       | Code review for bugs, logic errors, and dead code (report only, no fixes)                |
+| `/changes`      | Analyze git diff and update `changes.md` (for manual edits only)                         |
+| `/release-note` | Convert `changes.md` to release note format                                              |
 
 ---
 
