@@ -267,10 +267,25 @@ class Editor {
 
 			if (e.get('options').get('iframe')) {
 				const iframeLoaded = new Promise((resolve) => {
-					this.$.eventManager.addEvent(e.get('wysiwygFrame'), 'load', ({ target }) => {
-						this.#setIframeDocument(/** @type{HTMLIFrameElement} */ (target), this.$.optionProvider.options, e.get('options'));
+					const setupIframe = (/** @type{HTMLIFrameElement} */ target) => {
+						this.#setIframeDocument(target, this.$.optionProvider.options, e.get('options'));
 						resolve();
-					});
+					};
+
+					if (env.isGecko) {
+						// Firefox fires the iframe "load" event twice for sandboxed about:blank iframes —
+						// once for the initial document and again after sandbox processing replaces it.
+						// Debounce to ensure we initialize against the final document.
+						let debounceTimer = null;
+						this.$.eventManager.addEvent(e.get('wysiwygFrame'), 'load', ({ target }) => {
+							clearTimeout(debounceTimer);
+							debounceTimer = setTimeout(() => setupIframe(/** @type{HTMLIFrameElement} */ (target)), 60);
+						});
+					} else {
+						this.$.eventManager.addEvent(e.get('wysiwygFrame'), 'load', ({ target }) => {
+							setupIframe(/** @type{HTMLIFrameElement} */ (target));
+						});
+					}
 				});
 				iframePromises.push(iframeLoaded);
 			}

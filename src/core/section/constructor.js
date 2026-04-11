@@ -946,7 +946,7 @@ function _initTargetElements(key, options, topDiv, targetOptions) {
 		// [sandbox] prop
 		let sandboxValue = frameAttrs.sandbox;
 		if (sandboxValue) {
-			const requiredSandbox = ['allow-same-origin'];
+			const requiredSandbox = ['allow-same-origin', 'allow-scripts'];
 			const userSandbox = sandboxValue.split(/\s+/);
 			const missingSandbox = requiredSandbox.filter((req) => !userSandbox.includes(req));
 
@@ -955,7 +955,7 @@ function _initTargetElements(key, options, topDiv, targetOptions) {
 				sandboxValue = userSandbox.concat(missingSandbox).join(' ');
 			}
 		} else {
-			sandboxValue = 'allow-same-origin';
+			sandboxValue = 'allow-same-origin allow-scripts';
 		}
 
 		// iframe [sandbox] attr
