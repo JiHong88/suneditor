@@ -1,5 +1,5 @@
 import KernelInjector from '../kernel/kernelInjector';
-import { dom, unicode, numbers, env, converter } from '../../helper';
+import { dom, unicode, numbers, env, converter, msOffice } from '../../helper';
 import { _DragHandle } from '../../modules/ui';
 
 // event handlers
@@ -256,6 +256,7 @@ class EventOrchestrator extends KernelInjector {
 			if (MSData) {
 				cleanData = cleanData.replace(/\n/g, ' ');
 				plainText = plainText.replace(/\n/g, ' ');
+				cleanData = msOffice.cleanHTML(cleanData);
 			}
 		}
 

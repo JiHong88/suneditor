@@ -1648,10 +1648,32 @@ class HTML {
 
 		for (let i = 0, len = withoutFormatCells.length, t, f; i < len; i++) {
 			t = withoutFormatCells[i];
+
 			f = dom.utils.createElement('DIV');
-			f.innerHTML = t.textContent.trim().length === 0 && t.children.length === 0 ? '<br>' : t.innerHTML;
+			f.innerHTML = t.innerHTML;
+
+			if (t.textContent.trim().length === 0 && this.#isAllTextStyleNodes(t)) {
+				let leaf = /** @type {Element} */ (f);
+				while (leaf.firstElementChild) leaf = leaf.firstElementChild;
+				leaf.innerHTML = '<br>';
+			}
+
 			t.innerHTML = f.outerHTML;
 		}
+	}
+
+	/**
+	 * @description Checks if all element descendants are text-style nodes (no focusable non-text elements like br, img, etc.).
+	 * @param {Element} el Target element
+	 * @returns {boolean}
+	 */
+	#isAllTextStyleNodes(el) {
+		const nodes = el.querySelectorAll('*');
+		const format = this.#$.format;
+		for (let i = 0; i < nodes.length; i++) {
+			if (!format.isTextStyleNode(nodes[i])) return false;
+		}
+		return true;
 	}
 
 	/**

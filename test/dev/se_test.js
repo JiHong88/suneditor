@@ -1314,6 +1314,14 @@ const options1 = {
 	// mode: 'inline:bottom',
 	// mode: 'classic:bottom',
 	// maxHeight: 400,
+	subToolbar: {
+		buttonList: [['bold', 'italic', 'underline']],
+		mode: 'balloon-always',
+		width: 'auto',
+	},
+	layout: {
+		items: [{ name: 'Two Column', html: '<div style="display:flex;gap:1em"><div style="flex:1">Left</div><div style="flex:1">Right</div></div>' }],
+	},
 	type: '',
 	// textDirection: 'rtl',
 	value: `<pre style="line-height: 1.45;margin: 0px 0px 10px">

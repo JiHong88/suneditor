@@ -6,6 +6,7 @@ import Numbers from './numbers';
 import KeyCodeMap from './keyCodeMap';
 import Clipboard from './clipboard';
 import Markdown from './markdown';
+import MSOffice from './msOffice';
 
 export const env = Env;
 export const unicode = Unicode;
@@ -15,6 +16,7 @@ export const numbers = Numbers;
 export const keyCodeMap = KeyCodeMap;
 export const clipboard = Clipboard;
 export const markdown = Markdown;
+export const msOffice = MSOffice;
 
 export default {
 	env,
@@ -25,4 +27,5 @@ export default {
 	keyCodeMap,
 	clipboard,
 	markdown,
+	msOffice,
 };
