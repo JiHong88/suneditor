@@ -903,7 +903,7 @@ const options1 = {
 			},
 			// ── : Emoji (static data) ──
 			':': {
-				searchStartLength: 2,
+				searchStartLength: 1,
 				limitSize: 10,
 				useCachingFieldData: false,
 				data: [
