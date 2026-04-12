@@ -1589,8 +1589,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             if (!notSelect) {
-                this.setRange(element, 0, element, 0);
-
                 const fileComponentInfo = this.getFileComponent(element);
                 if (fileComponentInfo) {
                     this.selectComponent(fileComponentInfo.target, fileComponentInfo.pluginName);
