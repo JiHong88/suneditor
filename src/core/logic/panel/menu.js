@@ -26,6 +26,7 @@ class Menu {
 	#menuContainer = null;
 	#deferredShowTimer = null;
 	#viewportListener = null;
+	#visualViewport = null;
 
 	/**
 	 * @constructor
@@ -71,6 +72,7 @@ class Menu {
 		// eventManager member (viewport)
 		this.#menuBtn = null;
 		this.#menuContainer = null;
+		this.#visualViewport = _w.visualViewport || null;
 	}
 
 	/**
@@ -285,7 +287,10 @@ class Menu {
 		this.#menuBtn = element;
 		this.#menuContainer = menu;
 
+		let resolved = false;
 		const show = (delay) => {
+			if (resolved) return;
+			resolved = true;
 			this.#clearDeferredShow();
 			this.#deferredShowTimer = _w.setTimeout(() => {
 				this.#deferredShowTimer = null;
@@ -295,11 +300,13 @@ class Menu {
 			}, delay);
 		};
 
-		// listen for viewport resize (keyboard dismiss) — small delay to let viewport settle
-		this.#viewportListener = () => show(10);
-		_w.visualViewport.addEventListener('resize', this.#viewportListener, { once: true });
+		if (this.#visualViewport) {
+			// listen for viewport resize (keyboard dismiss) — small delay to let viewport settle
+			this.#viewportListener = () => show(10);
+			this.#visualViewport.addEventListener('resize', this.#viewportListener, { once: true });
+		}
 
-		// fallback if no viewport change occurs (keyboard already hidden)
+		// fallback if no viewport change occurs (keyboard already hidden or no visualViewport)
 		this.#deferredShowTimer = _w.setTimeout(() => show(0), 50);
 	}
 
@@ -312,7 +319,7 @@ class Menu {
 			this.#deferredShowTimer = null;
 		}
 		if (this.#viewportListener) {
-			_w.visualViewport.removeEventListener('resize', this.#viewportListener);
+			this.#visualViewport?.removeEventListener('resize', this.#viewportListener);
 			this.#viewportListener = null;
 		}
 	}
