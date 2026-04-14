@@ -1,4 +1,6 @@
-import { dom, converter } from '../../../helper';
+import { dom, converter, env } from '../../../helper';
+
+const { isMobile, _w } = env;
 
 /**
  * @description Dropdown and container menu management class
@@ -22,6 +24,8 @@ class Menu {
 	#bindMenu_mouseout = null;
 	#menuBtn = null;
 	#menuContainer = null;
+	#deferredShowTimer = null;
+	#viewportListener = null;
 
 	/**
 	 * @constructor
@@ -109,7 +113,12 @@ class Menu {
 		this.currentDropdownType = btnEl.getAttribute('data-type');
 		const menu = (this.currentDropdown = this.targetMap[dropdownName]);
 		this.currentDropdownActiveButton = btnEl;
-		this.#setMenuPosition(btnEl, menu);
+
+		if (isMobile) {
+			this.#deferMenuShow(btnEl, menu);
+		} else {
+			this.#setMenuPosition(btnEl, menu);
+		}
 
 		this.#bindClose_dropdown_mouse = this.#eventManager.addGlobalEvent('mousedown', this.#globalEventHandler.mousedown, false);
 		if (this.#dropdownCommands.includes(dropdownName)) {
@@ -131,6 +140,7 @@ class Menu {
 	 * @description Closes the currently open dropdown menu.
 	 */
 	dropdownOff() {
+		this.#clearDeferredShow();
 		this.#removeGlobalEvent();
 		if (IsFree(this.currentDropdownType)) this.currentDropdownPlugin?.off?.();
 
@@ -189,7 +199,13 @@ class Menu {
 
 		this.currentContainerActiveButton = /** @type {HTMLButtonElement} */ (button);
 		const containerName = (this.currentContainerName = this.currentContainerActiveButton.getAttribute('data-command'));
-		this.#setMenuPosition(button, (this.currentContainer = this.targetMap[containerName]));
+		this.currentContainer = this.targetMap[containerName];
+
+		if (isMobile) {
+			this.#deferMenuShow(button, this.currentContainer);
+		} else {
+			this.#setMenuPosition(button, this.currentContainer);
+		}
 
 		this.#bindClose_cons_mouse = this.#eventManager.addGlobalEvent('mousedown', this.#globalEventHandler.containerDown, false);
 
@@ -201,6 +217,7 @@ class Menu {
 	 * @description Closes the currently open menu container.
 	 */
 	containerOff() {
+		this.#clearDeferredShow();
 		this.#removeGlobalEvent();
 
 		if (this.currentContainer) {
@@ -231,6 +248,8 @@ class Menu {
 	 */
 	__restoreMenuPosition() {
 		if (!this.#menuBtn || !this.#menuContainer) return;
+		// skip if deferred show is pending — it will handle positioning after viewport settles
+		if (this.#viewportListener || this.#deferredShowTimer) return;
 		this.#setMenuPosition(this.#menuBtn, this.#menuContainer);
 	}
 
@@ -251,6 +270,51 @@ class Menu {
 
 		this.#menuBtn = element;
 		this.#menuContainer = menu;
+	}
+
+	/**
+	 * @description Defer menu display on mobile until viewport settles after keyboard dismiss.
+	 * @param {Node} element Button element
+	 * @param {HTMLElement} menu Menu element
+	 */
+	#deferMenuShow(element, menu) {
+		this.#clearDeferredShow();
+
+		menu.style.display = 'none';
+		dom.utils.addClass(element.parentElement.children, 'on');
+		this.#menuBtn = element;
+		this.#menuContainer = menu;
+
+		const show = (delay) => {
+			this.#clearDeferredShow();
+			this.#deferredShowTimer = _w.setTimeout(() => {
+				this.#deferredShowTimer = null;
+				if (this.#menuBtn === element) {
+					this.#setMenuPosition(element, menu);
+				}
+			}, delay);
+		};
+
+		// listen for viewport resize (keyboard dismiss) — small delay to let viewport settle
+		this.#viewportListener = () => show(10);
+		_w.visualViewport.addEventListener('resize', this.#viewportListener, { once: true });
+
+		// fallback if no viewport change occurs (keyboard already hidden)
+		this.#deferredShowTimer = _w.setTimeout(() => show(0), 50);
+	}
+
+	/**
+	 * @description Clear deferred show timer and viewport listener.
+	 */
+	#clearDeferredShow() {
+		if (this.#deferredShowTimer) {
+			_w.clearTimeout(this.#deferredShowTimer);
+			this.#deferredShowTimer = null;
+		}
+		if (this.#viewportListener) {
+			_w.visualViewport.removeEventListener('resize', this.#viewportListener);
+			this.#viewportListener = null;
+		}
 	}
 
 	/**

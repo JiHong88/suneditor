@@ -59,11 +59,48 @@ function defaultOnSelect(item, triggerText) {
  * @property {boolean} [useCachingFieldData=true] - Whether to cache selected items for priority display.
  * @property {Object<string, AutocompleteTriggerConfig>} triggers - Per-trigger configurations keyed by trigger character.
  * ```js
- * // triggers
- * {
- *   '@': { data: [...], renderItem: (item) => `...` },
- *   '#': { apiUrl: '/api/tags?q={key}' }
- * }
+ * // Basic usage with static data — mention trigger
+ * const editor = SUNEDITOR.create('#editor', {
+ *   plugins: [autocomplete],
+ *   autocomplete: {
+ *     triggers: {
+ *       '@': {
+ *         data: [
+ *           { key: 'john', name: 'John Doe' },
+ *           { key: 'jane', name: 'Jane Smith' },
+ *         ],
+ *       },
+ *     },
+ *   },
+ * });
+ *
+ * // API-based trigger with custom rendering and selection
+ * const editor = SUNEDITOR.create('#editor', {
+ *   plugins: [autocomplete],
+ *   autocomplete: {
+ *     delayTime: 200,
+ *     limitSize: 10,
+ *     triggers: {
+ *       '@': {
+ *         apiUrl: '/api/users?q={key}&limit={limitSize}',
+ *         apiHeaders: { Authorization: 'Bearer TOKEN' },
+ *         transformResponse: (json) => json.data.map((u) => ({ key: u.username, name: u.displayName, id: u.id })),
+ *         renderItem: (item) => `<div class="user-item"><strong>${item.key}</strong> <span>${item.name}</span></div>`,
+ *         onSelect: (item, trigger) => ({
+ *           tag: 'a',
+ *           attrs: { href: `/users/${item.id}`, 'data-se-autocomplete': trigger + item.key },
+ *           text: trigger + item.key,
+ *         }),
+ *       },
+ *       '#': {
+ *         apiUrl: '/api/tags?q={key}',
+ *         transformResponse: (json) => json.tags,
+ *         searchStartLength: 2,
+ *         useCachingData: false,
+ *       },
+ *     },
+ *   },
+ * });
  * ```
  */
 

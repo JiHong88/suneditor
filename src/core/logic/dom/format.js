@@ -766,7 +766,11 @@ class Format {
 	 * @returns {node is HTMLElement}
 	 */
 	isEdgeLine(node, offset, dir) {
-		if (!dom.check.isEdgePoint(node, offset, dir)) return false;
+		if (dir === 'front') {
+			if (offset > 0) return false;
+		} else {
+			if (node?.textContent?.length > offset) return false;
+		}
 
 		let result = false;
 		const siblingType = dir === 'front' ? 'previousSibling' : 'nextSibling';
