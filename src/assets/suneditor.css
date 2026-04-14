@@ -1156,7 +1156,7 @@
 	height: auto;
 	z-index: 5;
 	border: 1px solid var(--se-main-divider-color);
-	border-radius: var(--se-border-radius);
+	border-radius: var(--se-border-radius-lg);
 	padding: 4px;
 	background-color: var(--se-main-background-color);
 	box-shadow: 0 3px 9px var(--se-shadow-layer-color);
@@ -1189,7 +1189,8 @@
 
 /* dropdown layer - basic list */
 .sun-editor .se-list-inner .se-list-basic li {
-	width: 100%;
+	width: auto;
+	max-width: 100%;
 }
 .sun-editor .se-list-inner input {
 	border-radius: 0;
@@ -1561,6 +1562,19 @@
 	color: #fff;
 	stroke: #000;
 	stroke-width: 2px;
+}
+
+.sun-editor .se-list-layer .se-selector-color .se-color-pallet:first-child li:first-child button {
+	border-top-left-radius: var(--se-border-radius);
+}
+.sun-editor .se-list-layer .se-selector-color .se-color-pallet:first-child li:last-child button {
+	border-top-right-radius: var(--se-border-radius);
+}
+.sun-editor .se-list-layer .se-selector-color .se-color-pallet:last-of-type li:first-child button {
+	border-bottom-left-radius: var(--se-border-radius);
+}
+.sun-editor .se-list-layer .se-selector-color .se-color-pallet:last-of-type li:last-child button {
+	border-bottom-right-radius: var(--se-border-radius);
 }
 
 /* --- hue slider -------------------------------------------------------------- */
@@ -1997,7 +2011,7 @@
 	-webkit-background-clip: padding-box;
 	background-clip: padding-box;
 	border: 1px solid rgba(0, 0, 0, 0.2);
-	border-radius: var(--se-border-radius);
+	border-radius: var(--se-border-radius-lg);
 	outline: 0;
 	box-shadow: 0 3px 9px var(--se-shadow-layer-color);
 }
@@ -2558,6 +2572,7 @@
 	color: var(--se-controller-color);
 	-webkit-background-clip: padding-box;
 	background-clip: padding-box;
+	border-radius: var(--se-border-radius);
 	line-break: auto;
 }
 
@@ -2582,13 +2597,13 @@
 
 .sun-editor-editable[contenteditable='true'] figure figcaption {
 	display: block;
-	z-index: 2;
+	z-index: 11;
 }
 
 .sun-editor-editable[contenteditable='true']:not(.se-read-only) figure:not(.se-input-component)::after {
 	position: absolute;
 	content: '';
-	z-index: 1;
+	z-index: 10;
 	top: 0;
 	left: 0;
 	right: 0;
@@ -2960,10 +2975,10 @@
 	overflow-x: visible;
 	overflow: visible;
 	background-color: var(--se-main-background-color);
-	border-radius: var(--se-border-radius);
-	padding: 2px 0;
+	border-radius: var(--se-border-radius-lg);
+	padding: 4px 0;
 	margin: 0;
-	border: 1px solid var(--se-main-outline-color);
+	border: 1px solid var(--se-main-divider-color);
 	box-shadow: 0 3px 9px var(--se-shadow-layer-color);
 	outline: 0 none;
 }
@@ -2990,8 +3005,10 @@
 	min-height: 28px;
 	font-size: var(--se-btn-font-size);
 	padding: 0 6px;
-	margin: 2px 0;
+	margin: 1px 4px;
 	cursor: pointer;
+	border-radius: var(--se-border-radius);
+	transition: background-color 0.08s ease;
 }
 
 .sun-editor .se-select-menu .se-select-item button {
@@ -3011,21 +3028,12 @@
 
 .sun-editor .se-select-menu.se-select-menu-mouse-move .se-select-item:hover,
 .sun-editor .se-select-menu:not(.se-select-menu-mouse-move) .se-select-item.active {
-	border-color: var(--se-active-light3-color) !important;
-	outline: 1px solid var(--se-active-color) !important;
-	box-shadow: 0 0 0 0.3rem var(--se-active-light3-color);
-	transition: box-shadow 0.1s ease-in-out;
+	background-color: rgba(55, 53, 47, 0.06);
 }
 
 .sun-editor .se-select-menu.se-select-menu-mouse-move .se-select-item:active,
 .sun-editor .se-select-menu.se-select-menu-mouse-move .se-select-item.__se__active {
-	background-color: var(--se-active-light4-color);
-	border-color: var(--se-active-light4-color) !important;
-	outline: 1px solid var(--se-active-color) !important;
-	box-shadow: none;
-	transition:
-		background-color 0.1s ease-in-out,
-		box-shadow 0.1s ease-in-out;
+	background-color: rgba(55, 53, 47, 0.12);
 }
 
 .sun-editor .se-modal-form-files .se-select-menu {
@@ -3086,7 +3094,7 @@
 	-webkit-background-clip: padding-box;
 	background-clip: padding-box;
 	border: 1px solid rgba(0, 0, 0, 0.2);
-	border-radius: var(--se-border-radius);
+	border-radius: var(--se-border-radius-lg);
 	outline: 0;
 	box-shadow: 0 3px 9px var(--se-shadow-layer-color);
 }
