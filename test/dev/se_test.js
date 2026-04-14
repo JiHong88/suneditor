@@ -1404,7 +1404,7 @@ const options1 = {
 	// maxHeight: 600,
 	// toolbar_sticky: 50,
 	iframe_attributes: { frameborder: '1' },
-	// mode: 'inline:bottom',
+	mode: 'classic:bottom',
 	// mode: 'classic:bottom',
 	// maxHeight: 400,
 	subToolbar: {
