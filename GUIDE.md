@@ -19,7 +19,7 @@
 - [Markdown View](#markdown-view)
 - Supplementary Guides
     - [External Libraries](./guide/external-libraries.md) - CodeMirror, KaTeX, MathJax
-    - [Changes Guide](./guide/changes-guide.md) - changes.md 작성 규칙 및 릴리즈 활용법
+    - [Changes Guide](#changes-log) - changes.md writing rules and how to use releases.
 
 ---
 
