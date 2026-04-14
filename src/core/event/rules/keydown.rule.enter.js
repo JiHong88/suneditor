@@ -40,8 +40,8 @@ export function reduceEnterDown(actions, ports, ctx) {
 	}
 
 	if (!shift) {
-		const formatEndEdge = !range.endContainer.nextSibling && format.isEdgeLine(range.endContainer, range.endOffset, 'end');
-		const formatStartEdge = !range.startContainer.previousSibling && format.isEdgeLine(range.startContainer, range.startOffset, 'front');
+		const formatEndEdge = format.isEdgeLine(range.endContainer, range.endOffset, 'end');
+		const formatStartEdge = format.isEdgeLine(range.startContainer, range.startOffset, 'front');
 
 		// add default format line
 		if (formatEndEdge && (/^H[1-6]$/i.test(formatEl.nodeName) || /^HR$/i.test(formatEl.nodeName))) {
