@@ -67,9 +67,10 @@ async function manageIssues() {
 		if (lastUpdated >= threshold) continue;
 
 		if (item.pull_request) {
-			// PR: comment only
-			console.log(`PR #${item.number} — commenting (last updated: ${item.updated_at})`);
+			// PR: comment + close
+			console.log(`PR #${item.number} — commenting & closing (last updated: ${item.updated_at})`);
 			await addComment(item.number, PR_COMMENT);
+			await closeIssue(item.number);
 		} else {
 			// Issue: comment + close
 			console.log(`Issue #${item.number} — commenting & closing (last updated: ${item.updated_at})`);
