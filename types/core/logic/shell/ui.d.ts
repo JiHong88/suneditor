@@ -51,9 +51,9 @@ declare class UIManager {
 	setTheme(theme: string): void;
 	/**
 	 * @description Set direction to `rtl` or `ltr`.
-	 * @param {string} dir `rtl` or `ltr`
+	 * @param {"rtl"|"ltr"} dir `rtl` or `ltr`
 	 */
-	setDir(dir: string): void;
+	setDir(dir: 'rtl' | 'ltr'): void;
 	/**
 	 * @description Switch to or off `ReadOnly` mode.
 	 * @param {boolean} value `readOnly` boolean value.

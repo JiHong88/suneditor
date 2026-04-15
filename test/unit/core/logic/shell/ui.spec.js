@@ -168,6 +168,9 @@ function createUIKernel(overrides = {}) {
 		['hasCodeMirror', false],
 		['_themeClass', ''],
 		['theme', ''],
+		['_editableClass', ''],
+		['textDirection', 'ltr'],
+		['printClass', ''],
 	]);
 
 	// --- Context (global UI elements) ---

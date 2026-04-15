@@ -963,6 +963,18 @@
 	bottom: 0px;
 }
 
+/* Bottom toolbar: tooltip appears above */
+.sun-editor .se-toolbar.se-toolbar-bottom .se-tooltip .se-tooltip-inner {
+	top: auto;
+	bottom: 120%;
+}
+
+.sun-editor .se-toolbar.se-toolbar-bottom .se-tooltip .se-tooltip-inner .se-tooltip-text::after {
+	top: 100%;
+	bottom: auto;
+	border-color: var(--se-main-font-color) transparent transparent transparent;
+}
+
 /* toolbar arrow up */
 .sun-editor .se-toolbar .se-arrow.se-arrow-up {
 	border-bottom-color: var(--se-main-divider-color);

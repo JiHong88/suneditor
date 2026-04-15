@@ -361,8 +361,21 @@ export function CreateShortcuts(command, button, values, keyMap, rc, reverseKeys
 	}
 }
 
+/**
+ * @description Append tooltip span
+ * @param {Element} tooptipBtn
+ * @param {boolean} shift
+ * @param {string} shortcut
+ */
 function _addTooltip(tooptipBtn, shift, shortcut) {
-	tooptipBtn.appendChild(dom.utils.createElement('SPAN', { class: 'se-shortcut' }, env.cmdIcon + (shift ? env.shiftIcon : '') + '+<span class="se-shortcut-key">' + shortcut + '</span>'));
+	const tooltip = dom.utils.createElement('SPAN', { class: 'se-shortcut' }, env.cmdIcon + (shift ? env.shiftIcon : '') + '+<span class="se-shortcut-key">' + shortcut + '</span>');
+	const prevTooltip = tooptipBtn.querySelector('.se-shortcut');
+
+	if (prevTooltip) {
+		tooptipBtn.replaceChild(tooltip, prevTooltip);
+	} else {
+		tooptipBtn.appendChild(tooltip);
+	}
 }
 
 /**
