@@ -42,7 +42,7 @@ declare const _default: {
 	/** @action enterFormatInsertBrNode */
 	'enter.format.insertBrNode': ({ ports }: EffectContext_keydown, { wSelection }: any) => void;
 	/** @action enterFormatBreakAtEdge */
-	'enter.format.breakAtEdge': ({ ports, ctx }: EffectContext_keydown, { formatEl, selectionNode, formatStartEdge, formatEndEdge }: any) => void;
+	'enter.format.breakAtEdge': ({ ports, ctx }: EffectContext_keydown, { formatEl, selectionNode, formatStartEdge, formatEndEdge, bidiSwapped }: any) => void;
 	/** @action enterFormatBreakWithSelection */
 	'enter.format.breakWithSelection': ({ ports, ctx }: EffectContext_keydown, { formatEl, range, formatStartEdge, formatEndEdge }: any) => void;
 	/** @action enterFormatBreakAtCursor */

@@ -950,6 +950,7 @@ function _initTargetElements(key, options, topDiv, targetOptions) {
 
 	if (!targetOptions.get('iframe')) {
 		wysiwygDiv.setAttribute('contenteditable', 'true');
+		if (options.get('_rtl')) wysiwygDiv.dir = 'rtl';
 		wysiwygDiv.className += ' ' + options.get('_editableClass');
 		wysiwygDiv.style.cssText = editorStyles.frame + editorStyles.editor;
 	} else {

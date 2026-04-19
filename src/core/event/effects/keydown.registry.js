@@ -411,7 +411,7 @@ export default {
 	},
 
 	/** @action enterFormatBreakAtEdge */
-	'enter.format.breakAtEdge': ({ ports, ctx }, { formatEl, selectionNode, formatStartEdge, formatEndEdge }) => {
+	'enter.format.breakAtEdge': ({ ports, ctx }, { formatEl, selectionNode, formatStartEdge, formatEndEdge, bidiSwapped }) => {
 		const focusBR = dom.utils.createElement('BR');
 		const newFormat = dom.utils.createElement(formatEl.nodeName, null, focusBR);
 
@@ -432,6 +432,8 @@ export default {
 		formatEl.parentNode.insertBefore(newFormat, formatStartEdge && !formatEndEdge ? formatEl : formatEl.nextElementSibling);
 		if (formatEndEdge) {
 			ports.selection.setRange(focusBR, 1, focusBR, 1);
+		} else if (bidiSwapped) {
+			ports.selection.setRange(formatEl, 1, formatEl, 1);
 		} else {
 			const firstEl = formatEl.firstChild || formatEl;
 			ports.selection.setRange(firstEl, 0, firstEl, 0);

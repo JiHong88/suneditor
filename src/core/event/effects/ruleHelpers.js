@@ -145,4 +145,33 @@ function setDefaultLine(ports, lineTagName) {
 	return ports.setDefaultLine(lineTagName);
 }
 
-export { hardDelete, cleanRemovedTags, isUneditableNode, setDefaultLine };
+/**
+ * @description Detects if a detected logical edge is incorrect due to bidi text direction mismatch in RTL mode.
+ * When LTR text (numbers, Latin) is inside an RTL line, the browser may place the caret at offset 0
+ * for the visual end or offset=length for the visual start. This function compares the caret's visual
+ * position against the content boundaries to detect such mismatches.
+ * @param {Range} range - The current collapsed range
+ * @param {HTMLElement} formatEl - The format/line element
+ * @param {'front'|'end'} detectedEdge - The edge detected by logical offset check
+ * @param {Document} doc - The document object
+ * @returns {boolean} true if the detected edge doesn't match the visual position (bidi mismatch)
+ */
+function isRtlBidiMismatch(range, formatEl, detectedEdge, doc) {
+	if (!range.collapsed || !formatEl) return false;
+
+	const caretRect = range.getBoundingClientRect();
+	if (caretRect.height <= 0) return false;
+
+	const contentRange = doc.createRange();
+	contentRange.selectNodeContents(formatEl);
+
+	const contentRect = contentRange.getBoundingClientRect();
+	if (contentRect.width <= 2) return false;
+
+	// In RTL: content left = visual end, content right = visual start
+	// 'front' mismatch: logically at front (offset 0) but caret at left = visual end
+	// 'end' mismatch: logically at end (offset=length) but caret at right = visual start
+	return detectedEdge === 'front' ? caretRect.left <= contentRect.left + 2 : caretRect.left >= contentRect.right - 2;
+}
+
+export { hardDelete, cleanRemovedTags, isUneditableNode, setDefaultLine, isRtlBidiMismatch };

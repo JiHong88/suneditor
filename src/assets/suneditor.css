@@ -3963,6 +3963,12 @@
 .sun-editor.se-rtl .se-find-replace-row {
 	justify-content: flex-start;
 }
+.sun-editor.se-rtl .se-find-replace-input {
+	direction: rtl;
+}
+.sun-editor.se-rtl .se-input-form {
+	direction: rtl;
+}
 
 /* statusbar */
 .sun-editor.se-rtl .se-status-bar {

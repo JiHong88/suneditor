@@ -34,3 +34,15 @@ export function isUneditableNode(ports: EventPorts, range: Range, isFront: boole
  * @returns {void}
  */
 export function setDefaultLine(ports: EventPorts, lineTagName: string): void;
+/**
+ * @description Detects if a detected logical edge is incorrect due to bidi text direction mismatch in RTL mode.
+ * When LTR text (numbers, Latin) is inside an RTL line, the browser may place the caret at offset 0
+ * for the visual end or offset=length for the visual start. This function compares the caret's visual
+ * position against the content boundaries to detect such mismatches.
+ * @param {Range} range - The current collapsed range
+ * @param {HTMLElement} formatEl - The format/line element
+ * @param {'front'|'end'} detectedEdge - The edge detected by logical offset check
+ * @param {Document} doc - The document object
+ * @returns {boolean} true if the detected edge doesn't match the visual position (bidi mismatch)
+ */
+export function isRtlBidiMismatch(range: Range, formatEl: HTMLElement, detectedEdge: 'front' | 'end', doc: Document): boolean;

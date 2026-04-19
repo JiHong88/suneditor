@@ -245,6 +245,7 @@ class Editor {
 			converter._setAutoHeightStyle(targetOptions.get('height'));
 		frame.contentDocument.body.className = originOptions.get('_editableClass');
 		frame.contentDocument.body.setAttribute('contenteditable', 'true');
+		if (originOptions.get('_rtl')) frame.contentDocument.body.dir = 'rtl';
 	}
 
 	/**

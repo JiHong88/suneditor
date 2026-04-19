@@ -230,11 +230,13 @@ class UIManager {
 			if (rtl) {
 				this.#contextProvider.applyToRoots((e) => {
 					dom.utils.addClass([e.get('topArea'), e.get('wysiwyg'), e.get('documentTypePageMirror')], 'se-rtl');
+					e.get('wysiwyg').dir = 'rtl';
 				});
 				dom.utils.addClass([this.#carrierWrapper, toolbarWrapper, statusbarWrapper], 'se-rtl');
 			} else {
 				this.#contextProvider.applyToRoots((e) => {
 					dom.utils.removeClass([e.get('topArea'), e.get('wysiwyg'), e.get('documentTypePageMirror')], 'se-rtl');
+					e.get('wysiwyg').removeAttribute('dir');
 				});
 				dom.utils.removeClass([this.#carrierWrapper, toolbarWrapper, statusbarWrapper], 'se-rtl');
 			}
