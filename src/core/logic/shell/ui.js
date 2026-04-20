@@ -200,14 +200,27 @@ class UIManager {
 
 	/**
 	 * @description Set direction to `rtl` or `ltr`.
-	 * @param {string} dir `rtl` or `ltr`
+	 * @param {"rtl"|"ltr"} dir `rtl` or `ltr`
 	 */
 	setDir(dir) {
 		const rtl = dir === 'rtl';
 		if (this.#options.get('_rtl') === rtl) return;
 
+		const prevDir = this.#options.get('textDirection');
+		const prevEditableClass = this.#options.get('_editableClass');
+		const prevPrintClass = this.#options.get('printClass');
+
 		try {
 			this.#options.set('_rtl', rtl);
+			this.#options.set('textDirection', dir);
+
+			// update _editableClass / printClass
+			const editableClass = rtl ? this.#options.get('_editableClass').replace(/\s*se-rtl/, '') + ' se-rtl' : this.#options.get('_editableClass').replace(/\s*se-rtl/, '');
+			this.#options.set('_editableClass', editableClass);
+			if (this.#options.get('printClass')) {
+				this.#options.set('printClass', rtl ? this.#options.get('printClass').replace(/\s*se-rtl/, '') + ' se-rtl' : this.#options.get('printClass').replace(/\s*se-rtl/, ''));
+			}
+
 			this.offCurrentController();
 
 			const fc = this.#frameContext;
@@ -221,11 +234,13 @@ class UIManager {
 			if (rtl) {
 				this.#contextProvider.applyToRoots((e) => {
 					dom.utils.addClass([e.get('topArea'), e.get('wysiwyg'), e.get('documentTypePageMirror')], 'se-rtl');
+					e.get('wysiwyg').dir = 'rtl';
 				});
 				dom.utils.addClass([this.#carrierWrapper, toolbarWrapper, statusbarWrapper], 'se-rtl');
 			} else {
 				this.#contextProvider.applyToRoots((e) => {
 					dom.utils.removeClass([e.get('topArea'), e.get('wysiwyg'), e.get('documentTypePageMirror')], 'se-rtl');
+					e.get('wysiwyg').removeAttribute('dir');
 				});
 				dom.utils.removeClass([this.#carrierWrapper, toolbarWrapper, statusbarWrapper], 'se-rtl');
 			}
@@ -255,6 +270,12 @@ class UIManager {
 
 			this.#activeDirBtn(rtl);
 
+			// reverse toolbar buttons
+			this.#reverseToolbarButtons(this.#context.get('toolbar_buttonTray'));
+			if (this.#context.has('toolbar_sub_buttonTray')) {
+				this.#reverseToolbarButtons(this.#context.get('toolbar_sub_buttonTray'));
+			}
+
 			// document type
 			if (fc.has('documentType_use_header')) {
 				if (rtl) fc.get('wrapper').appendChild(fc.get('documentTypeInner'));
@@ -269,6 +290,9 @@ class UIManager {
 			else if (this.#store.mode.isSubBalloon) this.#$.subToolbar._showBalloon();
 		} catch (e) {
 			this.#options.set('_rtl', !rtl);
+			this.#options.set('textDirection', prevDir);
+			this.#options.set('_editableClass', prevEditableClass);
+			if (prevPrintClass !== null) this.#options.set('printClass', prevPrintClass);
 			console.warn(`[SUNEDITOR.ui.setDir.fail] ${e.toString()}`);
 		}
 
@@ -700,6 +724,20 @@ class UIManager {
 			dom.utils.addClass(commandTargets.get('dir_ltr'), 'active');
 			dom.utils.removeClass(commandTargets.get('dir_rtl'), 'active');
 		}
+	}
+
+	/**
+	 * @description Reverse the order of toolbar button groups (excluding the more-layer).
+	 * @param {HTMLElement} buttonTray - The `.se-btn-tray` element.
+	 */
+	#reverseToolbarButtons(buttonTray) {
+		if (!buttonTray) return;
+		const moreLayer = buttonTray.querySelector('.se-toolbar-more-layer');
+		const children = Array.from(buttonTray.children).filter((c) => c !== moreLayer);
+		for (let i = children.length - 1; i >= 0; i--) {
+			buttonTray.appendChild(children[i]);
+		}
+		if (moreLayer) buttonTray.appendChild(moreLayer);
 	}
 
 	/**

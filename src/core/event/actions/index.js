@@ -203,9 +203,10 @@ export const A = {
 	 * @param {Node} selectionNode
 	 * @param {boolean} formatStartEdge
 	 * @param {boolean} formatEndEdge
+	 * @param {boolean} [bidiSwapped]
 	 * @returns {Action}
 	 */
-	enterFormatBreakAtEdge: (formatEl, selectionNode, formatStartEdge, formatEndEdge) => ({ t: 'enter.format.breakAtEdge', p: { formatEl, selectionNode, formatStartEdge, formatEndEdge } }),
+	enterFormatBreakAtEdge: (formatEl, selectionNode, formatStartEdge, formatEndEdge, bidiSwapped) => ({ t: 'enter.format.breakAtEdge', p: { formatEl, selectionNode, formatStartEdge, formatEndEdge, bidiSwapped } }),
 	/**
 	 * @param {Element} formatEl
 	 * @param {Range} range

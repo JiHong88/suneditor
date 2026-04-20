@@ -601,11 +601,11 @@ const options1 = {
 	// iframe: true,
 
 	video: null,
-	subToolbar: {
-		buttonList: [['bold', 'dir', 'dir_ltr', 'dir_rtl', 'save', 'list']],
-		width: 'auto',
-		mode: 'balloon', // balloon, balloon-always, balloon-block
-	},
+	// subToolbar: {
+	// 	buttonList: [['bold', 'dir', 'dir_ltr', 'dir_rtl', 'save', 'list']],
+	// 	width: 'auto',
+	// 	mode: 'balloon', // balloon, balloon-always, balloon-block
+	// },
 	// shortcuts: {
 	// 	// bold: ['s75', 'K'],
 	// 	italic: [],
@@ -1405,13 +1405,14 @@ const options1 = {
 	// toolbar_sticky: 50,
 	iframe_attributes: { frameborder: '1' },
 	mode: 'classic:bottom',
+	textDirection: 'rtl',
 	// mode: 'classic:bottom',
 	// maxHeight: 400,
-	subToolbar: {
-		buttonList: [['bold', 'italic', 'underline']],
-		mode: 'balloon-always',
-		width: 'auto',
-	},
+	// subToolbar: {
+	// 	buttonList: [['bold', 'italic', 'underline']],
+	// 	mode: 'balloon-always',
+	// 	width: 'auto',
+	// },
 	layout: {
 		items: [{ name: 'Two Column', html: '<div style="display:flex;gap:1em"><div style="flex:1">Left</div><div style="flex:1">Right</div></div>' }],
 	},

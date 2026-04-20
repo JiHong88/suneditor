@@ -8,7 +8,8 @@
 
 	/** --------------------------- layout - [size] ----------- */
 	/** main, common */
-	--se-border-radius: 2px;
+	--se-border-radius: 3px;
+	--se-border-radius-lg: 6px;
 	--se-min-height: 65px;
 	--se-scroll-padding: 2em;
 

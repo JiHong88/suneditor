@@ -30,3 +30,82 @@ Refer to [guide/changes-guide.md](./prompts/changes-guide.md) for formatting rul
 
 When asked to write a release note, read [changes.md](./changes.md) and write a release note to [release-note.md](./release-note.md) following the style and rules in [prompts/release-note.md](./prompts/release-note.md).
 Replace the entire contents of `release-note.md` with the generated release note.
+
+# LLM Wiki
+
+This is a persistent, LLM-maintained knowledge base following the
+[llm-wiki pattern](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f).
+You (the LLM) own the `wiki/` layer. I (the human) own `raw/` and sourcing.
+
+---
+
+## Directory layout
+
+```
+raw/          ← source documents. READ ONLY — never modify
+wiki/
+  index.md    ← master page catalog (always keep current)
+  log.md      ← append-only operation log
+  sources/    ← one summary page per raw source
+  concepts/   ← topic / entity pages
+  decisions/  ← confirmed architecture or design decisions
+  insights/   ← notable answers or analyses worth keeping
+CLAUDE.md     ← this file
+```
+
+---
+
+## Operations
+
+### INGEST — when I say "ingest: <filename>"
+
+1. Read the source file in `raw/`
+2. Discuss key takeaways with me
+3. Create `wiki/sources/<slug>.md` with summary + key points
+4. Update or create relevant `wiki/concepts/<topic>.md` pages
+5. Update `wiki/decisions/` if any decisions are confirmed
+6. Update `wiki/index.md` with all new/changed pages
+7. Append to `wiki/log.md`:
+   `## [YYYY-MM-DD] ingest | <title>`
+
+### QUERY — when I ask a question
+
+1. Read `wiki/index.md` first to find relevant pages
+2. Read those pages, synthesize an answer with [[wiki links]]
+3. If the answer is worth keeping, offer to save it to `wiki/insights/`
+
+### LINT — when I say "lint"
+
+Check for and report:
+
+- Pages referenced in [[links]] that don't exist
+- Contradictions between pages
+- Concepts mentioned but lacking their own page
+- Stale claims likely superseded by newer sources
+- Orphan pages with no inbound links
+
+---
+
+## Page format
+
+Every wiki page should include frontmatter:
+
+```yaml
+---
+tags: [concept|source|decision|insight]
+sources: [source-slug, ...]
+updated: YYYY-MM-DD
+---
+```
+
+Use `[[PageName]]` wikilinks. Obsidian-compatible markdown.
+
+---
+
+## Rules
+
+- Never modify anything in `raw/`
+- Always update `index.md` and `log.md` after any wiki change
+- Prefer updating existing pages over creating redundant new ones
+- Flag contradictions explicitly — don't silently overwrite
+- When unsure, ask rather than invent

@@ -1,5 +1,5 @@
 import { dom } from '../../../helper';
-import { hardDelete, isUneditableNode } from '../effects/ruleHelpers';
+import { hardDelete, isUneditableNode, isRtlBidiMismatch } from '../effects/ruleHelpers';
 import { A } from '../actions';
 
 /**
@@ -18,10 +18,12 @@ import { A } from '../actions';
  */
 export function reduceDeleteDown(actions, ports, ctx) {
 	const { format, component } = ports;
-	const { range, selectionNode } = ctx;
+	const { fc, range, selectionNode } = ctx;
 	let { formatEl } = ctx;
 
 	const selectRange = !range.collapsed || range.startContainer !== range.endContainer;
+	// RTL bidi guard: if offset=length is actually at the visual start due to LTR text in RTL line, skip end-edge handling
+	const bidiNotEnd = ctx.options.get('_rtl') && !selectRange && range.endOffset >= (range.endContainer.textContent?.length || 0) && isRtlBidiMismatch(range, formatEl, 'end', fc.get('_wd'));
 
 	actions.push(A.componentDeselect());
 	actions.push(A.cacheStyleNode());
@@ -31,7 +33,7 @@ export function reduceDeleteDown(actions, ports, ctx) {
 		return true;
 	}
 
-	if (!selectRange && format.isEdgeLine(range.endContainer, range.endOffset, 'end') && !formatEl.nextSibling) {
+	if (!selectRange && !bidiNotEnd && format.isEdgeLine(range.endContainer, range.endOffset, 'end') && !formatEl.nextSibling) {
 		actions.push(A.preventStop());
 		return false;
 	}
@@ -107,7 +109,7 @@ export function reduceDeleteDown(actions, ports, ctx) {
 	}
 
 	// format attributes
-	if (!selectRange && format.isEdgeLine(range.endContainer, range.endOffset, 'end')) {
+	if (!selectRange && !bidiNotEnd && format.isEdgeLine(range.endContainer, range.endOffset, 'end')) {
 		if (format.isLine(formatEl.nextElementSibling)) {
 			actions.push(A.cacheFormatAttrsTemp(formatEl.attributes));
 		}
@@ -122,7 +124,7 @@ export function reduceDeleteDown(actions, ports, ctx) {
 		(selectionNode === formatEl ||
 			(selectionNode.nodeType === 3 &&
 				(!selectionNode.nextSibling || dom.check.isList(selectionNode.nextSibling)) &&
-				(format.getLine(range.startContainer, null) !== format.getLine(range.endContainer, null) ? rangeEl.contains(range.endContainer) : range.endOffset === selectionNode.textContent.length && range.collapsed)))
+				(format.getLine(range.startContainer, null) !== format.getLine(range.endContainer, null) ? rangeEl.contains(range.endContainer) : range.endOffset === selectionNode.textContent.length && range.collapsed && !bidiNotEnd)))
 	) {
 		actions.push(A.deleteListRemoveNested(range, formatEl, rangeEl));
 		return true;

@@ -18,6 +18,7 @@ Conventional Commits 스타일을 기반으로 했습니다.
 | `test`     | 테스트 코드 추가/수정                | `test: 병합 케이스 유닛 테스트 추가`     |
 | `chore`    | 빌드 설정, 패키지 관리, 기타 작업    | `chore: webpack 설정 정리`               |
 | `ci`       | CI/CD 설정 관련 변경                 | `ci: GitHub Actions 배포 설정 추가`      |
+| `design`   | 디자인 관련 UIUX 변경                | `버튼 전체 radius값 수정`                |
 | `build`    | 빌드 시스템 변경                     | `build: babel 최신 버전으로 업데이트`    |
 
 ---

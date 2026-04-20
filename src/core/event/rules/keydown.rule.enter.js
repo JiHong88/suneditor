@@ -1,4 +1,5 @@
 import { dom } from '../../../helper';
+import { isRtlBidiMismatch } from '../effects/ruleHelpers';
 import { A } from '../actions';
 
 /**
@@ -40,8 +41,24 @@ export function reduceEnterDown(actions, ports, ctx) {
 	}
 
 	if (!shift) {
-		const formatEndEdge = format.isEdgeLine(range.endContainer, range.endOffset, 'end');
-		const formatStartEdge = format.isEdgeLine(range.startContainer, range.startOffset, 'front');
+		let formatEndEdge = format.isEdgeLine(range.endContainer, range.endOffset, 'end');
+		let formatStartEdge = format.isEdgeLine(range.startContainer, range.startOffset, 'front');
+
+		// RTL bidi edge correction: when LTR text (e.g. numbers) is inside an RTL line,
+		// the browser places the caret at the logically opposite offset at bidi boundaries.
+		let bidiSwapped = false;
+		if (ctx.options.get('_rtl') && formatEl && range.collapsed && formatStartEdge !== formatEndEdge) {
+			const _wd = ctx.fc.get('_wd');
+			if (formatStartEdge && isRtlBidiMismatch(range, formatEl, 'front', _wd)) {
+				formatStartEdge = false;
+				formatEndEdge = true;
+				bidiSwapped = true;
+			} else if (formatEndEdge && isRtlBidiMismatch(range, formatEl, 'end', _wd)) {
+				formatEndEdge = false;
+				formatStartEdge = true;
+				bidiSwapped = true;
+			}
+		}
 
 		// add default format line
 		if (formatEndEdge && (/^H[1-6]$/i.test(formatEl.nodeName) || /^HR$/i.test(formatEl.nodeName))) {
@@ -115,7 +132,7 @@ export function reduceEnterDown(actions, ports, ctx) {
 		// set format attrs - edge
 		if (range.collapsed && (formatStartEdge || formatEndEdge)) {
 			ports.enterPrevent(e);
-			actions.push(A.enterFormatBreakAtEdge(formatEl, selectionNode, formatStartEdge, formatEndEdge));
+			actions.push(A.enterFormatBreakAtEdge(formatEl, selectionNode, formatStartEdge, formatEndEdge, bidiSwapped));
 			actions.push(A.enterScrollTo(range));
 			return true;
 		}
@@ -125,6 +142,19 @@ export function reduceEnterDown(actions, ports, ctx) {
 
 			/** @type {HTMLElement} */
 			if (selectRange) {
+				// RTL bidi edge correction for selection ranges (formatStartEdge only)
+				// formatEndEdge insert-after behavior is already correct for RTL selections
+				if (ctx.options.get('_rtl') && formatStartEdge && !formatEndEdge) {
+					const _wd = ctx.fc.get('_wd');
+					const testRange = _wd.createRange();
+					testRange.setStart(range.startContainer, range.startOffset);
+					testRange.collapse(true);
+					if (isRtlBidiMismatch(testRange, formatEl, 'front', _wd)) {
+						formatStartEdge = false;
+						formatEndEdge = true;
+						bidiSwapped = true;
+					}
+				}
 				actions.push(A.enterFormatBreakWithSelection(formatEl, range, formatStartEdge, formatEndEdge));
 			} else {
 				actions.push(A.enterFormatBreakAtCursor(formatEl, range));

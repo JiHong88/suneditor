@@ -1,5 +1,5 @@
 import { dom } from '../../../helper';
-import { cleanRemovedTags, hardDelete, isUneditableNode, setDefaultLine } from '../effects/ruleHelpers';
+import { cleanRemovedTags, hardDelete, isUneditableNode, setDefaultLine, isRtlBidiMismatch } from '../effects/ruleHelpers';
 import { A } from '../actions';
 
 /**
@@ -22,6 +22,8 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 	let { formatEl } = ctx;
 
 	const selectRange = !range.collapsed || range.startContainer !== range.endContainer;
+	// RTL bidi guard: if offset 0 is actually at the visual end due to LTR text in RTL line, skip front-edge handling
+	const bidiNotFront = options.get('_rtl') && !selectRange && range.startOffset === 0 && isRtlBidiMismatch(range, formatEl, 'front', fc.get('_wd'));
 
 	actions.push(A.componentDeselect());
 	actions.push(A.cacheStyleNode());
@@ -54,6 +56,7 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 	// closure, default
 	if (
 		!selectRange &&
+		!bidiNotFront &&
 		!formatEl.previousElementSibling &&
 		range.startOffset === 0 &&
 		!selectionNode.previousSibling &&
@@ -87,7 +90,7 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 
 	// clean remove tag
 	const startCon = range.startContainer;
-	if (formatEl && !formatEl.previousElementSibling && range.startOffset === 0 && startCon.nodeType === 3 && dom.check.isZeroWidth(startCon)) {
+	if (formatEl && !bidiNotFront && !formatEl.previousElementSibling && range.startOffset === 0 && startCon.nodeType === 3 && dom.check.isZeroWidth(startCon)) {
 		if (cleanRemovedTags(ports, startCon, formatEl) === true) return true;
 	}
 
@@ -118,7 +121,7 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 	}
 
 	// format attributes
-	if (!selectRange && format.isEdgeLine(range.startContainer, range.startOffset, 'front')) {
+	if (!selectRange && !bidiNotFront && format.isEdgeLine(range.startContainer, range.startOffset, 'front')) {
 		if (format.isLine(formatEl.previousElementSibling)) {
 			actions.push(A.cacheFormatAttrsTemp(formatEl.previousElementSibling.attributes));
 		}
@@ -134,7 +137,7 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 			dom.check.isList(rangeEl) &&
 			(dom.check.isListCell(rangeEl.parentElement) || formatEl.previousElementSibling) &&
 			(selectionNode === formatEl || (selectionNode.nodeType === 3 && (!selectionNode.previousSibling || dom.check.isList(selectionNode.previousSibling)))) &&
-			(format.getLine(range.startContainer, null) !== format.getLine(range.endContainer, null) ? rangeEl.contains(range.startContainer) : range.startOffset === 0 && range.collapsed)
+			(format.getLine(range.startContainer, null) !== format.getLine(range.endContainer, null) ? rangeEl.contains(range.startContainer) : range.startOffset === 0 && range.collapsed && !bidiNotFront)
 		) {
 			if (range.startContainer !== range.endContainer) {
 				actions.push(A.prevent());
@@ -163,7 +166,7 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 		}
 
 		// detach range
-		if (!selectRange && range.startOffset === 0) {
+		if (!selectRange && range.startOffset === 0 && !bidiNotFront) {
 			let detach = true;
 			let comm = commonCon;
 			while (comm && comm !== rangeEl && !dom.check.isWysiwygFrame(comm)) {
@@ -182,6 +185,16 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 				actions.push(A.historyPush(true));
 				return true;
 			}
+		}
+	}
+
+	// empty line adjacent to component (offset-independent — handles RTL caret at offset 1)
+	if (!selectRange && formatEl && dom.check.isEmptyLine(formatEl) && component.is(formatEl.previousElementSibling)) {
+		const fileComponentInfo = component.get(formatEl.previousElementSibling);
+		if (fileComponentInfo) {
+			actions.push(A.preventStop());
+			actions.push(A.backspaceComponentRemove(false, formatEl.firstChild, formatEl, fileComponentInfo));
+			return true;
 		}
 	}
 

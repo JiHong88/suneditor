@@ -31,7 +31,7 @@ export namespace A {
 	function enterFormatCleanBrAndZWS(selectionNode: Node, selectionFormat: boolean, brBlock: Element, children: NodeList, offset: number): Action;
 	function enterFormatInsertBrHtml(brBlock: Element, range: Range, wSelection: Selection, offset: number): Action;
 	function enterFormatInsertBrNode(wSelection: Selection): Action;
-	function enterFormatBreakAtEdge(formatEl: Element, selectionNode: Node, formatStartEdge: boolean, formatEndEdge: boolean): Action;
+	function enterFormatBreakAtEdge(formatEl: Element, selectionNode: Node, formatStartEdge: boolean, formatEndEdge: boolean, bidiSwapped?: boolean): Action;
 	function enterFormatBreakWithSelection(formatEl: Element, range: Range, formatStartEdge: boolean, formatEndEdge: boolean): Action;
 	function enterFormatBreakAtCursor(formatEl: Element, range: Range): Action;
 	function enterFigcaptionExitInList(formatEl: Element): Action;
