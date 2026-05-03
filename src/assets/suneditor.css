@@ -1149,6 +1149,26 @@
 	z-index: 2147483646;
 }
 
+/** --- popover UA override ---------------------------------------------------- */
+.sun-editor .se-controller[popover],
+.sun-editor.sun-editor-carrier-wrapper .se-drag-cursor[popover] {
+	inset: unset;
+	margin: 0;
+}
+
+.sun-editor .se-modal-area[popover],
+.sun-editor .se-back-wrapper[popover],
+.sun-editor .se-loading-box[popover],
+.sun-editor .se-toast[popover],
+.sun-editor .se-browser[popover],
+.sun-editor .se-menu-tray[popover] {
+	background: none;
+	border: none;
+	padding: 0;
+	overflow: visible;
+	color: inherit;
+}
+
 /** --- dropdown layer ---------------------------------------------------------- */
 .sun-editor .se-dropdown {
 	overflow-x: hidden;
@@ -2568,6 +2588,12 @@
 	display: none;
 	overflow: visible;
 	z-index: 2147483646;
+}
+
+.sun-editor .se-controller[popover]:popover-open {
+	position: absolute;
+	inset: unset;
+	margin: 0;
 	padding: 2px 2px 0 2px;
 	margin: 0;
 	border: 1px solid var(--se-controller-border-color);
@@ -4553,8 +4579,8 @@
 .sun-editor-editable[contenteditable='true'] .se-page-break::after {
 	content: '⎯⎯⎯⎯⎯⎯';
 	position: absolute;
-	top: 1px;
-	background: var(--se-main-background-color);
+	top: 0px;
+	background: transparent;
 	padding: 0 5px;
 	color: var(--se-doc-info-page-background-color);
 	font-size: var(--se-main-font-size);

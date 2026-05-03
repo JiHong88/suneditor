@@ -89,6 +89,7 @@ class UIManager {
 
 		// toast
 		const toastPopup = CreateToastHTML();
+		toastPopup.setAttribute('popover', 'manual');
 		this.toastPopup = toastPopup;
 		this.toastContainer = toastPopup.querySelector('.se-toast-container');
 		this.toastMessage = toastPopup.querySelector('span');
@@ -396,7 +397,9 @@ class UIManager {
 	 * @param {string} [rootKey] Root key
 	 */
 	showLoading(rootKey) {
-		/** @type {HTMLElement} */ ((rootKey ? this.#frameRoots.get(rootKey).get('container') : this.#carrierWrapper).querySelector('.se-loading-box')).style.display = 'block';
+		const el = /** @type {HTMLElement} */ ((rootKey ? this.#frameRoots.get(rootKey).get('container') : this.#carrierWrapper).querySelector('.se-loading-box'));
+		el.style.display = 'block';
+		el.showPopover?.();
 	}
 
 	/**
@@ -404,7 +407,9 @@ class UIManager {
 	 * @param {string} [rootKey] Root key
 	 */
 	hideLoading(rootKey) {
-		/** @type {HTMLElement} */ ((rootKey ? this.#frameRoots.get(rootKey).get('container') : this.#carrierWrapper).querySelector('.se-loading-box')).style.display = 'none';
+		const el = /** @type {HTMLElement} */ ((rootKey ? this.#frameRoots.get(rootKey).get('container') : this.#carrierWrapper).querySelector('.se-loading-box'));
+		el.hidePopover?.();
+		el.style.display = 'none';
 	}
 
 	/**
@@ -423,6 +428,7 @@ class UIManager {
 		this.#bindClose = this.#eventManager.addGlobalEvent('keydown', this.#closeListener[0]);
 
 		this.#alertArea.style.display = 'block';
+		this.#alertArea.showPopover?.();
 		dom.utils.addClass(this.alertModal, 'se-modal-show');
 	}
 
@@ -432,6 +438,7 @@ class UIManager {
 	alertClose() {
 		dom.utils.removeClass(this.alertModal, 'se-modal-show');
 		dom.utils.removeClass(this.alertModal, 'se-alert-*');
+		this.#alertArea.hidePopover?.();
 		this.#alertArea.style.display = 'none';
 		this.#bindAlertClick &&= this.#eventManager.removeEvent(this.#bindAlertClick);
 		this.#bindClose &&= this.#eventManager.removeGlobalEvent(this.#bindClose);
@@ -452,6 +459,7 @@ class UIManager {
 		if (type) dom.utils.addClass(this.toastPopup, `se-toast-${type}`);
 
 		this.toastPopup.style.display = 'block';
+		this.toastPopup.showPopover?.();
 		this.toastMessage.textContent = message;
 		dom.utils.addClass(this.toastContainer, 'se-toast-show');
 
@@ -468,6 +476,7 @@ class UIManager {
 		if (this.#toastToggle) _w.clearTimeout(this.#toastToggle);
 		this.#toastToggle = null;
 		dom.utils.removeClass(this.toastContainer, 'se-toast-show');
+		this.toastPopup.hidePopover?.();
 		this.toastPopup.style.display = 'none';
 	}
 
@@ -509,12 +518,14 @@ class UIManager {
 	enableBackWrapper(cursor) {
 		this.#backWrapper.style.cursor = cursor;
 		this.#backWrapper.style.display = 'block';
+		this.#backWrapper.showPopover?.();
 	}
 
 	/**
 	 * @description Disabled background `div`
 	 */
 	disableBackWrapper() {
+		this.#backWrapper.hidePopover?.();
 		this.#backWrapper.style.display = 'none';
 		this.#backWrapper.style.cursor = 'default';
 	}

@@ -1405,7 +1405,8 @@ const options1 = {
 	// toolbar_sticky: 50,
 	iframe_attributes: { frameborder: '1' },
 	mode: 'classic:bottom',
-	textDirection: 'rtl',
+	type: 'document:page,header',
+	// textDirection: 'rtl',
 	// mode: 'classic:bottom',
 	// maxHeight: 400,
 	// subToolbar: {
@@ -1416,7 +1417,6 @@ const options1 = {
 	layout: {
 		items: [{ name: 'Two Column', html: '<div style="display:flex;gap:1em"><div style="flex:1">Left</div><div style="flex:1">Right</div></div>' }],
 	},
-	type: '',
 	// textDirection: 'rtl',
 	value: `<pre style="line-height: 1.45;margin: 0px 0px 10px">
 ​dsadsa</pre>

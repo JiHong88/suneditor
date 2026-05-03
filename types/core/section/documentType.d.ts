@@ -30,9 +30,19 @@ declare class DocumentType {
 	 * @param {number} t - The initial top position value to be adjusted.
 	 * @param {HTMLCollection} chr - The elements array in the current (main) page.
 	 * @param {HTMLCollection} mChr - The elements array in the mirrored page.
+	 * @param {Array.<{number: number, top: number, isBreak?: boolean}>} [pages] - The pages array containing page break info.
 	 * @returns {number|null} The adjusted top value.
 	 */
-	_calcPageBreakTop(t: number, chr: HTMLCollection, mChr: HTMLCollection): number | null;
+	_calcPageBreakTop(
+		t: number,
+		chr: HTMLCollection,
+		mChr: HTMLCollection,
+		pages?: Array<{
+			number: number;
+			top: number;
+			isBreak?: boolean;
+		}>,
+	): number | null;
 	/**
 	 * @internal
 	 * @description Initializes the cache for document elements.
@@ -44,6 +54,7 @@ declare class DocumentType {
 	 * @description Retrieves the element at a given position.
 	 * @param {number} pageTop - The vertical position to check.
 	 * @param {HTMLCollection} mChr - List of mirrored elements.
+	 * @param {Array.<{number: number, top: number, isBreak?: boolean}>} [pages] - The pages array containing page break info for skipping break elements.
 	 * @returns {{ci: number, cm: number, ch: number}} The closest element and its related data.
 	 * - ci: The index of the closest element.
 	 * - cm: The distance between the top of the closest element and the given position.
@@ -52,6 +63,11 @@ declare class DocumentType {
 	_getElementAtPosition(
 		pageTop: number,
 		mChr: HTMLCollection,
+		pages?: Array<{
+			number: number;
+			top: number;
+			isBreak?: boolean;
+		}>,
 	): {
 		ci: number;
 		cm: number;

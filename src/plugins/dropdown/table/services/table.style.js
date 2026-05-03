@@ -598,16 +598,25 @@ export class TableStyleService {
 		this._propsCache = [];
 
 		for (let i = 0, t, isBreak; (t = targets[i]); i++) {
-			// eslint-disable-next-line no-shadow
-			const { cssText, border, backgroundColor, color, textAlign, verticalAlign, fontWeight, textDecoration, fontStyle } = t.style;
-			this._propsCache.push([t, cssText]);
+			const {
+				cssText: t_cssText,
+				border: t_border,
+				backgroundColor: t_backgroundColor,
+				color: t_color,
+				textAlign: t_textAlign,
+				verticalAlign: t_verticalAlign,
+				fontWeight: t_fontWeight,
+				textDecoration: t_textDecoration,
+				fontStyle: t_fontStyle,
+			} = t.style;
+			this._propsCache.push([t, t_cssText]);
 			if (isBreak) continue;
 
-			const { c, s, w } = this.#getBorderStyle(border);
+			const { c, s, w } = this.#getBorderStyle(t_border);
 
 			// use getComputedStyle to normalize any CSS color format to rgb
-			let hexBackColor = backgroundColor;
-			let hexColor = color;
+			let hexBackColor = t_backgroundColor;
+			let hexColor = t_color;
 			if (hexBackColor || hexColor) {
 				const computed = _w.getComputedStyle(t);
 				if (hexBackColor) hexBackColor = computed.backgroundColor;
@@ -619,12 +628,12 @@ export class TableStyleService {
 			if (b_width && cellBorder.w !== w) b_width = '';
 			if (backColor !== converter.rgb2hex(hexBackColor)) backColor = '';
 			if (fontColor !== converter.rgb2hex(hexColor)) fontColor = '';
-			if (align !== (isTable ? this.#state.figureElement?.style.float : textAlign)) align = '';
-			if (align_v && align_v !== verticalAlign) align_v = '';
-			if (bold && bold !== /.+/.test(fontWeight)) bold = false;
-			if (underline && underline !== /underline/i.test(textDecoration)) underline = false;
-			if (strike && strike !== /line-through/i.test(textDecoration)) strike = false;
-			if (italic && italic !== /italic/i.test(fontStyle)) italic = false;
+			if (align !== (isTable ? this.#state.figureElement?.style.float : t_textAlign)) align = '';
+			if (align_v && align_v !== t_verticalAlign) align_v = '';
+			if (bold && bold !== /.+/.test(t_fontWeight)) bold = false;
+			if (underline && underline !== /underline/i.test(t_textDecoration)) underline = false;
+			if (strike && strike !== /line-through/i.test(t_textDecoration)) strike = false;
+			if (italic && italic !== /italic/i.test(t_fontStyle)) italic = false;
 			if (!b_color || !b_style || !b_width || !backColor || !fontColor) {
 				isBreak = true;
 			}

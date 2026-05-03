@@ -162,28 +162,19 @@ class DocumentType {
 
 			// page break
 			let pageBreakHeight = 0;
-			let lastBreakPosition = 0;
-			let additionalPages = 0;
+			const breakPoints = [];
 			if (pageBreaks.length > 0) {
 				pageBreakHeight = pageBreaks[0].offsetHeight;
 				for (let i = 0; i < pageBreaks.length; i++) {
-					const breakPosition = pageBreaks[i].offsetTop;
-					const sectionHeight = breakPosition - lastBreakPosition;
-					if (sectionHeight % A4_PAGE_HEIGHT !== 0) additionalPages++;
-					lastBreakPosition = breakPosition;
+					breakPoints.push({ top: pageBreaks[i].offsetTop, end: pageBreaks[i].offsetTop + pageBreakHeight / 2 });
 				}
-
-				const lastSectionHeight = mirrorHeight - lastBreakPosition;
-				if (lastSectionHeight > 0 && lastSectionHeight % A4_PAGE_HEIGHT !== 0) additionalPages++;
 			}
 
 			const scrollTop = !this.#isScrollable(this.#fc) ? 0 : this._getWWScrollTop();
-			const totalPages = Math.ceil(mirrorHeight / A4_PAGE_HEIGHT) + additionalPages;
-			const wwWidth = this.#wwFrame.offsetWidth + 1;
-			const pages = [];
+			const pages = [{ number: 0, top: 0 }];
 
-			for (let i = 0; i < pageBreaks.length; i++) {
-				pages.push({ number: i, top: pageBreaks[i].offsetTop + pageBreakHeight / 2 });
+			for (let i = 0; i < breakPoints.length; i++) {
+				pages.push({ number: 0, top: breakPoints[i].top + pageBreakHeight / 2, isBreak: true });
 			}
 
 			this.#mirrorCache = 0;
@@ -191,14 +182,27 @@ class DocumentType {
 			const mChr = this.#mirror.children;
 			this._initializeCache(mChr);
 
-			pages.push({ number: 0, top: 0 });
+			// Calculate page positions per section (between page breaks)
+			const sectionStarts = [0, ...breakPoints.map((b) => b.end)];
+			const sectionEnds = [...breakPoints.map((b) => b.top), mirrorHeight];
 
-			for (let i = 1, t = 0; i < totalPages; i++) {
-				t += A4_PAGE_HEIGHT + (i === 1 ? this.#paddingTop + this.#paddingBottom : this.#paddingTop);
-				if (!pages.some((p) => Math.abs(p.top - t) < 3)) {
-					const top = this._calcPageBreakTop(t, chr, mChr);
-					if (top === null) break;
-					pages.push({ number: i, top });
+			for (let s = 0; s < sectionStarts.length; s++) {
+				const sStart = sectionStarts[s];
+				const sEnd = sectionEnds[s];
+				let t = sStart;
+				let isFirst = s === 0;
+
+				while (true) {
+					t += A4_PAGE_HEIGHT + (isFirst ? this.#paddingTop + this.#paddingBottom : this.#paddingTop);
+					isFirst = false;
+
+					if (t >= sEnd) break;
+
+					if (!pages.some((p) => Math.abs(p.top - t) < 3)) {
+						const top = this._calcPageBreakTop(t, chr, mChr, pages);
+						if (top === null) break;
+						pages.push({ number: 0, top });
+					}
 				}
 			}
 
@@ -214,8 +218,8 @@ class DocumentType {
 			this.#page.innerHTML = '';
 			this.#pages = [];
 
-			for (let i = 0, t; i < totalPages; i++) {
-				if (!pages[i]) continue;
+			const wwWidth = this.#wwFrame.offsetWidth + 1;
+			for (let i = 0, t; i < pages.length; i++) {
 				t = pages[i].top;
 				if (mirrorHeight < t) break;
 
@@ -249,10 +253,11 @@ class DocumentType {
 	 * @param {number} t - The initial top position value to be adjusted.
 	 * @param {HTMLCollection} chr - The elements array in the current (main) page.
 	 * @param {HTMLCollection} mChr - The elements array in the mirrored page.
+	 * @param {Array.<{number: number, top: number, isBreak?: boolean}>} [pages] - The pages array containing page break info.
 	 * @returns {number|null} The adjusted top value.
 	 */
-	_calcPageBreakTop(t, chr, mChr) {
-		const { ci } = this._getElementAtPosition(t, mChr);
+	_calcPageBreakTop(t, chr, mChr, pages) {
+		const { ci } = this._getElementAtPosition(t, mChr, pages);
 		const mel = /** @type {HTMLElement} */ (mChr[ci]);
 		const el = /** @type {HTMLElement} */ (chr[ci]);
 		if (!mel || !el) return null;
@@ -290,22 +295,39 @@ class DocumentType {
 	 * @description Retrieves the element at a given position.
 	 * @param {number} pageTop - The vertical position to check.
 	 * @param {HTMLCollection} mChr - List of mirrored elements.
+	 * @param {Array.<{number: number, top: number, isBreak?: boolean}>} [pages] - The pages array containing page break info for skipping break elements.
 	 * @returns {{ci: number, cm: number, ch: number}} The closest element and its related data.
 	 * - ci: The index of the closest element.
 	 * - cm: The distance between the top of the closest element and the given position.
 	 * - ch: The height of the closest element.
 	 */
-	_getElementAtPosition(pageTop, mChr) {
+	_getElementAtPosition(pageTop, mChr, pages) {
 		let start = this.#mirrorCache;
 		let end = mChr.length - 1;
+
+		// Reset cache if target position is before cached position (crossing section boundaries)
+		if (start > 0) {
+			const cachedPos = this.#positionCache.get(start);
+			if (cachedPos && pageTop < cachedPos.top) {
+				start = 0;
+			}
+		}
 
 		while (start <= end) {
 			const mid = Math.floor((start + end) / 2);
 			const { top, height, bottom } = this.#positionCache.get(mid);
 
 			if (pageTop >= top && pageTop <= bottom) {
-				this.#mirrorCache = mid;
-				return { ci: mid, cm: pageTop - bottom, ch: height };
+				let ci = mid;
+				// Skip page break elements — use adjacent content element
+				if (pages && dom.utils.hasClass(mChr[ci], 'se-page-break')) {
+					ci = ci + 1 < mChr.length ? ci + 1 : Math.max(0, ci - 1);
+					const adjPos = this.#positionCache.get(ci);
+					this.#mirrorCache = ci;
+					return { ci, cm: pageTop - adjPos.bottom, ch: adjPos.height };
+				}
+				this.#mirrorCache = ci;
+				return { ci, cm: pageTop - bottom, ch: height };
 			}
 
 			if (pageTop < top) {
@@ -315,7 +337,11 @@ class DocumentType {
 			}
 		}
 
-		const closestIndex = mChr[start] ? start : end;
+		let closestIndex = mChr[start] ? start : end;
+		// Skip page break elements for closest match
+		if (pages && dom.utils.hasClass(mChr[closestIndex], 'se-page-break')) {
+			closestIndex = closestIndex + 1 < mChr.length ? closestIndex + 1 : Math.max(0, closestIndex - 1);
+		}
 		this.#mirrorCache = closestIndex;
 		const iElement = this.#positionCache.get(closestIndex);
 		return { ci: closestIndex, cm: pageTop - iElement.bottom, ch: iElement.height };

@@ -11,6 +11,10 @@ import Constructor, {
 } from '../../../../src/core/section/constructor';
 
 describe('Core Section - Constructor', () => {
+    afterEach(() => {
+        document.querySelectorAll('.sun-editor-carrier-wrapper, .sun-editor').forEach((element) => element.remove());
+    });
+
     describe('Exported functions', () => {
         it('should export Constructor as default function', () => {
             expect(typeof Constructor).toBe('function');
@@ -34,6 +38,32 @@ describe('Core Section - Constructor', () => {
 
         it('should export CreateToolBar as function', () => {
             expect(typeof CreateToolBar).toBe('function');
+        });
+    });
+
+    describe('Constructor DOM', () => {
+        it('should annotate generated form fields to avoid browser form warnings', () => {
+            const target = document.createElement('textarea');
+
+            const result = Constructor([{ target, key: null, options: {} }], {
+                buttonList: [['codeView', 'markdownView']]
+            });
+
+            const focusTemp = result.carrierWrapper.querySelector('.__se__focus__temp__');
+            const frame = result.frameRoots.get(null);
+            const codeWrapper = frame.get('codeWrapper');
+            const markdownWrapper = frame.get('markdownWrapper');
+            const codeView = frame.get('code');
+            const markdownView = frame.get('markdown');
+
+            expect(focusTemp.id).toMatch(/^suneditor-\d+-focus-temp$/);
+            expect(focusTemp.getAttribute('autocomplete')).toBe('off');
+            expect(focusTemp.getAttribute('aria-hidden')).toBe('true');
+
+            [codeView, markdownView, codeWrapper.querySelector('.se-code-view-line'), markdownWrapper.querySelector('.se-markdown-view-line')].forEach((field) => {
+                expect(field.id).toMatch(/^suneditor-\d+-/);
+                expect(field.getAttribute('autocomplete')).toBe('off');
+            });
         });
     });
 

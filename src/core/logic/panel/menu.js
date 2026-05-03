@@ -122,6 +122,7 @@ class Menu {
 			this.#setMenuPosition(btnEl, menu);
 		}
 
+		this.#context.get('menuTray').showPopover?.();
 		this.#bindClose_dropdown_mouse = this.#eventManager.addGlobalEvent('mousedown', this.#globalEventHandler.mousedown, false);
 		if (this.#dropdownCommands.includes(dropdownName)) {
 			this.menus = converter.nodeListToArray(menu.querySelectorAll('[data-command]'));
@@ -162,6 +163,7 @@ class Menu {
 			}
 			this.currentDropdownActiveButton = null;
 			this.#$.ui.preventToolbarHide(false);
+			this.#context.get('menuTray').hidePopover?.();
 		}
 
 		this.#store.set('_preventBlur', false);
@@ -209,6 +211,7 @@ class Menu {
 			this.#setMenuPosition(button, this.currentContainer);
 		}
 
+		this.#context.get('menuTray').showPopover?.();
 		this.#bindClose_cons_mouse = this.#eventManager.addGlobalEvent('mousedown', this.#globalEventHandler.containerDown, false);
 
 		if (this.#$.plugins[containerName].on) this.#$.plugins[containerName].on(button);
@@ -229,6 +232,7 @@ class Menu {
 			dom.utils.removeClass(this.currentContainerActiveButton, 'on');
 			this.currentContainerActiveButton = null;
 			this.#$.ui.preventToolbarHide(false);
+			this.#context.get('menuTray').hidePopover?.();
 		}
 
 		this.#store.set('_preventBlur', false);

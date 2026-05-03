@@ -46,7 +46,17 @@ export function OnDragOver_wysiwyg(fc, dragCursor, _iframeTopArea, _innerToolbar
 		dragCursor.style.top = `${rect.top + _w.scrollY + _offset.y - 5 + frameY}px`;
 		dragCursor.style.height = `${rect.height + 10}px`;
 		dragCursor.style.display = 'block';
+		try {
+			dragCursor.showPopover?.();
+		} catch {
+			// ignore
+		}
 	} else {
+		try {
+			dragCursor.hidePopover?.();
+		} catch {
+			// ignore
+		}
 		dragCursor.style.display = 'none';
 	}
 }
@@ -56,6 +66,11 @@ export function OnDragOver_wysiwyg(fc, dragCursor, _iframeTopArea, _innerToolbar
  * @param {HTMLElement} dragCursor - Drag cursor element
  */
 export function OnDragEnd_wysiwyg(dragCursor) {
+	try {
+		dragCursor.hidePopover?.();
+	} catch {
+		// ignore
+	}
 	dragCursor.style.display = 'none';
 }
 
@@ -109,6 +124,11 @@ export function OnDrop_wysiwyg(fc, dragCursor, e) {
 		this.$.selection.setRange(sc, so, ec, eo);
 		return this._dataTransferAction('drop', e, dataTransfer, fc);
 	} finally {
+		try {
+			dragCursor.hidePopover?.();
+		} catch {
+			// ignore
+		}
 		dragCursor.style.display = 'none';
 	}
 }

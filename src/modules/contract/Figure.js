@@ -282,10 +282,18 @@ class Figure {
 		const cover = dom.query.getParentElement(element, 'FIGURE', 2);
 		const inlineCover = dom.query.getParentElement(element, 'SPAN', 2);
 		const anyCover = cover || inlineCover;
-		const target = dom.query.getParentElement(element, (current) => current.parentElement === anyCover, 0) || /** @type {HTMLElement} */ (element);
+		let target = dom.query.getParentElement(element, (current) => current.parentElement === anyCover, 0) || element;
+
+		// When image is wrapped by anchor, target becomes <a> instead of <img>
+		if (dom.check.isAnchor(target)) {
+			const imgEl = target.querySelector(':scope > img');
+			if (imgEl) {
+				target = imgEl;
+			}
+		}
 
 		return {
-			target,
+			target: /** @type {HTMLElement} */ (target),
 			container: dom.query.getParentElement(target, Figure.is, 3) || cover,
 			cover: cover,
 			inlineCover: dom.utils.hasClass(inlineCover, 'se-inline-component') ? /** @type {HTMLElement} */ (inlineCover) : null,
@@ -734,11 +742,22 @@ class Figure {
 		const { container, inlineCover, target } = Figure.GetContainer(targetNode);
 		const { w, h } = this.getSize(target);
 
+		// Check if target is wrapped by an anchor
+		const anchorEl = dom.check.isAnchor(target.parentNode) ? target.parentNode : null;
+
 		const newTarget = /** @type {HTMLElement} */ (target.cloneNode(false));
 		newTarget.style.width = '';
 		newTarget.style.height = '';
 		newTarget.removeAttribute('width');
 		newTarget.removeAttribute('height');
+
+		// Preserve anchor wrapper if exists
+		let elementToInsert = newTarget;
+		if (anchorEl) {
+			const newAnchor = /** @type {HTMLElement} */ (anchorEl.cloneNode(false));
+			newAnchor.appendChild(newTarget);
+			elementToInsert = newAnchor;
+		}
 
 		switch (formatStyle) {
 			case 'inline': {
@@ -748,7 +767,7 @@ class Figure {
 				const next = container.nextElementSibling;
 				const parent = container.parentElement;
 
-				const figure = Figure.CreateInlineContainer(newTarget);
+				const figure = Figure.CreateInlineContainer(elementToInsert);
 				dom.utils.addClass(
 					figure.container,
 					container.className
@@ -777,7 +796,7 @@ class Figure {
 					dom.utils.removeItem(s.previousElementSibling);
 				}
 
-				const figure = Figure.CreateContainer(newTarget);
+				const figure = Figure.CreateContainer(elementToInsert);
 				dom.utils.addClass(
 					figure.container,
 					container.className

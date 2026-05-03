@@ -309,7 +309,7 @@ export namespace DEFAULTS {
  *   attributeWhitelist: {
  *     a: 'href|target',
  *     img: 'src|alt',
- *     '*': 'id|data-*'
+ *     '*': 'id|data-[^\s]+'
  *   }
  * }
  * ```
@@ -1055,7 +1055,7 @@ export type EditorBaseOptions = {
 	 * attributeWhitelist: {
 	 * a: 'href|target',
 	 * img: 'src|alt',
-	 * '*': 'id|data-*'
+	 * '*': 'id|data-[^\s]+'
 	 * }
 	 * }
 	 * ```

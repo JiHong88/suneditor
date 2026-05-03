@@ -162,6 +162,7 @@ class Modal {
 
 		dom.utils.addClass(this.#modalArea, 'se-backdrop-show');
 		dom.utils.addClass(this.form, 'se-modal-show');
+		this.#modalArea.showPopover?.();
 
 		if (this.#resizeBody) {
 			const offset = this.#saveOffset();
@@ -197,6 +198,7 @@ class Modal {
 		this.#bindClose &&= this.#$.eventManager.removeGlobalEvent(this.#bindClose);
 
 		// close
+		this.#modalArea.hidePopover?.();
 		dom.utils.removeClass(this.#modalArea, 'se-backdrop-show');
 		dom.utils.removeClass(this.form, 'se-modal-show');
 

@@ -49,7 +49,8 @@ jest.mock('../../../src/helper', () => ({
             isFigure: jest.fn().mockReturnValue(false),
             isListCell: jest.fn().mockReturnValue(false),
             isExcludeFormat: jest.fn().mockReturnValue(false),
-            isWysiwygFrame: jest.fn().mockReturnValue(false)
+            isWysiwygFrame: jest.fn().mockReturnValue(false),
+            isAnchor: jest.fn().mockReturnValue(false)
         },
         utils: {
             addClass: jest.fn(),

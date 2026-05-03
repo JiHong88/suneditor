@@ -28,5 +28,5 @@ Refer to [guide/changes-guide.md](./prompts/changes-guide.md) for formatting rul
 
 ## Release Note
 
-When asked to write a release note, read [changes.md](./changes.md) and rewrite its contents as a release note following the style and rules in [prompts/release-note.md](./prompts/release-note.md).
-Replace the entire contents of `changes.md` with the generated release note.
+When asked to write a release note, read [changes.md](./changes.md) and write a release note to [release-note.md](./release-note.md) following the style and rules in [prompts/release-note.md](./prompts/release-note.md).
+Replace the entire contents of `release-note.md` with the generated release note.

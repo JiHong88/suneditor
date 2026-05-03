@@ -110,6 +110,7 @@ class Controller {
 		}
 
 		// add element
+		this.form.setAttribute('popover', 'manual');
 		this.#$.contextProvider.carrierWrapper.appendChild(element);
 
 		// init
@@ -394,6 +395,7 @@ class Controller {
 	 * @description Hide controller at editor area (link button, image resize button..)
 	 */
 	#controllerOff() {
+		this.form.hidePopover?.();
 		this.form.style.display = 'none';
 		this.#$.ui.opendControllers = this.#$.ui.opendControllers.filter((v) => v.form !== this.form);
 		if (this.#$.ui.currentControllerName !== this.kind && this.#$.ui.opendControllers.length > 0) return;
@@ -464,6 +466,7 @@ class Controller {
 
 		controller.style.zIndex = this.toTop ? INDEX_0 : this.#reserveIndex ? INDEX_S_1 : INDEX_1;
 		controller.style.visibility = '';
+		controller.showPopover?.();
 		return true;
 	}
 

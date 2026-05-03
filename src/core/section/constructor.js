@@ -6,6 +6,7 @@ import { dom, numbers, converter, env } from '../../helper';
 import { DEFAULTS } from '../schema/options';
 
 const _d = env._d;
+let editorInstanceId = 0;
 
 /**
  * @typedef {import('../schema/options').AllBaseOptions} AllBaseOptions_constructor
@@ -57,16 +58,21 @@ function Constructor(editorTargets, options) {
 	const icons = optionMap.i;
 	const lang = optionMap.l;
 	const loadingBox = dom.utils.createElement('DIV', { class: 'se-loading-box sun-editor-common' }, '<div class="se-loading-effect"></div>');
+	const editorFormFieldPrefix = 'suneditor-' + ++editorInstanceId;
 
 	/** --- carrier wrapper --------------------------------------------------------------- */
 	const editor_carrier_wrapper = dom.utils.createElement('DIV', { class: 'sun-editor sun-editor-carrier-wrapper sun-editor-common' + o.get('_themeClass') + (o.get('_rtl') ? ' se-rtl' : '') });
 	// menuTray
-	const menuTray = dom.utils.createElement('DIV', { class: 'se-menu-tray' });
+	const menuTray = dom.utils.createElement('DIV', { class: 'se-menu-tray', popover: 'manual' });
 	editor_carrier_wrapper.appendChild(menuTray);
 	// focus temp element
 	const focusTemp = /** @type {HTMLInputElement} */ (
 		dom.utils.createElement('INPUT', {
+			type: 'text',
+			id: editorFormFieldPrefix + '-focus-temp',
 			class: '__se__focus__temp__',
+			autocomplete: 'off',
+			'aria-hidden': 'true',
 			style: 'position: fixed !important; top: -10000px !important; left: -10000px !important; display: block !important; width: 0 !important; height: 0 !important; margin: 0 !important; padding: 0 !important;',
 		})
 	);
@@ -74,7 +80,7 @@ function Constructor(editorTargets, options) {
 	editor_carrier_wrapper.appendChild(focusTemp);
 
 	// modal
-	const modal = dom.utils.createElement('DIV', { class: 'se-modal se-modal-area sun-editor-common' });
+	const modal = dom.utils.createElement('DIV', { class: 'se-modal se-modal-area sun-editor-common', popover: 'manual' });
 	const modal_back = dom.utils.createElement('DIV', { class: 'se-modal-back' });
 	const modal_inner = dom.utils.createElement('DIV', { class: 'se-modal-inner' });
 	modal.appendChild(modal_back);
@@ -82,7 +88,7 @@ function Constructor(editorTargets, options) {
 	editor_carrier_wrapper.appendChild(modal);
 
 	// alert
-	const alert = dom.utils.createElement('DIV', { class: 'se-alert se-modal-area sun-editor-common', style: 'display: none;' });
+	const alert = dom.utils.createElement('DIV', { class: 'se-alert se-modal-area sun-editor-common', style: 'display: none;', popover: 'manual' });
 	const alert_back = dom.utils.createElement('DIV', { class: 'se-modal-back' });
 	const alert_inner = dom.utils.createElement('DIV', { class: 'se-modal-inner' });
 	alert.appendChild(alert_back);
@@ -90,11 +96,13 @@ function Constructor(editorTargets, options) {
 	editor_carrier_wrapper.appendChild(alert);
 
 	// loding box, resizing back
-	editor_carrier_wrapper.appendChild(dom.utils.createElement('DIV', { class: 'se-back-wrapper' }));
-	editor_carrier_wrapper.appendChild(loadingBox.cloneNode(true));
+	editor_carrier_wrapper.appendChild(dom.utils.createElement('DIV', { class: 'se-back-wrapper', popover: 'manual' }));
+	const loadingBoxEl = /** @type {HTMLElement} */ (loadingBox.cloneNode(true));
+	loadingBoxEl.setAttribute('popover', 'manual');
+	editor_carrier_wrapper.appendChild(loadingBoxEl);
 
 	// drag cursor
-	const dragCursor = dom.utils.createElement('DIV', { class: 'se-drag-cursor' });
+	const dragCursor = dom.utils.createElement('DIV', { class: 'se-drag-cursor', popover: 'manual' });
 	editor_carrier_wrapper.appendChild(dragCursor);
 
 	// set carrier wrapper
@@ -146,7 +154,7 @@ function Constructor(editorTargets, options) {
 		container.appendChild(dom.utils.createElement('DIV', { class: 'se-toolbar-shadow' }));
 
 		// init element
-		const initElements = _initTargetElements(editTarget.key, o, top_div, to);
+		const initElements = _initTargetElements(editTarget.key, o, top_div, to, editorFormFieldPrefix);
 		const bottomBar = initElements.bottomBar;
 		const statusbar = bottomBar.statusbar;
 		const wysiwyg_div = initElements.wysiwygFrame;
@@ -195,7 +203,11 @@ function Constructor(editorTargets, options) {
 			// not used code mirror
 			if (textarea === codeMirrorEl) {
 				// add line nubers
-				const codeNumbers = dom.utils.createElement('TEXTAREA', { class: 'se-code-view-line', readonly: 'true' }, null);
+				const codeNumbers = dom.utils.createElement(
+					'TEXTAREA',
+					{ id: editorFormFieldPrefix + '-code-view-line-' + (key || 'default'), class: 'se-code-view-line', readonly: 'true', autocomplete: 'off', 'aria-hidden': 'true', tabindex: '-1' },
+					null,
+				);
 				codeWrapper.insertBefore(codeNumbers, textarea);
 			} else {
 				textarea = codeMirrorEl;
@@ -207,7 +219,11 @@ function Constructor(editorTargets, options) {
 		let markdownTextarea = null;
 		if (o.get('buttons').has('markdownView')) {
 			markdownTextarea = initElements.markdownView;
-			const markdownNumbers = dom.utils.createElement('TEXTAREA', { class: 'se-markdown-view-line', readonly: 'true' }, null);
+			const markdownNumbers = dom.utils.createElement(
+				'TEXTAREA',
+				{ id: editorFormFieldPrefix + '-markdown-view-line-' + (key || 'default'), class: 'se-markdown-view-line', readonly: 'true', autocomplete: 'off', 'aria-hidden': 'true', tabindex: '-1' },
+				null,
+			);
 			markdownWrapper = dom.utils.createElement('DIV', { class: 'se-markdown-wrapper' });
 			markdownWrapper.appendChild(markdownNumbers);
 			markdownWrapper.appendChild(markdownTextarea);
@@ -934,9 +950,10 @@ function InitFrameOptions(o, origin) {
  * @param {Map<string, *>} options - Options
  * @param {HTMLElement} topDiv - Top div
  * @param {SunEditor.FrameOptions} targetOptions - `editor.frameOptions`
+ * @param {string} formFieldPrefix - Prefix for generated form field ids
  * @returns {{bottomBar: ReturnType<CreateStatusbar>, wysiwygFrame: HTMLElement, codeView: HTMLElement, markdownView: HTMLElement, placeholder: HTMLElement}}
  */
-function _initTargetElements(key, options, topDiv, targetOptions) {
+function _initTargetElements(key, options, topDiv, targetOptions, formFieldPrefix) {
 	const editorStyles = targetOptions.get('_defaultStyles');
 	/** top div */
 	topDiv.style.cssText = editorStyles.top;
@@ -990,10 +1007,10 @@ function _initTargetElements(key, options, topDiv, targetOptions) {
 	}
 
 	// textarea for code view
-	const textarea = dom.utils.createElement('TEXTAREA', { class: 'se-wrapper-inner se-code-viewer', style: editorStyles.frame });
+	const textarea = dom.utils.createElement('TEXTAREA', { id: formFieldPrefix + '-code-viewer-' + (key || 'default'), class: 'se-wrapper-inner se-code-viewer', style: editorStyles.frame, autocomplete: 'off' });
 
 	// textarea for markdown view
-	const markdownTextarea = dom.utils.createElement('TEXTAREA', { class: 'se-wrapper-inner se-markdown-viewer', style: editorStyles.frame });
+	const markdownTextarea = dom.utils.createElement('TEXTAREA', { id: formFieldPrefix + '-markdown-viewer-' + (key || 'default'), class: 'se-wrapper-inner se-markdown-viewer', style: editorStyles.frame, autocomplete: 'off' });
 
 	const placeholder = dom.utils.createElement('SPAN', { class: 'se-placeholder' });
 	if (targetOptions.get('placeholder')) {

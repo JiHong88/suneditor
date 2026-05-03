@@ -151,6 +151,7 @@ class Browser {
 		// init
 		browserFrame.appendChild(dom.utils.createElement('DIV', { class: 'se-browser-back' }));
 		browserFrame.appendChild(content);
+		browserFrame.setAttribute('popover', 'manual');
 		this.#$.contextProvider.carrierWrapper.appendChild(browserFrame);
 
 		this.#$.eventManager.addEvent(this.tagArea, 'click', this.#OnClickTag.bind(this));
@@ -197,6 +198,7 @@ class Browser {
 
 		this.titleArea.textContent = params.title || this.title;
 		this.area.style.display = 'block';
+		this.area.showPopover?.();
 		this.#$.ui.opendBrowser = this;
 		this.closeArrow = this.#$.options.get('_rtl') ? this.#$.icons.menu_arrow_left : this.#$.icons.menu_arrow_right;
 
@@ -217,6 +219,7 @@ class Browser {
 		this.#removeGlobalEvent();
 		this.apiManager.cancel();
 
+		this.area.hidePopover?.();
 		this.area.style.display = 'none';
 		this.selectedTags = [];
 		this.items = [];
