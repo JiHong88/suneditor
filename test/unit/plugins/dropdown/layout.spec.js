@@ -46,6 +46,9 @@ describe('Plugins - Dropdown - Layout', () => {
 
         kernel = createMockEditor();
 
+        const { dom } = require('../../../../src/helper');
+        kernel.$.menu.initDropdownTarget = jest.fn().mockImplementation(() => dom.utils.createElement('DIV', {}, ''));
+
         const pluginOptions = {
             items: [
                 { name: 'Layout 1', html: '<div class="layout-1"><p>Layout 1 content</p></div>' },
@@ -61,7 +64,7 @@ describe('Plugins - Dropdown - Layout', () => {
     describe('Constructor', () => {
 
         it('should initialize dropdown menu', () => {
-            expect(kernel.$.menu.initDropdownTarget).toHaveBeenCalledWith(Layout, expect.any(Object));
+            expect(kernel.$.menu.initDropdownTarget).toHaveBeenCalledWith(Layout, expect.any(Array));
         });
 
         it('should create layout items with correct structure', () => {
@@ -127,15 +130,14 @@ describe('Plugins - Dropdown - Layout', () => {
         });
     });
 
-    describe('CreateHTML function', () => {
-        it('should create dropdown menu structure with layout items', () => {
-            const { dom } = require('../../../../src/helper');
+    describe('CreateItems function', () => {
+        it('should pass correct items to initDropdownTarget for layout items', () => {
+            const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
 
-            expect(dom.utils.createElement).toHaveBeenCalledWith(
-                'DIV',
-                { class: 'se-list-layer' },
-                expect.stringContaining('se-dropdown se-list-inner')
-            );
+            expect(items).toHaveLength(3);
+            expect(items[0]).toMatchObject({ command: 'layout', title: 'Layout 1', innerHTML: 'Layout 1', value: '0' });
+            expect(items[1]).toMatchObject({ command: 'layout', title: 'Layout 2', innerHTML: 'Layout 2', value: '1' });
+            expect(items[2]).toMatchObject({ command: 'layout', title: 'Layout 3', innerHTML: 'Layout 3', value: '2' });
         });
 
         it('should warn when no layout items provided', () => {

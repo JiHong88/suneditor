@@ -37,6 +37,7 @@ import { isMobile } from '../../helper/env';
  * @property {(...args: Parameters<Format['isEdgeLine']>) => ReturnType<Format['isEdgeLine']>} isEdgeLine
  * @property {(...args: Parameters<Format['removeBlock']>) => ReturnType<Format['removeBlock']>} removeBlock
  * @property {(...args: Parameters<Format['addLine']>) => ReturnType<Format['addLine']>} addLine
+ * @property {(...args: Parameters<Format['addLineAfter']>) => ReturnType<Format['addLineAfter']>} addLineAfter
  */
 
 /**
@@ -112,6 +113,7 @@ export function makePorts(inst, { _styleNodes }) {
 			isEdgeLine: (node, offset, dir) => format.isEdgeLine(node, offset, dir),
 			removeBlock: (n, p) => format.removeBlock(n, p),
 			addLine: (el, nextOrTag) => format.addLine(el, nextOrTag),
+			addLineAfter: (el) => format.addLineAfter(el),
 		},
 
 		listFormat: {

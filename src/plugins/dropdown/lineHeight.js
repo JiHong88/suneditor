@@ -30,17 +30,15 @@ class LineHeight extends PluginDropdown {
 		this.title = this.$.lang.lineHeight;
 		this.icon = 'line_height';
 
-		// create HTML
-		const menu = CreateHTML(this.$, pluginOptions.items);
+		// create menu from items
+		const prependHTML = `<li><button type="button" class="se-btn se-btn-list default_value" data-command="" title="${this.$.lang.default}" aria-label="${this.$.lang.default}">${this.$.lang.default}</button></li><li class="se-btn-list se-sub-list"><span></span></li>`;
+		const menu = this.$.menu.initDropdownTarget(LineHeight, CreateItems(pluginOptions.items), { prependHTML });
 
 		// members
 		this.sizeList = menu.querySelectorAll('li button');
 		this.currentSize = null;
 
 		this.#defaultValue = /** @type {HTMLSpanElement} */ (menu.querySelector('.se-sub-list span'));
-
-		// init
-		this.$.menu.initDropdownTarget(LineHeight, menu);
 	}
 
 	/**
@@ -108,11 +106,10 @@ class LineHeight extends PluginDropdown {
 }
 
 /**
- * @param {SunEditor.Deps} $ - Kernel dependencies
  * @param {Array<{text: string, value: string}>} [items] - Line height items
- * @returns {HTMLElement}
+ * @returns {Array<import('../../core/logic/panel/menu').DropdownItem>}
  */
-function CreateHTML({ lang }, items) {
+function CreateItems(items) {
 	const sizeList = items || [
 		{ text: '1', value: '1em' },
 		{ text: '1.2', value: '1.2em' },
@@ -120,31 +117,11 @@ function CreateHTML({ lang }, items) {
 		{ text: '2', value: '2em' },
 	];
 
-	let list = /*html*/ `
-	<div class="se-list-inner">
-		<ul class="se-list-basic">
-			<li>
-				<button type="button" class="se-btn se-btn-list default_value" data-command="" title="${lang.default}" aria-label="${lang.default}">
-					${lang.default}
-				</button>
-			</li>
-			<li class="se-btn-list se-sub-list"><span></span></li>`;
-
-	for (let i = 0, len = sizeList.length, size; i < len; i++) {
-		size = sizeList[i];
-		list += /*html*/ `
-			<li>
-				<button type="button" class="se-btn se-btn-list" data-command="${size.value}" title="${size.text}" aria-label="${size.text}">
-					${size.text}
-				</button>
-			</li>`;
-	}
-
-	list += /*html*/ `
-		</ul>
-	</div>`;
-
-	return dom.utils.createElement('DIV', { class: 'se-dropdown se-list-layer' }, list);
+	return sizeList.map((size) => ({
+		command: size.value,
+		title: size.text,
+		innerHTML: size.text,
+	}));
 }
 
 export default LineHeight;

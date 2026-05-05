@@ -721,7 +721,7 @@
 	display: inline-block;
 	width: 16px;
 	height: 16px;
-	margin: 0 6px 6px 0;
+	margin: 0 6px 0 0;
 	vertical-align: middle;
 }
 
@@ -3038,6 +3038,7 @@
 }
 
 .sun-editor .se-select-menu .se-select-item {
+	position: relative;
 	list-style: none;
 	line-height: 28px;
 	min-height: 28px;
@@ -3081,6 +3082,41 @@
 
 .sun-editor .se-select-menu.se-figure-select-list {
 	width: 74px;
+}
+
+/* --- select menu - submenu ---------------------------------------- */
+.sun-editor .se-select-menu .se-has-submenu {
+	position: relative;
+}
+
+.sun-editor .se-select-menu .se-submenu-arrow {
+	position: absolute;
+	right: 4px;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 16px;
+	height: 16px;
+	display: inline-flex;
+	align-items: center;
+	pointer-events: none;
+	opacity: 0.5;
+}
+
+.sun-editor .se-select-menu .se-submenu-arrow svg {
+	width: 100%;
+	height: 100%;
+}
+
+.sun-editor .se-select-menu > .se-select-submenu {
+	position: absolute;
+	display: none;
+	min-width: 100px;
+	background-color: var(--se-main-background-color);
+	border: 1px solid var(--se-main-divider-color);
+	border-radius: var(--se-border-radius-lg);
+	padding: 4px 0;
+	box-shadow: 0 3px 9px var(--se-shadow-layer-color);
+	z-index: 1;
 }
 
 /* --- browser ---------------------------------------------------------- */
@@ -4090,7 +4126,12 @@
 
 /* select menu inner icon */
 .sun-editor.se-rtl .se-select-item .se-list-icon {
-	margin: 0 0 6px 6px;
+	margin: 0 0 0 6px;
+}
+
+/* block handle - submenu */
+.sun-editor.se-rtl .se-block-submenu-item svg {
+	margin: 0 0 0 6px;
 }
 
 /* menu list - color picker */

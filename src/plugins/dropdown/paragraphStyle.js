@@ -35,14 +35,11 @@ class ParagraphStyle extends PluginDropdown {
 		this.title = this.$.lang.paragraphStyle;
 		this.icon = 'paragraph_style';
 
-		// create HTML
-		const menu = CreateHTML(this.$, pluginOptions.items);
+		// create menu from items
+		const menu = this.$.menu.initDropdownTarget(ParagraphStyle, CreateItems(this.$, pluginOptions.items), { className: 'se-list-format' });
 
 		// members
 		this.classList = menu.querySelectorAll('li button');
-
-		// init
-		this.$.menu.initDropdownTarget(ParagraphStyle, menu);
 	}
 
 	/**
@@ -88,9 +85,9 @@ class ParagraphStyle extends PluginDropdown {
 /**
  * @param {SunEditor.Deps} $ - Kernel dependencies
  * @param {Array<string|{name: string, class: string, _class?: string}>} [items] - Paragraph style items
- * @returns {HTMLElement}
+ * @returns {Array<import('../../core/logic/panel/menu').DropdownItem>}
  */
-function CreateHTML({ lang }, items) {
+function CreateItems({ lang }, items) {
 	const defaultList = {
 		spaced: {
 			name: lang.menu_spaced,
@@ -109,12 +106,9 @@ function CreateHTML({ lang }, items) {
 		},
 	};
 	const paragraphStyles = !items || items.length === 0 ? ['spaced', 'bordered', 'neon'] : items;
+	const result = [];
 
-	let list = /*html*/ `
-	<div class="se-list-inner">
-		<ul class="se-list-basic">`;
-
-	for (let i = 0, len = paragraphStyles.length, p, name, attrs, _class; i < len; i++) {
+	for (let i = 0, len = paragraphStyles.length, p, name, attrs; i < len; i++) {
 		p = paragraphStyles[i];
 
 		if (typeof p === 'string') {
@@ -125,20 +119,16 @@ function CreateHTML({ lang }, items) {
 
 		name = p.name;
 		attrs = p.class ? ` class="${p.class}"` : '';
-		_class = p._class;
 
-		list += /*html*/ `
-			<li>
-				<button type="button" class="se-btn se-btn-list${_class ? ' ' + _class : ''}" data-command="${p.class}" title="${name}" aria-label="${name}">
-					<div${attrs}>${name}</div>
-				</button>
-			</li>`;
+		result.push({
+			command: p.class,
+			title: name,
+			innerHTML: `<div${attrs}>${name}</div>`,
+			className: p._class || undefined,
+		});
 	}
-	list += /*html*/ `
-		</ul>
-	</div>`;
 
-	return dom.utils.createElement('DIV', { class: 'se-dropdown se-list-layer se-list-format' }, list);
+	return result;
 }
 
 export default ParagraphStyle;

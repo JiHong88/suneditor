@@ -74,6 +74,10 @@ describe('Plugins - Dropdown - blockStyle', () => {
         jest.clearAllMocks();
 
         kernel = createMockEditor();
+        kernel.$.menu.initDropdownTarget = jest.fn().mockImplementation(() => {
+            const { dom } = require('../../../../src/helper');
+            return dom.utils.createElement('DIV', {}, '');
+        });
         kernel.$.lang.formats = 'Formats';
         kernel.$.lang.tag_p = 'Paragraph';
         kernel.$.lang.tag_h = 'Header';
@@ -97,17 +101,8 @@ describe('Plugins - Dropdown - blockStyle', () => {
             expect(blockStyle.currentFormat).toBe('');
         });
 
-        it('should create dropdown menu structure', () => {
-            const { dom } = require('../../../../src/helper/index.js');
-            expect(dom.utils.createElement).toHaveBeenCalledWith(
-                'DIV',
-                { class: 'se-dropdown se-list-layer se-list-format' },
-                expect.stringContaining('se-list-inner')
-            );
-        });
-
-        it('should initialize dropdown menu', () => {
-            expect(kernel.$.menu.initDropdownTarget).toHaveBeenCalledWith(BlockStyle, expect.any(Object));
+        it('should initialize dropdown menu with items and options', () => {
+            expect(kernel.$.menu.initDropdownTarget).toHaveBeenCalledWith(BlockStyle, expect.any(Array), expect.any(Object));
         });
 
         it('should initialize format list from menu', () => {
@@ -509,46 +504,44 @@ describe('Plugins - Dropdown - blockStyle', () => {
         });
     });
 
-    describe('CreateHTML function', () => {
-        it('should create dropdown menu with custom items', () => {
-            const { dom } = require('../../../../src/helper/index.js');
+    describe('CreateItems function', () => {
+        it('should pass correct items to initDropdownTarget', () => {
+            const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
 
-            const createCallArgs = dom.utils.createElement.mock.calls.find(
-                call => call[1]?.class === 'se-dropdown se-list-layer se-list-format'
-            );
+            expect(items).toBeInstanceOf(Array);
+            expect(items.length).toBe(4); // 'pre' is not in defaultFormats, filtered out
 
-            expect(createCallArgs[2]).toContain('se-list-inner');
-            expect(createCallArgs[2]).toContain('data-command="line"');
-            expect(createCallArgs[2]).toContain('data-value="p"');
-            expect(createCallArgs[2]).toContain('data-value="h1"');
-            expect(createCallArgs[2]).toContain('data-value="h2"');
-            expect(createCallArgs[2]).toContain('data-command="block"');
-            expect(createCallArgs[2]).toContain('data-value="blockquote"');
+            const commands = items.map(item => item.command);
+            expect(commands).toContain('line');
+            expect(commands).toContain('block');
+
+            const values = items.map(item => item.value);
+            expect(values).toContain('p');
+            expect(values).toContain('h1');
+            expect(values).toContain('h2');
+            expect(values).toContain('blockquote');
         });
 
         it('should include default formats when no items provided', () => {
-            const { dom } = require('../../../../src/helper/index.js');
-            dom.utils.createElement.mockClear();
+            kernel.$.menu.initDropdownTarget.mockClear();
 
             const defaultFormatBlock = new BlockStyle(kernel, {});
 
-            const createCallArgs = dom.utils.createElement.mock.calls.find(
-                call => call[1]?.class === 'se-dropdown se-list-layer se-list-format'
-            );
+            const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
+            const values = items.map(item => item.value);
 
-            expect(createCallArgs[2]).toContain('data-value="p"');
-            expect(createCallArgs[2]).toContain('data-value="blockquote"');
-            expect(createCallArgs[2]).toContain('data-value="h1"');
-            expect(createCallArgs[2]).toContain('data-value="h2"');
-            expect(createCallArgs[2]).toContain('data-value="h3"');
-            expect(createCallArgs[2]).toContain('data-value="h4"');
-            expect(createCallArgs[2]).toContain('data-value="h5"');
-            expect(createCallArgs[2]).toContain('data-value="h6"');
+            expect(values).toContain('p');
+            expect(values).toContain('blockquote');
+            expect(values).toContain('h1');
+            expect(values).toContain('h2');
+            expect(values).toContain('h3');
+            expect(values).toContain('h4');
+            expect(values).toContain('h5');
+            expect(values).toContain('h6');
         });
 
         it('should handle custom format objects', () => {
-            const { dom } = require('../../../../src/helper/index.js');
-            dom.utils.createElement.mockClear();
+            kernel.$.menu.initDropdownTarget.mockClear();
 
             const customFormatBlock = new BlockStyle(kernel, {
                 items: [
@@ -561,20 +554,16 @@ describe('Plugins - Dropdown - blockStyle', () => {
                 ]
             });
 
-            const createCallArgs = dom.utils.createElement.mock.calls.find(
-                call => call[1]?.class === 'se-dropdown se-list-layer se-list-format'
-            );
+            const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
 
-            expect(createCallArgs[2]).toContain('data-command="block"');
-            expect(createCallArgs[2]).toContain('data-value="div"');
-            expect(createCallArgs[2]).toContain('data-class="__se__format__custom"');
-            expect(createCallArgs[2]).toContain('Custom Div');
-            expect(createCallArgs[2]).toContain('class="__se__format__custom"');
+            expect(items).toHaveLength(1);
+            expect(items[0].command).toBe('block');
+            expect(items[0].title).toContain('Custom Div');
+            expect(items[0].innerHTML).toContain('Custom Div');
         });
 
         it('should handle format objects without name', () => {
-            const { dom } = require('../../../../src/helper/index.js');
-            dom.utils.createElement.mockClear();
+            kernel.$.menu.initDropdownTarget.mockClear();
 
             const noNameFormatBlock = new BlockStyle(kernel, {
                 items: [
@@ -585,59 +574,33 @@ describe('Plugins - Dropdown - blockStyle', () => {
                 ]
             });
 
-            const createCallArgs = dom.utils.createElement.mock.calls.find(
-                call => call[1]?.class === 'se-dropdown se-list-layer se-list-format'
-            );
+            const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
 
-            expect(createCallArgs[2]).toContain('span'); // Uses tagName as name
-        });
-
-        it('should handle format objects without class', () => {
-            const { dom } = require('../../../../src/helper/index.js');
-            dom.utils.createElement.mockClear();
-
-            const noClassFormatBlock = new BlockStyle(kernel, {
-                items: [
-                    {
-                        tag: 'SPAN',
-                        name: 'Span Element',
-                        command: 'line'
-                        // No class property - becomes undefined
-                    }
-                ]
-            });
-
-            const createCallArgs = dom.utils.createElement.mock.calls.find(
-                call => call[1]?.class === 'se-dropdown se-list-layer se-list-format'
-            );
-
-            expect(createCallArgs[2]).toContain('data-class="undefined"'); // undefined becomes string
-            // The HTML element will not have a class attribute because className is undefined
+            expect(items).toHaveLength(1);
+            expect(items[0].command).toBe('line');
+            expect(items[0].innerHTML).toContain('span');
         });
 
         it('should handle all header types', () => {
-            const { dom } = require('../../../../src/helper/index.js');
-            dom.utils.createElement.mockClear();
+            kernel.$.menu.initDropdownTarget.mockClear();
 
             const headerFormatBlock = new BlockStyle(kernel, {
                 items: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']
             });
 
-            const createCallArgs = dom.utils.createElement.mock.calls.find(
-                call => call[1]?.class === 'se-dropdown se-list-layer se-list-format'
-            );
+            const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
 
-            expect(createCallArgs[2]).toContain('Header1');
-            expect(createCallArgs[2]).toContain('Header2');
-            expect(createCallArgs[2]).toContain('Header3');
-            expect(createCallArgs[2]).toContain('Header4');
-            expect(createCallArgs[2]).toContain('Header5');
-            expect(createCallArgs[2]).toContain('Header6');
+            expect(items).toHaveLength(6);
+            expect(items[0].title).toContain('Header');
+            expect(items[1].title).toContain('Header');
+            expect(items[2].title).toContain('Header');
+            expect(items[3].title).toContain('Header');
+            expect(items[4].title).toContain('Header');
+            expect(items[5].title).toContain('Header');
         });
 
         it('should handle mixed string and object formats', () => {
-            const { dom } = require('../../../../src/helper/index.js');
-            dom.utils.createElement.mockClear();
+            kernel.$.menu.initDropdownTarget.mockClear();
 
             const mixedFormatBlock = new BlockStyle(kernel, {
                 items: [
@@ -647,14 +610,17 @@ describe('Plugins - Dropdown - blockStyle', () => {
                 ]
             });
 
-            const createCallArgs = dom.utils.createElement.mock.calls.find(
-                call => call[1]?.class === 'se-dropdown se-list-layer se-list-format'
-            );
+            const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
 
-            expect(createCallArgs[2]).toContain('data-value="p"');
-            expect(createCallArgs[2]).toContain('data-value="div"');
-            expect(createCallArgs[2]).toContain('data-value="h1"');
-            expect(createCallArgs[2]).toContain('Custom Div');
+            expect(items).toHaveLength(3);
+
+            const values = items.map(item => item.value);
+            expect(values).toContain('p');
+            expect(values).toContain('div');
+            expect(values).toContain('h1');
+
+            const titles = items.map(item => item.title);
+            expect(titles).toContain('Custom Div');
         });
 
     });

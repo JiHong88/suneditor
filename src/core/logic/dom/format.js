@@ -92,7 +92,7 @@ class Format {
 	/**
 	 * @description If a parent node that contains an argument node finds a format node (`format.isLine`), it returns that node.
 	 * @param {Node} node Reference node.
-	 * @param {?(current: Node) => boolean} [validation] Additional validation function.
+	 * @param {?(((current: Node) => boolean)|Function)} [validation] Additional validation function.
 	 * @returns {HTMLElement|null}
 	 * @example
 	 * const line = editor.$.format.getLine(editor.$.selection.getNode());
@@ -198,7 +198,7 @@ class Format {
 	/**
 	 * @description If a parent node that contains an argument node finds a `brLine` (`format.isBrLine`), it returns that node.
 	 * @param {Node} element Reference node.
-	 * @param {?(current: Node) => boolean} [validation] Additional validation function.
+	 * @param {?(((current: Node) => boolean)|Function)} [validation] Additional validation function.
 	 * @returns {HTMLBRElement|null}
 	 * @example
 	 * const brLine = editor.$.format.getBrLine(editor.$.selection.getNode());
@@ -219,12 +219,19 @@ class Format {
 	}
 
 	/**
-	 * @description Append `line` element to sibling node of argument element.
-	 * - If the `lineNode` argument value is present, the tag of that argument value is inserted,
-	 * - If not, the currently selected format tag is inserted.
-	 * @param {Node} element Insert as siblings of that element
-	 * @param {?(string|Node)} [lineNode] Node name or node obejct to be inserted
-	 * @returns {HTMLElement}
+	 * @description Insert a new line as the next sibling of `element`.
+	 * - Selection-aware — tag/attributes default to the **currently selected line**, not
+	 * - `element`'s tag. Use {@link addLineAfter} when the decision must depend only on
+	 * - `element` (e.g., Enter exiting a heading).
+	 *
+	 * - Tag resolution: brLine context → bare `<br>`; else `lineNode` override → current
+	 * - line clone → `defaultLine`. Attribute copy excludes only `id` (vs `addLineAfter`
+	 * - which respects `lineAttrReset`). Inside a table cell, inserts within the cell.
+	 *
+	 * @param {Node} element Reference element — new line is inserted right after it
+	 * @param {?(string|Node)} [lineNode] Override: string tag name, or Node whose tag
+	 *   and attributes (except `id`) are copied
+	 * @returns {HTMLElement} The new line, or a `<br>` in brLine context
 	 */
 	addLine(element, lineNode) {
 		if (!element || !element.parentNode) return null;
@@ -248,9 +255,41 @@ class Format {
 	}
 
 	/**
+	 * @description Insert a new line after the given block element.
+	 * Selection-independent — determines tag/attributes from the element itself.
+	 * - Heading (H1-H6), HR → new default line
+	 * - LI → new LI with copied attributes
+	 * - PRE / brLine → new default line (exit brLine)
+	 * - Normal line → same tag with copied attributes
+	 * @param {HTMLElement} element The block element to insert after
+	 * @returns {HTMLElement|null} The newly created element
+	 */
+	addLineAfter(element) {
+		if (!element || !element.parentNode) return null;
+
+		const tag = element.nodeName;
+		const lineAttrReset = this.#options.get('lineAttrReset');
+		let newEl;
+
+		if (/^H[1-6]$|^HR$/i.test(tag)) {
+			newEl = dom.utils.createElement(this.#options.get('defaultLine'), null, '<br>');
+		} else if (this.isBrLine(element)) {
+			newEl = dom.utils.createElement(this.#options.get('defaultLine'), null, '<br>');
+		} else {
+			newEl = dom.utils.createElement(tag, null, '<br>');
+			dom.utils.copyTagAttributes(newEl, element, lineAttrReset);
+		}
+
+		if (dom.check.isTableCell(element)) element.insertBefore(newEl, element.nextElementSibling);
+		else element.parentNode.insertBefore(newEl, /** @type {HTMLElement} */ (element).nextElementSibling);
+
+		return newEl;
+	}
+
+	/**
 	 * @description If a parent node that contains an argument node finds a format node (`format.isBlock`), it returns that node.
 	 * @param {Node} element Reference node.
-	 * @param {?(current: Node) => boolean} [validation] Additional validation function.
+	 * @param {?(((current: Node) => boolean)|Function)} [validation] Additional validation function.
 	 * @returns {HTMLElement|null}
 	 * @example
 	 * const block = editor.$.format.getBlock(editor.$.selection.getNode());
@@ -893,7 +932,7 @@ class Format {
 
 	/**
 	 * @description Returns a `line` array from selected range.
-	 * @param {?(current: Node) => boolean} [validation] The validation function. (Replaces the default validation `format.isLine(current)`)
+	 * @param {?(((current: Node) => boolean)|Function)} [validation] The validation function. (Replaces the default validation `format.isLine(current)`)
 	 * @returns {Array<HTMLElement>}
 	 * @example
 	 * const selectedLines = editor.$.format.getLines();

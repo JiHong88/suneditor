@@ -48,6 +48,24 @@ jest.mock('../../../../src/helper', () => ({
                         }
                         return null;
                     }),
+                    querySelectorAll: jest.fn().mockReturnValue([
+                        {
+                            tagName: 'BUTTON',
+                            getAttribute: jest.fn().mockReturnValue('left')
+                        },
+                        {
+                            tagName: 'BUTTON',
+                            getAttribute: jest.fn().mockReturnValue('center')
+                        },
+                        {
+                            tagName: 'BUTTON',
+                            getAttribute: jest.fn().mockReturnValue('right')
+                        },
+                        {
+                            tagName: 'BUTTON',
+                            getAttribute: jest.fn().mockReturnValue('justify')
+                        }
+                    ]),
                     getAttribute: jest.fn(),
                     setAttribute: jest.fn()
                 };
@@ -95,7 +113,10 @@ describe('Plugins - Dropdown - Align', () => {
             { style: {} },
             { style: {} }
         ]);
-        kernel.$.menu.initDropdownTarget = jest.fn();
+        kernel.$.menu.initDropdownTarget = jest.fn().mockImplementation(() => {
+            const { dom } = require('../../../../src/helper');
+            return dom.utils.createElement('DIV', {}, '');
+        });
         kernel.$.frameContext.set('wwComputedStyle', {
             getPropertyValue: jest.fn().mockReturnValue('left')
         });
@@ -131,17 +152,8 @@ describe('Plugins - Dropdown - Align', () => {
             expect(rtlAlign.defaultDir).toBe('right');
         });
 
-        it('should create dropdown menu structure', () => {
-            const { dom } = require('../../../../src/helper');
-            expect(dom.utils.createElement).toHaveBeenCalledWith(
-                'div',
-                { class: 'se-dropdown se-list-layer se-list-align' },
-                expect.stringContaining('se-list-inner')
-            );
-        });
-
-        it('should initialize dropdown menu', () => {
-            expect(kernel.$.menu.initDropdownTarget).toHaveBeenCalledWith(Align, expect.any(Object));
+        it('should initialize dropdown menu with items and options', () => {
+            expect(kernel.$.menu.initDropdownTarget).toHaveBeenCalledWith(Align, expect.any(Array), expect.any(Object));
         });
 
         it('should initialize align list from menu', () => {
@@ -521,39 +533,33 @@ describe('Plugins - Dropdown - Align', () => {
 
     });
 
-    describe('CreateHTML function', () => {
-        it('should create dropdown menu with custom items', () => {
-            const { dom } = require('../../../../src/helper');
+    describe('CreateItems function', () => {
+        it('should pass correct items to initDropdownTarget', () => {
+            const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
 
-            const createCallArgs = dom.utils.createElement.mock.calls.find(
-                call => call[1]?.class === 'se-dropdown se-list-layer se-list-align'
-            );
-
-            expect(createCallArgs[2]).toContain('se-list-inner');
-            expect(createCallArgs[2]).toContain('data-command="left"');
-            expect(createCallArgs[2]).toContain('data-command="center"');
-            expect(createCallArgs[2]).toContain('data-command="right"');
-            expect(createCallArgs[2]).toContain('data-command="justify"');
-            expect(createCallArgs[2]).toContain('Left');
-            expect(createCallArgs[2]).toContain('Center');
-            expect(createCallArgs[2]).toContain('Right');
-            expect(createCallArgs[2]).toContain('Justify');
+            expect(items).toHaveLength(4);
+            expect(items[0].command).toBe('left');
+            expect(items[1].command).toBe('center');
+            expect(items[2].command).toBe('right');
+            expect(items[3].command).toBe('justify');
+            expect(items[0].title).toBe('Left');
+            expect(items[1].title).toBe('Center');
+            expect(items[2].title).toBe('Right');
+            expect(items[3].title).toBe('Justify');
         });
 
         it('should include default align items when none provided', () => {
-            const { dom } = require('../../../../src/helper');
-            dom.utils.createElement.mockClear();
+            kernel.$.menu.initDropdownTarget.mockClear();
 
             const defaultAlign = new Align(kernel, {});
 
-            const createCallArgs = dom.utils.createElement.mock.calls.find(
-                call => call[1]?.class === 'se-dropdown se-list-layer se-list-align'
-            );
+            const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
+            const commands = items.map(item => item.command);
 
-            expect(createCallArgs[2]).toContain('data-command="left"');
-            expect(createCallArgs[2]).toContain('data-command="center"');
-            expect(createCallArgs[2]).toContain('data-command="right"');
-            expect(createCallArgs[2]).toContain('data-command="justify"');
+            expect(commands).toContain('left');
+            expect(commands).toContain('center');
+            expect(commands).toContain('right');
+            expect(commands).toContain('justify');
         });
 
         it('should use RTL order when editor is RTL', () => {
@@ -561,49 +567,39 @@ describe('Plugins - Dropdown - Align', () => {
                 if (key === '_rtl') return true;
                 return null;
             });
-            const { dom } = require('../../../../src/helper');
-            dom.utils.createElement.mockClear();
+            kernel.$.menu.initDropdownTarget.mockClear();
 
             const rtlAlign = new Align(kernel, {});
 
-            const createCallArgs = dom.utils.createElement.mock.calls.find(
-                call => call[1]?.class === 'se-dropdown se-list-layer se-list-align'
-            );
+            const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
+            const commands = items.map(item => item.command);
 
             // RTL order: right, center, left, justify
-            const content = createCallArgs[2];
-            const rightIndex = content.indexOf('data-command="right"');
-            const leftIndex = content.indexOf('data-command="left"');
-            expect(rightIndex).toBeLessThan(leftIndex);
+            expect(commands.indexOf('right')).toBeLessThan(commands.indexOf('left'));
         });
 
         it('should include align icons in menu items', () => {
-            const { dom } = require('../../../../src/helper');
+            const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
 
-            const createCallArgs = dom.utils.createElement.mock.calls.find(
-                call => call[1]?.class === 'se-dropdown se-list-layer se-list-align'
-            );
-
-            expect(createCallArgs[2]).toContain('<svg>left</svg>');
-            expect(createCallArgs[2]).toContain('<svg>center</svg>');
-            expect(createCallArgs[2]).toContain('<svg>right</svg>');
-            expect(createCallArgs[2]).toContain('<svg>justify</svg>');
+            expect(items[0].innerHTML).toContain('<svg>left</svg>');
+            expect(items[1].innerHTML).toContain('<svg>center</svg>');
+            expect(items[2].innerHTML).toContain('<svg>right</svg>');
+            expect(items[3].innerHTML).toContain('<svg>justify</svg>');
         });
 
         it('should handle partial item lists', () => {
-            const { dom } = require('../../../../src/helper');
-            dom.utils.createElement.mockClear();
+            kernel.$.menu.initDropdownTarget.mockClear();
 
             const partialAlign = new Align(kernel, { items: ['left', 'center'] });
 
-            const createCallArgs = dom.utils.createElement.mock.calls.find(
-                call => call[1]?.class === 'se-dropdown se-list-layer se-list-align'
-            );
+            const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
+            const commands = items.map(item => item.command);
 
-            expect(createCallArgs[2]).toContain('data-command="left"');
-            expect(createCallArgs[2]).toContain('data-command="center"');
-            expect(createCallArgs[2]).not.toContain('data-command="right"');
-            expect(createCallArgs[2]).not.toContain('data-command="justify"');
+            expect(items).toHaveLength(2);
+            expect(commands).toContain('left');
+            expect(commands).toContain('center');
+            expect(commands).not.toContain('right');
+            expect(commands).not.toContain('justify');
         });
     });
 
@@ -688,6 +684,10 @@ describe('Plugins - Dropdown - Align', () => {
         it('should handle missing icons gracefully', () => {
             const incompleteKernel = createMockEditor();
             incompleteKernel.$.icons = {};
+            incompleteKernel.$.menu.initDropdownTarget = jest.fn().mockImplementation(() => {
+                const { dom } = require('../../../../src/helper');
+                return dom.utils.createElement('DIV', {}, '');
+            });
 
             expect(() => {
                 new Align(incompleteKernel, {});

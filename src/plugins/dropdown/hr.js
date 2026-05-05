@@ -39,14 +39,11 @@ class HR extends PluginDropdown {
 		this.title = this.$.lang.horizontalLine;
 		this.icon = 'horizontal_line';
 
-		// create HTML
-		const HRMenus = CreateHTML(this.$, pluginOptions.items);
+		// create menu from items
+		const menu = this.$.menu.initDropdownTarget(HR, CreateItems(this.$, pluginOptions.items), { className: 'se-list-line' });
 
 		// members
-		this.list = HRMenus.querySelectorAll('button');
-
-		// init
-		this.$.menu.initDropdownTarget(HR, HRMenus);
+		this.list = menu.querySelectorAll('button');
 	}
 
 	/**
@@ -117,47 +114,20 @@ class HR extends PluginDropdown {
 /**
  * @param {SunEditor.Deps} $ - Kernel dependencies
  * @param {Array<{name: string, class: string, style?: string}>} [HRItems] - HR style items
- * @returns {HTMLElement}
+ * @returns {Array<import('../../core/logic/panel/menu').DropdownItem>}
  */
-function CreateHTML({ lang }, HRItems) {
+function CreateItems({ lang }, HRItems) {
 	const items = HRItems || [
-		{
-			name: lang.hr_solid,
-			class: '__se__solid',
-			style: null,
-		},
-		{
-			name: lang.hr_dashed,
-			class: '__se__dashed',
-			style: null,
-		},
-		{
-			name: lang.hr_dotted,
-			class: '__se__dotted',
-			style: null,
-		},
+		{ name: lang.hr_solid, class: '__se__solid', style: null },
+		{ name: lang.hr_dashed, class: '__se__dashed', style: null },
+		{ name: lang.hr_dotted, class: '__se__dotted', style: null },
 	];
 
-	let list = '';
-	for (let i = 0, len = items.length; i < len; i++) {
-		list += /*html*/ `
-		<li>
-			<button type="button" class="se-btn se-btn-list" data-command="hr" title="${items[i].name}" aria-label="${items[i].name}">
-				<hr${items[i].class ? ` class="${items[i].class}"` : ''}${items[i].style ? ` style="${items[i].style}"` : ''}/>
-			</button>
-		</li>`;
-	}
-
-	return dom.utils.createElement(
-		'DIV',
-		{
-			class: 'se-dropdown se-list-layer se-list-line',
-		},
-		/*html*/ `
-		<div class="se-list-inner">
-			<ul class="se-list-basic">${list}</ul>
-		</div>`,
-	);
+	return items.map((item) => ({
+		command: 'hr',
+		title: item.name,
+		innerHTML: `<hr${item.class ? ` class="${item.class}"` : ''}${item.style ? ` style="${item.style}"` : ''}/>`,
+	}));
 }
 
 export default HR;

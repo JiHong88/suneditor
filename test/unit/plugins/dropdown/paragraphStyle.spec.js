@@ -65,6 +65,9 @@ describe('Plugins - Dropdown - ParagraphStyle', () => {
         kernel.$.lang.menu_bordered = 'Bordered';
         kernel.$.lang.menu_neon = 'Neon';
 
+        const { dom } = require('../../../../src/helper');
+        kernel.$.menu.initDropdownTarget = jest.fn().mockImplementation(() => dom.utils.createElement('DIV', {}, ''));
+
         pluginOptions = {
             items: [
                 { name: 'Custom Spaced', class: '__se__p-custom-spaced', _class: 'custom-btn' },
@@ -78,17 +81,16 @@ describe('Plugins - Dropdown - ParagraphStyle', () => {
 
     describe('Constructor', () => {
 
-        it('should create dropdown menu structure', () => {
-            const { dom } = require('../../../../src/helper');
-            expect(dom.utils.createElement).toHaveBeenCalledWith(
-                'DIV',
-                { class: 'se-dropdown se-list-layer se-list-format' },
-                expect.stringContaining('se-list-inner')
+        it('should create dropdown menu via initDropdownTarget', () => {
+            expect(kernel.$.menu.initDropdownTarget).toHaveBeenCalledWith(
+                ParagraphStyle,
+                expect.any(Array),
+                expect.objectContaining({ className: 'se-list-format' })
             );
         });
 
         it('should initialize dropdown menu', () => {
-            expect(kernel.$.menu.initDropdownTarget).toHaveBeenCalledWith(ParagraphStyle, expect.any(Object));
+            expect(kernel.$.menu.initDropdownTarget).toHaveBeenCalledWith(ParagraphStyle, expect.any(Array), expect.any(Object));
         });
 
         it('should initialize class list from menu', () => {
@@ -249,71 +251,56 @@ describe('Plugins - Dropdown - ParagraphStyle', () => {
         });
     });
 
-    describe('CreateHTML function', () => {
-        it('should create dropdown menu with custom items', () => {
-            const { dom } = require('../../../../src/helper');
+    describe('CreateItems function', () => {
+        it('should pass correct items to initDropdownTarget for custom items', () => {
+            const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
 
-            const createCallArgs = dom.utils.createElement.mock.calls.find(
-                call => call[1]?.class === 'se-dropdown se-list-layer se-list-format'
-            );
-
-            expect(createCallArgs[2]).toContain('se-list-inner');
-            expect(createCallArgs[2]).toContain('data-command="__se__p-custom-spaced"');
-            expect(createCallArgs[2]).toContain('Custom Spaced');
-            expect(createCallArgs[2]).toContain('data-command="__se__p-custom-bordered"');
-            expect(createCallArgs[2]).toContain('Custom Bordered');
+            expect(items).toHaveLength(2);
+            expect(items[0]).toMatchObject({ command: '__se__p-custom-spaced', title: 'Custom Spaced' });
+            expect(items[1]).toMatchObject({ command: '__se__p-custom-bordered', title: 'Custom Bordered' });
         });
 
-        it('should include default paragraph styles when no items provided', () => {
-            const { dom } = require('../../../../src/helper');
-            dom.utils.createElement.mockClear();
+        it('should pass default paragraph style items when no items provided', () => {
+            kernel.$.menu.initDropdownTarget.mockClear();
 
             const defaultParagraphStyle = new ParagraphStyle(kernel, {});
 
-            const createCallArgs = dom.utils.createElement.mock.calls.find(
-                call => call[1]?.class === 'se-dropdown se-list-layer se-list-format'
-            );
+            const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
 
-            expect(createCallArgs[2]).toContain('data-command="__se__p-spaced"');
-            expect(createCallArgs[2]).toContain('data-command="__se__p-bordered"');
-            expect(createCallArgs[2]).toContain('data-command="__se__p-neon"');
-            expect(createCallArgs[2]).toContain('Spaced');
-            expect(createCallArgs[2]).toContain('Bordered');
-            expect(createCallArgs[2]).toContain('Neon');
+            expect(items.find(i => i.command === '__se__p-spaced')).toBeDefined();
+            expect(items.find(i => i.command === '__se__p-bordered')).toBeDefined();
+            expect(items.find(i => i.command === '__se__p-neon')).toBeDefined();
+            expect(items.find(i => i.title === 'Spaced')).toBeDefined();
+            expect(items.find(i => i.title === 'Bordered')).toBeDefined();
+            expect(items.find(i => i.title === 'Neon')).toBeDefined();
         });
 
         it('should handle string items from default list', () => {
-            const { dom } = require('../../../../src/helper');
-            dom.utils.createElement.mockClear();
+            kernel.$.menu.initDropdownTarget.mockClear();
 
             const stringParagraphStyle = new ParagraphStyle(kernel, {
                 items: ['spaced', 'neon']
             });
 
-            const createCallArgs = dom.utils.createElement.mock.calls.find(
-                call => call[1]?.class === 'se-dropdown se-list-layer se-list-format'
-            );
+            const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
 
-            expect(createCallArgs[2]).toContain('data-command="__se__p-spaced"');
-            expect(createCallArgs[2]).toContain('data-command="__se__p-neon"');
-            expect(createCallArgs[2]).not.toContain('data-command="__se__p-bordered"');
+            expect(items.find(i => i.command === '__se__p-spaced')).toBeDefined();
+            expect(items.find(i => i.command === '__se__p-neon')).toBeDefined();
+            expect(items.find(i => i.command === '__se__p-bordered')).toBeUndefined();
         });
 
         it('should skip invalid string items', () => {
-            const { dom } = require('../../../../src/helper');
-            dom.utils.createElement.mockClear();
+            kernel.$.menu.initDropdownTarget.mockClear();
 
             const invalidParagraphStyle = new ParagraphStyle(kernel, {
                 items: ['spaced', 'invalid-style', 'neon']
             });
 
-            const createCallArgs = dom.utils.createElement.mock.calls.find(
-                call => call[1]?.class === 'se-dropdown se-list-layer se-list-format'
-            );
+            const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
 
-            expect(createCallArgs[2]).toContain('data-command="__se__p-spaced"');
-            expect(createCallArgs[2]).toContain('data-command="__se__p-neon"');
-            expect(createCallArgs[2]).not.toContain('invalid-style');
+            expect(items.find(i => i.command === '__se__p-spaced')).toBeDefined();
+            expect(items.find(i => i.command === '__se__p-neon')).toBeDefined();
+            expect(items).toHaveLength(2); // invalid-style is skipped
         });
     });
 

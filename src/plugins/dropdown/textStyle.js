@@ -29,14 +29,11 @@ class TextStyle extends PluginDropdown {
 		this.title = this.$.lang.textStyle;
 		this.icon = 'text_style';
 
-		// create HTML
-		const menu = CreateHTML(this.$, pluginOptions.items);
+		// create menu from items
+		const menu = this.$.menu.initDropdownTarget(TextStyle, CreateItems(this.$, pluginOptions.items), { className: 'se-list-format' });
 
 		// members
 		this.styleList = menu.querySelectorAll('li button');
-
-		// init
-		this.$.menu.initDropdownTarget(TextStyle, menu);
 	}
 
 	/**
@@ -98,9 +95,9 @@ class TextStyle extends PluginDropdown {
 /**
  * @param {SunEditor.Deps} $ - Kernel dependencies
  * @param {Array<string|{name: string, class: string, tag?: string}>} [items] - Text style items
- * @returns {HTMLElement}
+ * @returns {Array<import('../../core/logic/panel/menu').DropdownItem>}
  */
-function CreateHTML({ lang }, items) {
+function CreateItems({ lang }, items) {
 	const defaultList = {
 		code: {
 			name: lang.menu_code,
@@ -114,13 +111,10 @@ function CreateHTML({ lang }, items) {
 		},
 	};
 	const styleList = items || Object.keys(defaultList);
+	const result = [];
 
-	let list = '<div class="se-list-inner"><ul class="se-list-basic">';
-	for (let i = 0, len = styleList.length, t, tag, name, attrs, command, value; i < len; i++) {
+	for (let i = 0, len = styleList.length, t, tag, name, value; i < len; i++) {
 		t = styleList[i];
-		attrs = '';
-		value = '';
-		command = [];
 
 		if (typeof t === 'string') {
 			const cssText = defaultList[t.toLowerCase()];
@@ -130,30 +124,17 @@ function CreateHTML({ lang }, items) {
 
 		name = t.name;
 		tag = t.tag || 'span';
+		value = `.${t.class.trim().replace(/\s+/g, ',.')}`.replace(/,$/, '');
 
-		attrs += ` class="${t.class}"`;
-		value += `.${t.class.trim().replace(/\s+/g, ',.')}`;
-		command.push('class');
-
-		value = value.replace(/,$/, '');
-
-		list += `
-		<li>
-			<button 
-				type="button" 
-				class="se-btn se-btn-list" 
-				data-command="${tag}" 
-				data-value="${value}" 
-				title="${name}" 
-				aria-label="${name}"
-			>
-				<${tag}${attrs}>${name}</${tag}>
-			</button>
-		</li>`;
+		result.push({
+			command: tag,
+			value,
+			title: name,
+			innerHTML: `<${tag} class="${t.class}">${name}</${tag}>`,
+		});
 	}
-	list += '</ul></div>';
 
-	return dom.utils.createElement('DIV', { class: 'se-dropdown se-list-layer se-list-format' }, list);
+	return result;
 }
 
 export default TextStyle;

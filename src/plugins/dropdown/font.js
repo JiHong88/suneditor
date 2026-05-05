@@ -27,9 +27,10 @@ class Font extends PluginDropdown {
 		this.title = this.$.lang.font;
 		this.inner = '<span class="se-txt">' + this.$.lang.font + '</span>' + this.$.icons.arrow_down;
 
-		// create HTML
+		// create menu from items
 		const fontList = pluginOptions.items || ['Arial', 'Comic Sans MS', 'Courier New', 'Impact', 'Georgia', 'tahoma', 'Trebuchet MS', 'Verdana'];
-		const menu = CreateHTML(this.$, fontList);
+		const prependHTML = `<li><button type="button" class="se-btn se-btn-list default_value" data-command="" title="${this.$.lang.default}" aria-label="${this.$.lang.default}">${this.$.lang.default}</button></li><li class="se-btn-list se-sub-list"><span></span></li>`;
+		const menu = this.$.menu.initDropdownTarget(Font, CreateItems(fontList), { className: 'se-list-font-family', prependHTML });
 
 		// members
 		this.currentFont = '';
@@ -37,9 +38,6 @@ class Font extends PluginDropdown {
 		this.fontArray = fontList;
 
 		this.#defaultValue = /** @type {HTMLSpanElement} */ (menu.querySelector('.se-sub-list span'));
-
-		// init
-		this.$.menu.initDropdownTarget(Font, menu);
 	}
 
 	/**
@@ -122,34 +120,19 @@ class Font extends PluginDropdown {
 }
 
 /**
- * @param {SunEditor.Deps} $ - Kernel dependencies
  * @param {string[]} fontList - Font name list
- * @returns {HTMLElement}
+ * @returns {Array<import('../../core/logic/panel/menu').DropdownItem>}
  */
-function CreateHTML({ lang }, fontList) {
-	let list = /*html*/ `
-	<div class="se-list-inner">
-		<ul class="se-list-basic">
-			<li>
-				<button type="button" class="se-btn se-btn-list default_value" data-command="" title="${lang.default}" aria-label="${lang.default}">
-					${lang.default}
-				</button>
-			</li>
-			<li class="se-btn-list se-sub-list"><span></span></li>`;
-
-	for (let i = 0, len = fontList.length, font, text; i < len; i++) {
-		font = fontList[i];
-		text = font.split(',')[0];
-		list += /*html*/ `
-			<li>
-				<button type="button" class="se-btn se-btn-list" data-command="${font}" data-txt="${text}" title="${text}" aria-label="${text}" style="font-family:${font};">${text}</button>
-			</li>`;
-	}
-	list += /*html*/ `
-		</ul>
-	</div>`;
-
-	return dom.utils.createElement('DIV', { class: 'se-dropdown se-list-layer se-list-font-family' }, list);
+function CreateItems(fontList) {
+	return fontList.map((font) => {
+		const text = font.split(',')[0];
+		return {
+			command: font,
+			title: text,
+			innerHTML: text,
+			attrs: { 'data-txt': text, style: `font-family:${font};` },
+		};
+	});
 }
 
 export default Font;

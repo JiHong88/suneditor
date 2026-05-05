@@ -43,6 +43,8 @@ class Menu {
 		// members
 		/** @type {Object<string, HTMLElement>} */
 		this.targetMap = {};
+		/** @type {Object<string, Array<DropdownItem>>} Structured items keyed by plugin name */
+		this.itemsMap = {};
 		this.index = -1;
 		this.menus = [];
 		// dropdown
@@ -79,19 +81,37 @@ class Menu {
 	 * @description Method for managing dropdown element.
 	 * - You must add the `dropdown` element using this method at custom plugin.
 	 * @param {{key: string, type: string}} classObj Class object
-	 * @param {Node} menu Dropdown element
+	 * @param {Node|Array<DropdownItem>} menuOrItems Dropdown element or array of standardized items
+	 * @param {Object} [options] Options when passing items array
+	 * @param {string} [options.className] Additional CSS class for the wrapper element
+	 * @param {string} [options.prependHTML] HTML to prepend inside the `<ul>` (e.g. default/sub-list items)
+	 * @returns {HTMLElement} The registered menu element
 	 */
-	initDropdownTarget({ key, type }, menu) {
-		if (key) {
-			if (!IsFree(type)) {
-				/** @type {HTMLElement} */ (menu).setAttribute('data-key', key);
-				this.#dropdownCommands.push(key);
+	initDropdownTarget({ key, type }, menuOrItems, options) {
+		if (!key) throw Error("[SUNEDITOR.init.fail] The plugin's key is not added.");
+
+		let menu;
+		if (Array.isArray(menuOrItems)) {
+			menu = CreateDropdownMenu(menuOrItems, options);
+
+			const allButtons = menu.querySelectorAll('.se-list-inner li > button');
+			const offset = allButtons.length - menuOrItems.length;
+			for (let i = 0; i < menuOrItems.length; i++) {
+				menuOrItems[i]._element = /** @type {HTMLElement} */ (allButtons[offset + i]) || null;
 			}
-			this.#context.get('menuTray').appendChild(menu);
-			this.targetMap[key] = /** @type {HTMLElement} */ (menu);
+			this.itemsMap[key] = menuOrItems;
 		} else {
-			throw Error("[SUNEDITOR.init.fail] The plugin's key is not added.");
+			menu = /** @type {HTMLElement} */ (menuOrItems);
 		}
+
+		if (!IsFree(type)) {
+			menu.setAttribute('data-key', key);
+			this.#dropdownCommands.push(key);
+		}
+
+		this.#context.get('menuTray').appendChild(menu);
+		this.targetMap[key] = menu;
+		return menu;
 	}
 
 	/**
@@ -463,4 +483,48 @@ function IsFree(type) {
 	return /free$/.test(type);
 }
 
+/**
+ * @typedef {Object} DropdownItem
+ * @property {string} command - `data-command` attribute value
+ * @property {string} [value] - `data-value` attribute value
+ * @property {string} title - Title text (used for `title` and `aria-label`)
+ * @property {string} innerHTML - Button inner HTML content
+ * @property {string} [className] - Additional CSS class for the `<button>`
+ * @property {Object<string, string>} [attrs] - Extra data attributes (e.g. `{ 'data-class': 'xxx' }`)
+ * @property {HTMLElement} [_element] - Rendered button element (set by `initDropdownTarget`)
+ */
+
+/**
+ * @description Creates a dropdown menu element from standardized item objects.
+ * @param {Array<DropdownItem>} items - Menu items
+ * @param {Object} [options]
+ * @param {string} [options.className] - Additional class for the wrapper `<div>`
+ * @param {string} [options.prependHTML] - HTML to prepend inside the `<ul>` (e.g. default value items)
+ * @returns {HTMLElement}
+ */
+function CreateDropdownMenu(items, options = {}) {
+	let html = '';
+	for (let i = 0, len = items.length; i < len; i++) {
+		const item = items[i];
+		let attrStr = '';
+		if (item.attrs) {
+			const keys = Object.keys(item.attrs);
+			for (let a = 0; a < keys.length; a++) {
+				attrStr += ` ${keys[a]}="${item.attrs[keys[a]]}"`;
+			}
+		}
+		html += /*html*/ `
+		<li>
+			<button type="button" class="se-btn se-btn-list${item.className ? ' ' + item.className : ''}" data-command="${item.command}"${item.value !== undefined ? ` data-value="${item.value}"` : ''} title="${item.title}" aria-label="${item.title}"${attrStr}>${item.innerHTML}</button>
+		</li>`;
+	}
+
+	return dom.utils.createElement(
+		'DIV',
+		{ class: 'se-dropdown se-list-layer' + (options.className ? ' ' + options.className : '') },
+		/*html*/ `<div class="se-list-inner"><ul class="se-list-basic">${options.prependHTML || ''}${html}</ul></div>`,
+	);
+}
+
+export { CreateDropdownMenu };
 export default Menu;

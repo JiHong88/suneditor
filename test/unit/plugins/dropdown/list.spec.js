@@ -60,6 +60,10 @@ describe('Plugins - Dropdown - List', () => {
 		jest.clearAllMocks();
 
 		kernel = createMockEditor();
+		kernel.$.menu.initDropdownTarget = jest.fn().mockImplementation(() => {
+			const { dom } = require('../../../../src/helper');
+			return dom.utils.createElement('DIV', {}, '');
+		});
 		kernel.$.lang.list = 'List';
 		kernel.$.lang.numberedList = 'Numbered List';
 		kernel.$.lang.bulletedList = 'Bulleted List';
@@ -68,13 +72,8 @@ describe('Plugins - Dropdown - List', () => {
 	});
 
 	describe('Constructor', () => {
-		it('should create dropdown menu structure', () => {
-			const { dom } = require('../../../../src/helper');
-			expect(dom.utils.createElement).toHaveBeenCalledWith('DIV', { class: 'se-dropdown se-list-layer' }, expect.stringContaining('se-list-inner'));
-		});
-
-		it('should initialize dropdown menu', () => {
-			expect(kernel.$.menu.initDropdownTarget).toHaveBeenCalledWith(List, expect.any(Object));
+		it('should initialize dropdown menu with items', () => {
+			expect(kernel.$.menu.initDropdownTarget).toHaveBeenCalledWith(List, expect.any(Array));
 		});
 	});
 
@@ -186,26 +185,28 @@ describe('Plugins - Dropdown - List', () => {
 		});
 	});
 
-	describe('CreateHTML function', () => {
-		it('should create dropdown menu with numbered and bulleted list options', () => {
-			const { dom } = require('../../../../src/helper');
+	describe('CreateItems function', () => {
+		it('should pass correct items to initDropdownTarget', () => {
+			const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
 
-			const createCallArgs = dom.utils.createElement.mock.calls.find((call) => call[1]?.class === 'se-dropdown se-list-layer');
+			expect(items).toBeInstanceOf(Array);
+			expect(items.length).toBe(2);
 
-			expect(createCallArgs[2]).toContain('se-list-inner');
-			expect(createCallArgs[2]).toContain('data-command="ol"');
-			expect(createCallArgs[2]).toContain('data-command="ul"');
-			expect(createCallArgs[2]).toContain('Numbered List');
-			expect(createCallArgs[2]).toContain('Bulleted List');
+			const commands = items.map(item => item.command);
+			expect(commands).toContain('ol');
+			expect(commands).toContain('ul');
+
+			const titles = items.map(item => item.title);
+			expect(titles).toContain('Numbered List');
+			expect(titles).toContain('Bulleted List');
 		});
 
-		it('should include editor icons in the menu', () => {
-			const { dom } = require('../../../../src/helper');
+		it('should include editor icons in the items', () => {
+			const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
 
-			const createCallArgs = dom.utils.createElement.mock.calls.find((call) => call[1]?.class === 'se-dropdown se-list-layer');
-
-			expect(createCallArgs[2]).toContain('<svg>numbered</svg>');
-			expect(createCallArgs[2]).toContain('<svg>bulleted</svg>');
+			const htmls = items.map(item => item.innerHTML);
+			expect(htmls.some(h => h.includes('<svg>numbered</svg>'))).toBe(true);
+			expect(htmls.some(h => h.includes('<svg>bulleted</svg>'))).toBe(true);
 		});
 	});
 

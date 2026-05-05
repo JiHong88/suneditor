@@ -23,10 +23,6 @@ class Align extends PluginDropdown {
 		this.title = this.$.lang.align;
 		this.icon = this.$.options.get('_rtl') ? 'align_right' : 'align_left';
 
-		// create HTML
-		const menu = CreateHTML(this.$, pluginOptions.items);
-		const commandArea = (this._itemMenu = menu.querySelector('ul'));
-
 		// members
 		this.defaultDir = '';
 		this.alignIcons = {
@@ -35,10 +31,11 @@ class Align extends PluginDropdown {
 			right: this.$.icons.align_right,
 			center: this.$.icons.align_center,
 		};
-		this.alignList = commandArea.querySelectorAll('li button');
 
-		// init
-		this.$.menu.initDropdownTarget(Align, menu);
+		// create menu from items
+		const menu = this.$.menu.initDropdownTarget(Align, CreateItems(this.$, pluginOptions.items), { className: 'se-list-align' });
+		this._itemMenu = menu.querySelector('ul');
+		this.alignList = menu.querySelectorAll('li button');
 	}
 
 	/**
@@ -139,33 +136,18 @@ class Align extends PluginDropdown {
 /**
  * @param {SunEditor.Deps} $ - Kernel dependencies
  * @param {string[]} [items] - Align items list
- * @returns {HTMLElement}
+ * @returns {Array<import('../../core/logic/panel/menu').DropdownItem>}
  */
-function CreateHTML({ lang, icons, options }, items) {
+function CreateItems({ lang, icons, options }, items) {
 	const alignItems = Array.isArray(items) ? items : options.get('_rtl') ? ['right', 'center', 'left', 'justify'] : ['left', 'center', 'right', 'justify'];
-
-	let html = '';
-	for (let i = 0, item, text; i < alignItems.length; i++) {
-		item = alignItems[i];
-		text = lang['align' + item.charAt(0).toUpperCase() + item.slice(1)];
-		html += /*html*/ `
-		<li>
-			<button type="button" class="se-btn se-btn-list" data-command="${item}" title="${text}" aria-label="${text}">
-				<span class="se-list-icon">${icons['align_' + item]}</span>${text}
-			</button>
-		</li>`;
-	}
-
-	return dom.utils.createElement(
-		'div',
-		{
-			class: 'se-dropdown se-list-layer se-list-align',
-		},
-		/*html*/ `
-		<div class="se-list-inner">
-			<ul class="se-list-basic">${html}</ul>
-		</div>`,
-	);
+	return alignItems.map((item) => {
+		const text = lang['align' + item.charAt(0).toUpperCase() + item.slice(1)];
+		return {
+			command: item,
+			title: text,
+			innerHTML: `<span class="se-list-icon">${icons['align_' + item]}</span>${text}`,
+		};
+	});
 }
 
 export default Align;

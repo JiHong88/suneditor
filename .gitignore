@@ -2,7 +2,8 @@
 .DS_Store
 
 # project files
-.vscode/
+.vscode/*
+!.vscode/settings.json
 .idea/
 .out/
 .gen/

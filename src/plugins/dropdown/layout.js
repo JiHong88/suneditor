@@ -1,5 +1,4 @@
 import { PluginDropdown } from '../../interfaces';
-import { dom } from '../../helper';
 
 /**
  * @typedef {Object} LayoutPluginOptions
@@ -32,11 +31,8 @@ class Layout extends PluginDropdown {
 		this.selectedIndex = -1;
 		this.items = pluginOptions.items;
 
-		// create HTML
-		const menu = CreateHTML(this.items);
-
-		// init
-		this.$.menu.initDropdownTarget(Layout, menu);
+		// create menu from items
+		this.$.menu.initDropdownTarget(Layout, CreateItems(this.items));
 	}
 
 	/**
@@ -60,32 +56,19 @@ class Layout extends PluginDropdown {
 
 /**
  * @param {Array<{name: string, html: string}>} layoutList - Layout items
- * @returns {HTMLElement}
+ * @returns {Array<import('../../core/logic/panel/menu').DropdownItem>}
  */
-function CreateHTML(layoutList) {
+function CreateItems(layoutList) {
 	if (!layoutList || layoutList.length === 0) {
 		console.warn('[SUNEDITOR.plugins.layout.warn] To use the "layout" plugin, please define the "layouts" option.');
 	}
 
-	let list = /*html*/ `
-	<div class="se-dropdown se-list-inner">
-		<ul class="se-list-basic">`;
-
-	for (let i = 0, len = (layoutList || []).length, t; i < len; i++) {
-		t = layoutList[i];
-		list += /*html*/ `
-			<li>
-				<button type="button" class="se-btn se-btn-list" data-command="layout" data-value="${i}" title="${t.name}" aria-label="${t.name}">
-					${t.name}
-				</button>
-			</li>`;
-	}
-
-	list += /*html*/ `
-		</ul>
-	</div>`;
-
-	return dom.utils.createElement('DIV', { class: 'se-list-layer' }, list);
+	return (layoutList || []).map((t, i) => ({
+		command: 'layout',
+		value: String(i),
+		title: t.name,
+		innerHTML: t.name,
+	}));
 }
 
 export default Layout;

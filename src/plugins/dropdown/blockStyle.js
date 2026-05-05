@@ -35,15 +35,12 @@ class BlockStyle extends PluginDropdown {
 		this.title = this.$.lang.formats;
 		this.inner = '<span class="se-txt">' + this.$.lang.formats + '</span>' + this.$.icons.arrow_down;
 
-		// create HTML
-		const menu = CreateHTML(this.$, pluginOptions.items);
+		// create menu from items
+		const menu = this.$.menu.initDropdownTarget(BlockStyle, CreateItems(this.$, pluginOptions.items), { className: 'se-list-format' });
 
 		// members
 		this.formatList = menu.querySelectorAll('li button');
 		this.currentFormat = '';
-
-		// init
-		this.$.menu.initDropdownTarget(BlockStyle, menu);
 	}
 
 	/**
@@ -136,15 +133,12 @@ class BlockStyle extends PluginDropdown {
 /**
  * @param {SunEditor.Deps} $ - Kernel dependencies
  * @param {Array<string|BlockStyleItem>} [items] - Block style items
- * @returns {HTMLElement}
+ * @returns {Array<import('../../core/logic/panel/menu').DropdownItem>}
  */
-function CreateHTML({ lang }, items) {
+function CreateItems({ lang }, items) {
 	const defaultFormats = ['p', 'blockquote', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
 	const formatList = !items || items.length === 0 ? defaultFormats : items;
-
-	let list = /*html*/ `
-	<div class="se-list-inner">
-		<ul class="se-list-basic">`;
+	const result = [];
 
 	for (let i = 0, len = formatList.length, format, tagName, command, name, h, attrs, className; i < len; i++) {
 		format = formatList[i];
@@ -165,18 +159,16 @@ function CreateHTML({ lang }, items) {
 			attrs = className ? ' class="' + className + '"' : '';
 		}
 
-		list += /*html*/ `
-			<li>
-				<button type="button" class="se-btn se-btn-list" data-command="${command}" data-value="${tagName}" data-class="${className}" title="${name}" aria-label="${name}">
-					<${tagName}${attrs}>${name}</${tagName}>
-				</button>
-			</li>`;
+		result.push({
+			command,
+			value: tagName,
+			title: name,
+			innerHTML: `<${tagName}${attrs}>${name}</${tagName}>`,
+			attrs: { 'data-class': className || '' },
+		});
 	}
-	list += /*html*/ `
-		</ul>
-	</div>`;
 
-	return dom.utils.createElement('DIV', { class: 'se-dropdown se-list-layer se-list-format' }, list);
+	return result;
 }
 
 export default BlockStyle;

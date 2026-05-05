@@ -68,7 +68,8 @@ describe('Plugins - Dropdown - LineHeight', () => {
         jest.clearAllMocks();
 
         kernel = createMockEditor();
-        kernel.$.menu.initDropdownTarget = jest.fn();
+        const { dom } = require('../../../../src/helper');
+        kernel.$.menu.initDropdownTarget = jest.fn().mockImplementation(() => dom.utils.createElement('DIV', {}, ''));
         kernel.$.lang.lineHeight = 'Line Height';
         kernel.$.lang.default = 'Default';
 
@@ -86,17 +87,16 @@ describe('Plugins - Dropdown - LineHeight', () => {
 
     describe('Constructor', () => {
 
-        it('should create dropdown menu structure', () => {
-            const { dom } = require('../../../../src/helper');
-            expect(dom.utils.createElement).toHaveBeenCalledWith(
-                'DIV',
-                { class: 'se-dropdown se-list-layer' },
-                expect.stringContaining('se-list-inner')
+        it('should create dropdown menu via initDropdownTarget', () => {
+            expect(kernel.$.menu.initDropdownTarget).toHaveBeenCalledWith(
+                LineHeight,
+                expect.any(Array),
+                expect.any(Object)
             );
         });
 
         it('should initialize dropdown menu', () => {
-            expect(kernel.$.menu.initDropdownTarget).toHaveBeenCalledWith(LineHeight, expect.any(Object));
+            expect(kernel.$.menu.initDropdownTarget).toHaveBeenCalledWith(LineHeight, expect.any(Array), expect.any(Object));
         });
 
         it('should initialize size list from menu', () => {
@@ -348,37 +348,27 @@ describe('Plugins - Dropdown - LineHeight', () => {
         });
     });
 
-    describe('CreateHTML function', () => {
-        it('should create dropdown menu with default and custom items', () => {
-            const { dom } = require('../../../../src/helper');
+    describe('CreateItems function', () => {
+        it('should pass correct items to initDropdownTarget for custom items', () => {
+            const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
 
-            const createCallArgs = dom.utils.createElement.mock.calls.find(
-                call => call[1]?.class === 'se-dropdown se-list-layer'
-            );
-
-            expect(createCallArgs[2]).toContain('se-list-inner');
-            expect(createCallArgs[2]).toContain('default_value');
-            expect(createCallArgs[2]).toContain('Default');
-            expect(createCallArgs[2]).toContain('data-command="1em"');
-            expect(createCallArgs[2]).toContain('data-command="1.5em"');
-            expect(createCallArgs[2]).toContain('data-command="2em"');
+            expect(items).toHaveLength(3);
+            expect(items[0]).toMatchObject({ command: '1em', title: '1', innerHTML: '1' });
+            expect(items[1]).toMatchObject({ command: '1.5em', title: '1.5', innerHTML: '1.5' });
+            expect(items[2]).toMatchObject({ command: '2em', title: '2', innerHTML: '2' });
         });
 
-        it('should include default line heights when no items provided', () => {
-            // Clear previous calls first
-            const { dom } = require('../../../../src/helper');
-            dom.utils.createElement.mockClear();
+        it('should pass default line height items when no items provided', () => {
+            kernel.$.menu.initDropdownTarget.mockClear();
 
             const defaultLineHeight = new LineHeight(kernel, {});
 
-            const createCallArgs = dom.utils.createElement.mock.calls.find(
-                call => call[1]?.class === 'se-dropdown se-list-layer'
-            );
+            const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
 
-            expect(createCallArgs[2]).toContain('data-command="1em"');
-            expect(createCallArgs[2]).toContain('data-command="1.2em"');
-            expect(createCallArgs[2]).toContain('data-command="1.7em"');
-            expect(createCallArgs[2]).toContain('data-command="2em"');
+            expect(items.find(i => i.command === '1em')).toBeDefined();
+            expect(items.find(i => i.command === '1.2em')).toBeDefined();
+            expect(items.find(i => i.command === '1.7em')).toBeDefined();
+            expect(items.find(i => i.command === '2em')).toBeDefined();
         });
     });
 
