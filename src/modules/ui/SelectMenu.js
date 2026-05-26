@@ -255,17 +255,32 @@ class SelectMenu {
 		if (sub) {
 			sub.style.display = 'block';
 
-			// position relative to parent li
+			// Default: open to the right of parent LI, top-aligned with it.
 			const parentRect = parentLi.getBoundingClientRect();
 			const formRect = this.form.getBoundingClientRect();
 			sub.style.top = parentRect.top - formRect.top + 'px';
 			sub.style.left = parentRect.right - formRect.left + 'px';
 			sub.style.right = '';
 
-			// viewport overflow check — flip to left if needed
-			const rect = sub.getBoundingClientRect();
+			// Horizontal: flip right→left if overflowing right edge, then clamp into viewport.
+			let rect = sub.getBoundingClientRect();
 			if (rect.right > _w.innerWidth) {
 				sub.style.left = parentRect.left - formRect.left - sub.offsetWidth + 'px';
+				rect = sub.getBoundingClientRect();
+			}
+			if (rect.left < 0) {
+				sub.style.left = parseFloat(sub.style.left) - rect.left + 4 + 'px';
+				rect = sub.getBoundingClientRect();
+			}
+
+			// Vertical: flip top→bottom if overflowing bottom (extend upward from parent),
+			// then clamp into viewport.
+			if (rect.bottom > _w.innerHeight) {
+				sub.style.top = parentRect.bottom - formRect.top - sub.offsetHeight + 'px';
+				rect = sub.getBoundingClientRect();
+			}
+			if (rect.top < 0) {
+				sub.style.top = parseFloat(sub.style.top) - rect.top + 4 + 'px';
 			}
 		}
 	}

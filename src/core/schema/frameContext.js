@@ -118,6 +118,11 @@ export function CreateFrameContext(editorTarget, top, wwFrame, codeWrapper, code
 			// linebreak, toolbar internal
 			['lineBreaker_t', top.querySelector('.se-line-breaker-component-t')],
 			['lineBreaker_b', top.querySelector('.se-line-breaker-component-b')],
+			// block handle
+			['blockHandleArea', top.querySelector('.se-block-handle-area')],
+			['blockHandle', top.querySelector('.se-block-handle')],
+			['blockHandlePlus', top.querySelector('.se-block-handle-plus')],
+			['blockHandleDrag', top.querySelector('.se-block-handle-drag')],
 			['_stickyDummy', top.querySelector('.se-toolbar-sticky-dummy')],
 			['_toolbarShadow', top.querySelector('.se-toolbar-shadow')],
 			['_minHeight', getNumber(wwFrame.style.minHeight || '65', 0)],

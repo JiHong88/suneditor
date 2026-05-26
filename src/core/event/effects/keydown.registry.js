@@ -309,8 +309,8 @@ export default {
 	},
 
 	/** @action enterLineAddDefault */
-	'enter.line.addDefault': ({ ports, ctx }, { formatEl }) => {
-		const newFormat = ports.format.addLine(formatEl, ctx.options.get('defaultLine'));
+	'enter.line.addDefault': ({ ports }, { formatEl }) => {
+		const newFormat = ports.format.addLineAfter(formatEl);
 		const temp = newFormat.firstChild;
 		if (dom.check.isBreak(temp)) {
 			const zeroWidth = dom.utils.createTextNode(unicode.zeroWidthSpace);

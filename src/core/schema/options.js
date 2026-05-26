@@ -287,6 +287,15 @@ export const DEFAULTS = {
  * === Modes & Themes ===
  * @property {boolean} [v2Migration=false] - Enables migration mode for SunEditor v2.
  * @property {"classic"|"inline"|"balloon"|"balloon-always"|"classic:bottom"|"inline:bottom"} [mode="classic"] - Toolbar mode: `classic`, `inline`, `balloon`, `balloon-always`. Append `:bottom` to place toolbar at the bottom (e.g. `classic:bottom`, `inline:bottom`).
+ * @property {Object} [blockHandle] - Block handle configuration. When provided, a per-line block handle UI is shown. Works independently of `mode`.
+ * @property {Array<string>} [blockHandle.menu] - Menu keys for block handle. Accepts the same values as toolbar `buttonList`.
+ * - **Block format keys**: `p`, `h1`-`h6`, `heading` (H1-H6 submenu), `ul`, `ol`, `list` (UL/OL submenu), `blockquote`, `pre`.
+ * - **Plugin names**: Any registered plugin name (e.g. `blockStyle`, `align`, `image`, `link`). Dropdown plugins display their items as a submenu. Modal plugins open the modal on click.
+ * - **Built-in commands**: `bold`, `italic`, `underline`, `strike`, `undo`, `redo`, etc.
+ * - Defaults to `['p', 'heading', 'list', 'blockquote', 'pre']`.
+ * ```js
+ * blockHandle: { menu: ['p', 'heading', 'blockStyle', 'align', 'image', 'bold'] }
+ * ```
  * @property {string} [type=""] - Editor type. Use `"document"` for a document-style layout, with optional sub-types after `:`.
  * ```js
  * // type
@@ -704,6 +713,7 @@ export const OPTION_FIXED_FLAG = {
 	v2Migration: 'fixed',
 	strictMode: 'fixed',
 	mode: 'fixed',
+	blockHandle: 'fixed',
 	type: 'fixed',
 	theme: true,
 	lang: 'fixed',

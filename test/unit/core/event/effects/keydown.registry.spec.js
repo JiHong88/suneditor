@@ -29,6 +29,11 @@ describe('keydown.registry effects', () => {
 					p.innerHTML = '<br>';
 					return p;
 				}),
+				addLineAfter: jest.fn().mockImplementation(() => {
+					const p = document.createElement('p');
+					p.innerHTML = '<br>';
+					return p;
+				}),
 				getLine: jest.fn(),
 				getLines: jest.fn().mockReturnValue([]),
 				isLine: jest.fn().mockReturnValue(false),
@@ -267,12 +272,12 @@ describe('keydown.registry effects', () => {
 	});
 
 	describe('enter.line.addDefault', () => {
-		it('should call format.addLine with defaultLine', () => {
+		it('should call format.addLineAfter', () => {
 			const formatEl = document.createElement('h1');
 
 			effects['enter.line.addDefault']({ ports: mockPorts, ctx: mockCtx }, { formatEl });
 
-			expect(mockPorts.format.addLine).toHaveBeenCalledWith(formatEl, 'P');
+			expect(mockPorts.format.addLineAfter).toHaveBeenCalledWith(formatEl);
 			expect(mockPorts.selection.setRange).toHaveBeenCalled();
 		});
 	});

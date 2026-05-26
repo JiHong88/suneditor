@@ -4,6 +4,12 @@ import { _DragHandle } from '../../../modules/ui';
 const { _w } = env;
 
 /**
+ * Per-frame rAF state for wysiwyg mousemove coalescing.
+ * @type {WeakMap<*, {rafId: ?number, event: ?MouseEvent}>}
+ */
+const __wwMousemoveRaf = new WeakMap();
+
+/**
  * @typedef {import('../eventOrchestrator').default} EventManagerThis_handler_ww_mouse
  */
 
@@ -144,14 +150,35 @@ export async function OnClick_wysiwyg(fc, e) {
  */
 export function OnMouseMove_wysiwyg(fc, e) {
 	if (fc.get('isReadOnly') || fc.get('isDisabled')) return false;
-	const eventTarget = dom.query.getEventTarget(e);
 
-	// over component
-	if (_DragHandle.get('__overInfo') !== false) {
-		this.$.component.hoverSelect(eventTarget);
+	let s = __wwMousemoveRaf.get(fc);
+
+	if (!s) {
+		s = { rafId: null, event: null };
+		__wwMousemoveRaf.set(fc, s);
 	}
 
-	this._callPluginEvent('onMouseMove', { frameContext: fc, event: e });
+	s.event = e;
+	if (s.rafId !== null) return;
+
+	s.rafId = _w.requestAnimationFrame(() => {
+		const ev = s.event;
+		s.rafId = null;
+		s.event = null;
+		if (!ev) return;
+
+		const eventTarget = dom.query.getEventTarget(ev);
+
+		// over component — skip while select menu (block handle menu) is open
+		if (_DragHandle.get('__overInfo') !== false && !this.$.ui.selectMenuOn) {
+			this.$.component.hoverSelect(eventTarget);
+		}
+
+		// block handle
+		this.$.ui.blockHandle?.positionForTarget(eventTarget, ev.clientY);
+
+		this._callPluginEvent('onMouseMove', { frameContext: fc, event: ev });
+	});
 }
 
 /**
@@ -160,6 +187,9 @@ export function OnMouseMove_wysiwyg(fc, e) {
  * @param {MouseEvent} e - Event object
  */
 export async function OnMouseLeave_wysiwyg(fc, e) {
+	// block handle hide
+	this.$.ui.blockHandle?.hide(e);
+
 	// user event
 	if ((await this.$.eventManager.triggerEvent('onMouseLeave', { frameContext: fc, event: e })) === false) return;
 	// plugin event

@@ -993,6 +993,154 @@
 	border-top-color: var(--se-main-background-color);
 }
 
+/* --- Block handle ------------------------------------------------------- */
+.sun-editor .se-wrapper.se-mode-block {
+	display: flex;
+	flex-direction: row;
+}
+
+.sun-editor .se-block-handle-area {
+	position: relative;
+	width: 52px;
+	flex-shrink: 0;
+	overflow: visible;
+	z-index: 2;
+}
+
+.sun-editor .se-wrapper.se-mode-block .se-wrapper-inner {
+	flex: 1;
+	min-width: 0;
+	position: relative;
+	z-index: 1;
+}
+
+.sun-editor .se-block-handle {
+	position: absolute;
+	display: none;
+	align-items: center;
+	gap: 1px;
+	color: var(--se-main-color-lighter);
+	z-index: 1;
+	transition:
+		top 0.15s ease-out,
+		left 0.15s ease-out;
+}
+
+.sun-editor .se-block-handle.se-no-transition {
+	transition: none;
+}
+
+.sun-editor .se-block-handle-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	border-radius: var(--se-border-radius);
+	cursor: pointer;
+	opacity: 0.55;
+	transition:
+		opacity 0.15s,
+		background-color 0.08s ease;
+}
+
+.sun-editor .se-block-handle-btn:hover {
+	opacity: 1;
+	background-color: rgba(55, 53, 47, 0.08);
+}
+
+.sun-editor .se-block-handle-btn:active {
+	opacity: 1;
+	background-color: rgba(55, 53, 47, 0.14);
+}
+
+.sun-editor .se-block-handle-btn svg {
+	width: 18px;
+	height: 18px;
+}
+
+.sun-editor .se-block-handle-drag {
+	cursor: grab;
+}
+
+.sun-editor .se-block-handle-drag:active {
+	cursor: grabbing;
+}
+
+/* block hover highlight (Notion-style) */
+.sun-editor .se-block-hover {
+	background-color: rgba(55, 53, 47, 0.04);
+	border-radius: var(--se-border-radius);
+	outline: 2px solid rgba(55, 53, 47, 0.04);
+}
+
+/* drag indicator line */
+.sun-editor .se-block-drag-indicator {
+	position: absolute;
+	height: 2px;
+	background-color: var(--se-active-dark3-color);
+	border-radius: 1px;
+	pointer-events: none;
+	z-index: 10;
+}
+
+.sun-editor .se-block-dragging {
+	opacity: 0.4;
+	transition: opacity 0.1s;
+}
+
+.sun-editor .se-block-menu-icon {
+	display: inline-flex;
+	align-items: center;
+	width: 16px;
+	height: 16px;
+	margin-right: 12px;
+	margin-left: 12px;
+	vertical-align: middle;
+}
+
+.sun-editor .se-block-menu-icon svg {
+	width: 100%;
+	height: 100%;
+}
+
+.sun-editor .se-block-menu-label {
+	vertical-align: middle;
+}
+
+.sun-editor .se-block-menu-label-full {
+	padding-left: 22px;
+}
+
+/* block handle - submenu items (dropdown child items) */
+.sun-editor .se-block-submenu-item {
+	display: flex;
+	align-items: center;
+	padding: 2px 8px;
+	gap: 6px;
+	line-height: 1.4;
+}
+
+.sun-editor .se-block-submenu-item .se-list-icon,
+.sun-editor .se-block-submenu-item svg {
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	margin: 0 6px 0 0;
+	flex-shrink: 0;
+	vertical-align: middle;
+}
+
+.sun-editor .se-block-submenu-item .se-list-icon svg {
+	width: 100%;
+	height: 100%;
+}
+
+/* dragging source line */
+.sun-editor .se-block-dragging {
+	opacity: 0.4;
+}
+
 /** --- tool bar --- module --- button, module, group ----------------------------------------------------------  */
 /* module */
 .sun-editor .se-btn-module {
@@ -1435,6 +1583,7 @@
 	opacity: 0.4;
 	pointer-events: none;
 	display: none;
+	z-index: 2;
 }
 
 /* table resize - row, cursor */
@@ -1448,6 +1597,7 @@
 	opacity: 0.4;
 	pointer-events: none;
 	display: none;
+	z-index: 2;
 }
 
 .sun-editor .se-table-resize-line-prev {
@@ -1461,6 +1611,7 @@
 	opacity: 0.8;
 	pointer-events: none;
 	display: none;
+	z-index: 2;
 }
 .sun-editor .se-table-resize-row-prev {
 	position: absolute;
@@ -1473,6 +1624,7 @@
 	opacity: 0.8;
 	pointer-events: none;
 	display: none;
+	z-index: 2;
 }
 
 /* dropdown layer --- table selector */
@@ -3067,12 +3219,12 @@
 
 .sun-editor .se-select-menu.se-select-menu-mouse-move .se-select-item:hover,
 .sun-editor .se-select-menu:not(.se-select-menu-mouse-move) .se-select-item.active {
-	background-color: var(--se-hover-light-color);
+	background-color: #eef3f9;
 }
 
 .sun-editor .se-select-menu.se-select-menu-mouse-move .se-select-item:active,
 .sun-editor .se-select-menu.se-select-menu-mouse-move .se-select-item.__se__active {
-	background-color: var(--se-hover-light2-color);
+	background-color: #dde7f3;
 }
 
 .sun-editor .se-modal-form-files .se-select-menu {
@@ -3089,6 +3241,20 @@
 	position: relative;
 }
 
+/* Reserve right space for the submenu arrow so labels don't overlap it */
+.sun-editor .se-select-menu .se-select-item:has(> .se-submenu-arrow) {
+	padding-right: 26px;
+}
+
+/* Block handle action menu — wider items + arrow clearance */
+.sun-editor .se-select-menu.se-block-action-menu .se-select-item {
+	padding-left: 10px;
+	padding-right: 10px;
+}
+.sun-editor .se-select-menu.se-block-action-menu .se-select-item:has(> .se-submenu-arrow) {
+	padding-right: 28px;
+}
+
 .sun-editor .se-select-menu .se-submenu-arrow {
 	position: absolute;
 	right: 4px;
@@ -3099,7 +3265,7 @@
 	display: inline-flex;
 	align-items: center;
 	pointer-events: none;
-	opacity: 0.5;
+	opacity: 0.8;
 }
 
 .sun-editor .se-select-menu .se-submenu-arrow svg {

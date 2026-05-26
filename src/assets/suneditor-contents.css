@@ -478,6 +478,7 @@
 
 .sun-editor-editable table th,
 .sun-editor-editable table td {
+	position: relative;
 	border-width: 1px;
 	border-style: solid;
 	border-color: var(--se-edit-border-table);

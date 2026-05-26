@@ -149,7 +149,10 @@ function Constructor(editorTargets, options) {
 		const to = optionMap.frameMap.get(editTarget.key);
 		const top_div = dom.utils.createElement('DIV', { class: 'sun-editor' + o.get('_themeClass') + (o.get('_rtl') ? ' se-rtl' : '') });
 		const container = dom.utils.createElement('DIV', { class: 'se-container' });
-		const editor_div = dom.utils.createElement('DIV', { class: 'se-wrapper' + (o.get('type') === 'document' ? ' se-type-document' : '') + (o.get('_type_options').includes('header') ? ' se-type-document-header' : '') });
+		const isBlockHandle = !!o.get('blockHandle');
+		const editor_div = dom.utils.createElement('DIV', {
+			class: 'se-wrapper' + (isBlockHandle ? ' se-mode-block' : '') + (o.get('type') === 'document' ? ' se-type-document' : '') + (o.get('_type_options').includes('header') ? ' se-type-document-header' : ''),
+		});
 
 		container.appendChild(dom.utils.createElement('DIV', { class: 'se-toolbar-shadow' }));
 
@@ -167,6 +170,18 @@ function Constructor(editorTargets, options) {
 
 		editor_div.appendChild(line_breaker_t);
 		editor_div.appendChild(line_breaker_b);
+
+		// block handle
+		if (isBlockHandle) {
+			const blockHandleArea = dom.utils.createElement('DIV', { class: 'se-block-handle-area' });
+			const blockHandleGroup = dom.utils.createElement('DIV', { class: 'se-block-handle' });
+			const blockHandlePlus = dom.utils.createElement('DIV', { class: 'se-block-handle-btn se-block-handle-plus' }, icons.plus);
+			const blockHandleDrag = dom.utils.createElement('DIV', { class: 'se-block-handle-btn se-block-handle-drag' }, icons.dragHandle);
+			blockHandleGroup.appendChild(blockHandlePlus);
+			blockHandleGroup.appendChild(blockHandleDrag);
+			blockHandleArea.appendChild(blockHandleGroup);
+			editor_div.appendChild(blockHandleArea);
+		}
 
 		// append container
 		if (placeholder_span) editor_div.appendChild(placeholder_span);
@@ -459,6 +474,7 @@ export function InitOptions(options, editorTargets, plugins) {
 	const [modeBase, modePart] = (options.mode || 'classic').split(':');
 	o.set('mode', modeBase); // classic, inline, balloon, balloon-always
 	o.set('_toolbar_bottom', modePart === 'bottom' && /^(classic|inline)$/i.test(modeBase));
+	o.set('blockHandle', options.blockHandle ? (typeof options.blockHandle === 'object' ? options.blockHandle : {}) : null);
 	o.set('type', options.type?.split(':')[0] || ''); // document:header,page
 	o.set('theme', options.theme || '');
 	o.set('_themeClass', options.theme ? ` se-theme-${options.theme}` : '');
@@ -1130,6 +1146,45 @@ function _createWhitelist(o) {
 		.filter((v, i, a) => v && a.indexOf(v) === i && !blacklist.includes(v));
 
 	return whitelist.join('|');
+}
+
+/**
+ * @description Resolves a button key to its toolbar metadata.
+ * Checks plugins first, then falls back to the default button list.
+ * Same resolution logic as `CreateToolBar`.
+ * @param {string} key Button name
+ * @param {?Object<string, *>} plugins Plugin instances
+ * @param {SunEditor.Options} options Options map
+ * @param {Object<string, string>} icons Icons
+ * @param {Object<string, string>} lang Language object
+ * @returns {{className: string, title: string, command: string, type: string, icon: string}|null}
+ */
+export function ResolveButton(key, plugins, options, icons, lang) {
+	const plugin = plugins?.[key];
+	if (plugin) {
+		const s = typeof plugin === 'function' ? plugin : plugin.constructor;
+		return {
+			className: plugin.className || s.className || '',
+			title: lang[plugin.title] || plugin.title || lang[s.title] || s.title || key,
+			command: key,
+			type: plugin.type || s.type || '',
+			icon: icons[plugin.icon] || plugin.icon || icons[s.icon] || s.icon || '',
+		};
+	}
+
+	const defaults = _defaultButtons(options.get('_rtl'), icons, lang);
+	const def = defaults[key];
+	if (def) {
+		return {
+			className: def[0],
+			title: def[1],
+			command: def[2],
+			type: def[3],
+			icon: def[4],
+		};
+	}
+
+	return null;
 }
 
 /**

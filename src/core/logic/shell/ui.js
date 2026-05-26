@@ -1,5 +1,6 @@
 import { dom, converter, keyCodeMap, env, numbers } from '../../../helper';
 import { _DragHandle } from '../../../modules/ui';
+import BlockHandle from '../panel/blockHandle.js';
 import { COMMAND_BUTTONS } from './commandDispatcher';
 
 const DISABLE_BUTTONS_CODEVIEW = `${COMMAND_BUTTONS}:not([class~="se-code-view-enabled"]):not([data-type="MORE"])`;
@@ -64,6 +65,12 @@ class UIManager {
 	 * @type {HTMLElement}
 	 */
 	#lineBreaker_b = null;
+
+	/**
+	 * @description Block handle instance
+	 * @type {BlockHandle}
+	 */
+	#blockHandle = null;
 
 	/**
 	 * @constructor
@@ -573,10 +580,24 @@ class UIManager {
 	/**
 	 * @param {SunEditor.FrameContext} rt Root target[key] FrameContext
 	 */
+	/**
+	 * @description Block handle instance for external access.
+	 * @type {BlockHandle}
+	 */
+	get blockHandle() {
+		return this.#blockHandle;
+	}
+
 	reset(rt) {
 		rt.set('_editorHeight', rt.get('wysiwygFrame').offsetHeight);
 		this.#lineBreaker_t = rt.get('lineBreaker_t');
 		this.#lineBreaker_b = rt.get('lineBreaker_b');
+
+		// block handle init
+		const blockHandleOpt = this.#options.get('blockHandle');
+		if (blockHandleOpt && rt.get('blockHandleArea') && !this.#blockHandle) {
+			this.#blockHandle = new BlockHandle(this.#$, rt.get('blockHandleArea'), rt.get('blockHandle'), rt.get('blockHandlePlus'), rt.get('blockHandleDrag'), blockHandleOpt.menu);
+		}
 	}
 
 	/**
@@ -623,6 +644,9 @@ class UIManager {
 			this.#context.get('toolbar_sub_main').style.top = this.#$.subToolbar.balloonOffset.top - y + 'px';
 			this.#context.get('toolbar_sub_main').style.left = this.#$.subToolbar.balloonOffset.left - x + 'px';
 		}
+
+		// block handle scroll sync
+		this.#blockHandle?.syncScroll();
 
 		if (this.controllerTargetContext !== this.#frameContext.get('topArea')) {
 			this.offCurrentController();
@@ -943,6 +967,8 @@ class UIManager {
 		this.opendBrowser = null;
 		this.#lineBreaker_t = null;
 		this.#lineBreaker_b = null;
+		this.#blockHandle?.destroy();
+		this.#blockHandle = null;
 		this.#controllerOnDisabledButtons = null;
 		this.#codeViewDisabledButtons = null;
 	}

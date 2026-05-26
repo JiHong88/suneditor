@@ -66,6 +66,9 @@ describe('handler_ww_mouse', () => {
 				},
 				commandDispatcher: {
 					_copyFormat: jest.fn()
+				},
+				ui: {
+					blockHandle: { hide: jest.fn(), positionForTarget: jest.fn() }
 				}
 			},
 			_setSelectionSync: jest.fn(),
@@ -288,6 +291,8 @@ describe('handler_ww_mouse', () => {
 			const event = { target: document.createElement('p') };
 
 			OnMouseMove_wysiwyg.call(mockThis, mockFc, event);
+			// Handler is rAF-coalesced — flush the pending frame.
+			jest.runAllTimers();
 
 			expect(mockThis._callPluginEvent).toHaveBeenCalledWith('onMouseMove', {
 				frameContext: mockFc,
