@@ -2,8 +2,8 @@
 .sun-editor-editable {
 	/** --------------------------- content - [size] ----------- */
 	/* main */
-	--se-edit-inner-padding: 1.5em 1.5em;
-	--se-edit-inner-padding-doc-type: 2.5rem 2.5rem;
+	--se-edit-inner-padding: 1.5em;
+	--se-edit-inner-padding-doc-type: 2.5rem;
 	--se-edit-scroll-margin: 3em;
 
 	/** --------------------------- layout - [size] ----------- */
@@ -18,6 +18,13 @@
 
 	/* input:btn */
 	--se-input-btn-size: 32px;
+
+	/* block handle */
+	--se-block-handle-area-width: 52px;
+	--se-block-handle-btn-size: 24px;
+	--se-block-handle-btn-icon-size: 18px;
+	--se-block-handle-gap: 1px;
+	--se-block-drag-indicator-height: 2px;
 
 	/* document type */
 	--se-doc-min-padding: 1rem;

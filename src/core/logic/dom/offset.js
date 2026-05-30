@@ -425,20 +425,28 @@ class Offset {
 
 		// left
 		const ew = element.offsetWidth;
-		const tw = target.offsetWidth;
 		const tl = tGlobal.left;
 		const tcleft = this.getGlobal(t_container).left;
 
 		if (this.#options.get('_rtl')) {
-			const rtlW = ew > tw ? ew - tw : 0;
-			const rtlL = rtlW > 0 ? 0 : tw - ew;
-			element.style.left = `${tl - rtlW + rtlL}px`;
-			if (tcleft > this.getGlobal(element).left) {
-				element.style.left = tcleft + 'px';
+			const targetRect = target.getBoundingClientRect();
+			const vpW = _w.innerWidth;
+			let rightPx = vpW - targetRect.right;
+
+			if (ew > 0) {
+				const tcRect = t_container.getBoundingClientRect();
+				const menuLeftVP = vpW - rightPx - ew;
+				if (menuLeftVP < tcRect.left) {
+					rightPx = vpW - tcRect.left - ew;
+				}
 			}
+
+			element.style.left = 'auto';
+			element.style.right = `${Math.max(0, rightPx)}px`;
 		} else {
 			const cw = t_container.offsetWidth + tcleft;
 			const overLeft = cw <= ew ? 0 : cw - (tl + ew);
+			element.style.right = '';
 			if (overLeft < 0) {
 				element.style.left = `${tl + overLeft}px`;
 			} else {

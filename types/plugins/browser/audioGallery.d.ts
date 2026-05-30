@@ -65,7 +65,7 @@ declare class AudioGallery extends PluginBrowser {
 	 */
 	constructor(kernel: SunEditor.Kernel, pluginOptions: AudioGalleryPluginOptions);
 	title: any;
-	onSelectfunction: (target: Node) => any;
+	onSelectfunction: (target: any) => any;
 	browser: Browser;
 	#private;
 }

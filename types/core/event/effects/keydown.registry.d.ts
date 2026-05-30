@@ -30,7 +30,7 @@ declare const _default: {
 	/** @action enterScrollTo */
 	'enter.scrollTo': ({ ports }: EffectContext_keydown, { range }: any) => void;
 	/** @action enterLineAddDefault */
-	'enter.line.addDefault': ({ ports, ctx }: EffectContext_keydown, { formatEl }: any) => void;
+	'enter.line.addDefault': ({ ports }: EffectContext_keydown, { formatEl }: any) => void;
 	/** @action enterListAddItem */
 	'enter.list.addItem': ({ ports }: EffectContext_keydown, { formatEl, selectionNode }: any) => void;
 	/** @action enterFormatExitEmpty */

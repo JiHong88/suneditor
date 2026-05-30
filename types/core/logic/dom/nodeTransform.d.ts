@@ -54,16 +54,16 @@ declare class NodeTransform {
 	/**
 	 * @description Remove nested tags without other child nodes.
 	 * @param {Node} element Element object
-	 * @param {?(((current: Node) => boolean)|string)} [validation] Validation function / String(`tag1|tag2..`) / If `null`, all tags are applicable.
+	 * @param {?(((current: *) => boolean)|string)} [validation] Validation function / String(`tag1|tag2..`) / If `null`, all tags are applicable.
 	 * @example
 	 * editor.$.nodeTransform.mergeNestedTags(parentElement, (current) => current.nodeName === 'SPAN');
 	 */
-	mergeNestedTags(element: Node, validation?: (((current: Node) => boolean) | string) | null): void;
+	mergeNestedTags(element: Node, validation?: (((current: any) => boolean) | string) | null): void;
 	/**
 	 * @description Delete itself and all parent nodes that match the condition.
 	 * - Returns an {sc: previousSibling, ec: nextSibling}(the deleted node reference) or `null`.
 	 * @param {Node} item Node to be remove
-	 * @param {?(current: Node) => boolean} [validation] Validation function. default(Deleted if it only have `breakLine` and blanks)
+	 * @param {?(current: *) => boolean} [validation] Validation function. default(Deleted if it only have `breakLine` and blanks)
 	 * @param {?Node} [stopParent] Stop when the parent node reaches `stopParent`
 	 * @returns {{sc: Node|null, ec: Node|null}|null} {sc: previousSibling, ec: nextSibling} (the deleted node reference) or `null`.
 	 * @example
@@ -82,7 +82,7 @@ declare class NodeTransform {
 	 */
 	removeAllParents(
 		item: Node,
-		validation?: ((current: Node) => boolean) | null,
+		validation?: ((current: any) => boolean) | null,
 		stopParent?: Node | null,
 	): {
 		sc: Node | null;
@@ -98,7 +98,7 @@ declare class NodeTransform {
 	/**
 	 * @description Creates a nested node structure from the given array of nodes.
 	 * @param {SunEditor.NodeCollection} nodeArray An array of nodes to clone. The first node in the array will be the top-level parent.
-	 * @param {?(current: Node) => boolean} [validate] A validate function.
+	 * @param {?(current: *) => boolean} [validate] A validate function.
 	 * @returns {{ parent: Node, inner: Node }} An object containing the top-level parent node and the innermost child node.
 	 * @example
 	 * // [div, span, em] → <div><span><em></em></span></div> (cloned)
@@ -114,7 +114,7 @@ declare class NodeTransform {
 	 */
 	createNestedNode(
 		nodeArray: SunEditor.NodeCollection,
-		validate?: ((current: Node) => boolean) | null,
+		validate?: ((current: any) => boolean) | null,
 	): {
 		parent: Node;
 		inner: Node;

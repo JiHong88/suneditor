@@ -17,7 +17,7 @@ declare class HTML {
 	 * @param {Object} params - Filtering parameters.
 	 * @param {string} [params.tagWhitelist] - Allowed tags, specified as a string with tags separated by `'|'`. (e.g. `"div|p|span"`).
 	 * @param {string} [params.tagBlacklist] - Disallowed tags, specified as a string with tags separated by `'|'`. (e.g. `"script|iframe"`).
-	 * @param {(node: Node) => Node | string | null} [params.validate] - Function to validate and modify individual nodes.
+	 * @param {(node: *) => Node | string | null} [params.validate] - Function to validate and modify individual nodes.
 	 *   - Return `null` to remove the node.
 	 *   - Return a `Node` to replace the current node.
 	 *   - Return a `string` to replace the node's `outerHTML`.
@@ -54,7 +54,7 @@ declare class HTML {
 		}: {
 			tagWhitelist?: string;
 			tagBlacklist?: string;
-			validate?: (node: Node) => Node | string | null;
+			validate?: (node: any) => Node | string | null;
 			validateAll?: boolean;
 		},
 	): string;

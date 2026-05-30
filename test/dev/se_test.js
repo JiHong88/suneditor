@@ -1406,9 +1406,13 @@ const options1 = {
 	iframe_attributes: { frameborder: '1' },
 	mode: 'classic',
 	// textDirection: 'rtl',
-	type: '',
+	// iframe: true,
+	height: '500px',
+	// type: 'document:page,header',
+	// innerWidth: '740px',
+	toolbar_innerWidth: 'auto',
 	blockHandle: {
-		menu: ['blockStyle', 'blockquote', 'list', 'align', 'hr', 'bold', 'italic', 'underline', 'strike', 'link', 'image', 'table', 'fontColor']
+		menu: ['blockStyle', 'blockquote', 'list', 'align', 'hr', 'bold', 'italic', 'underline', 'strike', 'link', 'image', 'table', 'fontColor'],
 	},
 	// mode: 'classic:bottom',
 	// maxHeight: 400,
@@ -1850,7 +1854,8 @@ const options1 = {
 
 <p><br>
 </p>
-`,
+	`,
+	// value: `<a href="https://example.com"><img alt="Logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==" /></a>`,
 };
 
 window.editor_root = suneditor.create('#editor_classic', options1);

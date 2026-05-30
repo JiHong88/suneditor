@@ -140,7 +140,7 @@ class ColorPicker {
 	 * @description Displays or resets the currently selected color at color list.
 	 * @param {Node|string} nodeOrColor Current Selected node
 	 * @param {Node} target target
-	 * @param {?(current: Node) => boolean} [stopCondition] - A function used to stop traversing parent nodes while finding the color.
+	 * @param {?(current: *) => boolean} [stopCondition] - A function used to stop traversing parent nodes while finding the color.
 	 * - When this function returns `true`, the traversal ends at that node.
 	 * - e.g., `(node) => this.format.isLine(node)` stops at line-level elements like <p>, <div>.
 	 * @example

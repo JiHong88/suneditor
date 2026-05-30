@@ -33,6 +33,7 @@ import type {} from '../../typedef';
  * @property {(...args: Parameters<Format['isEdgeLine']>) => ReturnType<Format['isEdgeLine']>} isEdgeLine
  * @property {(...args: Parameters<Format['removeBlock']>) => ReturnType<Format['removeBlock']>} removeBlock
  * @property {(...args: Parameters<Format['addLine']>) => ReturnType<Format['addLine']>} addLine
+ * @property {(...args: Parameters<Format['addLineAfter']>) => ReturnType<Format['addLineAfter']>} addLineAfter
  */
 /**
  * @typedef {Object} ListFormatPorts
@@ -111,6 +112,7 @@ export function makePorts(
 			removeArray: Array<Node> | null;
 		};
 		addLine: (el: any, nextOrTag: any) => HTMLElement;
+		addLineAfter: (el: any) => HTMLElement;
 	};
 	listFormat: {
 		applyNested: (
@@ -204,6 +206,7 @@ export type FormatPorts = {
 	isEdgeLine: (...args: Parameters<Format['isEdgeLine']>) => ReturnType<Format['isEdgeLine']>;
 	removeBlock: (...args: Parameters<Format['removeBlock']>) => ReturnType<Format['removeBlock']>;
 	addLine: (...args: Parameters<Format['addLine']>) => ReturnType<Format['addLine']>;
+	addLineAfter: (...args: Parameters<Format['addLineAfter']>) => ReturnType<Format['addLineAfter']>;
 };
 export type ListFormatPorts = {
 	applyNested: (...args: Parameters<ListFormat['applyNested']>) => ReturnType<ListFormat['applyNested']>;

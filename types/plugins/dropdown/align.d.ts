@@ -21,7 +21,6 @@ declare class Align extends PluginDropdown {
 	 */
 	constructor(kernel: SunEditor.Kernel, pluginOptions: AlignPluginOptions);
 	title: any;
-	_itemMenu: HTMLUListElement;
 	defaultDir: string;
 	alignIcons: {
 		justify: any;
@@ -29,6 +28,7 @@ declare class Align extends PluginDropdown {
 		right: any;
 		center: any;
 	};
+	_itemMenu: HTMLUListElement;
 	alignList: NodeListOf<Element>;
 	active(element: HTMLElement | null, target: HTMLElement | null): boolean | void;
 	setDir(dir: string): void;

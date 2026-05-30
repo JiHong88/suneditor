@@ -299,14 +299,17 @@ class Editor {
 
 			// document type
 			if (e.get('documentTypeInner')) {
-				if (this.$.options.get('_rtl')) e.get('wrapper').appendChild(e.get('documentTypeInner'));
-				else e.get('wrapper').insertBefore(e.get('documentTypeInner'), e.get('wysiwygFrame'));
+				e.get('wrapper').insertBefore(e.get('documentTypeInner'), e.get('wysiwygFrame'));
 			}
 			if (e.get('documentTypePage')) {
-				if (this.$.options.get('_rtl')) e.get('wrapper').insertBefore(e.get('documentTypePage'), e.get('wysiwygFrame'));
-				else e.get('wrapper').appendChild(e.get('documentTypePage'));
+				e.get('wrapper').appendChild(e.get('documentTypePage'));
 				// page mirror
 				e.get('wrapper').appendChild(e.get('documentTypePageMirror'));
+			}
+
+			// block handle
+			if (e.get('blockHandleArea')) {
+				e.get('wrapper').insertBefore(e.get('blockHandleArea'), e.get('wysiwygFrame'));
 			}
 		});
 

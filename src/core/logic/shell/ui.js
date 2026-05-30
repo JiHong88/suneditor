@@ -284,16 +284,6 @@ class UIManager {
 				this.#reverseToolbarButtons(this.#context.get('toolbar_sub_buttonTray'));
 			}
 
-			// document type
-			if (fc.has('documentType_use_header')) {
-				if (rtl) fc.get('wrapper').appendChild(fc.get('documentTypeInner'));
-				else fc.get('wrapper').insertBefore(fc.get('documentTypeInner'), fc.get('wysiwygFrame'));
-			}
-			if (fc.has('documentType_use_page')) {
-				if (rtl) fc.get('wrapper').insertBefore(fc.get('documentTypePage'), fc.get('wysiwygFrame'));
-				else fc.get('wrapper').appendChild(fc.get('documentTypePage'));
-			}
-
 			if (this.#store.mode.isBalloon) this.#$.toolbar._showBalloon();
 			else if (this.#store.mode.isSubBalloon) this.#$.subToolbar._showBalloon();
 		} catch (e) {

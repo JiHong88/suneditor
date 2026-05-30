@@ -154,6 +154,9 @@ function Constructor(editorTargets, options) {
 			class: 'se-wrapper' + (isBlockHandle ? ' se-mode-block' : '') + (o.get('type') === 'document' ? ' se-type-document' : '') + (o.get('_type_options').includes('header') ? ' se-type-document-header' : ''),
 		});
 
+		const editorInnerW = to.get('innerWidth');
+		if (editorInnerW && editorInnerW !== 'auto') editor_div.style.setProperty('--se-editor-inner-width', editorInnerW);
+
 		container.appendChild(dom.utils.createElement('DIV', { class: 'se-toolbar-shadow' }));
 
 		// init element
@@ -170,18 +173,6 @@ function Constructor(editorTargets, options) {
 
 		editor_div.appendChild(line_breaker_t);
 		editor_div.appendChild(line_breaker_b);
-
-		// block handle
-		if (isBlockHandle) {
-			const blockHandleArea = dom.utils.createElement('DIV', { class: 'se-block-handle-area' });
-			const blockHandleGroup = dom.utils.createElement('DIV', { class: 'se-block-handle' });
-			const blockHandlePlus = dom.utils.createElement('DIV', { class: 'se-block-handle-btn se-block-handle-plus' }, icons.plus);
-			const blockHandleDrag = dom.utils.createElement('DIV', { class: 'se-block-handle-btn se-block-handle-drag' }, icons.dragHandle);
-			blockHandleGroup.appendChild(blockHandlePlus);
-			blockHandleGroup.appendChild(blockHandleDrag);
-			blockHandleArea.appendChild(blockHandleGroup);
-			editor_div.appendChild(blockHandleArea);
-		}
 
 		// append container
 		if (placeholder_span) editor_div.appendChild(placeholder_span);
@@ -263,12 +254,38 @@ function Constructor(editorTargets, options) {
 			);
 		}
 
+		// block handle
+		let blockHandleArea = null;
+		if (isBlockHandle) {
+			blockHandleArea = dom.utils.createElement('DIV', { class: 'se-block-handle-area' });
+
+			const blockHandleGroup = dom.utils.createElement('DIV', { class: 'se-block-handle' });
+			const blockHandlePlus = dom.utils.createElement('DIV', { class: 'se-block-handle-btn se-block-handle-plus' }, icons.plus);
+			const blockHandleDrag = dom.utils.createElement('DIV', { class: 'se-block-handle-btn se-block-handle-drag' }, icons.dragHandle);
+			blockHandleGroup.appendChild(blockHandlePlus);
+			blockHandleGroup.appendChild(blockHandleDrag);
+
+			blockHandleArea.appendChild(blockHandleGroup);
+		}
+
 		// set container
 		top_div.appendChild(container);
 		rootKeys.push(key);
 		frameRoots.set(
 			key,
-			CreateFrameContext({ target: editTarget.target, key: editTarget.key, options: to }, top_div, wysiwyg_div, codeWrapper, textarea, markdownWrapper, markdownTextarea, default_status_bar || statusbar, documentTypeInner, key),
+			CreateFrameContext(
+				{ target: editTarget.target, key: editTarget.key, options: to },
+				top_div,
+				wysiwyg_div,
+				codeWrapper,
+				textarea,
+				markdownWrapper,
+				markdownTextarea,
+				default_status_bar || statusbar,
+				documentTypeInner,
+				blockHandleArea,
+				key,
+			),
 		);
 	}
 	/** frame - root set - end -------------------------------------------------------------- */
@@ -660,6 +677,7 @@ export function InitOptions(options, editorTargets, plugins) {
 
 	/** Toolbar */
 	o.set('toolbar_width', options.toolbar_width ? (numbers.is(options.toolbar_width) ? options.toolbar_width + 'px' : options.toolbar_width) : 'auto');
+	o.set('toolbar_innerWidth', options.toolbar_innerWidth ? (numbers.is(options.toolbar_innerWidth) ? options.toolbar_innerWidth + 'px' : options.toolbar_innerWidth) : '');
 	o.set('toolbar_container', options.toolbar_container && !/inline/i.test(o.get('mode')) ? (typeof options.toolbar_container === 'string' ? _d.querySelector(options.toolbar_container) : options.toolbar_container) : null);
 
 	const _stickyOpt = options.toolbar_sticky;
@@ -907,6 +925,7 @@ function InitFrameOptions(o, origin) {
 	const width = o.width === undefined ? origin.width : o.width;
 	const minWidth = o.minWidth === undefined ? origin.minWidth : o.minWidth;
 	const maxWidth = o.maxWidth === undefined ? origin.maxWidth : o.maxWidth;
+	const innerWidth = o.innerWidth === undefined ? origin.innerWidth : o.innerWidth;
 	const height = o.height === undefined ? origin.height : o.height;
 	const minHeight = o.minHeight === undefined ? origin.minHeight : o.minHeight;
 	const maxHeight = o.maxHeight === undefined ? origin.maxHeight : o.maxHeight;
@@ -933,6 +952,7 @@ function InitFrameOptions(o, origin) {
 	fo.set('width', width ? String(numbers.is(width) ? width + 'px' : width) : '100%');
 	fo.set('minWidth', minWidth ? String(numbers.is(minWidth) ? minWidth + 'px' : minWidth) : '');
 	fo.set('maxWidth', maxWidth ? String(numbers.is(maxWidth) ? maxWidth + 'px' : maxWidth) : '');
+	fo.set('innerWidth', innerWidth ? String(numbers.is(innerWidth) ? innerWidth + 'px' : innerWidth) : '');
 	fo.set('height', height ? String(numbers.is(height) ? height + 'px' : height) : 'auto');
 	fo.set('minHeight', minHeight ? String(numbers.is(minHeight) ? minHeight + 'px' : minHeight) : '');
 	fo.set('maxHeight', maxHeight ? String(numbers.is(maxHeight) ? maxHeight + 'px' : maxHeight) : '');
@@ -1146,6 +1166,20 @@ function _createWhitelist(o) {
 		.filter((v, i, a) => v && a.indexOf(v) === i && !blacklist.includes(v));
 
 	return whitelist.join('|');
+}
+
+/**
+ * @description Toolbar variant — sizes the button row to its content and centers it.
+ * - When `value` is a CSS length (e.g. `"500px"`, `"740px"`): the row is capped at that width.
+ * @param {?HTMLElement} el Target element (`.se-btn-tray`)
+ * @param {string} value CSS length, `'auto'` for center-only, or empty for no constraint
+ */
+function _applyToolbarInnerWidth(el, value) {
+	if (!el || !value) return;
+	if (value !== 'auto') el.style.maxWidth = value;
+	el.style.width = 'max-content';
+	el.style.marginLeft = 'auto';
+	el.style.marginRight = 'auto';
 }
 
 /**
@@ -1516,6 +1550,8 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang, isUpdat
 
 	if (moreLayer.children.length > 0) buttonTray.appendChild(moreLayer);
 	if (responsiveButtons.length > 0) responsiveButtons.unshift(buttonList);
+
+	_applyToolbarInnerWidth(buttonTray, options.get('toolbar_innerWidth'));
 
 	// rendering toolbar
 	const tool_bar = dom.utils.createElement('DIV', { class: 'se-toolbar sun-editor-common' + (!options.get('shortcutsHint') ? ' se-shortcut-hide' : '') }, buttonTray);

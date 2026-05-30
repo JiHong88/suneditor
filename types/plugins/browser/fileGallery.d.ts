@@ -67,7 +67,7 @@ declare class FileGallery extends PluginBrowser {
 	 */
 	constructor(kernel: SunEditor.Kernel, pluginOptions: FileGalleryPluginOptions);
 	title: any;
-	onSelectfunction: (target: Node) => any;
+	onSelectfunction: (target: any) => any;
 	browser: Browser;
 	#private;
 }

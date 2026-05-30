@@ -100,6 +100,7 @@ describe('Core Config - Frame Context', () => {
                 mockDOM.markdownFrame,
                 mockDOM.statusbar,
                 mockDOM.documentTypeInner,
+                null,
                 'testKey'
             );
 
@@ -123,6 +124,7 @@ describe('Core Config - Frame Context', () => {
                 mockDOM.markdownFrame,
                 mockDOM.statusbar,
                 mockDOM.documentTypeInner,
+                null,
                 'testKey'
             );
 
@@ -155,6 +157,7 @@ describe('Core Config - Frame Context', () => {
                 mockDOM.markdownFrame,
                 mockDOM.statusbar,
                 mockDOM.documentTypeInner,
+                null,
                 'testKey'
             );
 
@@ -170,6 +173,60 @@ describe('Core Config - Frame Context', () => {
             expect(context.get('savedIndex')).toBe(-1);
         });
 
+        it('should populate block handle entries from blockHandleArea param', () => {
+            const blockHandleArea = document.createElement('div');
+            blockHandleArea.classList.add('se-block-handle-area');
+            const handle = document.createElement('div');
+            handle.classList.add('se-block-handle');
+            const plus = document.createElement('div');
+            plus.classList.add('se-block-handle-plus');
+            const drag = document.createElement('div');
+            drag.classList.add('se-block-handle-drag');
+            handle.appendChild(plus);
+            handle.appendChild(drag);
+            blockHandleArea.appendChild(handle);
+
+            const context = CreateFrameContext(
+                mockEditorTarget,
+                mockDOM.top,
+                mockDOM.wwFrame,
+                mockDOM.codeWrapper,
+                mockDOM.codeFrame,
+                mockDOM.markdownWrapper,
+                mockDOM.markdownFrame,
+                mockDOM.statusbar,
+                mockDOM.documentTypeInner,
+                blockHandleArea,
+                'testKey'
+            );
+
+            expect(context.get('blockHandleArea')).toBe(blockHandleArea);
+            expect(context.get('blockHandle')).toBe(handle);
+            expect(context.get('blockHandlePlus')).toBe(plus);
+            expect(context.get('blockHandleDrag')).toBe(drag);
+        });
+
+        it('should null block handle entries when blockHandleArea is null', () => {
+            const context = CreateFrameContext(
+                mockEditorTarget,
+                mockDOM.top,
+                mockDOM.wwFrame,
+                mockDOM.codeWrapper,
+                mockDOM.codeFrame,
+                mockDOM.markdownWrapper,
+                mockDOM.markdownFrame,
+                mockDOM.statusbar,
+                mockDOM.documentTypeInner,
+                null,
+                'testKey'
+            );
+
+            expect(context.get('blockHandleArea')).toBe(null);
+            expect(context.get('blockHandle')).toBe(null);
+            expect(context.get('blockHandlePlus')).toBe(null);
+            expect(context.get('blockHandleDrag')).toBe(null);
+        });
+
         it('should set up document type elements', () => {
             const context = CreateFrameContext(
                 mockEditorTarget,
@@ -181,6 +238,7 @@ describe('Core Config - Frame Context', () => {
                 mockDOM.markdownFrame,
                 mockDOM.statusbar,
                 mockDOM.documentTypeInner,
+                null,
                 'testKey'
             );
 
@@ -200,6 +258,7 @@ describe('Core Config - Frame Context', () => {
                 mockDOM.markdownFrame,
                 mockDOM.statusbar,
                 mockDOM.documentTypeInner,
+                null,
                 'testKey'
             );
 
@@ -218,6 +277,7 @@ describe('Core Config - Frame Context', () => {
                 mockDOM.markdownFrame,
                 mockDOM.statusbar,
                 mockDOM.documentTypeInner,
+                null,
                 'testKey'
             );
 
@@ -239,6 +299,7 @@ describe('Core Config - Frame Context', () => {
                 mockDOM.markdownFrame,
                 mockDOM.statusbar,
                 mockDOM.documentTypeInner,
+                null,
                 'testKey'
             );
 
@@ -256,6 +317,7 @@ describe('Core Config - Frame Context', () => {
                 mockDOM.markdownFrame,
                 null,
                 mockDOM.documentTypeInner,
+                null,
                 'testKey'
             );
 

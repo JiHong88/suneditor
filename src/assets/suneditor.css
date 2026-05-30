@@ -177,6 +177,7 @@
 	position: relative;
 	text-align: center;
 	pointer-events: none;
+	z-index: 1;
 }
 
 .sun-editor .se-wrapper.se-type-document .se-document-page > div {
@@ -196,6 +197,7 @@
 	border-bottom: 1px dashed var(--se-doc-info-page-background-color);
 	top: 0px;
 	right: 100%;
+	z-index: 1;
 }
 
 /* se-type-document - placeholder position set */
@@ -999,9 +1001,13 @@
 	flex-direction: row;
 }
 
+.sun-editor.se-rtl .se-wrapper.se-mode-block {
+	flex-direction: row-reverse;
+}
+
 .sun-editor .se-block-handle-area {
 	position: relative;
-	width: 52px;
+	width: var(--se-block-handle-area-width);
 	flex-shrink: 0;
 	overflow: visible;
 	z-index: 2;
@@ -1018,12 +1024,13 @@
 	position: absolute;
 	display: none;
 	align-items: center;
-	gap: 1px;
-	color: var(--se-main-color-lighter);
-	z-index: 1;
+	gap: var(--se-block-handle-gap);
+	color: var(--se-block-handle-color);
+	z-index: 10;
 	transition:
 		top 0.15s ease-out,
-		left 0.15s ease-out;
+		left 0.15s ease-out,
+		right 0.15s ease-out;
 }
 
 .sun-editor .se-block-handle.se-no-transition {
@@ -1034,8 +1041,8 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	width: 24px;
-	height: 24px;
+	width: var(--se-block-handle-btn-size);
+	height: var(--se-block-handle-btn-size);
 	border-radius: var(--se-border-radius);
 	cursor: pointer;
 	opacity: 0.55;
@@ -1046,17 +1053,17 @@
 
 .sun-editor .se-block-handle-btn:hover {
 	opacity: 1;
-	background-color: rgba(55, 53, 47, 0.08);
+	background-color: var(--se-block-handle-btn-hover-bg);
 }
 
 .sun-editor .se-block-handle-btn:active {
 	opacity: 1;
-	background-color: rgba(55, 53, 47, 0.14);
+	background-color: var(--se-block-handle-btn-active-bg);
 }
 
 .sun-editor .se-block-handle-btn svg {
-	width: 18px;
-	height: 18px;
+	width: var(--se-block-handle-btn-icon-size);
+	height: var(--se-block-handle-btn-icon-size);
 }
 
 .sun-editor .se-block-handle-drag {
@@ -1069,19 +1076,44 @@
 
 /* block hover highlight (Notion-style) */
 .sun-editor .se-block-hover {
-	background-color: rgba(55, 53, 47, 0.04);
+	background-color: var(--se-block-hover-bg);
 	border-radius: var(--se-border-radius);
-	outline: 2px solid rgba(55, 53, 47, 0.04);
+	outline: 2px solid var(--se-block-hover-outline);
 }
 
-/* drag indicator line */
+/* drag indicator line — mirrors `.se-drag-cursor` for component drag-drop, but
+   horizontal (between blocks) instead of vertical (between text positions). */
 .sun-editor .se-block-drag-indicator {
 	position: absolute;
-	height: 2px;
-	background-color: var(--se-active-dark3-color);
+	height: var(--se-block-drag-indicator-height);
+	background-color: var(--se-block-drag-indicator-color);
 	border-radius: 1px;
 	pointer-events: none;
 	z-index: 10;
+}
+
+.sun-editor .se-block-drag-indicator::before {
+	content: '';
+	position: absolute;
+	left: -3px;
+	top: -4px;
+	width: 0;
+	height: 0;
+	border: 0 solid transparent;
+	border-width: 5px 0 5px 6px;
+	border-color: transparent transparent transparent var(--se-block-drag-indicator-color);
+}
+
+.sun-editor .se-block-drag-indicator::after {
+	content: '';
+	position: absolute;
+	right: -3px;
+	top: -4px;
+	width: 0;
+	height: 0;
+	border: 0 solid transparent;
+	border-width: 5px 6px 5px 0;
+	border-color: transparent var(--se-block-drag-indicator-color) transparent transparent;
 }
 
 .sun-editor .se-block-dragging {
@@ -1947,6 +1979,15 @@
 	outline: none;
 }
 
+/* `innerWidth` option — when the wrapper carries the inner-width CSS variable */
+.sun-editor .se-wrapper[style*='--se-editor-inner-width'] .se-wrapper-inner {
+	padding-inline: max(var(--se-edit-inner-padding), calc((100% - var(--se-editor-inner-width)) / 2));
+}
+
+.sun-editor .se-wrapper.se-mode-block[style*='--se-editor-inner-width'] .se-wrapper-inner {
+	padding-inline-start: max(var(--se-edit-inner-padding), calc((100% - var(--se-editor-inner-width)) / 2 - var(--se-block-handle-area-width)));
+}
+
 .sun-editor .se-wrapper .se-code-wrapper {
 	width: 100%;
 	overflow: hidden;
@@ -2767,8 +2808,8 @@
 }
 
 .sun-editor .se-controller.se-empty-controller {
-	border: none;
-	padding: 0;
+	border: none !important;
+	padding: 0 !important;
 }
 .sun-editor .se-controller.se-controller-simple-input {
 	padding: 4px 3px 0 3px;
@@ -3219,12 +3260,12 @@
 
 .sun-editor .se-select-menu.se-select-menu-mouse-move .se-select-item:hover,
 .sun-editor .se-select-menu:not(.se-select-menu-mouse-move) .se-select-item.active {
-	background-color: #eef3f9;
+	background-color: var(--se-select-menu-hover-bg);
 }
 
 .sun-editor .se-select-menu.se-select-menu-mouse-move .se-select-item:active,
 .sun-editor .se-select-menu.se-select-menu-mouse-move .se-select-item.__se__active {
-	background-color: #dde7f3;
+	background-color: var(--se-select-menu-active-bg);
 }
 
 .sun-editor .se-modal-form-files .se-select-menu {
@@ -3283,6 +3324,43 @@
 	padding: 4px 0;
 	box-shadow: 0 3px 9px var(--se-shadow-layer-color);
 	z-index: 1;
+}
+
+.sun-editor .se-select-menu > .se-select-submenu[popover] {
+	position: fixed;
+	inset: unset;
+	margin: 0;
+	color: inherit;
+}
+
+.sun-editor .se-select-menu > .se-select-submenu[popover]:popover-open {
+	display: block;
+}
+
+/* --- select menu - RTL (opt-in via `params.dir: 'rtl'`) --------------- */
+.sun-editor .se-select-menu.se-rtl,
+.sun-editor .se-select-menu.se-rtl > .se-select-submenu {
+	direction: rtl;
+}
+
+.sun-editor .se-select-menu.se-rtl .se-submenu-arrow {
+	right: auto;
+	left: 4px;
+}
+
+.sun-editor .se-select-menu.se-rtl .se-select-item:has(> .se-submenu-arrow) {
+	padding-right: 6px;
+	padding-left: 26px;
+}
+
+.sun-editor .se-select-menu.se-rtl.se-block-action-menu .se-select-item:has(> .se-submenu-arrow) {
+	padding-right: 10px;
+	padding-left: 28px;
+}
+
+.sun-editor .se-select-menu.se-rtl .se-block-menu-label-full {
+	padding-left: 0;
+	padding-right: 22px;
 }
 
 /* --- browser ---------------------------------------------------------- */
@@ -4295,14 +4373,44 @@
 	margin: 0 0 0 6px;
 }
 
+/* block handle - flip button order so the plus sits at the outer (right) edge */
+.sun-editor.se-rtl .se-block-handle {
+	flex-direction: row-reverse;
+}
+
 /* block handle - submenu */
 .sun-editor.se-rtl .se-block-submenu-item svg {
 	margin: 0 0 0 6px;
 }
 
+/* select menu submenu arrow — point left in RTL */
+.sun-editor.se-rtl .se-submenu-arrow svg {
+	transform: scaleX(-1);
+}
+
 /* menu list - color picker */
 .sun-editor.se-rtl .se-list-layer .se-selector-color .se-color-pallet li {
 	float: right;
+}
+
+/* RTL flips visual order via `float: right`, so DOM `:first-child` lands at the
+   visual right end and `:last-child` at the left end — corner radii must swap
+   sides to follow the visual layout. */
+.sun-editor.se-rtl .se-list-layer .se-selector-color .se-color-pallet:first-child li:first-child button {
+	border-top-left-radius: 0;
+	border-top-right-radius: var(--se-border-radius);
+}
+.sun-editor.se-rtl .se-list-layer .se-selector-color .se-color-pallet:first-child li:last-child button {
+	border-top-right-radius: 0;
+	border-top-left-radius: var(--se-border-radius);
+}
+.sun-editor.se-rtl .se-list-layer .se-selector-color .se-color-pallet:last-of-type li:first-child button {
+	border-bottom-left-radius: 0;
+	border-bottom-right-radius: var(--se-border-radius);
+}
+.sun-editor.se-rtl .se-list-layer .se-selector-color .se-color-pallet:last-of-type li:last-child button {
+	border-bottom-right-radius: 0;
+	border-bottom-left-radius: var(--se-border-radius);
 }
 
 /* dropdown layer - checked list */
@@ -4543,13 +4651,13 @@
 }
 .sun-editor.se-rtl .se-wrapper.se-type-document .se-document-page > div {
 	right: 0px;
+	left: revert;
 	margin-left: 0;
 	margin-right: 1px;
 }
 .sun-editor.se-rtl .se-wrapper.se-type-document .se-document-page > div > div.se-document-page-line {
 	right: unset;
 	left: 100%;
-	z-index: 1;
 }
 
 /* modal - footer */

@@ -31,7 +31,7 @@ jest.mock('../../../../../src/helper', () => ({
 			getListChildren: jest.fn().mockReturnValue([])
 		}
 	},
-	env: { _w: { requestAnimationFrame: jest.fn((cb) => { cb(); return 1; }), cancelAnimationFrame: jest.fn(), setTimeout: jest.fn((cb) => { cb(); return 1; }), clearTimeout: jest.fn(), innerWidth: 1024, innerHeight: 768, getComputedStyle: jest.fn(() => ({ marginLeft: '0px', paddingLeft: '0px' })), scrollY: 0 } }
+	env: { _w: { requestAnimationFrame: jest.fn((cb) => { cb(); return 1; }), cancelAnimationFrame: jest.fn(), setTimeout: jest.fn((cb) => { cb(); return 1; }), clearTimeout: jest.fn(), innerWidth: 1024, innerHeight: 768, getComputedStyle: jest.fn(() => ({ marginLeft: '0px', paddingLeft: '0px', marginRight: '0px', paddingRight: '0px', fontSize: '16px', getPropertyValue: () => '' })), scrollX: 0, scrollY: 0 }, _d: { documentElement: {} } }
 }));
 
 // Mock resolveBlock — blockHandle imports it directly from `./blockResolver`
@@ -80,13 +80,29 @@ function createMockDeps() {
 		history: {
 			push: jest.fn()
 		},
-		frameContext: {
-			get: jest.fn().mockReturnValue(document.createElement('div'))
-		},
+		frameContext: (() => {
+			const cache = {};
+			return {
+				get: jest.fn((key) => {
+					if (!cache[key]) {
+						const el = document.createElement('div');
+						el.getBoundingClientRect = () => ({ top: 0, left: 0, right: 1024, bottom: 768, width: 1024, height: 768 });
+						cache[key] = el;
+					}
+					return cache[key];
+				})
+			};
+		})(),
 		options: {
 			get: jest.fn().mockImplementation((key) => {
 				if (key === 'defaultLine') return 'P';
 				if (key === '_rtl') return false;
+				return false;
+			})
+		},
+		frameOptions: {
+			get: jest.fn().mockImplementation((key) => {
+				if (key === 'innerWidth') return '';
 				return false;
 			})
 		},
@@ -96,7 +112,17 @@ function createMockDeps() {
 		lang: {},
 		ui: { selectMenuOn: false },
 		offset: { getGlobal: jest.fn().mockReturnValue({ top: 100, left: 0, height: 24, width: 24 }) },
-		store: { set: jest.fn() }
+		store: { set: jest.fn() },
+		contextProvider: { carrierWrapper: document.createElement('div') },
+		eventManager: {
+			addEvent: jest.fn((target, type, handler, useCapture) => {
+				target?.addEventListener?.(type, handler, useCapture);
+				return { target, type, handler, useCapture };
+			}),
+			removeEvent: jest.fn((info) => {
+				info?.target?.removeEventListener?.(info.type, info.handler, info.useCapture);
+			})
+		}
 	};
 }
 
@@ -164,7 +190,7 @@ describe('BlockHandle', () => {
 
 			expect(resolveBlock).toHaveBeenCalled();
 			expect(els.handle.style.display).toBe('flex');
-			expect(els.handle.style.top).toBe('50px'); // 100 - 50
+			expect(els.handle.style.top).toBe('100px'); // blockRect.top + scrollY (handle lives in carrierWrapper)
 		});
 
 		it('hides handle when resolveBlock returns null', () => {
@@ -238,7 +264,7 @@ describe('BlockHandle', () => {
 			p.getBoundingClientRect.mockReturnValue({ top: 80, left: 0, bottom: 100, right: 400, width: 400, height: 20 });
 			blockHandle.syncScroll();
 
-			expect(els.handle.style.top).toBe('30px'); // 80 - 50
+			expect(els.handle.style.top).toBe('80px'); // blockRect.top + scrollY (handle lives in carrierWrapper)
 		});
 
 		it('does nothing when no current block', () => {
@@ -474,6 +500,122 @@ describe('BlockHandle', () => {
 			els.drag.click();
 
 			expect($.selection.setRange).toHaveBeenCalledWith(p3, 0, p3, p3.childNodes.length);
+		});
+	});
+
+	describe('hideNow', () => {
+		it('hides handle immediately and clears current block', () => {
+			const { p1 } = setupThreeBlocks();
+
+			blockHandle = new BlockHandle($, els.area, els.handle, els.plus, els.drag, null);
+			blockHandle.positionForTarget(p1);
+			expect(els.handle.style.display).toBe('flex');
+
+			blockHandle.hideNow();
+			expect(els.handle.style.display).toBe('none');
+
+			// After hideNow the handle should treat the next target as a fresh first appearance
+			// (no sticky lock-in to a previous block).
+			expect(() => blockHandle.hideNow()).not.toThrow();
+		});
+	});
+
+	describe('plus button no-op', () => {
+		it('does nothing when there is no current block', () => {
+			blockHandle = new BlockHandle($, els.area, els.handle, els.plus, els.drag, null);
+
+			els.plus.click();
+			expect($.format.addLineAfter).not.toHaveBeenCalled();
+			expect($.selection.setRange).not.toHaveBeenCalled();
+			expect($.history.push).not.toHaveBeenCalled();
+		});
+	});
+
+	describe('RTL positioning', () => {
+		it('sets style.right (not style.left) when _rtl is true', () => {
+			const { p1 } = setupThreeBlocks();
+			$.options.get.mockImplementation((key) => key === '_rtl' ? true : key === 'defaultLine' ? 'P' : false);
+			els.area.getBoundingClientRect = jest.fn().mockReturnValue({ top: 50, left: 0, right: 60 });
+
+			blockHandle = new BlockHandle($, els.area, els.handle, els.plus, els.drag, null);
+			blockHandle.positionForTarget(p1);
+
+			expect(els.handle.style.right).not.toBe('');
+			expect(els.handle.style.left).toBe('');
+		});
+	});
+
+	describe('keydown in wysiwyg clears hover lines', () => {
+		it('removes se-block-hover from current block on keydown', () => {
+			const helperMock = require('../../../../../src/helper');
+			const { p1 } = setupThreeBlocks();
+
+			// frameContext.get('eventWysiwyg') returns a (cached) element — capture it so
+			// we can dispatch a keydown that hits the wrapper key handler.
+			const eventWysiwyg = $.frameContext.get('eventWysiwyg');
+
+			blockHandle = new BlockHandle($, els.area, els.handle, els.plus, els.drag, null);
+			blockHandle.positionForTarget(p1);
+			helperMock.dom.utils.removeClass.mockClear();
+
+			eventWysiwyg.dispatchEvent(new KeyboardEvent('keydown', { key: 'a' }));
+
+			const removeCalls = helperMock.dom.utils.removeClass.mock.calls.filter((c) => c[1] === 'se-block-hover');
+			expect(removeCalls.length).toBeGreaterThan(0);
+		});
+	});
+
+	describe('innerWidth centering compensation', () => {
+		it('shifts handle left by the extra centering padding when innerWidth is set', () => {
+			const { p1 } = setupThreeBlocks();
+			els.area.getBoundingClientRect = jest.fn().mockReturnValue({ top: 50, left: 0, right: 60 });
+
+			// frameOptions.innerWidth truthy triggers `_resolveLengthPx` path
+			$.frameOptions.get.mockImplementation((key) => key === 'innerWidth' ? '740px' : false);
+
+			// Mock the computed style returned by `_w.getComputedStyle` for the wysiwyg.
+			// `paddingLeft` (40) exceeds `--se-edit-inner-padding` (16) → centeringExtra = 24px.
+			const helperMock = require('../../../../../src/helper');
+			helperMock.env._w.getComputedStyle = jest.fn(() => ({
+				marginLeft: '0px',
+				paddingLeft: '40px',
+				marginRight: '0px',
+				paddingRight: '40px',
+				fontSize: '16px',
+				getPropertyValue: () => '16px',
+			}));
+
+			blockHandle = new BlockHandle($, els.area, els.handle, els.plus, els.drag, null);
+			blockHandle.positionForTarget(p1);
+
+			// Without innerWidth, style.left would be areaRect.left + scrollX = 0px.
+			// With centeringExtra of 24px applied, it should be 24px (or greater).
+			const leftPx = parseInt(els.handle.style.left, 10) || 0;
+			expect(leftPx).toBeGreaterThan(0);
+		});
+	});
+
+	describe('destroy cleanup', () => {
+		it('drops the carrierWrapper handle and disables dragBtn', () => {
+			blockHandle = new BlockHandle($, els.area, els.handle, els.plus, els.drag, null);
+			expect(els.drag.draggable).toBe(true);
+			expect(els.handle.parentNode).toBe($.contextProvider.carrierWrapper);
+
+			blockHandle.destroy();
+			expect(els.drag.draggable).toBe(false);
+			expect(els.handle.parentNode).toBe(null);
+
+			blockHandle = null; // prevent afterEach double-destroy
+		});
+
+		it('positionForTarget is a no-op after destroy', () => {
+			blockHandle = new BlockHandle($, els.area, els.handle, els.plus, els.drag, null);
+			blockHandle.destroy();
+			resolveBlock.mockClear();
+
+			blockHandle.positionForTarget(document.createElement('p'));
+			expect(resolveBlock).not.toHaveBeenCalled();
+			blockHandle = null;
 		});
 	});
 });

@@ -238,6 +238,7 @@ class DocumentType {
 
 			this.#pagesLine = this.#page.querySelectorAll('.se-document-page-line');
 			this.#totalPages = this.#pages.length;
+			this.#updatePageVisibility();
 			this._displayCurrentPage();
 		}, 400);
 	}
@@ -382,12 +383,27 @@ class DocumentType {
 		if (prevScrollTop === scrollTop) return;
 
 		const pages = this.#pages;
+		const delta = scrollTop - prevScrollTop;
 		for (let i = 0, len = pages.length; i < len; i++) {
-			pages[i].style.top = `${numbers.get(pages[i].style.top) - (scrollTop - prevScrollTop)}px`;
+			pages[i].style.top = `${numbers.get(pages[i].style.top) - delta}px`;
 		}
+		this.#updatePageVisibility();
 
 		this.#prevScrollTop = scrollTop;
 		this._displayCurrentPage();
+	}
+
+	/**
+	 * @description Hide page indicators whose `top` has scrolled past the wysiwyg
+	 */
+	#updatePageVisibility() {
+		const pages = this.#pages;
+		if (!pages?.length) return;
+		const wwHeight = this.#wwFrame.offsetHeight;
+		for (let i = 0, len = pages.length; i < len; i++) {
+			const top = numbers.get(pages[i].style.top);
+			pages[i].style.display = top < 0 || top > wwHeight ? 'none' : '';
+		}
 	}
 
 	/**

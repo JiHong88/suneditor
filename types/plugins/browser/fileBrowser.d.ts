@@ -99,7 +99,7 @@ declare class FileBrowser extends PluginBrowser {
 	 */
 	constructor(kernel: SunEditor.Kernel, pluginOptions: FileBrowserPluginOptions);
 	title: any;
-	onSelectfunction: (target: Node) => any;
+	onSelectfunction: (target: any) => any;
 	browser: Browser;
 	#private;
 }

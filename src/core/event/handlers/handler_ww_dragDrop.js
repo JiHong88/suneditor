@@ -16,6 +16,11 @@ const { _w } = env;
  * @param {DragEvent} e - Event object
  */
 export function OnDragOver_wysiwyg(fc, dragCursor, _iframeTopArea, _innerToolbar, e) {
+	// Block-handle drag uses its own indicator + drop logic — skip the component
+	if (e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('application/x-suneditor-block-drag')) {
+		return;
+	}
+
 	const { sc, so, ec, eo } = this.$.selection.getDragEventLocationRange(e);
 	if (!sc) return;
 
@@ -90,6 +95,11 @@ export function OnDrop_wysiwyg(fc, dragCursor, e) {
 
 		const dataTransfer = e.dataTransfer;
 		if (!dataTransfer) return true;
+
+		// Block-handle drag handles its own drop — skip the text-insertion path.
+		if (Array.from(dataTransfer.types || []).includes('application/x-suneditor-block-drag')) {
+			return;
+		}
 
 		const { sc, so, ec, eo } = this.$.selection.getDragEventLocationRange(e);
 		if (!sc) return;

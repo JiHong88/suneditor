@@ -3,7 +3,27 @@ import { resolveBlock } from './blockResolver';
 import { ResolveButton } from '../../section/constructor';
 import SelectMenu from '../../../modules/ui/SelectMenu.js';
 
-const { _w } = env;
+const { _w, _d } = env;
+
+/**
+ * @description Resolve a CSS length value (`px`, `em`, `rem`, or unitless) to pixels.
+ * Falls back to `0` when the value is empty or unparseable.
+ * @param {string} value Raw CSS length string (e.g. `"1.5em"`)
+ * @param {CSSStyleDeclaration} contextStyle Computed style of the element using the value (for `em`)
+ * @returns {number} Resolved pixel length
+ */
+function _resolveLengthPx(value, contextStyle) {
+	const trimmed = (value || '').trim();
+	const num = parseFloat(trimmed);
+	if (!num) return 0;
+	if (/rem$/.test(trimmed)) {
+		return num * (parseFloat(_w.getComputedStyle(_d.documentElement).fontSize) || 16);
+	}
+	if (/em$/.test(trimmed)) {
+		return num * (parseFloat(contextStyle.fontSize) || 16);
+	}
+	return num;
+}
 
 /**
  * @class
@@ -36,28 +56,20 @@ class BlockHandle {
 	// Drag state
 	/** @type {boolean} */
 	#isDragging = false;
-	/** @type {{x: number, y: number}|null} */
-	#dragStartPos = null;
 	/** @type {HTMLElement|null} */
 	#dragIndicator = null;
 	/** @type {HTMLElement|null} */
 	#dragTarget = null;
 	/** @type {{element: HTMLElement, position: 'before'|'after'}|null} */
 	#dropTarget = null;
+	/** @type {HTMLElement|null} */
+	#dragWysiwyg = null;
+	/** @type {HTMLElement[]|null} */
+	#dragChildren = null;
 
 	// Free dropdown (table, fontColor, etc.) — opened as a flyout next to the action menu
-	/** @type {{ dropdown: HTMLElement, plugin: Object|null, originalParent: Node|null, anchorLi: HTMLElement|null, onClick: (e: Event) => void }|null} */
+	/** @type {{ dropdown: HTMLElement, plugin: Object|null, originalParent: Node|null, anchorLi: HTMLElement|null, evClick: ?SunEditor.Event.Info }|null} */
 	#freeDropdownState = null;
-
-	// Bound handlers for cleanup
-	#boundPlusClick = null;
-	#boundDragClick = null;
-	#boundAreaMouseMove = null;
-	#boundAreaMouseLeave = null;
-	#boundWrapperMouseLeave = null;
-	#boundDragMouseDown = null;
-	#boundHandleMouseDown = null;
-	#boundWrapperKeyDown = null;
 
 	/**
 	 * @constructor
@@ -76,36 +88,37 @@ class BlockHandle {
 		this.#dragBtn = blockHandleDrag;
 		this.#menuConfig = menuConfig || null;
 
-		// Bind events
-		this.#boundPlusClick = this.#onPlusClick.bind(this);
-		this.#boundDragClick = this.#onDragClick.bind(this);
-		this.#boundDragMouseDown = this.#onDragMouseDown.bind(this);
-		this.#boundAreaMouseMove = this.#onAreaMouseMove.bind(this);
-		this.#boundAreaMouseLeave = this.#onAreaMouseLeave.bind(this);
-		this.#boundWrapperMouseLeave = this.#onWrapperMouseLeave.bind(this);
-		this.#boundHandleMouseDown = this.#onHandleMouseDown.bind(this);
-		this.#boundWrapperKeyDown = this.#onWrapperKeyDown.bind(this);
+		this.#$.contextProvider.carrierWrapper.appendChild(this.#handle);
+
+		const em = this.#$.eventManager;
 
 		// Prevent editor blur on handle interaction — preserves selection range (same as toolbar)
-		this.#handle.addEventListener('mousedown', this.#boundHandleMouseDown);
+		em.addEvent(this.#handle, 'mousedown', this.#onHandleMouseDown.bind(this));
 
 		// Create drag indicator
 		this.#dragIndicator = dom.utils.createElement('DIV', { class: 'se-block-drag-indicator' });
 		this.#dragIndicator.style.display = 'none';
 		this.#area.parentElement?.appendChild(this.#dragIndicator);
 
-		this.#plusBtn.addEventListener('click', this.#boundPlusClick);
-		this.#dragBtn.addEventListener('mousedown', this.#boundDragMouseDown);
-		this.#dragBtn.addEventListener('click', this.#boundDragClick);
-		this.#area.addEventListener('mousemove', this.#boundAreaMouseMove);
-		this.#area.addEventListener('mouseleave', this.#boundAreaMouseLeave);
+		em.addEvent(this.#plusBtn, 'click', this.#onPlusClick.bind(this));
+		// HTML5 drag-and-drop: native drag image, native event flow.
+		this.#dragBtn.draggable = true;
+		em.addEvent(this.#dragBtn, 'dragstart', this.#onDragStart.bind(this));
+		em.addEvent(this.#dragBtn, 'dragend', this.#onDragEnd.bind(this));
+		em.addEvent(this.#dragBtn, 'click', this.#onDragClick.bind(this));
+		em.addEvent(this.#area, 'mousemove', this.#onAreaMouseMove.bind(this));
+		em.addEvent(this.#area, 'mouseleave', this.#onAreaMouseLeave.bind(this));
 
-		// Wrapper (parent of area + wysiwyg) — catches mouse leaving the entire editor zone
+		// Wrapper (parent of area + wysiwyg) — catches mouse leaving the entire editor
+		// zone, plus the dragover/drop targets for the in-flight HTML5 drag.
 		const wrapper = this.#area.parentElement;
 		if (wrapper) {
-			wrapper.addEventListener('mouseleave', this.#boundWrapperMouseLeave);
-			wrapper.addEventListener('keydown', this.#boundWrapperKeyDown, true);
+			em.addEvent(wrapper, 'mouseleave', this.#onWrapperMouseLeave.bind(this));
+			em.addEvent(wrapper, 'dragover', this.#onDragOver.bind(this));
+			em.addEvent(wrapper, 'drop', this.#onDrop.bind(this));
 		}
+
+		em.addEvent(this.#$.frameContext.get('eventWysiwyg'), 'keydown', this.#onWrapperKeyDown.bind(this), true);
 	}
 
 	/**
@@ -131,15 +144,12 @@ class BlockHandle {
 
 	/**
 	 * @description Schedule hiding the block handle with a short delay.
-	 * Called from wysiwyg mouseleave — the area mousemove will cancel the hide
-	 * if the mouse is crossing into the handle area.
 	 * @param {MouseEvent} e - Mouse event
 	 */
 	hide(e) {
 		if (this.#actionMenu?.isOpen) return;
-		const related = e?.relatedTarget;
-		// Mouse moved into the handle area or its children — don't hide
-		if (related && this.#area.contains(/** @type {Node} */ (related))) return;
+		const related = /** @type {Node} */ (e?.relatedTarget);
+		if (related && (this.#area.contains(related) || this.#handle?.contains(related))) return;
 		this.#scheduleHide();
 	}
 
@@ -158,15 +168,15 @@ class BlockHandle {
 	 */
 	syncScroll() {
 		if (!this.#currentBlock) return;
-		// Close menu on scroll to prevent stale positioning
-		if (this.#actionMenu?.isOpen) {
-			this.#actionMenu.close();
-		}
 		// Skip transition during scroll — handle should track scroll instantly
 		dom.utils.addClass(this.#handle, 'se-no-transition');
 		this.#updatePosition(this.#currentBlock);
 		void this.#handle.offsetHeight;
 		dom.utils.removeClass(this.#handle, 'se-no-transition');
+
+		if (this.#actionMenu?.isOpen) {
+			this.#actionMenu.setHidden(this.#handle.style.display === 'none');
+		}
 	}
 
 	/**
@@ -177,20 +187,13 @@ class BlockHandle {
 			_w.cancelAnimationFrame(this.#rafId);
 			this.#rafId = null;
 		}
+		this.#isDragging = false;
 		this.#cancelHide();
 		this.#closeFreeDropdown();
-		this.#handle?.removeEventListener('mousedown', this.#boundHandleMouseDown);
-		this.#plusBtn?.removeEventListener('click', this.#boundPlusClick);
-		this.#dragBtn?.removeEventListener('mousedown', this.#boundDragMouseDown);
-		this.#dragBtn?.removeEventListener('click', this.#boundDragClick);
+
+		if (this.#dragBtn) this.#dragBtn.draggable = false;
 		this.#dragIndicator?.remove();
-		this.#area?.removeEventListener('mousemove', this.#boundAreaMouseMove);
-		this.#area?.removeEventListener('mouseleave', this.#boundAreaMouseLeave);
-		const wrapper = this.#area?.parentElement;
-		if (wrapper) {
-			wrapper.removeEventListener('mouseleave', this.#boundWrapperMouseLeave);
-			wrapper.removeEventListener('keydown', this.#boundWrapperKeyDown, true);
-		}
+		this.#handle?.remove();
 		this.#actionMenu?.close();
 		this.#actionMenu = null;
 		this.#setCurrentBlock(null);
@@ -232,9 +235,7 @@ class BlockHandle {
 			const startLine = this.#$.format.getLine(range.startContainer, null);
 			const endLine = this.#$.format.getLine(range.endContainer, null);
 			if (!startLine || !endLine || startLine === endLine) return null;
-			// Non-mutating line collection — `format.getLines` calls `resetRangeToTextNode` which
-			// mutates the selection and breaks bottom-to-top drag selection (every mousemove
-			// re-normalizes endpoints to document order, killing the user's anchor).
+
 			const all = dom.query.getListChildren(range.commonAncestorContainer, (n) => this.#$.format.isLine(n), null);
 			const sIdx = all.indexOf(startLine);
 			const eIdx = all.indexOf(endLine);
@@ -242,8 +243,8 @@ class BlockHandle {
 			const lines = all.slice(Math.min(sIdx, eIdx), Math.max(sIdx, eIdx) + 1);
 			if (lines.indexOf(block) === -1) return null;
 			return lines;
-		} catch (_) {
-			// No valid selection — treat as no multi-line range
+		} catch {
+			// No valid selection
 		}
 		return null;
 	}
@@ -284,12 +285,12 @@ class BlockHandle {
 	/**
 	 * @description Mouse moves inside the block handle area.
 	 * Probes the wysiwyg at the same Y level to find which block to show the handle for.
-	 * This keeps the handle alive when the mouse is in the gutter, and enables
-	 * repositioning as the mouse moves vertically within the area.
 	 * @param {MouseEvent} e
 	 */
 	#onAreaMouseMove(e) {
 		if (!this.#$) return;
+		if (this.#isDragging) return;
+
 		this.#cancelHide();
 
 		// Don't reposition while action menu is open
@@ -320,20 +321,24 @@ class BlockHandle {
 
 	/**
 	 * @description Mouse leaves the block handle area.
-	 * If mouse moves into the wysiwyg, positionForTarget will take over.
-	 * If mouse moves outside the wrapper, wrapperMouseLeave handles it.
-	 * Schedule hide as a safety net.
+	 * @param {MouseEvent} e
 	 */
-	#onAreaMouseLeave() {
+	#onAreaMouseLeave(e) {
+		if (this.#actionMenu?.isOpen) return;
+
+		const related = /** @type {Node} */ (e?.relatedTarget);
+		if (related && this.#handle?.contains(related)) return;
+
 		this.#scheduleHide();
 	}
 
 	/**
 	 * @description Mouse leaves the entire wrapper (area + wysiwyg).
-	 * Hides the handle immediately — mouse is completely outside the editor zone.
 	 */
-	#onWrapperMouseLeave() {
+	#onWrapperMouseLeave(e) {
 		if (this.#actionMenu?.isOpen) return;
+		const related = /** @type {Node} */ (e?.relatedTarget);
+		if (related && this.#handle?.contains(related)) return;
 		this.#cancelHide();
 		this.#handle.style.display = 'none';
 		this.#setCurrentBlock(null);
@@ -350,7 +355,6 @@ class BlockHandle {
 		const wysiwygFrame = this.#$.frameContext.get('wysiwyg');
 		if (!wysiwygFrame) return;
 
-		// If target is the wysiwyg itself (padding area), probe center to find the actual block
 		let target = eventTarget;
 		if (target === wysiwygFrame && mouseY !== undefined) {
 			const rect = wysiwygFrame.getBoundingClientRect();
@@ -380,10 +384,6 @@ class BlockHandle {
 		// Same block and handle already visible — skip
 		if (block.element === this.#currentBlock && this.#handle.style.display === 'flex') return;
 
-		// Sticky: keep current block when mouseY is within current block's bounds.
-		// - Ancestor resolved (parent padding crossed): sticky if still in child's Y range
-		// - Sibling resolved (gap between items): sticky if still in current's Y range
-		// - Descendant resolved (parent→child): always allow switch
 		if (this.#currentBlock?.isConnected && this.#handle.style.display === 'flex' && mouseY !== undefined) {
 			if (!this.#currentBlock.contains(block.element)) {
 				const r = this.#currentBlock.getBoundingClientRect();
@@ -400,28 +400,68 @@ class BlockHandle {
 	 */
 	#updatePosition(blockElement) {
 		if (!blockElement.isConnected) {
-			this.hide(null);
+			this.hideNow();
 			return;
 		}
 
 		const blockRect = blockElement.getBoundingClientRect();
 		const areaRect = this.#area.getBoundingClientRect();
-		const top = blockRect.top - areaRect.top;
-		const handleW = this.#handle.offsetWidth || 49;
-		const areaW = areaRect.width;
 
-		// Handle left offset: based only on the block's own margin/padding indent.
-		// For LI, account for parent UL/OL padding (marker space).
-		const indent = this.#getBlockIndent(blockElement);
-		const left = indent > 0 ? indent + 'px' : '';
+		const wysiwygFrameEl = this.#$.frameContext.get('wysiwygFrame');
+		const isIframe = /^iframe$/i.test(wysiwygFrameEl.nodeName);
+		const iframeRect = isIframe ? wysiwygFrameEl.getBoundingClientRect() : null;
 
-		// First appearance after being hidden — skip transition so it doesn't slide in
-		// from the previous block's position.
+		if (isIframe) {
+			const iframeH = wysiwygFrameEl.clientHeight || 0;
+			if (blockRect.bottom <= 0 || blockRect.top >= iframeH) {
+				this.#handle.style.display = 'none';
+				return;
+			}
+		} else {
+			const wwFrameRect = wysiwygFrameEl.getBoundingClientRect();
+			if (blockRect.bottom <= wwFrameRect.top || blockRect.top >= wwFrameRect.bottom) {
+				this.#handle.style.display = 'none';
+				return;
+			}
+		}
+
+		const scrollX = _w.scrollX;
+		const scrollY = _w.scrollY;
+
+		// parent-viewport top to convert to parent coordinates
+		const blockTopVP = isIframe ? blockRect.top + iframeRect.top : blockRect.top;
+		const top = blockTopVP + scrollY;
+
+		// Handle inline offset
+		const isRtl = !!this.#$.options.get('_rtl');
+		const indent = this.#getBlockIndent(blockElement, isRtl);
+
+		// innerWidth
+		let centeringExtra = 0;
+		if (this.#$.frameOptions.get('innerWidth')) {
+			const wysiwygFrame = this.#$.frameContext.get('wysiwyg');
+			if (wysiwygFrame) {
+				const cs = _w.getComputedStyle(wysiwygFrame);
+				const padStart = parseFloat(isRtl ? cs.paddingRight : cs.paddingLeft) || 0;
+				const baseline = _resolveLengthPx(cs.getPropertyValue('--se-edit-inner-padding'), cs);
+				centeringExtra = Math.max(0, padStart - baseline);
+			}
+		}
+
+		const totalOffset = indent + centeringExtra;
+
+		// First appearance after being hidden — skip transition
 		const wasHidden = this.#handle.style.display !== 'flex';
 		if (wasHidden) dom.utils.addClass(this.#handle, 'se-no-transition');
 
 		this.#handle.style.top = top + 'px';
-		this.#handle.style.left = left;
+		if (isRtl) {
+			this.#handle.style.left = '';
+			this.#handle.style.right = _w.innerWidth - areaRect.right - scrollX + totalOffset + 'px';
+		} else {
+			this.#handle.style.right = '';
+			this.#handle.style.left = areaRect.left + scrollX + totalOffset + 'px';
+		}
 		this.#handle.style.display = 'flex';
 
 		if (wasHidden) {
@@ -431,28 +471,27 @@ class BlockHandle {
 	}
 
 	/**
-	 * @description Calculate the handle's left indent.
-	 * Walks from the block up to the wysiwyg, summing padding-left and margin-left
-	 * of all ancestor block elements (format.isBlock). Also includes the block's own margin-left.
+	 * @description Calculate the handle's inline indent.
 	 * @param {HTMLElement} blockElement
+	 * @param {boolean} isRtl
 	 * @returns {number} Indent in pixels (0 = default gutter position)
 	 */
-	#getBlockIndent(blockElement) {
+	#getBlockIndent(blockElement, isRtl) {
 		const wysiwyg = this.#$.frameContext.get('wysiwyg');
 		if (!wysiwyg) return 0;
 
 		const format = this.#$.format;
+		const marginKey = isRtl ? 'marginRight' : 'marginLeft';
+		const paddingKey = isRtl ? 'paddingRight' : 'paddingLeft';
 		let indent = 0;
 
-		// Block's own margin-left
-		indent += parseFloat(_w.getComputedStyle(blockElement).marginLeft) || 0;
+		indent += parseFloat(_w.getComputedStyle(blockElement)[marginKey]) || 0;
 
-		// Walk ancestors: sum padding-left + margin-left of block elements
 		let el = blockElement.parentElement;
 		while (el && el !== wysiwyg) {
 			if (format.isBlock(el)) {
 				const s = _w.getComputedStyle(el);
-				indent += (parseFloat(s.paddingLeft) || 0) + (parseFloat(s.marginLeft) || 0);
+				indent += (parseFloat(s[paddingKey]) || 0) + (parseFloat(s[marginKey]) || 0);
 			}
 			el = el.parentElement;
 		}
@@ -462,10 +501,6 @@ class BlockHandle {
 
 	/**
 	 * @description Expand the selection range so it covers full lines.
-	 * - If a non-collapsed range covers multiple lines including `currentBlock`,
-	 *   keep that line set but extend the start to the first line's beginning and
-	 *   the end to the last line's end (line element start/end, inline content included).
-	 * - Otherwise, select the entire `currentBlock` line (start to end of its content).
 	 */
 	#expandRangeToFullLines() {
 		if (!this.#currentBlock) return;
@@ -497,73 +532,93 @@ class BlockHandle {
 	}
 
 	/**
-	 * @description Drag button mousedown — start tracking for drag vs click.
+	 * @description Handle group mousedown — prevents editor blur on click so the selection survives.
 	 * @param {MouseEvent} e
 	 */
 	#onHandleMouseDown(e) {
-		if (!env.isMobile) {
-			e.preventDefault();
-		} else {
+		const onDragBtn = this.#dragBtn && (e.target === this.#dragBtn || this.#dragBtn.contains(/** @type {Node} */ (e.target)));
+		if (env.isMobile) {
 			this.#$.store.set('_preventBlur', true);
+			return;
 		}
+		if (!onDragBtn) e.preventDefault();
 	}
 
 	/**
-	 * @description Editor keyboard activity (typing, Enter, etc.) means the user moved
-	 * focus into editing — strip the hover styling so it doesn't get cloned into new
-	 * lines on Enter (`formatEl.cloneNode(false)` and `copyTagAttributes` would otherwise
-	 * carry `se-block-hover` to the new element). `currentBlock` is preserved so the
-	 * handle keeps tracking; mousemove will re-apply hover when the user goes back to it.
+	 * @description Editor keyboard activity (typing, Enter, etc.)
 	 */
 	#onWrapperKeyDown() {
 		this.#clearHoverLines();
 	}
 
-	#onDragMouseDown(e) {
-		if (e.button !== 0 || !this.#currentBlock) return;
-		this.#dragStartPos = { x: e.clientX, y: e.clientY };
+	/**
+	 * @description Dragstart on the drag handle.
+	 * @param {DragEvent} e
+	 */
+	#onDragStart(e) {
+		if (!this.#currentBlock) {
+			e.preventDefault();
+			return;
+		}
 		this.#dragTarget = this.#currentBlock;
+		this.#isDragging = true;
+		this.#actionMenu?.close();
+		dom.utils.addClass(this.#dragTarget, 'se-block-dragging');
 
-		// rAF-coalesced indicator update — caps work at display refresh rate (~60Hz)
-		// regardless of native mousemove rate (1000Hz on gaming mice).
-		let pendingY = null;
-		let dragRafId = null;
+		// Cache wysiwyg + children for the duration of the drag — DOM is stable until drop.
+		const wysiwygEl = /** @type {HTMLElement} */ (this.#$.frameContext.get('wysiwyg'));
+		this.#dragWysiwyg = wysiwygEl || null;
+		this.#dragChildren = wysiwygEl ? /** @type {HTMLElement[]} */ (Array.from(wysiwygEl.children)) : null;
 
-		const onMove = (me) => {
-			const dx = me.clientX - this.#dragStartPos.x;
-			const dy = me.clientY - this.#dragStartPos.y;
-			if (!this.#isDragging && (Math.abs(dx) > 4 || Math.abs(dy) > 4)) {
-				this.#isDragging = true;
-				this.#actionMenu?.close();
-				dom.utils.addClass(this.#dragTarget, 'se-block-dragging');
-			}
-			if (this.#isDragging) {
-				pendingY = me.clientY;
-				if (dragRafId === null) {
-					dragRafId = _w.requestAnimationFrame(() => {
-						dragRafId = null;
-						if (pendingY !== null) this.#updateDragIndicator(pendingY);
-					});
-				}
-			}
-		};
+		const isRtl = !!this.#$.options.get('_rtl');
+		const cover = /** @type {HTMLElement} */ (this.#dragTarget);
 
-		const onUp = () => {
-			document.removeEventListener('mousemove', onMove);
-			document.removeEventListener('mouseup', onUp);
-			if (dragRafId !== null) {
-				_w.cancelAnimationFrame(dragRafId);
-				dragRafId = null;
-			}
-			if (this.#isDragging) {
-				this.#executeDrop();
-			}
-			this.#isDragging = false;
-			this.#dragStartPos = null;
-		};
+		e.dataTransfer.setDragImage(cover, isRtl ? cover.offsetWidth : -5, -5);
+		e.dataTransfer.effectAllowed = 'move';
+		e.dataTransfer.setData('application/x-suneditor-block-drag', '1');
+	}
 
-		document.addEventListener('mousemove', onMove);
-		document.addEventListener('mouseup', onUp);
+	/**
+	 * @description Dragover on the wrapper.
+	 * @param {DragEvent} e
+	 */
+	#onDragOver(e) {
+		if (!this.#isDragging) return;
+		e.preventDefault();
+		e.stopPropagation();
+		e.dataTransfer.dropEffect = 'move';
+		this.#updateDragIndicator(e.clientY);
+	}
+
+	/**
+	 * @description Native HTML5 drop on the wrapper. Commits the move.
+	 * @param {DragEvent} e
+	 */
+	#onDrop(e) {
+		if (!this.#isDragging) return;
+		e.preventDefault();
+		e.stopPropagation();
+		this.#executeDrop();
+	}
+
+	/**
+	 * @description Dragend on the drag handle.
+	 */
+	#onDragEnd() {
+		if (this.#dragTarget) dom.utils.removeClass(this.#dragTarget, 'se-block-dragging');
+		this.#dragIndicator.style.display = 'none';
+		this.#isDragging = false;
+		this.#dragTarget = null;
+		this.#dropTarget = null;
+		this.#dragWysiwyg = null;
+		this.#dragChildren = null;
+
+		if (this.#dragBtn?.parentNode) {
+			const parent = this.#dragBtn.parentNode;
+			const next = this.#dragBtn.nextSibling;
+			parent.removeChild(this.#dragBtn);
+			parent.insertBefore(this.#dragBtn, next);
+		}
 	}
 
 	/**
@@ -573,12 +628,12 @@ class BlockHandle {
 	#updateDragIndicator(clientY) {
 		if (!this.#$ || !this.#dragTarget) return;
 
-		const wysiwygEl = this.#$.frameContext.get('wysiwyg');
-		if (!wysiwygEl) return;
+		const wysiwygEl = this.#dragWysiwyg;
+		const children = this.#dragChildren;
+		if (!wysiwygEl || !children) return;
 
 		const wysiwygRect = wysiwygEl.getBoundingClientRect();
 		const wrapperRect = this.#area.parentElement.getBoundingClientRect();
-		const children = wysiwygEl.children;
 
 		let closest = null;
 
@@ -629,12 +684,7 @@ class BlockHandle {
 		const target = this.#dragTarget;
 		const drop = this.#dropTarget;
 
-		dom.utils.removeClass(target, 'se-block-dragging');
-		this.#dragIndicator.style.display = 'none';
-
 		if (!target || !drop || drop.element === target) {
-			this.#dropTarget = null;
-			this.#dragTarget = null;
 			return;
 		}
 
@@ -647,13 +697,9 @@ class BlockHandle {
 			drop.element.parentNode.insertBefore(target, drop.element.nextSibling);
 		}
 
-		// Update handle position and push history
 		this.#setCurrentBlock(target);
 		this.#updatePosition(target);
 		this.#$.history.push(false);
-
-		this.#dropTarget = null;
-		this.#dragTarget = null;
 	}
 
 	/**
@@ -677,9 +723,6 @@ class BlockHandle {
 		if (this.#actionMenu.isOpen) {
 			this.#actionMenu.close();
 		} else {
-			// Expand selection to full lines:
-			// - multi-line range containing currentBlock → first/last lines extended to line bounds
-			// - else → currentBlock selected as a full line
 			this.#expandRangeToFullLines();
 
 			// Highlight selected range lines
@@ -688,11 +731,12 @@ class BlockHandle {
 				this.#setHoverLines(lines);
 			}
 
-			// Choose open direction based on available space
+			// Choose open direction based on available space.
 			const btnGlobal = this.#$.offset.getGlobal(this.#dragBtn);
 			const spaceBelow = dom.utils.getClientSize().h - (btnGlobal.top - _w.scrollY + btnGlobal.height);
 			const spaceAbove = btnGlobal.top - _w.scrollY;
-			const dir = spaceBelow >= spaceAbove ? 'left-bottom' : 'left-top';
+			const horiz = this.#$.options.get('_rtl') ? 'left' : 'right';
+			const dir = `${horiz}-${spaceBelow >= spaceAbove ? 'bottom' : 'top'}`;
 			this.#actionMenu.open(dir);
 		}
 	}
@@ -703,9 +747,10 @@ class BlockHandle {
 	 */
 	#buildActionMenu() {
 		const menu = new SelectMenu(this.#$, {
-			position: 'left-top',
+			position: 'right-top',
 			dir: this.#$.options.get('_rtl') ? 'rtl' : 'ltr',
 			minWidth: '200px',
+			keydownTarget: _w,
 			closeMethod: () => {
 				dom.utils.removeClass(this.#dragBtn, 'on');
 				this.#closeFreeDropdown();
@@ -719,7 +764,7 @@ class BlockHandle {
 		menu.on(this.#dragBtn, this.#onActionSelect.bind(this), { class: 'se-block-action-menu' });
 
 		// Prevent blur on menu interaction — preserve selection range
-		menu.form.addEventListener('mousedown', (e) => {
+		this.#$.eventManager.addEvent(menu.form, 'mousedown', (e) => {
 			if (!env.isMobile) {
 				e.preventDefault();
 			} else {
@@ -740,8 +785,6 @@ class BlockHandle {
 			const type = resolved.type;
 
 			if (/dropdown-free/.test(type)) {
-				// Free dropdowns (table, fontColor, etc.) build their own complex UI. Render with the
-				// same submenu arrow as regular dropdowns; click opens the plugin's dropdown as a flyout.
 				items.push({ pluginName: name, type });
 				menus.push(`${menuHTML}<span class="se-submenu-arrow">${this.#$.icons.menu_arrow_right}</span>`);
 			} else if (/dropdown/.test(type)) {
@@ -772,9 +815,7 @@ class BlockHandle {
 	}
 
 	/**
-	 * @description Hover-to-open for dropdown-free items. Mirrors the native dropdown submenu UX —
-	 * moving the mouse over a dropdown-free LI opens its flyout immediately; moving to another LI
-	 * (or another part of the form outside the open dropdown) closes it.
+	 * @description Hover-to-open for dropdown-free items.
 	 * @param {Array<*>} items
 	 * @param {SelectMenu} menu
 	 */
@@ -788,9 +829,8 @@ class BlockHandle {
 		}
 		if (freeMap.size === 0) return;
 
-		menu.form.addEventListener('mousemove', (e) => {
+		this.#$.eventManager.addEvent(menu.form, 'mousemove', (e) => {
 			const target = /** @type {HTMLElement} */ (e.target);
-			// Inside the currently open free dropdown — keep open
 			if (this.#freeDropdownState?.dropdown?.contains(target)) return;
 
 			const li = target.closest?.('li[data-index]');
@@ -809,10 +849,7 @@ class BlockHandle {
 	}
 
 	/**
-	 * @description Open a dropdown-free plugin's dropdown (table, fontColor, etc.) as a flyout
-	 * next to the anchor LI. The plugin's dropdown DOM is borrowed from the menuTray, positioned
-	 * next to the LI, and restored on close. A click anywhere inside the dropdown closes the flyout —
-	 * plugin actions (cell pick, color pick) all complete via click, so this is sufficient.
+	 * @description Open a dropdown-free plugin's dropdown (table, fontColor, etc.)
 	 * @param {string} pluginName
 	 * @param {Object} plugin
 	 * @param {HTMLElement} anchorLi
@@ -829,14 +866,14 @@ class BlockHandle {
 		dom.utils.addClass(anchorLi, 'se-submenu-open');
 		plugin.on?.(anchorLi);
 
-		const onClick = () =>
+		const evClick = this.#$.eventManager.addEvent(dropdown, 'click', () =>
 			_w.setTimeout(() => {
 				this.#closeFreeDropdown();
 				this.#actionMenu?.close();
-			}, 0);
-		dropdown.addEventListener('click', onClick);
+			}, 0),
+		);
 
-		this.#freeDropdownState = { dropdown, plugin, originalParent, anchorLi, onClick };
+		this.#freeDropdownState = { dropdown, plugin, originalParent, anchorLi, evClick };
 	}
 
 	#closeFreeDropdown() {
@@ -844,7 +881,7 @@ class BlockHandle {
 		if (!s) return;
 		this.#freeDropdownState = null;
 
-		s.dropdown.removeEventListener('click', s.onClick);
+		this.#$?.eventManager.removeEvent(s.evClick);
 		s.dropdown.style.cssText = '';
 		s.dropdown.style.display = 'none';
 
@@ -859,9 +896,8 @@ class BlockHandle {
 	}
 
 	/**
-	 * @description Place `el` to the right of `anchor`, coordinates relative to `container`.
-	 * Mirrors `SelectMenu.#openSubmenu`: opens right by default, flips to left if overflowing
-	 * the right edge, flips up if overflowing the bottom, then clamps into the viewport.
+	 * @description Place `el` next to `anchor`, coordinates relative to `container`.
+	 * Mirrors `SelectMenu.#openSubmenu`: tries the preferred side first.
 	 * @param {HTMLElement} el
 	 * @param {HTMLElement} anchor
 	 * @param {HTMLElement} container
@@ -869,31 +905,56 @@ class BlockHandle {
 	#positionFlyout(el, anchor, container) {
 		const a = anchor.getBoundingClientRect();
 		const c = container.getBoundingClientRect();
+		const isRtl = !!this.#$.options.get('_rtl');
+
 		el.style.position = 'absolute';
-		el.style.top = a.top - c.top + 'px';
-		el.style.left = a.right - c.left + 4 + 'px';
 		el.style.right = '';
+		el.style.visibility = 'hidden';
 		el.style.display = 'block';
 
-		// Horizontal: flip right→left if overflowing right; clamp into viewport otherwise.
-		let rect = el.getBoundingClientRect();
-		if (rect.right > _w.innerWidth) {
-			el.style.left = a.left - c.left - el.offsetWidth - 4 + 'px';
-			rect = el.getBoundingClientRect();
-		}
-		if (rect.left < 0) {
-			el.style.left = parseFloat(el.style.left) - rect.left + 4 + 'px';
-			rect = el.getBoundingClientRect();
-		}
+		const elW = el.offsetWidth;
+		const elH = el.offsetHeight;
+		const vpW = _w.innerWidth;
+		const vpH = _w.innerHeight;
+		const gap = 4;
 
-		// Vertical: flip top-anchor → bottom-anchor if overflowing bottom; clamp top otherwise.
-		if (rect.bottom > _w.innerHeight) {
-			el.style.top = a.bottom - c.top - el.offsetHeight + 'px';
-			rect = el.getBoundingClientRect();
+		// Horizontal: preferred side follows text direction (right of anchor in LTR,
+		// left of anchor in RTL). Flip if it overflows; if both overflow, keep the
+		// smaller-overflow side and shift inward by the missing amount.
+		const rightVP = a.right + gap;
+		const leftVP = a.left - elW - gap;
+		const rightOverflow = Math.max(0, rightVP + elW - vpW);
+		const leftOverflow = Math.max(0, -leftVP);
+		const prefer = isRtl ? 'left' : 'right';
+		let leftPx;
+		if (prefer === 'right') {
+			if (rightOverflow === 0) leftPx = rightVP;
+			else if (leftOverflow === 0) leftPx = leftVP;
+			else if (rightOverflow <= leftOverflow) leftPx = rightVP - rightOverflow;
+			else leftPx = leftVP + leftOverflow;
+		} else {
+			if (leftOverflow === 0) leftPx = leftVP;
+			else if (rightOverflow === 0) leftPx = rightVP;
+			else if (leftOverflow <= rightOverflow) leftPx = leftVP + leftOverflow;
+			else leftPx = rightVP - rightOverflow;
 		}
-		if (rect.top < 0) {
-			el.style.top = parseFloat(el.style.top) - rect.top + 4 + 'px';
-		}
+		el.style.left = leftPx - c.left + 'px';
+
+		// Vertical: try top-aligned with anchor; flip to bottom-anchored if it overflows
+		// downward; if both directions overflow, keep the smaller-overflow side and shift
+		// inward by the missing amount.
+		const topVP = a.top;
+		const bottomVP = a.bottom - elH;
+		const downOverflow = Math.max(0, topVP + elH - vpH);
+		const upOverflow = Math.max(0, -bottomVP);
+		let topPx;
+		if (downOverflow === 0) topPx = topVP;
+		else if (upOverflow === 0) topPx = bottomVP;
+		else if (downOverflow <= upOverflow) topPx = topVP - downOverflow;
+		else topPx = bottomVP + upOverflow;
+		el.style.top = topPx - c.top + 'px';
+
+		el.style.visibility = '';
 	}
 
 	/**
@@ -911,7 +972,6 @@ class BlockHandle {
 			const plugin = this.#$.plugins[item.pluginName];
 			if (plugin) {
 				if (/dropdown-free/.test(item.type)) {
-					// Open as flyout next to the action menu — toggle if already open for this plugin
 					if (this.#freeDropdownState?.plugin === plugin) {
 						this.#closeFreeDropdown();
 					} else {

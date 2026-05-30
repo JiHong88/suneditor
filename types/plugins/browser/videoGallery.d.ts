@@ -67,7 +67,7 @@ declare class VideoGallery extends PluginBrowser {
 	 */
 	constructor(kernel: SunEditor.Kernel, pluginOptions: VideoGalleryPluginOptions);
 	title: any;
-	onSelectfunction: (target: Node) => any;
+	onSelectfunction: (target: any) => any;
 	browser: Browser;
 	width: any;
 	height: any;

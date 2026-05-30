@@ -224,6 +224,9 @@ export function prevIndex(array, item) {
 	return idx - 1;
 }
 
+// Block-handle transient markers — never persisted to cloned/split elements.
+const TRANSIENT_CLASSES_RE = /(\s|^)(se-block-hover|se-block-dragging)(?=\s|$)/g;
+
 /**
  * @description Add style and className of copyEl to originEl
  * @param {Node} originEl Origin element
@@ -246,7 +249,15 @@ export function copyTagAttributes(originEl, copyEl, blacklist) {
 	for (let i = 0, len = attrs.length, name; i < len; i++) {
 		name = attrs[i].name.toLowerCase();
 		if (blacklist?.includes(name) || !attrs[i].value) o.removeAttribute(name);
-		else if (name !== 'style') o.setAttribute(attrs[i].name, attrs[i].value);
+		else if (name !== 'style') {
+			if (name === 'class') {
+				const classNames = attrs[i].value.replace(TRANSIENT_CLASSES_RE, ' ').replace(/\s+/g, ' ').trim();
+				if (classNames) o.setAttribute('class', classNames);
+				else o.removeAttribute('class');
+			} else {
+				o.setAttribute(attrs[i].name, attrs[i].value);
+			}
+		}
 	}
 }
 

@@ -46,6 +46,10 @@ import { get as getNumber } from '../../helper/numbers';
  * === UI Utilities & Visual Components ===
  * @property {HTMLElement} lineBreaker_t - Top floating line-breaker UI element (for line insertion).
  * @property {HTMLElement} lineBreaker_b - Bottom floating line-breaker UI element (for line insertion).
+ * @property {?HTMLElement} blockHandleArea - Gutter container (`.se-block-handle-area`) holding the per-line block handle. `null` when the `blockHandle` option is disabled.
+ * @property {?HTMLElement} blockHandle - Block handle group (`.se-block-handle`) containing the plus and drag buttons. `null` when disabled.
+ * @property {?HTMLElement} blockHandlePlus - Plus button (`.se-block-handle-plus`) — inserts a new line after the current block. `null` when disabled.
+ * @property {?HTMLElement} blockHandleDrag - Drag button (`.se-block-handle-drag`) — opens the action menu / starts drag-to-reorder. `null` when disabled.
  * @property {HTMLElement} [_stickyDummy] - Placeholder element used for sticky toolbar behavior.
  * @property {HTMLElement} [_toolbarShadow] - Shadow element below the toolbar for visual effects.
  * @property {{main: HTMLElement, border: HTMLElement, display: HTMLElement, handles: HTMLElement[]}} [_figure] - Current active figure component (image, table, etc.).
@@ -91,12 +95,15 @@ import { get as getNumber } from '../../helper/numbers';
  * @param {HTMLElement} wwFrame Editor wysiwyg frame
  * @param {HTMLElement} codeWrapper Editor code view wrapper
  * @param {HTMLElement} codeFrame Editor code view frame
- * @param {{inner: HTMLElement, page: HTMLElement, pageMirror: HTMLElement}} documentTypeInner Document type elements
+ * @param {?HTMLElement} markdownWrapper Editor markdown view wrapper (only present when the markdown view button is enabled)
+ * @param {?HTMLElement} markdownFrame Editor markdown view frame (only present when the markdown view button is enabled)
  * @param {?HTMLElement} statusbar Editor statusbar
+ * @param {{inner: HTMLElement, page: HTMLElement, pageMirror: HTMLElement}} documentTypeInner Document type elements
+ * @param {?HTMLElement} blockHandleArea Block handle gutter (`.se-block-handle-area`). `null` when the `blockHandle` option is disabled.
  * @param {*} key root key
  * @returns {FrameContexType}
  */
-export function CreateFrameContext(editorTarget, top, wwFrame, codeWrapper, codeFrame, markdownWrapper, markdownFrame, statusbar, documentTypeInner, key) {
+export function CreateFrameContext(editorTarget, top, wwFrame, codeWrapper, codeFrame, markdownWrapper, markdownFrame, statusbar, documentTypeInner, blockHandleArea, key) {
 	const m = /** @type {FrameContexType} */ (
 		new Map([
 			['key', key],
@@ -119,10 +126,10 @@ export function CreateFrameContext(editorTarget, top, wwFrame, codeWrapper, code
 			['lineBreaker_t', top.querySelector('.se-line-breaker-component-t')],
 			['lineBreaker_b', top.querySelector('.se-line-breaker-component-b')],
 			// block handle
-			['blockHandleArea', top.querySelector('.se-block-handle-area')],
-			['blockHandle', top.querySelector('.se-block-handle')],
-			['blockHandlePlus', top.querySelector('.se-block-handle-plus')],
-			['blockHandleDrag', top.querySelector('.se-block-handle-drag')],
+			['blockHandleArea', blockHandleArea],
+			['blockHandle', blockHandleArea?.querySelector('.se-block-handle') || null],
+			['blockHandlePlus', blockHandleArea?.querySelector('.se-block-handle-plus') || null],
+			['blockHandleDrag', blockHandleArea?.querySelector('.se-block-handle-drag') || null],
 			['_stickyDummy', top.querySelector('.se-toolbar-sticky-dummy')],
 			['_toolbarShadow', top.querySelector('.se-toolbar-shadow')],
 			['_minHeight', getNumber(wwFrame.style.minHeight || '65', 0)],

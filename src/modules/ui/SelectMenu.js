@@ -18,6 +18,11 @@ const MENU_MIN_HEIGHT = 38;
  * @property {() => void} [closeMethod] Optional method to call when the menu is closed
  * @property {string} [maxHeight] Optional max-height CSS value (e.g. `"200px"`). Enables scrolling when items exceed this height.
  * @property {string} [minWidth] Optional min-width CSS value (e.g. `"130px"`).
+ * @property {*} [keydownTarget]  Optional override for the keyboard navigation target. By default `on()` listens
+ * - on the iframe `contentWindow` (`_ww`) when the refer isn't an input — appropriate when the
+ * - refer is inside the wysiwyg. Set this to `window` (parent) for menus whose refer lives in
+ * - the parent doc (e.g. BlockHandle's dragBtn in `carrierWrapper`). Also avoids
+ * - cross-origin/sandboxed iframe `addEventListener` errors.
  */
 
 /**
@@ -35,11 +40,15 @@ class SelectMenu {
 
 	#refer = null;
 	#keydownTarget = null;
+	#keydownTargetOverride = null;
 	#selectMethod = null;
 	#bindClose_key = null;
 	#bindClose_mousedown = null;
 	#bindClose_click = null;
+	#bindSubmenuReposition = null;
 	#events = null;
+	#lastMainPosition = null;
+	#lastSubPosition = null;
 
 	// submenu
 	#submenuData = new Map();
@@ -75,6 +84,7 @@ class SelectMenu {
 		this.closeMethod = params.closeMethod;
 		this.maxHeight = params.maxHeight || '';
 		this.minWidth = params.minWidth || '';
+		this.#keydownTargetOverride = params.keydownTarget || null;
 
 		this.#dirPosition = /^(left|right)$/.test(this.position) ? (this.position === 'left' ? 'right' : 'left') : this.position;
 		this.#dirSubPosition = /^(left|right)$/.test(this.subPosition) ? (this.subPosition === 'left' ? 'right' : 'left') : this.subPosition;
@@ -86,13 +96,31 @@ class SelectMenu {
 			click: this.#OnClick_list.bind(this),
 			keydown: this.#OnKeyDown_refer.bind(this),
 		};
-		this.#globalEventHandlers = { keydown: this.#CloseListener_key.bind(this), mousedown: this.#CloseListener_mousedown.bind(this), click: this.#CloseListener_click.bind(this) };
+		this.#globalEventHandlers = {
+			keydown: this.#CloseListener_key.bind(this),
+			mousedown: this.#CloseListener_mousedown.bind(this),
+			click: this.#CloseListener_click.bind(this),
+			submenuReposition: this.#OnSubmenuReposition.bind(this),
+		};
 	}
 
 	/**
 	 * @description Creates the select menu items.
-	 * @param {Array<*>} items - Command list of selectable items.
-	 * @param {Array<string>|SunEditor.NodeCollection} [menus] - Optional list of menu display elements; defaults to `items`.
+	 * @param {Array<*>} items - Selectable items.
+	 * - Plain entry: any value (string/object); passed to the `selectMethod` callback when picked.
+	 * - Submenu entry: `{ children: Array<*>, childMenus?: Array<string|HTMLElement> }` —
+	 *   `children` are the child values delivered to `selectMethod` on selection; `childMenus`
+	 *   is the optional display content for each child (HTML string or `HTMLElement`). When
+	 *   omitted, `children` doubles as the display content.
+	 * @param {Array<string>|SunEditor.NodeCollection} [menus] - Optional list of display elements
+	 * (HTML strings or nodes) for the top-level rows. Defaults to `items`. For submenu entries
+	 * this controls the parent row's content; child rows use `childMenus` (or `children`).
+	 * @example
+	 * // Submenu — "List" opens a hover submenu of UL/OL options
+	 * selectMenu.create(
+	 *   [{ children: ['ul', 'ol'], childMenus: ['<i>•</i> Bulleted', '<i>1.</i> Numbered'] }],
+	 *   ['List']
+	 * );
 	 */
 	create(items, menus) {
 		this.form.firstElementChild.innerHTML = '';
@@ -124,7 +152,9 @@ class SelectMenu {
 				}
 				html += `<li class="se-select-item se-has-submenu" data-index="${i}">${menuContent}` + `<span class="se-submenu-arrow">${this.#$.icons.menu_arrow_right}</span></li>`;
 
-				const subEl = dom.utils.createElement('DIV', { class: 'se-select-submenu', 'data-parent-index': String(i) }, `<ul class="se-list-basic se-list-checked">${subHtml}</ul>`);
+				// `popover: manual` lifts the submenu into the top layer so it escapes any
+				// `overflow: hidden` on the form's ancestors (toolbar, dropdown panels, ...).
+				const subEl = dom.utils.createElement('DIV', { class: 'se-select-submenu', popover: 'manual', 'data-parent-index': String(i) }, `<ul class="se-list-basic se-list-checked">${subHtml}</ul>`);
 				this.#submenuData.set(i, { items: itemObj.children, menus: childMenus, element: subEl });
 			} else {
 				html += `<li class="se-select-item" data-index="${i}">${menuContent}</li>`;
@@ -156,7 +186,7 @@ class SelectMenu {
 	 */
 	on(referElement, selectMethod, attr = {}) {
 		this.#refer = /** @type {HTMLElement} */ (referElement);
-		this.#keydownTarget = dom.check.isInputElement(referElement) ? referElement : this.#$.frameContext.get('_ww');
+		this.#keydownTarget = this.#keydownTargetOverride || (dom.check.isInputElement(referElement) ? referElement : this.#$.frameContext.get('_ww'));
 		this.#selectMethod = selectMethod;
 
 		let innerStyle = '';
@@ -166,7 +196,7 @@ class SelectMenu {
 		this.form = dom.utils.createElement(
 			'DIV',
 			{
-				class: 'se-select-menu' + (attr.class ? ' ' + attr.class : ''),
+				class: 'se-select-menu' + (this.#textDirDiff === true ? ' se-rtl' : '') + (attr.class ? ' ' + attr.class : ''),
 				style: attr.style || '',
 			},
 			'<div class="se-list-inner"' + (innerStyle ? ' style="' + innerStyle + '"' : '') + '></div>',
@@ -200,8 +230,34 @@ class SelectMenu {
 		const positionItems = position ? position.split('-') : [];
 		const mainPosition = positionItems[0] || (this.#textDirDiff !== null && this.#textDirDiff !== this.#$.options.get('_rtl') ? this.#dirPosition : this.position);
 		const subPosition = positionItems[1] || (this.#textDirDiff !== null && this.#textDirDiff !== this.#$.options.get('_rtl') ? this.#dirSubPosition : this.subPosition);
+		this.#lastMainPosition = mainPosition;
+		this.#lastSubPosition = subPosition;
 		this.#setPosition(mainPosition, subPosition, onItemQuerySelector);
 		this.isOpen = true;
+	}
+
+	/**
+	 * @description Re-runs positioning using the same direction the menu was opened with.
+	 * Use when the reference element has moved (e.g. scroll repositioned the trigger) but
+	 * the menu should stay open and follow.
+	 */
+	reposition() {
+		if (!this.isOpen || !this.#lastMainPosition) return;
+		this.#setPosition(this.#lastMainPosition, this.#lastSubPosition);
+	}
+
+	/**
+	 * @description Soft-hide / soft-show without changing open state.
+	 * close listeners (outside click, ESC) keep working, but is visually hidden until the trigger comes back.
+	 */
+	setHidden(hidden) {
+		if (!this.isOpen) return;
+		if (hidden) {
+			this.#closeSubmenu();
+			this.form.style.display = 'none';
+		} else {
+			this.reposition();
+		}
 	}
 
 	/**
@@ -253,36 +309,100 @@ class SelectMenu {
 		const data = this.#submenuData.get(parentIndex);
 		const sub = data?.element;
 		if (sub) {
-			sub.style.display = 'block';
+			// Show first so the top-layer containing block (viewport) is in effect when we
+			const supportsPopover = typeof sub.showPopover === 'function';
+			sub.style.visibility = 'hidden';
 
-			// Default: open to the right of parent LI, top-aligned with it.
-			const parentRect = parentLi.getBoundingClientRect();
-			const formRect = this.form.getBoundingClientRect();
-			sub.style.top = parentRect.top - formRect.top + 'px';
-			sub.style.left = parentRect.right - formRect.left + 'px';
-			sub.style.right = '';
-
-			// Horizontal: flip right→left if overflowing right edge, then clamp into viewport.
-			let rect = sub.getBoundingClientRect();
-			if (rect.right > _w.innerWidth) {
-				sub.style.left = parentRect.left - formRect.left - sub.offsetWidth + 'px';
-				rect = sub.getBoundingClientRect();
-			}
-			if (rect.left < 0) {
-				sub.style.left = parseFloat(sub.style.left) - rect.left + 4 + 'px';
-				rect = sub.getBoundingClientRect();
+			if (supportsPopover) {
+				if (!sub.matches(':popover-open')) sub.showPopover();
+			} else {
+				sub.style.display = 'block';
 			}
 
-			// Vertical: flip top→bottom if overflowing bottom (extend upward from parent),
-			// then clamp into viewport.
-			if (rect.bottom > _w.innerHeight) {
-				sub.style.top = parentRect.bottom - formRect.top - sub.offsetHeight + 'px';
-				rect = sub.getBoundingClientRect();
-			}
-			if (rect.top < 0) {
-				sub.style.top = parseFloat(sub.style.top) - rect.top + 4 + 'px';
-			}
+			this.#positionSubmenu(parentLi, sub, supportsPopover);
+			sub.style.visibility = '';
+
+			// Submenu is top-layer popover (viewport-fixed), but the parent form is in document
+			// flow (absolute) and scrolls with the page/container. Re-run positioning on scroll
+			// so the submenu stays anchored to the parent LI as it moves.
+			this.#bindSubmenuReposition = this.#$.eventManager.addGlobalEvent('scroll', this.#globalEventHandlers.submenuReposition, true);
 		}
+	}
+
+	/**
+	 * @description Position the submenu element next to the parent menu
+	 * @param {HTMLElement} parentLi
+	 * @param {HTMLElement} sub
+	 * @param {boolean} supportsPopover
+	 */
+	#positionSubmenu(parentLi, sub, supportsPopover) {
+		// In the top layer the containing block is the viewport; otherwise it's the form.
+		const formRect = supportsPopover ? { top: 0, left: 0 } : this.form.getBoundingClientRect();
+
+		const parentRect = parentLi.getBoundingClientRect();
+		const subW = sub.offsetWidth;
+		const subH = sub.offsetHeight;
+		const vpW = _w.innerWidth;
+		const vpH = _w.innerHeight;
+
+		// Horizontal: open in the arrow's direction — RTL prefers left of parent, LTR prefers
+		// right. Flip to the opposite side if the preferred side overflows; if both overflow,
+		// keep the smaller-overflow side and shift inward by exactly that amount.
+		const rightVP = parentRect.right;
+		const leftVP = parentRect.left - subW;
+		const rightOverflow = Math.max(0, rightVP + subW - vpW);
+		const leftOverflow = Math.max(0, -leftVP);
+		const preferLeft = this.#textDirDiff === true;
+
+		let leftPx;
+		if (preferLeft) {
+			if (leftOverflow === 0) leftPx = leftVP;
+			else if (rightOverflow === 0) leftPx = rightVP;
+			else if (leftOverflow <= rightOverflow) leftPx = leftVP + leftOverflow;
+			else leftPx = rightVP - rightOverflow;
+		} else {
+			if (rightOverflow === 0) leftPx = rightVP;
+			else if (leftOverflow === 0) leftPx = leftVP;
+			else if (rightOverflow <= leftOverflow) leftPx = rightVP - rightOverflow;
+			else leftPx = leftVP + leftOverflow;
+		}
+
+		sub.style.left = leftPx - formRect.left + 'px';
+		sub.style.right = '';
+
+		// Vertical: try top-aligned with parent; flip to bottom-anchored if it overflows
+		// downward; if both directions overflow (submenu taller than viewport), keep the
+		// side with the smaller overflow and shift inward by exactly that amount.
+		const topVP = parentRect.top;
+		const bottomVP = parentRect.bottom - subH;
+		const downOverflow = Math.max(0, topVP + subH - vpH);
+		const upOverflow = Math.max(0, -bottomVP);
+
+		let topPx;
+		if (downOverflow === 0) {
+			topPx = topVP;
+		} else if (upOverflow === 0) {
+			topPx = bottomVP;
+		} else if (downOverflow <= upOverflow) {
+			topPx = topVP - downOverflow;
+		} else {
+			topPx = bottomVP + upOverflow;
+		}
+
+		sub.style.top = topPx - formRect.top + 'px';
+	}
+
+	/**
+	 * @description Scroll/resize callback while submenu is open — re-runs positioning so the
+	 * top-layer popover follows the parent LI which scrolls with the document.
+	 */
+	#OnSubmenuReposition() {
+		if (this.#activeSubmenuIndex < 0) return;
+		const data = this.#submenuData.get(this.#activeSubmenuIndex);
+		const sub = data?.element;
+		const parentLi = this.menus[this.#activeSubmenuIndex];
+		if (!sub || !parentLi) return;
+		this.#positionSubmenu(parentLi, sub, typeof sub.showPopover === 'function');
 	}
 
 	/**
@@ -293,13 +413,18 @@ class SelectMenu {
 			_w.clearTimeout(this.#submenuHoverTimer);
 			this.#submenuHoverTimer = null;
 		}
+		this.#bindSubmenuReposition &&= this.#$.eventManager.removeGlobalEvent(this.#bindSubmenuReposition);
 		if (this.#activeSubmenuIndex > -1) {
 			const parentLi = this.menus[this.#activeSubmenuIndex];
 			if (parentLi) dom.utils.removeClass(parentLi, 'se-submenu-open');
 
 			const data = this.#submenuData.get(this.#activeSubmenuIndex);
 			if (data?.element) {
-				data.element.style.display = '';
+				if (typeof data.element.hidePopover === 'function') {
+					if (data.element.matches(':popover-open')) data.element.hidePopover();
+				} else {
+					data.element.style.display = '';
+				}
 				dom.utils.removeClass(data.element.querySelectorAll('.se-select-item'), 'active');
 			}
 		}

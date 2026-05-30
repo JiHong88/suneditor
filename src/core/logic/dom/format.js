@@ -92,7 +92,7 @@ class Format {
 	/**
 	 * @description If a parent node that contains an argument node finds a format node (`format.isLine`), it returns that node.
 	 * @param {Node} node Reference node.
-	 * @param {?(((current: Node) => boolean)|Function)} [validation] Additional validation function.
+	 * @param {?(current: *) => boolean} [validation] Additional validation function.
 	 * @returns {HTMLElement|null}
 	 * @example
 	 * const line = editor.$.format.getLine(editor.$.selection.getNode());
@@ -198,7 +198,7 @@ class Format {
 	/**
 	 * @description If a parent node that contains an argument node finds a `brLine` (`format.isBrLine`), it returns that node.
 	 * @param {Node} element Reference node.
-	 * @param {?(((current: Node) => boolean)|Function)} [validation] Additional validation function.
+	 * @param {?(current: *) => boolean} [validation] Additional validation function.
 	 * @returns {HTMLBRElement|null}
 	 * @example
 	 * const brLine = editor.$.format.getBrLine(editor.$.selection.getNode());
@@ -289,7 +289,7 @@ class Format {
 	/**
 	 * @description If a parent node that contains an argument node finds a format node (`format.isBlock`), it returns that node.
 	 * @param {Node} element Reference node.
-	 * @param {?(((current: Node) => boolean)|Function)} [validation] Additional validation function.
+	 * @param {?(current: *) => boolean} [validation] Additional validation function.
 	 * @returns {HTMLElement|null}
 	 * @example
 	 * const block = editor.$.format.getBlock(editor.$.selection.getNode());
@@ -932,7 +932,7 @@ class Format {
 
 	/**
 	 * @description Returns a `line` array from selected range.
-	 * @param {?(((current: Node) => boolean)|Function)} [validation] The validation function. (Replaces the default validation `format.isLine(current)`)
+	 * @param {?(current: *) => boolean} [validation] The validation function. (Replaces the default validation `format.isLine(current)`)
 	 * @returns {Array<HTMLElement>}
 	 * @example
 	 * const selectedLines = editor.$.format.getLines();

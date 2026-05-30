@@ -110,6 +110,13 @@ export const DEFAULTS = {
  * @property {string|number} [width="100%"] - Width for the editor.
  * @property {string|number} [minWidth=""] - Min width for the editor.
  * @property {string|number} [maxWidth=""] - Max width for the editor.
+ * @property {string} [innerWidth=""] - Optional max-width for the editor body (`.se-wrapper`).
+ * - **CSS length** (`"740px"`, `"60ch"`): editor body's content is clamped to this width and centered horizontally; scroll container stays full width (scrollbar at the outer edge, wheel/touch active over the whole area).
+ * - **`"auto"`** or **empty string** (default): no constraint — natural full-width layout with default content padding.
+ * - In `blockHandle` mode, the gutter handle tracks the centered text band.
+ * ```js
+ * { innerWidth: '740px' }
+ * ```
  * @property {string|number} [height="auto"] - Height for the editor.
  * @property {string|number} [minHeight=""] - Min height for the editor.
  * @property {string|number} [maxHeight=""] - Max height for the editor.
@@ -475,6 +482,15 @@ export const DEFAULTS = {
  * @property {boolean} [syncTabIndent=true] - Synchronizes tab indent with spaces.
  * @property {boolean} [tabDisable=false] - Disables tab key input.
  * @property {string} [toolbar_width="auto"] - Toolbar width.
+ * @property {string} [toolbar_innerWidth=""] - Center the toolbar's button row (`.se-btn-tray`) horizontally.
+ * - **CSS length** (e.g. `"500px"`, `"740px"`, `"60ch"`): toolbar background spans full width while the button row is capped at that width and centered. If buttons fit, the row stays on a single line; if they exceed the cap, they wrap inside it.
+ * - **`"auto"`**: no cap — the row is sized to its content and simply centered.
+ * - **Empty string** (default): no constraint.
+ * - **Note on `responsiveButtonList`**: thresholds compare against the toolbar's full width, not the band. When this option is set, calibrate `responsiveButtonList` keys around the toolbar size you actually want each button set to kick in at.
+ * ```js
+ * { toolbar_innerWidth: '740px' }
+ * { toolbar_innerWidth: 'auto' }
+ * ```
  * @property {?HTMLElement} [toolbar_container] - Container element for the toolbar.
  * @property {number|{top: number, offset: number}} [toolbar_sticky=0] - Enables sticky toolbar.
  * - `number`: Sets the sticky top position (px). Use `-1` to disable sticky.
@@ -682,6 +698,7 @@ export const OPTION_FRAME_FIXED_FLAG = {
 	width: true,
 	minWidth: true,
 	maxWidth: true,
+	innerWidth: 'fixed',
 	height: true,
 	minHeight: true,
 	maxHeight: true,
@@ -762,6 +779,7 @@ export const OPTION_FIXED_FLAG = {
 	formatClosureBlock: 'fixed',
 	allowedEmptyTags: true,
 	toolbar_width: true,
+	toolbar_innerWidth: 'fixed',
 	toolbar_container: 'fixed',
 	toolbar_sticky: true,
 	toolbar_hide: true,

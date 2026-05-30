@@ -109,6 +109,7 @@ declare namespace _default {
 	export let download: string;
 	export let dir_ltr: string;
 	export let dir_rtl: string;
+	export let dragHandle: string;
 	export let file_upload: string;
 	export let file_thumbnail: string;
 	export let file_plus: string;

@@ -65,7 +65,7 @@ export class PluginBrowser extends Base {
 	/**
 	 * @abstract
 	 * @description Executes the method that is called when a `Browser` module is opened.
-	 * @param {?(target: Node) => *} [onSelectfunction] - Method to be executed after selecting an item in the gallery
+	 * @param {?(target: *) => *} [onSelectfunction] - Method to be executed after selecting an item in the gallery
 	 * @returns {void}
 	 */
 	open(onSelectfunction) {

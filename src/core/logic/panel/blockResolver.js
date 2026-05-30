@@ -17,8 +17,8 @@ import { isWysiwygFrame, isTableCell, isComponentContainer } from '../../../help
 
 /**
  * @typedef {Object} FormatAPI
- * @property {(node: Node, validation?: Function) => HTMLElement|null} getLine
- * @property {(element: Node, validation?: Function) => HTMLElement|null} getBlock
+ * @property {(node: Node, validation?: (current: *) => boolean) => HTMLElement|null} getLine
+ * @property {(element: Node, validation?: (current: *) => boolean) => HTMLElement|null} getBlock
  * @property {(element: Node) => boolean} isLine
  * @property {(element: Node) => boolean} isBlock
  */
@@ -49,10 +49,9 @@ function classifyType(el) {
 /**
  * @description Walk up from a table-internal node (td, th, tr, thead, tbody) to the table element.
  * @param {Node} node
- * @param {HTMLElement} wysiwygFrame
  * @returns {HTMLElement|null}
  */
-function resolveToTable(node, wysiwygFrame) {
+function resolveToTable(node) {
 	let el = node;
 	while (el && !isWysiwygFrame(el)) {
 		if (el.nodeName === 'TABLE') return /** @type {HTMLElement} */ (el);
@@ -64,10 +63,9 @@ function resolveToTable(node, wysiwygFrame) {
 /**
  * @description Check if the node is inside or is a component (.se-component, .se-flex-component)
  * @param {Node} node
- * @param {HTMLElement} wysiwygFrame
  * @returns {boolean}
  */
-function isInsideComponent(node, wysiwygFrame) {
+function isInsideComponent(node) {
 	let el = node;
 	while (el && !isWysiwygFrame(el)) {
 		if (el.nodeType === 1 && isComponentContainer(/** @type {Element} */ (el))) return true;
@@ -80,10 +78,9 @@ function isInsideComponent(node, wysiwygFrame) {
  * @description Count block-level ancestors between element and wysiwyg root.
  * @param {HTMLElement} element
  * @param {FormatAPI} format
- * @param {HTMLElement} wysiwygFrame
  * @returns {{ depth: number, parent: HTMLElement|null }}
  */
-function computeDepth(element, format, wysiwygFrame) {
+function computeDepth(element, format) {
 	let depth = 0;
 	let parent = null;
 	let node = element.parentNode;
@@ -197,13 +194,13 @@ export function resolveBlock(node, format, wysiwygFrame, mouseY) {
 	if (isWysiwygFrame(node)) return null;
 
 	// Skip components (images, videos, etc.) — they have their own interaction
-	if (isInsideComponent(node, wysiwygFrame)) return null;
+	if (isInsideComponent(node)) return null;
 
 	let resolved = null;
 
 	// Table cell or table-internal → resolve to TABLE
 	if (TABLE_INNER_RE.test(node.nodeName)) {
-		resolved = resolveToTable(node, wysiwygFrame);
+		resolved = resolveToTable(node);
 	}
 	// List container (UL/OL) → keep as-is, resolveListChildLI will pick the right LI
 	else if (LIST_RE.test(node.nodeName)) {
@@ -215,7 +212,7 @@ export function resolveBlock(node, format, wysiwygFrame, mouseY) {
 	}
 	// Check if inside a table cell — walk up to table
 	else if (isTableCell(node.parentNode)) {
-		resolved = resolveToTable(node, wysiwygFrame);
+		resolved = resolveToTable(node);
 	} else {
 		// Try getLine first (finds P, H1-H6, PRE, LI, etc.)
 		const line = format.getLine(node, null);
@@ -229,7 +226,7 @@ export function resolveBlock(node, format, wysiwygFrame, mouseY) {
 			if (block) {
 				// For table internals, resolve up to TABLE
 				if (TABLE_INNER_RE.test(block.nodeName)) {
-					resolved = resolveToTable(block, wysiwygFrame);
+					resolved = resolveToTable(block);
 				} else {
 					resolved = block;
 				}
@@ -252,7 +249,7 @@ export function resolveBlock(node, format, wysiwygFrame, mouseY) {
 	if (!resolved) return null;
 
 	// Final component check on resolved element
-	if (isInsideComponent(resolved, wysiwygFrame)) return null;
+	if (isInsideComponent(resolved)) return null;
 
 	// For UL/OL, resolve to the closest child LI by mouse Y.
 	// For LI with nested sub-lists, find the deepest child LI.
@@ -266,7 +263,7 @@ export function resolveBlock(node, format, wysiwygFrame, mouseY) {
 		}
 	}
 
-	const { depth, parent } = computeDepth(resolved, format, wysiwygFrame);
+	const { depth, parent } = computeDepth(resolved, format);
 	const siblings = computeSiblings(resolved);
 	const type = classifyType(resolved);
 

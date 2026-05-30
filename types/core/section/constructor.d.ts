@@ -56,6 +56,36 @@ export function CreateStatusbar(
 	wordCounter: HTMLElement;
 };
 /**
+ * @description Resolves a button key to its toolbar metadata.
+ * Checks plugins first, then falls back to the default button list.
+ * Same resolution logic as `CreateToolBar`.
+ * @param {string} key Button name
+ * @param {?Object<string, *>} plugins Plugin instances
+ * @param {SunEditor.Options} options Options map
+ * @param {Object<string, string>} icons Icons
+ * @param {Object<string, string>} lang Language object
+ * @returns {{className: string, title: string, command: string, type: string, icon: string}|null}
+ */
+export function ResolveButton(
+	key: string,
+	plugins: {
+		[x: string]: any;
+	} | null,
+	options: SunEditor.Options,
+	icons: {
+		[x: string]: string;
+	},
+	lang: {
+		[x: string]: string;
+	},
+): {
+	className: string;
+	title: string;
+	command: string;
+	type: string;
+	icon: string;
+} | null;
+/**
  * @description Update a button state, attributes, and icons
  * @param {?HTMLElement} element Button element
  * @param {Object<string, *>} plugin Plugin
