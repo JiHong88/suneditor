@@ -102,7 +102,7 @@ export type BrowserParams = {
 	/**
 	 * - File server search http header. Optional. Can be overridden in browser.
 	 */
-	searchUrlHeader?: {
+	searchHeaders?: {
 		[x: string]: string;
 	};
 	/**
@@ -172,7 +172,7 @@ export type BrowserParams = {
  *   ]
  * }
  * ```
- * @property {Object<string, string>} [searchUrlHeader] - File server search http header. Optional. Can be overridden in browser.
+ * @property {Object<string, string>} [searchHeaders] - File server search http header. Optional. Can be overridden in browser.
  * @property {string} [listClass] - Class name of list div. Required. Can be overridden in browser.
  * @property {(item: BrowserFile) => string} [drawItemHandler] - Function that returns HTML string for rendering each file item. Required. Can be overridden in browser.
  * ```js
@@ -227,11 +227,11 @@ declare class Browser {
 				[x: string]: any;
 		  };
 	url: string;
-	urlHeader: {
+	headers: {
 		[x: string]: string;
 	};
 	searchUrl: string;
-	searchUrlHeader: {
+	searchHeaders: {
 		[x: string]: string;
 	};
 	drawItemHandler: any;
@@ -276,7 +276,7 @@ declare class Browser {
 	 * @param {string} [params.listClass] - Class name of list div. If not, use `this.listClass`.
 	 * @param {string} [params.title] - File browser window title. If not, use `this.title`.
 	 * @param {string} [params.url] - File server url. If not, use `this.url`.
-	 * @param {Object<string, string>} [params.urlHeader] - File server http header. If not, use `this.urlHeader`.
+	 * @param {Object<string, string>} [params.headers] - File server http header. If not, use `this.headers`.
 	 * @example
 	 * // Open with default settings (configured at construction):
 	 * this.browser.open();
@@ -285,14 +285,14 @@ declare class Browser {
 	 * this.browser.open({
 	 *   title: 'Select a video',
 	 *   url: '/api/videos',
-	 *   urlHeader: { Authorization: 'Bearer token' },
+	 *   headers: { Authorization: 'Bearer token' },
 	 * });
 	 */
 	open(params?: {
 		listClass?: string;
 		title?: string;
 		url?: string;
-		urlHeader?: {
+		headers?: {
 			[x: string]: string;
 		};
 	}): void;

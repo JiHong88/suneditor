@@ -45,7 +45,7 @@ const { _w, NO_EVENT } = env;
  * ```js
  * {
  *   scriptSrcWhitelist: [
- *     /^https:\/\/platform\.twitter\.com\/widgets\.js$/,
+ *     /^https:\/\/platform\.x\.com\/widgets\.js$/,
  *     /^https:\/\/www\.instagram\.com\/embed\.js$/,
  *   ]
  * }

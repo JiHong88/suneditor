@@ -1417,6 +1417,9 @@ const options1 = {
 	layout: {
 		items: [{ name: 'Two Column', html: '<div style="display:flex;gap:1em"><div style="flex:1">Left</div><div style="flex:1">Right</div></div>' }],
 	},
+	embed: {
+		scriptSrcWhitelist: [/^https:\/\/platform\.x\.com\/widgets\.js$/, /^https:\/\/www\.instagram\.com\/embed\.js$/],
+	},
 	// textDirection: 'rtl',
 	value: `<pre style="line-height: 1.45;margin: 0px 0px 10px">
 ​dsadsa</pre>
@@ -2255,6 +2258,7 @@ const options_test = {
 	embed: {
 		width: '100%',
 		height: 'auto',
+		scriptSrcWhitelist: [/^https:\/\/platform\.x\.com\/widgets\.js$/, /^https:\/\/www\.instagram\.com\/embed\.js$/],
 	},
 	exportPDF: {
 		options: {

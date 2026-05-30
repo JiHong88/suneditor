@@ -80,13 +80,12 @@ export type EmbedPluginOptions = {
 	urlPatterns?: Array<RegExp>;
 	/**
 	 * - Allowed `<script src=...>` patterns for raw embed HTML
-	 * (e.g. Twitter blockquote + `widgets.js`). Each entry is a `RegExp` (tested against the full src) or a `string`
-	 * (matched via `startsWith`). **Defaults to `[]` — all script tags are rejected.** Inline scripts (no `src`)
-	 * are always rejected. Only add entries for embed providers you trust to execute scripts in your editor page.
+	 * - (e.g. Twitter blockquote + `widgets.js`). Each entry is a `RegExp` (tested against the full src) or a `string` (matched via `startsWith`).
+	 * - Defaults to `[]` — all script tags are rejected.** Inline scripts (no `src`) are always rejected.
 	 * ```js
 	 * {
 	 * scriptSrcWhitelist: [
-	 * /^https:\/\/platform\.twitter\.com\/widgets\.js$/,
+	 * /^https:\/\/platform\.x\.com\/widgets\.js$/,
 	 * /^https:\/\/www\.instagram\.com\/embed\.js$/,
 	 * ]
 	 * }
@@ -166,13 +165,12 @@ export type EmbedPluginOptions = {
  * ```
  * @property {Array<RegExp>} [urlPatterns] - Additional URL patterns to recognize as embeddable content.
  * @property {Array<RegExp|string>} [scriptSrcWhitelist] - Allowed `<script src=...>` patterns for raw embed HTML
- * (e.g. Twitter blockquote + `widgets.js`). Each entry is a `RegExp` (tested against the full src) or a `string`
- * (matched via `startsWith`). **Defaults to `[]` — all script tags are rejected.** Inline scripts (no `src`)
- * are always rejected. Only add entries for embed providers you trust to execute scripts in your editor page.
+ * - (e.g. Twitter blockquote + `widgets.js`). Each entry is a `RegExp` (tested against the full src) or a `string` (matched via `startsWith`).
+ * - Defaults to `[]` — all script tags are rejected.** Inline scripts (no `src`) are always rejected.
  * ```js
  * {
  *   scriptSrcWhitelist: [
- *     /^https:\/\/platform\.twitter\.com\/widgets\.js$/,
+ *     /^https:\/\/platform\.x\.com\/widgets\.js$/,
  *     /^https:\/\/www\.instagram\.com\/embed\.js$/,
  *   ]
  * }

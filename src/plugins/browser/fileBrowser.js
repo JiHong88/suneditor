@@ -26,6 +26,10 @@ import { Browser } from '../../modules/contract';
  * }
  * ```
  * @property {Object<string, string>} [headers] - Server request headers
+ * @property {string} [searchUrl] - Server-side search URL. When set, the keyword is sent to this URL
+ * as `?keyword=<value>` and the server response replaces the list. When not set, search filters the
+ * already-loaded items locally.
+ * @property {Object<string, string>} [searchHeaders] - Server-side search request headers
  * @property {string|((item: SunEditor.Module.Browser.File) => string)} [thumbnail] - Default thumbnail URL or a function that returns a thumbnail URL per item.
  * @property {number} [expand=1] - Initial folder expand depth. `1` expands the first level, `Infinity` expands all. Default: `1`.
  * @property {Array<string>} [props] - Additional tag names
@@ -64,6 +68,8 @@ class FileBrowser extends PluginBrowser {
 			data: pluginOptions.data,
 			url: pluginOptions.url,
 			headers: pluginOptions.headers,
+			searchUrl: pluginOptions.searchUrl,
+			searchHeaders: pluginOptions.searchHeaders,
 			selectorHandler: this.#SetItem.bind(this),
 			columnSize: 4,
 			className: 'se-file-browser',
