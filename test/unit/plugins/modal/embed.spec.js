@@ -517,7 +517,7 @@ describe('Embed Plugin', () => {
 
 		describe('submitSRC', () => {
 			it('should process iframe embed code', async () => {
-				const iframeCode = '<iframe src="https://example.com/embed"></iframe>';
+				const iframeCode = '<iframe src="https://www.facebook.com/plugins/post.php?href=test"></iframe>';
 				// Mock triggerEvent to call the handler (simulating event listener that approves)
 				embed.$.eventManager.triggerEvent = jest.fn().mockImplementation(async (eventName, data) => {
 					if (eventName === 'onEmbedInputBefore' && data.handler) {

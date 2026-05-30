@@ -39,6 +39,17 @@ const { _w, NO_EVENT } = env;
  * { query_vimeo: 'autoplay=1' }
  * ```
  * @property {Array<RegExp>} [urlPatterns] - Additional URL patterns to recognize as embeddable content.
+ * @property {Array<RegExp|string>} [scriptSrcWhitelist] - Allowed `<script src=...>` patterns for raw embed HTML
+ * - (e.g. Twitter blockquote + `widgets.js`). Each entry is a `RegExp` (tested against the full src) or a `string` (matched via `startsWith`).
+ * - Defaults to `[]` — all script tags are rejected.** Inline scripts (no `src`) are always rejected.
+ * ```js
+ * {
+ *   scriptSrcWhitelist: [
+ *     /^https:\/\/platform\.twitter\.com\/widgets\.js$/,
+ *     /^https:\/\/www\.instagram\.com\/embed\.js$/,
+ *   ]
+ * }
+ * ```
  * @property {Object<string, {pattern: RegExp, action: (url: string) => string, tag: string}>} [embedQuery] - Custom embed service definitions.
  * Each key is a service name, with `pattern` to match the URL, `action` to transform it into an embed URL, and `tag` for the output element.
  * ```js
@@ -125,6 +136,18 @@ class Embed extends PluginModal {
 		return false;
 	}
 
+	/**
+	 * @description Validate a `<script src>` against the configured whitelist for raw embed HTML.
+	 * Inline scripts (no `src`) are always rejected.
+	 * @param {string} src
+	 * @param {Array<RegExp|string>} whitelist
+	 * @returns {boolean}
+	 */
+	static #isAllowedScriptSrc(src, whitelist) {
+		if (!src) return false;
+		return whitelist.some((p) => (p instanceof RegExp ? p.test(src) : src.startsWith(p)));
+	}
+
 	/** @type {Array<RegExp>} */
 	static #urlPatterns = null;
 
@@ -168,6 +191,7 @@ class Embed extends PluginModal {
 			iframeTagAttributes: pluginOptions.iframeTagAttributes || null,
 			query_youtube: pluginOptions.query_youtube || '',
 			query_vimeo: pluginOptions.query_vimeo || '',
+			scriptSrcWhitelist: Array.isArray(pluginOptions.scriptSrcWhitelist) ? pluginOptions.scriptSrcWhitelist : [],
 			insertBehavior: pluginOptions.insertBehavior,
 		};
 
@@ -446,6 +470,19 @@ class Embed extends PluginModal {
 		if (/^<iframe\s|^<blockquote\s/i.test(src)) {
 			const embedDOM = new DOMParser().parseFromString(src, 'text/html').body.children;
 			if (embedDOM.length === 0) return false;
+
+			// Validate every iframe in the raw HTML against the URL whitelist.
+			for (let i = 0; i < embedDOM.length; i++) {
+				const node = /** @type {Element} */ (embedDOM[i]);
+				if (/^iframe$/i.test(node.nodeName) && !Embed.#checkContentType(node.getAttribute('src') || '')) return false;
+				const nested = node.querySelectorAll?.('iframe');
+				if (nested) {
+					for (let j = 0; j < nested.length; j++) {
+						if (!Embed.#checkContentType(nested[j].getAttribute('src') || '')) return false;
+					}
+				}
+			}
+
 			embedInfo = { children: embedDOM, ...this.#getInfo(), process: null };
 		} else {
 			const processUrl = this.findProcessUrl(src);
@@ -604,9 +641,12 @@ class Embed extends PluginModal {
 				container = figure.container;
 
 				const childNodes = Array.from(children);
+				const scriptWhitelist = this.pluginOptions.scriptSrcWhitelist;
 				for (const chd of childNodes) {
 					if (/^script$/i.test(chd.nodeName)) {
-						scriptTag = dom.utils.createElement('script', { src: /** @type {Element} */ (chd).getAttribute('src'), async: 'true' }, null);
+						const scriptSrc = /** @type {Element} */ (chd).getAttribute('src') || '';
+						if (!Embed.#isAllowedScriptSrc(scriptSrc, scriptWhitelist)) continue;
+						scriptTag = dom.utils.createElement('script', { src: scriptSrc, async: 'true' }, null);
 						continue;
 					}
 					cover.appendChild(chd);

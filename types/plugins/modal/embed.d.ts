@@ -79,6 +79,21 @@ export type EmbedPluginOptions = {
 	 */
 	urlPatterns?: Array<RegExp>;
 	/**
+	 * - Allowed `<script src=...>` patterns for raw embed HTML
+	 * (e.g. Twitter blockquote + `widgets.js`). Each entry is a `RegExp` (tested against the full src) or a `string`
+	 * (matched via `startsWith`). **Defaults to `[]` — all script tags are rejected.** Inline scripts (no `src`)
+	 * are always rejected. Only add entries for embed providers you trust to execute scripts in your editor page.
+	 * ```js
+	 * {
+	 * scriptSrcWhitelist: [
+	 * /^https:\/\/platform\.twitter\.com\/widgets\.js$/,
+	 * /^https:\/\/www\.instagram\.com\/embed\.js$/,
+	 * ]
+	 * }
+	 * ```
+	 */
+	scriptSrcWhitelist?: Array<RegExp | string>;
+	/**
 	 * - Custom embed service definitions.
 	 * Each key is a service name, with `pattern` to match the URL, `action` to transform it into an embed URL, and `tag` for the output element.
 	 * ```js
@@ -150,6 +165,18 @@ export type EmbedPluginOptions = {
  * { query_vimeo: 'autoplay=1' }
  * ```
  * @property {Array<RegExp>} [urlPatterns] - Additional URL patterns to recognize as embeddable content.
+ * @property {Array<RegExp|string>} [scriptSrcWhitelist] - Allowed `<script src=...>` patterns for raw embed HTML
+ * (e.g. Twitter blockquote + `widgets.js`). Each entry is a `RegExp` (tested against the full src) or a `string`
+ * (matched via `startsWith`). **Defaults to `[]` — all script tags are rejected.** Inline scripts (no `src`)
+ * are always rejected. Only add entries for embed providers you trust to execute scripts in your editor page.
+ * ```js
+ * {
+ *   scriptSrcWhitelist: [
+ *     /^https:\/\/platform\.twitter\.com\/widgets\.js$/,
+ *     /^https:\/\/www\.instagram\.com\/embed\.js$/,
+ *   ]
+ * }
+ * ```
  * @property {Object<string, {pattern: RegExp, action: (url: string) => string, tag: string}>} [embedQuery] - Custom embed service definitions.
  * Each key is a service name, with `pattern` to match the URL, `action` to transform it into an embed URL, and `tag` for the output element.
  * ```js
@@ -189,6 +216,14 @@ declare class Embed extends PluginModal {
 	 * @returns {boolean} `true` if the URL matches a known pattern; otherwise, `false`.
 	 */
 	static #checkContentType(url: string): boolean;
+	/**
+	 * @description Validate a `<script src>` against the configured whitelist for raw embed HTML.
+	 * Inline scripts (no `src`) are always rejected.
+	 * @param {string} src
+	 * @param {Array<RegExp|string>} whitelist
+	 * @returns {boolean}
+	 */
+	static #isAllowedScriptSrc(src: string, whitelist: Array<RegExp | string>): boolean;
 	/** @type {Array<RegExp>} */
 	static #urlPatterns: Array<RegExp>;
 	/**
@@ -215,6 +250,7 @@ declare class Embed extends PluginModal {
 		};
 		query_youtube: string;
 		query_vimeo: string;
+		scriptSrcWhitelist: (string | RegExp)[];
 		insertBehavior: SunEditor.ComponentInsertType;
 	};
 	modal: Modal;
