@@ -1420,6 +1420,9 @@ const options1 = {
 	embed: {
 		scriptSrcWhitelist: [/^https:\/\/platform\.x\.com\/widgets\.js$/, /^https:\/\/www\.instagram\.com\/embed\.js$/],
 	},
+	tagStyles: {
+       div: "color"
+    },
 	// textDirection: 'rtl',
 	value: `<pre style="line-height: 1.45;margin: 0px 0px 10px">
 ​dsadsa</pre>
@@ -2124,12 +2127,12 @@ const options_test = {
 	},
 	allUsedStyles: 'text-shadow|letter-spacing',
 	tagStyles: {
+		'@text': 'font-family|font-size|color|background-color',
+		'@line': 'text-align|margin|line-height',
 		table: 'border|border-collapse',
 		th: 'background-color|font-weight',
 		td: 'vertical-align',
 	},
-	spanStyles: 'font-family|font-size|color|background-color',
-	lineStyles: 'text-align|margin|line-height',
 	fontSizeUnits: ['px', 'pt', 'em', 'rem', '%'],
 	retainStyleMode: 'repeat',
 
