@@ -10,6 +10,9 @@ const DIRECTION_CURSOR_MAP = { w: 'ns-resize', h: 'ew-resize', c: 'nwse-resize',
 class Modal {
 	#$;
 
+	/** @type {Node} */
+	#targetElement;
+
 	/** @type {HTMLElement} */
 	#modalArea;
 	/** @type {HTMLElement} */
@@ -175,6 +178,8 @@ class Modal {
 		}
 
 		if (this.focusElement) this.focusElement.focus();
+
+		this.#targetElement = this.#$.component.currentTarget;
 	}
 
 	/**
@@ -205,7 +210,13 @@ class Modal {
 		this.inst.modalInit?.();
 		this.inst.modalOff?.(this.isUpdate);
 
-		if (!this.isUpdate) this.#$.focusManager.focus();
+		if (!this.isUpdate) {
+			this.#$.focusManager.focus();
+		} else if (this.#targetElement) {
+			this.inst.componentSelect?.(this.#targetElement);
+		}
+
+		this.#targetElement = null;
 	}
 
 	/**

@@ -40,7 +40,7 @@ import ApiManager from '../manager/ApiManager';
  *   ]
  * }
  * ```
- * @property {Object<string, string>} [searchUrlHeader] - File server search http header. Optional. Can be overridden in browser.
+ * @property {Object<string, string>} [searchHeaders] - File server search http header. Optional. Can be overridden in browser.
  * @property {string} [listClass] - Class name of list div. Required. Can be overridden in browser.
  * @property {(item: BrowserFile) => string} [drawItemHandler] - Function that returns HTML string for rendering each file item. Required. Can be overridden in browser.
  * ```js
@@ -114,9 +114,9 @@ class Browser {
 		this.listClass = params.listClass || 'se-preview-list';
 		this.directData = params.data;
 		this.url = params.url;
-		this.urlHeader = params.headers;
+		this.headers = params.headers;
 		this.searchUrl = params.searchUrl;
-		this.searchUrlHeader = params.searchUrlHeader;
+		this.searchHeaders = params.searchHeaders;
 		this.drawItemHandler = (params.drawItemHandler || DrawItems).bind({ thumbnail: params.thumbnail, props: params.props || [] });
 		this.selectorHandler = params.selectorHandler;
 		this.columnSize = params.columnSize || 4;
@@ -176,7 +176,7 @@ class Browser {
 	 * @param {string} [params.listClass] - Class name of list div. If not, use `this.listClass`.
 	 * @param {string} [params.title] - File browser window title. If not, use `this.title`.
 	 * @param {string} [params.url] - File server url. If not, use `this.url`.
-	 * @param {Object<string, string>} [params.urlHeader] - File server http header. If not, use `this.urlHeader`.
+	 * @param {Object<string, string>} [params.headers] - File server http header. If not, use `this.headers`.
 	 * @example
 	 * // Open with default settings (configured at construction):
 	 * this.browser.open();
@@ -185,7 +185,7 @@ class Browser {
 	 * this.browser.open({
 	 *   title: 'Select a video',
 	 *   url: '/api/videos',
-	 *   urlHeader: { Authorization: 'Bearer token' },
+	 *   headers: { Authorization: 'Bearer token' },
 	 * });
 	 */
 	open(params = {}) {
@@ -205,7 +205,7 @@ class Browser {
 		if (this.directData) {
 			this.#drowItems(this.directData);
 		} else {
-			this.#drawFileList(params.url || this.url, params.urlHeader || this.urlHeader, false);
+			this.#drawFileList(params.url || this.url, params.headers || this.headers, false);
 		}
 
 		this.body.style.maxHeight = dom.utils.getClientSize().h - (this.#$.offset.getGlobal(this.body).top - _w.scrollY) - 20 + 'px';
@@ -246,7 +246,8 @@ class Browser {
 	search(keyword) {
 		if (this.searchUrl) {
 			this.keyword = keyword;
-			this.#drawFileList(this.searchUrl + '?keyword=' + keyword, this.searchUrlHeader, false);
+			const sep = this.searchUrl.includes('?') ? '&' : '?';
+			this.#drawFileList(this.searchUrl + sep + 'keyword=' + _w.encodeURIComponent(keyword), this.searchHeaders, false);
 		} else {
 			this.keyword = keyword.toLowerCase();
 			this.#drawListItem(this.#allItems.length > 0 ? this.#allItems : this.items, false);
@@ -302,11 +303,11 @@ class Browser {
 	/**
 	 * @description Fetches the file list from the server.
 	 * @param {string} url - The file server URL.
-	 * @param {Object<string, string>} urlHeader - The HTTP headers for the request.
+	 * @param {Object<string, string>} headers - The HTTP headers for the request.
 	 * @param {boolean} pageLoading - Indicates if this is a paginated request.
 	 */
-	#drawFileList(url, urlHeader, pageLoading) {
-		this.apiManager.call({ method: 'GET', url, headers: urlHeader, callBack: this.#CallBackGet.bind(this), errorCallBack: this.#CallBackError.bind(this) });
+	#drawFileList(url, headers, pageLoading) {
+		this.apiManager.call({ method: 'GET', url, headers, callBack: this.#CallBackGet.bind(this), errorCallBack: this.#CallBackError.bind(this) });
 		if (!pageLoading) {
 			this.sideOpenBtn.style.display = 'none';
 			this.showBrowserLoading();
@@ -601,7 +602,7 @@ class Browser {
 		this.selectedTags = [];
 
 		if (typeof data === 'string') {
-			this.#drawFileList(data, this.urlHeader, true);
+			this.#drawFileList(data, this.headers, true);
 		} else {
 			this.#drawListItem(data, true);
 		}

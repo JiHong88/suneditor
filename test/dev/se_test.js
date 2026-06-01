@@ -1417,6 +1417,12 @@ const options1 = {
 	layout: {
 		items: [{ name: 'Two Column', html: '<div style="display:flex;gap:1em"><div style="flex:1">Left</div><div style="flex:1">Right</div></div>' }],
 	},
+	embed: {
+		scriptSrcWhitelist: [/^https:\/\/platform\.x\.com\/widgets\.js$/, /^https:\/\/www\.instagram\.com\/embed\.js$/],
+	},
+	tagStyles: {
+       div: "color"
+    },
 	// textDirection: 'rtl',
 	value: `<pre style="line-height: 1.45;margin: 0px 0px 10px">
 ​dsadsa</pre>
@@ -2121,12 +2127,12 @@ const options_test = {
 	},
 	allUsedStyles: 'text-shadow|letter-spacing',
 	tagStyles: {
+		'@text': 'font-family|font-size|color|background-color',
+		'@line': 'text-align|margin|line-height',
 		table: 'border|border-collapse',
 		th: 'background-color|font-weight',
 		td: 'vertical-align',
 	},
-	spanStyles: 'font-family|font-size|color|background-color',
-	lineStyles: 'text-align|margin|line-height',
 	fontSizeUnits: ['px', 'pt', 'em', 'rem', '%'],
 	retainStyleMode: 'repeat',
 
@@ -2255,6 +2261,7 @@ const options_test = {
 	embed: {
 		width: '100%',
 		height: 'auto',
+		scriptSrcWhitelist: [/^https:\/\/platform\.x\.com\/widgets\.js$/, /^https:\/\/www\.instagram\.com\/embed\.js$/],
 	},
 	exportPDF: {
 		options: {

@@ -90,8 +90,6 @@ export const mockOptions = {
 	convertTextTags: { bold: 'strong', underline: 'u', italic: 'em', strike: 'del', subscript: 'sub', superscript: 'sup' },
 	allUsedStyles: '',
 	tagStyles: {},
-	spanStyles: 'font-family|font-size|color|background-color|width|height',
-	lineStyles: 'text-align|margin|margin-left|margin-right|line-height',
 	fontSizeUnits: ['px', 'pt', 'em', 'rem'],
 	retainStyleMode: 'repeat',
 	defaultLine: 'p',

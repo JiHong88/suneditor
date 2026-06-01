@@ -1553,6 +1553,7 @@ class Figure {
 		this.setAlign(this._element, value);
 		this.selectMenu_align.close();
 		this.#$.component.select(this._element, this.kind);
+		this.#$.history.push(false);
 	}
 
 	/**
@@ -1561,6 +1562,7 @@ class Figure {
 	#SetMenuAs(value) {
 		this.convertAsFormat(this._element, value);
 		this.selectMenu_as.close();
+		this.#$.history.push(false);
 	}
 
 	/**
@@ -1583,6 +1585,7 @@ class Figure {
 
 		this.selectMenu_resize.close();
 		this.#$.component.select(this._element, this.kind);
+		this.#$.history.push(false);
 	}
 
 	#OffFigureContainer() {
