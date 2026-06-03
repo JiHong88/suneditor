@@ -120,7 +120,11 @@ class ColorPicker {
 		if (!params.disableHEXInput) {
 			this.hueSlider = new HueSlider(this, $, params.hueSliderOptions, 'se-dropdown');
 			// hue open
-			this.#$.eventManager.addEvent(this.target.querySelector('.__se_hue'), 'click', this.#OnColorPalette.bind(this));
+			this.#$.eventManager.addEvent(
+				this.target.querySelector('.__se_hue'),
+				'click',
+				this.#OnColorPalette.bind(this),
+			);
 			this.#$.eventManager.addEvent(this.inputElement, 'input', this.#OnChangeInput.bind(this));
 			this.#$.eventManager.addEvent(this.target.querySelector('form'), 'submit', this.#Submit.bind(this));
 		}
@@ -154,7 +158,9 @@ class ColorPicker {
 		this.targetButton = target;
 		if (typeof stopCondition !== 'function') stopCondition = () => false;
 
-		let fillColor = (typeof nodeOrColor === 'string' ? nodeOrColor : this.#getColorInNode(nodeOrColor, stopCondition)) || this.defaultColor;
+		let fillColor =
+			(typeof nodeOrColor === 'string' ? nodeOrColor : this.#getColorInNode(nodeOrColor, stopCondition)) ||
+			this.defaultColor;
 		fillColor = converter.isHexColor(fillColor) ? fillColor : converter.rgb2hex(fillColor) || fillColor || '';
 
 		const colorList = this.colorList;
@@ -248,7 +254,9 @@ class ColorPicker {
 				return parseInt(a, 10);
 			});
 		dom.utils.removeItem(temp);
-		return colors.length >= 3 ? '#' + ((1 << 24) + (colors[0] << 16) + (colors[1] << 8) + colors[2]).toString(16).substring(1) : '';
+		return colors.length >= 3
+			? '#' + ((1 << 24) + (colors[0] << 16) + (colors[1] << 8) + colors[2]).toString(16).substring(1)
+			: '';
 	}
 
 	#OnColorPalette() {

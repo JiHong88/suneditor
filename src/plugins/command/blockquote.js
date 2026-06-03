@@ -45,7 +45,12 @@ class Blockquote extends PluginCommand {
 		const currentBlockquote = dom.query.getParentElement(this.$.selection.getNode(), 'blockquote');
 
 		if (currentBlockquote) {
-			this.$.format.removeBlock(currentBlockquote, { selectedFormats: null, newBlockElement: null, shouldDelete: false, skipHistory: false });
+			this.$.format.removeBlock(currentBlockquote, {
+				selectedFormats: null,
+				newBlockElement: null,
+				shouldDelete: false,
+				skipHistory: false,
+			});
 		} else {
 			this.$.format.applyBlock(this.quoteTag.cloneNode(false));
 		}

@@ -69,7 +69,10 @@ export function reduceEnterDown(actions, ports, ctx) {
 		} else if (rangeEl && formatEl && !dom.check.isTableCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
 			// add default List line
 			const rangeEnt = selection.getRange();
-			if (dom.check.isEdgePoint(rangeEnt.endContainer, rangeEnt.endOffset) && dom.check.isList(selectionNode.nextSibling)) {
+			if (
+				dom.check.isEdgePoint(rangeEnt.endContainer, rangeEnt.endOffset) &&
+				dom.check.isList(selectionNode.nextSibling)
+			) {
 				ports.enterPrevent(e);
 				actions.push(A.enterListAddItem(formatEl, selectionNode));
 				actions.push(A.enterScrollTo(range));
@@ -77,7 +80,9 @@ export function reduceEnterDown(actions, ports, ctx) {
 			}
 
 			if (
-				(rangeEnt.commonAncestorContainer.nodeType === 3 ? !(/** @type {HTMLElement} */ (rangeEnt.commonAncestorContainer).nextElementSibling) : true) &&
+				(rangeEnt.commonAncestorContainer.nodeType === 3
+					? !(/** @type {HTMLElement} */ (rangeEnt.commonAncestorContainer).nextElementSibling)
+					: true) &&
 				dom.check.isZeroWidth(formatEl.innerText.trim()) &&
 				!dom.check.isListCell(formatEl.nextElementSibling)
 			) {
@@ -105,13 +110,17 @@ export function reduceEnterDown(actions, ports, ctx) {
 					range.collapsed &&
 					children.length - 1 <= offset + 1 &&
 					dom.check.isBreak(children[offset]) &&
-					(!children[offset + 1] || ((!children[offset + 2] || dom.check.isZeroWidth(children[offset + 2].textContent)) && children[offset + 1].nodeType === 3 && dom.check.isZeroWidth(children[offset + 1].textContent))) &&
+					(!children[offset + 1] ||
+						((!children[offset + 2] || dom.check.isZeroWidth(children[offset + 2].textContent)) &&
+							children[offset + 1].nodeType === 3 &&
+							dom.check.isZeroWidth(children[offset + 1].textContent))) &&
 					offset > 0 &&
 					dom.check.isBreak(children[offset - 1])) ||
 					(!selectionFormat &&
 						dom.check.isZeroWidth(selectionNode.textContent) &&
 						dom.check.isBreak(prev) &&
-						(dom.check.isBreak(prev.previousSibling) || !dom.check.isZeroWidth(prev.previousSibling?.textContent)) &&
+						(dom.check.isBreak(prev.previousSibling) ||
+							!dom.check.isZeroWidth(prev.previousSibling?.textContent)) &&
 						(!next || (!dom.check.isBreak(next) && dom.check.isZeroWidth(next.textContent)))))
 			) {
 				actions.push(A.enterFormatCleanBrAndZWS(selectionNode, selectionFormat, brBlock, children, offset));
@@ -132,7 +141,9 @@ export function reduceEnterDown(actions, ports, ctx) {
 		// set format attrs - edge
 		if (range.collapsed && (formatStartEdge || formatEndEdge)) {
 			ports.enterPrevent(e);
-			actions.push(A.enterFormatBreakAtEdge(formatEl, selectionNode, formatStartEdge, formatEndEdge, bidiSwapped));
+			actions.push(
+				A.enterFormatBreakAtEdge(formatEl, selectionNode, formatStartEdge, formatEndEdge, bidiSwapped),
+			);
 			actions.push(A.enterScrollTo(range));
 			return true;
 		}
@@ -170,7 +181,11 @@ export function reduceEnterDown(actions, ports, ctx) {
 		return true;
 	}
 
-	if (rangeEl && dom.query.getParentElement(rangeEl, 'FIGCAPTION') && dom.query.getParentElement(rangeEl, dom.check.isList)) {
+	if (
+		rangeEl &&
+		dom.query.getParentElement(rangeEl, 'FIGCAPTION') &&
+		dom.query.getParentElement(rangeEl, dom.check.isList)
+	) {
 		ports.enterPrevent(e);
 		actions.push(A.enterFigcaptionExitInList(formatEl));
 		actions.push(A.enterScrollTo(range));

@@ -223,7 +223,9 @@ export type HtmlPorts = {
 	insertNode: (...args: Parameters<Html['insertNode']>) => ReturnType<Html['insertNode']>;
 };
 export type NodeTransformPorts = {
-	removeAllParents: (...args: Parameters<NodeTransform['removeAllParents']>) => ReturnType<NodeTransform['removeAllParents']>;
+	removeAllParents: (
+		...args: Parameters<NodeTransform['removeAllParents']>
+	) => ReturnType<NodeTransform['removeAllParents']>;
 	split: (...args: Parameters<NodeTransform['split']>) => ReturnType<NodeTransform['split']>;
 };
 export type CharPorts = {

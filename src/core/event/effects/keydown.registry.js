@@ -20,7 +20,12 @@ export default {
 		if (rInfo.commonCon !== rInfo.container && formatEl.parentElement) {
 			if (formatEl.contains(container)) {
 				const focusNode = LineDelete_next(formatEl);
-				ports.selection.setRange(focusNode, focusNode.textContent.length, focusNode, focusNode.textContent.length);
+				ports.selection.setRange(
+					focusNode,
+					focusNode.textContent.length,
+					focusNode,
+					focusNode.textContent.length,
+				);
 			} else {
 				const { focusNode, focusOffset } = LineDelete_prev(formatEl);
 				ports.selection.setRange(focusNode, focusOffset, focusNode, focusOffset);
@@ -64,7 +69,10 @@ export default {
 				formatEl.removeAttribute(attrs[0].name);
 			}
 		} else {
-			formatEl.parentNode.replaceChild(dom.utils.createElement(ctx.options.get('defaultLine'), null, '<br>'), formatEl);
+			formatEl.parentNode.replaceChild(
+				dom.utils.createElement(ctx.options.get('defaultLine'), null, '<br>'),
+				formatEl,
+			);
 		}
 	},
 
@@ -72,16 +80,19 @@ export default {
 	'backspace.component.select': ({ ports }, { selectionNode, range, fileComponentInfo }) => {
 		let currentZWS = null;
 		if (dom.check.isBreak(selectionNode)) dom.utils.removeItem(selectionNode);
-		else if (dom.check.isBreak((currentZWS = range.startContainer.childNodes?.[range.startOffset]))) dom.utils.removeItem(currentZWS);
+		else if (dom.check.isBreak((currentZWS = range.startContainer.childNodes?.[range.startOffset])))
+			dom.utils.removeItem(currentZWS);
 
-		if (ports.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) ports.focusManager.blur();
+		if (ports.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false)
+			ports.focusManager.blur();
 	},
 
 	/** @action backspaceComponentRemove */
 	'backspace.component.remove': ({ ports }, { isList, sel, formatEl, fileComponentInfo }) => {
 		if (isList) dom.utils.removeItem(sel);
 		if (formatEl.textContent.length === 0) dom.utils.removeItem(formatEl);
-		if (ports.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) ports.focusManager.blur();
+		if (ports.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false)
+			ports.focusManager.blur();
 	},
 
 	/** @action backspaceListMergePrev */
@@ -110,7 +121,12 @@ export default {
 	'backspace.list.removeNested': ({ ports }, { range }) => {
 		ports.html.remove();
 		if (range.startContainer.nodeType === 3) {
-			ports.selection.setRange(range.startContainer, range.startContainer.textContent.length, range.startContainer, range.startContainer.textContent.length);
+			ports.selection.setRange(
+				range.startContainer,
+				range.startContainer.textContent.length,
+				range.startContainer,
+				range.startContainer.textContent.length,
+			);
 		}
 	},
 
@@ -125,7 +141,8 @@ export default {
 			dom.utils.removeItem(formatEl);
 		}
 
-		if (ports.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) ports.focusManager.blur();
+		if (ports.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false)
+			ports.focusManager.blur();
 	},
 
 	/** @action deleteComponentSelectNext */
@@ -146,7 +163,8 @@ export default {
 		const fileComponentInfo = ports.component.get(nextEl);
 		if (fileComponentInfo) {
 			ctx.e.stopPropagation();
-			if (ports.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) ports.focusManager.blur();
+			if (ports.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false)
+				ports.focusManager.blur();
 		} else if (ports.component.is(nextEl)) {
 			ctx.e.stopPropagation();
 			dom.utils.removeItem(nextEl);
@@ -157,7 +175,11 @@ export default {
 	'delete.list.removeNested': ({ ports, ctx }, { range, formatEl, rangeEl }) => {
 		if (range.startContainer !== range.endContainer) ports.html.remove();
 
-		const next = /** @type {HTMLElement} */ (dom.utils.arrayFind(formatEl.children, dom.check.isList) || formatEl.nextElementSibling || rangeEl.parentElement.nextElementSibling);
+		const next = /** @type {HTMLElement} */ (
+			dom.utils.arrayFind(formatEl.children, dom.check.isList) ||
+				formatEl.nextElementSibling ||
+				rangeEl.parentElement.nextElementSibling
+		);
 		if (next && (dom.check.isList(next) || dom.utils.arrayFind(next.children, dom.check.isList))) {
 			ctx.e.preventDefault();
 
@@ -224,8 +246,15 @@ export default {
 				if (lines.length === 1) {
 					let tabSize = ctx.store.get('tabSize') + 1;
 					if (ctx.options.get('syncTabIndent')) {
-						const baseIndex = dom.query.findTextIndexOnLine(formatEl, range.startContainer, range.startOffset, (current) => ports.component.is(current));
-						const prevTabEndIndex = ports.format.isLine(formatEl.previousElementSibling) ? dom.query.findTabEndIndex(formatEl.previousElementSibling, baseIndex, 2) : 0;
+						const baseIndex = dom.query.findTextIndexOnLine(
+							formatEl,
+							range.startContainer,
+							range.startOffset,
+							(current) => ports.component.is(current),
+						);
+						const prevTabEndIndex = ports.format.isLine(formatEl.previousElementSibling)
+							? dom.query.findTabEndIndex(formatEl.previousElementSibling, baseIndex, 2)
+							: 0;
 						if (prevTabEndIndex > baseIndex) {
 							tabSize = prevTabEndIndex - baseIndex;
 						}
@@ -359,7 +388,12 @@ export default {
 			}
 
 			newEl = dom.utils.createElement(newFormat);
-			const edge = ports.format.removeBlock(rangeEl, { selectedFormats: [formatEl], newBlockElement: null, shouldDelete: true, skipHistory: true });
+			const edge = ports.format.removeBlock(rangeEl, {
+				selectedFormats: [formatEl],
+				newBlockElement: null,
+				shouldDelete: true,
+				skipHistory: true,
+			});
 			edge.cc.insertBefore(newEl, edge.ec);
 		}
 
@@ -380,7 +414,12 @@ export default {
 
 	/** @action enterFormatInsertBrHtml */
 	'enter.format.insertBrHtml': ({ ports }, { brBlock, range, wSelection, offset }) => {
-		ports.html.insert(range.collapsed && dom.check.isBreak(range.startContainer.childNodes[range.startOffset - 1]) ? '<br>' : '<br><br>', { selectInserted: false, skipCharCount: true, skipCleaning: true });
+		ports.html.insert(
+			range.collapsed && dom.check.isBreak(range.startContainer.childNodes[range.startOffset - 1])
+				? '<br>'
+				: '<br><br>',
+			{ selectInserted: false, skipCharCount: true, skipCleaning: true },
+		);
 
 		let focusNode = wSelection.focusNode;
 		const wOffset = wSelection.focusOffset;
@@ -411,7 +450,10 @@ export default {
 	},
 
 	/** @action enterFormatBreakAtEdge */
-	'enter.format.breakAtEdge': ({ ports, ctx }, { formatEl, selectionNode, formatStartEdge, formatEndEdge, bidiSwapped }) => {
+	'enter.format.breakAtEdge': (
+		{ ports, ctx },
+		{ formatEl, selectionNode, formatStartEdge, formatEndEdge, bidiSwapped },
+	) => {
 		const focusBR = dom.utils.createElement('BR');
 		const newFormat = dom.utils.createElement(formatEl.nodeName, null, focusBR);
 
@@ -429,7 +471,10 @@ export default {
 		} while (formatEl !== sNode && formatEl.contains(sNode));
 
 		newFormat.appendChild(child);
-		formatEl.parentNode.insertBefore(newFormat, formatStartEdge && !formatEndEdge ? formatEl : formatEl.nextElementSibling);
+		formatEl.parentNode.insertBefore(
+			newFormat,
+			formatStartEdge && !formatEndEdge ? formatEl : formatEl.nextElementSibling,
+		);
 		if (formatEndEdge) {
 			ports.selection.setRange(focusBR, 1, focusBR, 1);
 		} else if (bidiSwapped) {
@@ -442,13 +487,19 @@ export default {
 
 	/** @action enterFormatBreakWithSelection */
 	'enter.format.breakWithSelection': ({ ports, ctx }, { formatEl, range, formatStartEdge, formatEndEdge }) => {
-		const isMultiLine = ports.format.getLine(range.startContainer, null) !== ports.format.getLine(range.endContainer, null);
+		const isMultiLine =
+			ports.format.getLine(range.startContainer, null) !== ports.format.getLine(range.endContainer, null);
 		const newFormat = /** @type {HTMLElement} */ (formatEl.cloneNode(false));
 		newFormat.innerHTML = '<br>';
 		const commonCon = /** @type {HTMLElement} */ (range.commonAncestorContainer);
 		const rcon =
 			commonCon === range.startContainer && commonCon === range.endContainer && dom.check.isZeroWidth(commonCon)
-				? { container: commonCon, offset: range.endOffset, prevContainer: commonCon.previousElementSibling, commonCon: commonCon }
+				? {
+						container: commonCon,
+						offset: range.endOffset,
+						prevContainer: commonCon.previousElementSibling,
+						commonCon: commonCon,
+					}
 				: ports.html.remove();
 
 		let newEl = ports.format.getLine(rcon.container, null);
@@ -467,10 +518,15 @@ export default {
 		}
 
 		const innerRange = ports.format.getBlock(rcon.container);
-		newEl = newEl.contains(innerRange) ? dom.query.getEdgeChild(innerRange, (current) => Boolean(ports.format.getLine(current)), false) : newEl;
+		newEl = newEl.contains(innerRange)
+			? dom.query.getEdgeChild(innerRange, (current) => Boolean(ports.format.getLine(current)), false)
+			: newEl;
 		if (isMultiLine) {
 			if (formatEndEdge && !formatStartEdge) {
-				newEl.parentNode.insertBefore(newFormat, !rcon.prevContainer || rcon.container === rcon.prevContainer ? newEl.nextElementSibling : newEl);
+				newEl.parentNode.insertBefore(
+					newFormat,
+					!rcon.prevContainer || rcon.container === rcon.prevContainer ? newEl.nextElementSibling : newEl,
+				);
 				newEl = newFormat;
 				offset = 0;
 			} else {
@@ -485,7 +541,10 @@ export default {
 			}
 		} else {
 			if (formatEndEdge && formatStartEdge) {
-				newEl.parentNode.insertBefore(newFormat, rcon.prevContainer && rcon.container === rcon.prevContainer ? newEl.nextElementSibling : newEl);
+				newEl.parentNode.insertBefore(
+					newFormat,
+					rcon.prevContainer && rcon.container === rcon.prevContainer ? newEl.nextElementSibling : newEl,
+				);
 				newEl = newFormat;
 				offset = 0;
 			} else if (formatEndEdge) {
@@ -526,7 +585,10 @@ export default {
 	/** [keydown reducer] */
 	/** @action keydownInputInsertNbsp */
 	'keydown.input.insertNbsp': ({ ports }) => {
-		const nbsp = ports.html.insertNode(dom.utils.createTextNode('\u00a0'), { afterNode: null, skipCharCount: true });
+		const nbsp = ports.html.insertNode(dom.utils.createTextNode('\u00a0'), {
+			afterNode: null,
+			skipCharCount: true,
+		});
 		if (nbsp) {
 			ports.selection.setRange(nbsp, nbsp.length, nbsp, nbsp.length);
 		}

@@ -223,10 +223,17 @@ class UIManager {
 			this.#options.set('textDirection', dir);
 
 			// update _editableClass / printClass
-			const editableClass = rtl ? this.#options.get('_editableClass').replace(/\s*se-rtl/, '') + ' se-rtl' : this.#options.get('_editableClass').replace(/\s*se-rtl/, '');
+			const editableClass = rtl
+				? this.#options.get('_editableClass').replace(/\s*se-rtl/, '') + ' se-rtl'
+				: this.#options.get('_editableClass').replace(/\s*se-rtl/, '');
 			this.#options.set('_editableClass', editableClass);
 			if (this.#options.get('printClass')) {
-				this.#options.set('printClass', rtl ? this.#options.get('printClass').replace(/\s*se-rtl/, '') + ' se-rtl' : this.#options.get('printClass').replace(/\s*se-rtl/, ''));
+				this.#options.set(
+					'printClass',
+					rtl
+						? this.#options.get('printClass').replace(/\s*se-rtl/, '') + ' se-rtl'
+						: this.#options.get('printClass').replace(/\s*se-rtl/, ''),
+				);
 			}
 
 			this.offCurrentController();
@@ -247,7 +254,10 @@ class UIManager {
 				dom.utils.addClass([this.#carrierWrapper, toolbarWrapper, statusbarWrapper], 'se-rtl');
 			} else {
 				this.#contextProvider.applyToRoots((e) => {
-					dom.utils.removeClass([e.get('topArea'), e.get('wysiwyg'), e.get('documentTypePageMirror')], 'se-rtl');
+					dom.utils.removeClass(
+						[e.get('topArea'), e.get('wysiwyg'), e.get('documentTypePageMirror')],
+						'se-rtl',
+					);
 					e.get('wysiwyg').removeAttribute('dir');
 				});
 				dom.utils.removeClass([this.#carrierWrapper, toolbarWrapper, statusbarWrapper], 'se-rtl');
@@ -256,7 +266,10 @@ class UIManager {
 			const lineNodes = dom.query.getListChildren(
 				fc.get('wysiwyg'),
 				(current) => {
-					return this.#$.format.isLine(current) && !!(current.style.marginRight || current.style.marginLeft || current.style.textAlign);
+					return (
+						this.#$.format.isLine(current) &&
+						!!(current.style.marginRight || current.style.marginLeft || current.style.textAlign)
+					);
 				},
 				null,
 			);
@@ -394,7 +407,11 @@ class UIManager {
 	 * @param {string} [rootKey] Root key
 	 */
 	showLoading(rootKey) {
-		const el = /** @type {HTMLElement} */ ((rootKey ? this.#frameRoots.get(rootKey).get('container') : this.#carrierWrapper).querySelector('.se-loading-box'));
+		const el = /** @type {HTMLElement} */ (
+			(rootKey ? this.#frameRoots.get(rootKey).get('container') : this.#carrierWrapper).querySelector(
+				'.se-loading-box',
+			)
+		);
 		el.style.display = 'block';
 		el.showPopover?.();
 	}
@@ -404,7 +421,11 @@ class UIManager {
 	 * @param {string} [rootKey] Root key
 	 */
 	hideLoading(rootKey) {
-		const el = /** @type {HTMLElement} */ ((rootKey ? this.#frameRoots.get(rootKey).get('container') : this.#carrierWrapper).querySelector('.se-loading-box'));
+		const el = /** @type {HTMLElement} */ (
+			(rootKey ? this.#frameRoots.get(rootKey).get('container') : this.#carrierWrapper).querySelector(
+				'.se-loading-box',
+			)
+		);
 		el.hidePopover?.();
 		el.style.display = 'none';
 	}
@@ -420,7 +441,8 @@ class UIManager {
 		dom.utils.removeClass(this.alertModal, 'se-alert-error|se-alert-success');
 		if (type) dom.utils.addClass(this.alertModal, `se-alert-${type}`);
 
-		if (this.#closeSignal) this.#bindAlertClick = this.#eventManager.addEvent(this.#alertInner, 'click', this.#closeListener[1]);
+		if (this.#closeSignal)
+			this.#bindAlertClick = this.#eventManager.addEvent(this.#alertInner, 'click', this.#closeListener[1]);
 		this.#bindClose &&= this.#eventManager.removeGlobalEvent(this.#bindClose);
 		this.#bindClose = this.#eventManager.addGlobalEvent('keydown', this.#closeListener[0]);
 
@@ -586,7 +608,14 @@ class UIManager {
 		// block handle init
 		const blockHandleOpt = this.#options.get('blockHandle');
 		if (blockHandleOpt && rt.get('blockHandleArea') && !this.#blockHandle) {
-			this.#blockHandle = new BlockHandle(this.#$, rt.get('blockHandleArea'), rt.get('blockHandle'), rt.get('blockHandlePlus'), rt.get('blockHandleDrag'), blockHandleOpt.menu);
+			this.#blockHandle = new BlockHandle(
+				this.#$,
+				rt.get('blockHandleArea'),
+				rt.get('blockHandle'),
+				rt.get('blockHandlePlus'),
+				rt.get('blockHandleDrag'),
+				blockHandleOpt.menu,
+			);
 		}
 	}
 
@@ -738,7 +767,10 @@ class UIManager {
 
 		// change dir buttons
 		this.#$.commandDispatcher.applyTargets('dir', (e) => {
-			dom.utils.changeTxt(e.querySelector('.se-tooltip-text'), this.#contextProvider.lang[rtl ? 'dir_ltr' : 'dir_rtl']);
+			dom.utils.changeTxt(
+				e.querySelector('.se-tooltip-text'),
+				this.#contextProvider.lang[rtl ? 'dir_ltr' : 'dir_rtl'],
+			);
 			dom.utils.changeElement(e.firstElementChild, icons[rtl ? 'dir_ltr' : 'dir_rtl']);
 		});
 
@@ -772,12 +804,22 @@ class UIManager {
 	_initToggleButtons() {
 		const ctx = this.#context;
 
-		this.#codeViewDisabledButtons = converter.nodeListToArray(ctx.get('toolbar_buttonTray').querySelectorAll(DISABLE_BUTTONS_CODEVIEW));
-		this.#controllerOnDisabledButtons = converter.nodeListToArray(ctx.get('toolbar_buttonTray').querySelectorAll(DISABLE_BUTTONS_CONTROLLER));
+		this.#codeViewDisabledButtons = converter.nodeListToArray(
+			ctx.get('toolbar_buttonTray').querySelectorAll(DISABLE_BUTTONS_CODEVIEW),
+		);
+		this.#controllerOnDisabledButtons = converter.nodeListToArray(
+			ctx.get('toolbar_buttonTray').querySelectorAll(DISABLE_BUTTONS_CONTROLLER),
+		);
 
 		if (this.#options.has('_subMode')) {
-			this.#codeViewDisabledButtons = this.#codeViewDisabledButtons.concat(converter.nodeListToArray(ctx.get('toolbar_sub_buttonTray').querySelectorAll(DISABLE_BUTTONS_CODEVIEW)));
-			this.#controllerOnDisabledButtons = this.#controllerOnDisabledButtons.concat(converter.nodeListToArray(ctx.get('toolbar_sub_buttonTray').querySelectorAll(DISABLE_BUTTONS_CONTROLLER)));
+			this.#codeViewDisabledButtons = this.#codeViewDisabledButtons.concat(
+				converter.nodeListToArray(ctx.get('toolbar_sub_buttonTray').querySelectorAll(DISABLE_BUTTONS_CODEVIEW)),
+			);
+			this.#controllerOnDisabledButtons = this.#controllerOnDisabledButtons.concat(
+				converter.nodeListToArray(
+					ctx.get('toolbar_sub_buttonTray').querySelectorAll(DISABLE_BUTTONS_CONTROLLER),
+				),
+			);
 		}
 	}
 
@@ -804,7 +846,10 @@ class UIManager {
 	 * @returns {boolean}
 	 */
 	isButtonDisabled(button) {
-		if (this.#frameContext.get('isReadOnly') && dom.utils.arrayIncludes(this.#controllerOnDisabledButtons, button)) {
+		if (
+			this.#frameContext.get('isReadOnly') &&
+			dom.utils.arrayIncludes(this.#controllerOnDisabledButtons, button)
+		) {
 			return true;
 		}
 		return false;
@@ -901,10 +946,17 @@ class UIManager {
 			h === -1
 				? resizeObserverEntry?.borderBoxSize && resizeObserverEntry.borderBoxSize[0]
 					? resizeObserverEntry.borderBoxSize[0].blockSize
-					: resizeObserverEntry.contentRect.height + numbers.get(fc.get('wwComputedStyle').getPropertyValue('padding-left')) + numbers.get(fc.get('wwComputedStyle').getPropertyValue('padding-right'))
+					: resizeObserverEntry.contentRect.height +
+						numbers.get(fc.get('wwComputedStyle').getPropertyValue('padding-left')) +
+						numbers.get(fc.get('wwComputedStyle').getPropertyValue('padding-right'))
 				: h;
 		if (fc.get('_editorHeight') !== h) {
-			this.#eventManager.triggerEvent('onResizeEditor', { height: h, prevHeight: fc.get('_editorHeight'), frameContext: fc, observerEntry: resizeObserverEntry });
+			this.#eventManager.triggerEvent('onResizeEditor', {
+				height: h,
+				prevHeight: fc.get('_editorHeight'),
+				frameContext: fc,
+				observerEntry: resizeObserverEntry,
+			});
 			fc.set('_editorHeight', h);
 		}
 
@@ -915,7 +967,11 @@ class UIManager {
 	}
 
 	init() {
-		this.#closeSignal = !this.#eventManager.addEvent(this.alertModal.querySelector('[data-command="close"]'), 'click', this.alertClose.bind(this));
+		this.#closeSignal = !this.#eventManager.addEvent(
+			this.alertModal.querySelector('[data-command="close"]'),
+			'click',
+			this.alertClose.bind(this),
+		);
 		this._initToggleButtons();
 	}
 
@@ -965,7 +1021,12 @@ class UIManager {
 }
 
 function CreateAlertHTML({ lang, icons }) {
-	const html = '<div><button class="close" data-command="close" title="' + lang.close + '">' + icons.cancel + '</button></div><div><span></span></div>';
+	const html =
+		'<div><button class="close" data-command="close" title="' +
+		lang.close +
+		'">' +
+		icons.cancel +
+		'</button></div><div><span></span></div>';
 	return dom.utils.createElement('DIV', { class: 'se-alert-content' }, html);
 }
 

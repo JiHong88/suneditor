@@ -89,7 +89,10 @@ class HTML {
 		// extra tags
 		const allowedExtraTags = options.get('_allowedExtraTag');
 		const disallowedExtraTags = options.get('_disallowedExtraTag');
-		this.#disallowedTagsRegExp = new RegExp(`<(${disallowedExtraTags})[^>]*>([\\s\\S]*?)<\\/\\1>|<(${disallowedExtraTags})[^>]*\\/?>`, 'gi');
+		this.#disallowedTagsRegExp = new RegExp(
+			`<(${disallowedExtraTags})[^>]*>([\\s\\S]*?)<\\/\\1>|<(${disallowedExtraTags})[^>]*\\/?>`,
+			'gi',
+		);
 		this.#disallowedTagNameRegExp = new RegExp(`^(${disallowedExtraTags})$`, 'i');
 		this.#allowedTagNameRegExp = new RegExp(`^(${allowedExtraTags})$`, 'i');
 
@@ -104,18 +107,29 @@ class HTML {
 		for (let i = 0; i < allowStyleNodes.length; i++) {
 			disallowStyleNodes.splice(disallowStyleNodes.indexOf(allowStyleNodes[i].toLowerCase()), 1);
 		}
-		this.#disallowedStyleNodesRegExp = disallowStyleNodes.length === 0 ? null : new RegExp('(<\\/?)(' + disallowStyleNodes.join('|') + ')\\b\\s*([^>^<]+)?\\s*(?=>)', 'gi');
+		this.#disallowedStyleNodesRegExp =
+			disallowStyleNodes.length === 0
+				? null
+				: new RegExp('(<\\/?)(' + disallowStyleNodes.join('|') + ')\\b\\s*([^>^<]+)?\\s*(?=>)', 'gi');
 
 		// whitelist
 		// tags
 		const defaultAttr = options.get('__defaultAttributeWhitelist');
-		this.#allowHTMLComment = options.get('_editorElementWhitelist').includes('//') || options.get('_editorElementWhitelist') === '*';
+		this.#allowHTMLComment =
+			options.get('_editorElementWhitelist').includes('//') || options.get('_editorElementWhitelist') === '*';
 		// html check
-		this.#htmlCheckWhitelistRegExp = new RegExp('^(' + GetRegList(options.get('_editorElementWhitelist').replace('|//', ''), '') + ')$', 'i');
+		this.#htmlCheckWhitelistRegExp = new RegExp(
+			'^(' + GetRegList(options.get('_editorElementWhitelist').replace('|//', ''), '') + ')$',
+			'i',
+		);
 		this.#htmlCheckBlacklistRegExp = new RegExp('^(' + (options.get('elementBlacklist') || '^') + ')$', 'i');
 		// elements
-		this.#elementWhitelistRegExp = converter.createElementWhitelist(GetRegList(options.get('_editorElementWhitelist').replace('|//', '|<!--|-->'), ''));
-		this.#elementBlacklistRegExp = converter.createElementBlacklist(options.get('elementBlacklist').replace('|//', '|<!--|-->'));
+		this.#elementWhitelistRegExp = converter.createElementWhitelist(
+			GetRegList(options.get('_editorElementWhitelist').replace('|//', '|<!--|-->'), ''),
+		);
+		this.#elementBlacklistRegExp = converter.createElementBlacklist(
+			options.get('elementBlacklist').replace('|//', '|<!--|-->'),
+		);
 		// attributes
 		const regEndStr = '\\s*=\\s*(")[^"]*\\1';
 		const _wAttr = options.get('attributeWhitelist');
@@ -134,7 +148,16 @@ class HTML {
 			}
 		}
 
-		this.#attributeWhitelistRegExp = new RegExp('\\s(?:' + (allAttr || defaultAttr) + '|' + REQUIRED_DATA_ATTRS + (options.get('v2Migration') ? V2_MIG_DATA_ATTRS : '') + ')' + regEndStr, 'ig');
+		this.#attributeWhitelistRegExp = new RegExp(
+			'\\s(?:' +
+				(allAttr || defaultAttr) +
+				'|' +
+				REQUIRED_DATA_ATTRS +
+				(options.get('v2Migration') ? V2_MIG_DATA_ATTRS : '') +
+				')' +
+				regEndStr,
+			'ig',
+		);
 		this.#attributeWhitelist = tagsAttr;
 
 		// blacklist
@@ -244,14 +267,18 @@ class HTML {
 	 * });
 	 */
 	clean(html, { forceFormat, whitelist, blacklist, _freeCodeViewMode } = {}) {
-		const { tagFilter, formatFilter, classFilter, textStyleTagFilter, attrFilter, styleFilter } = this.#options.get('strictMode');
+		const { tagFilter, formatFilter, classFilter, textStyleTagFilter, attrFilter, styleFilter } =
+			this.#options.get('strictMode');
 		let cleanData = '';
 
 		html = this.compress(html);
 
 		if (tagFilter) {
 			html = html.replace(this.#disallowedTagsRegExp, '');
-			html = this.#deleteDisallowedTags(html, this.#elementWhitelistRegExp, this.#elementBlacklistRegExp).replace(/<br\/?>$/i, '');
+			html = this.#deleteDisallowedTags(html, this.#elementWhitelistRegExp, this.#elementBlacklistRegExp).replace(
+				/<br\/?>$/i,
+				'',
+			);
 		}
 
 		if (this.#autoStyleify) {
@@ -269,7 +296,15 @@ class HTML {
 
 		if (tagFilter) {
 			try {
-				this.#consistencyCheckOfHTML(domParser, this.#htmlCheckWhitelistRegExp, this.#htmlCheckBlacklistRegExp, tagFilter, formatFilter, classFilter, _freeCodeViewMode);
+				this.#consistencyCheckOfHTML(
+					domParser,
+					this.#htmlCheckWhitelistRegExp,
+					this.#htmlCheckBlacklistRegExp,
+					tagFilter,
+					formatFilter,
+					classFilter,
+					_freeCodeViewMode,
+				);
 			} catch (error) {
 				console.warn('[SUNEDITOR.html.clean.fail]', error.message);
 			}
@@ -314,8 +349,16 @@ class HTML {
 
 		// whitelist, blacklist
 		if (tagFilter) {
-			if (whitelist) cleanData = cleanData.replace(typeof whitelist === 'string' ? converter.createElementWhitelist(whitelist) : whitelist, '');
-			if (blacklist) cleanData = cleanData.replace(typeof blacklist === 'string' ? converter.createElementBlacklist(blacklist) : blacklist, '');
+			if (whitelist)
+				cleanData = cleanData.replace(
+					typeof whitelist === 'string' ? converter.createElementWhitelist(whitelist) : whitelist,
+					'',
+				);
+			if (blacklist)
+				cleanData = cleanData.replace(
+					typeof blacklist === 'string' ? converter.createElementBlacklist(blacklist) : blacklist,
+					'',
+				);
 		}
 
 		if (textStyleTagFilter) {
@@ -345,7 +388,8 @@ class HTML {
 	 * editor.html.insert('<div class="custom">Content</div>', { skipCleaning: true });
 	 */
 	insert(html, { selectInserted, skipCharCount, skipCleaning } = {}) {
-		if (!this.#frameContext.get('wysiwyg').contains(this.#$.selection.get().focusNode)) this.#$.focusManager.focus();
+		if (!this.#frameContext.get('wysiwyg').contains(this.#$.selection.get().focusNode))
+			this.#$.focusManager.focus();
 
 		this.remove();
 		this.#$.focusManager.focus();
@@ -364,7 +408,8 @@ class HTML {
 				const domTree = domParser.childNodes;
 
 				if (!skipCharCount) {
-					const type = this.#frameOptions.get('charCounter_type') === 'byte-html' ? 'outerHTML' : 'textContent';
+					const type =
+						this.#frameOptions.get('charCounter_type') === 'byte-html' ? 'outerHTML' : 'textContent';
 					let checkHTML = '';
 					for (let i = 0, len = domTree.length; i < len; i++) {
 						checkHTML += domTree[i][type];
@@ -462,13 +507,18 @@ class HTML {
 		let range = null;
 
 		if (afterNode) {
-			const afterNewLine = this.#$.format.isLine(afterNode) || this.#$.format.isBlock(afterNode) || this.#$.component.is(afterNode) ? this.#$.format.addLine(afterNode, null) : afterNode;
+			const afterNewLine =
+				this.#$.format.isLine(afterNode) || this.#$.format.isBlock(afterNode) || this.#$.component.is(afterNode)
+					? this.#$.format.addLine(afterNode, null)
+					: afterNode;
 			range = this.#$.selection.setRange(afterNewLine, 1, afterNewLine, 1);
 		} else {
 			range = this.#$.selection.getRange();
 		}
 
-		let line = dom.check.isListCell(range.commonAncestorContainer) ? range.commonAncestorContainer : this.#$.format.getLine(this.#$.selection.getNode(), null);
+		let line = dom.check.isListCell(range.commonAncestorContainer)
+			? range.commonAncestorContainer
+			: this.#$.format.getLine(this.#$.selection.getNode(), null);
 		let insertListCell = dom.check.isListCell(line) && (dom.check.isListCell(oNode) || dom.check.isList(oNode));
 
 		let parentNode,
@@ -476,7 +526,8 @@ class HTML {
 			tempAfterNode,
 			tempParentNode = null;
 		const freeFormat = this.#$.format.isBrLine(line);
-		const isFormats = this.#$.format.isLine(oNode) || this.#$.format.isBlock(oNode) || this.#$.component.isBasic(oNode);
+		const isFormats =
+			this.#$.format.isLine(oNode) || this.#$.format.isBlock(oNode) || this.#$.component.isBasic(oNode);
 
 		if (insertListCell) {
 			tempAfterNode = afterNode || dom.check.isList(oNode) ? line.lastChild : line.nextElementSibling;
@@ -511,7 +562,11 @@ class HTML {
 				const depthFormat = dom.query.getParentElement(container, (current) => {
 					return this.#$.format.isBlock(current) || dom.check.isListCell(current);
 				});
-				afterNode = this.#$.nodeTransform.split(container, r.offset, !depthFormat ? 0 : dom.query.getNodeDepth(depthFormat) + 1);
+				afterNode = this.#$.nodeTransform.split(
+					container,
+					r.offset,
+					!depthFormat ? 0 : dom.query.getNodeDepth(depthFormat) + 1,
+				);
 				if (!afterNode) {
 					if (!dom.check.isListCell(line)) {
 						tempAfterNode = afterNode = line;
@@ -522,7 +577,11 @@ class HTML {
 						let newCell = null;
 						if (!isEdge) {
 							newCell = line.cloneNode(false);
-							newCell.appendChild(afterNode.textContent.trim() ? afterNode : dom.utils.createTextNode(unicode.zeroWidthSpace));
+							newCell.appendChild(
+								afterNode.textContent.trim()
+									? afterNode
+									: dom.utils.createTextNode(unicode.zeroWidthSpace),
+							);
 						}
 						if (subList) {
 							if (!newCell) {
@@ -542,13 +601,22 @@ class HTML {
 			}
 		}
 
-		range = !afterNode && !isFormats ? this.#$.selection.getRangeAndAddLine(this.#$.selection.getRange(), null) : this.#$.selection.getRange();
+		range =
+			!afterNode && !isFormats
+				? this.#$.selection.getRangeAndAddLine(this.#$.selection.getRange(), null)
+				: this.#$.selection.getRange();
 		const commonCon = range.commonAncestorContainer;
 		const startOff = range.startOffset;
 		const endOff = range.endOffset;
 		const formatRange = range.startContainer === commonCon && this.#$.format.isLine(commonCon);
-		const startCon = formatRange ? commonCon.childNodes[startOff] || commonCon.childNodes[0] || range.startContainer : range.startContainer;
-		const endCon = formatRange ? commonCon.childNodes[endOff] || commonCon.childNodes[commonCon.childNodes.length - 1] || range.endContainer : range.endContainer;
+		const startCon = formatRange
+			? commonCon.childNodes[startOff] || commonCon.childNodes[0] || range.startContainer
+			: range.startContainer;
+		const endCon = formatRange
+			? commonCon.childNodes[endOff] ||
+				commonCon.childNodes[commonCon.childNodes.length - 1] ||
+				range.endContainer
+			: range.endContainer;
 
 		if (!insertListCell) {
 			if (!afterNode) {
@@ -560,18 +628,25 @@ class HTML {
 				/** No Select range node */
 				if (range.collapsed) {
 					if (commonCon.nodeType === 3) {
-						if (commonCon.textContent.length > endOff) afterNode = /** @type {Text} */ (commonCon).splitText(endOff);
+						if (commonCon.textContent.length > endOff)
+							afterNode = /** @type {Text} */ (commonCon).splitText(endOff);
 						else afterNode = commonCon.nextSibling;
 					} else {
 						if (!dom.check.isBreak(parentNode)) {
 							const c = parentNode.childNodes[startOff];
-							const focusNode = c?.nodeType === 3 && dom.check.isZeroWidth(c) && dom.check.isBreak(c.nextSibling) ? c.nextSibling : c;
+							const focusNode =
+								c?.nodeType === 3 && dom.check.isZeroWidth(c) && dom.check.isBreak(c.nextSibling)
+									? c.nextSibling
+									: c;
 							if (focusNode) {
 								if (!focusNode.nextSibling && dom.check.isBreak(focusNode)) {
 									parentNode.removeChild(focusNode);
 									afterNode = null;
 								} else {
-									afterNode = dom.check.isBreak(focusNode) && !dom.check.isBreak(oNode) ? focusNode : focusNode.nextSibling;
+									afterNode =
+										dom.check.isBreak(focusNode) && !dom.check.isBreak(oNode)
+											? focusNode
+											: focusNode.nextSibling;
 								}
 							} else {
 								afterNode = null;
@@ -590,7 +665,8 @@ class HTML {
 						else afterNode = /** @type {Text} */ (endCon).splitText(endOff);
 
 						let removeNode = startCon;
-						if (!dom.check.isEdgePoint(startCon, startOff)) removeNode = /** @type {Text} */ (startCon).splitText(startOff);
+						if (!dom.check.isEdgePoint(startCon, startOff))
+							removeNode = /** @type {Text} */ (startCon).splitText(startOff);
 
 						parentNode.removeChild(removeNode);
 						if (parentNode.childNodes.length === 0 && isFormats) {
@@ -605,7 +681,12 @@ class HTML {
 							if (this.#$.format.isLine(container)) {
 								container.innerHTML = '<br>';
 							} else if (this.#$.format.isBlock(container)) {
-								container.innerHTML = '<' + this.#options.get('defaultLine') + '><br></' + this.#options.get('defaultLine') + '>';
+								container.innerHTML =
+									'<' +
+									this.#options.get('defaultLine') +
+									'><br></' +
+									this.#options.get('defaultLine') +
+									'>';
 							}
 						}
 
@@ -626,10 +707,16 @@ class HTML {
 								afterNode = null;
 							}
 						} else if (dom.check.isWysiwygFrame(container) && !this.#$.format.isLine(oNode)) {
-							parentNode = container.appendChild(dom.utils.createElement(this.#options.get('defaultLine')));
+							parentNode = container.appendChild(
+								dom.utils.createElement(this.#options.get('defaultLine')),
+							);
 							afterNode = null;
 						} else {
-							afterNode = isFormats ? endCon : container === prevContainer ? container.nextSibling : container;
+							afterNode = isFormats
+								? endCon
+								: container === prevContainer
+									? container.nextSibling
+									: container;
 							parentNode = !afterNode || !afterNode.parentNode ? commonCon : afterNode.parentNode;
 						}
 
@@ -655,13 +742,22 @@ class HTML {
 					afterNode = null;
 				}
 
-				if (this.#$.format.isLine(oNode) || this.#$.format.isBlock(oNode) || (!dom.check.isListCell(parentNode) && this.#$.component.isBasic(oNode))) {
+				if (
+					this.#$.format.isLine(oNode) ||
+					this.#$.format.isBlock(oNode) ||
+					(!dom.check.isListCell(parentNode) && this.#$.component.isBasic(oNode))
+				) {
 					const oldParent = parentNode;
 					if (dom.check.isListCell(afterNode)) {
 						parentNode = afterNode.previousElementSibling || afterNode;
 					} else if (!originAfter && !afterNode) {
 						const r = this.remove();
-						const container = r.container.nodeType === 3 ? (dom.check.isListCell(this.#$.format.getLine(r.container, null)) ? r.container : this.#$.format.getLine(r.container, null) || r.container.parentNode) : r.container;
+						const container =
+							r.container.nodeType === 3
+								? dom.check.isListCell(this.#$.format.getLine(r.container, null))
+									? r.container
+									: this.#$.format.getLine(r.container, null) || r.container.parentNode
+								: r.container;
 						const rangeCon = dom.check.isWysiwygFrame(container) || this.#$.format.isBlock(container);
 						parentNode = rangeCon ? container : container.parentNode;
 						afterNode = rangeCon ? null : container.nextSibling;
@@ -670,7 +766,13 @@ class HTML {
 					if (oldParent.childNodes.length === 0 && parentNode !== oldParent) dom.utils.removeItem(oldParent);
 				}
 
-				if (isFormats && !freeFormat && !this.#$.format.isBlock(parentNode) && !dom.check.isListCell(parentNode) && !dom.check.isWysiwygFrame(parentNode)) {
+				if (
+					isFormats &&
+					!freeFormat &&
+					!this.#$.format.isBlock(parentNode) &&
+					!dom.check.isListCell(parentNode) &&
+					!dom.check.isWysiwygFrame(parentNode)
+				) {
 					afterNode = /** @type {HTMLElement} */ (parentNode).nextElementSibling;
 					parentNode = parentNode.parentNode;
 				}
@@ -762,7 +864,11 @@ class HTML {
 				}
 			}
 
-			if (freeFormat && !dom.check.isList(oNode) && (this.#$.format.isLine(oNode) || this.#$.format.isBlock(oNode))) {
+			if (
+				freeFormat &&
+				!dom.check.isList(oNode) &&
+				(this.#$.format.isLine(oNode) || this.#$.format.isBlock(oNode))
+			) {
 				oNode = this.#setIntoFreeFormat(oNode);
 			}
 
@@ -771,7 +877,11 @@ class HTML {
 				if (oNode.nodeType === 3) {
 					offset = oNode.textContent.length;
 					this.#$.selection.setRange(oNode, offset, oNode, offset);
-				} else if (!dom.check.isBreak(oNode) && !dom.check.isListCell(oNode) && this.#$.format.isLine(parentNode)) {
+				} else if (
+					!dom.check.isBreak(oNode) &&
+					!dom.check.isListCell(oNode) &&
+					this.#$.format.isLine(parentNode)
+				) {
 					let zeroWidth = null;
 					if (!oNode.previousSibling || dom.check.isBreak(oNode.previousSibling)) {
 						zeroWidth = dom.utils.createTextNode(unicode.zeroWidthSpace);
@@ -831,7 +941,12 @@ class HTML {
 		let endCon = range.endContainer;
 		let startOff = range.startOffset;
 		let endOff = range.endOffset;
-		const commonCon = /** @type {HTMLElement} */ (range.commonAncestorContainer.nodeType === 3 && range.commonAncestorContainer.parentNode === startCon.parentNode ? startCon.parentNode : range.commonAncestorContainer);
+		const commonCon = /** @type {HTMLElement} */ (
+			range.commonAncestorContainer.nodeType === 3 &&
+			range.commonAncestorContainer.parentNode === startCon.parentNode
+				? startCon.parentNode
+				: range.commonAncestorContainer
+		);
 
 		if (dom.check.isWysiwygFrame(startCon) && dom.check.isWysiwygFrame(endCon)) {
 			this.set('');
@@ -852,7 +967,8 @@ class HTML {
 				const next = compContainer.nextSibling || compContainer.previousSibling;
 				const nextOffset = next === compContainer.previousSibling ? next?.textContent?.length || 1 : 0;
 				const parentNext = parent.nextElementSibling || parent.previousElementSibling;
-				const parentNextOffset = parentNext === parent.previousElementSibling ? parentNext?.textContent?.length || 1 : 0;
+				const parentNextOffset =
+					parentNext === parent.previousElementSibling ? parentNext?.textContent?.length || 1 : 0;
 
 				dom.utils.removeItem(compContainer);
 
@@ -879,7 +995,10 @@ class HTML {
 					};
 				}
 			} else {
-				if ((commonCon.nodeType === 1 && startOff === 0 && endOff === 1) || (commonCon.nodeType === 3 && startOff === 0 && endOff === commonCon.textContent.length)) {
+				if (
+					(commonCon.nodeType === 1 && startOff === 0 && endOff === 1) ||
+					(commonCon.nodeType === 3 && startOff === 0 && endOff === commonCon.textContent.length)
+				) {
 					const nextEl = dom.query.getNextDeepestNode(commonCon, this.#frameContext.get('wysiwyg'));
 					const prevEl = dom.query.getPreviousDeepestNode(commonCon, this.#frameContext.get('wysiwyg'));
 					const line = this.#$.format.getLine(commonCon);
@@ -938,7 +1057,11 @@ class HTML {
 
 		if (childNodes.length > 0 && startIndex > -1 && endIndex > -1) {
 			for (let i = startIndex + 1, startNode = startCon; i >= 0; i--) {
-				if (childNodes[i] === startNode.parentNode && childNodes[i].firstChild === startNode && startOff === 0) {
+				if (
+					childNodes[i] === startNode.parentNode &&
+					childNodes[i].firstChild === startNode &&
+					startOff === 0
+				) {
 					startIndex = i;
 					startNode = startNode.parentNode;
 				}
@@ -953,7 +1076,13 @@ class HTML {
 			}
 		} else {
 			if (childNodes.length === 0) {
-				if (this.#$.format.isLine(commonCon) || this.#$.format.isBlock(commonCon) || dom.check.isWysiwygFrame(commonCon) || dom.check.isBreak(commonCon) || dom.check.isMedia(commonCon)) {
+				if (
+					this.#$.format.isLine(commonCon) ||
+					this.#$.format.isBlock(commonCon) ||
+					dom.check.isWysiwygFrame(commonCon) ||
+					dom.check.isBreak(commonCon) ||
+					dom.check.isMedia(commonCon)
+				) {
 					return {
 						container: commonCon,
 						offset: 0,
@@ -1002,7 +1131,9 @@ class HTML {
 					const sc = /** @type {Text} */ (startCon);
 					const ec = /** @type {Text} */ (endCon);
 					if (item === endCon) {
-						beforeNode = dom.utils.createTextNode(sc.substringData(0, startOff) + ec.substringData(endOff, ec.length - endOff));
+						beforeNode = dom.utils.createTextNode(
+							sc.substringData(0, startOff) + ec.substringData(endOff, ec.length - endOff),
+						);
 						offset = startOff;
 					} else {
 						beforeNode = dom.utils.createTextNode(sc.substringData(0, startOff));
@@ -1045,7 +1176,12 @@ class HTML {
 			container = endUl.previousSibling;
 			offset = container.textContent.length;
 		} else {
-			container = endCon && endCon.parentNode ? endCon : startCon && startCon.parentNode ? startCon : range.endContainer || range.startContainer;
+			container =
+				endCon && endCon.parentNode
+					? endCon
+					: startCon && startCon.parentNode
+						? startCon
+						: range.endContainer || range.startContainer;
 			if (isStartEdge || isEndEdge) {
 				if (isEndEdge) {
 					if (container.nodeType === 1 && container.childNodes.length === 0) {
@@ -1075,7 +1211,10 @@ class HTML {
 			if (rc) container = rc.sc || rc.ec || this.#frameContext.get('wysiwyg');
 		}
 
-		if (!container || (container.nodeType === 1 && !this.#$.format.isLine(container) && !dom.check.isBreak(container))) {
+		if (
+			!container ||
+			(container.nodeType === 1 && !this.#$.format.isLine(container) && !dom.check.isBreak(container))
+		) {
 			container = nextFocusNodes?.sc || nextFocusNodes?.ec;
 			offset = container?.nodeType === 3 ? container.textContent.length : 1;
 		}
@@ -1112,7 +1251,11 @@ class HTML {
 		for (let i = 0, len = rootKey.length, r; i < len; i++) {
 			this.#$.facade.changeFrameContext(rootKey[i]);
 
-			const renderHTML = dom.utils.createElement('DIV', null, this._convertToCode(this.#frameContext.get('wysiwyg'), true));
+			const renderHTML = dom.utils.createElement(
+				'DIV',
+				null,
+				this._convertToCode(this.#frameContext.get('wysiwyg'), true),
+			);
 
 			const isTableCell = dom.check.isTableCell;
 			const isEmptyLine = dom.check.isEmptyLine;
@@ -1147,13 +1290,17 @@ class HTML {
 			const content = renderHTML.innerHTML;
 			if (this.#frameOptions.get('iframe_fullPage')) {
 				if (includeFullPage) {
-					const attrs = dom.utils.getAttributesToString(this.#frameContext.get('_wd').body, ['contenteditable']);
+					const attrs = dom.utils.getAttributesToString(this.#frameContext.get('_wd').body, [
+						'contenteditable',
+					]);
 					r = `<!DOCTYPE html><html>${this.#frameContext.get('_wd').head.outerHTML}<body ${attrs}>${content}</body></html>`;
 				} else {
 					r = content;
 				}
 			} else {
-				r = withFrame ? `<div class="${this.#options.get('_editableClass') + '' + (this.#options.get('_rtl') ? ' se-rtl' : '')}">${content}</div>` : renderHTML.innerHTML;
+				r = withFrame
+					? `<div class="${this.#options.get('_editableClass') + '' + (this.#options.get('_rtl') ? ' se-rtl' : '')}">${content}</div>`
+					: renderHTML.innerHTML;
 			}
 
 			resultValue[rootKey[i]] = r;
@@ -1175,7 +1322,10 @@ class HTML {
 	set(html, { rootKey } = {}) {
 		this.#$.ui.offCurrentController();
 		this.#$.selection.removeRange();
-		const convertValue = html === null || html === undefined ? '' : this.clean(html, { forceFormat: true, whitelist: null, blacklist: null });
+		const convertValue =
+			html === null || html === undefined
+				? ''
+				: this.clean(html, { forceFormat: true, whitelist: null, blacklist: null });
 
 		if (!rootKey) rootKey = [this.#store.get('rootKey')];
 		else if (!Array.isArray(rootKey)) rootKey = [rootKey];
@@ -1225,7 +1375,9 @@ class HTML {
 				this.#$.history.push(false, rootKey[i]);
 				this.#$.selection.scrollTo(children.at(-1));
 			} else {
-				this.#$.viewer._setCodeView(this.#$.viewer._getCodeView() + '\n' + this._convertToCode(convertValue, false));
+				this.#$.viewer._setCodeView(
+					this.#$.viewer._getCodeView() + '\n' + this._convertToCode(convertValue, false),
+				);
 			}
 		}
 	}
@@ -1268,10 +1420,15 @@ class HTML {
 	 */
 	async copy(content) {
 		try {
-			if (typeof content !== 'string' && !dom.check.isElement(content) && !dom.check.isText(content)) return false;
+			if (typeof content !== 'string' && !dom.check.isElement(content) && !dom.check.isText(content))
+				return false;
 
 			if ((await clipboard.write(content)) === false) {
-				this.#$.ui.showToast(this.#$.lang.message_copy_fail, this.#options.get('toastMessageTime').copy, 'error');
+				this.#$.ui.showToast(
+					this.#$.lang.message_copy_fail,
+					this.#options.get('toastMessageTime').copy,
+					'error',
+				);
 				return false;
 			}
 			this.#$.ui.showToast(this.#$.lang.message_copy_success, this.#options.get('toastMessageTime').copy);
@@ -1297,8 +1454,14 @@ class HTML {
 
 		for (let i = 0; i < rootKey.length; i++) {
 			this.#$.facade.changeFrameContext(rootKey[i]);
-			if (ctx.head) this.#frameContext.get('_wd').head.innerHTML = ctx.head.replace(this.#disallowedTagsRegExp, '');
-			if (ctx.body) this.#frameContext.get('_wd').body.innerHTML = this.clean(ctx.body, { forceFormat: true, whitelist: null, blacklist: null });
+			if (ctx.head)
+				this.#frameContext.get('_wd').head.innerHTML = ctx.head.replace(this.#disallowedTagsRegExp, '');
+			if (ctx.body)
+				this.#frameContext.get('_wd').body.innerHTML = this.clean(ctx.body, {
+					forceFormat: true,
+					whitelist: null,
+					blacklist: null,
+				});
 			this.#$.pluginManager.resetFileInfo();
 		}
 	}
@@ -1322,7 +1485,10 @@ class HTML {
 	_convertToCode(html, comp) {
 		let returnHTML = '';
 		const wRegExp = RegExp;
-		const brReg = new wRegExp('^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR|BR|CANVAS|SELECT)$', 'i');
+		const brReg = new wRegExp(
+			'^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR|BR|CANVAS|SELECT)$',
+			'i',
+		);
 		const wDoc = typeof html === 'string' ? _d.createRange().createContextualFragment(html) : html;
 		const isFormat = (current) => {
 			return this.#$.format.isLine(current) || this.#$.component.is(current);
@@ -1350,11 +1516,20 @@ class HTML {
 					continue;
 				}
 				if (node.nodeType === 3) {
-					if (!dom.check.isList(node.parentElement)) returnHTML += converter.htmlToEntity(/^\n+$/.test(/** @type {Text} */ (node).data) ? '' : /** @type {Text} */ (node).data);
+					if (!dom.check.isList(node.parentElement))
+						returnHTML += converter.htmlToEntity(
+							/^\n+$/.test(/** @type {Text} */ (node).data) ? '' : /** @type {Text} */ (node).data,
+						);
 					continue;
 				}
 				if (node.childNodes.length === 0) {
-					returnHTML += (/^HR$/i.test(node.nodeName) ? brChar : '') + (/^PRE$/i.test(node.parentElement.nodeName) && /^BR$/i.test(node.nodeName) ? '' : elementIndent) + /** @type {HTMLElement} */ (node).outerHTML + br;
+					returnHTML +=
+						(/^HR$/i.test(node.nodeName) ? brChar : '') +
+						(/^PRE$/i.test(node.parentElement.nodeName) && /^BR$/i.test(node.nodeName)
+							? ''
+							: elementIndent) +
+						/** @type {HTMLElement} */ (node).outerHTML +
+						br;
 					continue;
 				}
 
@@ -1363,9 +1538,18 @@ class HTML {
 				} else {
 					tag = node.nodeName.toLowerCase();
 					tagIndent = elementIndent || nodeRegTest ? indent : '';
-					returnHTML += (lineBR || (elementRegTest ? '' : br)) + tagIndent + /** @type {HTMLElement} */ (node).outerHTML.match(wRegExp('<' + tag + '[^>]*>', 'i'))[0] + br;
+					returnHTML +=
+						(lineBR || (elementRegTest ? '' : br)) +
+						tagIndent +
+						/** @type {HTMLElement} */ (node).outerHTML.match(wRegExp('<' + tag + '[^>]*>', 'i'))[0] +
+						br;
 					recursionFunc(node, indent + indentSize + '');
-					returnHTML += (/\n$/.test(returnHTML) ? tagIndent : '') + '</' + tag + '>' + (lineBR || br || elementRegTest ? brChar : /^(TH|TD)$/i.test(node.nodeName) ? brChar : '');
+					returnHTML +=
+						(/\n$/.test(returnHTML) ? tagIndent : '') +
+						'</' +
+						tag +
+						'>' +
+						(lineBR || br || elementRegTest ? brChar : /^(TH|TD)$/i.test(node.nodeName) ? brChar : '');
 				}
 			}
 		})(wDoc, '');
@@ -1443,7 +1627,10 @@ class HTML {
 				dom.query.getListChildNodes(
 					node,
 					(current) => {
-						return dom.check.isSpanWithoutAttr(current) && !dom.query.getParentElement(current, dom.check.isExcludeFormat);
+						return (
+							dom.check.isSpanWithoutAttr(current) &&
+							!dom.query.getParentElement(current, dom.check.isExcludeFormat)
+						);
 					},
 					null,
 				) || [];
@@ -1465,7 +1652,15 @@ class HTML {
 				return dom.check.isSpanWithoutAttr(node) ? n.innerHTML : n.outerHTML;
 			} else {
 				const n = /** @type {HTMLElement} */ (node);
-				return '<' + defaultLine + '>' + (dom.check.isSpanWithoutAttr(node) ? n.innerHTML : n.outerHTML) + '</' + defaultLine + '>';
+				return (
+					'<' +
+					defaultLine +
+					'>' +
+					(dom.check.isSpanWithoutAttr(node) ? n.innerHTML : n.outerHTML) +
+					'</' +
+					defaultLine +
+					'>'
+				);
 			}
 		}
 		// text
@@ -1475,7 +1670,8 @@ class HTML {
 			let html = '';
 			for (let i = 0, tLen = textArray.length, text; i < tLen; i++) {
 				text = textArray[i].trim();
-				if (text.length > 0) html += '<' + defaultLine + '>' + converter.htmlToEntity(text) + '</' + defaultLine + '>';
+				if (text.length > 0)
+					html += '<' + defaultLine + '>' + converter.htmlToEntity(text) + '</' + defaultLine + '>';
 			}
 			return html;
 		}
@@ -1497,7 +1693,15 @@ class HTML {
 	 * @param {boolean} classFilter Class name filter option
 	 * @param {boolean} _freeCodeViewMode Enforces strict HTML validation based on the editor`s policy
 	 */
-	#consistencyCheckOfHTML(documentFragment, htmlCheckWhitelistRegExp, htmlCheckBlacklistRegExp, tagFilter, formatFilter, classFilter, _freeCodeViewMode) {
+	#consistencyCheckOfHTML(
+		documentFragment,
+		htmlCheckWhitelistRegExp,
+		htmlCheckBlacklistRegExp,
+		tagFilter,
+		formatFilter,
+		classFilter,
+		_freeCodeViewMode,
+	) {
 		const removeTags = [],
 			emptyTags = [],
 			wrongList = [],
@@ -1516,7 +1720,12 @@ class HTML {
 				// tag filter
 				if (tagFilter) {
 					// white list
-					if (htmlCheckBlacklistRegExp.test(current.nodeName) || (!htmlCheckWhitelistRegExp.test(current.nodeName) && current.childNodes.length === 0 && dom.check.isExcludeFormat(current))) {
+					if (
+						htmlCheckBlacklistRegExp.test(current.nodeName) ||
+						(!htmlCheckWhitelistRegExp.test(current.nodeName) &&
+							current.childNodes.length === 0 &&
+							dom.check.isExcludeFormat(current))
+					) {
 						removeTags.push(current);
 						return false;
 					}
@@ -1534,7 +1743,9 @@ class HTML {
 						!dom.check.isTableElements(current) &&
 						!dom.check.isListCell(current) &&
 						!dom.check.isAnchor(current) &&
-						(this.#$.format.isLine(current) || this.#$.format.isBlock(current) || this.#$.format.isTextStyleNode(current)) &&
+						(this.#$.format.isLine(current) ||
+							this.#$.format.isBlock(current) ||
+							this.#$.format.isTextStyleNode(current)) &&
 						current.childNodes.length === 0 &&
 						nrtag
 					) {
@@ -1543,7 +1754,11 @@ class HTML {
 					}
 
 					// wrong list
-					if (dom.check.isList(current.parentNode) && !dom.check.isList(current) && !dom.check.isListCell(current)) {
+					if (
+						dom.check.isList(current.parentNode) &&
+						!dom.check.isList(current) &&
+						!dom.check.isListCell(current)
+					) {
 						wrongList.push(current);
 						return false;
 					}
@@ -1577,7 +1792,9 @@ class HTML {
 					current.parentNode !== documentFragment &&
 					nrtag &&
 					((dom.check.isListCell(current) && !dom.check.isList(current.parentNode)) ||
-						((this.#$.format.isLine(current) || this.#$.component.is(current)) && !this.#$.format.isBlock(current.parentNode) && !dom.query.getParentElement(current, this.#$.component.is.bind(this.#$.component))));
+						((this.#$.format.isLine(current) || this.#$.component.is(current)) &&
+							!this.#$.format.isBlock(current.parentNode) &&
+							!dom.query.getParentElement(current, this.#$.component.is.bind(this.#$.component))));
 
 				return result;
 			},
@@ -1701,7 +1918,13 @@ class HTML {
 
 			if (n.nodeType === 8) {
 				value += '<!-- ' + n.textContent + ' -->';
-			} else if (!/meta/i.test(n.nodeName) && !this.#$.format.isLine(n) && !this.#$.format.isBlock(n) && !this.#$.component.is(n) && !dom.check.isExcludeFormat(n)) {
+			} else if (
+				!/meta/i.test(n.nodeName) &&
+				!this.#$.format.isLine(n) &&
+				!this.#$.format.isBlock(n) &&
+				!this.#$.component.is(n) &&
+				!dom.check.isExcludeFormat(n)
+			) {
 				f ||= dom.utils.createElement(this.#options.get('defaultLine'));
 				if (this.#$.format.isTextStyleNode(n)) {
 					/** @type {HTMLElement} */
@@ -1766,7 +1989,12 @@ class HTML {
 
 		for (let i = 0, len = domTree.length, t; i < len; i++) {
 			t = domTree[i];
-			if (t.nodeType === 1 && !this.#$.format.isTextStyleNode(t) && !dom.check.isBreak(t) && !this.#disallowedTagNameRegExp.test(t.nodeName)) {
+			if (
+				t.nodeType === 1 &&
+				!this.#$.format.isTextStyleNode(t) &&
+				!dom.check.isBreak(t) &&
+				!this.#disallowedTagNameRegExp.test(t.nodeName)
+			) {
 				requireFormat = true;
 				break;
 			}
@@ -1790,7 +2018,12 @@ class HTML {
 			const face = (m.match(_RE_FACE_ATTR) || [])[1];
 			const color = (m.match(_RE_COLOR_ATTR) || [])[1];
 			if (size || face || color) {
-				sv = 'style="' + (size ? 'font-size:' + numbers.get(Number(size) / 3.333, 1) + 'rem;' : '') + (face ? 'font-family:' + face + ';' : '') + (color ? 'color:' + color + ';' : '') + '"';
+				sv =
+					'style="' +
+					(size ? 'font-size:' + numbers.get(Number(size) / 3.333, 1) + 'rem;' : '') +
+					(face ? 'font-family:' + face + ';' : '') +
+					(color ? 'color:' + color + ';' : '') +
+					'"';
 			}
 		}
 
@@ -1823,7 +2056,10 @@ class HTML {
 						case 'fontSize':
 							if (!this.#$.plugins.fontSize) continue;
 							if (!this.#fontSizeUnitRegExp.test(r[0])) {
-								r[0] = r[0].replace((r[0].match(_RE_CSS_VALUE) || [])[1], converter.toFontUnit.bind(null, this.#options.get('fontSizeUnits')[0]));
+								r[0] = r[0].replace(
+									(r[0].match(_RE_CSS_VALUE) || [])[1],
+									converter.toFontUnit.bind(null, this.#options.get('fontSizeUnits')[0]),
+								);
 							}
 							break;
 						case 'color':
@@ -2003,10 +2239,16 @@ class HTML {
 						styleToTag.italic = { regex: /font-style\s*:\s*italic/i, tag: convertTextTags.italic };
 						break;
 					case 'underline':
-						styleToTag.underline = { regex: /text-decoration\s*:\s*underline/i, tag: convertTextTags.underline };
+						styleToTag.underline = {
+							regex: /text-decoration\s*:\s*underline/i,
+							tag: convertTextTags.underline,
+						};
 						break;
 					case 'strike':
-						styleToTag.strike = { regex: /text-decoration\s*:\s*line-through/i, tag: convertTextTags.strike };
+						styleToTag.strike = {
+							regex: /text-decoration\s*:\s*line-through/i,
+							tag: convertTextTags.strike,
+						};
 						break;
 				}
 			});

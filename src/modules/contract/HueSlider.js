@@ -135,7 +135,13 @@ class HueSlider {
 		if (!params.isNewForm) {
 			const hueController = CreateHTML_basicControllerForm($, className);
 			this.circle = hueController.querySelector('.se-hue');
-			this.controller = new Controller(this, $, hueController, { position: 'bottom', isWWTarget: false, parents: [inst.form], parentsHide: true, ...params.controllerOptions });
+			this.controller = new Controller(this, $, hueController, {
+				position: 'bottom',
+				isWWTarget: false,
+				parents: [inst.form],
+				parentsHide: true,
+				...params.controllerOptions,
+			});
 		}
 	}
 
@@ -224,7 +230,10 @@ class HueSlider {
 		// touch event
 		if (isTouchDevice) {
 			// mobile name
-			this.#globalTouchStart = this.#$.eventManager.addGlobalEvent('touchstart', OnTouchstart, { passive: false, capture: true });
+			this.#globalTouchStart = this.#$.eventManager.addGlobalEvent('touchstart', OnTouchstart, {
+				passive: false,
+				capture: true,
+			});
 			this.#globalTouchMove = this.#$.eventManager.addGlobalEvent('touchmove', OnTouchmove, true);
 			this.#globalTouchEnd = this.#$.eventManager.addGlobalEvent(
 				'touchend',
@@ -237,7 +246,10 @@ class HueSlider {
 		}
 
 		// mouse event
-		this.#globalMouseDown = this.#$.eventManager.addGlobalEvent('mousedown', OnMousedown, { passive: false, capture: true });
+		this.#globalMouseDown = this.#$.eventManager.addGlobalEvent('mousedown', OnMousedown, {
+			passive: false,
+			capture: true,
+		});
 		this.#globalMouseMove = this.#$.eventManager.addGlobalEvent('mousemove', OnMousemove, true);
 		this.#globalMouseUp = this.#$.eventManager.addGlobalEvent(
 			'mouseup',
@@ -271,7 +283,18 @@ class HueSlider {
 }
 
 // init
-const { slider, offscreenCanvas, offscreenCtx, wheel, wheelCtx, wheelPointer, gradientBar, gradientPointer, fanalColorHex, fanalColorBackground } = CreateSliderCtx();
+const {
+	slider,
+	offscreenCanvas,
+	offscreenCtx,
+	wheel,
+	wheelCtx,
+	wheelPointer,
+	gradientBar,
+	gradientPointer,
+	fanalColorHex,
+	fanalColorBackground,
+} = CreateSliderCtx();
 
 // mobile
 function OnTouchstart(event) {

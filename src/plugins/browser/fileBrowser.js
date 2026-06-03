@@ -61,7 +61,11 @@ class FileBrowser extends PluginBrowser {
 		this.onSelectfunction = null;
 
 		// modules
-		const thumbnail = { video: this.$.icons.video_thumbnail, audio: this.$.icons.audio_thumbnail, file: this.$.icons.file_thumbnail };
+		const thumbnail = {
+			video: this.$.icons.video_thumbnail,
+			audio: this.$.icons.audio_thumbnail,
+			file: this.$.icons.file_thumbnail,
+		};
 		const defaultThumbnail = this.$.icons.file_thumbnail;
 		this.browser = new Browser(this, this.$, {
 			title: this.$.lang.fileBrowser,
@@ -73,7 +77,10 @@ class FileBrowser extends PluginBrowser {
 			selectorHandler: this.#SetItem.bind(this),
 			columnSize: 4,
 			className: 'se-file-browser',
-			thumbnail: typeof pluginOptions.thumbnail === 'function' ? pluginOptions.thumbnail : (item) => thumbnail[item.type] || defaultThumbnail,
+			thumbnail:
+				typeof pluginOptions.thumbnail === 'function'
+					? pluginOptions.thumbnail
+					: (item) => thumbnail[item.type] || defaultThumbnail,
 			props: [...new Set((pluginOptions.props ?? []).concat(['frame']))],
 			expand: pluginOptions.expand,
 		});

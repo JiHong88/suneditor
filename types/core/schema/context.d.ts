@@ -38,7 +38,13 @@ import type {} from '../../typedef';
  * @param {?Element} statusbarContainer - Status bar container element.
  * @returns {SunEditor.Context} - A map of key DOM nodes used throughout the editor.
  */
-export function CreateContext(toolbar: Element, toolbarContainer: Element | null, menuTray: Element, subbar: Element | null, statusbarContainer: Element | null): SunEditor.Context;
+export function CreateContext(
+	toolbar: Element,
+	toolbarContainer: Element | null,
+	menuTray: Element,
+	subbar: Element | null,
+	statusbarContainer: Element | null,
+): SunEditor.Context;
 /**
  * This object stores **global editor-level UI references** for a SunEditor instance.
  *

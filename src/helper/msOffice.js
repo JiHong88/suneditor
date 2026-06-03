@@ -212,7 +212,13 @@ function _cleanStyles(el) {
 		cleaned += ';background-color:' + highlightMatch[1].trim();
 	}
 
-	cleaned = cleaned.replace(_RE_MSO_STYLE, '').replace(_RE_TAB_STOPS, '').replace(_RE_ZERO_MARGIN, '').replace(_RE_TEXT_INDENT, '').replace(_RE_LINE_HEIGHT_NORMAL, '').trim();
+	cleaned = cleaned
+		.replace(_RE_MSO_STYLE, '')
+		.replace(_RE_TAB_STOPS, '')
+		.replace(_RE_ZERO_MARGIN, '')
+		.replace(_RE_TEXT_INDENT, '')
+		.replace(_RE_LINE_HEIGHT_NORMAL, '')
+		.trim();
 
 	// Remove trailing/leading semicolons
 	cleaned = cleaned
@@ -297,7 +303,8 @@ function _convertLists(doc, listStyles) {
 
 	for (const item of items) {
 		const prevSibling = _getPrevSiblingElement(item.el);
-		const isConsecutive = currentGroup && currentGroup.length > 0 && prevSibling === currentGroup[currentGroup.length - 1].el;
+		const isConsecutive =
+			currentGroup && currentGroup.length > 0 && prevSibling === currentGroup[currentGroup.length - 1].el;
 
 		if (isConsecutive) {
 			currentGroup.push(item);

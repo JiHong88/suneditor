@@ -7,7 +7,12 @@ import type {} from '../../../typedef';
  * @param {number} [mouseY] - Mouse clientY for nested list resolution
  * @returns {BlockInfo|null} Block information, or null if node is outside editable area
  */
-export function resolveBlock(node: Node | null, format: FormatAPI, wysiwygFrame: HTMLElement, mouseY?: number): BlockInfo | null;
+export function resolveBlock(
+	node: Node | null,
+	format: FormatAPI,
+	wysiwygFrame: HTMLElement,
+	mouseY?: number,
+): BlockInfo | null;
 export type BlockInfo = {
 	/**
 	 * - The resolved block-level DOM element

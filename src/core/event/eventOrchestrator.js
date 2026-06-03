@@ -4,7 +4,13 @@ import { _DragHandle } from '../../modules/ui';
 
 // event handlers
 import { ButtonsHandler, OnClick_menuTray, OnClick_toolbar } from '../event/handlers/handler_toolbar';
-import { OnMouseDown_wysiwyg, OnMouseUp_wysiwyg, OnClick_wysiwyg, OnMouseMove_wysiwyg, OnMouseLeave_wysiwyg } from '../event/handlers/handler_ww_mouse';
+import {
+	OnMouseDown_wysiwyg,
+	OnMouseUp_wysiwyg,
+	OnClick_wysiwyg,
+	OnMouseMove_wysiwyg,
+	OnMouseLeave_wysiwyg,
+} from '../event/handlers/handler_ww_mouse';
 import { OnBeforeInput_wysiwyg, OnInput_wysiwyg } from '../event/handlers/handler_ww_input';
 import { OnKeyDown_wysiwyg, OnKeyUp_wysiwyg } from '../event/handlers/handler_ww_key';
 import { OnPaste_wysiwyg, OnCopy_wysiwyg, OnCut_wysiwyg } from '../event/handlers/handler_ww_clipboard';
@@ -245,14 +251,21 @@ class EventOrchestrator extends KernelInjector {
 		// SE copy data
 		const SEData = this.__secopy === plainText;
 		// MS word, OneNode, Excel
-		const MSData = /class=["']*Mso(Normal|List)/i.test(cleanData) || /content=["']*Word.Document/i.test(cleanData) || /content=["']*OneNote.File/i.test(cleanData) || /content=["']*Excel.Sheet/i.test(cleanData);
+		const MSData =
+			/class=["']*Mso(Normal|List)/i.test(cleanData) ||
+			/content=["']*Word.Document/i.test(cleanData) ||
+			/content=["']*OneNote.File/i.test(cleanData) ||
+			/content=["']*Excel.Sheet/i.test(cleanData);
 		// from
 		const from = SEData ? 'SE' : MSData ? 'MS' : '';
 
 		if (onlyText) {
 			cleanData = converter.htmlToEntity(plainText).replace(/\n/g, '<br>');
 		} else {
-			cleanData = cleanData.replace(/^<html>\r?\n?<body>\r?\n?\x3C!--StartFragment-->|\x3C!--EndFragment-->\r?\n?<\/body>\r?\n?<\/html>$/g, '');
+			cleanData = cleanData.replace(
+				/^<html>\r?\n?<body>\r?\n?\x3C!--StartFragment-->|\x3C!--EndFragment-->\r?\n?<\/body>\r?\n?<\/html>$/g,
+				'',
+			);
 			if (MSData) {
 				cleanData = cleanData.replace(/\n/g, ' ');
 				plainText = plainText.replace(/\n/g, ' ');
@@ -273,10 +286,19 @@ class EventOrchestrator extends KernelInjector {
 			cleanData = this.$.html.clean(cleanData, { forceFormat: false, whitelist: null, blacklist: null });
 		}
 
-		const maxCharCount = this.$.char.test(this.$.frameOptions.get('charCounter_type') === 'byte-html' ? cleanData : plainText, false);
+		const maxCharCount = this.$.char.test(
+			this.$.frameOptions.get('charCounter_type') === 'byte-html' ? cleanData : plainText,
+			false,
+		);
 		// user event - paste
 		if (type === 'paste') {
-			const value = await this.#eventManager.triggerEvent('onPaste', { frameContext, event: e, data: cleanData, maxCharCount, from });
+			const value = await this.#eventManager.triggerEvent('onPaste', {
+				frameContext,
+				event: e,
+				data: cleanData,
+				maxCharCount,
+				from,
+			});
 			if (value === false) {
 				return false;
 			} else if (typeof value === 'string') {
@@ -286,7 +308,13 @@ class EventOrchestrator extends KernelInjector {
 		}
 		// user event - drop
 		if (type === 'drop') {
-			const value = await this.#eventManager.triggerEvent('onDrop', { frameContext, event: e, data: cleanData, maxCharCount, from });
+			const value = await this.#eventManager.triggerEvent('onDrop', {
+				frameContext,
+				event: e,
+				data: cleanData,
+				maxCharCount,
+				from,
+			});
 			if (value === false) {
 				return false;
 			} else if (typeof value === 'string') {
@@ -311,7 +339,14 @@ class EventOrchestrator extends KernelInjector {
 
 		if (cleanData) {
 			const domParser = new DOMParser().parseFromString(cleanData, 'text/html');
-			if ((await this._callPluginEventAsync('onPaste', { frameContext, event: e, data: cleanData, doc: domParser })) !== false) {
+			if (
+				(await this._callPluginEventAsync('onPaste', {
+					frameContext,
+					event: e,
+					data: cleanData,
+					doc: domParser,
+				})) !== false
+			) {
 				this.$.html.insert(cleanData, { selectInserted: false, skipCharCount: true, skipCleaning: true });
 			}
 
@@ -422,12 +457,21 @@ class EventOrchestrator extends KernelInjector {
 		this.#eventManager.addEvent(
 			eventWysiwyg,
 			'dragover',
-			OnDragOver_wysiwyg.bind(this, fc, dragCursor, isIframe ? this.$.frameContext.get('topArea') : null, !this.#options.get('toolbar_container') && !this.#store.mode.isBalloon && !this.#store.mode.isInline),
+			OnDragOver_wysiwyg.bind(
+				this,
+				fc,
+				dragCursor,
+				isIframe ? this.$.frameContext.get('topArea') : null,
+				!this.#options.get('toolbar_container') && !this.#store.mode.isBalloon && !this.#store.mode.isInline,
+			),
 			false,
 		);
 		this.#eventManager.addEvent(eventWysiwyg, 'dragend', OnDragEnd_wysiwyg.bind(this, dragCursor), false);
 		this.#eventManager.addEvent(eventWysiwyg, 'drop', OnDrop_wysiwyg.bind(this, fc, dragCursor), false);
-		this.#eventManager.addEvent(eventWysiwyg, 'scroll', this.#OnScroll_wysiwyg.bind(this, fc, eventWysiwyg), { passive: true, capture: false });
+		this.#eventManager.addEvent(eventWysiwyg, 'scroll', this.#OnScroll_wysiwyg.bind(this, fc, eventWysiwyg), {
+			passive: true,
+			capture: false,
+		});
 		this.#eventManager.addEvent(eventWysiwyg, 'focus', this.#OnFocus_wysiwyg.bind(this, fc), false);
 		this.#eventManager.addEvent(eventWysiwyg, 'blur', this.#OnBlur_wysiwyg.bind(this, fc), false);
 		this.#eventManager.addEvent(codeArea, 'mousedown', this.#OnFocus_code.bind(this, fc), false);
@@ -445,8 +489,18 @@ class EventOrchestrator extends KernelInjector {
 		);
 
 		/** line breaker */
-		this.#eventManager.addEvent(fc.get('lineBreaker_t'), 'pointerdown', this.#DisplayLineBreak.bind(this, 't'), false);
-		this.#eventManager.addEvent(fc.get('lineBreaker_b'), 'pointerdown', this.#DisplayLineBreak.bind(this, 'b'), false);
+		this.#eventManager.addEvent(
+			fc.get('lineBreaker_t'),
+			'pointerdown',
+			this.#DisplayLineBreak.bind(this, 't'),
+			false,
+		);
+		this.#eventManager.addEvent(
+			fc.get('lineBreaker_b'),
+			'pointerdown',
+			this.#DisplayLineBreak.bind(this, 'b'),
+			false,
+		);
 
 		/** Events are registered mobile. */
 		if (isTouchDevice) {
@@ -459,7 +513,12 @@ class EventOrchestrator extends KernelInjector {
 		/** code view area auto line */
 		if (!this.#options.get('hasCodeMirror')) {
 			const codeNumbers = fc.get('codeNumbers');
-			const cvAuthHeight = this.$.viewer._codeViewAutoHeight.bind(this.$.viewer, fc.get('code'), codeNumbers, this.$.frameOptions.get('height') === 'auto');
+			const cvAuthHeight = this.$.viewer._codeViewAutoHeight.bind(
+				this.$.viewer,
+				fc.get('code'),
+				codeNumbers,
+				this.$.frameOptions.get('height') === 'auto',
+			);
 
 			this.#eventManager.addEvent(codeArea, 'keydown', cvAuthHeight, false);
 			this.#eventManager.addEvent(codeArea, 'keyup', cvAuthHeight, false);
@@ -471,7 +530,13 @@ class EventOrchestrator extends KernelInjector {
 			}
 
 			/** code view numbers */
-			if (codeNumbers) this.#eventManager.addEvent(codeArea, 'scroll', this.$.viewer._scrollLineNumbers.bind(codeArea, codeNumbers), false);
+			if (codeNumbers)
+				this.#eventManager.addEvent(
+					codeArea,
+					'scroll',
+					this.$.viewer._scrollLineNumbers.bind(codeArea, codeNumbers),
+					false,
+				);
 		}
 
 		/** markdown view area */
@@ -480,7 +545,12 @@ class EventOrchestrator extends KernelInjector {
 			this.#eventManager.addEvent(markdownArea, 'mousedown', this.#OnFocus_markdown.bind(this, fc), false);
 
 			const mdNumbers = fc.get('markdownNumbers');
-			const mdAutoHeight = this.$.viewer._markdownViewAutoHeight.bind(this.$.viewer, markdownArea, mdNumbers, this.$.frameOptions.get('height') === 'auto');
+			const mdAutoHeight = this.$.viewer._markdownViewAutoHeight.bind(
+				this.$.viewer,
+				markdownArea,
+				mdNumbers,
+				this.$.frameOptions.get('height') === 'auto',
+			);
 
 			this.#eventManager.addEvent(markdownArea, 'keydown', mdAutoHeight, false);
 			this.#eventManager.addEvent(markdownArea, 'keyup', mdAutoHeight, false);
@@ -491,7 +561,13 @@ class EventOrchestrator extends KernelInjector {
 				this.#eventManager.addEvent(markdownArea, 'keydown', InsertTab, false);
 			}
 
-			if (mdNumbers) this.#eventManager.addEvent(markdownArea, 'scroll', this.$.viewer._scrollMarkdownLineNumbers.bind(markdownArea, mdNumbers), false);
+			if (mdNumbers)
+				this.#eventManager.addEvent(
+					markdownArea,
+					'scroll',
+					this.$.viewer._scrollMarkdownLineNumbers.bind(markdownArea, mdNumbers),
+					false,
+				);
 		}
 
 		if (fc.has('statusbar')) this.__addStatusbarEvent(fc, fc.get('options'));
@@ -509,7 +585,12 @@ class EventOrchestrator extends KernelInjector {
 		/** document event */
 		if (this.__eventDoc !== fc.get('_wd')) {
 			this.__eventDoc = fc.get('_wd');
-			this.#eventManager.addEvent(this.__eventDoc, 'selectionchange', this.#OnSelectionchange_document.bind(this, this.__eventDoc), false);
+			this.#eventManager.addEvent(
+				this.__eventDoc,
+				'selectionchange',
+				this.#OnSelectionchange_document.bind(this, this.__eventDoc),
+				false,
+			);
 		}
 	}
 
@@ -522,7 +603,15 @@ class EventOrchestrator extends KernelInjector {
 	 */
 	__addStatusbarEvent(fc, fo) {
 		if (/\d+/.test(fo.get('height')) && fo.get('statusbar_resizeEnable')) {
-			fo.set('__statusbarEvent', this.#eventManager.addEvent(fc.get('statusbar'), 'mousedown', this.#OnMouseDown_statusbar.bind(this), false));
+			fo.set(
+				'__statusbarEvent',
+				this.#eventManager.addEvent(
+					fc.get('statusbar'),
+					'mousedown',
+					this.#OnMouseDown_statusbar.bind(this),
+					false,
+				),
+			);
 		} else {
 			dom.utils.addClass(fc.get('statusbar'), 'se-resizing-none');
 		}
@@ -735,12 +824,14 @@ class EventOrchestrator extends KernelInjector {
 		}
 
 		const toolbar = this.#context.get('toolbar_main');
-		const isToolbarHidden = toolbar.style.display === 'none' || (this.#store.mode.isInline && !this.#toolbar.inlineToolbarAttr.isShow);
+		const isToolbarHidden =
+			toolbar.style.display === 'none' || (this.#store.mode.isInline && !this.#toolbar.inlineToolbarAttr.isShow);
 		if (toolbar.offsetWidth === 0 && !isToolbarHidden) return;
 
 		const opendBrowser = this.#ui.opendBrowser;
 		if (opendBrowser && opendBrowser.area.style.display === 'block') {
-			opendBrowser.body.style.maxHeight = dom.utils.getClientSize().h - opendBrowser.header.offsetHeight - 50 + 'px';
+			opendBrowser.body.style.maxHeight =
+				dom.utils.getClientSize().h - opendBrowser.header.offsetHeight - 50 + 'px';
 		}
 
 		if (this.#menu.currentDropdownActiveButton && this.#menu.currentDropdown) {
@@ -812,7 +903,11 @@ class EventOrchestrator extends KernelInjector {
 			return;
 		}
 
-		if ((this.#store.get('rootKey') === rootKey && this.#store.get('_preventBlur')) || this.#store.get('_preventFocus')) return;
+		if (
+			(this.#store.get('rootKey') === rootKey && this.#store.get('_preventBlur')) ||
+			this.#store.get('_preventFocus')
+		)
+			return;
 		this.#store.set('_preventFocus', true);
 
 		dom.utils.removeClass(this.$.commandDispatcher.targets.get('codeView'), 'active');
@@ -897,7 +992,9 @@ class EventOrchestrator extends KernelInjector {
 		if (!component) return;
 
 		const isList = dom.check.isListCell(component.parentElement);
-		const format = dom.utils.createElement(isList ? 'BR' : dom.check.isTableCell(component.parentElement) ? 'DIV' : this.#options.get('defaultLine'));
+		const format = dom.utils.createElement(
+			isList ? 'BR' : dom.check.isTableCell(component.parentElement) ? 'DIV' : this.#options.get('defaultLine'),
+		);
 		if (!isList) format.innerHTML = '<br>';
 
 		if (this.$.frameOptions.get('charCounter_type') === 'byte-html' && !this.$.char.check(format.outerHTML)) return;
@@ -939,7 +1036,11 @@ class EventOrchestrator extends KernelInjector {
 		this.__setViewportSize();
 
 		if (isMobile && prevHeight > 0 && prevHeight - _w.visualViewport.height > 100 && this.#store.get('hasFocus')) {
-			this.$.selection.scrollTo(this.$.selection.getRange(), { behavior: 'auto', block: 'nearest', inline: 'nearest' });
+			this.$.selection.scrollTo(this.$.selection.getRange(), {
+				behavior: 'auto',
+				block: 'nearest',
+				inline: 'nearest',
+			});
 		}
 	}
 
@@ -991,7 +1092,10 @@ class EventOrchestrator extends KernelInjector {
 
 				// document type
 				if (root.has('documentType_use_header')) {
-					const el = dom.query.getParentElement(this.$.selection.selectionNode, this.$.format.isLine.bind(this.$.format));
+					const el = dom.query.getParentElement(
+						this.$.selection.selectionNode,
+						this.$.format.isLine.bind(this.$.format),
+					);
 					root.get('documentType').on(el);
 				}
 			}

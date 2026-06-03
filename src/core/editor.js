@@ -44,7 +44,11 @@ class Editor {
 	 */
 	isEmpty(fc) {
 		const wysiwyg = (fc || this.$.frameContext).get('wysiwyg');
-		return dom.check.isZeroWidth(wysiwyg.textContent) && !wysiwyg.querySelector(this.$.options.get('allowedEmptyTags')) && (wysiwyg.innerText.match(/\n/g) || '').length <= 1;
+		return (
+			dom.check.isZeroWidth(wysiwyg.textContent) &&
+			!wysiwyg.querySelector(this.$.options.get('allowedEmptyTags')) &&
+			(wysiwyg.innerText.match(/\n/g) || '').length <= 1
+		);
 	}
 
 	/**
@@ -160,7 +164,9 @@ class Editor {
 		env._w.setTimeout(() => {
 			// Check if instance was destroyed (e.g., in SSR with dynamic imports mistake)
 			if (!this.$.context?.size) {
-				console.warn('[SUNEDITOR:E_INIT_FAIL] Editor instance was destroyed before initialization completed. Check if destroy() was called.');
+				console.warn(
+					'[SUNEDITOR:E_INIT_FAIL] Editor instance was destroyed before initialization completed. Check if destroy() was called.',
+				);
 				return;
 			}
 
@@ -169,8 +175,10 @@ class Editor {
 			// roots
 			this.$.contextProvider.applyToRoots((e) => {
 				// observer
-				if (this.#kernel._eventOrchestrator._wwFrameObserver) this.#kernel._eventOrchestrator._wwFrameObserver.observe(e.get('wysiwygFrame'));
-				if (this.#kernel._eventOrchestrator._toolbarObserver) this.#kernel._eventOrchestrator._toolbarObserver.observe(e.get('_toolbarShadow'));
+				if (this.#kernel._eventOrchestrator._wwFrameObserver)
+					this.#kernel._eventOrchestrator._wwFrameObserver.observe(e.get('wysiwygFrame'));
+				if (this.#kernel._eventOrchestrator._toolbarObserver)
+					this.#kernel._eventOrchestrator._toolbarObserver.observe(e.get('_toolbarShadow'));
 				// resource state
 				this.$.ui._syncFrameState(e);
 			});
@@ -195,12 +203,19 @@ class Editor {
 	#initWysiwygArea(e, value) {
 		// set content
 		e.get('wysiwyg').innerHTML =
-			this.$.html.clean(typeof value === 'string' ? value : (/^TEXTAREA$/i.test(e.get('originElement').nodeName) ? e.get('originElement').value : e.get('originElement').innerHTML) || '', {
-				forceFormat: true,
-				whitelist: null,
-				blacklist: null,
-				_freeCodeViewMode: this.$.options.get('freeCodeViewMode'),
-			}) || '<' + this.$.options.get('defaultLine') + '><br></' + this.$.options.get('defaultLine') + '>';
+			this.$.html.clean(
+				typeof value === 'string'
+					? value
+					: (/^TEXTAREA$/i.test(e.get('originElement').nodeName)
+							? e.get('originElement').value
+							: e.get('originElement').innerHTML) || '',
+				{
+					forceFormat: true,
+					whitelist: null,
+					blacklist: null,
+					_freeCodeViewMode: this.$.options.get('freeCodeViewMode'),
+				},
+			) || '<' + this.$.options.get('defaultLine') + '><br></' + this.$.options.get('defaultLine') + '>';
 
 		// char counter
 		if (e.has('charCounter')) e.get('charCounter').textContent = String(this.$.char.getLength());

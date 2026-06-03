@@ -36,7 +36,9 @@ class BlockStyle extends PluginDropdown {
 		this.inner = '<span class="se-txt">' + this.$.lang.formats + '</span>' + this.$.icons.arrow_down;
 
 		// create menu from items
-		const menu = this.$.menu.initDropdownTarget(BlockStyle, CreateItems(this.$, pluginOptions.items), { className: 'se-list-format' });
+		const menu = this.$.menu.initDropdownTarget(BlockStyle, CreateItems(this.$, pluginOptions.items), {
+			className: 'se-list-format',
+		});
 
 		// members
 		this.formatList = menu.querySelectorAll('li button');
@@ -83,7 +85,8 @@ class BlockStyle extends PluginDropdown {
 	on(target) {
 		const formatList = this.formatList;
 		const targetText = target.querySelector('.se-txt');
-		const currentFormat = (targetText.getAttribute('data-value') || '') + (targetText.getAttribute('data-class') || '');
+		const currentFormat =
+			(targetText.getAttribute('data-value') || '') + (targetText.getAttribute('data-class') || '');
 
 		if (currentFormat !== this.currentFormat) {
 			for (let i = 0, len = formatList.length, f; i < len; i++) {

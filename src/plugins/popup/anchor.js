@@ -42,11 +42,23 @@ class Anchor extends PluginPopup {
 		// controller
 		const controllerSelectEl = CreateHTML_controller_select(this.$);
 		this.displayId = controllerSelectEl.querySelector('.se-controller-display');
-		this.controllerSelect = new Controller(this, this.$, controllerSelectEl, { position: 'bottom', disabled: true }, Anchor.key);
+		this.controllerSelect = new Controller(
+			this,
+			this.$,
+			controllerSelectEl,
+			{ position: 'bottom', disabled: true },
+			Anchor.key,
+		);
 
 		const controllerEl = CreateHTML_controller(this.$);
 		this.inputEl = controllerEl.querySelector('input');
-		this.controller = new Controller(this, this.$, controllerEl, { position: 'bottom', disabled: true, parents: [this.controllerSelect.form], parentsHide: true }, Anchor.key);
+		this.controller = new Controller(
+			this,
+			this.$,
+			controllerEl,
+			{ position: 'bottom', disabled: true, parents: [this.controllerSelect.form], parentsHide: true },
+			Anchor.key,
+		);
 	}
 
 	/**

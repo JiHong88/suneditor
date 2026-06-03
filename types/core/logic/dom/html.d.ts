@@ -185,7 +185,15 @@ declare class HTML {
 	 * const html = editor.$.html.get();
 	 * const htmlWithFrame = editor.$.html.get({ withFrame: true });
 	 */
-	get({ withFrame, includeFullPage, rootKey }?: { withFrame?: boolean; includeFullPage?: boolean; rootKey?: number | Array<number> }): string | any;
+	get({
+		withFrame,
+		includeFullPage,
+		rootKey,
+	}?: {
+		withFrame?: boolean;
+		includeFullPage?: boolean;
+		rootKey?: number | Array<number>;
+	}): string | any;
 	/**
 	 * @description Sets the HTML string to the editor content
 	 * @param {string} html HTML string

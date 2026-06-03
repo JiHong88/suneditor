@@ -14,7 +14,14 @@ declare class BlockHandle {
 	 * @param {HTMLElement} blockHandleDrag - Drag button
 	 * @param {Array<string>|null} menuConfig - Array of plugin names (like buttonList), or null
 	 */
-	constructor($: SunEditor.Deps, blockHandleArea: HTMLElement, blockHandle: HTMLElement, blockHandlePlus: HTMLElement, blockHandleDrag: HTMLElement, menuConfig: Array<string> | null);
+	constructor(
+		$: SunEditor.Deps,
+		blockHandleArea: HTMLElement,
+		blockHandle: HTMLElement,
+		blockHandlePlus: HTMLElement,
+		blockHandleDrag: HTMLElement,
+		menuConfig: Array<string> | null,
+	);
 	/**
 	 * @description Position the block handle for the given mouse target. Uses rAF throttle.
 	 * Called from wysiwyg mousemove.

@@ -101,7 +101,11 @@ class Component {
 	_init() {
 		this.#contextProvider.applyToRoots((e) => {
 			// drag
-			const dragHandle = dom.utils.createElement('DIV', { class: 'se-drag-handle', draggable: 'true' }, this.#contextProvider.icons.selection);
+			const dragHandle = dom.utils.createElement(
+				'DIV',
+				{ class: 'se-drag-handle', draggable: 'true' },
+				this.#contextProvider.icons.selection,
+			);
 			e.get('wrapper').appendChild(dragHandle);
 			this.#eventManager.addEvent(dragHandle, 'mouseenter', this.#OnDragEnter.bind(this));
 			this.#eventManager.addEvent(dragHandle, 'mouseleave', this.#OnDragLeave.bind(this));
@@ -139,15 +143,36 @@ class Component {
 
 		try {
 			if (dom.check.isListCell(formatEl)) {
-				this.#$.html.insertNode(element, { afterNode: isInline ? null : !dom.check.isZeroWidth(selectionNode) ? null : (selectionNode || r.container || {}).nextSibling, skipCharCount: true });
+				this.#$.html.insertNode(element, {
+					afterNode: isInline
+						? null
+						: !dom.check.isZeroWidth(selectionNode)
+							? null
+							: (selectionNode || r.container || {}).nextSibling,
+					skipCharCount: true,
+				});
 				if (!isInline && !element.nextSibling) element.parentNode.appendChild(dom.utils.createElement('BR'));
 			} else {
-				if (!isInline && this.#$.selection.getRange().collapsed && (r.container?.nodeType === 3 || dom.check.isBreak(r.container))) {
-					const depthFormat = dom.query.getParentElement(r.container, this.#$.format.isBlock.bind(this.#$.format));
-					oNode = this.#$.nodeTransform.split(r.container, r.offset, !depthFormat ? 0 : dom.query.getNodeDepth(depthFormat) + 1);
+				if (
+					!isInline &&
+					this.#$.selection.getRange().collapsed &&
+					(r.container?.nodeType === 3 || dom.check.isBreak(r.container))
+				) {
+					const depthFormat = dom.query.getParentElement(
+						r.container,
+						this.#$.format.isBlock.bind(this.#$.format),
+					);
+					oNode = this.#$.nodeTransform.split(
+						r.container,
+						r.offset,
+						!depthFormat ? 0 : dom.query.getNodeDepth(depthFormat) + 1,
+					);
 					if (oNode) formatEl = /** @type {HTMLElement} */ (oNode.previousSibling);
 				}
-				this.#$.html.insertNode(element, { afterNode: isInline ? null : this.#$.format.isBlock(formatEl) ? null : formatEl, skipCharCount: true });
+				this.#$.html.insertNode(element, {
+					afterNode: isInline ? null : this.#$.format.isBlock(formatEl) ? null : formatEl,
+					skipCharCount: true,
+				});
 				if (!isInline && formatEl && dom.check.isZeroWidth(formatEl)) dom.utils.removeItem(formatEl);
 			}
 
@@ -243,7 +268,8 @@ class Component {
 		let launcher = null;
 
 		if (this.is(element)) {
-			if (dom.check.isComponentContainer(element) && !dom.utils.hasClass(element, 'se-inline-component')) element = /** @type {HTMLElement} */ (element).firstElementChild || element;
+			if (dom.check.isComponentContainer(element) && !dom.utils.hasClass(element, 'se-inline-component'))
+				element = /** @type {HTMLElement} */ (element).firstElementChild || element;
 			if (/^FIGURE$/i.test(element.nodeName)) element = /** @type {HTMLElement} */ (element).firstElementChild;
 			if (!element) return null;
 
@@ -296,7 +322,12 @@ class Component {
 	 */
 	select(element, pluginName, { isInput = false } = {}) {
 		const info = this.get(element);
-		if (!info || dom.check.isUneditable(dom.query.getParentElement(element, this.is.bind(this))) || dom.check.isUneditable(element)) return false;
+		if (
+			!info ||
+			dom.check.isUneditable(dom.query.getParentElement(element, this.is.bind(this))) ||
+			dom.check.isUneditable(element)
+		)
+			return false;
 
 		const plugin = info.launcher || this.#$.plugins[pluginName];
 		if (!plugin) return;
@@ -324,7 +355,8 @@ class Component {
 		if (typeof plugin.componentSelect === 'function') isNonFigureComponent = plugin.componentSelect(element);
 
 		const isBreakComponent = dom.utils.hasClass(info.target, 'se-component-line-break');
-		if (isBreakComponent || (!isNonFigureComponent && !dom.utils.hasClass(info.container, 'se-inline-component'))) this._setComponentLineBreaker(/** @type {HTMLElement} */ (info.container || info.cover || element));
+		if (isBreakComponent || (!isNonFigureComponent && !dom.utils.hasClass(info.container, 'se-inline-component')))
+			this._setComponentLineBreaker(/** @type {HTMLElement} */ (info.container || info.cover || element));
 
 		this.currentTarget = element;
 		this.currentPlugin = plugin;
@@ -365,7 +397,9 @@ class Component {
 
 			this.#store.set('controlActive', true);
 		} else if (isBreakComponent || !dom.utils.hasClass(info.container, 'se-input-component')) {
-			const dragHandle = /** @type {HTMLElement} */ (this.#frameContext.get('wrapper').querySelector('.se-drag-handle'));
+			const dragHandle = /** @type {HTMLElement} */ (
+				this.#frameContext.get('wrapper').querySelector('.se-drag-handle')
+			);
 			dom.utils.addClass(dragHandle, 'se-drag-handle-full');
 			this.#$.ui._visibleControllers(false, false);
 
@@ -435,7 +469,12 @@ class Component {
 		if (dom.utils.hasClass(element, 'se-inline-component')) return true;
 
 		const comp = this.#$.pluginManager.findComponentInfo(element);
-		if (comp && (dom.utils.hasClass(element, 'se-inline-component') || dom.utils.hasClass(element.parentElement, 'se-inline-component'))) return true;
+		if (
+			comp &&
+			(dom.utils.hasClass(element, 'se-inline-component') ||
+				dom.utils.hasClass(element.parentElement, 'se-inline-component'))
+		)
+			return true;
 
 		return false;
 	}
@@ -518,7 +557,9 @@ class Component {
 		}
 
 		if (this.#frameContext.get('lineBreaker_t')) {
-			this.#frameContext.get('lineBreaker_t').style.display = this.#frameContext.get('lineBreaker_b').style.display = 'none';
+			this.#frameContext.get('lineBreaker_t').style.display = this.#frameContext.get(
+				'lineBreaker_b',
+			).style.display = 'none';
 		}
 
 		if (this.currentPlugin) {
@@ -563,7 +604,13 @@ class Component {
 		const { top, left, right, scrollX, scrollY } = this.#$.offset.getLocal(offsetTarget);
 		const sideOffset = isRtl ? right : left;
 
-		if (isList ? (!dom.check.isBreak(container.previousElementSibling) && !container.previousSibling?.textContent?.trim()) || this.is(container.previousElementSibling) : !this.#$.format.isLine(container.previousElementSibling)) {
+		if (
+			isList
+				? (!dom.check.isBreak(container.previousElementSibling) &&
+						!container.previousSibling?.textContent?.trim()) ||
+					this.is(container.previousElementSibling)
+				: !this.#$.format.isLine(container.previousElementSibling)
+		) {
 			const cStyle = _w.getComputedStyle(lb_t);
 			const cH = numbers.get(cStyle.height, 1);
 			const cW = numbers.get(cStyle.width, 1);
@@ -587,7 +634,12 @@ class Component {
 		}
 
 		// bottom
-		if (isList ? (!dom.check.isBreak(container.nextElementSibling) && !container.nextSibling?.textContent?.trim()) || this.is(container.nextElementSibling) : !this.#$.format.isLine(container.nextElementSibling)) {
+		if (
+			isList
+				? (!dom.check.isBreak(container.nextElementSibling) && !container.nextSibling?.textContent?.trim()) ||
+					this.is(container.nextElementSibling)
+				: !this.#$.format.isLine(container.nextElementSibling)
+		) {
 			const cStyle = _w.getComputedStyle(lb_b);
 			const cH = numbers.get(cStyle.height, 1);
 			const cW = numbers.get(cStyle.width, 1);
@@ -599,7 +651,8 @@ class Component {
 			}
 
 			b_style.top = componentTop + target.offsetHeight - cH / 2 + 'px';
-			b_style[dir[0]] = sideOffset + target.offsetWidth - (isNonSelected ? 0 : w) - (isNonSelected ? cW / 2 : cW) + 'px';
+			b_style[dir[0]] =
+				sideOffset + target.offsetWidth - (isNonSelected ? 0 : w) - (isNonSelected ? cW / 2 : cW) + 'px';
 			b_style[dir[1]] = '';
 
 			lb_b.setAttribute('data-offset', scrollY + ',' + dir[0] + ',' + scrollX);
@@ -659,7 +712,11 @@ class Component {
 	 */
 	#addNotFileGlobalEvent() {
 		this.#removeNotFileGlobalEvent();
-		this.#bindClose_mousedown = this.#eventManager.addGlobalEvent(isMobile ? 'click' : 'mousedown', this.#globalEvents.mousedown, true);
+		this.#bindClose_mousedown = this.#eventManager.addGlobalEvent(
+			isMobile ? 'click' : 'mousedown',
+			this.#globalEvents.mousedown,
+			true,
+		);
 	}
 
 	/**
@@ -703,19 +760,26 @@ class Component {
 		const nodeName = element.nodeName.toLowerCase();
 		return (
 			this.#$.pluginManager.fileInfo.regExp.test(nodeName) &&
-			(!this.#$.pluginManager.fileInfo.tagAttrs[nodeName] || this.#$.pluginManager.fileInfo.tagAttrs[nodeName]?.every((v) => /** @type {HTMLElement} */ (element).hasAttribute(v)))
+			(!this.#$.pluginManager.fileInfo.tagAttrs[nodeName] ||
+				this.#$.pluginManager.fileInfo.tagAttrs[nodeName]?.every((v) =>
+					/** @type {HTMLElement} */ (element).hasAttribute(v),
+				))
 		);
 	}
 
 	#OnDragEnter() {
 		this.#store.set('_preventBlur', true);
-		this.#$.ui._visibleControllers(false, dom.utils.hasClass(_DragHandle.get('__dragHandler'), 'se-drag-handle-full'));
+		this.#$.ui._visibleControllers(
+			false,
+			dom.utils.hasClass(_DragHandle.get('__dragHandler'), 'se-drag-handle-full'),
+		);
 		dom.utils.addClass(_DragHandle.get('__dragCover') || _DragHandle.get('__dragContainer'), 'se-drag-over');
 	}
 
 	#OnDragLeave() {
 		this.#store.set('_preventBlur', false);
-		if (!dom.utils.hasClass(_DragHandle.get('__dragHandler'), 'se-drag-handle-full')) this.#$.ui._visibleControllers(true, true);
+		if (!dom.utils.hasClass(_DragHandle.get('__dragHandler'), 'se-drag-handle-full'))
+			this.#$.ui._visibleControllers(true, true);
 		dom.utils.removeClass([_DragHandle.get('__dragCover'), _DragHandle.get('__dragContainer')], 'se-drag-over');
 	}
 
@@ -765,7 +829,8 @@ class Component {
 			this.currentTarget?.contains(target) ||
 			dom.query.getParentElement(target, '.se-controller') ||
 			dom.utils.hasClass(target, 'se-drag-handle') ||
-			(this.currentPluginName === this.#$.ui.currentControllerName && this.#$.ui.opendControllers.some(({ form }) => form.contains(target)))
+			(this.currentPluginName === this.#$.ui.currentControllerName &&
+				this.#$.ui.opendControllers.some(({ form }) => form.contains(target)))
 		) {
 			return;
 		}
@@ -783,7 +848,10 @@ class Component {
 		if (!info) return;
 
 		const cloneContainer = info.container.cloneNode(true);
-		if (typeof this.#$.plugins[info.pluginName]?.componentCopy !== 'function' || this.#$.plugins[info.pluginName].componentCopy({ event: e, cloneContainer, info }) === false) {
+		if (
+			typeof this.#$.plugins[info.pluginName]?.componentCopy !== 'function' ||
+			this.#$.plugins[info.pluginName].componentCopy({ event: e, cloneContainer, info }) === false
+		) {
 			SetClipboardComponent(e, cloneContainer, e.clipboardData);
 		}
 
@@ -833,7 +901,10 @@ class Component {
 			e.preventDefault();
 			e.stopPropagation();
 
-			if (typeof this.currentPlugin?.componentDestroy === 'function' && (!this.info.isInputType || !this.#store.get('hasFocus'))) {
+			if (
+				typeof this.currentPlugin?.componentDestroy === 'function' &&
+				(!this.info.isInputType || !this.#store.get('hasFocus'))
+			) {
 				const focusNode = this.info.container.previousSibling;
 				await this.currentPlugin.componentDestroy(this.currentTarget);
 				this.deselect();
@@ -857,7 +928,11 @@ class Component {
 			if (dom.check.isListCell(container.parentNode)) {
 				newEl = dom.utils.createElement('BR');
 			} else {
-				newEl = dom.utils.createElement(this.#$.format.isLine(sibling) ? sibling.nodeName : this.#options.get('defaultLine'), null, '<br>');
+				newEl = dom.utils.createElement(
+					this.#$.format.isLine(sibling) ? sibling.nodeName : this.#options.get('defaultLine'),
+					null,
+					'<br>',
+				);
 			}
 
 			const pluginName = this.currentPluginName;

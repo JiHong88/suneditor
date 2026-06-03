@@ -92,9 +92,17 @@ class BackgroundColor extends PluginDropdownFree {
 	colorPickerAction(color) {
 		if (color) {
 			const newNode = dom.utils.createElement('SPAN', { style: 'background-color: ' + color + ';' });
-			this.$.inline.apply(newNode, { stylesToModify: ['background-color'], nodesToRemove: null, strictRemove: null });
+			this.$.inline.apply(newNode, {
+				stylesToModify: ['background-color'],
+				nodesToRemove: null,
+				strictRemove: null,
+			});
 		} else {
-			this.$.inline.apply(null, { stylesToModify: ['background-color'], nodesToRemove: ['span'], strictRemove: true });
+			this.$.inline.apply(null, {
+				stylesToModify: ['background-color'],
+				nodesToRemove: ['span'],
+				strictRemove: true,
+			});
 		}
 
 		this.$.menu.dropdownOff();

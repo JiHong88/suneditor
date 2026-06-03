@@ -1,7 +1,14 @@
 import { dom, env, keyCodeMap } from '../../helper';
 
 const { _w } = env;
-const DIRECTION_CURSOR_MAP = { w: 'ns-resize', h: 'ew-resize', c: 'nwse-resize', wRTL: 'ns-resize', hRTL: 'ew-resize', cRTL: 'nesw-resize' };
+const DIRECTION_CURSOR_MAP = {
+	w: 'ns-resize',
+	h: 'ew-resize',
+	c: 'nwse-resize',
+	wRTL: 'ns-resize',
+	hRTL: 'ew-resize',
+	cRTL: 'nesw-resize',
+};
 
 /**
  * @class
@@ -59,14 +66,38 @@ class Modal {
 
 		// init
 		this.#$.eventManager.addEvent(element.querySelector('form'), 'submit', this.#Action.bind(this));
-		this.#hasNoCloseButton = !this.#$.eventManager.addEvent(element.querySelector('[data-command="close"]'), 'click', this.close.bind(this));
+		this.#hasNoCloseButton = !this.#$.eventManager.addEvent(
+			element.querySelector('[data-command="close"]'),
+			'click',
+			this.close.bind(this),
+		);
 
 		// resize
-		if (element.querySelector('.se-modal-resize-handle-w') || element.querySelector('.se-modal-resize-handle-h') || element.querySelector('.se-modal-resize-handle-c') || element.querySelector('.se-modal-resize-form')) {
-			if (!(this.#resizeBody = element.querySelector('.se-modal-resize-form')) && (this.#resizeBody = element.querySelector('.se-modal-body'))) {
-				this.#$.eventManager.addEvent(element.querySelector('.se-modal-resize-handle-w'), 'mousedown', this.#OnResizeMouseDown.bind(this, 'w'));
-				this.#$.eventManager.addEvent(element.querySelector('.se-modal-resize-handle-h'), 'mousedown', this.#OnResizeMouseDown.bind(this, 'h'));
-				this.#$.eventManager.addEvent(element.querySelector('.se-modal-resize-handle-c'), 'mousedown', this.#OnResizeMouseDown.bind(this, 'c'));
+		if (
+			element.querySelector('.se-modal-resize-handle-w') ||
+			element.querySelector('.se-modal-resize-handle-h') ||
+			element.querySelector('.se-modal-resize-handle-c') ||
+			element.querySelector('.se-modal-resize-form')
+		) {
+			if (
+				!(this.#resizeBody = element.querySelector('.se-modal-resize-form')) &&
+				(this.#resizeBody = element.querySelector('.se-modal-body'))
+			) {
+				this.#$.eventManager.addEvent(
+					element.querySelector('.se-modal-resize-handle-w'),
+					'mousedown',
+					this.#OnResizeMouseDown.bind(this, 'w'),
+				);
+				this.#$.eventManager.addEvent(
+					element.querySelector('.se-modal-resize-handle-h'),
+					'mousedown',
+					this.#OnResizeMouseDown.bind(this, 'h'),
+				);
+				this.#$.eventManager.addEvent(
+					element.querySelector('.se-modal-resize-handle-c'),
+					'mousedown',
+					this.#OnResizeMouseDown.bind(this, 'c'),
+				);
 
 				this.#globalEventHandlers = {
 					mousemove: this.#OnResize.bind(this),
@@ -173,7 +204,8 @@ class Modal {
 			const mw = `${this.form.offsetWidth - offset.width}px`;
 			const mh = `${this.form.offsetTop + (this.form.offsetHeight - this.#resizeBody.offsetHeight)}px`;
 			// set max
-			if (maxWidth && typeof this.#resizeDir === 'string') dom.utils.setStyle(this.#resizeBody, 'max-width', `calc(${maxWidth} - ${mw})`);
+			if (maxWidth && typeof this.#resizeDir === 'string')
+				dom.utils.setStyle(this.#resizeBody, 'max-width', `calc(${maxWidth} - ${mw})`);
 			if (maxHeight) dom.utils.setStyle(this.#resizeBody, 'max-height', `calc(${maxHeight} - ${mh})`);
 		}
 
@@ -249,8 +281,16 @@ class Modal {
 	#addGlobalEvent(dir) {
 		this.#removeGlobalEvent();
 		this.#$.ui.enableBackWrapper(DIRECTION_CURSOR_MAP[dir]);
-		this.#bindClose_mousemove = this.#$.eventManager.addGlobalEvent('mousemove', this.#globalEventHandlers.mousemove, true);
-		this.#bindClose_mouseup = this.#$.eventManager.addGlobalEvent('mouseup', this.#globalEventHandlers.mouseup, true);
+		this.#bindClose_mousemove = this.#$.eventManager.addGlobalEvent(
+			'mousemove',
+			this.#globalEventHandlers.mousemove,
+			true,
+		);
+		this.#bindClose_mouseup = this.#$.eventManager.addGlobalEvent(
+			'mouseup',
+			this.#globalEventHandlers.mouseup,
+			true,
+		);
 	}
 
 	/**

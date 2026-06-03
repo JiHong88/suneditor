@@ -10,14 +10,29 @@ export namespace A {
 	function historyPush(hard: boolean): Action;
 	function documentTypeRefreshHeader(): Action;
 	function selectionSetRange(sc: Node, so: number, ec: Node, eo: number): Action;
-	function formatRemoveBlock(rangeEl: Element, selectedFormats: Element[] | null, newBlockElement: Element | null, shouldDelete: boolean, skipHistory: boolean): Action;
+	function formatRemoveBlock(
+		rangeEl: Element,
+		selectedFormats: Element[] | null,
+		newBlockElement: Element | null,
+		shouldDelete: boolean,
+		skipHistory: boolean,
+	): Action;
 	function domUtilsRemoveItem(item: Node): Action;
 	function selectComponentFallback(cmponentInfo: SunEditor.ComponentInfo): Action;
 	function delFormatRemoveAndMove(container: Node, formatEl: Element): Action;
 	function backspaceFormatMaintain(formatEl: Element): Action;
 	function backspaceBrLineStrip(formatEl: Element): Action;
-	function backspaceComponentSelect(selectionNode: Node, range: Range, fileComponentInfo: SunEditor.ComponentInfo): Action;
-	function backspaceComponentRemove(isList: boolean, sel: Node, formatEl: Element, fileComponentInfo: SunEditor.ComponentInfo): Action;
+	function backspaceComponentSelect(
+		selectionNode: Node,
+		range: Range,
+		fileComponentInfo: SunEditor.ComponentInfo,
+	): Action;
+	function backspaceComponentRemove(
+		isList: boolean,
+		sel: Node,
+		formatEl: Element,
+		fileComponentInfo: SunEditor.ComponentInfo,
+	): Action;
 	function backspaceListMergePrev(prev: Element, formatEl: Element, rangeEl: Element): Action;
 	function backspaceListRemoveNested(range: Range): Action;
 	function deleteComponentSelect(formatEl: Element, fileComponentInfo: SunEditor.ComponentInfo): Action;
@@ -28,11 +43,28 @@ export namespace A {
 	function enterLineAddDefault(formatEl: Element): Action;
 	function enterListAddItem(formatEl: Element, selectionNode: Node): Action;
 	function enterFormatExitEmpty(formatEl: Element, rangeEl: Element): Action;
-	function enterFormatCleanBrAndZWS(selectionNode: Node, selectionFormat: boolean, brBlock: Element, children: NodeList, offset: number): Action;
+	function enterFormatCleanBrAndZWS(
+		selectionNode: Node,
+		selectionFormat: boolean,
+		brBlock: Element,
+		children: NodeList,
+		offset: number,
+	): Action;
 	function enterFormatInsertBrHtml(brBlock: Element, range: Range, wSelection: Selection, offset: number): Action;
 	function enterFormatInsertBrNode(wSelection: Selection): Action;
-	function enterFormatBreakAtEdge(formatEl: Element, selectionNode: Node, formatStartEdge: boolean, formatEndEdge: boolean, bidiSwapped?: boolean): Action;
-	function enterFormatBreakWithSelection(formatEl: Element, range: Range, formatStartEdge: boolean, formatEndEdge: boolean): Action;
+	function enterFormatBreakAtEdge(
+		formatEl: Element,
+		selectionNode: Node,
+		formatStartEdge: boolean,
+		formatEndEdge: boolean,
+		bidiSwapped?: boolean,
+	): Action;
+	function enterFormatBreakWithSelection(
+		formatEl: Element,
+		range: Range,
+		formatStartEdge: boolean,
+		formatEndEdge: boolean,
+	): Action;
 	function enterFormatBreakAtCursor(formatEl: Element, range: Range): Action;
 	function enterFigcaptionExitInList(formatEl: Element): Action;
 	function keydownInputInsertNbsp(): Action;

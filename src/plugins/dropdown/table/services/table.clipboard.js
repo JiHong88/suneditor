@@ -292,7 +292,11 @@ export class TableClipboardService {
 				const cEnd = cStart + cs - 1;
 				const mergeCells = [];
 
-				for (let targetR = targetInfo.rowIndex + r, tRowCnt = targetR + rs, rowOffset = 0; targetR < tRowCnt; targetR++, rowOffset++) {
+				for (
+					let targetR = targetInfo.rowIndex + r, tRowCnt = targetR + rs, rowOffset = 0;
+					targetR < tRowCnt;
+					targetR++, rowOffset++
+				) {
 					const targetRow = targetRows[targetR];
 					const targetCells = targetRow.cells;
 

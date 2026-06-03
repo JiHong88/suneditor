@@ -103,7 +103,19 @@ import { get as getNumber } from '../../helper/numbers';
  * @param {*} key root key
  * @returns {FrameContexType}
  */
-export function CreateFrameContext(editorTarget, top, wwFrame, codeWrapper, codeFrame, markdownWrapper, markdownFrame, statusbar, documentTypeInner, blockHandleArea, key) {
+export function CreateFrameContext(
+	editorTarget,
+	top,
+	wwFrame,
+	codeWrapper,
+	codeFrame,
+	markdownWrapper,
+	markdownFrame,
+	statusbar,
+	documentTypeInner,
+	blockHandleArea,
+	key,
+) {
 	const m = /** @type {FrameContexType} */ (
 		new Map([
 			['key', key],
@@ -121,7 +133,10 @@ export function CreateFrameContext(editorTarget, top, wwFrame, codeWrapper, code
 			// markdown
 			['markdownWrapper', markdownWrapper],
 			['markdown', markdownFrame],
-			['markdownNumbers', /** @type {HTMLTextAreaElement} */ (markdownWrapper?.querySelector('.se-markdown-view-line'))],
+			[
+				'markdownNumbers',
+				/** @type {HTMLTextAreaElement} */ (markdownWrapper?.querySelector('.se-markdown-view-line')),
+			],
 			// linebreak, toolbar internal
 			['lineBreaker_t', top.querySelector('.se-line-breaker-component-t')],
 			['lineBreaker_b', top.querySelector('.se-line-breaker-component-b')],

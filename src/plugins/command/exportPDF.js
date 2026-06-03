@@ -62,17 +62,29 @@ class ExportPDF extends PluginCommand {
 		let ww = null;
 
 		try {
-			const standardWW = this.$.frameContext.get('documentTypePageMirror') || this.$.frameContext.get('wysiwygFrame');
+			const standardWW =
+				this.$.frameContext.get('documentTypePageMirror') || this.$.frameContext.get('wysiwygFrame');
 
 			// Strip theme class so getComputedStyle resolves default (light) colors for borders, shadows, etc.
 			const themeClass = (this.$.options.get('_themeClass') || '').trim();
 			const wwClassName = themeClass ? standardWW.className.replace(themeClass, '').trim() : standardWW.className;
 			const editableDiv = dom.utils.createElement('div', { class: wwClassName }, standardWW.innerHTML);
-			ww = dom.utils.createElement('div', { style: `position: absolute; top: -10000px; left: -10000px; width: 21cm; columns: 21cm; height: auto;` }, editableDiv);
+			ww = dom.utils.createElement(
+				'div',
+				{
+					style: `position: absolute; top: -10000px; left: -10000px; width: 21cm; columns: 21cm; height: auto;`,
+				},
+				editableDiv,
+			);
 
 			const innerPadding = _w.getComputedStyle(standardWW).padding;
 			const inlineWW = dom.utils.applyInlineStylesAll(editableDiv, true, this.$.options.get('allUsedStyles'));
-			inlineWW.style.padding = inlineWW.style.paddingTop = inlineWW.style.paddingBottom = inlineWW.style.paddingLeft = inlineWW.style.paddingRight = '0';
+			inlineWW.style.padding =
+				inlineWW.style.paddingTop =
+				inlineWW.style.paddingBottom =
+				inlineWW.style.paddingLeft =
+				inlineWW.style.paddingRight =
+					'0';
 
 			ww.innerHTML = `
 				<style>
@@ -129,7 +141,11 @@ class ExportPDF extends PluginCommand {
 		const contentDisposition = xhr.getResponseHeader('Content-Disposition');
 		const downloadUrl = URL.createObjectURL(blob);
 		const filename = (contentDisposition.match(/filename="([^"]+)/) || [])[1] || this.fileName + '.pdf';
-		const a = dom.utils.createElement('A', { href: downloadUrl, download: filename, style: 'display: none;' }, null);
+		const a = dom.utils.createElement(
+			'A',
+			{ href: downloadUrl, download: filename, style: 'display: none;' },
+			null,
+		);
 
 		try {
 			_d.body.appendChild(a);

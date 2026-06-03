@@ -36,7 +36,10 @@ export type LinkOptions = {
 	 */
 	acceptedFormats?: string;
 };
-export type LinkPluginOptions = Omit<LinkOptions & import('../../modules/ui/ModalAnchorEditor').ModalAnchorEditorParams, ''>;
+export type LinkPluginOptions = Omit<
+	LinkOptions & import('../../modules/ui/ModalAnchorEditor').ModalAnchorEditorParams,
+	''
+>;
 /**
  * @typedef {Object} LinkOptions
  * @property {string} [uploadUrl] - The URL endpoint for file uploads.

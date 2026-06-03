@@ -435,7 +435,11 @@ export function textToAnchor(node) {
  * @param {Node} node Node
  */
 export function spanToStyleNode(styleToTag, node) {
-	if (node.nodeType === 1 && /^SPAN$/i.test(node.nodeName) && /** @type {HTMLElement} */ (node).hasAttribute('style')) {
+	if (
+		node.nodeType === 1 &&
+		/^SPAN$/i.test(node.nodeName) &&
+		/** @type {HTMLElement} */ (node).hasAttribute('style')
+	) {
 		const style = /** @type {HTMLElement} */ (node).getAttribute('style');
 		const tags = [];
 		Object.keys(styleToTag).forEach((key) => {
@@ -572,7 +576,9 @@ export function _setIframeStyleLinks(linkNames) {
 			}
 
 			if (!path || path.length === 0) {
-				throw new Error('[SUNEDITOR.constructor.iframe.fail] The suneditor CSS files installation path could not be automatically detected. Please set the option property "iframe_cssFileName" before creating editor instances.');
+				throw new Error(
+					'[SUNEDITOR.constructor.iframe.fail] The suneditor CSS files installation path could not be automatically detected. Please set the option property "iframe_cssFileName" before creating editor instances.',
+				);
 			}
 
 			for (let i = 0, pLen = path.length; i < pLen; i++) {
@@ -590,7 +596,9 @@ export function _setIframeStyleLinks(linkNames) {
  * @returns {string} `"<style>...</style>"`
  */
 export function _setAutoHeightStyle(frameHeight) {
-	return frameHeight === 'auto' ? '<style>\n/** Iframe height auto */\nbody{height: min-content; overflow: hidden;}\n</style>' : '';
+	return frameHeight === 'auto'
+		? '<style>\n/** Iframe height auto */\nbody{height: min-content; overflow: hidden;}\n</style>'
+		: '';
 }
 
 const converter = {

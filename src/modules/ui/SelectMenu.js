@@ -86,8 +86,16 @@ class SelectMenu {
 		this.minWidth = params.minWidth || '';
 		this.#keydownTargetOverride = params.keydownTarget || null;
 
-		this.#dirPosition = /^(left|right)$/.test(this.position) ? (this.position === 'left' ? 'right' : 'left') : this.position;
-		this.#dirSubPosition = /^(left|right)$/.test(this.subPosition) ? (this.subPosition === 'left' ? 'right' : 'left') : this.subPosition;
+		this.#dirPosition = /^(left|right)$/.test(this.position)
+			? this.position === 'left'
+				? 'right'
+				: 'left'
+			: this.position;
+		this.#dirSubPosition = /^(left|right)$/.test(this.subPosition)
+			? this.subPosition === 'left'
+				? 'right'
+				: 'left'
+			: this.subPosition;
 		this.#textDirDiff = params.dir === 'ltr' ? false : params.dir === 'rtl' ? true : null;
 
 		this.#eventHandlers = {
@@ -140,8 +148,11 @@ class SelectMenu {
 			}
 
 			const item = items[i];
-			const menuContent = typeof menus[i] === 'string' ? menus[i] : /** @type {HTMLElement} */ (menus[i]).outerHTML;
-			const itemObj = /** @type {{children?: Array, childMenus?: Array}} */ (item && typeof item === 'object' ? item : {});
+			const menuContent =
+				typeof menus[i] === 'string' ? menus[i] : /** @type {HTMLElement} */ (menus[i]).outerHTML;
+			const itemObj = /** @type {{children?: Array, childMenus?: Array}} */ (
+				item && typeof item === 'object' ? item : {}
+			);
 			const hasChildren = itemObj.children?.length > 0;
 
 			if (hasChildren) {
@@ -150,11 +161,17 @@ class SelectMenu {
 				for (let c = 0; c < childMenus.length; c++) {
 					subHtml += `<li class="se-select-item" data-parent-index="${i}" data-child-index="${c}">${typeof childMenus[c] === 'string' ? childMenus[c] : childMenus[c].outerHTML}</li>`;
 				}
-				html += `<li class="se-select-item se-has-submenu" data-index="${i}">${menuContent}` + `<span class="se-submenu-arrow">${this.#$.icons.menu_arrow_right}</span></li>`;
+				html +=
+					`<li class="se-select-item se-has-submenu" data-index="${i}">${menuContent}` +
+					`<span class="se-submenu-arrow">${this.#$.icons.menu_arrow_right}</span></li>`;
 
 				// `popover: manual` lifts the submenu into the top layer so it escapes any
 				// `overflow: hidden` on the form's ancestors (toolbar, dropdown panels, ...).
-				const subEl = dom.utils.createElement('DIV', { class: 'se-select-submenu', popover: 'manual', 'data-parent-index': String(i) }, `<ul class="se-list-basic se-list-checked">${subHtml}</ul>`);
+				const subEl = dom.utils.createElement(
+					'DIV',
+					{ class: 'se-select-submenu', popover: 'manual', 'data-parent-index': String(i) },
+					`<ul class="se-list-basic se-list-checked">${subHtml}</ul>`,
+				);
 				this.#submenuData.set(i, { items: itemObj.children, menus: childMenus, element: subEl });
 			} else {
 				html += `<li class="se-select-item" data-index="${i}">${menuContent}</li>`;
@@ -186,7 +203,9 @@ class SelectMenu {
 	 */
 	on(referElement, selectMethod, attr = {}) {
 		this.#refer = /** @type {HTMLElement} */ (referElement);
-		this.#keydownTarget = this.#keydownTargetOverride || (dom.check.isInputElement(referElement) ? referElement : this.#$.frameContext.get('_ww'));
+		this.#keydownTarget =
+			this.#keydownTargetOverride ||
+			(dom.check.isInputElement(referElement) ? referElement : this.#$.frameContext.get('_ww'));
 		this.#selectMethod = selectMethod;
 
 		let innerStyle = '';
@@ -196,7 +215,10 @@ class SelectMenu {
 		this.form = dom.utils.createElement(
 			'DIV',
 			{
-				class: 'se-select-menu' + (this.#textDirDiff === true ? ' se-rtl' : '') + (attr.class ? ' ' + attr.class : ''),
+				class:
+					'se-select-menu' +
+					(this.#textDirDiff === true ? ' se-rtl' : '') +
+					(attr.class ? ' ' + attr.class : ''),
 				style: attr.style || '',
 			},
 			'<div class="se-list-inner"' + (innerStyle ? ' style="' + innerStyle + '"' : '') + '></div>',
@@ -228,8 +250,16 @@ class SelectMenu {
 		this.#addEvents();
 		this.#addGlobalEvent();
 		const positionItems = position ? position.split('-') : [];
-		const mainPosition = positionItems[0] || (this.#textDirDiff !== null && this.#textDirDiff !== this.#$.options.get('_rtl') ? this.#dirPosition : this.position);
-		const subPosition = positionItems[1] || (this.#textDirDiff !== null && this.#textDirDiff !== this.#$.options.get('_rtl') ? this.#dirSubPosition : this.subPosition);
+		const mainPosition =
+			positionItems[0] ||
+			(this.#textDirDiff !== null && this.#textDirDiff !== this.#$.options.get('_rtl')
+				? this.#dirPosition
+				: this.position);
+		const subPosition =
+			positionItems[1] ||
+			(this.#textDirDiff !== null && this.#textDirDiff !== this.#$.options.get('_rtl')
+				? this.#dirSubPosition
+				: this.subPosition);
 		this.#lastMainPosition = mainPosition;
 		this.#lastSubPosition = subPosition;
 		this.#setPosition(mainPosition, subPosition, onItemQuerySelector);
@@ -325,7 +355,11 @@ class SelectMenu {
 			// Submenu is top-layer popover (viewport-fixed), but the parent form is in document
 			// flow (absolute) and scrolls with the page/container. Re-run positioning on scroll
 			// so the submenu stays anchored to the parent LI as it moves.
-			this.#bindSubmenuReposition = this.#$.eventManager.addGlobalEvent('scroll', this.#globalEventHandlers.submenuReposition, true);
+			this.#bindSubmenuReposition = this.#$.eventManager.addGlobalEvent(
+				'scroll',
+				this.#globalEventHandlers.submenuReposition,
+				true,
+			);
 		}
 	}
 
@@ -713,7 +747,11 @@ class SelectMenu {
 	#addGlobalEvent() {
 		this.#removeGlobalEvent();
 		this.#bindClose_key = this.#$.eventManager.addGlobalEvent('keydown', this.#globalEventHandlers.keydown, true);
-		this.#bindClose_mousedown = this.#$.eventManager.addGlobalEvent('mousedown', this.#globalEventHandlers.mousedown, true);
+		this.#bindClose_mousedown = this.#$.eventManager.addGlobalEvent(
+			'mousedown',
+			this.#globalEventHandlers.mousedown,
+			true,
+		);
 	}
 
 	/**
@@ -750,7 +788,8 @@ class SelectMenu {
 					this.#submenuItemIndex = -1;
 					{
 						const subData = this.#submenuData.get(this.#activeSubmenuIndex);
-						if (subData?.element) dom.utils.removeClass(subData.element.querySelectorAll('.se-select-item'), 'active');
+						if (subData?.element)
+							dom.utils.removeClass(subData.element.querySelectorAll('.se-select-item'), 'active');
 					}
 					return;
 				case 'Enter':

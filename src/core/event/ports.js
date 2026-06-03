@@ -83,7 +83,20 @@ import { isMobile } from '../../helper/env';
  * @param {*} param1._styleNodes - Style nodes reference object
  */
 export function makePorts(inst, { _styleNodes }) {
-	const { frameContext, ui, focusManager, selection, format, listFormat, component, html, nodeTransform, history, char, menu } = inst.$;
+	const {
+		frameContext,
+		ui,
+		focusManager,
+		selection,
+		format,
+		listFormat,
+		component,
+		html,
+		nodeTransform,
+		history,
+		char,
+		menu,
+	} = inst.$;
 
 	return {
 		// focusManager

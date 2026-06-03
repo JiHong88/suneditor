@@ -157,7 +157,11 @@ class Math_ extends PluginModal {
 				const value = getValue(element);
 				if (!value) return;
 
-				const domParser = _d.createRange().createContextualFragment(this.#renderer(converter.entityToHTML(this.#escapeBackslashes(value, true))));
+				const domParser = _d
+					.createRange()
+					.createContextualFragment(
+						this.#renderer(converter.entityToHTML(this.#escapeBackslashes(value, true))),
+					);
 				element.innerHTML = domParser.querySelector('.se-math, .katex').innerHTML;
 				element.setAttribute('contenteditable', 'false');
 				dom.utils.addClass(element, 'se-component|se-inline-component|se-disable-pointer|se-math');
@@ -512,7 +516,11 @@ function CreateHTML_modal(inst) {
     </form>`;
 
 	inst.defaultFontSize = defaultFontSize;
-	return dom.utils.createElement('DIV', { class: 'se-modal-content se-modal-responsive', style: `max-width: ${maxWidth}; max-height: ${maxHeight};` }, html);
+	return dom.utils.createElement(
+		'DIV',
+		{ class: 'se-modal-content se-modal-responsive', style: `max-width: ${maxWidth}; max-height: ${maxHeight};` },
+		html,
+	);
 }
 
 /**

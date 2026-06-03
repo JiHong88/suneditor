@@ -241,7 +241,9 @@ class Offset {
 				y += el.offsetTop;
 			}
 			if (el.scrollHeight >= el.clientHeight) {
-				oh = /^html$/i.test(el.nodeName) ? oh || el.clientHeight : el.clientHeight + (ohel ? -ohel.clientTop : 0);
+				oh = /^html$/i.test(el.nodeName)
+					? oh || el.clientHeight
+					: el.clientHeight + (ohel ? -ohel.clientTop : 0);
 				ohOffsetEl = ohel || ohOffsetEl || el;
 				ohel = el;
 			}
@@ -249,7 +251,9 @@ class Offset {
 				x += el.offsetLeft;
 			}
 			if (el.scrollWidth >= el.clientWidth) {
-				ow = /^html$/i.test(el.nodeName) ? ow || el.clientWidth : el.clientWidth + (owel ? -owel.clientLeft : 0);
+				ow = /^html$/i.test(el.nodeName)
+					? ow || el.clientWidth
+					: el.clientWidth + (owel ? -owel.clientLeft : 0);
 				owOffsetEl = owel || owOffsetEl || el;
 				owel = el;
 			}
@@ -268,14 +272,18 @@ class Offset {
 					y += el.offsetTop;
 				}
 				if (el.scrollHeight >= el.clientHeight) {
-					oh = /^html$/i.test(el.nodeName) ? oh || el.clientHeight : el.clientHeight + (ohel ? -ohel.clientTop : 0);
+					oh = /^html$/i.test(el.nodeName)
+						? oh || el.clientHeight
+						: el.clientHeight + (ohel ? -ohel.clientTop : 0);
 					ohel = el;
 				}
 				if (el.scrollLeft > 0) {
 					x += el.offsetLeft;
 				}
 				if (el.scrollWidth >= el.clientWidth) {
-					ow = /^html$/i.test(el.nodeName) ? ow || el.clientWidth : el.clientWidth + (owel ? -owel.clientLeft : 0);
+					ow = /^html$/i.test(el.nodeName)
+						? ow || el.clientWidth
+						: el.clientWidth + (owel ? -owel.clientLeft : 0);
 					owel = el;
 				}
 				el = el.parentElement;
@@ -293,14 +301,18 @@ class Offset {
 				y += el.offsetTop;
 			}
 			if (el.scrollHeight >= el.clientHeight) {
-				oh = /^html$/i.test(el.nodeName) ? oh || el.clientHeight : el.clientHeight + (ohel ? -ohel.clientTop : 0);
+				oh = /^html$/i.test(el.nodeName)
+					? oh || el.clientHeight
+					: el.clientHeight + (ohel ? -ohel.clientTop : 0);
 				ohel = el;
 			}
 			if (el.scrollLeft > 0) {
 				x += el.offsetLeft;
 			}
 			if (el.scrollWidth >= el.clientWidth) {
-				ow = /^html$/i.test(el.nodeName) ? ow || el.clientWidth : el.clientWidth + (owel ? -owel.clientLeft : 0);
+				ow = /^html$/i.test(el.nodeName)
+					? ow || el.clientWidth
+					: el.clientWidth + (owel ? -owel.clientLeft : 0);
 				owel = el;
 			}
 			el = el.parentElement;
@@ -310,8 +322,14 @@ class Offset {
 		const widthEditorRefer = topArea.contains(owOffsetEl);
 		ohOffsetEl = heightEditorRefer ? topArea : ohOffsetEl;
 		owOffsetEl = widthEditorRefer ? topArea : owOffsetEl;
-		const ts = !ohOffsetEl ? 0 : ohOffsetEl.getBoundingClientRect().top + (!ohOffsetEl.parentElement || /^html$/i.test(ohOffsetEl.parentElement.nodeName) ? _w.scrollY : 0);
-		const ls = !owOffsetEl ? 0 : owOffsetEl.getBoundingClientRect().left + (!owOffsetEl.parentElement || /^html$/i.test(owOffsetEl.parentElement.nodeName) ? _w.scrollX : 0);
+		const ts = !ohOffsetEl
+			? 0
+			: ohOffsetEl.getBoundingClientRect().top +
+				(!ohOffsetEl.parentElement || /^html$/i.test(ohOffsetEl.parentElement.nodeName) ? _w.scrollY : 0);
+		const ls = !owOffsetEl
+			? 0
+			: owOffsetEl.getBoundingClientRect().left +
+				(!owOffsetEl.parentElement || /^html$/i.test(owOffsetEl.parentElement.nodeName) ? _w.scrollX : 0);
 
 		oh = heightEditorRefer ? topArea.clientHeight : oh;
 		ow = widthEditorRefer ? topArea.clientWidth : ow;
@@ -388,7 +406,8 @@ class Offset {
 				const menuHeight_top = containerTop - scrollTop + bt;
 				if (menuHeight_top < elHeight) {
 					// Not enough space above — try below
-					const menuHeight_bottom = getClientSize(_d).h - (containerTop - scrollTop + bt + target.offsetHeight);
+					const menuHeight_bottom =
+						getClientSize(_d).h - (containerTop - scrollTop + bt + target.offsetHeight);
 					if (menuHeight_bottom >= elHeight) {
 						element.style.top = `${bt + target.offsetHeight}px`;
 					} else if (menuHeight_bottom > menuHeight_top) {
@@ -487,7 +506,10 @@ class Offset {
 		}
 
 		const isIframe = this.#frameOptions.get('iframe');
-		const isWWTarget = this.#frameContext.get('wrapper').contains(target) || params.isWWTarget || (isIframe ? this.#frameContext.get('wysiwyg').contains(target) : false);
+		const isWWTarget =
+			this.#frameContext.get('wrapper').contains(target) ||
+			params.isWWTarget ||
+			(isIframe ? this.#frameContext.get('wysiwyg').contains(target) : false);
 		const isToolbarTarget = Boolean(getParentElement(target, '.se-toolbar'));
 		const isElTarget = target.nodeType === 1;
 
@@ -495,9 +517,14 @@ class Offset {
 		const isInlineTarget = isElTarget && /inline/.test(_w.getComputedStyle(target).display);
 		const clientSize = getClientSize(_d);
 		const wwScroll = isTextSelection ? this.getWWScroll() : this.#getWindowScroll();
-		const targetRect = !isWWTarget || (!isIframe && isElTarget) ? target.getBoundingClientRect() : this.#$.selection.getRects(target, 'start').rects;
+		const targetRect =
+			!isWWTarget || (!isIframe && isElTarget)
+				? target.getBoundingClientRect()
+				: this.#$.selection.getRects(target, 'start').rects;
 		const targetOffset = this.getGlobal(target);
-		const arrow = /** @type {HTMLElement} */ (hasClass(element.firstElementChild, 'se-arrow') ? element.firstElementChild : null);
+		const arrow = /** @type {HTMLElement} */ (
+			hasClass(element.firstElementChild, 'se-arrow') ? element.firstElementChild : null
+		);
 
 		// top ----------------------------------------------------------------------------------------------------
 		const siblingH = params.sibling?.offsetHeight || 0;
@@ -512,16 +539,38 @@ class Offset {
 		const th = this.#context.get('toolbar_main').offsetHeight;
 		const containerToolbar = this.#options.get('toolbar_container');
 		const headLess = this.#store.mode.isBalloon || this.#store.mode.isInline || containerToolbar;
-		const toolbarH = (containerToolbar && globalTop - wScrollY - th > 0) || (!this.#$.toolbar.isSticky && headLess) ? 0 : th + (this.#$.toolbar.isSticky ? this.#options.get('_toolbar_sticky') : 0);
+		const toolbarH =
+			(containerToolbar && globalTop - wScrollY - th > 0) || (!this.#$.toolbar.isSticky && headLess)
+				? 0
+				: th + (this.#$.toolbar.isSticky ? this.#options.get('_toolbar_sticky') : 0);
 		const statusBarH = this.#frameContext.get('statusbar')?.offsetHeight || 0;
 
 		// check margin
-		const { rmt, rmb, bMargin, rt } = this.#getVMargin(tmtw, tmbw, toolbarH, clientSize, targetRect, isTextSelection, isToolbarTarget);
-		if ((isWWTarget && (rmb - statusBarH + targetH <= 0 || rmt + rt + targetH - (this.#$.toolbar.isSticky && isInlineTarget ? toolbarH : 0) <= 0)) || rmt + targetH < 0) return;
+		const { rmt, rmb, bMargin, rt } = this.#getVMargin(
+			tmtw,
+			tmbw,
+			toolbarH,
+			clientSize,
+			targetRect,
+			isTextSelection,
+			isToolbarTarget,
+		);
+		if (
+			(isWWTarget &&
+				(rmb - statusBarH + targetH <= 0 ||
+					rmt + rt + targetH - (this.#$.toolbar.isSticky && isInlineTarget ? toolbarH : 0) <= 0)) ||
+			rmt + targetH < 0
+		)
+			return;
 
 		const topAreaRect = this.#frameContext.get('topArea').getBoundingClientRect();
-		const isStickyVisible = this.#store.mode.isBottom ? topAreaRect.bottom >= _w.innerHeight - th : topAreaRect.top <= th;
-		const isSticky = this.#$.toolbar.isSticky && this.#context.get('toolbar_main').style.display !== 'none' && (!headLess || isStickyVisible);
+		const isStickyVisible = this.#store.mode.isBottom
+			? topAreaRect.bottom >= _w.innerHeight - th
+			: topAreaRect.top <= th;
+		const isSticky =
+			this.#$.toolbar.isSticky &&
+			this.#context.get('toolbar_main').style.display !== 'none' &&
+			(!headLess || isStickyVisible);
 		let t = addOffset.top;
 		let y = 0;
 		let arrowDir = '';
@@ -579,7 +628,13 @@ class Offset {
 			arrow.style.right = '';
 		}
 
-		let l = addOffset.left || (addOffset.right ? (isLTR ? addOffset.right - element.offsetWidth : element.offsetWidth - addOffset.right) : 0);
+		let l =
+			addOffset.left ||
+			(addOffset.right
+				? isLTR
+					? addOffset.right - element.offsetWidth
+					: element.offsetWidth - addOffset.right
+				: 0);
 		let x = 0;
 		let ax = 0;
 		let awLimit = 0;
@@ -698,7 +753,10 @@ class Offset {
 		const targetH = rects.height;
 		const tmtw = rects.top;
 		const tmbw = clientSize.h - rects.bottom;
-		const toolbarH = !this.#$.toolbar.isSticky && (this.#store.mode.isBalloon || this.#store.mode.isInline) ? 0 : this.#context.get('toolbar_main').offsetHeight;
+		const toolbarH =
+			!this.#$.toolbar.isSticky && (this.#store.mode.isBalloon || this.#store.mode.isInline)
+				? 0
+				: this.#context.get('toolbar_main').offsetHeight;
 
 		const { rmt, rmb, rt } = this.#getVMargin(tmtw, tmbw, toolbarH, clientSize, rects, isTextSelection, false);
 		if (rmb + targetH <= 0 || rmt + rt + targetH <= 0) return;
@@ -731,11 +789,18 @@ class Offset {
 		const absoluteLeft = (isDirTop ? rects.left : rects.right) - editorLeft - elW / 2 + scrollLeft;
 		const overRight = absoluteLeft + elW - editorWidth;
 
-		let t = (isDirTop ? rects.top - elH - arrowMargin : rects.bottom + arrowMargin) - (rects.noText ? 0 : addTop) + scrollTop;
+		let t =
+			(isDirTop ? rects.top - elH - arrowMargin : rects.bottom + arrowMargin) -
+			(rects.noText ? 0 : addTop) +
+			scrollTop;
 		const l = absoluteLeft < 0 ? padding : overRight < 0 ? absoluteLeft : absoluteLeft - overRight - padding - 1;
 
 		let resetTop = false;
-		const space = t + (isDirTop ? this.getGlobal(this.#frameContext.get('topArea')).top : element.offsetHeight - this.#frameContext.get('wysiwyg').offsetHeight);
+		const space =
+			t +
+			(isDirTop
+				? this.getGlobal(this.#frameContext.get('topArea')).top
+				: element.offsetHeight - this.#frameContext.get('wysiwyg').offsetHeight);
 		if (!isDirTop && space > 0 && this.#getPageBottomSpace() < space) {
 			isDirTop = true;
 			resetTop = true;
@@ -744,7 +809,11 @@ class Offset {
 			resetTop = true;
 		}
 
-		if (resetTop) t = (isDirTop ? rects.top - elH - arrowMargin : rects.bottom + arrowMargin) - (rects.noText ? 0 : addTop) + scrollTop;
+		if (resetTop)
+			t =
+				(isDirTop ? rects.top - elH - arrowMargin : rects.bottom + arrowMargin) -
+				(rects.noText ? 0 : addTop) +
+				scrollTop;
 
 		element.style.left = Math.floor(l) + 'px';
 		element.style.top = Math.floor(t) + 'px';
@@ -758,7 +827,12 @@ class Offset {
 		}
 
 		const arrow_left = Math.floor(elW / 2 + (absoluteLeft - l));
-		arrow.style.left = (arrow_left + arrowMargin > element.offsetWidth ? element.offsetWidth - arrowMargin : arrow_left < arrowMargin ? arrowMargin : arrow_left) + 'px';
+		arrow.style.left =
+			(arrow_left + arrowMargin > element.offsetWidth
+				? element.offsetWidth - arrowMargin
+				: arrow_left < arrowMargin
+					? arrowMargin
+					: arrow_left) + 'px';
 	}
 
 	/**
@@ -815,9 +889,12 @@ class Offset {
 				rmb = bMargin - (emb > 0 ? emb : 0);
 			}
 		} else {
-			rt = !isToolbarTarget && !this.#$.toolbar.isSticky && !this.#options.get('toolbar_container') ? toolbarH : 0;
+			rt =
+				!isToolbarTarget && !this.#$.toolbar.isSticky && !this.#options.get('toolbar_container') ? toolbarH : 0;
 			const wst = !isIframe ? editorOffset.top - _w.scrollY + rt : 0;
-			const wsb = !isIframe ? this.#store.get('currentViewportHeight') - (editorOffset.top + editorOffset.height - _w.scrollY) : 0;
+			const wsb = !isIframe
+				? this.#store.get('currentViewportHeight') - (editorOffset.top + editorOffset.height - _w.scrollY)
+				: 0;
 			let st = wst;
 			let sb = wsb;
 			if (isBottom) {

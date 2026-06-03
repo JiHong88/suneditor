@@ -30,7 +30,9 @@ class TextStyle extends PluginDropdown {
 		this.icon = 'text_style';
 
 		// create menu from items
-		const menu = this.$.menu.initDropdownTarget(TextStyle, CreateItems(this.$, pluginOptions.items), { className: 'se-list-format' });
+		const menu = this.$.menu.initDropdownTarget(TextStyle, CreateItems(this.$, pluginOptions.items), {
+			className: 'se-list-format',
+		});
 
 		// members
 		this.styleList = menu.querySelectorAll('li button');
@@ -55,7 +57,11 @@ class TextStyle extends PluginDropdown {
 				while (node && !this.$.format.isLine(node) && !this.$.component.is(node)) {
 					if (node.nodeName.toLowerCase() === btn.getAttribute('data-command').toLowerCase()) {
 						value = data[v];
-						if (/^\./.test(value) ? dom.utils.hasClass(node, value.replace(/^\./, '')) : /** @type {HTMLElement} */ (node).style[value]) {
+						if (
+							/^\./.test(value)
+								? dom.utils.hasClass(node, value.replace(/^\./, ''))
+								: /** @type {HTMLElement} */ (node).style[value]
+						) {
 							active = true;
 							break;
 						}

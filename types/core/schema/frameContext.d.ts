@@ -126,7 +126,10 @@ export function CreateFrameContext(
  * @param {HTMLElement} statusbar Statusbar element
  * @param {FrameContexType|import('../config/contextProvider').FrameContextMap} mapper FrameContext map
  */
-export function UpdateStatusbarContext(statusbar: HTMLElement, mapper: FrameContexType | import('../config/contextProvider').FrameContextMap): void;
+export function UpdateStatusbarContext(
+	statusbar: HTMLElement,
+	mapper: FrameContexType | import('../config/contextProvider').FrameContextMap,
+): void;
 /**
  * This object stores **all frame-specific states and DOM references** for a SunEditor instance.
  *

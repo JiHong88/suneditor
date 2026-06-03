@@ -67,7 +67,13 @@ class PageNavigator extends PluginInput {
  * @returns {HTMLInputElement}
  */
 function CreateInner() {
-	return /** @type {HTMLInputElement} */ (dom.utils.createElement('input', { type: 'number', class: 'se-not-arrow-text', placeholder: '1', value: '1', min: '1' }, null));
+	return /** @type {HTMLInputElement} */ (
+		dom.utils.createElement(
+			'input',
+			{ type: 'number', class: 'se-not-arrow-text', placeholder: '1', value: '1', min: '1' },
+			null,
+		)
+	);
 }
 
 export default PageNavigator;

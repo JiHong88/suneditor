@@ -91,7 +91,12 @@ class Toolbar {
 		const isStickyPosible = !this.isSub && !balloon && !inline;
 		const stickyTop = this.#options.get('_toolbar_sticky');
 
-		this.#useCSSSticky = isStickyPosible && stickyTop >= 0 && !this.#options.get('toolbar_container') && typeof CSS !== 'undefined' && CSS.supports('position', 'sticky');
+		this.#useCSSSticky =
+			isStickyPosible &&
+			stickyTop >= 0 &&
+			!this.#options.get('toolbar_container') &&
+			typeof CSS !== 'undefined' &&
+			CSS.supports('position', 'sticky');
 
 		this.isBottomMode = this.#store.mode.isBottom;
 
@@ -153,14 +158,20 @@ class Toolbar {
 		this._moreLayerOff();
 		this.#$.menu.dropdownOff();
 		this.#$.menu.containerOff();
-		dom.utils.setDisabled(this.#context.get(this.keyName.buttonTray).querySelectorAll('.se-menu-list .se-toolbar-btn[data-type]'), true);
+		dom.utils.setDisabled(
+			this.#context.get(this.keyName.buttonTray).querySelectorAll('.se-menu-list .se-toolbar-btn[data-type]'),
+			true,
+		);
 	}
 
 	/**
 	 * @description Enables all toolbar buttons.
 	 */
 	enable() {
-		dom.utils.setDisabled(this.#context.get(this.keyName.buttonTray).querySelectorAll('.se-menu-list .se-toolbar-btn[data-type]'), false);
+		dom.utils.setDisabled(
+			this.#context.get(this.keyName.buttonTray).querySelectorAll('.se-menu-list .se-toolbar-btn[data-type]'),
+			false,
+		);
 	}
 
 	/**
@@ -208,7 +219,10 @@ class Toolbar {
 		const responsiveSize = this.#rButtonsize;
 		if (responsiveSize) {
 			let w = 0;
-			if (((this.isBalloonMode || this.isInlineMode) && this.#options.get('toolbar_width') === 'auto') || (this.#store.mode.isSubBalloon && this.#options.get('toolbar_sub_width') === 'auto')) {
+			if (
+				((this.isBalloonMode || this.isInlineMode) && this.#options.get('toolbar_width') === 'auto') ||
+				(this.#store.mode.isSubBalloon && this.#options.get('toolbar_sub_width') === 'auto')
+			) {
 				w = this.#frameContext.get('topArea').offsetWidth;
 			} else {
 				w = this.#context.get(this.keyName.main).offsetWidth;
@@ -243,12 +257,17 @@ class Toolbar {
 
 		newToolbar.updateButtons.forEach((v) => UpdateButton(v.button, v.plugin, this.#icons, this.#lang));
 
-		this.#context.get(this.keyName.main).replaceChild(newToolbar.buttonTray, this.#context.get(this.keyName.buttonTray));
+		this.#context
+			.get(this.keyName.main)
+			.replaceChild(newToolbar.buttonTray, this.#context.get(this.keyName.buttonTray));
 		this.#context.set(this.keyName.buttonTray, newToolbar.buttonTray);
 
 		this.#resetButtonInfo();
 
-		this.#eventManager.triggerEvent('onSetToolbarButtons', { buttonTray: newToolbar.buttonTray, frameContext: this.#frameContext });
+		this.#eventManager.triggerEvent('onSetToolbarButtons', {
+			buttonTray: newToolbar.buttonTray,
+			frameContext: this.#frameContext,
+		});
 	}
 
 	/**
@@ -280,7 +299,9 @@ class Toolbar {
 			const editorBottom = editorOffset.top + editorHeight;
 			const y = viewportBottom - stickyTop - (this.isInlineMode ? toolbar.offsetHeight : 0);
 
-			const offSticky = !this.#options.get('toolbar_container') ? y - editorOffset.top - minHeight : viewportBottom - stickyTop - editorOffset.top - minHeight - toolbar.offsetHeight;
+			const offSticky = !this.#options.get('toolbar_container')
+				? y - editorOffset.top - minHeight
+				: viewportBottom - stickyTop - editorOffset.top - minHeight - toolbar.offsetHeight;
 			if (y > editorBottom) {
 				this.#offSticky();
 			} else if (offSticky < 0) {
@@ -292,9 +313,15 @@ class Toolbar {
 			}
 		} else {
 			const y = currentScrollY + stickyTop;
-			const t = (this.isBalloonMode || this.isInlineMode ? editorOffset.top : this.#$.offset.getGlobal(this.#options.get('toolbar_container')).top) - (this.isInlineMode ? toolbar.offsetHeight : 0);
+			const t =
+				(this.isBalloonMode || this.isInlineMode
+					? editorOffset.top
+					: this.#$.offset.getGlobal(this.#options.get('toolbar_container')).top) -
+				(this.isInlineMode ? toolbar.offsetHeight : 0);
 
-			const offSticky = !this.#options.get('toolbar_container') ? editorHeight + t + stickyTop - y - minHeight : editorOffset.top - currentScrollY + editorHeight - minHeight - stickyTop - toolbar.offsetHeight;
+			const offSticky = !this.#options.get('toolbar_container')
+				? editorHeight + t + stickyTop - y - minHeight
+				: editorOffset.top - currentScrollY + editorHeight - minHeight - stickyTop - toolbar.offsetHeight;
 			if (y < t) {
 				this.#offSticky();
 			} else if (offSticky < 0) {
@@ -372,12 +399,18 @@ class Toolbar {
 			isDirTop = selection.focusOffset < selection.anchorOffset;
 		} else {
 			const childNodes = dom.query.getListChildNodes(range.commonAncestorContainer, null, null);
-			isDirTop = dom.utils.getArrayIndex(childNodes, selection.focusNode) < dom.utils.getArrayIndex(childNodes, selection.anchorNode);
+			isDirTop =
+				dom.utils.getArrayIndex(childNodes, selection.focusNode) <
+				dom.utils.getArrayIndex(childNodes, selection.anchorNode);
 		}
 
 		this._setBalloonOffset(isDirTop, range);
 
-		this.#eventManager.triggerEvent('onShowToolbar', { toolbar, mode: 'balloon', frameContext: this.#frameContext });
+		this.#eventManager.triggerEvent('onShowToolbar', {
+			toolbar,
+			mode: 'balloon',
+			frameContext: this.#frameContext,
+		});
 	}
 
 	/**
@@ -392,7 +425,12 @@ class Toolbar {
 		const offsets = this.#$.offset.getGlobal(topArea);
 		const stickyTop = offsets.top;
 
-		if (!this.#$.offset.setRangePosition(toolbar, range, { position: positionTop ? 'top' : 'bottom', addTop: stickyTop })) {
+		if (
+			!this.#$.offset.setRangePosition(toolbar, range, {
+				position: positionTop ? 'top' : 'bottom',
+				addTop: stickyTop,
+			})
+		) {
 			this.hide();
 			return;
 		}
@@ -404,7 +442,10 @@ class Toolbar {
 			let left = container.offsetLeft;
 			let top = container.offsetTop;
 
-			while (!container.parentElement.contains(editorParent) && !/^(BODY|HTML)$/i.test(container.parentElement.nodeName)) {
+			while (
+				!container.parentElement.contains(editorParent) &&
+				!/^(BODY|HTML)$/i.test(container.parentElement.nodeName)
+			) {
 				container = /** @type {HTMLElement} */ (container.offsetParent);
 				left += container.offsetLeft;
 				top += container.offsetTop;
@@ -438,9 +479,18 @@ class Toolbar {
 		this.inlineToolbarAttr.width = toolbar.style.width = this.#options.get(this.keyName.width);
 		if (this.isBottomMode) {
 			const topArea = this.#frameContext.get('topArea');
-			this.inlineToolbarAttr.top = toolbar.style.top = this.#$.offset.getGlobal(topArea).top + topArea.offsetHeight - this.#$.offset.getGlobal(toolbar).top + 'px';
+			this.inlineToolbarAttr.top = toolbar.style.top =
+				this.#$.offset.getGlobal(topArea).top +
+				topArea.offsetHeight -
+				this.#$.offset.getGlobal(toolbar).top +
+				'px';
 		} else {
-			this.inlineToolbarAttr.top = toolbar.style.top = -1 + (this.#$.offset.getGlobal(this.#frameContext.get('topArea')).top - this.#$.offset.getGlobal(toolbar).top - toolbar.offsetHeight) + 'px';
+			this.inlineToolbarAttr.top = toolbar.style.top =
+				-1 +
+				(this.#$.offset.getGlobal(this.#frameContext.get('topArea')).top -
+					this.#$.offset.getGlobal(toolbar).top -
+					toolbar.offsetHeight) +
+				'px';
 		}
 
 		this._resetSticky();
@@ -470,7 +520,9 @@ class Toolbar {
 	_moreLayerOff() {
 		if (this.currentMoreLayerActiveButton) {
 			/** @type {HTMLElement} */
-			const layer = this.#context.get(this.keyName.main).querySelector('.' + this.currentMoreLayerActiveButton.getAttribute('data-command'));
+			const layer = this.#context
+				.get(this.keyName.main)
+				.querySelector('.' + this.currentMoreLayerActiveButton.getAttribute('data-command'));
 			layer.style.display = 'none';
 			dom.utils.removeClass(this.currentMoreLayerActiveButton, 'on');
 			this.currentMoreLayerActiveButton = null;
@@ -484,7 +536,9 @@ class Toolbar {
 		const toolbar = this.#context.get(this.keyName.main);
 
 		if (!this.isInlineMode) {
-			const stickyDummy = !this.#options.get('toolbar_container') ? this.#frameContext.get('_stickyDummy') : this.#context.get('_stickyDummy');
+			const stickyDummy = !this.#options.get('toolbar_container')
+				? this.#frameContext.get('_stickyDummy')
+				: this.#context.get('_stickyDummy');
 			stickyDummy.style.height = toolbar.offsetHeight + 'px';
 			stickyDummy.style.display = 'block';
 		}
@@ -554,7 +608,9 @@ class Toolbar {
 	 * @description Disable `sticky` toolbar mode.
 	 */
 	#offSticky() {
-		const stickyDummy = !this.#options.get('toolbar_container') ? this.#frameContext.get('_stickyDummy') : this.#context.get('_stickyDummy');
+		const stickyDummy = !this.#options.get('toolbar_container')
+			? this.#frameContext.get('_stickyDummy')
+			: this.#context.get('_stickyDummy');
 		stickyDummy.style.display = 'none';
 
 		const toolbar = this.#context.get(this.keyName.main);

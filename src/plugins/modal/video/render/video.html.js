@@ -71,7 +71,10 @@ export function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 		const onlyPercentDisplay = onlyPercentage ? ' style="display: none !important;"' : '';
 		const heightDisplay = !pluginOptions.showHeightInput ? ' style="display: none !important;"' : '';
 		const ratioDisplay = !pluginOptions.showRatioOption ? ' style="display: none !important;"' : '';
-		const onlyWidthDisplay = !onlyPercentage && !pluginOptions.showHeightInput && !pluginOptions.showRatioOption ? ' style="display: none !important;"' : '';
+		const onlyWidthDisplay =
+			!onlyPercentage && !pluginOptions.showHeightInput && !pluginOptions.showRatioOption
+				? ' style="display: none !important;"'
+				: '';
 		html += /*html*/ `
 			<div class="se-modal-form">
 				<div class="se-modal-size-text">

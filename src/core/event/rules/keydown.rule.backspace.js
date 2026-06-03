@@ -1,5 +1,11 @@
 import { dom } from '../../../helper';
-import { cleanRemovedTags, hardDelete, isUneditableNode, setDefaultLine, isRtlBidiMismatch } from '../effects/ruleHelpers';
+import {
+	cleanRemovedTags,
+	hardDelete,
+	isUneditableNode,
+	setDefaultLine,
+	isRtlBidiMismatch,
+} from '../effects/ruleHelpers';
 import { A } from '../actions';
 
 /**
@@ -23,7 +29,11 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 
 	const selectRange = !range.collapsed || range.startContainer !== range.endContainer;
 	// RTL bidi guard: if offset 0 is actually at the visual end due to LTR text in RTL line, skip front-edge handling
-	const bidiNotFront = options.get('_rtl') && !selectRange && range.startOffset === 0 && isRtlBidiMismatch(range, formatEl, 'front', fc.get('_wd'));
+	const bidiNotFront =
+		options.get('_rtl') &&
+		!selectRange &&
+		range.startOffset === 0 &&
+		isRtlBidiMismatch(range, formatEl, 'front', fc.get('_wd'));
 
 	actions.push(A.componentDeselect());
 	actions.push(A.cacheStyleNode());
@@ -33,7 +43,13 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 		return true;
 	}
 
-	if (!format.isNormalLine(formatEl) && !format.isBrLine(formatEl) && !fc.get('wysiwyg').firstElementChild && !component.is(selectionNode) && setDefaultLine(ports, options.get('defaultLine')) !== null) {
+	if (
+		!format.isNormalLine(formatEl) &&
+		!format.isBrLine(formatEl) &&
+		!fc.get('wysiwyg').firstElementChild &&
+		!component.is(selectionNode) &&
+		setDefaultLine(ports, options.get('defaultLine')) !== null
+	) {
 		actions.push(A.preventStop());
 		return false;
 	}
@@ -62,7 +78,9 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 		!selectionNode.previousSibling &&
 		!dom.check.isListCell(formatEl) &&
 		format.isLine(formatEl) &&
-		(!format.isBrLine(formatEl) || format.isClosureBrLine(formatEl) || dom.check.isWysiwygFrame(formatEl.parentNode))
+		(!format.isBrLine(formatEl) ||
+			format.isClosureBrLine(formatEl) ||
+			dom.check.isWysiwygFrame(formatEl.parentNode))
 	) {
 		// closure range
 		if (format.isClosureBlock(formatEl.parentNode)) {
@@ -79,7 +97,11 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 		}
 
 		// maintain default format
-		if (dom.check.isWysiwygFrame(formatEl.parentNode) && formatEl.childNodes.length <= 1 && (!formatEl.firstChild || dom.check.isZeroWidth(formatEl.textContent))) {
+		if (
+			dom.check.isWysiwygFrame(formatEl.parentNode) &&
+			formatEl.childNodes.length <= 1 &&
+			(!formatEl.firstChild || dom.check.isZeroWidth(formatEl.textContent))
+		) {
 			actions.push(A.preventStop());
 			actions.push(A.backspaceFormatMaintain(formatEl));
 		}
@@ -90,7 +112,14 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 
 	// clean remove tag
 	const startCon = range.startContainer;
-	if (formatEl && !bidiNotFront && !formatEl.previousElementSibling && range.startOffset === 0 && startCon.nodeType === 3 && dom.check.isZeroWidth(startCon)) {
+	if (
+		formatEl &&
+		!bidiNotFront &&
+		!formatEl.previousElementSibling &&
+		range.startOffset === 0 &&
+		startCon.nodeType === 3 &&
+		dom.check.isZeroWidth(startCon)
+	) {
 		if (cleanRemovedTags(ports, startCon, formatEl) === true) return true;
 	}
 
@@ -136,8 +165,12 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 			dom.check.isListCell(formatEl) &&
 			dom.check.isList(rangeEl) &&
 			(dom.check.isListCell(rangeEl.parentElement) || formatEl.previousElementSibling) &&
-			(selectionNode === formatEl || (selectionNode.nodeType === 3 && (!selectionNode.previousSibling || dom.check.isList(selectionNode.previousSibling)))) &&
-			(format.getLine(range.startContainer, null) !== format.getLine(range.endContainer, null) ? rangeEl.contains(range.startContainer) : range.startOffset === 0 && range.collapsed && !bidiNotFront)
+			(selectionNode === formatEl ||
+				(selectionNode.nodeType === 3 &&
+					(!selectionNode.previousSibling || dom.check.isList(selectionNode.previousSibling)))) &&
+			(format.getLine(range.startContainer, null) !== format.getLine(range.endContainer, null)
+				? rangeEl.contains(range.startContainer)
+				: range.startOffset === 0 && range.collapsed && !bidiNotFront)
 		) {
 			if (range.startContainer !== range.endContainer) {
 				actions.push(A.prevent());
@@ -149,10 +182,16 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 					actions.push(A.prevent());
 
 					let prevLast = prev;
-					if (!prev.contains(formatEl) && dom.check.isListCell(prevLast) && dom.check.isList(prevLast.lastElementChild)) {
+					if (
+						!prev.contains(formatEl) &&
+						dom.check.isListCell(prevLast) &&
+						dom.check.isList(prevLast.lastElementChild)
+					) {
 						prevLast = /** @type {HTMLLIElement} */ (prevLast.lastElementChild.lastElementChild);
 						while (dom.check.isListCell(prevLast) && dom.check.isList(prevLast.lastElementChild)) {
-							prevLast = /** @type {HTMLLIElement} */ (prevLast.lastElementChild && prevLast.lastElementChild.lastElementChild);
+							prevLast = /** @type {HTMLLIElement} */ (
+								prevLast.lastElementChild && prevLast.lastElementChild.lastElementChild
+							);
 						}
 						prev = prevLast;
 					}
@@ -171,7 +210,10 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 			let comm = commonCon;
 			while (comm && comm !== rangeEl && !dom.check.isWysiwygFrame(comm)) {
 				if (comm.previousSibling) {
-					if (comm.previousSibling.nodeType === 1 || !dom.check.isZeroWidth(comm.previousSibling.textContent.trim())) {
+					if (
+						comm.previousSibling.nodeType === 1 ||
+						!dom.check.isZeroWidth(comm.previousSibling.textContent.trim())
+					) {
 						detach = false;
 						break;
 					}
@@ -181,7 +223,15 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 
 			if (detach && rangeEl.parentNode) {
 				actions.push(A.prevent());
-				actions.push(A.formatRemoveBlock(rangeEl, dom.check.isListCell(formatEl) ? [formatEl] : null, null, false, false));
+				actions.push(
+					A.formatRemoveBlock(
+						rangeEl,
+						dom.check.isListCell(formatEl) ? [formatEl] : null,
+						null,
+						false,
+						false,
+					),
+				);
 				actions.push(A.historyPush(true));
 				return true;
 			}
@@ -199,13 +249,25 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 	}
 
 	// component
-	if (!selectRange && formatEl && (range.startOffset === 0 || (selectionNode === formatEl ? formatEl.childNodes[range.startOffset] : false))) {
+	if (
+		!selectRange &&
+		formatEl &&
+		(range.startOffset === 0 || (selectionNode === formatEl ? formatEl.childNodes[range.startOffset] : false))
+	) {
 		const isList = dom.check.isListCell(formatEl);
 		const sel = selectionNode === formatEl ? formatEl.childNodes[range.startOffset] : selectionNode;
 		const prev = (isList ? sel : formatEl).previousSibling;
 		// select file component
-		const ignoreZWS = isList || ((commonCon.nodeType === 3 || dom.check.isBreak(commonCon)) && !commonCon.previousSibling && range.startOffset === 0);
-		if (sel && (isList || !sel.previousSibling) && ((commonCon && component.is(commonCon.previousSibling)) || (ignoreZWS && component.is(prev)))) {
+		const ignoreZWS =
+			isList ||
+			((commonCon.nodeType === 3 || dom.check.isBreak(commonCon)) &&
+				!commonCon.previousSibling &&
+				range.startOffset === 0);
+		if (
+			sel &&
+			(isList || !sel.previousSibling) &&
+			((commonCon && component.is(commonCon.previousSibling)) || (ignoreZWS && component.is(prev)))
+		) {
 			const fileComponentInfo = component.get(prev);
 			if (fileComponentInfo) {
 				actions.push(A.preventStop());

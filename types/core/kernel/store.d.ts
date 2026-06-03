@@ -168,7 +168,10 @@ declare class Store {
 	 * @param {(newValue: StoreState[K], oldValue: StoreState[K]) => void} callback
 	 * @returns {() => void} Unsubscribe function
 	 */
-	subscribe<K extends keyof StoreState>(path: K, callback: (newValue: StoreState[K], oldValue: StoreState[K]) => void): () => void;
+	subscribe<K extends keyof StoreState>(
+		path: K,
+		callback: (newValue: StoreState[K], oldValue: StoreState[K]) => void,
+	): () => void;
 	_reset(): void;
 	_destroy(): void;
 	#private;

@@ -39,7 +39,8 @@ export const DEFAULTS = {
 	FORMAT_BLOCK: 'BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|CAPTION|DETAILS',
 	FORMAT_CLOSURE_BLOCK: 'TH|TD',
 
-	ALLOWED_EMPTY_NODE_LIST: '.se-component, pre, blockquote, hr, li, table, img, iframe, video, audio, canvas, details',
+	ALLOWED_EMPTY_NODE_LIST:
+		'.se-component, pre, blockquote, hr, li, table, img, iframe, video, audio, canvas, details',
 
 	SIZE_UNITS: ['px', 'pt', 'em', 'rem'],
 
@@ -69,7 +70,8 @@ export const DEFAULTS = {
 	TAG_STYLES: {
 		'@text': 'font-family|font-size|color|background-color|width|height',
 		'@line': 'text-align|margin|margin-left|margin-right|line-height',
-		'table|th|td': 'border|border-[a-z]+|color|background-color|text-align|float|font-weight|text-decoration|font-style|vertical-align',
+		'table|th|td':
+			'border|border-[a-z]+|color|background-color|text-align|float|font-weight|text-decoration|font-style|vertical-align',
 		'table|td': 'width',
 		tr: 'height',
 		col: 'width',
@@ -77,7 +79,8 @@ export const DEFAULTS = {
 		'ol|ul': 'list-style-type',
 		figure: 'display|width|height|padding|padding-bottom',
 		figcaption: 'margin|margin-top|margin-bottom|text-align',
-		'img|video|iframe': 'transform|transform-origin|width|min-width|max-width|height|min-height|max-height|float|margin|margin-top',
+		'img|video|iframe':
+			'transform|transform-origin|width|min-width|max-width|height|min-height|max-height|float|margin|margin-top',
 		hr: '',
 	},
 

@@ -96,7 +96,12 @@ declare class EventOrchestrator extends KernelInjector {
 	 * @param {SunEditor.FrameContext} frameContext The frame context
 	 * @returns {Promise<boolean>} Resolves to `false` if processing is complete, otherwise allows default behavior
 	 */
-	_dataTransferAction(type: 'paste' | 'drop', e: Event, clipboardData: DataTransfer, frameContext: SunEditor.FrameContext): Promise<boolean>;
+	_dataTransferAction(
+		type: 'paste' | 'drop',
+		e: Event,
+		clipboardData: DataTransfer,
+		frameContext: SunEditor.FrameContext,
+	): Promise<boolean>;
 	/**
 	 * @internal
 	 * @description Registers common UI events such as toolbar and menu interactions.

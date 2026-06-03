@@ -49,7 +49,9 @@ class Drawing extends PluginModal {
 		this.pluginOptions = {
 			outputFormat: pluginOptions.outputFormat || 'dataurl', // dataurl, svg
 			useFormatType: pluginOptions.useFormatType ?? false,
-			defaultFormatType: ['block', 'inline'].includes(pluginOptions.defaultFormatType) ? pluginOptions.defaultFormatType : 'block',
+			defaultFormatType: ['block', 'inline'].includes(pluginOptions.defaultFormatType)
+				? pluginOptions.defaultFormatType
+				: 'block',
 			keepFormatType: pluginOptions.keepFormatType ?? false,
 			lineWidth: pluginOptions.lineWidth || 5,
 			lineReconnect: !!pluginOptions.lineReconnect,
@@ -70,9 +72,13 @@ class Drawing extends PluginModal {
 
 		// exception
 		if (!this.$.plugins.image) {
-			console.warn('[SUNEDITOR.plugins.drawing.warn] The drawing plugin must need either "image" plugin. Please add the "image" plugin.');
+			console.warn(
+				'[SUNEDITOR.plugins.drawing.warn] The drawing plugin must need either "image" plugin. Please add the "image" plugin.',
+			);
 		} else if (this.pluginOptions.outputFormat === 'svg' && !this.$.plugins.image.pluginOptions.uploadUrl) {
-			console.warn('[SUNEDITOR.plugins.drawing.warn] The drawing plugin must need the "image" plugin with the "uploadUrl" option. Please add the "image" plugin with the "uploadUrl" option.');
+			console.warn(
+				'[SUNEDITOR.plugins.drawing.warn] The drawing plugin must need the "image" plugin with the "uploadUrl" option. Please add the "image" plugin with the "uploadUrl" option.',
+			);
 		}
 
 		// create HTML
@@ -119,7 +125,11 @@ class Drawing extends PluginModal {
 		};
 
 		// init
-		this.$.eventManager.addEvent(modalEl.querySelector('[data-command="remove"]'), 'click', this.#OnRemove.bind(this));
+		this.$.eventManager.addEvent(
+			modalEl.querySelector('[data-command="remove"]'),
+			'click',
+			this.#OnRemove.bind(this),
+		);
 	}
 
 	/**
@@ -128,7 +138,9 @@ class Drawing extends PluginModal {
 	 */
 	open() {
 		if (this.pluginOptions.useFormatType) {
-			this.#activeAsInline((this.pluginOptions.keepFormatType ? this.as : this.pluginOptions.defaultFormatType) === 'inline');
+			this.#activeAsInline(
+				(this.pluginOptions.keepFormatType ? this.as : this.pluginOptions.defaultFormatType) === 'inline',
+			);
 		}
 		this.modal.open();
 		this.#initDrawing();
@@ -180,10 +192,26 @@ class Drawing extends PluginModal {
 
 		this.#setCtx();
 
-		this.#eventsRegister.touchstart = this.$.eventManager.addEvent(canvas, 'touchstart', this.#events.touchstart, { passive: false, capture: true });
-		this.#eventsRegister.touchmove = this.$.eventManager.addEvent(canvas, 'touchmove', this.#events.touchmove, true);
-		this.#eventsRegister.mousedown = this.$.eventManager.addEvent(canvas, 'mousedown', this.#events.mousedown, { passive: false, capture: true });
-		this.#eventsRegister.mousemove = this.$.eventManager.addEvent(canvas, 'mousemove', this.#events.mousemove, true);
+		this.#eventsRegister.touchstart = this.$.eventManager.addEvent(canvas, 'touchstart', this.#events.touchstart, {
+			passive: false,
+			capture: true,
+		});
+		this.#eventsRegister.touchmove = this.$.eventManager.addEvent(
+			canvas,
+			'touchmove',
+			this.#events.touchmove,
+			true,
+		);
+		this.#eventsRegister.mousedown = this.$.eventManager.addEvent(canvas, 'mousedown', this.#events.mousedown, {
+			passive: false,
+			capture: true,
+		});
+		this.#eventsRegister.mousemove = this.$.eventManager.addEvent(
+			canvas,
+			'mousemove',
+			this.#events.mousemove,
+			true,
+		);
 		this.#eventsRegister.mouseup = this.$.eventManager.addEvent(canvas, 'mouseup', this.#events.mouseup, true);
 		this.#eventsRegister.mouseleave = this.$.eventManager.addEvent(canvas, 'mouseleave', this.#events.mouseleave);
 		this.#eventsRegister.mouseenter = this.$.eventManager.addEvent(canvas, 'mouseenter', this.#events.mouseenter);
@@ -202,7 +230,8 @@ class Drawing extends PluginModal {
 				canvas.width = newWidth;
 				canvas.height = newHeight;
 				if (prevWidth !== canvas.width || prevHeight !== canvas.height) {
-					if (this.pluginOptions.maintainRatio) this.#adjustPathsToNewDimensions(prevWidth, prevHeight, newWidth, newHeight);
+					if (this.pluginOptions.maintainRatio)
+						this.#adjustPathsToNewDimensions(prevWidth, prevHeight, newWidth, newHeight);
 					this.#drawAll();
 				}
 			});
@@ -241,7 +270,8 @@ class Drawing extends PluginModal {
 	#setCtx() {
 		this.ctx.lineWidth = this.pluginOptions.lineWidth;
 		this.ctx.lineCap = this.pluginOptions.lineCap;
-		this.ctx.strokeStyle = this.pluginOptions.lineColor || _w.getComputedStyle(this.$.contextProvider.carrierWrapper).color;
+		this.ctx.strokeStyle =
+			this.pluginOptions.lineColor || _w.getComputedStyle(this.$.contextProvider.carrierWrapper).color;
 	}
 
 	/**

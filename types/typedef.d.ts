@@ -140,12 +140,15 @@ declare global {
 			}
 			namespace ColorPicker {
 				type Action = typeof import('./interfaces/contracts').ModuleColorPicker.prototype.colorPickerAction;
-				type HueSliderOpen = typeof import('./interfaces/contracts').ModuleColorPicker.prototype.colorPickerHueSliderOpen;
-				type HueSliderClose = typeof import('./interfaces/contracts').ModuleColorPicker.prototype.colorPickerHueSliderClose;
+				type HueSliderOpen =
+					typeof import('./interfaces/contracts').ModuleColorPicker.prototype.colorPickerHueSliderOpen;
+				type HueSliderClose =
+					typeof import('./interfaces/contracts').ModuleColorPicker.prototype.colorPickerHueSliderClose;
 			}
 			namespace HueSlider {
 				type Action = typeof import('./interfaces/contracts').ModuleHueSlider.prototype.hueSliderAction;
-				type CancelAction = typeof import('./interfaces/contracts').ModuleHueSlider.prototype.hueSliderCancelAction;
+				type CancelAction =
+					typeof import('./interfaces/contracts').ModuleHueSlider.prototype.hueSliderCancelAction;
 			}
 		}
 		export namespace HookParams {
@@ -261,7 +264,13 @@ declare global {
 			 * - `"#fix"`: RTL direction fix
 			 * - `"%100"|"%50"`: Responsive breakpoint (percentage)
 			 */
-			type ButtonSpecial = '|' | '/' | `-${'left' | 'right' | 'center'}` | '#fix' | `:${string}-${string}` | `%${number}`;
+			type ButtonSpecial =
+				| '|'
+				| '/'
+				| `-${'left' | 'right' | 'center'}`
+				| '#fix'
+				| `:${string}-${string}`
+				| `%${number}`;
 			/**
 			 * Plugin buttons available in the toolbar
 			 */
@@ -339,7 +348,11 @@ declare global {
 			 * Button list configuration for the toolbar
 			 * Supports nested arrays, special controls, and responsive breakpoint configurations
 			 */
-			type ButtonItem = SunEditor.UI.ButtonCommand | SunEditor.UI.ButtonPlugin | SunEditor.UI.ButtonSpecial | string;
+			type ButtonItem =
+				| SunEditor.UI.ButtonCommand
+				| SunEditor.UI.ButtonPlugin
+				| SunEditor.UI.ButtonSpecial
+				| string;
 			/**
 			 * ///
 			 * ---[ End of auto-generated button types ]---

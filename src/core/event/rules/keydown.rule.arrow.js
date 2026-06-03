@@ -23,7 +23,16 @@ export function reduceArrowDown(actions, ports, ctx) {
 	const rtl = ctx.options.get('_rtl');
 
 	// In RTL, ArrowLeft is forward (toward end on the left), ArrowRight is backward (toward start on the right)
-	const hDir = keyCode === 'ArrowLeft' ? (rtl ? 'forward' : 'back') : keyCode === 'ArrowRight' ? (rtl ? 'back' : 'forward') : null;
+	const hDir =
+		keyCode === 'ArrowLeft'
+			? rtl
+				? 'forward'
+				: 'back'
+			: keyCode === 'ArrowRight'
+				? rtl
+					? 'back'
+					: 'forward'
+				: null;
 
 	// next component
 	let cmponentInfo = null;
@@ -46,7 +55,8 @@ export function reduceArrowDown(actions, ports, ctx) {
 				}
 			} else if (hDir === 'back') {
 				if (dom.check.isEdgePoint(selectionNode, range.startOffset, 'front')) {
-					const prevEl = selectionNode.previousElementSibling || dom.query.getPreviousDeepestNode(selectionNode);
+					const prevEl =
+						selectionNode.previousElementSibling || dom.query.getPreviousDeepestNode(selectionNode);
 					if (prevEl) {
 						if (component.is(prevEl)) cmponentInfo = component.get(prevEl);
 					} else if (component.is(formatEl.previousElementSibling)) {

@@ -216,7 +216,9 @@ class PluginManager {
 	register(pluginName, targets, pluginOptions) {
 		let plugin = this.#plugins[pluginName];
 		if (!plugin) {
-			throw Error(`[SUNEDITOR.registerPlugin.fail] The called plugin does not exist or is in an invalid format. (pluginName: "${pluginName}")`);
+			throw Error(
+				`[SUNEDITOR.registerPlugin.fail] The called plugin does not exist or is in an invalid format. (pluginName: "${pluginName}")`,
+			);
 		} else if (typeof this.#plugins[pluginName] === 'function') {
 			plugin = this.#plugins[pluginName] = new this.#plugins[pluginName](this.#kernel, pluginOptions || {});
 		}
@@ -227,7 +229,10 @@ class PluginManager {
 				UpdateButton(targets[i], plugin, icons, lang);
 			}
 
-			if (!this.#$.commandDispatcher.activeCommands.includes(pluginName) && typeof this.#plugins[pluginName].active === 'function') {
+			if (
+				!this.#$.commandDispatcher.activeCommands.includes(pluginName) &&
+				typeof this.#plugins[pluginName].active === 'function'
+			) {
 				this.#$.commandDispatcher.activeCommands.push(pluginName);
 			}
 		}
@@ -325,7 +330,10 @@ class PluginManager {
 		}
 
 		this.#fileInfo.regExp = new RegExp(`^(${this.#fileInfo.tags.join('|') || '\\^'})$`, 'i');
-		this.#fileInfo.pluginRegExp = new RegExp(`^(${filePluginRegExp.length === 0 ? '\\^' : filePluginRegExp.join('|')})$`, 'i');
+		this.#fileInfo.pluginRegExp = new RegExp(
+			`^(${filePluginRegExp.length === 0 ? '\\^' : filePluginRegExp.join('|')})$`,
+			'i',
+		);
 
 		this.#pluginCallButtons = null;
 		this.#pluginCallButtons_sub = null;

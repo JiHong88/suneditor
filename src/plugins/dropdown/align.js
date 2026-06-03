@@ -33,7 +33,9 @@ class Align extends PluginDropdown {
 		};
 
 		// create menu from items
-		const menu = this.$.menu.initDropdownTarget(Align, CreateItems(this.$, pluginOptions.items), { className: 'se-list-align' });
+		const menu = this.$.menu.initDropdownTarget(Align, CreateItems(this.$, pluginOptions.items), {
+			className: 'se-list-align',
+		});
 		this._itemMenu = menu.querySelector('ul');
 		this.alignList = menu.querySelectorAll('li button');
 	}
@@ -139,7 +141,11 @@ class Align extends PluginDropdown {
  * @returns {Array<import('../../core/logic/panel/menu').DropdownItem>}
  */
 function CreateItems({ lang, icons, options }, items) {
-	const alignItems = Array.isArray(items) ? items : options.get('_rtl') ? ['right', 'center', 'left', 'justify'] : ['left', 'center', 'right', 'justify'];
+	const alignItems = Array.isArray(items)
+		? items
+		: options.get('_rtl')
+			? ['right', 'center', 'left', 'justify']
+			: ['left', 'center', 'right', 'justify'];
 	return alignItems.map((item) => {
 		const text = lang['align' + item.charAt(0).toUpperCase() + item.slice(1)];
 		return {

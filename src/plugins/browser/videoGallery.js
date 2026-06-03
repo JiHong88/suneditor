@@ -50,7 +50,8 @@ class VideoGallery extends PluginBrowser {
 		this.onSelectfunction = null;
 
 		// modules
-		const thumbnail = typeof pluginOptions.thumbnail === 'string' ? pluginOptions.thumbnail : this.$.icons.video_thumbnail;
+		const thumbnail =
+			typeof pluginOptions.thumbnail === 'string' ? pluginOptions.thumbnail : this.$.icons.video_thumbnail;
 		this.browser = new Browser(this, this.$, {
 			title: this.$.lang.videoGallery,
 			data: pluginOptions.data,
@@ -66,8 +67,14 @@ class VideoGallery extends PluginBrowser {
 		});
 
 		// members
-		this.width = this.$.plugins.video.pluginOptions.defaultWidth === 'auto' ? '' : this.$.plugins.video.pluginOptions.defaultWidth;
-		this.height = this.$.plugins.video.pluginOptions.defaultHeight === 'auto' ? '' : this.$.plugins.video.pluginOptions.defaultHeight;
+		this.width =
+			this.$.plugins.video.pluginOptions.defaultWidth === 'auto'
+				? ''
+				: this.$.plugins.video.pluginOptions.defaultWidth;
+		this.height =
+			this.$.plugins.video.pluginOptions.defaultHeight === 'auto'
+				? ''
+				: this.$.plugins.video.pluginOptions.defaultHeight;
 	}
 
 	/**
@@ -105,7 +112,9 @@ class VideoGallery extends PluginBrowser {
 			const file = { name: target.getAttribute('data-name'), size: 0 };
 			this.$.plugins.video.modalInit();
 			this.$.plugins.video.create(
-				this.$.plugins.video[target.getAttribute('data-frame') === 'iframe' ? 'createIframeTag' : 'createVideoTag']({ poster: target.getAttribute('data-thumbnail') }),
+				this.$.plugins.video[
+					target.getAttribute('data-frame') === 'iframe' ? 'createIframeTag' : 'createVideoTag'
+				]({ poster: target.getAttribute('data-thumbnail') }),
 				url,
 				null,
 				this.width,

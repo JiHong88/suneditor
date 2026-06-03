@@ -36,7 +36,9 @@ class ParagraphStyle extends PluginDropdown {
 		this.icon = 'paragraph_style';
 
 		// create menu from items
-		const menu = this.$.menu.initDropdownTarget(ParagraphStyle, CreateItems(this.$, pluginOptions.items), { className: 'se-list-format' });
+		const menu = this.$.menu.initDropdownTarget(ParagraphStyle, CreateItems(this.$, pluginOptions.items), {
+			className: 'se-list-format',
+		});
 
 		// members
 		this.classList = menu.querySelectorAll('li button');

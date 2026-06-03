@@ -67,7 +67,14 @@ class EventManager {
 	 */
 	addEvent(target, type, listener, useCapture) {
 		if (!target) return null;
-		if (target === _w || target === _d || typeof target.length !== 'number' || target.nodeType || (!Array.isArray(target) && target.length < 1)) target = [target];
+		if (
+			target === _w ||
+			target === _d ||
+			typeof target.length !== 'number' ||
+			target.nodeType ||
+			(!Array.isArray(target) && target.length < 1)
+		)
+			target = [target];
 		if (target.length === 0) return null;
 
 		const len = target.length;
@@ -103,7 +110,14 @@ class EventManager {
 		const useCapture = params.useCapture;
 
 		if (!target) return;
-		if (target === _w || target === _d || typeof target.length !== 'number' || target.nodeType || (!Array.isArray(target) && target.length < 1)) target = [target];
+		if (
+			target === _w ||
+			target === _d ||
+			typeof target.length !== 'number' ||
+			target.nodeType ||
+			(!Array.isArray(target) && target.length < 1)
+		)
+			target = [target];
 		if (target.length === 0) return;
 
 		for (let i = 0, len = target.length; i < len; i++) {

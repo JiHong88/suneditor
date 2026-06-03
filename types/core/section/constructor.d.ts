@@ -8,7 +8,14 @@ import type {} from '../../typedef';
  * @param {Array} rc `_reverseCommandArray` option
  * @param {Set} reverseKeys Reverse key array
  */
-export function CreateShortcuts(command: string, button: Element | null, values: Array<string>, keyMap: Map<string, any>, rc: any[], reverseKeys: Set<any>): void;
+export function CreateShortcuts(
+	command: string,
+	button: Element | null,
+	values: Array<string>,
+	keyMap: Map<string, any>,
+	rc: any[],
+	reverseKeys: Set<any>,
+): void;
 /**
  * @typedef {Object} InitOptionsReturnType
  * @property {Map<string, *>} o - Processed base options (`Map` containing {@link AllBaseOptions_constructor} keys)

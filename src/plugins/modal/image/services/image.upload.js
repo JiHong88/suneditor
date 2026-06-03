@@ -40,7 +40,13 @@ export class ImageUploadService {
 		// server upload
 		const imageUploadUrl = this.#pluginOptions.uploadUrl;
 		if (typeof imageUploadUrl === 'string' && imageUploadUrl.length > 0) {
-			this.#main.fileManager.upload(imageUploadUrl, this.#pluginOptions.uploadHeaders, info.files, this.#UploadCallBack.bind(this, info), this.#error.bind(this));
+			this.#main.fileManager.upload(
+				imageUploadUrl,
+				this.#pluginOptions.uploadHeaders,
+				info.files,
+				this.#UploadCallBack.bind(this, info),
+				this.#error.bind(this),
+			);
 		} else {
 			this.#setBase64(info);
 		}
@@ -55,7 +61,17 @@ export class ImageUploadService {
 		const infoUrl = info.url;
 
 		if (this.#main.modal.isUpdate) this.#updateSrc(infoUrl, info.element, info.files);
-		else this.#produce(infoUrl, info.anchor, info.inputWidth, info.inputHeight, info.align, info.files, info.alt, true);
+		else
+			this.#produce(
+				infoUrl,
+				info.anchor,
+				info.inputWidth,
+				info.inputHeight,
+				info.align,
+				info.files,
+				info.alt,
+				true,
+			);
 	}
 
 	/**
@@ -107,7 +123,16 @@ export class ImageUploadService {
 				this.#updateSrc(fileList[i].url, info.element, file);
 				break;
 			} else {
-				this.#produce(fileList[i].url, info.anchor, info.inputWidth, info.inputHeight, info.align, file, info.alt, i === len - 1);
+				this.#produce(
+					fileList[i].url,
+					info.anchor,
+					info.inputWidth,
+					info.inputHeight,
+					info.align,
+					file,
+					info.alt,
+					i === len - 1,
+				);
 			}
 		}
 	}
@@ -179,7 +204,16 @@ export class ImageUploadService {
 			if (update) {
 				this.#updateSrc(filesStack[i].result, updateElement, filesStack[i].file);
 			} else {
-				this.#produce(filesStack[i].result, anchor, width, height, align, filesStack[i].file, alt, i === len - 1);
+				this.#produce(
+					filesStack[i].result,
+					anchor,
+					width,
+					height,
+					align,
+					filesStack[i].file,
+					alt,
+					i === len - 1,
+				);
 			}
 		}
 	}

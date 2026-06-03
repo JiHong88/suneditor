@@ -4,7 +4,16 @@ import { _DragHandle } from '../ui/_DragHandle';
 import { dom, numbers, env, converter, keyCodeMap } from '../../helper';
 
 const { _w, ON_OVER_COMPONENT } = env;
-const DIRECTION_CURSOR_MAP = { tl: 'nwse-resize', tr: 'nesw-resize', bl: 'nesw-resize', br: 'nwse-resize', lw: 'ew-resize', th: 'ns-resize', rw: 'ew-resize', bh: 'ns-resize' };
+const DIRECTION_CURSOR_MAP = {
+	tl: 'nwse-resize',
+	tr: 'nesw-resize',
+	bl: 'nesw-resize',
+	br: 'nwse-resize',
+	lw: 'ew-resize',
+	th: 'ns-resize',
+	rw: 'ew-resize',
+	bh: 'ns-resize',
+};
 const DIR_DIAGONAL = 'tl|bl|tr|br';
 const DIR_W = 'lw|rw';
 let __resizing_p_wh = false;
@@ -151,7 +160,9 @@ class Figure {
 		this._action = {};
 
 		const controllerEl = CreateHTML_controller(this, $, controls || []);
-		this.controller = controllerEl ? new Controller(this, $, controllerEl, { position: 'bottom', disabled: true }, this.kind) : null;
+		this.controller = controllerEl
+			? new Controller(this, $, controllerEl, { position: 'bottom', disabled: true }, this.kind)
+			: null;
 
 		if (controllerEl) {
 			// align selectmenu
@@ -159,7 +170,9 @@ class Figure {
 			const alignMenus = CreateAlign(this, $, this.alignButton);
 			if (alignMenus) {
 				this.selectMenu_align = new SelectMenu($, { checkList: false, position: 'bottom-center' });
-				this.selectMenu_align.on(this.alignButton, this.#SetMenuAlign.bind(this), { class: 'se-figure-select-list' });
+				this.selectMenu_align.on(this.alignButton, this.#SetMenuAlign.bind(this), {
+					class: 'se-figure-select-list',
+				});
 				this.selectMenu_align.create(alignMenus.items, alignMenus.html);
 			}
 			// as [block, inline] selectmenu
@@ -241,7 +254,11 @@ class Figure {
 	 * // figureInfo.cover     → <figure> wrapping the imgEl
 	 */
 	static CreateContainer(element, className) {
-		dom.utils.createElement('DIV', { class: 'se-component' + (className ? ' ' + className : '') }, dom.utils.createElement('FIGURE', null, element));
+		dom.utils.createElement(
+			'DIV',
+			{ class: 'se-component' + (className ? ' ' + className : '') },
+			dom.utils.createElement('FIGURE', null, element),
+		);
 		return Figure.GetContainer(element);
 	}
 
@@ -258,7 +275,11 @@ class Figure {
 	 * // figureInfo.inlineCover  → same as container (inline mode)
 	 */
 	static CreateInlineContainer(element, className) {
-		dom.utils.createElement('SPAN', { class: 'se-component se-inline-component' + (className ? ' ' + className : '') }, element);
+		dom.utils.createElement(
+			'SPAN',
+			{ class: 'se-component se-inline-component' + (className ? ' ' + className : '') },
+			element,
+		);
 		return Figure.GetContainer(element);
 	}
 
@@ -296,7 +317,9 @@ class Figure {
 			target: /** @type {HTMLElement} */ (target),
 			container: dom.query.getParentElement(target, Figure.is, 3) || cover,
 			cover: cover,
-			inlineCover: dom.utils.hasClass(inlineCover, 'se-inline-component') ? /** @type {HTMLElement} */ (inlineCover) : null,
+			inlineCover: dom.utils.hasClass(inlineCover, 'se-inline-component')
+				? /** @type {HTMLElement} */ (inlineCover)
+				: null,
 			caption: dom.query.getEdgeChild(target.parentElement, 'FIGCAPTION', false),
 			isVertical: IsVertical(target),
 		};
@@ -445,7 +468,9 @@ class Figure {
 
 		this.#setFigureInfo(figureInfo);
 
-		const sizeTarget = /** @type {HTMLElement} */ (figureTarget ? this._cover || this._container || target : target);
+		const sizeTarget = /** @type {HTMLElement} */ (
+			figureTarget ? this._cover || this._container || target : target
+		);
 		const w = sizeTarget.offsetWidth || null;
 		const h = sizeTarget.offsetHeight || null;
 		const { top, left, scrollX, scrollY } = this.#$.offset.getLocal(sizeTarget);
@@ -502,7 +527,10 @@ class Figure {
 		});
 
 		// percentage active
-		const value = /%$/.test(target.style.width) && /%$/.test(figureInfo.container.style.width) ? numbers.get(figureInfo.container.style.width, 0) / 100 + '' : '';
+		const value =
+			/%$/.test(target.style.width) && /%$/.test(figureInfo.container.style.width)
+				? numbers.get(figureInfo.container.style.width, 0) / 100 + ''
+				: '';
 		for (let i = 0, len = this.percentageButtons.length; i < len; i++) {
 			if (this.percentageButtons[i].getAttribute('data-value') === value) {
 				dom.utils.addClass(this.percentageButtons[i], 'active');
@@ -535,7 +563,10 @@ class Figure {
 			if (this.controller) {
 				// size display
 				const size = this.getSize(target);
-				dom.utils.changeTxt(_figure.display, this.#$.lang[this.align === 'none' ? 'basic' : this.align] + ' (' + size.dw + ', ' + size.dh + ')');
+				dom.utils.changeTxt(
+					_figure.display,
+					this.#$.lang[this.align === 'none' ? 'basic' : this.align] + ' (' + size.dw + ', ' + size.dh + ')',
+				);
 
 				// align button
 				this.#setAlignIcon();
@@ -560,7 +591,11 @@ class Figure {
 
 			// selecte
 			dom.utils.removeClass(this._cover, 'se-figure-over-selected');
-			this.controller?.open(_figure.main, null, { initMethod: this.#offContainer, isWWTarget: false, addOffset: null });
+			this.controller?.open(_figure.main, null, {
+				initMethod: this.#offContainer,
+				isWWTarget: false,
+				addOffset: null,
+			});
 			_w.setTimeout(() => _DragHandle.set('__overInfo', false), 0);
 		} else {
 			dom.utils.addClass(this._cover, 'se-figure-over-selected');
@@ -572,7 +607,11 @@ class Figure {
 		this.#element_h = this.#resize_h = h;
 
 		// drag
-		if (!this._inlineCover && (_DragHandle.get('__overInfo') !== ON_OVER_COMPONENT || dom.utils.hasClass(figureInfo.container, 'se-input-component'))) {
+		if (
+			!this._inlineCover &&
+			(_DragHandle.get('__overInfo') !== ON_OVER_COMPONENT ||
+				dom.utils.hasClass(figureInfo.container, 'se-input-component'))
+		) {
 			this.#setDragEvent(_figure.main);
 		}
 
@@ -663,9 +702,13 @@ class Figure {
 				h = target.style.height;
 			}
 		} else {
-			w = !/%$/.test(target.style.width) ? target.style.width : ((figure.container && numbers.get(figure.container.style.width, 2)) || 100) + '%';
+			w = !/%$/.test(target.style.width)
+				? target.style.width
+				: ((figure.container && numbers.get(figure.container.style.width, 2)) || 100) + '%';
 			h = figure.inlineCover
-				? figure.inlineCover.style.height || /** @type {HTMLElement} */ (targetNode).style.height || String(/** @type {HTMLImageElement} */ (targetNode).height || '')
+				? figure.inlineCover.style.height ||
+					/** @type {HTMLElement} */ (targetNode).style.height ||
+					String(/** @type {HTMLImageElement} */ (targetNode).height || '')
 				: numbers.get(figure.cover?.style.paddingBottom, 0) > 0 && !v
 					? figure.cover?.style.height
 					: !/%$/.test(target.style.height) || !/%$/.test(target.style.width)
@@ -707,7 +750,11 @@ class Figure {
 			cover.style.width = container.style.width;
 		} else {
 			container.style.minWidth = '';
-			cover.style.width = this.isVertical ? target.style.height || target.offsetHeight + 'px' : !target.style.width || target.style.width === 'auto' ? '' : target.style.width || '100%';
+			cover.style.width = this.isVertical
+				? target.style.height || target.offsetHeight + 'px'
+				: !target.style.width || target.style.width === 'auto'
+					? ''
+					: target.style.width || '100%';
 		}
 
 		if (!dom.utils.hasClass(container, '__se__float-' + align)) {
@@ -801,7 +848,12 @@ class Figure {
 					figure.container,
 					container.className
 						.split(' ')
-						.filter((v) => v !== 'se-inline-component' && v !== 'se-figure-selected' && v !== 'se-component-selected')
+						.filter(
+							(v) =>
+								v !== 'se-inline-component' &&
+								v !== 'se-figure-selected' &&
+								v !== 'se-component-selected',
+						)
 						.join('|'),
 				);
 
@@ -923,13 +975,17 @@ class Figure {
 	retainFigureFormat(container, originEl, anchorCover, fileManagerInst) {
 		const isInline = this.#$.component.isInline(container);
 		const originParent = originEl.parentNode;
-		let existElement = this.#$.format.isBlock(originParent) || dom.check.isWysiwygFrame(originParent) || originParent.nodeType >= 9 ? originEl : Figure.GetContainer(originEl)?.container || originParent || originEl;
+		let existElement =
+			this.#$.format.isBlock(originParent) || dom.check.isWysiwygFrame(originParent) || originParent.nodeType >= 9
+				? originEl
+				: Figure.GetContainer(originEl)?.container || originParent || originEl;
 
 		if (dom.query.getParentElement(originEl, dom.check.isExcludeFormat)) {
 			existElement = anchorCover && anchorCover !== originEl ? anchorCover : originEl;
 			existElement.parentNode.replaceChild(container, existElement);
 		} else if (isInline && this.#$.format.isLine(existElement)) {
-			const refer = isInline && /^SPAN$/i.test(originEl.parentElement.nodeName) ? originEl.parentElement : originEl;
+			const refer =
+				isInline && /^SPAN$/i.test(originEl.parentElement.nodeName) ? originEl.parentElement : originEl;
 			refer.parentElement.replaceChild(container, refer);
 		} else if (dom.check.isListCell(existElement)) {
 			const refer = dom.query.getParentElement(originEl, (current) => current.parentNode === existElement);
@@ -945,11 +1001,17 @@ class Figure {
 		} else {
 			if (this.#$.format.isLine(existElement.parentNode)) {
 				const formats = existElement.parentNode;
-				formats.parentNode.insertBefore(container, existElement.previousSibling ? formats.nextElementSibling : formats);
-				if (fileManagerInst?.__updateTags.map((current) => existElement.contains(current)).length === 0) dom.utils.removeItem(existElement);
+				formats.parentNode.insertBefore(
+					container,
+					existElement.previousSibling ? formats.nextElementSibling : formats,
+				);
+				if (fileManagerInst?.__updateTags.map((current) => existElement.contains(current)).length === 0)
+					dom.utils.removeItem(existElement);
 				else if (dom.check.isZeroWidth(existElement)) dom.utils.removeItem(existElement);
 			} else {
-				existElement = dom.check.isFigure(existElement.parentNode) ? dom.query.getParentElement(existElement.parentNode, Figure.is) : existElement;
+				existElement = dom.check.isFigure(existElement.parentNode)
+					? dom.query.getParentElement(existElement.parentNode, Figure.is)
+					: existElement;
 				existElement.parentNode.replaceChild(container, existElement);
 			}
 		}
@@ -1097,7 +1159,10 @@ class Figure {
 		this._container = figureInfo.container;
 		this._caption = figureInfo.caption;
 		this._element = figureInfo.target;
-		this.align = (this._container.className.match(/(?:^|\s)__se__float-(none|left|center|right)(?:$|\s)/) || [])[1] || figureInfo.target.style.float || 'none';
+		this.align =
+			(this._container.className.match(/(?:^|\s)__se__float-(none|left|center|right)(?:$|\s)/) || [])[1] ||
+			figureInfo.target.style.float ||
+			'none';
 		this.as = this._inlineCover ? 'inline' : 'block';
 		this.isVertical = IsVertical(figureInfo.target);
 	}
@@ -1141,7 +1206,13 @@ class Figure {
 			element.style.maxWidth = '';
 		}
 
-		element.style.transform = 'rotate(' + r + 'deg)' + (x ? ' rotateX(' + x + 'deg)' : '') + (y ? ' rotateY(' + y + 'deg)' : '') + (translate ? ' translate' + translate + '(' + width + 'px)' : '');
+		element.style.transform =
+			'rotate(' +
+			r +
+			'deg)' +
+			(x ? ' rotateX(' + x + 'deg)' : '') +
+			(y ? ' rotateY(' + y + 'deg)' : '') +
+			(translate ? ' translate' + translate + '(' + width + 'px)' : '');
 	}
 
 	/**
@@ -1195,7 +1266,9 @@ class Figure {
 
 		this._cover.style.height = h;
 		if (/%$/.test(w) && this.align === 'center') {
-			this._cover.style.paddingBottom = !/%$/.test(h) ? h : numbers.get((numbers.get(h, 2) / 100) * numbers.get(w, 2), 2) + '%';
+			this._cover.style.paddingBottom = !/%$/.test(h)
+				? h
+				: numbers.get((numbers.get(h, 2) / 100) * numbers.get(w, 2), 2) + '%';
 		} else {
 			this._cover.style.paddingBottom = h;
 		}
@@ -1235,8 +1308,19 @@ class Figure {
 	 * @param {string|number} h Height percentage.
 	 */
 	_setPercentSize(w, h) {
-		h ||= this.autoRatio ? (/%$/.test(this.autoRatio.current) ? this.autoRatio.current : this.autoRatio.default) : h;
-		h = h && !/%$/.test(h + '') && !numbers.get(h, 0) ? (numbers.is(h) ? h + '%' : h) : numbers.is(h) ? h + this.sizeUnit : h || (this.autoRatio ? this.autoRatio.default : '');
+		h ||= this.autoRatio
+			? /%$/.test(this.autoRatio.current)
+				? this.autoRatio.current
+				: this.autoRatio.default
+			: h;
+		h =
+			h && !/%$/.test(h + '') && !numbers.get(h, 0)
+				? numbers.is(h)
+					? h + '%'
+					: h
+				: numbers.is(h)
+					? h + this.sizeUnit
+					: h || (this.autoRatio ? this.autoRatio.default : '');
 
 		const heightPercentage = /%$/.test(h + '');
 		this._container.style.width = String(numbers.is(w) ? w + '%' : w);
@@ -1335,9 +1419,12 @@ class Figure {
 	 * @param {HTMLElement} element Target element.
 	 */
 	#setCaptionPosition(element) {
-		const figcaption = /** @type {HTMLElement} */ (dom.query.getEdgeChild(dom.query.getParentElement(element, 'FIGURE'), 'FIGCAPTION', false));
+		const figcaption = /** @type {HTMLElement} */ (
+			dom.query.getEdgeChild(dom.query.getParentElement(element, 'FIGURE'), 'FIGCAPTION', false)
+		);
 		if (figcaption) {
-			figcaption.style.marginTop = (this.isVertical && !this.autoRatio ? element.offsetWidth - element.offsetHeight : 0) + 'px';
+			figcaption.style.marginTop =
+				(this.isVertical && !this.autoRatio ? element.offsetWidth - element.offsetHeight : 0) + 'px';
 			if (this.isVertical && this.autoRatio) {
 				element.style.marginTop = figcaption.offsetHeight + 'px';
 			} else {
@@ -1351,7 +1438,9 @@ class Figure {
 	 * @param {HTMLElement} element Target element.
 	 */
 	#deleteCaptionPosition(element) {
-		const figcaption = /** @type {HTMLElement} */ (dom.query.getEdgeChild(dom.query.getParentElement(element, 'FIGURE'), 'FIGCAPTION', false));
+		const figcaption = /** @type {HTMLElement} */ (
+			dom.query.getEdgeChild(dom.query.getParentElement(element, 'FIGURE'), 'FIGCAPTION', false)
+		);
 		if (figcaption) {
 			figcaption.style.marginTop = '';
 		}
@@ -1383,7 +1472,9 @@ class Figure {
 	 * @param {Node} figureMain The main figure container element.
 	 */
 	#setDragEvent(figureMain) {
-		const dragHandle = /** @type {HTMLElement} */ (this.#$.frameContext.get('wrapper').querySelector('.se-drag-handle'));
+		const dragHandle = /** @type {HTMLElement} */ (
+			this.#$.frameContext.get('wrapper').querySelector('.se-drag-handle')
+		);
 		dom.utils.removeClass(dragHandle, 'se-drag-handle-full');
 
 		dragHandle.style.opacity = '';
@@ -1406,7 +1497,12 @@ class Figure {
 	 */
 	#OnScrollDragHandler(dragHandle, figureMain) {
 		dragHandle.style.display = 'block';
-		dragHandle.style.left = figureMain.offsetLeft + (this.#$.options.get('_rtl') ? dragHandle.offsetWidth : figureMain.offsetWidth - dragHandle.offsetWidth * 1.5) + 'px';
+		dragHandle.style.left =
+			figureMain.offsetLeft +
+			(this.#$.options.get('_rtl')
+				? dragHandle.offsetWidth
+				: figureMain.offsetWidth - dragHandle.offsetWidth * 1.5) +
+			'px';
 		dragHandle.style.top = figureMain.offsetTop - dragHandle.offsetHeight + 0.5 + 'px';
 	}
 
@@ -1424,7 +1520,11 @@ class Figure {
 		const direction = (inst._resize_direction = eventTarget.classList[0]);
 		inst._resizeClientX = e.clientX;
 		inst._resizeClientY = e.clientY;
-		this.#$.frameContext.get('_figure').main.style.float = /l/.test(direction) ? 'right' : /r/.test(direction) ? 'left' : 'none';
+		this.#$.frameContext.get('_figure').main.style.float = /l/.test(direction)
+			? 'right'
+			: /r/.test(direction)
+				? 'left'
+				: 'none';
 		this.#$.ui.enableBackWrapper(DIRECTION_CURSOR_MAP[direction]);
 
 		const { w, h, dw, dh } = this.getSize(inst._element);
@@ -1442,7 +1542,8 @@ class Figure {
 			if (__resizing_p_wh || __resizing_p_ow) {
 				const sizeTarget = inst._cover || inst._element;
 				__resizing_sw = sizeTarget.offsetWidth;
-				__resizing_cw = converter.getWidthInPercentage(sizeTarget, this.#$.frameContext.get('wysiwygFrame')) / 100;
+				__resizing_cw =
+					converter.getWidthInPercentage(sizeTarget, this.#$.frameContext.get('wysiwygFrame')) / 100;
 			}
 		}
 
@@ -1492,7 +1593,10 @@ class Figure {
 		const resize_w = /** @type {number} */ (!v && /h$/.test(direction) ? this.#width : Math.round(resultW));
 		const resize_h = /** @type {number} */ (!v && /w$/.test(direction) ? this.#height : Math.round(resultH));
 		const rw = __resizing_cw ? (resize_w / __resizing_sw) * __resizing_cw * 100 : resize_w;
-		dom.utils.changeTxt(this.#$.frameContext.get('_figure').display, __resizing_cw ? numbers.get(rw > 100 ? 100 : rw, 2).toFixed(2) + '%' : rw + ' * ' + resize_h);
+		dom.utils.changeTxt(
+			this.#$.frameContext.get('_figure').display,
+			__resizing_cw ? numbers.get(rw > 100 ? 100 : rw, 2).toFixed(2) + '%' : rw + ' * ' + resize_h,
+		);
 
 		this.#resize_w = resize_w;
 		this.#resize_h = resize_h;
@@ -1645,7 +1749,11 @@ function GetRotateValue(element) {
  * @returns {boolean} Whether to rotate vertically
  */
 function IsVertical(elementOrDeg) {
-	return /^(90|270)$/.test(Math.abs(numbers.is(elementOrDeg) ? elementOrDeg : GetRotateValue(/** @type{Node} */ (elementOrDeg)).r).toString());
+	return /^(90|270)$/.test(
+		Math.abs(
+			numbers.is(elementOrDeg) ? elementOrDeg : GetRotateValue(/** @type{Node} */ (elementOrDeg)).r,
+		).toString(),
+	);
 }
 
 /**
@@ -1718,7 +1826,15 @@ function CreateResize($, button) {
 		n = numbers.is(v);
 		c = n ? 'resize_percent' + v : 'auto';
 		l = n ? v + '%' : $.lang.autoSize;
-		html.push('<button type="button" class="se-btn-list" data-command="' + c + '" data-value="' + v + '"><span>' + l + '</span></button>');
+		html.push(
+			'<button type="button" class="se-btn-list" data-command="' +
+				c +
+				'" data-value="' +
+				v +
+				'"><span>' +
+				l +
+				'</span></button>',
+		);
 	}
 
 	return { html: html, items: items };
@@ -1741,7 +1857,11 @@ function CreateHTML_resizeDot() {
 			<div class="se-resize-display"></div>
 		</div>`;
 
-	return dom.utils.createElement('DIV', { class: 'se-controller se-resizing-container', style: 'display: none;' }, html);
+	return dom.utils.createElement(
+		'DIV',
+		{ class: 'se-controller se-resizing-container', style: 'display: none;' },
+		html,
+	);
 }
 
 /**

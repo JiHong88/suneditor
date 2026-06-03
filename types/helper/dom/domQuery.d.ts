@@ -40,7 +40,10 @@ export function getNodeFromPath<T extends Node>(offsets: Array<number>, parentNo
  * @param {?(current: *) => boolean} validation Conditional function
  * @returns {T|null}
  */
-export function getChildNode<T extends HTMLElement>(element: Node, validation: ((current: any) => boolean) | null): T | null;
+export function getChildNode<T extends HTMLElement>(
+	element: Node,
+	validation: ((current: any) => boolean) | null,
+): T | null;
 /**
  * @template {HTMLElement} T
  * @description Get all `children` of the argument value element (Without text nodes)
@@ -49,7 +52,11 @@ export function getChildNode<T extends HTMLElement>(element: Node, validation: (
  * @param {?number} depth Number of child levels to depth.
  * @returns {Array<T>}
  */
-export function getListChildren<T extends HTMLElement>(element: Node, validation: ((current: any) => boolean) | null, depth: number | null): Array<T>;
+export function getListChildren<T extends HTMLElement>(
+	element: Node,
+	validation: ((current: any) => boolean) | null,
+	depth: number | null,
+): Array<T>;
 /**
  * @template {Node} T
  * @description Get all `childNodes` of the argument value element (Include text nodes)
@@ -60,7 +67,11 @@ export function getListChildren<T extends HTMLElement>(element: Node, validation
  * @example
  * const allNodes = dom.query.getListChildNodes(container, (node) => node.nodeType === 3);
  */
-export function getListChildNodes<T extends Node>(element: Node, validation: ((current: any) => boolean) | null, depth: number | null): Array<T>;
+export function getListChildNodes<T extends Node>(
+	element: Node,
+	validation: ((current: any) => boolean) | null,
+	depth: number | null,
+): Array<T>;
 /**
  * @description Returns the number of parents nodes.
  * - `0` when the parent node is the WYSIWYG area.
@@ -115,7 +126,11 @@ export function compareElements(
  * @param {?number} [depth] Number of parent levels to depth.
  * @returns {T|null} Not found: `null`
  */
-export function getParentElement<T extends HTMLElement>(element: Node, query: string | ((current: any) => boolean) | Node, depth?: number | null): T | null;
+export function getParentElement<T extends HTMLElement>(
+	element: Node,
+	query: string | ((current: any) => boolean) | Node,
+	depth?: number | null,
+): T | null;
 /**
  * @template {HTMLElement} T
  * @description Gets all ancestors of the argument value.
@@ -127,7 +142,11 @@ export function getParentElement<T extends HTMLElement>(element: Node, query: st
  * @param {?number} [depth] Number of parent levels to depth.
  * @returns {Array<T>} Returned in an array in order.
  */
-export function getParentElements<T extends HTMLElement>(element: Node, query: string | ((current: any) => boolean) | Node, depth?: number | null): Array<T>;
+export function getParentElements<T extends HTMLElement>(
+	element: Node,
+	query: string | ((current: any) => boolean) | Node,
+	depth?: number | null,
+): Array<T>;
 /**
  * @template {HTMLElement} T
  * @description Gets the element with `data-command` attribute among the parent elements.
@@ -156,7 +175,11 @@ export function getEventTarget<T extends HTMLElement>(event: Event): T | null;
  * const firstLeaf = dom.query.getEdgeChild(container, (n) => n.nodeType === 3, false);
  * const lastLeaf = dom.query.getEdgeChild(container, (n) => n.nodeType === 3, true);
  */
-export function getEdgeChild<T extends Node>(node: Node, query: string | ((current: any) => boolean) | Node, last: boolean): T | null;
+export function getEdgeChild<T extends Node>(
+	node: Node,
+	query: string | ((current: any) => boolean) | Node,
+	last: boolean,
+): T | null;
 /**
  * @description Get edge child nodes of the argument value.
  * - 1. The first node of all the child nodes of the `first` element is returned.
@@ -197,7 +220,12 @@ export function getNextDeepestNode<T extends Node>(node: Node, ceiling?: Node | 
  * @param {?(current: *) => boolean} [validate] Validation function
  * @returns {number}
  */
-export function findTextIndexOnLine(line: Node, offsetContainer: Node, offset: number, validate?: ((current: any) => boolean) | null): number;
+export function findTextIndexOnLine(
+	line: Node,
+	offsetContainer: Node,
+	offset: number,
+	validate?: ((current: any) => boolean) | null,
+): number;
 /**
  * @description Find the end index of a sequence of at least minTabSize consecutive non-breaking spaces or spaces
  * - which are interpreted as a tab key, occurring after a given base index in a text string.

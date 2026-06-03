@@ -122,7 +122,9 @@ class Menu {
 		this.#removeGlobalEvent();
 		const moreBtn = this.#checkMoreLayer(button);
 		if (moreBtn) {
-			const target = dom.query.getParentElement(moreBtn, '.se-btn-tray').querySelector('[data-command="' + moreBtn.getAttribute('data-ref') + '"]');
+			const target = dom.query
+				.getParentElement(moreBtn, '.se-btn-tray')
+				.querySelector('[data-command="' + moreBtn.getAttribute('data-ref') + '"]');
 			if (target) {
 				this.#$.commandDispatcher.runFromTarget(target);
 				this.dropdownOn(button);
@@ -143,13 +145,31 @@ class Menu {
 		}
 
 		this.#context.get('menuTray').showPopover?.();
-		this.#bindClose_dropdown_mouse = this.#eventManager.addGlobalEvent('mousedown', this.#globalEventHandler.mousedown, false);
+		this.#bindClose_dropdown_mouse = this.#eventManager.addGlobalEvent(
+			'mousedown',
+			this.#globalEventHandler.mousedown,
+			false,
+		);
 		if (this.#dropdownCommands.includes(dropdownName)) {
 			this.menus = converter.nodeListToArray(menu.querySelectorAll('[data-command]'));
 			if (this.menus.length > 0) {
-				this.#bindClose_dropdown_key = this.#eventManager.addGlobalEvent('keydown', this.#globalEventHandler.keydown, false);
-				this.#bindMenu_mousemove = this.#eventManager.addEvent(menu, 'mousemove', this.#globalEventHandler.mousemove, false);
-				this.#bindMenu_mouseout = this.#eventManager.addEvent(menu, 'mouseout', this.#globalEventHandler.mouseout, false);
+				this.#bindClose_dropdown_key = this.#eventManager.addGlobalEvent(
+					'keydown',
+					this.#globalEventHandler.keydown,
+					false,
+				);
+				this.#bindMenu_mousemove = this.#eventManager.addEvent(
+					menu,
+					'mousemove',
+					this.#globalEventHandler.mousemove,
+					false,
+				);
+				this.#bindMenu_mouseout = this.#eventManager.addEvent(
+					menu,
+					'mouseout',
+					this.#globalEventHandler.mouseout,
+					false,
+				);
 			}
 		}
 
@@ -222,7 +242,8 @@ class Menu {
 		this.#removeGlobalEvent();
 
 		this.currentContainerActiveButton = /** @type {HTMLButtonElement} */ (button);
-		const containerName = (this.currentContainerName = this.currentContainerActiveButton.getAttribute('data-command'));
+		const containerName = (this.currentContainerName =
+			this.currentContainerActiveButton.getAttribute('data-command'));
 		this.currentContainer = this.targetMap[containerName];
 
 		if (isMobile) {
@@ -232,7 +253,11 @@ class Menu {
 		}
 
 		this.#context.get('menuTray').showPopover?.();
-		this.#bindClose_cons_mouse = this.#eventManager.addGlobalEvent('mousedown', this.#globalEventHandler.containerDown, false);
+		this.#bindClose_cons_mouse = this.#eventManager.addGlobalEvent(
+			'mousedown',
+			this.#globalEventHandler.containerDown,
+			false,
+		);
 
 		if (this.#$.plugins[containerName].on) this.#$.plugins[containerName].on(button);
 		this.#store.set('_preventBlur', true);
@@ -265,7 +290,13 @@ class Menu {
 	 * @param {HTMLElement} menu Menu element
 	 */
 	__resetMenuPosition(element, menu) {
-		this.#$.offset.setRelPosition(menu, this.#contextProvider.carrierWrapper, element.parentElement, dom.query.getParentElement(element, '.se-toolbar'), { preferUp: this.#store.mode.isBottom });
+		this.#$.offset.setRelPosition(
+			menu,
+			this.#contextProvider.carrierWrapper,
+			element.parentElement,
+			dom.query.getParentElement(element, '.se-toolbar'),
+			{ preferUp: this.#store.mode.isBottom },
+		);
 	}
 
 	/**
@@ -290,7 +321,13 @@ class Menu {
 		menu.style.height = '';
 		dom.utils.addClass(element.parentElement.children, 'on');
 
-		this.#$.offset.setRelPosition(menu, this.#contextProvider.carrierWrapper, element.parentElement, dom.query.getParentElement(element, '.se-toolbar'), { preferUp: this.#store.mode.isBottom });
+		this.#$.offset.setRelPosition(
+			menu,
+			this.#contextProvider.carrierWrapper,
+			element.parentElement,
+			dom.query.getParentElement(element, '.se-toolbar'),
+			{ preferUp: this.#store.mode.isBottom },
+		);
 
 		menu.style.visibility = '';
 

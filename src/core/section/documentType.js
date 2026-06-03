@@ -152,7 +152,10 @@ class DocumentType {
 		this.#rePageTimeout = _w.setTimeout(async () => {
 			await dom.utils.waitForMediaLoad(this.#mirror, 1500);
 
-			const heightGap = this.#ww.scrollHeight > this.#mirror.scrollHeight ? this.#ww.scrollHeight - this.#mirror.scrollHeight : 0;
+			const heightGap =
+				this.#ww.scrollHeight > this.#mirror.scrollHeight
+					? this.#ww.scrollHeight - this.#mirror.scrollHeight
+					: 0;
 			const mirrorHeight = this.#mirror.scrollHeight + heightGap;
 			const pageBreaks = /** @type { NodeListOf<HTMLElement>} */ (this.#ww.querySelectorAll('.se-page-break'));
 			if (!force && this.#pageHeight === mirrorHeight && this.#pageBreaksCnt === pageBreaks.length) return;
@@ -166,7 +169,10 @@ class DocumentType {
 			if (pageBreaks.length > 0) {
 				pageBreakHeight = pageBreaks[0].offsetHeight;
 				for (let i = 0; i < pageBreaks.length; i++) {
-					breakPoints.push({ top: pageBreaks[i].offsetTop, end: pageBreaks[i].offsetTop + pageBreakHeight / 2 });
+					breakPoints.push({
+						top: pageBreaks[i].offsetTop,
+						end: pageBreaks[i].offsetTop + pageBreakHeight / 2,
+					});
 				}
 			}
 
@@ -524,15 +530,22 @@ class DocumentType {
 		const globalTop = this._getGlobalTop();
 		const isScrollable = this.#isScrollable(this.#fc);
 		const children = converter.nodeListToArray(this.#ww.children);
-		const pageTop = this.#page.offsetTop + numbers.get(this.#pages[pageNum - 1].style.top) + (!isScrollable ? 0 : this._getWWScrollTop());
+		const pageTop =
+			this.#page.offsetTop +
+			numbers.get(this.#pages[pageNum - 1].style.top) +
+			(!isScrollable ? 0 : this._getWWScrollTop());
 		for (let i = 0, len = children.length, c; i < len; i++) {
 			c = children[i];
 			if (c.offsetTop >= pageTop) {
 				if (!force) this.#selection.setRange(c, 0, c, 0);
-				const scrollTop = i === 0 && isScrollable ? 0 : c.offsetTop - this.#page.offsetTop - c.offsetHeight + globalTop;
+				const scrollTop =
+					i === 0 && isScrollable ? 0 : c.offsetTop - this.#page.offsetTop - c.offsetHeight + globalTop;
 				this._applyPageScroll(scrollTop, () => {
 					if (this.#toolbar.isSticky && !this.#store.mode.isBottom) {
-						this._getDisplayPage().scrollTo({ top: scrollTop - this.#context.get('toolbar_main').offsetHeight, behavior: 'smooth' });
+						this._getDisplayPage().scrollTo({
+							top: scrollTop - this.#context.get('toolbar_main').offsetHeight,
+							behavior: 'smooth',
+						});
 					}
 				});
 

@@ -25,4 +25,30 @@ import ur from './ur';
 import zh_cn from './zh_cn';
 
 export { ckb, cs, da, de, en, es, fa, fr, he, hu, it, ja, ko, km, lv, nl, pl, pt_br, ro, ru, se, tr, uk, ur, zh_cn };
-export default { ckb, cs, da, de, en, es, fa, fr, he, hu, it, ja, ko, km, lv, nl, pl, pt_br, ro, ru, se, tr, uk, ur, zh_cn };
+export default {
+	ckb,
+	cs,
+	da,
+	de,
+	en,
+	es,
+	fa,
+	fr,
+	he,
+	hu,
+	it,
+	ja,
+	ko,
+	km,
+	lv,
+	nl,
+	pl,
+	pt_br,
+	ro,
+	ru,
+	se,
+	tr,
+	uk,
+	ur,
+	zh_cn,
+};

@@ -9,9 +9,15 @@ declare const _default: {
 	/** @action backspaceFormatMaintain */
 	'backspace.format.maintain': ({ ctx }: EffectContext_keydown, { formatEl }: any) => void;
 	/** @action backspaceComponentSelect */
-	'backspace.component.select': ({ ports }: EffectContext_keydown, { selectionNode, range, fileComponentInfo }: any) => void;
+	'backspace.component.select': (
+		{ ports }: EffectContext_keydown,
+		{ selectionNode, range, fileComponentInfo }: any,
+	) => void;
 	/** @action backspaceComponentRemove */
-	'backspace.component.remove': ({ ports }: EffectContext_keydown, { isList, sel, formatEl, fileComponentInfo }: any) => void;
+	'backspace.component.remove': (
+		{ ports }: EffectContext_keydown,
+		{ isList, sel, formatEl, fileComponentInfo }: any,
+	) => void;
 	/** @action backspaceListMergePrev */
 	'backspace.list.mergePrev': ({ ports }: EffectContext_keydown, { prev, formatEl, rangeEl }: any) => void;
 	/** @action backspaceListRemoveNested */
@@ -36,15 +42,27 @@ declare const _default: {
 	/** @action enterFormatExitEmpty */
 	'enter.format.exitEmpty': ({ ports, ctx }: EffectContext_keydown, { formatEl, rangeEl }: any) => void;
 	/** @action enterFormatCleanBrAndZWS */
-	'enter.format.cleanBrAndZWS': ({ ports }: EffectContext_keydown, { selectionNode, selectionFormat, brBlock, children, offset }: any) => void;
+	'enter.format.cleanBrAndZWS': (
+		{ ports }: EffectContext_keydown,
+		{ selectionNode, selectionFormat, brBlock, children, offset }: any,
+	) => void;
 	/** @action enterFormatInsertBrHtml */
-	'enter.format.insertBrHtml': ({ ports }: EffectContext_keydown, { brBlock, range, wSelection, offset }: any) => void;
+	'enter.format.insertBrHtml': (
+		{ ports }: EffectContext_keydown,
+		{ brBlock, range, wSelection, offset }: any,
+	) => void;
 	/** @action enterFormatInsertBrNode */
 	'enter.format.insertBrNode': ({ ports }: EffectContext_keydown, { wSelection }: any) => void;
 	/** @action enterFormatBreakAtEdge */
-	'enter.format.breakAtEdge': ({ ports, ctx }: EffectContext_keydown, { formatEl, selectionNode, formatStartEdge, formatEndEdge, bidiSwapped }: any) => void;
+	'enter.format.breakAtEdge': (
+		{ ports, ctx }: EffectContext_keydown,
+		{ formatEl, selectionNode, formatStartEdge, formatEndEdge, bidiSwapped }: any,
+	) => void;
 	/** @action enterFormatBreakWithSelection */
-	'enter.format.breakWithSelection': ({ ports, ctx }: EffectContext_keydown, { formatEl, range, formatStartEdge, formatEndEdge }: any) => void;
+	'enter.format.breakWithSelection': (
+		{ ports, ctx }: EffectContext_keydown,
+		{ formatEl, range, formatStartEdge, formatEndEdge }: any,
+	) => void;
 	/** @action enterFormatBreakAtCursor */
 	'enter.format.breakAtCursor': ({ ports, ctx }: EffectContext_keydown, { formatEl, range }: any) => void;
 	/** @action enterFigcaptionExitInList */

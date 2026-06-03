@@ -44,7 +44,9 @@ function Constructor(editorTargets, options) {
 	if (options.plugins) {
 		const excludedPlugins = options.excludedPlugins || [];
 		const originPlugins = options.plugins;
-		const pluginsValues = (Array.isArray(originPlugins) ? originPlugins : Object.keys(originPlugins)).filter((name) => !excludedPlugins.includes(name)).map((name) => originPlugins[name]);
+		const pluginsValues = (Array.isArray(originPlugins) ? originPlugins : Object.keys(originPlugins))
+			.filter((name) => !excludedPlugins.includes(name))
+			.map((name) => originPlugins[name]);
 
 		for (let i = 0, len = pluginsValues.length, p; i < len; i++) {
 			p = pluginsValues[i].default || pluginsValues[i];
@@ -57,11 +59,20 @@ function Constructor(editorTargets, options) {
 	const o = optionMap.o;
 	const icons = optionMap.i;
 	const lang = optionMap.l;
-	const loadingBox = dom.utils.createElement('DIV', { class: 'se-loading-box sun-editor-common' }, '<div class="se-loading-effect"></div>');
+	const loadingBox = dom.utils.createElement(
+		'DIV',
+		{ class: 'se-loading-box sun-editor-common' },
+		'<div class="se-loading-effect"></div>',
+	);
 	const editorFormFieldPrefix = 'suneditor-' + ++editorInstanceId;
 
 	/** --- carrier wrapper --------------------------------------------------------------- */
-	const editor_carrier_wrapper = dom.utils.createElement('DIV', { class: 'sun-editor sun-editor-carrier-wrapper sun-editor-common' + o.get('_themeClass') + (o.get('_rtl') ? ' se-rtl' : '') });
+	const editor_carrier_wrapper = dom.utils.createElement('DIV', {
+		class:
+			'sun-editor sun-editor-carrier-wrapper sun-editor-common' +
+			o.get('_themeClass') +
+			(o.get('_rtl') ? ' se-rtl' : ''),
+	});
 	// menuTray
 	const menuTray = dom.utils.createElement('DIV', { class: 'se-menu-tray', popover: 'manual' });
 	editor_carrier_wrapper.appendChild(menuTray);
@@ -80,7 +91,10 @@ function Constructor(editorTargets, options) {
 	editor_carrier_wrapper.appendChild(focusTemp);
 
 	// modal
-	const modal = dom.utils.createElement('DIV', { class: 'se-modal se-modal-area sun-editor-common', popover: 'manual' });
+	const modal = dom.utils.createElement('DIV', {
+		class: 'se-modal se-modal-area sun-editor-common',
+		popover: 'manual',
+	});
 	const modal_back = dom.utils.createElement('DIV', { class: 'se-modal-back' });
 	const modal_inner = dom.utils.createElement('DIV', { class: 'se-modal-inner' });
 	modal.appendChild(modal_back);
@@ -88,7 +102,11 @@ function Constructor(editorTargets, options) {
 	editor_carrier_wrapper.appendChild(modal);
 
 	// alert
-	const alert = dom.utils.createElement('DIV', { class: 'se-alert se-modal-area sun-editor-common', style: 'display: none;', popover: 'manual' });
+	const alert = dom.utils.createElement('DIV', {
+		class: 'se-alert se-modal-area sun-editor-common',
+		style: 'display: none;',
+		popover: 'manual',
+	});
 	const alert_back = dom.utils.createElement('DIV', { class: 'se-modal-back' });
 	const alert_inner = dom.utils.createElement('DIV', { class: 'se-modal-inner' });
 	alert.appendChild(alert_back);
@@ -147,15 +165,22 @@ function Constructor(editorTargets, options) {
 	for (let i = 0, len = editorTargets.length; i < len; i++) {
 		const editTarget = editorTargets[i];
 		const to = optionMap.frameMap.get(editTarget.key);
-		const top_div = dom.utils.createElement('DIV', { class: 'sun-editor' + o.get('_themeClass') + (o.get('_rtl') ? ' se-rtl' : '') });
+		const top_div = dom.utils.createElement('DIV', {
+			class: 'sun-editor' + o.get('_themeClass') + (o.get('_rtl') ? ' se-rtl' : ''),
+		});
 		const container = dom.utils.createElement('DIV', { class: 'se-container' });
 		const isBlockHandle = !!o.get('blockHandle');
 		const editor_div = dom.utils.createElement('DIV', {
-			class: 'se-wrapper' + (isBlockHandle ? ' se-mode-block' : '') + (o.get('type') === 'document' ? ' se-type-document' : '') + (o.get('_type_options').includes('header') ? ' se-type-document-header' : ''),
+			class:
+				'se-wrapper' +
+				(isBlockHandle ? ' se-mode-block' : '') +
+				(o.get('type') === 'document' ? ' se-type-document' : '') +
+				(o.get('_type_options').includes('header') ? ' se-type-document-header' : ''),
 		});
 
 		const editorInnerW = to.get('innerWidth');
-		if (editorInnerW && editorInnerW !== 'auto') editor_div.style.setProperty('--se-editor-inner-width', editorInnerW);
+		if (editorInnerW && editorInnerW !== 'auto')
+			editor_div.style.setProperty('--se-editor-inner-width', editorInnerW);
 
 		container.appendChild(dom.utils.createElement('DIV', { class: 'se-toolbar-shadow' }));
 
@@ -168,8 +193,16 @@ function Constructor(editorTargets, options) {
 		let textarea = initElements.codeView;
 
 		// line breaker
-		const line_breaker_t = dom.utils.createElement('DIV', { class: 'se-line-breaker-component se-line-breaker-component-t', title: lang.insertLine }, icons.line_break);
-		const line_breaker_b = dom.utils.createElement('DIV', { class: 'se-line-breaker-component se-line-breaker-component-b', title: lang.insertLine }, icons.line_break);
+		const line_breaker_t = dom.utils.createElement(
+			'DIV',
+			{ class: 'se-line-breaker-component se-line-breaker-component-t', title: lang.insertLine },
+			icons.line_break,
+		);
+		const line_breaker_b = dom.utils.createElement(
+			'DIV',
+			{ class: 'se-line-breaker-component se-line-breaker-component-b', title: lang.insertLine },
+			icons.line_break,
+		);
 
 		editor_div.appendChild(line_breaker_t);
 		editor_div.appendChild(line_breaker_b);
@@ -183,7 +216,9 @@ function Constructor(editorTargets, options) {
 		if (statusbar) {
 			if (statusbarContainer) {
 				if (!default_status_bar) {
-					statusbarContainer.appendChild(dom.utils.createElement('DIV', { class: 'sun-editor' + o.get('_themeClass') }, statusbar));
+					statusbarContainer.appendChild(
+						dom.utils.createElement('DIV', { class: 'sun-editor' + o.get('_themeClass') }, statusbar),
+					);
 					default_status_bar = statusbar;
 				}
 			} else {
@@ -211,7 +246,14 @@ function Constructor(editorTargets, options) {
 				// add line nubers
 				const codeNumbers = dom.utils.createElement(
 					'TEXTAREA',
-					{ id: editorFormFieldPrefix + '-code-view-line-' + (key || 'default'), class: 'se-code-view-line', readonly: 'true', autocomplete: 'off', 'aria-hidden': 'true', tabindex: '-1' },
+					{
+						id: editorFormFieldPrefix + '-code-view-line-' + (key || 'default'),
+						class: 'se-code-view-line',
+						readonly: 'true',
+						autocomplete: 'off',
+						'aria-hidden': 'true',
+						tabindex: '-1',
+					},
 					null,
 				);
 				codeWrapper.insertBefore(codeNumbers, textarea);
@@ -227,7 +269,14 @@ function Constructor(editorTargets, options) {
 			markdownTextarea = initElements.markdownView;
 			const markdownNumbers = dom.utils.createElement(
 				'TEXTAREA',
-				{ id: editorFormFieldPrefix + '-markdown-view-line-' + (key || 'default'), class: 'se-markdown-view-line', readonly: 'true', autocomplete: 'off', 'aria-hidden': 'true', tabindex: '-1' },
+				{
+					id: editorFormFieldPrefix + '-markdown-view-line-' + (key || 'default'),
+					class: 'se-markdown-view-line',
+					readonly: 'true',
+					autocomplete: 'off',
+					'aria-hidden': 'true',
+					tabindex: '-1',
+				},
 				null,
 			);
 			markdownWrapper = dom.utils.createElement('DIV', { class: 'se-markdown-wrapper' });
@@ -240,7 +289,11 @@ function Constructor(editorTargets, options) {
 		// document type
 		const documentTypeInner = { inner: null, page: null, pageMirror: null };
 		if (o.get('_type_options').includes('header')) {
-			documentTypeInner.inner = dom.utils.createElement('DIV', { class: 'se-document-lines', style: `height: ${to.get('height')};` }, '<div class="se-document-lines-inner"></div>');
+			documentTypeInner.inner = dom.utils.createElement(
+				'DIV',
+				{ class: 'se-document-lines', style: `height: ${to.get('height')};` },
+				'<div class="se-document-lines-inner"></div>',
+			);
 		}
 		if (o.get('_type_options').includes('page')) {
 			documentTypeInner.page = dom.utils.createElement('DIV', { class: 'se-document-page' }, null);
@@ -260,8 +313,16 @@ function Constructor(editorTargets, options) {
 			blockHandleArea = dom.utils.createElement('DIV', { class: 'se-block-handle-area' });
 
 			const blockHandleGroup = dom.utils.createElement('DIV', { class: 'se-block-handle' });
-			const blockHandlePlus = dom.utils.createElement('DIV', { class: 'se-block-handle-btn se-block-handle-plus' }, icons.plus);
-			const blockHandleDrag = dom.utils.createElement('DIV', { class: 'se-block-handle-btn se-block-handle-drag' }, icons.dragHandle);
+			const blockHandlePlus = dom.utils.createElement(
+				'DIV',
+				{ class: 'se-block-handle-btn se-block-handle-plus' },
+				icons.plus,
+			);
+			const blockHandleDrag = dom.utils.createElement(
+				'DIV',
+				{ class: 'se-block-handle-btn se-block-handle-drag' },
+				icons.dragHandle,
+			);
 			blockHandleGroup.appendChild(blockHandlePlus);
 			blockHandleGroup.appendChild(blockHandleDrag);
 
@@ -293,7 +354,9 @@ function Constructor(editorTargets, options) {
 	// toolbar container
 	const toolbar_container = o.get('toolbar_container');
 	if (toolbar_container) {
-		const top_div = dom.utils.createElement('DIV', { class: 'sun-editor' + o.get('_themeClass') + (o.get('_rtl') ? ' se-rtl' : '') });
+		const top_div = dom.utils.createElement('DIV', {
+			class: 'sun-editor' + o.get('_themeClass') + (o.get('_rtl') ? ' se-rtl' : ''),
+		});
 		const container = dom.utils.createElement('DIV', { class: 'se-container' });
 		container.appendChild(toolbar);
 		if (subbar) container.appendChild(subbar);
@@ -343,7 +406,11 @@ export function CreateShortcuts(command, button, values, keyMap, rc, reverseKeys
 	if (!values || values.length < 2) return;
 	const tooptip = button?.querySelector('.se-tooltip-text');
 
-	for (let i = 0, a, v, c, s, edge, space, enter, textTrigger, plugin, method, t, k, r, _i; i < values.length; i += 2 + _i) {
+	for (
+		let i = 0, a, v, c, s, edge, space, enter, textTrigger, plugin, method, t, k, r, _i;
+		i < values.length;
+		i += 2 + _i
+	) {
 		_i = 0;
 		a = values[i].split('+');
 
@@ -400,7 +467,21 @@ export function CreateShortcuts(command, button, values, keyMap, rc, reverseKeys
 				r = r === -1 ? '' : numbers.isOdd(r) ? rc[r + 1] : rc[r - 1];
 				if (r) reverseKeys.add(k);
 
-				keyMap.set(k, { c, s, edge, space, enter, textTrigger, plugin, command, method, r, type: button?.getAttribute('data-type'), button, key: k });
+				keyMap.set(k, {
+					c,
+					s,
+					edge,
+					space,
+					enter,
+					textTrigger,
+					plugin,
+					command,
+					method,
+					r,
+					type: button?.getAttribute('data-type'),
+					button,
+					key: k,
+				});
 			}
 		}
 
@@ -416,7 +497,11 @@ export function CreateShortcuts(command, button, values, keyMap, rc, reverseKeys
  * @param {string} shortcut
  */
 function _addTooltip(tooptipBtn, shift, shortcut) {
-	const tooltip = dom.utils.createElement('SPAN', { class: 'se-shortcut' }, env.cmdIcon + (shift ? env.shiftIcon : '') + '+<span class="se-shortcut-key">' + shortcut + '</span>');
+	const tooltip = dom.utils.createElement(
+		'SPAN',
+		{ class: 'se-shortcut' },
+		env.cmdIcon + (shift ? env.shiftIcon : '') + '+<span class="se-shortcut-key">' + shortcut + '</span>',
+	);
 	const prevTooltip = tooptipBtn.querySelector('.se-shortcut');
 
 	if (prevTooltip) {
@@ -466,7 +551,10 @@ export function InitOptions(options, editorTargets, plugins) {
 
 	/** Multi root */
 	if (editorTargets.length > 1) {
-		if (!options.toolbar_container && !/inline|balloon/i.test(options.mode)) throw Error('[SUNEDITOR.create.fail] In multi root, The "mode" option cannot be "classic" without using the "toolbar_container" option.');
+		if (!options.toolbar_container && !/inline|balloon/i.test(options.mode))
+			throw Error(
+				'[SUNEDITOR.create.fail] In multi root, The "mode" option cannot be "classic" without using the "toolbar_container" option.',
+			);
 	}
 
 	// migration data-.+
@@ -491,14 +579,27 @@ export function InitOptions(options, editorTargets, plugins) {
 	const [modeBase, modePart] = (options.mode || 'classic').split(':');
 	o.set('mode', modeBase); // classic, inline, balloon, balloon-always
 	o.set('_toolbar_bottom', modePart === 'bottom' && /^(classic|inline)$/i.test(modeBase));
-	o.set('blockHandle', options.blockHandle ? (typeof options.blockHandle === 'object' ? options.blockHandle : {}) : null);
+	o.set(
+		'blockHandle',
+		options.blockHandle ? (typeof options.blockHandle === 'object' ? options.blockHandle : {}) : null,
+	);
 	o.set('type', options.type?.split(':')[0] || ''); // document:header,page
 	o.set('theme', options.theme || '');
 	o.set('_themeClass', options.theme ? ` se-theme-${options.theme}` : '');
 	o.set('_type_options', options.type?.split(':')[1] || '');
 	o.set('externalLibs', options.externalLibs || {});
-	o.set('fontSizeUnits', Array.isArray(options.fontSizeUnits) && options.fontSizeUnits.length > 0 ? options.fontSizeUnits.map((v) => v.toLowerCase()) : DEFAULTS.SIZE_UNITS);
-	o.set('allowedClassName', new RegExp(`${options.allowedClassName && typeof options.allowedClassName === 'string' ? options.allowedClassName + '|' : ''}${DEFAULTS.CLASS_NAME}`));
+	o.set(
+		'fontSizeUnits',
+		Array.isArray(options.fontSizeUnits) && options.fontSizeUnits.length > 0
+			? options.fontSizeUnits.map((v) => v.toLowerCase())
+			: DEFAULTS.SIZE_UNITS,
+	);
+	o.set(
+		'allowedClassName',
+		new RegExp(
+			`${options.allowedClassName && typeof options.allowedClassName === 'string' ? options.allowedClassName + '|' : ''}${DEFAULTS.CLASS_NAME}`,
+		),
+	);
 	o.set('closeModalOutsideClick', !!options.closeModalOutsideClick);
 
 	// format
@@ -507,11 +608,16 @@ export function InitOptions(options, editorTargets, plugins) {
 
 	// auto convert on paste
 	o.set('autoLinkify', options.autoLinkify ?? !!plugins.link);
-	o.set('autoStyleify', Array.isArray(options.autoStyleify) ? options.autoStyleify : ['bold', 'underline', 'italic', 'strike']);
+	o.set(
+		'autoStyleify',
+		Array.isArray(options.autoStyleify) ? options.autoStyleify : ['bold', 'underline', 'italic', 'strike'],
+	);
 
 	let retainStyleMode = options.retainStyleMode || 'repeat';
 	if (typeof retainStyleMode === 'string' && !DEFAULTS.RETAIN_STYLE_MODE.includes(retainStyleMode)) {
-		console.error(`Invalid retainStyleMode: ${retainStyleMode}. Valid options are ${DEFAULTS.RETAIN_STYLE_MODE.join(', ')}. Using default 'repeat'.`);
+		console.error(
+			`Invalid retainStyleMode: ${retainStyleMode}. Valid options are ${DEFAULTS.RETAIN_STYLE_MODE.join(', ')}. Using default 'repeat'.`,
+		);
 		retainStyleMode = 'repeat';
 	}
 	o.set('retainStyleMode', retainStyleMode);
@@ -526,7 +632,11 @@ export function InitOptions(options, editorTargets, plugins) {
 	o.set('events', options.events || {});
 
 	// text style tags
-	o.set('textStyleTags', (typeof options.__textStyleTags === 'string' ? options.__textStyleTags : DEFAULTS.TEXT_STYLE_TAGS) + (options.textStyleTags ? '|' + options.textStyleTags : ''));
+	o.set(
+		'textStyleTags',
+		(typeof options.__textStyleTags === 'string' ? options.__textStyleTags : DEFAULTS.TEXT_STYLE_TAGS) +
+			(options.textStyleTags ? '|' + options.textStyleTags : ''),
+	);
 	const textTags = _mergeObject(
 		{
 			bold: 'strong',
@@ -542,12 +652,15 @@ export function InitOptions(options, editorTargets, plugins) {
 	o.set('_textStyleTags', Object.values(textTags).concat(['span', 'li']));
 	o.set(
 		'tagStyles',
-		[{ ...DEFAULTS.TAG_STYLES, ...(options.__tagStyles || {}) }, options.tagStyles || {}].reduce((_default, _new) => {
-			for (const key in _new) {
-				_default[key] = _new[key];
-			}
-			return _default;
-		}, {}),
+		[{ ...DEFAULTS.TAG_STYLES, ...(options.__tagStyles || {}) }, options.tagStyles || {}].reduce(
+			(_default, _new) => {
+				for (const key in _new) {
+					_default[key] = _new[key];
+				}
+				return _default;
+			},
+			{},
+		),
 	);
 	o.set('_defaultStyleTagMap', {
 		strong: textTags.bold,
@@ -593,36 +706,79 @@ export function InitOptions(options, editorTargets, plugins) {
 	o.set('reverseCommands', ['indent-outdent'].concat(options.reverseButtons || []));
 	o.set('_reverseCommandArray', ('-' + o.get('reverseCommands').join('-')).split('-'));
 	if (numbers.isEven(o.get('_reverseCommandArray').length)) {
-		console.warn('[SUNEDITOR.create.warning] The "reverseCommands" option is invalid, Shortcuts key may not work properly.');
+		console.warn(
+			'[SUNEDITOR.create.warning] The "reverseCommands" option is invalid, Shortcuts key may not work properly.',
+		);
 	}
 
 	// etc
-	o.set('historyStackDelayTime', typeof options.historyStackDelayTime === 'number' ? options.historyStackDelayTime : 400);
-	o.set('historyStackSize', typeof options.historyStackSize === 'number' && options.historyStackSize > 0 ? options.historyStackSize : 100);
-	o.set('_editableClass', 'sun-editor-editable' + o.get('_themeClass') + (o.get('_rtl') ? ' se-rtl' : '') + (o.get('type') === 'document' ? ' se-type-document-editable-a4' : ''));
-	o.set('lineAttrReset', ['id'].concat(options.lineAttrReset && typeof options.lineAttrReset === 'string' ? options.lineAttrReset.toLowerCase().split('|') : []));
-	o.set('printClass', typeof options.printClass === 'string' ? options.printClass + ' ' + o.get('_editableClass') : null);
+	o.set(
+		'historyStackDelayTime',
+		typeof options.historyStackDelayTime === 'number' ? options.historyStackDelayTime : 400,
+	);
+	o.set(
+		'historyStackSize',
+		typeof options.historyStackSize === 'number' && options.historyStackSize > 0 ? options.historyStackSize : 100,
+	);
+	o.set(
+		'_editableClass',
+		'sun-editor-editable' +
+			o.get('_themeClass') +
+			(o.get('_rtl') ? ' se-rtl' : '') +
+			(o.get('type') === 'document' ? ' se-type-document-editable-a4' : ''),
+	);
+	o.set(
+		'lineAttrReset',
+		['id'].concat(
+			options.lineAttrReset && typeof options.lineAttrReset === 'string'
+				? options.lineAttrReset.toLowerCase().split('|')
+				: [],
+		),
+	);
+	o.set(
+		'printClass',
+		typeof options.printClass === 'string' ? options.printClass + ' ' + o.get('_editableClass') : null,
+	);
 
 	/** whitelist, blacklist */
 	// default line
-	o.set('defaultLine', typeof options.defaultLine === 'string' && options.defaultLine.length > 0 ? options.defaultLine : 'p');
+	o.set(
+		'defaultLine',
+		typeof options.defaultLine === 'string' && options.defaultLine.length > 0 ? options.defaultLine : 'p',
+	);
 	o.set('defaultLineBreakFormat', options.defaultLineBreakFormat || 'line');
 	o.set('scopeSelectionTags', options.scopeSelectionTags || DEFAULTS.SCOPE_SELECTION_TAGS);
 	// element
 	const elw = (typeof options.elementWhitelist === 'string' ? options.elementWhitelist : '').toLowerCase();
 	const mjxEls = o.get('externalLibs').mathjax ? DEFAULTS.CLASS_MJX + '|' : '';
 	o.set('elementWhitelist', elw + (elw ? '|' : '') + mjxEls + o.get('_allowedExtraTag'));
-	const elb = _createBlacklist((typeof options.elementBlacklist === 'string' ? options.elementBlacklist : '').toLowerCase(), o.get('defaultLine'));
+	const elb = _createBlacklist(
+		(typeof options.elementBlacklist === 'string' ? options.elementBlacklist : '').toLowerCase(),
+		o.get('defaultLine'),
+	);
 	o.set('elementBlacklist', elb + (elb ? '|' : '') + o.get('_disallowedExtraTag'));
 	// attribute
-	o.set('attributeWhitelist', !options.attributeWhitelist || typeof options.attributeWhitelist !== 'object' ? null : options.attributeWhitelist);
-	o.set('attributeBlacklist', !options.attributeBlacklist || typeof options.attributeBlacklist !== 'object' ? null : options.attributeBlacklist);
+	o.set(
+		'attributeWhitelist',
+		!options.attributeWhitelist || typeof options.attributeWhitelist !== 'object'
+			? null
+			: options.attributeWhitelist,
+	);
+	o.set(
+		'attributeBlacklist',
+		!options.attributeBlacklist || typeof options.attributeBlacklist !== 'object'
+			? null
+			: options.attributeBlacklist,
+	);
 	// format tag
 	o.set(
 		'formatClosureBrLine',
 		_createFormatInfo(
 			options.formatClosureBrLine,
-			(options.__defaultFormatClosureBrLine = typeof options.__defaultFormatClosureBrLine === 'string' ? options.__defaultFormatClosureBrLine : DEFAULTS.FORMAT_CLOSURE_BR_LINE).toLowerCase(),
+			(options.__defaultFormatClosureBrLine =
+				typeof options.__defaultFormatClosureBrLine === 'string'
+					? options.__defaultFormatClosureBrLine
+					: DEFAULTS.FORMAT_CLOSURE_BR_LINE).toLowerCase(),
 			o.get('elementBlacklist'),
 		),
 	);
@@ -630,7 +786,10 @@ export function InitOptions(options, editorTargets, plugins) {
 		'formatBrLine',
 		_createFormatInfo(
 			(options.formatBrLine || '') + '|' + o.get('formatClosureBrLine').str,
-			(options.__defaultFormatBrLine = typeof options.__defaultFormatBrLine === 'string' ? options.__defaultFormatBrLine : DEFAULTS.FORMAT_BR_LINE).toLowerCase(),
+			(options.__defaultFormatBrLine =
+				typeof options.__defaultFormatBrLine === 'string'
+					? options.__defaultFormatBrLine
+					: DEFAULTS.FORMAT_BR_LINE).toLowerCase(),
 			o.get('elementBlacklist'),
 		),
 	);
@@ -638,21 +797,29 @@ export function InitOptions(options, editorTargets, plugins) {
 		'formatLine',
 		_createFormatInfo(
 			DEFAULTS.REQUIRED_FORMAT_LINE + '|' + (options.formatLine || '') + '|' + o.get('formatBrLine').str,
-			(options.__defaultFormatLine = typeof options.__defaultFormatLine === 'string' ? options.__defaultFormatLine : DEFAULTS.FORMAT_LINE).toLowerCase(),
+			(options.__defaultFormatLine =
+				typeof options.__defaultFormatLine === 'string'
+					? options.__defaultFormatLine
+					: DEFAULTS.FORMAT_LINE).toLowerCase(),
 			o.get('elementBlacklist'),
 		),
 	);
 
 	// Error - default line
 	if (!o.get('formatLine').reg.test(o.get('defaultLine'))) {
-		throw Error(`[SUNEDITOR.create.fail] The "defaultLine(${o.get('defaultLine')})" option must be included in the "formatLine(${o.get('formatLine').str})" option.`);
+		throw Error(
+			`[SUNEDITOR.create.fail] The "defaultLine(${o.get('defaultLine')})" option must be included in the "formatLine(${o.get('formatLine').str})" option.`,
+		);
 	}
 
 	o.set(
 		'formatClosureBlock',
 		_createFormatInfo(
 			options.formatClosureBlock,
-			(options.__defaultFormatClosureBlock = typeof options.__defaultFormatClosureBlock === 'string' ? options.__defaultFormatClosureBlock : DEFAULTS.FORMAT_CLOSURE_BLOCK).toLowerCase(),
+			(options.__defaultFormatClosureBlock =
+				typeof options.__defaultFormatClosureBlock === 'string'
+					? options.__defaultFormatClosureBlock
+					: DEFAULTS.FORMAT_CLOSURE_BLOCK).toLowerCase(),
 			o.get('elementBlacklist'),
 		),
 	);
@@ -660,23 +827,64 @@ export function InitOptions(options, editorTargets, plugins) {
 		'formatBlock',
 		_createFormatInfo(
 			(options.formatBlock || '') + '|' + o.get('formatClosureBlock').str,
-			(options.__defaultFormatBlock = typeof options.__defaultFormatBlock === 'string' ? options.__defaultFormatBlock : DEFAULTS.FORMAT_BLOCK).toLowerCase(),
+			(options.__defaultFormatBlock =
+				typeof options.__defaultFormatBlock === 'string'
+					? options.__defaultFormatBlock
+					: DEFAULTS.FORMAT_BLOCK).toLowerCase(),
 			o.get('elementBlacklist'),
 		),
 	);
 
-	o.set('allowedEmptyTags', DEFAULTS.ALLOWED_EMPTY_NODE_LIST + (options.allowedEmptyTags ? ', ' + options.allowedEmptyTags : ''));
+	o.set(
+		'allowedEmptyTags',
+		DEFAULTS.ALLOWED_EMPTY_NODE_LIST + (options.allowedEmptyTags ? ', ' + options.allowedEmptyTags : ''),
+	);
 
 	/** __defaults */
-	o.set('__defaultElementWhitelist', DEFAULTS.REQUIRED_ELEMENT_WHITELIST + '|' + (typeof options.__defaultElementWhitelist === 'string' ? options.__defaultElementWhitelist : DEFAULTS.ELEMENT_WHITELIST).toLowerCase());
-	o.set('__defaultAttributeWhitelist', (typeof options.__defaultAttributeWhitelist === 'string' ? options.__defaultAttributeWhitelist : DEFAULTS.ATTRIBUTE_WHITELIST).toLowerCase());
+	o.set(
+		'__defaultElementWhitelist',
+		DEFAULTS.REQUIRED_ELEMENT_WHITELIST +
+			'|' +
+			(typeof options.__defaultElementWhitelist === 'string'
+				? options.__defaultElementWhitelist
+				: DEFAULTS.ELEMENT_WHITELIST
+			).toLowerCase(),
+	);
+	o.set(
+		'__defaultAttributeWhitelist',
+		(typeof options.__defaultAttributeWhitelist === 'string'
+			? options.__defaultAttributeWhitelist
+			: DEFAULTS.ATTRIBUTE_WHITELIST
+		).toLowerCase(),
+	);
 	// --- create element whitelist (__defaultElementWhiteList + elementWhitelist + format[line, BrLine, Block, Closureblock, ClosureBrLine] - elementBlacklist)
 	o.set('_editorElementWhitelist', o.get('elementWhitelist') === '*' ? '*' : _createWhitelist(o));
 
 	/** Toolbar */
-	o.set('toolbar_width', options.toolbar_width ? (numbers.is(options.toolbar_width) ? options.toolbar_width + 'px' : options.toolbar_width) : 'auto');
-	o.set('toolbar_innerWidth', options.toolbar_innerWidth ? (numbers.is(options.toolbar_innerWidth) ? options.toolbar_innerWidth + 'px' : options.toolbar_innerWidth) : '');
-	o.set('toolbar_container', options.toolbar_container && !/inline/i.test(o.get('mode')) ? (typeof options.toolbar_container === 'string' ? _d.querySelector(options.toolbar_container) : options.toolbar_container) : null);
+	o.set(
+		'toolbar_width',
+		options.toolbar_width
+			? numbers.is(options.toolbar_width)
+				? options.toolbar_width + 'px'
+				: options.toolbar_width
+			: 'auto',
+	);
+	o.set(
+		'toolbar_innerWidth',
+		options.toolbar_innerWidth
+			? numbers.is(options.toolbar_innerWidth)
+				? options.toolbar_innerWidth + 'px'
+				: options.toolbar_innerWidth
+			: '',
+	);
+	o.set(
+		'toolbar_container',
+		options.toolbar_container && !/inline/i.test(o.get('mode'))
+			? typeof options.toolbar_container === 'string'
+				? _d.querySelector(options.toolbar_container)
+				: options.toolbar_container
+			: null,
+	);
 
 	const _stickyOpt = options.toolbar_sticky;
 	const _isBalloon = /balloon/i.test(o.get('mode'));
@@ -698,10 +906,15 @@ export function InitOptions(options, editorTargets, plugins) {
 	const subbar = options.subToolbar;
 	if (subbar?.buttonList?.length > 0) {
 		if (/balloon/.test(o.get('mode'))) {
-			console.warn('[SUNEDITOR.create.subToolbar.fail] When the "mode" option is "balloon-*", the "subToolbar" option is omitted.');
+			console.warn(
+				'[SUNEDITOR.create.subToolbar.fail] When the "mode" option is "balloon-*", the "subToolbar" option is omitted.',
+			);
 		} else {
 			o.set('_subMode', subbar.mode || 'balloon');
-			o.set('toolbar_sub_width', subbar.width ? (numbers.is(subbar.width) ? subbar.width + 'px' : subbar.width) : 'auto');
+			o.set(
+				'toolbar_sub_width',
+				subbar.width ? (numbers.is(subbar.width) ? subbar.width + 'px' : subbar.width) : 'auto',
+			);
 			subButtons = o.get('_rtl') ? subbar.buttonList.reverse() : subbar.buttonList;
 			o.set('buttons_sub', new Set(subButtons.toString().split(',')));
 		}
@@ -710,7 +923,10 @@ export function InitOptions(options, editorTargets, plugins) {
 	/** root options */
 	const frameMap = new Map();
 	for (let i = 0, len = editorTargets.length; i < len; i++) {
-		frameMap.set(editorTargets[i].key, InitFrameOptions(editorTargets[i].options || /** @type {SunEditor.InitFrameOptions} */ ({}), options));
+		frameMap.set(
+			editorTargets[i].key,
+			InitFrameOptions(editorTargets[i].options || /** @type {SunEditor.InitFrameOptions} */ ({}), options),
+		);
 	}
 
 	/** Key actions */
@@ -752,12 +968,24 @@ export function InitOptions(options, editorTargets, plugins) {
 	o.set('shortcuts', shortcuts);
 
 	/** View */
-	o.set('fullScreenOffset', options.fullScreenOffset === undefined ? 0 : numbers.is(options.fullScreenOffset) ? numbers.get(options.fullScreenOffset, 0) : 0);
+	o.set(
+		'fullScreenOffset',
+		options.fullScreenOffset === undefined
+			? 0
+			: numbers.is(options.fullScreenOffset)
+				? numbers.get(options.fullScreenOffset, 0)
+				: 0,
+	);
 	o.set('previewTemplate', typeof options.previewTemplate === 'string' ? options.previewTemplate : null);
 	o.set('printTemplate', typeof options.printTemplate === 'string' ? options.printTemplate : null);
 
 	/** --- Media select */
-	o.set('componentInsertBehavior', ['auto', 'select', 'line', 'none'].includes(options.componentInsertBehavior) ? options.componentInsertBehavior : 'auto');
+	o.set(
+		'componentInsertBehavior',
+		['auto', 'select', 'line', 'none'].includes(options.componentInsertBehavior)
+			? options.componentInsertBehavior
+			: 'auto',
+	);
 
 	/** --- Url input protocol */
 	o.set('defaultUrlProtocol', typeof options.defaultUrlProtocol === 'string' ? options.defaultUrlProtocol : null);
@@ -770,13 +998,18 @@ export function InitOptions(options, editorTargets, plugins) {
 		if (cm.src) {
 			o.set('codeMirrorEditor', true);
 		} else {
-			console.warn('[SUNEDITOR.options.externalLibs.codeMirror.fail] The codeMirror option is set incorrectly. See: https://github.com/ARA-developer/suneditor/blob/develop/guide/external-libraries.md');
+			console.warn(
+				'[SUNEDITOR.options.externalLibs.codeMirror.fail] The codeMirror option is set incorrectly. See: https://github.com/ARA-developer/suneditor/blob/develop/guide/external-libraries.md',
+			);
 			o.set('codeMirror', null);
 		}
 	}
 
 	/** Private options */
-	o.set('__listCommonStyle', options.__listCommonStyle || ['fontSize', 'color', 'fontFamily', 'fontWeight', 'fontStyle']);
+	o.set(
+		'__listCommonStyle',
+		options.__listCommonStyle || ['fontSize', 'color', 'fontFamily', 'fontWeight', 'fontStyle'],
+	);
 
 	/** --- Icons ------------------------------------------------------------------------------------------ */
 	const icons =
@@ -802,7 +1035,8 @@ export function InitOptions(options, editorTargets, plugins) {
 	for (let i = 0, len = _ls.length; i < len; i++) {
 		allUsedStyles.add(_ls[i]);
 	}
-	const _aus = (typeof options.allUsedStyles === 'string' ? options.allUsedStyles.split('|') : options.allUsedStyles) || [];
+	const _aus =
+		(typeof options.allUsedStyles === 'string' ? options.allUsedStyles.split('|') : options.allUsedStyles) || [];
 	for (let i = 0, len = _aus.length; i < len; i++) {
 		allUsedStyles.add(_aus[i]);
 	}
@@ -816,7 +1050,10 @@ export function InitOptions(options, editorTargets, plugins) {
 		v: (options.value = typeof options.value === 'string' ? options.value : null),
 		buttons: o.get('_rtl') ? buttonList.reverse() : buttonList,
 		subButtons: subButtons,
-		statusbarContainer: typeof options.statusbar_container === 'string' ? _d.querySelector(options.statusbar_container) : options.statusbar_container,
+		statusbarContainer:
+			typeof options.statusbar_container === 'string'
+				? _d.querySelector(options.statusbar_container)
+				: options.statusbar_container,
 		frameMap: frameMap,
 	};
 }
@@ -838,20 +1075,28 @@ export function CreateStatusbar(targetOptions, statusbar) {
 		statusbar ||= dom.utils.createElement('DIV', { class: 'se-status-bar sun-editor-common' });
 
 		/** navigation */
-		navigation = statusbar.querySelector('.se-navigation') || dom.utils.createElement('DIV', { class: 'se-navigation sun-editor-common' });
+		navigation =
+			statusbar.querySelector('.se-navigation') ||
+			dom.utils.createElement('DIV', { class: 'se-navigation sun-editor-common' });
 		statusbar.appendChild(navigation);
 
 		/** word counter (left) */
 		if (targetOptions.get('wordCounter')) {
-			wordWrapper = statusbar.querySelector('.se-word-counter-wrapper') || dom.utils.createElement('DIV', { class: 'se-word-counter-wrapper' });
+			wordWrapper =
+				statusbar.querySelector('.se-word-counter-wrapper') ||
+				dom.utils.createElement('DIV', { class: 'se-word-counter-wrapper' });
 
 			if (targetOptions.get('wordCounter_label')) {
-				const wordLabel = wordWrapper.querySelector('.se-word-label') || dom.utils.createElement('SPAN', { class: 'se-word-label' });
+				const wordLabel =
+					wordWrapper.querySelector('.se-word-label') ||
+					dom.utils.createElement('SPAN', { class: 'se-word-label' });
 				wordLabel.textContent = targetOptions.get('wordCounter_label');
 				wordWrapper.appendChild(wordLabel);
 			}
 
-			wordCounter = wordWrapper.querySelector('.se-word-counter') || dom.utils.createElement('SPAN', { class: 'se-word-counter' });
+			wordCounter =
+				wordWrapper.querySelector('.se-word-counter') ||
+				dom.utils.createElement('SPAN', { class: 'se-word-counter' });
 			wordCounter.textContent = '0';
 			wordWrapper.appendChild(wordCounter);
 
@@ -860,24 +1105,32 @@ export function CreateStatusbar(targetOptions, statusbar) {
 
 		/** char counter (right) */
 		if (targetOptions.get('charCounter')) {
-			charWrapper = statusbar.querySelector('.se-char-counter-wrapper') || dom.utils.createElement('DIV', { class: 'se-char-counter-wrapper' });
+			charWrapper =
+				statusbar.querySelector('.se-char-counter-wrapper') ||
+				dom.utils.createElement('DIV', { class: 'se-char-counter-wrapper' });
 
 			if (targetOptions.get('wordCounter') && charWrapper.className.indexOf('se-with-word-counter') === -1) {
 				charWrapper.className += ' se-with-word-counter';
 			}
 
 			if (targetOptions.get('charCounter_label')) {
-				const charLabel = charWrapper.querySelector('.se-char-label') || dom.utils.createElement('SPAN', { class: 'se-char-label' });
+				const charLabel =
+					charWrapper.querySelector('.se-char-label') ||
+					dom.utils.createElement('SPAN', { class: 'se-char-label' });
 				charLabel.textContent = targetOptions.get('charCounter_label');
 				charWrapper.appendChild(charLabel);
 			}
 
-			charCounter = charWrapper.querySelector('.se-char-counter') || dom.utils.createElement('SPAN', { class: 'se-char-counter' });
+			charCounter =
+				charWrapper.querySelector('.se-char-counter') ||
+				dom.utils.createElement('SPAN', { class: 'se-char-counter' });
 			charCounter.textContent = '0';
 			charWrapper.appendChild(charCounter);
 
 			if (targetOptions.get('charCounter_max') > 0) {
-				const char_max = charWrapper.querySelector('.se-char-max') || dom.utils.createElement('SPAN', { class: 'se-char-max' });
+				const char_max =
+					charWrapper.querySelector('.se-char-max') ||
+					dom.utils.createElement('SPAN', { class: 'se-char-max' });
 				char_max.textContent = ' / ' + targetOptions.get('charCounter_max');
 				charWrapper.appendChild(char_max);
 			}
@@ -911,7 +1164,8 @@ function InitFrameOptions(o, origin) {
 	// members
 	const value = o.value === undefined ? origin.value : o.value;
 	const placeholder = o.placeholder === undefined ? origin.placeholder : o.placeholder;
-	const editableFrameAttributes = o.editableFrameAttributes === undefined ? origin.editableFrameAttributes : o.editableFrameAttributes;
+	const editableFrameAttributes =
+		o.editableFrameAttributes === undefined ? origin.editableFrameAttributes : o.editableFrameAttributes;
 	const width = o.width === undefined ? origin.width : o.width;
 	const minWidth = o.minWidth === undefined ? origin.minWidth : o.minWidth;
 	const maxWidth = o.maxWidth === undefined ? origin.maxWidth : o.maxWidth;
@@ -925,14 +1179,25 @@ function InitFrameOptions(o, origin) {
 	const iframe_attributes = o.iframe_attributes === undefined ? origin.iframe_attributes : o.iframe_attributes;
 	const iframe_cssFileName = o.iframe_cssFileName === undefined ? origin.iframe_cssFileName : o.iframe_cssFileName;
 	const statusbar = barContainer || o.statusbar === undefined ? origin.statusbar : o.statusbar;
-	const statusbar_showPathLabel = barContainer || o.statusbar_showPathLabel === undefined ? origin.statusbar_showPathLabel : o.statusbar_showPathLabel;
-	const statusbar_resizeEnable = barContainer ? false : o.statusbar_resizeEnable === undefined ? origin.statusbar_resizeEnable : o.statusbar_resizeEnable;
+	const statusbar_showPathLabel =
+		barContainer || o.statusbar_showPathLabel === undefined
+			? origin.statusbar_showPathLabel
+			: o.statusbar_showPathLabel;
+	const statusbar_resizeEnable = barContainer
+		? false
+		: o.statusbar_resizeEnable === undefined
+			? origin.statusbar_resizeEnable
+			: o.statusbar_resizeEnable;
 	const charCounter = barContainer || o.charCounter === undefined ? origin.charCounter : o.charCounter;
-	const charCounter_max = barContainer || o.charCounter_max === undefined ? origin.charCounter_max : o.charCounter_max;
-	const charCounter_label = barContainer || o.charCounter_label === undefined ? origin.charCounter_label : o.charCounter_label;
-	const charCounter_type = barContainer || o.charCounter_type === undefined ? origin.charCounter_type : o.charCounter_type;
+	const charCounter_max =
+		barContainer || o.charCounter_max === undefined ? origin.charCounter_max : o.charCounter_max;
+	const charCounter_label =
+		barContainer || o.charCounter_label === undefined ? origin.charCounter_label : o.charCounter_label;
+	const charCounter_type =
+		barContainer || o.charCounter_type === undefined ? origin.charCounter_type : o.charCounter_type;
 	const wordCounter = barContainer || o.wordCounter === undefined ? origin.wordCounter : o.wordCounter;
-	const wordCounter_label = barContainer || o.wordCounter_label === undefined ? origin.wordCounter_label : o.wordCounter_label;
+	const wordCounter_label =
+		barContainer || o.wordCounter_label === undefined ? origin.wordCounter_label : o.wordCounter_label;
 
 	// value
 	fo.set('value', value);
@@ -952,12 +1217,23 @@ function InitFrameOptions(o, origin) {
 	fo.set('iframe', !!(iframe_fullPage || iframe));
 	fo.set('iframe_fullPage', !!iframe_fullPage);
 	fo.set('iframe_attributes', iframe_attributes || {});
-	fo.set('iframe_cssFileName', iframe ? (typeof iframe_cssFileName === 'string' ? [iframe_cssFileName] : iframe_cssFileName) || ['suneditor'] : null);
+	fo.set(
+		'iframe_cssFileName',
+		iframe
+			? (typeof iframe_cssFileName === 'string' ? [iframe_cssFileName] : iframe_cssFileName) || ['suneditor']
+			: null,
+	);
 	// status bar
 	const hasStatusbar = statusbar === undefined ? true : !!statusbar;
 	fo.set('statusbar', hasStatusbar);
-	fo.set('statusbar_showPathLabel', !hasStatusbar ? false : typeof statusbar_showPathLabel === 'boolean' ? statusbar_showPathLabel : true);
-	fo.set('statusbar_resizeEnable', !hasStatusbar ? false : statusbar_resizeEnable === undefined ? true : !!statusbar_resizeEnable);
+	fo.set(
+		'statusbar_showPathLabel',
+		!hasStatusbar ? false : typeof statusbar_showPathLabel === 'boolean' ? statusbar_showPathLabel : true,
+	);
+	fo.set(
+		'statusbar_resizeEnable',
+		!hasStatusbar ? false : statusbar_resizeEnable === undefined ? true : !!statusbar_resizeEnable,
+	);
 	// status bar - character count
 	fo.set('charCounter', charCounter_max > 0 ? true : typeof charCounter === 'boolean' ? charCounter : false);
 	fo.set('charCounter_max', numbers.is(charCounter_max) && charCounter_max > -1 ? charCounter_max * 1 : null);
@@ -987,7 +1263,9 @@ function _initTargetElements(key, options, topDiv, targetOptions, formFieldPrefi
 	/** editor */
 	// wysiwyg div or iframe
 	const wysiwygDiv = dom.utils.createElement(!targetOptions.get('iframe') ? 'DIV' : 'IFRAME', {
-		class: 'se-wrapper-inner se-wrapper-wysiwyg' + (options.get('type') === 'document' ? ' se-type-document-iframe-a4' : ''),
+		class:
+			'se-wrapper-inner se-wrapper-wysiwyg' +
+			(options.get('type') === 'document' ? ' se-type-document-iframe-a4' : ''),
 		'data-root-key': key,
 	});
 
@@ -1033,10 +1311,20 @@ function _initTargetElements(key, options, topDiv, targetOptions, formFieldPrefi
 	}
 
 	// textarea for code view
-	const textarea = dom.utils.createElement('TEXTAREA', { id: formFieldPrefix + '-code-viewer-' + (key || 'default'), class: 'se-wrapper-inner se-code-viewer', style: editorStyles.frame, autocomplete: 'off' });
+	const textarea = dom.utils.createElement('TEXTAREA', {
+		id: formFieldPrefix + '-code-viewer-' + (key || 'default'),
+		class: 'se-wrapper-inner se-code-viewer',
+		style: editorStyles.frame,
+		autocomplete: 'off',
+	});
 
 	// textarea for markdown view
-	const markdownTextarea = dom.utils.createElement('TEXTAREA', { id: formFieldPrefix + '-markdown-viewer-' + (key || 'default'), class: 'se-wrapper-inner se-markdown-viewer', style: editorStyles.frame, autocomplete: 'off' });
+	const markdownTextarea = dom.utils.createElement('TEXTAREA', {
+		id: formFieldPrefix + '-markdown-viewer-' + (key || 'default'),
+		class: 'se-wrapper-inner se-markdown-viewer',
+		style: editorStyles.frame,
+		autocomplete: 'off',
+	});
 
 	const placeholder = dom.utils.createElement('SPAN', { class: 'se-placeholder' });
 	if (targetOptions.get('placeholder')) {
@@ -1116,7 +1404,9 @@ function _createBlacklist(blacklist, defaultLine) {
 			if (v !== defaultLine) {
 				return true;
 			} else {
-				console.warn(`[SUNEDITOR.constructor.createBlacklist.warn] defaultLine("<${defaultLine}>") cannot be included in the blacklist and will be removed.`);
+				console.warn(
+					`[SUNEDITOR.constructor.createBlacklist.warn] defaultLine("<${defaultLine}>") cannot be included in the blacklist and will be removed.`,
+				);
 				return false;
 			}
 		})
@@ -1150,7 +1440,19 @@ function _createFormatInfo(value, defaultValue, blacklist) {
  */
 function _createWhitelist(o) {
 	const blacklist = o.get('elementBlacklist').split('|');
-	const whitelist = (o.get('__defaultElementWhitelist') + '|' + o.get('elementWhitelist') + '|' + o.get('formatLine').str + '|' + o.get('formatBrLine').str + '|' + o.get('formatClosureBlock').str + '|' + o.get('formatClosureBrLine').str)
+	const whitelist = (
+		o.get('__defaultElementWhitelist') +
+		'|' +
+		o.get('elementWhitelist') +
+		'|' +
+		o.get('formatLine').str +
+		'|' +
+		o.get('formatBrLine').str +
+		'|' +
+		o.get('formatClosureBlock').str +
+		'|' +
+		o.get('formatClosureBrLine').str
+	)
 		.replace(/(^\||\|$)/g, '')
 		.split('|')
 		.filter((v, i, a) => v && a.indexOf(v) === i && !blacklist.includes(v));
@@ -1230,7 +1532,13 @@ function _defaultButtons(isRTL, icons, lang) {
 		fullScreen: ['se-code-view-enabled se-component-enabled', lang.fullScreen, 'fullScreen', '', icons.expansion],
 		showBlocks: ['', lang.showBlocks, 'showBlocks', '', icons.show_blocks],
 		codeView: ['se-code-view-enabled se-component-enabled', lang.codeView, 'codeView', '', icons.code_view],
-		markdownView: ['se-code-view-enabled se-component-enabled', lang.markdownView, 'markdownView', '', icons.markdown_view],
+		markdownView: [
+			'se-code-view-enabled se-component-enabled',
+			lang.markdownView,
+			'markdownView',
+			'',
+			icons.markdown_view,
+		],
 		undo: ['se-component-enabled', lang.undo, 'undo', '', icons.undo],
 		redo: ['se-component-enabled', lang.redo, 'redo', '', icons.redo],
 		preview: ['se-component-enabled', lang.preview, 'preview', '', icons.preview],
@@ -1338,7 +1646,10 @@ export function UpdateButton(element, plugin, icons, lang) {
 	} else {
 		element.innerHTML = noneInner
 			? ''
-			: (plugin.inner || icons[plugin.icon] || plugin.icon || '<span class="se-icon-text">!</span>') + '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + (lang[plugin.title] || plugin.title) + '</span></span>';
+			: (plugin.inner || icons[plugin.icon] || plugin.icon || '<span class="se-icon-text">!</span>') +
+				'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
+				(lang[plugin.title] || plugin.title) +
+				'</span></span>';
 	}
 
 	element.setAttribute('aria-label', plugin.title);
@@ -1440,7 +1751,14 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang, isUpdat
 					modules = [plugin.className, plugin.title, button, plugin.type, plugin.innerHTML, plugin._disabled];
 				} else if (typeof plugin === 'object') {
 					const originFnc = plugin.constructor;
-					modules = [plugin.className || originFnc.className, plugin.title || originFnc.title, button, plugin.type || originFnc.type, plugin.innerHTML || originFnc.innerHTML, plugin._disabled || originFnc._disabled];
+					modules = [
+						plugin.className || originFnc.className,
+						plugin.title || originFnc.title,
+						button,
+						plugin.type || originFnc.type,
+						plugin.innerHTML || originFnc.innerHTML,
+						plugin._disabled || originFnc._disabled,
+					];
 				} else {
 					// align
 					if (/^-/.test(button)) {
@@ -1463,26 +1781,52 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang, isUpdat
 						moreCommand = '__se__more_' + i;
 						const title = matched[1].trim();
 						const innerHTML = matched[2].trim();
-						modules = ['se-btn-more', /^lang\./i.test(title) ? lang[title.replace(/^lang\./i, '')] : title, moreCommand, 'MORE', innerHTML];
+						modules = [
+							'se-btn-more',
+							/^lang\./i.test(title) ? lang[title.replace(/^lang\./i, '')] : title,
+							moreCommand,
+							'MORE',
+							innerHTML,
+						];
 					} else if (button === '|') {
 						// separator vertical
 						modules = ['se-toolbar-separator-vertical', '', '', 'separator', ''];
 					} else {
 						// default command
 						if (button === 'copy' && !env.isClipboardSupported) {
-							console.warn('[SUNEDITOR.constructor.warn] Clipboard is not supported in this browser. : [copy] button is not rendered.');
+							console.warn(
+								'[SUNEDITOR.constructor.warn] Clipboard is not supported in this browser. : [copy] button is not rendered.',
+							);
 						}
 						modules = defaultButtonList[button];
 					}
 
 					if (!modules) {
-						if (!plugin) throw Error(`[SUNEDITOR.create.toolbar.fail] The button name of a plugin that does not exist. [${button}]`);
+						if (!plugin)
+							throw Error(
+								`[SUNEDITOR.create.toolbar.fail] The button name of a plugin that does not exist. [${button}]`,
+							);
 						plugin = typeof plugin === 'object' ? plugin.constructor : plugin;
-						modules = [plugin.className, plugin.title, plugin.key, plugin.type, plugin.innerHTML, plugin._disabled];
+						modules = [
+							plugin.className,
+							plugin.title,
+							plugin.key,
+							plugin.type,
+							plugin.innerHTML,
+							plugin._disabled,
+						];
 					}
 				}
 
-				buttonElement = _createButton(modules[0], modules[1], modules[2], modules[3], modules[4], modules[5], icons);
+				buttonElement = _createButton(
+					modules[0],
+					modules[1],
+					modules[2],
+					modules[3],
+					modules[4],
+					modules[5],
+					icons,
+				);
 				(more ? moreContainer : moduleElement.ul).appendChild(buttonElement.li);
 
 				if (plugin) {
@@ -1503,7 +1847,10 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang, isUpdat
 					moreContainer = dom.utils.createElement('DIV');
 					moreContainer.className = 'se-more-layer ' + moreCommand;
 					moreContainer.setAttribute('data-ref', moreCommand);
-					moreContainer.innerHTML = '<div class="se-more-form"><ul class="se-menu-list"' + (align ? ' style="float: ' + align + ';"' : '') + '></ul></div>';
+					moreContainer.innerHTML =
+						'<div class="se-more-form"><ul class="se-menu-list"' +
+						(align ? ' style="float: ' + align + ';"' : '') +
+						'></ul></div>';
 					moreLayer.appendChild(moreContainer);
 					moreContainer = moreContainer.firstElementChild.firstElementChild;
 				}
@@ -1544,7 +1891,11 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang, isUpdat
 	_applyToolbarInnerWidth(buttonTray, options.get('toolbar_innerWidth'));
 
 	// rendering toolbar
-	const tool_bar = dom.utils.createElement('DIV', { class: 'se-toolbar sun-editor-common' + (!options.get('shortcutsHint') ? ' se-shortcut-hide' : '') }, buttonTray);
+	const tool_bar = dom.utils.createElement(
+		'DIV',
+		{ class: 'se-toolbar sun-editor-common' + (!options.get('shortcutsHint') ? ' se-shortcut-hide' : '') },
+		buttonTray,
+	);
 
 	if (options.get('toolbar_hide')) tool_bar.style.display = 'none';
 

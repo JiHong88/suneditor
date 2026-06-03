@@ -536,7 +536,8 @@ class BlockHandle {
 	 * @param {MouseEvent} e
 	 */
 	#onHandleMouseDown(e) {
-		const onDragBtn = this.#dragBtn && (e.target === this.#dragBtn || this.#dragBtn.contains(/** @type {Node} */ (e.target)));
+		const onDragBtn =
+			this.#dragBtn && (e.target === this.#dragBtn || this.#dragBtn.contains(/** @type {Node} */ (e.target)));
 		if (env.isMobile) {
 			this.#$.store.set('_preventBlur', true);
 			return;
@@ -824,7 +825,11 @@ class BlockHandle {
 		for (let i = 0; i < items.length; i++) {
 			const it = items[i];
 			if (it && /dropdown-free/.test(it.type)) {
-				freeMap.set(i, { pluginName: it.pluginName, plugin: this.#$.plugins[it.pluginName], li: menu.menus[i] });
+				freeMap.set(i, {
+					pluginName: it.pluginName,
+					plugin: this.#$.plugins[it.pluginName],
+					li: menu.menus[i],
+				});
 			}
 		}
 		if (freeMap.size === 0) return;

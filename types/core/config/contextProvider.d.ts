@@ -76,7 +76,13 @@ export default class ContextProvider {
 	 * @description Execute a function by traversing all root targets.
 	 * @param {(frameContext: SunEditor.FrameContext, rootKey: string|null, frameRoots: Map<string|null, SunEditor.FrameContext>) => void} f Callback function
 	 */
-	applyToRoots(f: (frameContext: SunEditor.FrameContext, rootKey: string | null, frameRoots: Map<string | null, SunEditor.FrameContext>) => void): void;
+	applyToRoots(
+		f: (
+			frameContext: SunEditor.FrameContext,
+			rootKey: string | null,
+			frameRoots: Map<string | null, SunEditor.FrameContext>,
+		) => void,
+	): void;
 	_destroy(): void;
 	#private;
 }

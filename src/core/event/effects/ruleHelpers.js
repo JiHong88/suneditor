@@ -35,8 +35,14 @@ function hardDelete(ports) {
 	const eCell = ports.format.getBlock(ec);
 	const sIsCell = dom.check.isTableCell(sCell);
 	const eIsCell = dom.check.isTableCell(eCell);
-	if (((sIsCell && !sCell.previousElementSibling && !sCell.parentElement.previousElementSibling) || (eIsCell && !eCell.nextElementSibling && !eCell.parentElement.nextElementSibling)) && sCell !== eCell) {
-		const ancestor = dom.query.getParentElement(range.commonAncestorContainer, dom.check.isFigure)?.parentElement || range.commonAncestorContainer;
+	if (
+		((sIsCell && !sCell.previousElementSibling && !sCell.parentElement.previousElementSibling) ||
+			(eIsCell && !eCell.nextElementSibling && !eCell.parentElement.nextElementSibling)) &&
+		sCell !== eCell
+	) {
+		const ancestor =
+			dom.query.getParentElement(range.commonAncestorContainer, dom.check.isFigure)?.parentElement ||
+			range.commonAncestorContainer;
 		if (!sIsCell) {
 			dom.utils.removeItem(dom.query.getParentElement(eCell, (current) => ancestor === current.parentNode));
 		} else if (!eIsCell) {
@@ -104,11 +110,18 @@ function isUneditableNode(ports, range, isFront) {
 
 	let siblingNode;
 	if (isElement) {
-		siblingNode = /** @type {HTMLElement} */ (_isUneditableNode_getSibling(ports, container.childNodes[offset], siblingKey, container));
+		siblingNode = /** @type {HTMLElement} */ (
+			_isUneditableNode_getSibling(ports, container.childNodes[offset], siblingKey, container)
+		);
 		return dom.check.isComponentContainer(siblingNode) || dom.check.isNonEditable(siblingNode) ? siblingNode : null;
 	} else {
-		siblingNode = /** @type {HTMLElement} */ (_isUneditableNode_getSibling(ports, container, siblingKey, container));
-		return dom.check.isEdgePoint(container, offset, isFront ? 'front' : 'end') && (dom.check.isComponentContainer(siblingNode) || dom.check.isNonEditable(siblingNode)) ? siblingNode : null;
+		siblingNode = /** @type {HTMLElement} */ (
+			_isUneditableNode_getSibling(ports, container, siblingKey, container)
+		);
+		return dom.check.isEdgePoint(container, offset, isFront ? 'front' : 'end') &&
+			(dom.check.isComponentContainer(siblingNode) || dom.check.isNonEditable(siblingNode))
+			? siblingNode
+			: null;
 	}
 }
 
@@ -128,7 +141,8 @@ function _isUneditableNode_getSibling(ports, selectNode, siblingKey, container) 
 	if (!siblingNode) {
 		siblingNode = ports.format.getLine(container);
 		siblingNode = siblingNode ? siblingNode[siblingKey] : null;
-		if (siblingNode && !ports.component.is(siblingNode)) siblingNode = siblingKey === 'previousSibling' ? siblingNode.firstChild : siblingNode.lastChild;
+		if (siblingNode && !ports.component.is(siblingNode))
+			siblingNode = siblingKey === 'previousSibling' ? siblingNode.firstChild : siblingNode.lastChild;
 		else return null;
 	}
 

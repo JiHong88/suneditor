@@ -108,7 +108,12 @@ export async function OnClick_wysiwyg(fc, e) {
 	if (e.detail === 3) {
 		const range = this.$.selection.getRange();
 		if (this.$.format.isLine(range.endContainer) && range.endOffset === 0) {
-			this.$.selection.setRange(range.startContainer, range.startOffset, range.startContainer, range.startContainer.textContent.length);
+			this.$.selection.setRange(
+				range.startContainer,
+				range.startOffset,
+				range.startContainer,
+				range.startContainer.textContent.length,
+			);
 		}
 	}
 
@@ -128,7 +133,8 @@ export async function OnClick_wysiwyg(fc, e) {
 				!dom.check.isWysiwygFrame(selectionNode) &&
 				!this.$.component.is(selectionNode) &&
 				(!dom.check.isTableElements(selectionNode) || dom.check.isTableCell(selectionNode)) &&
-				this._setDefaultLine(this.$.format.isBlock(rangeEl) ? 'DIV' : this.$.options.get('defaultLine')) !== null
+				this._setDefaultLine(this.$.format.isBlock(rangeEl) ? 'DIV' : this.$.options.get('defaultLine')) !==
+					null
 			) {
 				e.preventDefault();
 				this.$.focusManager.focus();
@@ -140,7 +146,8 @@ export async function OnClick_wysiwyg(fc, e) {
 	this.$.commandDispatcher._copyFormat();
 
 	// Defer balloon toggle — selection range is finalized after mouseup event returns
-	if (this.$.store.mode.isBalloon || this.$.store.mode.isSubBalloon) _w.setTimeout(this._toggleToolbarBalloon.bind(this), 0);
+	if (this.$.store.mode.isBalloon || this.$.store.mode.isSubBalloon)
+		_w.setTimeout(this._toggleToolbarBalloon.bind(this), 0);
 }
 
 /**

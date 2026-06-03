@@ -83,7 +83,10 @@ class Selection_ {
 	getRange() {
 		const range = this.#store.get('_range') || this.#createDefaultRange();
 		const selection = this.get();
-		if (range.collapsed === selection.isCollapsed || !this.#frameContext.get('wysiwyg').contains(selection.focusNode)) {
+		if (
+			range.collapsed === selection.isCollapsed ||
+			!this.#frameContext.get('wysiwyg').contains(selection.focusNode)
+		) {
 			if (this.#$.component.is(range.startContainer)) {
 				const compInfo = this.#$.component.get(range.startContainer);
 				const container = compInfo?.container;
@@ -104,7 +107,9 @@ class Selection_ {
 				so = selection.anchorOffset,
 				eo = selection.focusOffset;
 			const compareValue = dom.query.compareElements(sc, ec);
-			const rightDir = compareValue.ancestor && (compareValue.result === 0 ? so <= eo : compareValue.result > 1 ? true : false);
+			const rightDir =
+				compareValue.ancestor &&
+				(compareValue.result === 0 ? so <= eo : compareValue.result > 1 ? true : false);
 			return this.setRange(rightDir ? sc : ec, rightDir ? so : eo, rightDir ? ec : sc, rightDir ? eo : so);
 		}
 	}
@@ -157,18 +162,35 @@ class Selection_ {
 		if ((dom.check.isBreak(ec) || ec.nodeType === 3) && eo > ec.textContent.length) eo = ec.textContent.length;
 		if (this.#$.format.isLine(sc)) {
 			sc = sc.childNodes[so > 0 ? sc.childNodes.length - 1 : 0] || sc;
-			so = so > 0 ? (sc.nodeType === 1 && !dom.check.isBreak(sc) ? 1 : sc.textContent ? sc.textContent.length : 0) : 0;
+			so =
+				so > 0
+					? sc.nodeType === 1 && !dom.check.isBreak(sc)
+						? 1
+						: sc.textContent
+							? sc.textContent.length
+							: 0
+					: 0;
 		}
 		if (this.#$.format.isLine(ec)) {
 			ec = ec.childNodes[eo > 0 ? ec.childNodes.length - 1 : 0] || ec;
-			eo = eo > 0 ? (ec.nodeType === 1 && !dom.check.isBreak(ec) ? 1 : ec.textContent ? ec.textContent.length : 0) : 0;
+			eo =
+				eo > 0
+					? ec.nodeType === 1 && !dom.check.isBreak(ec)
+						? 1
+						: ec.textContent
+							? ec.textContent.length
+							: 0
+					: 0;
 		}
 
 		const range = this.#frameContext.get('_wd').createRange();
 
 		try {
 			so = Math.min(so, sc.textContent?.length || 0);
-			eo = eo > 0 && (ec.textContent?.length || 0) === 0 && ec.nodeType === 1 ? 1 : Math.min(Math.max(eo, 0), ec.textContent?.length || 0);
+			eo =
+				eo > 0 && (ec.textContent?.length || 0) === 0 && ec.nodeType === 1
+					? 1
+					: Math.min(Math.max(eo, 0), ec.textContent?.length || 0);
 			range.setStart(sc, so);
 			range.setEnd(ec, eo);
 			this.#store.set('hasFocus', true);
@@ -242,7 +264,14 @@ class Selection_ {
 		if (this.#isNone(range)) {
 			const parent = container?.parentElement || this.#frameContext.get('wysiwyg');
 			const op = dom.utils.createElement(this.#options.get('defaultLine'), null, '<br>');
-			parent.insertBefore(op, container && container !== parent ? (!(/** @type {HTMLElement} */ (container).previousElementSibling) ? container : /** @type {HTMLElement} */ (container).nextElementSibling) : parent.firstElementChild);
+			parent.insertBefore(
+				op,
+				container && container !== parent
+					? !(/** @type {HTMLElement} */ (container).previousElementSibling)
+						? container
+						: /** @type {HTMLElement} */ (container).nextElementSibling
+					: parent.firstElementChild,
+			);
 			this.setRange(op.firstElementChild, 0, op.firstElementChild, 1);
 			range = this.#store.get('_range');
 		}
@@ -259,7 +288,13 @@ class Selection_ {
 	getNode() {
 		if (!this.#frameContext.get('wysiwyg').contains(this.selectionNode)) this.init();
 		if (!this.selectionNode) {
-			const selectionNode = /** @type {HTMLElement|Text} */ (dom.query.getEdgeChild(this.#frameContext.get('wysiwyg').firstChild, (current) => current.childNodes.length === 0 || current.nodeType === 3, false));
+			const selectionNode = /** @type {HTMLElement|Text} */ (
+				dom.query.getEdgeChild(
+					this.#frameContext.get('wysiwyg').firstChild,
+					(current) => current.childNodes.length === 0 || current.nodeType === 3,
+					false,
+				)
+			);
 			if (!selectionNode) {
 				this.init();
 			} else {
@@ -290,8 +325,12 @@ class Selection_ {
 	 * tooltip.style.top = rects.top + 'px';
 	 */
 	getRects(target, position) {
-		const targetAbs = dom.check.isElement(/** @type {Node} */ (target)) ? _w.getComputedStyle(target).position === 'absolute' : false;
-		target = /** @type {Range} */ (!target || dom.check.isText(/** @type {Node} */ (target)) ? this.getRange() : target);
+		const targetAbs = dom.check.isElement(/** @type {Node} */ (target))
+			? _w.getComputedStyle(target).position === 'absolute'
+			: false;
+		target = /** @type {Range} */ (
+			!target || dom.check.isText(/** @type {Node} */ (target)) ? this.getRange() : target
+		);
 		let isStartPosition = position === 'start';
 		let scrollLeft = _w.scrollX;
 		let scrollTop = _w.scrollY;
@@ -326,7 +365,9 @@ class Selection_ {
 			isStartPosition = true;
 		}
 
-		const iframeRects = /^iframe$/i.test(this.#frameContext.get('wysiwygFrame').nodeName) ? this.#frameContext.get('wysiwygFrame').getClientRects()[0] : null;
+		const iframeRects = /^iframe$/i.test(this.#frameContext.get('wysiwygFrame').nodeName)
+			? this.#frameContext.get('wysiwygFrame').getClientRects()[0]
+			: null;
 		if (!targetAbs && iframeRects) {
 			rects = {
 				left: rects.left + iframeRects.left,
@@ -407,7 +448,10 @@ class Selection_ {
 				ref = this.setRange(ref, 1, ref, 1);
 			}
 		} else if (typeof ref?.startContainer === 'undefined') {
-			console.warn('[SUNEDITOR.html.scrollTo.warn] "selectionRange" must be Selection or Range or Node object.', ref);
+			console.warn(
+				'[SUNEDITOR.html.scrollTo.warn] "selectionRange" must be Selection or Range or Node object.',
+				ref,
+			);
 		}
 
 		const el = dom.query.getParentElement(ref?.startContainer, (current) => current.nodeType === 1);
@@ -425,7 +469,9 @@ class Selection_ {
 		const isBottom = this.#store.mode.isBottom;
 		const realToolbarHeight = this.#context.get('toolbar_main').offsetHeight;
 		const toolbarHeight = this.#$.toolbar.isSticky ? realToolbarHeight : 0;
-		const positionToolbarHeight = this.#$.toolbar.isSticky ? toolbarHeight + this.#options.get('_toolbar_sticky') : toolbarHeight;
+		const positionToolbarHeight = this.#$.toolbar.isSticky
+			? toolbarHeight + this.#options.get('_toolbar_sticky')
+			: toolbarHeight;
 		const statusbarHeight = this.#frameContext.get('statusbar')?.offsetHeight || 0;
 
 		if (this.#hasScrollParents) {
@@ -455,7 +501,9 @@ class Selection_ {
 		// --- When there is no upper scroll and it is an iframe ---
 		const PADDING = this.#scrollMargin;
 		// Reduce effective viewport height by toolbar+offset when bottom toolbar is sticky
-		const viewHeight = isAutoHeight ? viewportHeight - (isBottom ? positionToolbarHeight : 0) : wwFrame.offsetHeight;
+		const viewHeight = isAutoHeight
+			? viewportHeight - (isBottom ? positionToolbarHeight : 0)
+			: wwFrame.offsetHeight;
 
 		// Use range rect for accurate height — el.offsetHeight includes nested children (e.g. nested lists)
 		const refRect = ref?.getBoundingClientRect?.();
@@ -481,7 +529,10 @@ class Selection_ {
 
 				if (scrollMargin - PADDING > 0 && viewHeight > scrollMargin + PADDING + topToolbarH) return;
 
-				const newScrollTop = scrollMargin <= PADDING ? scrollY - scrollMargin + PADDING + statusbarHeight : scrollY - scrollMargin + (viewHeight - elH - PADDING);
+				const newScrollTop =
+					scrollMargin <= PADDING
+						? scrollY - scrollMargin + PADDING + statusbarHeight
+						: scrollY - scrollMargin + (viewHeight - elH - PADDING);
 				_w.scrollTo({
 					top: newScrollTop < scrollY ? newScrollTop - topToolbarH : newScrollTop,
 					behavior,
@@ -494,7 +545,13 @@ class Selection_ {
 			const innerTop = isIframe ? targetTop : targetTop - wwFrame.getBoundingClientRect().top;
 
 			const keepLocalScroll = innerTop - PADDING > 0 && innerTop + PADDING <= viewHeight;
-			const rectScroll = isBottom ? (innerTop - PADDING > 0 ? innerTop + PADDING - viewHeight + toolbarHeight : innerTop - elH) : innerTop - PADDING > 0 ? innerTop + PADDING - viewHeight : innerTop - (toolbarHeight + elH);
+			const rectScroll = isBottom
+				? innerTop - PADDING > 0
+					? innerTop + PADDING - viewHeight + toolbarHeight
+					: innerTop - elH
+				: innerTop - PADDING > 0
+					? innerTop + PADDING - viewHeight
+					: innerTop - (toolbarHeight + elH);
 			let newScrollTop = scrollY + rectScroll;
 
 			// frame scroll
@@ -507,7 +564,8 @@ class Selection_ {
 
 			// set frame scroll
 			if (topMargin > 0) {
-				const newFrameY = (keepLocalScroll ? innerTop : innerTop + scrollY - newScrollTop) - elH - PADDING - topMargin;
+				const newFrameY =
+					(keepLocalScroll ? innerTop : innerTop + scrollY - newScrollTop) - elH - PADDING - topMargin;
 				if (newFrameY < 0) {
 					newScrollTop += topToolbarFrame;
 					_w.scrollTo({
@@ -517,7 +575,11 @@ class Selection_ {
 				}
 			}
 			if (bottomMargin > 0) {
-				const newFrameY = (keepLocalScroll ? innerTop : innerTop + scrollY - newScrollTop) + elH + PADDING - (globalRect.height - bottomMargin);
+				const newFrameY =
+					(keepLocalScroll ? innerTop : innerTop + scrollY - newScrollTop) +
+					elH +
+					PADDING -
+					(globalRect.height - bottomMargin);
 				if (newFrameY > 0) {
 					newScrollTop += isBottom ? bottomToolbarFrame : statusbarHeight;
 					_w.scrollTo({
@@ -544,7 +606,8 @@ class Selection_ {
 	resetRangeToTextNode() {
 		let rangeObj = this.getRange();
 		if (this.#isNone(rangeObj)) {
-			if (!dom.check.isWysiwygFrame(rangeObj.startContainer) || !dom.check.isWysiwygFrame(rangeObj.endContainer)) return false;
+			if (!dom.check.isWysiwygFrame(rangeObj.startContainer) || !dom.check.isWysiwygFrame(rangeObj.endContainer))
+				return false;
 			const ww = /** @type {HTMLElement} */ (rangeObj.commonAncestorContainer);
 			const first = ww.children[rangeObj.startOffset];
 			const end = ww.children[rangeObj.endOffset];
@@ -593,14 +656,23 @@ class Selection_ {
 					tempChild = tempCon.childNodes;
 					if (tempChild.length === 0) break;
 					tempCon =
-						tempChild[tempOffset > 0 ? tempOffset - 1 : tempOffset] || !/FIGURE/i.test(tempChild[0].nodeName) ? tempChild[0] : /** @type {HTMLElement} */ (tempCon).previousElementSibling || tempCon.previousSibling || startCon;
+						tempChild[tempOffset > 0 ? tempOffset - 1 : tempOffset] ||
+						!/FIGURE/i.test(tempChild[0].nodeName)
+							? tempChild[0]
+							: /** @type {HTMLElement} */ (tempCon).previousElementSibling ||
+								tempCon.previousSibling ||
+								startCon;
 					tempOffset = tempOffset > 0 ? tempCon.textContent.length : tempOffset;
 				}
 
 				let format = this.#$.format.getLine(tempCon, null);
 				if (format === this.#$.format.getBlock(format, null)) {
 					tempCon ||= tempConCache;
-					format = dom.utils.createElement(dom.query.getParentElement(tempCon, dom.check.isTableCell) ? 'DIV' : this.#options.get('defaultLine'));
+					format = dom.utils.createElement(
+						dom.query.getParentElement(tempCon, dom.check.isTableCell)
+							? 'DIV'
+							: this.#options.get('defaultLine'),
+					);
 					tempCon.parentNode.insertBefore(format, tempCon);
 					if (tempCon !== tempConCache) format.appendChild(tempCon);
 				}
@@ -634,13 +706,20 @@ class Selection_ {
 					tempChild = tempCon.childNodes;
 					if (tempChild.length === 0) break;
 					tempCon =
-						tempChild[tempOffset > 0 ? tempOffset - 1 : tempOffset] || !/FIGURE/i.test(tempChild[0].nodeName) ? tempChild[0] : /** @type {HTMLElement} */ (tempCon).previousElementSibling || tempCon.previousSibling || startCon;
+						tempChild[tempOffset > 0 ? tempOffset - 1 : tempOffset] ||
+						!/FIGURE/i.test(tempChild[0].nodeName)
+							? tempChild[0]
+							: /** @type {HTMLElement} */ (tempCon).previousElementSibling ||
+								tempCon.previousSibling ||
+								startCon;
 					tempOffset = tempOffset > 0 ? tempCon.textContent.length : tempOffset;
 				}
 
 				let format = this.#$.format.getLine(tempCon, null);
 				if (format === this.#$.format.getBlock(format, null)) {
-					format = dom.utils.createElement(dom.check.isTableCell(format) ? 'DIV' : this.#options.get('defaultLine'));
+					format = dom.utils.createElement(
+						dom.check.isTableCell(format) ? 'DIV' : this.#options.get('defaultLine'),
+					);
 					tempCon.parentNode.insertBefore(format, tempCon);
 					format.appendChild(tempCon);
 				}
@@ -700,7 +779,9 @@ class Selection_ {
 		this.#store.set('_range', range);
 
 		if (range.collapsed) {
-			if (dom.check.isWysiwygFrame(range.commonAncestorContainer)) selectionNode = range.commonAncestorContainer.children[range.startOffset] || range.commonAncestorContainer;
+			if (dom.check.isWysiwygFrame(range.commonAncestorContainer))
+				selectionNode =
+					range.commonAncestorContainer.children[range.startOffset] || range.commonAncestorContainer;
 			else selectionNode = range.commonAncestorContainer;
 		} else {
 			selectionNode = selection.anchorNode;
@@ -719,7 +800,9 @@ class Selection_ {
 		return (
 			(dom.check.isWysiwygFrame(range.startContainer) && dom.check.isWysiwygFrame(range.endContainer)) ||
 			/FIGURE/i.test(comm.nodeName) ||
-			(this.#$.pluginManager.fileInfo.regExp.test(comm.nodeName) && (!this.#$.pluginManager.fileInfo.tagAttrs[comm.nodeName] || this.#$.pluginManager.fileInfo.tagAttrs[comm.nodeName]?.every((v) => comm.hasAttribute(v)))) ||
+			(this.#$.pluginManager.fileInfo.regExp.test(comm.nodeName) &&
+				(!this.#$.pluginManager.fileInfo.tagAttrs[comm.nodeName] ||
+					this.#$.pluginManager.fileInfo.tagAttrs[comm.nodeName]?.every((v) => comm.hasAttribute(v)))) ||
 			this.#$.component.is(comm)
 		);
 	}
@@ -779,7 +862,8 @@ class Selection_ {
 		this.#hasScrollParents = this.#kernel._eventOrchestrator.scrollparents?.length > 0;
 		this.#scrollMargin = !this.#frameContext?.get('wysiwyg')
 			? 40
-			: (numbers.get(_w.getComputedStyle(this.#frameContext.get('wysiwyg')).scrollMargin, 0) || 40) + numbers.get(_w.getComputedStyle(this.#frameContext.get('wrapper')).paddingBottom, 0);
+			: (numbers.get(_w.getComputedStyle(this.#frameContext.get('wysiwyg')).scrollMargin, 0) || 40) +
+				numbers.get(_w.getComputedStyle(this.#frameContext.get('wrapper')).paddingBottom, 0);
 	}
 }
 

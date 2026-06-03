@@ -501,7 +501,8 @@ export function getEdgeChildNodes(first, last) {
 	if (!first) return;
 	last ||= first;
 
-	while (first && first.nodeType === 1 && first.childNodes.length > 0 && !domCheck.isBreak(first)) first = first.firstChild;
+	while (first && first.nodeType === 1 && first.childNodes.length > 0 && !domCheck.isBreak(first))
+		first = first.firstChild;
 	while (last && last.nodeType === 1 && last.childNodes.length > 0 && !domCheck.isBreak(last)) last = last.lastChild;
 
 	return {

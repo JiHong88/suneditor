@@ -52,7 +52,11 @@ export class TableGridService {
 	 * @param {?HTMLTableCellElement} [positionResetElement] The element to reset the position of (optional). This can be the cell that triggered the column edit.
 	 * @returns {HTMLTableCellElement} Target table cell
 	 */
-	editColumn(option: string | null, targetCell?: HTMLTableCellElement | null, positionResetElement?: HTMLTableCellElement | null): HTMLTableCellElement;
+	editColumn(
+		option: string | null,
+		targetCell?: HTMLTableCellElement | null,
+		positionResetElement?: HTMLTableCellElement | null,
+	): HTMLTableCellElement;
 	/**
 	 * @description Edits a table row, either adding, removing, the row
 	 * @param {?string} option The action to perform on the row (`up`|`down`|`null`)
@@ -62,7 +66,11 @@ export class TableGridService {
 	 * @param {?HTMLTableCellElement} [targetCell] Target cell, (default: current selected cell)
 	 * @param {?HTMLTableCellElement} [positionResetElement] The element to reset the position of (optional). This can be the cell that triggered the row edit.
 	 */
-	editRow(option: string | null, targetCell?: HTMLTableCellElement | null, positionResetElement?: HTMLTableCellElement | null): void;
+	editRow(
+		option: string | null,
+		targetCell?: HTMLTableCellElement | null,
+		positionResetElement?: HTMLTableCellElement | null,
+	): void;
 	/**
 	 * @description Inserts a new row into the table at the specified index to it.
 	 * @param {HTMLTableElement} table The table element to insert the row into.

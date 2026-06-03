@@ -60,7 +60,9 @@ class Template extends PluginDropdown {
  */
 function CreateItems(templateList) {
 	if (!templateList || templateList.length === 0) {
-		console.warn('[SUNEDITOR.plugins.template.warn] To use the "template" plugin, please define the "templates" option.');
+		console.warn(
+			'[SUNEDITOR.plugins.template.warn] To use the "template" plugin, please define the "templates" option.',
+		);
 	}
 
 	return (templateList || []).map((t, i) => ({

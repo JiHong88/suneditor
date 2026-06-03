@@ -19,7 +19,10 @@ export default class SelectionState {
 	constructor(eventOrchestrator) {
 		this.#eventOrchestrator = eventOrchestrator;
 		this.#$ = eventOrchestrator.$;
-		this.#onButtonsCheck = new RegExp(`^(${Object.keys(this.#$.options.get('_defaultStyleTagMap')).join('|')})$`, 'i');
+		this.#onButtonsCheck = new RegExp(
+			`^(${Object.keys(this.#$.options.get('_defaultStyleTagMap')).join('|')})$`,
+			'i',
+		);
 	}
 
 	/**
@@ -101,7 +104,12 @@ export default class SelectionState {
 			/** indent, outdent */
 			if (this.#$.format.isLine(element)) {
 				/* Outdent */
-				if (!commandMapNodes.includes('outdent') && commandTargets.has('outdent') && (dom.check.isListCell(element) || (element.style[marginDir] && numbers.get(element.style[marginDir], 0) > 0))) {
+				if (
+					!commandMapNodes.includes('outdent') &&
+					commandTargets.has('outdent') &&
+					(dom.check.isListCell(element) ||
+						(element.style[marginDir] && numbers.get(element.style[marginDir], 0) > 0))
+				) {
 					if (
 						commandTargets.get('outdent').filter((e) => {
 							if (dom.check.isImportantDisabled(e)) return false;
@@ -148,7 +156,9 @@ export default class SelectionState {
 
 		/**  Displays the current node structure to statusbar */
 		if (this.#$.frameOptions.get('statusbar_showPathLabel') && fc.get('navigation')) {
-			fc.get('navigation').textContent = this.#$.options.get('_rtl') ? this.#$.store.get('currentNodes').reverse().join(' < ') : this.#$.store.get('currentNodes').join(' > ');
+			fc.get('navigation').textContent = this.#$.options.get('_rtl')
+				? this.#$.store.get('currentNodes').reverse().join(' < ')
+				: this.#$.store.get('currentNodes').join(' > ');
 		}
 
 		return selectionNode;

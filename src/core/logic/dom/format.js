@@ -67,7 +67,11 @@ class Format {
 		for (let i = 0, len = lines.length, node, newFormat; i < len; i++) {
 			node = lines[i];
 
-			if ((node.nodeName !== value || (node.className.match(/(\s|^)__se__format__[^\s]+/) || [''])[0].trim() !== className) && !this.#$.component.is(node)) {
+			if (
+				(node.nodeName !== value ||
+					(node.className.match(/(\s|^)__se__format__[^\s]+/) || [''])[0].trim() !== className) &&
+				!this.#$.component.is(node)
+			) {
 				newFormat = /** @type {HTMLElement} */ (element.cloneNode(false));
 				dom.utils.copyFormatAttributes(newFormat, node);
 				newFormat.innerHTML = node.innerHTML;
@@ -80,7 +84,12 @@ class Format {
 			newFormat = null;
 		}
 
-		this.#$.selection.setRange(dom.query.getNodeFromPath(info.firstPath, first), info.startOffset, dom.query.getNodeFromPath(info.lastPath, last), info.endOffset);
+		this.#$.selection.setRange(
+			dom.query.getNodeFromPath(info.firstPath, first),
+			info.startOffset,
+			dom.query.getNodeFromPath(info.lastPath, last),
+			info.endOffset,
+		);
 		this.#$.history.push(false);
 
 		// document type
@@ -238,10 +247,20 @@ class Format {
 
 		const currentFormatEl = this.getLine(this.#$.selection.getNode(), null);
 		let oFormat = null;
-		if (!this.isBrLine(element) && this.isBrLine(currentFormatEl || element.parentNode) && !this.#$.component.is(element)) {
+		if (
+			!this.isBrLine(element) &&
+			this.isBrLine(currentFormatEl || element.parentNode) &&
+			!this.#$.component.is(element)
+		) {
 			oFormat = dom.utils.createElement('BR');
 		} else {
-			const oFormatName = lineNode ? (typeof lineNode === 'string' ? lineNode : lineNode.nodeName) : this.isNormalLine(currentFormatEl) ? currentFormatEl.nodeName : this.#options.get('defaultLine');
+			const oFormatName = lineNode
+				? typeof lineNode === 'string'
+					? lineNode
+					: lineNode.nodeName
+				: this.isNormalLine(currentFormatEl)
+					? currentFormatEl.nodeName
+					: this.#options.get('defaultLine');
 			oFormat = dom.utils.createElement(oFormatName, null, '<br>');
 			if ((lineNode && typeof lineNode !== 'string') || (!lineNode && this.isLine(currentFormatEl))) {
 				dom.utils.copyTagAttributes(oFormat, /** @type {Node} */ (lineNode || currentFormatEl), ['id']);
@@ -301,7 +320,8 @@ class Format {
 
 		while (element) {
 			if (dom.check.isWysiwygFrame(element)) return null;
-			if (this.isBlock(element) && !/^(THEAD|TBODY|TR)$/i.test(element.nodeName) && validation(element)) return element;
+			if (this.isBlock(element) && !/^(THEAD|TBODY|TR)$/i.test(element.nodeName) && validation(element))
+				return element;
 			element = element.parentNode;
 		}
 
@@ -326,7 +346,11 @@ class Format {
 			if (!dom.check.isListCell(line)) continue;
 
 			nested = line.lastElementChild;
-			if (nested && dom.check.isListCell(line.nextElementSibling) && rangeLines.includes(line.nextElementSibling)) {
+			if (
+				nested &&
+				dom.check.isListCell(line.nextElementSibling) &&
+				rangeLines.includes(line.nextElementSibling)
+			) {
 				lEl = nested.lastElementChild;
 				if (rangeLines.includes(lEl)) {
 					let list = null;
@@ -381,7 +405,11 @@ class Format {
 			return cc ? cc.ec : before;
 		};
 
-		for (let i = 0, len = rangeLines.length, line, originParent, depth, before, nextLine, nextList, nested; i < len; i++) {
+		for (
+			let i = 0, len = rangeLines.length, line, originParent, depth, before, nextLine, nextList, nested;
+			i < len;
+			i++
+		) {
 			line = rangeLines[i];
 			originParent = line.parentNode;
 			if (!originParent || block.contains(originParent)) continue;
@@ -417,7 +445,12 @@ class Format {
 						list = list.parentNode;
 					}
 
-					const edge = this.removeBlock(originParent, { selectedFormats: lineArr, newBlockElement: null, shouldDelete: true, skipHistory: true });
+					const edge = this.removeBlock(originParent, {
+						selectedFormats: lineArr,
+						newBlockElement: null,
+						shouldDelete: true,
+						skipHistory: true,
+					});
 
 					if (parentDepth >= depth) {
 						parentDepth = depth;
@@ -464,9 +497,20 @@ class Format {
 		this.#$.nodeTransform.mergeNestedTags(block, (current) => dom.check.isList(current));
 
 		// Nested list
-		if (beforeTag && dom.query.getNodeDepth(beforeTag) > 0 && (dom.check.isList(beforeTag.parentNode) || dom.check.isList(beforeTag.parentNode.parentNode))) {
-			const depthFormat = dom.query.getParentElement(beforeTag, (current) => this.isBlock(current) && !dom.check.isList(current));
-			const splitRange = this.#$.nodeTransform.split(beforeTag, null, !depthFormat ? 0 : dom.query.getNodeDepth(depthFormat) + 1);
+		if (
+			beforeTag &&
+			dom.query.getNodeDepth(beforeTag) > 0 &&
+			(dom.check.isList(beforeTag.parentNode) || dom.check.isList(beforeTag.parentNode.parentNode))
+		) {
+			const depthFormat = dom.query.getParentElement(
+				beforeTag,
+				(current) => this.isBlock(current) && !dom.check.isList(current),
+			);
+			const splitRange = this.#$.nodeTransform.split(
+				beforeTag,
+				null,
+				!depthFormat ? 0 : dom.query.getNodeDepth(depthFormat) + 1,
+			);
 			splitRange.parentNode.insertBefore(block, splitRange);
 		} else {
 			// basic
@@ -621,7 +665,11 @@ class Format {
 				}
 
 				if (!newList && dom.check.isListCell(insNode)) {
-					if (next && dom.query.getNodeDepth(insNode) !== dom.query.getNodeDepth(next) && (dom.check.isListCell(parent) || dom.utils.arrayFind(insNode.children, dom.check.isList))) {
+					if (
+						next &&
+						dom.query.getNodeDepth(insNode) !== dom.query.getNodeDepth(next) &&
+						(dom.check.isListCell(parent) || dom.utils.arrayFind(insNode.children, dom.check.isList))
+					) {
 						const insNext = insNode.nextElementSibling;
 						const detachRange = this.#$.listFormat.removeNested(insNode, false);
 						if (blockElement !== detachRange || insNext !== insNode.nextElementSibling) {
@@ -633,7 +681,8 @@ class Format {
 						insNode = dom.utils.createElement(
 							shouldDelete
 								? inner.nodeName
-								: dom.check.isList(blockElement.parentNode) || dom.check.isListCell(blockElement.parentNode)
+								: dom.check.isList(blockElement.parentNode) ||
+									  dom.check.isListCell(blockElement.parentNode)
 									? 'LI'
 									: dom.check.isTableCell(blockElement.parentNode)
 										? 'DIV'
@@ -698,7 +747,8 @@ class Format {
 
 		if (newBlockElement) firstNode = newBlockElement.previousSibling;
 		else firstNode ||= blockElement.previousSibling;
-		rangeRight = blockElement.nextSibling !== rangeEl ? blockElement.nextSibling : rangeEl ? rangeEl.nextSibling : null;
+		rangeRight =
+			blockElement.nextSibling !== rangeEl ? blockElement.nextSibling : rangeEl ? rangeEl.nextSibling : null;
 
 		if (/** @type {HTMLElement} */ (blockElement).children.length === 0 || blockElement.textContent.length === 0) {
 			dom.utils.removeItem(blockElement);
@@ -761,7 +811,11 @@ class Format {
 		const eo = range.endOffset;
 
 		const lines = this.getLines(null);
-		const cells = SetLineMargin(lines, this.#store.get('indentSize'), this.#options.get('_rtl') ? 'marginRight' : 'marginLeft');
+		const cells = SetLineMargin(
+			lines,
+			this.#store.get('indentSize'),
+			this.#options.get('_rtl') ? 'marginRight' : 'marginLeft',
+		);
 
 		// list cells
 		if (cells.length > 0) {
@@ -785,7 +839,11 @@ class Format {
 		const eo = range.endOffset;
 
 		const lines = this.getLines(null);
-		const cells = SetLineMargin(lines, this.#store.get('indentSize') * -1, this.#options.get('_rtl') ? 'marginRight' : 'marginLeft');
+		const cells = SetLineMargin(
+			lines,
+			this.#store.get('indentSize') * -1,
+			this.#options.get('_rtl') ? 'marginRight' : 'marginLeft',
+		);
 
 		// list cells
 		if (cells.length > 0) {
@@ -834,7 +892,9 @@ class Format {
 	 * editor.$.format.isTextStyleNode('P'); // false
 	 */
 	isTextStyleNode(element) {
-		return typeof element === 'string' ? this.#textStyleTagsCheck.test(element) : element?.nodeType === 1 && this.#textStyleTagsCheck.test(element.nodeName);
+		return typeof element === 'string'
+			? this.#textStyleTagsCheck.test(element)
+			: element?.nodeType === 1 && this.#textStyleTagsCheck.test(element.nodeName);
 	}
 
 	/**
@@ -850,7 +910,10 @@ class Format {
 	isLine(element) {
 		return typeof element === 'string'
 			? this.#formatLineCheck.test(element)
-			: element?.nodeType === 1 && (this.#formatLineCheck.test(element.nodeName) || dom.utils.hasClass(element, '__se__format__line_.+|__se__format__br_line_.+')) && !this.#nonFormat(element);
+			: element?.nodeType === 1 &&
+					(this.#formatLineCheck.test(element.nodeName) ||
+						dom.utils.hasClass(element, '__se__format__line_.+|__se__format__br_line_.+')) &&
+					!this.#nonFormat(element);
 	}
 
 	/**
@@ -878,7 +941,10 @@ class Format {
 			(this.#brLineBreak && this.isLine(element)) ||
 			(typeof element === 'string'
 				? this.#formatBrLineCheck.test(element)
-				: element?.nodeType === 1 && (this.#formatBrLineCheck.test(element.nodeName) || dom.utils.hasClass(element, '__se__format__br_line_.+')) && !this.#nonFormat(element))
+				: element?.nodeType === 1 &&
+					(this.#formatBrLineCheck.test(element.nodeName) ||
+						dom.utils.hasClass(element, '__se__format__br_line_.+')) &&
+					!this.#nonFormat(element))
 		);
 	}
 
@@ -895,7 +961,10 @@ class Format {
 	isBlock(element) {
 		return typeof element === 'string'
 			? this.#formatBlockCheck.test(element)
-			: element?.nodeType === 1 && (this.#formatBlockCheck.test(element.nodeName) || dom.utils.hasClass(element, '__se__format__block_.+')) && !this.#nonFormat(element);
+			: element?.nodeType === 1 &&
+					(this.#formatBlockCheck.test(element.nodeName) ||
+						dom.utils.hasClass(element, '__se__format__block_.+')) &&
+					!this.#nonFormat(element);
 	}
 
 	/**
@@ -911,7 +980,10 @@ class Format {
 	isClosureBlock(element) {
 		return typeof element === 'string'
 			? this.#formatClosureBlockCheck.test(element)
-			: element?.nodeType === 1 && (this.#formatClosureBlockCheck.test(element.nodeName) || dom.utils.hasClass(element, '__se__format__block_closure_.+')) && !this.#nonFormat(element);
+			: element?.nodeType === 1 &&
+					(this.#formatClosureBlockCheck.test(element.nodeName) ||
+						dom.utils.hasClass(element, '__se__format__block_closure_.+')) &&
+					!this.#nonFormat(element);
 	}
 
 	/**
@@ -927,7 +999,10 @@ class Format {
 	isClosureBrLine(element) {
 		return typeof element === 'string'
 			? this.#formatClosureBrLineCheck.test(element)
-			: element?.nodeType === 1 && (this.#formatClosureBrLineCheck.test(element.nodeName) || dom.utils.hasClass(element, '__se__format__br_line__closure_.+')) && !this.#nonFormat(element);
+			: element?.nodeType === 1 &&
+					(this.#formatClosureBrLineCheck.test(element.nodeName) ||
+						dom.utils.hasClass(element, '__se__format__br_line__closure_.+')) &&
+					!this.#nonFormat(element);
 	}
 
 	/**
@@ -946,7 +1021,12 @@ class Format {
 			const childrenLen = children.length;
 			if (childrenLen === 0) return [];
 
-			this.#$.selection.setRange(children[0], 0, children[childrenLen - 1], children[childrenLen - 1].textContent.trim().length);
+			this.#$.selection.setRange(
+				children[0],
+				0,
+				children[childrenLen - 1],
+				children[childrenLen - 1].textContent.trim().length,
+			);
 			range = this.#$.selection.getRange();
 		}
 
@@ -958,7 +1038,8 @@ class Format {
 		validation ||= this.isLine.bind(this);
 		const lineNodes = dom.query.getListChildren(commonCon, (current) => validation(current), null);
 
-		if (commonCon.nodeType === 3 || (!dom.check.isWysiwygFrame(commonCon) && !this.isBlock(commonCon))) lineNodes.unshift(this.getLine(commonCon, null));
+		if (commonCon.nodeType === 3 || (!dom.check.isWysiwygFrame(commonCon) && !this.isBlock(commonCon)))
+			lineNodes.unshift(this.getLine(commonCon, null));
 		if (startCon === endCon || lineNodes.length === 1) return lineNodes;
 
 		const startLine = this.getLine(startCon, null);
@@ -972,8 +1053,10 @@ class Format {
 
 		let startRangeEl = this.getBlock(startLine, onlyTable);
 		let endRangeEl = this.getBlock(endLine, onlyTable);
-		if (dom.check.isTableElements(startRangeEl) && dom.check.isListCell(startRangeEl.parentNode)) startRangeEl = startRangeEl.parentNode;
-		if (dom.check.isTableElements(endRangeEl) && dom.check.isListCell(endRangeEl.parentNode)) endRangeEl = endRangeEl.parentNode;
+		if (dom.check.isTableElements(startRangeEl) && dom.check.isListCell(startRangeEl.parentNode))
+			startRangeEl = startRangeEl.parentNode;
+		if (dom.check.isTableElements(endRangeEl) && dom.check.isListCell(endRangeEl.parentNode))
+			endRangeEl = endRangeEl.parentNode;
 
 		const sameRange = startRangeEl === endRangeEl;
 		for (let i = 0, len = lineNodes.length, line; i < len; i++) {
@@ -1009,7 +1092,10 @@ class Format {
 			? this.getLines(null)
 			: this.getLines((current) => {
 					const component = dom.query.getParentElement(current, this.#$.component.is.bind(this.#$.component));
-					return (this.isLine(current) && (!component || component === myComponent)) || (dom.check.isComponentContainer(current) && !this.getLine(current));
+					return (
+						(this.isLine(current) && (!component || component === myComponent)) ||
+						(dom.check.isComponentContainer(current) && !this.getLine(current))
+					);
 				});
 
 		if (removeDuplicate) {
@@ -1048,7 +1134,9 @@ class Format {
 	 * @returns {boolean}
 	 */
 	_isExcludeSelectionElement(element) {
-		return !/FIGCAPTION/i.test(element.nodeName) && (this.#$.component.is(element) || /FIGURE/i.test(element.nodeName));
+		return (
+			!/FIGCAPTION/i.test(element.nodeName) && (this.#$.component.is(element) || /FIGURE/i.test(element.nodeName))
+		);
 	}
 
 	/**
@@ -1088,7 +1176,12 @@ class Format {
 		if (rlist.ec) last = rlist.ec;
 
 		// change format tag
-		this.#$.selection.setRange(dom.query.getNodeFromPath(firstPath, first), startOffset, dom.query.getNodeFromPath(lastPath, last), endOffset);
+		this.#$.selection.setRange(
+			dom.query.getNodeFromPath(firstPath, first),
+			startOffset,
+			dom.query.getNodeFromPath(lastPath, last),
+			endOffset,
+		);
 
 		return {
 			lines: this.getLinesAndComponents(false),

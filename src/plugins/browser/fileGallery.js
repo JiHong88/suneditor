@@ -50,7 +50,8 @@ class FileGallery extends PluginBrowser {
 		this.onSelectfunction = null;
 
 		// modules
-		const thumbnail = typeof pluginOptions.thumbnail === 'string' ? pluginOptions.thumbnail : this.$.icons.file_thumbnail;
+		const thumbnail =
+			typeof pluginOptions.thumbnail === 'string' ? pluginOptions.thumbnail : this.$.icons.file_thumbnail;
 		this.browser = new Browser(this, this.$, {
 			title: this.$.lang.fileGallery,
 			data: pluginOptions.data,

@@ -9,14 +9,35 @@ export const COMMAND_BUTTONS = '.se-menu-list .se-toolbar-btn[data-command]';
  * - These commands typically apply inline formatting or structural changes.
  * @constant {string[]}
  */
-const ACTIVE_EVENT_COMMANDS = ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'indent', 'outdent'];
+const ACTIVE_EVENT_COMMANDS = [
+	'bold',
+	'underline',
+	'italic',
+	'strike',
+	'subscript',
+	'superscript',
+	'indent',
+	'outdent',
+];
 
 /**
  * @description List of basic editor commands, including active event commands and additional actions
  * - such as undo, redo, saving, full-screen toggle, and text direction commands.
  * @constant {string[]}
  */
-const BASIC_COMMANDS = ACTIVE_EVENT_COMMANDS.concat(['undo', 'redo', 'save', 'fullScreen', 'showBlocks', 'codeView', 'markdownView', 'finder', 'dir', 'dir_ltr', 'dir_rtl']);
+const BASIC_COMMANDS = ACTIVE_EVENT_COMMANDS.concat([
+	'undo',
+	'redo',
+	'save',
+	'fullScreen',
+	'showBlocks',
+	'codeView',
+	'markdownView',
+	'finder',
+	'dir',
+	'dir_ltr',
+	'dir_rtl',
+]);
 
 /**
  * @description Routes toolbar button commands to their handlers and manages active button states.
@@ -103,14 +124,20 @@ export default class CommandDispatcher {
 				return;
 			}
 
-			if (/container/.test(type) && (this.#$.menu.targetMap[command] === null || button !== this.#$.menu.currentContainerActiveButton)) {
+			if (
+				/container/.test(type) &&
+				(this.#$.menu.targetMap[command] === null || button !== this.#$.menu.currentContainerActiveButton)
+			) {
 				this.#$.menu.containerOn(button);
 				return;
 			}
 
 			if (this.#$.ui.isButtonDisabled(button)) return;
 
-			if (/dropdown/.test(type) && (this.#$.menu.targetMap[command] === null || button !== this.#$.menu.currentDropdownActiveButton)) {
+			if (
+				/dropdown/.test(type) &&
+				(this.#$.menu.targetMap[command] === null || button !== this.#$.menu.currentDropdownActiveButton)
+			) {
 				this.#$.menu.dropdownOn(button);
 				return;
 			} else if (/modal/.test(type)) {

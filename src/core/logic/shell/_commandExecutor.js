@@ -59,7 +59,13 @@ export default class CommandExecutor {
 	 * @description Execute default command of command button
 	 */
 	async execute(command, button) {
-		if (this.#frameContext.get('isReadOnly') && !/copy|cut|selectAll|selectAll_full|codeView|markdownView|fullScreen|print|preview|showBlocks|finder/.test(command)) return;
+		if (
+			this.#frameContext.get('isReadOnly') &&
+			!/copy|cut|selectAll|selectAll_full|codeView|markdownView|fullScreen|print|preview|showBlocks|finder/.test(
+				command,
+			)
+		)
+			return;
 
 		switch (command) {
 			case 'selectAll':
@@ -162,7 +168,11 @@ export default class CommandExecutor {
 			this.#$.inline.remove();
 
 			if (n) {
-				const insertedNode = this.#$.inline.apply(n, { stylesToModify: null, nodesToRemove: [n.nodeName], strictRemove: false });
+				const insertedNode = this.#$.inline.apply(n, {
+					stylesToModify: null,
+					nodesToRemove: [n.nodeName],
+					strictRemove: false,
+				});
 				const { parent, inner } = this.#$.nodeTransform.createNestedNode(_styleNode);
 				insertedNode.parentNode.insertBefore(parent, insertedNode);
 				inner.appendChild(insertedNode);
@@ -200,14 +210,25 @@ export default class CommandExecutor {
 			let commonNodeName = (prevScopeTagName = commonNode.nodeName?.toLowerCase());
 			if (range.startOffset === 0 && range.endOffset === range.endContainer.textContent?.length) {
 				const commonParent = commonNode.parentElement;
-				if ((dom.check.isList(commonParent) || dom.check.isListCell(commonParent)) && commonParent.firstChild.contains?.(range.startContainer) && commonParent.lastChild?.contains(range.endContainer)) {
+				if (
+					(dom.check.isList(commonParent) || dom.check.isListCell(commonParent)) &&
+					commonParent.firstChild.contains?.(range.startContainer) &&
+					commonParent.lastChild?.contains(range.endContainer)
+				) {
 					prevScopeTag = commonNode = commonParent.parentElement;
 					prevScopeTagName = commonNode.nodeName?.toLowerCase();
 				}
 			}
 
 			commonNodeName = commonNode.nodeName?.toLowerCase();
-			while (commonNode && ((!commonNode.nextSibling && !commonNode.previousSibling && !scopeSelectionTags.includes(commonNodeName)) || dom.check.isContentLess(commonNodeName)) && commonNode !== ww) {
+			while (
+				commonNode &&
+				((!commonNode.nextSibling &&
+					!commonNode.previousSibling &&
+					!scopeSelectionTags.includes(commonNodeName)) ||
+					dom.check.isContentLess(commonNodeName)) &&
+				commonNode !== ww
+			) {
 				commonNode = commonNode.parentElement;
 				commonNodeName = commonNode.nodeName?.toLowerCase();
 			}
@@ -220,7 +241,9 @@ export default class CommandExecutor {
 
 		// select all
 		const scopeTagList = scopeSelectionTags.filter((tagName) => tagName !== prevScopeTagName);
-		const scopeBaseTag = dom.query.getParentElement(prevScopeTag || this.#$.selection.getNode(), (current) => scopeTagList.includes(current.nodeName?.toLowerCase()));
+		const scopeBaseTag = dom.query.getParentElement(prevScopeTag || this.#$.selection.getNode(), (current) =>
+			scopeTagList.includes(current.nodeName?.toLowerCase()),
+		);
 
 		let selectArea = scopeBaseTag || ww;
 		let { first, last } = __findFirstAndLast(selectArea);
@@ -230,7 +253,11 @@ export default class CommandExecutor {
 		const isZeroWidth = dom.check.isZeroWidth;
 		while (isZeroWidth(first) && isZeroWidth(last) && selectArea !== ww) {
 			selectArea = selectArea.parentElement;
-			({ first, last } = __findFirstAndLast(dom.query.getParentElement(selectArea, (current) => scopeTagList.includes(current.nodeName?.toLowerCase())) || ww));
+			({ first, last } = __findFirstAndLast(
+				dom.query.getParentElement(selectArea, (current) =>
+					scopeTagList.includes(current.nodeName?.toLowerCase()),
+				) || ww,
+			));
 		}
 
 		if (!first || !last) return;
@@ -371,7 +398,9 @@ export default class CommandExecutor {
 		command = this.#options.get('_defaultTagCommand')[command.toLowerCase()] || command;
 		let nodeName = this.#options.get('convertTextTags')[command] || command;
 		const nodesMap = this.#store.get('currentNodesMap');
-		const el = nodesMap.includes(this.#options.get('_styleCommandMap')[nodeName]) ? null : dom.utils.createElement(nodeName);
+		const el = nodesMap.includes(this.#options.get('_styleCommandMap')[nodeName])
+			? null
+			: dom.utils.createElement(nodeName);
 
 		if (/^sub$/i.test(nodeName) && nodesMap.includes('superscript')) {
 			nodeName = 'sup';
@@ -379,7 +408,11 @@ export default class CommandExecutor {
 			nodeName = 'sub';
 		}
 
-		this.#$.inline.apply(el, { stylesToModify: StyleMap[command] || null, nodesToRemove: [nodeName], strictRemove: false });
+		this.#$.inline.apply(el, {
+			stylesToModify: StyleMap[command] || null,
+			nodesToRemove: [nodeName],
+			strictRemove: false,
+		});
 		this.#$.focusManager.focus();
 	}
 
@@ -387,7 +420,9 @@ export default class CommandExecutor {
 	 * @description Inserts a page break element into the editor.
 	 */
 	#PAGE_BREAK() {
-		const pageBreak = dom.utils.createElement('DIV', { class: 'se-component se-component-line-break se-page-break' });
+		const pageBreak = dom.utils.createElement('DIV', {
+			class: 'se-component se-component-line-break se-page-break',
+		});
 		this.#$.component.insert(pageBreak, { skipCharCount: true, insertBehavior: 'line' });
 		const line = pageBreak.nextElementSibling || this.#$.format.addLine(pageBreak);
 		this.#$.selection.setRange(line, 1, line, 1);

@@ -98,7 +98,10 @@ class Controller {
 		this.__offset = {};
 
 		this.#initMethod = typeof params.initMethod === 'function' ? params.initMethod : null;
-		this.#globalEventHandlers = { keydown: this.#CloseListener_keydown.bind(this), mousedown: this.#CloseListener_mousedown.bind(this) };
+		this.#globalEventHandlers = {
+			keydown: this.#CloseListener_keydown.bind(this),
+			mousedown: this.#CloseListener_mousedown.bind(this),
+		};
 
 		for (const parent of this.parents) {
 			if (dom.check.isElement(parent)) {
@@ -293,7 +296,8 @@ class Controller {
 	 * @description Reposition controller on scroll event
 	 */
 	_scrollReposition() {
-		if (this.form.hasAttribute('data-se-hidden-by-parent') || this.form.hasAttribute('data-se-hidden-by-children')) return;
+		if (this.form.hasAttribute('data-se-hidden-by-parent') || this.form.hasAttribute('data-se-hidden-by-children'))
+			return;
 		if (this.#setControllerPosition(this.form, this.currentPositionTarget, false)) {
 			_w.setTimeout(() => {
 				this.#childrenSync('show');
@@ -368,7 +372,14 @@ class Controller {
 			notInCarrier: !this.#$.contextProvider.carrierWrapper.contains(form),
 		};
 
-		if ((await this.#$.eventManager.triggerEvent('onBeforeShowController', { caller: this.kind, frameContext: this.#$.frameContext, info })) === false) return;
+		if (
+			(await this.#$.eventManager.triggerEvent('onBeforeShowController', {
+				caller: this.kind,
+				frameContext: this.#$.frameContext,
+				info,
+			})) === false
+		)
+			return;
 
 		form.style.display = 'block';
 		if (this.#$.contextProvider.shadowRoot) {
@@ -388,7 +399,11 @@ class Controller {
 		this.isOpen = true;
 
 		this.host.controllerOn?.(form, target);
-		this.#$.eventManager.triggerEvent('onShowController', { caller: this.kind, frameContext: this.#$.frameContext, info });
+		this.#$.eventManager.triggerEvent('onShowController', {
+			caller: this.kind,
+			frameContext: this.#$.frameContext,
+			info,
+		});
 	}
 
 	/**
@@ -403,7 +418,9 @@ class Controller {
 		this.#$.ui.setControllerOnDisabledButtons(false);
 		this.#$.ui.offControllerContext();
 
-		this.#$.frameContext.get('lineBreaker_t').style.display = this.#$.frameContext.get('lineBreaker_b').style.display = 'none';
+		this.#$.frameContext.get('lineBreaker_t').style.display = this.#$.frameContext.get(
+			'lineBreaker_b',
+		).style.display = 'none';
 		this.#$.store.set('_lastSelectionNode', null);
 		this.#$.ui.currentControllerName = '';
 		this.#$.store.set('_preventBlur', false);
@@ -477,7 +494,11 @@ class Controller {
 	#addGlobalEvent() {
 		this.#removeGlobalEvent();
 		this.#bindClose_key = this.#$.eventManager.addGlobalEvent('keydown', this.#globalEventHandlers.keydown, true);
-		this.#bindClose_mouse = this.#$.eventManager.addGlobalEvent(isMobile ? 'click' : 'mousedown', this.#globalEventHandlers.mousedown, true);
+		this.#bindClose_mouse = this.#$.eventManager.addGlobalEvent(
+			isMobile ? 'click' : 'mousedown',
+			this.#globalEventHandlers.mousedown,
+			true,
+		);
 	}
 
 	/**
@@ -526,7 +547,11 @@ class Controller {
 		}
 
 		const _element = this.host._element;
-		return !isParentForm && (!!dom.query.getParentElement(target, '.se-controller') || (this.#$.component.isInline(_element) ? target === _element : target?.contains(_element)));
+		return (
+			!isParentForm &&
+			(!!dom.query.getParentElement(target, '.se-controller') ||
+				(this.#$.component.isInline(_element) ? target === _element : target?.contains(_element)))
+		);
 	}
 
 	/**

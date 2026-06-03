@@ -93,7 +93,9 @@ class Browser {
 
 		// create HTML
 		this.useSearch = params.useSearch ?? true;
-		const browserFrame = dom.utils.createElement('DIV', { class: 'se-browser sun-editor-common' + (params.className ? ` ${params.className}` : '') });
+		const browserFrame = dom.utils.createElement('DIV', {
+			class: 'se-browser sun-editor-common' + (params.className ? ` ${params.className}` : ''),
+		});
 		const contentHTML = CreateHTMLInfos(this.#$, this.useSearch);
 		const content = contentHTML.html;
 
@@ -117,7 +119,10 @@ class Browser {
 		this.headers = params.headers;
 		this.searchUrl = params.searchUrl;
 		this.searchHeaders = params.searchHeaders;
-		this.drawItemHandler = (params.drawItemHandler || DrawItems).bind({ thumbnail: params.thumbnail, props: params.props || [] });
+		this.drawItemHandler = (params.drawItemHandler || DrawItems).bind({
+			thumbnail: params.thumbnail,
+			props: params.props || [],
+		});
 		this.selectorHandler = params.selectorHandler;
 		this.columnSize = params.columnSize || 4;
 		this.expand = params.expand ?? 1;
@@ -159,13 +164,23 @@ class Browser {
 		this.#$.eventManager.addEvent(this.side, 'click', this.#OnClickSide.bind(this));
 		this.#$.eventManager.addEvent(content, 'mousedown', this.#OnMouseDown_browser.bind(this));
 		this.#$.eventManager.addEvent(content, 'click', this.#OnClick_browser.bind(this));
-		this.#$.eventManager.addEvent((this.sideOpenBtn = /** @type {HTMLButtonElement} */ (browserFrame.querySelector('.se-side-open-btn'))), 'click', this.#SideOpen.bind(this));
-		this.#$.eventManager.addEvent([this.header, browserFrame.querySelector('.se-browser-main')], 'mousedown', this.#SideClose.bind(this));
+		this.#$.eventManager.addEvent(
+			(this.sideOpenBtn = /** @type {HTMLButtonElement} */ (browserFrame.querySelector('.se-side-open-btn'))),
+			'click',
+			this.#SideOpen.bind(this),
+		);
+		this.#$.eventManager.addEvent(
+			[this.header, browserFrame.querySelector('.se-browser-main')],
+			'mousedown',
+			this.#SideClose.bind(this),
+		);
 
 		// search
 		const searchForm = browserFrame.querySelector('form.se-browser-search-form');
 		this.#searchInput = /** @type {HTMLInputElement} */ (searchForm?.querySelector('input[type="text"]'));
-		this.#searchClearBtn = /** @type {HTMLButtonElement} */ (browserFrame.querySelector('.se-browser-search-clear'));
+		this.#searchClearBtn = /** @type {HTMLButtonElement} */ (
+			browserFrame.querySelector('.se-browser-search-clear')
+		);
 		this.#$.eventManager.addEvent(searchForm, 'submit', this.#Search.bind(this));
 		this.#$.eventManager.addEvent(this.#searchClearBtn, 'click', this.#ClearSearch.bind(this));
 	}
@@ -208,7 +223,8 @@ class Browser {
 			this.#drawFileList(params.url || this.url, params.headers || this.headers, false);
 		}
 
-		this.body.style.maxHeight = dom.utils.getClientSize().h - (this.#$.offset.getGlobal(this.body).top - _w.scrollY) - 20 + 'px';
+		this.body.style.maxHeight =
+			dom.utils.getClientSize().h - (this.#$.offset.getGlobal(this.body).top - _w.scrollY) - 20 + 'px';
 	}
 
 	/**
@@ -247,7 +263,11 @@ class Browser {
 		if (this.searchUrl) {
 			this.keyword = keyword;
 			const sep = this.searchUrl.includes('?') ? '&' : '?';
-			this.#drawFileList(this.searchUrl + sep + 'keyword=' + _w.encodeURIComponent(keyword), this.searchHeaders, false);
+			this.#drawFileList(
+				this.searchUrl + sep + 'keyword=' + _w.encodeURIComponent(keyword),
+				this.searchHeaders,
+				false,
+			);
 		} else {
 			this.keyword = keyword.toLowerCase();
 			this.#drawListItem(this.#allItems.length > 0 ? this.#allItems : this.items, false);
@@ -283,7 +303,9 @@ class Browser {
 	 */
 	tagfilter(items) {
 		const selectedTags = this.selectedTags;
-		return selectedTags.length === 0 ? items : items.filter((item) => !Array.isArray(item.tag) || item.tag.some((tag) => selectedTags.includes(tag)));
+		return selectedTags.length === 0
+			? items
+			: items.filter((item) => !Array.isArray(item.tag) || item.tag.some((tag) => selectedTags.includes(tag)));
 	}
 
 	/**
@@ -307,7 +329,13 @@ class Browser {
 	 * @param {boolean} pageLoading - Indicates if this is a paginated request.
 	 */
 	#drawFileList(url, headers, pageLoading) {
-		this.apiManager.call({ method: 'GET', url, headers, callBack: this.#CallBackGet.bind(this), errorCallBack: this.#CallBackError.bind(this) });
+		this.apiManager.call({
+			method: 'GET',
+			url,
+			headers,
+			callBack: this.#CallBackGet.bind(this),
+			errorCallBack: this.#CallBackError.bind(this),
+		});
 		if (!pageLoading) {
 			this.sideOpenBtn.style.display = 'none';
 			this.showBrowserLoading();
@@ -404,7 +432,9 @@ class Browser {
 			this.side.appendChild(sideInner);
 
 			if (this.folderDefaultPath) {
-				const openFolder = /** @type {HTMLButtonElement} */ (sideInner.querySelector(`[data-command="${this.folderDefaultPath}"]`));
+				const openFolder = /** @type {HTMLButtonElement} */ (
+					sideInner.querySelector(`[data-command="${this.folderDefaultPath}"]`)
+				);
 				openFolder.click();
 				if (this.folderDefaultPath.includes('/')) {
 					dom.utils.removeClass(openFolder.parentElement, 'se-menu-hidden');
@@ -485,7 +515,10 @@ class Browser {
 				);
 				const folderDiv = dom.utils.createElement('div', { class: 'se-menu-folder' }, folderLabel);
 
-				folderLabel.insertBefore(dom.utils.createElement('button', null, expanded ? this.openArrow : this.closeArrow), folderLabel.firstElementChild);
+				folderLabel.insertBefore(
+					dom.utils.createElement('button', null, expanded ? this.openArrow : this.closeArrow),
+					folderLabel.firstElementChild,
+				);
 				const childContainer = document.createElement('div');
 				dom.utils.addClass(childContainer, expanded ? 'se-menu-child' : 'se-menu-child|se-menu-hidden');
 				this.#createFolderList(item.children, childContainer, depth + 1);
@@ -493,7 +526,11 @@ class Browser {
 
 				parentElement.appendChild(folderDiv);
 			} else {
-				const folderLabel = dom.utils.createElement('div', { 'data-command': item.key, 'aria-label': item.name, class: 'se-menu-folder-item' }, `<span class="se-menu-icon">${this.icon_item}</span><span>${item.name}</span>`);
+				const folderLabel = dom.utils.createElement(
+					'div',
+					{ 'data-command': item.key, 'aria-label': item.name, class: 'se-menu-folder-item' },
+					`<span class="se-menu-icon">${this.icon_item}</span><span>${item.name}</span>`,
+				);
 				if (parentElement === this.sideInner) {
 					const folderDiv = dom.utils.createElement('div', { class: 'se-menu-folder' }, folderLabel);
 					parentElement.appendChild(folderDiv);
@@ -529,7 +566,9 @@ class Browser {
 	 */
 	#CallBackError(res, xmlHttp) {
 		this.closeBrowserLoading();
-		throw Error(`[SUNEDITOR.browser.get.serverException] status: ${xmlHttp.status}, response: ${res.errorMessage || xmlHttp.responseText}`);
+		throw Error(
+			`[SUNEDITOR.browser.get.serverException] status: ${xmlHttp.status}, response: ${res.errorMessage || xmlHttp.responseText}`,
+		);
 	}
 
 	/**
@@ -666,7 +705,12 @@ class Browser {
 			const text = el.textContent;
 			const idx = text.toLowerCase().indexOf(keyword);
 			if (idx > -1) {
-				el.innerHTML = text.substring(0, idx) + '<mark>' + text.substring(idx, idx + keyword.length) + '</mark>' + text.substring(idx + keyword.length);
+				el.innerHTML =
+					text.substring(0, idx) +
+					'<mark>' +
+					text.substring(idx, idx + keyword.length) +
+					'</mark>' +
+					text.substring(idx + keyword.length);
 			}
 		}
 	}

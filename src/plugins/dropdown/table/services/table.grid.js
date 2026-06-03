@@ -28,13 +28,23 @@ export class TableGridService {
 
 		// members - SelectMenu - column
 		const columnMenu = CreateColumnMenu(this.#$.lang, this.#$.icons);
-		this.selectMenu_column = new SelectMenu(this.#$, { checkList: false, position: 'bottom-center', openMethod: openCellMenuFunc, closeMethod: closeCellMenuFunc });
+		this.selectMenu_column = new SelectMenu(this.#$, {
+			checkList: false,
+			position: 'bottom-center',
+			openMethod: openCellMenuFunc,
+			closeMethod: closeCellMenuFunc,
+		});
 		this.selectMenu_column.on(columnButton, this.#OnColumnEdit.bind(this));
 		this.selectMenu_column.create(columnMenu.items, columnMenu.menus);
 
 		// members - SelectMenu - row
 		const rownMenu = CreateRowMenu(this.#$.lang, this.#$.icons);
-		this.selectMenu_row = new SelectMenu(this.#$, { checkList: false, position: 'bottom-center', openMethod: openCellMenuFunc, closeMethod: closeCellMenuFunc });
+		this.selectMenu_row = new SelectMenu(this.#$, {
+			checkList: false,
+			position: 'bottom-center',
+			openMethod: openCellMenuFunc,
+			closeMethod: closeCellMenuFunc,
+		});
 		this.selectMenu_row.on(rowButton, this.#OnRowEdit.bind(this));
 		this.selectMenu_row.create(rownMenu.items, rownMenu.menus);
 	}
@@ -54,7 +64,11 @@ export class TableGridService {
 	 * @description Opens the row menu.
 	 */
 	openRowMenu() {
-		this.selectMenu_row.menus[0].style.display = this.selectMenu_row.menus[1].style.display = /^TH$/i.test(this.#state.tdElement?.nodeName) ? 'none' : '';
+		this.selectMenu_row.menus[0].style.display = this.selectMenu_row.menus[1].style.display = /^TH$/i.test(
+			this.#state.tdElement?.nodeName,
+		)
+			? 'none'
+			: '';
 		this.selectMenu_row.open();
 	}
 
@@ -77,7 +91,8 @@ export class TableGridService {
 						dom.utils.removeItem(this.#state.figureElement);
 						this.#main._closeTableSelectInfo();
 					} else {
-						table.innerHTML += '<tbody><tr>' + CreateCellsString('td', this.#state.logical_cellCnt) + '</tr></tbody>';
+						table.innerHTML +=
+							'<tbody><tr>' + CreateCellsString('td', this.#state.logical_cellCnt) + '</tr></tbody>';
 					}
 					return;
 				}
@@ -274,7 +289,12 @@ export class TableGridService {
 					if (removeIndex >= insertIndex && removeIndex + cs <= insertIndex + colSpan) {
 						removeCell.push(cell);
 					} else if (removeIndex <= insertIndex + colSpan && removeIndex + cs >= insertIndex) {
-						cell.colSpan -= numbers.getOverlapRangeAtIndex(cellIndex, cellIndex + colSpan, removeIndex, removeIndex + cs);
+						cell.colSpan -= numbers.getOverlapRangeAtIndex(
+							cellIndex,
+							cellIndex + colSpan,
+							removeIndex,
+							removeIndex + cs,
+						);
 					} else if (rs > 0 && (removeIndex < insertIndex || removeIndex + cs > insertIndex + colSpan)) {
 						removeSpanArr.push({
 							cell: cell,
@@ -311,8 +331,11 @@ export class TableGridService {
 			if (remove) {
 				dom.utils.removeItem(cols[insertIndex]);
 			} else {
-				const isAutoLayout = !dom.utils.hasClass(this.#main._element, 'se-table-layout-fixed') && this.#main._element.style.tableLayout !== 'fixed';
-				const hasWidth = !isAutoLayout && Array.prototype.some.call(cols, (col) => numbers.get(col.style.width) > 0);
+				const isAutoLayout =
+					!dom.utils.hasClass(this.#main._element, 'se-table-layout-fixed') &&
+					this.#main._element.style.tableLayout !== 'fixed';
+				const hasWidth =
+					!isAutoLayout && Array.prototype.some.call(cols, (col) => numbers.get(col.style.width) > 0);
 
 				if (hasWidth) {
 					let totalW = 0;
@@ -345,7 +368,12 @@ export class TableGridService {
 
 			for (let c = 0, cLen = removeSpanArr.length, rowSpanCell; c < cLen; c++) {
 				rowSpanCell = removeSpanArr[c];
-				rowSpanCell.cell.rowSpan = numbers.getOverlapRangeAtIndex(removeFirst, removeEnd, rowSpanCell.i, rowSpanCell.rs);
+				rowSpanCell.cell.rowSpan = numbers.getOverlapRangeAtIndex(
+					removeFirst,
+					removeEnd,
+					rowSpanCell.i,
+					rowSpanCell.rs,
+				);
 			}
 
 			this.#main._closeController();
@@ -408,7 +436,10 @@ export class TableGridService {
 
 					if (cell.rowSpan > 1) {
 						cell.rowSpan -= 1;
-						spanCells.push({ cell: /** @type {HTMLTableCellElement} */ (cell.cloneNode(true)), index: logcalIndex });
+						spanCells.push({
+							cell: /** @type {HTMLTableCellElement} */ (cell.cloneNode(true)),
+							index: logcalIndex,
+						});
 					}
 				}
 

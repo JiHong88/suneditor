@@ -74,7 +74,15 @@ class Shortcuts {
 			info = this.keyMap.get(text) || this.keyMap.get(text + event.key);
 		}
 
-		if (!info || (!shift && info.s) || (info.space && !keyCodeMap.isSpace(keyCode)) || (info.enter && !keyCodeMap.isEnter(keyCode)) || (info.textTrigger && !event.key.trim()) || (info.edge && !edge)) return false;
+		if (
+			!info ||
+			(!shift && info.s) ||
+			(info.space && !keyCodeMap.isSpace(keyCode)) ||
+			(info.enter && !keyCodeMap.isEnter(keyCode)) ||
+			(info.textTrigger && !event.key.trim()) ||
+			(info.edge && !edge)
+		)
+			return false;
 
 		if (info.plugin && typeof info.method === 'string') {
 			this.#$.plugins[info.plugin][info.method]?.({ range, line, info, event, keyCode });

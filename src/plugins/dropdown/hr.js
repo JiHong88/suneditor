@@ -40,7 +40,9 @@ class HR extends PluginDropdown {
 		this.icon = 'horizontal_line';
 
 		// create menu from items
-		const menu = this.$.menu.initDropdownTarget(HR, CreateItems(this.$, pluginOptions.items), { className: 'se-list-line' });
+		const menu = this.$.menu.initDropdownTarget(HR, CreateItems(this.$, pluginOptions.items), {
+			className: 'se-list-line',
+		});
 
 		// members
 		this.list = menu.querySelectorAll('button');

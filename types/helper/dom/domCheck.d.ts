@@ -61,7 +61,15 @@ export function isTable(node: (Node | string) | null): node is HTMLTableElement;
  * @param {?Node|string} node The element or element name to check
  * @returns {node is HTMLTableElement|HTMLTableSectionElement|HTMLTableRowElement|HTMLTableCellElement|HTMLTableColElement|HTMLTableColElement}
  */
-export function isTableElements(node: (Node | string) | null): node is HTMLTableElement | HTMLTableSectionElement | HTMLTableRowElement | HTMLTableCellElement | HTMLTableColElement | HTMLTableColElement;
+export function isTableElements(
+	node: (Node | string) | null,
+): node is
+	| HTMLTableElement
+	| HTMLTableSectionElement
+	| HTMLTableRowElement
+	| HTMLTableCellElement
+	| HTMLTableColElement
+	| HTMLTableColElement;
 /**
  * @description Check the node is a table cell (td, th)
  * @param {?Node|string} node The element or element name to check
@@ -91,7 +99,9 @@ export function isAnchor(node: (Node | string) | null): node is HTMLAnchorElemen
  * @param {?Node|string} node The element or element name to check
  * @returns {node is HTMLImageElement|HTMLIFrameElement|HTMLAudioElement|HTMLVideoElement|HTMLCanvasElement}
  */
-export function isMedia(node: (Node | string) | null): node is HTMLImageElement | HTMLIFrameElement | HTMLAudioElement | HTMLVideoElement | HTMLCanvasElement;
+export function isMedia(
+	node: (Node | string) | null,
+): node is HTMLImageElement | HTMLIFrameElement | HTMLAudioElement | HTMLVideoElement | HTMLCanvasElement;
 /**
  * @description Check the node is a iframe tag
  * @param {?Node|string} node The element or element name to check

@@ -102,7 +102,10 @@ export const A = {
 	 * @param {SunEditor.ComponentInfo} fileComponentInfo
 	 * @returns {Action}
 	 */
-	backspaceComponentSelect: (selectionNode, range, fileComponentInfo) => ({ t: 'backspace.component.select', p: { selectionNode, range, fileComponentInfo } }),
+	backspaceComponentSelect: (selectionNode, range, fileComponentInfo) => ({
+		t: 'backspace.component.select',
+		p: { selectionNode, range, fileComponentInfo },
+	}),
 	/**
 	 * @param {boolean} isList
 	 * @param {Node} sel
@@ -110,14 +113,20 @@ export const A = {
 	 * @param {SunEditor.ComponentInfo} fileComponentInfo
 	 * @returns {Action}
 	 */
-	backspaceComponentRemove: (isList, sel, formatEl, fileComponentInfo) => ({ t: 'backspace.component.remove', p: { isList, sel, formatEl, fileComponentInfo } }),
+	backspaceComponentRemove: (isList, sel, formatEl, fileComponentInfo) => ({
+		t: 'backspace.component.remove',
+		p: { isList, sel, formatEl, fileComponentInfo },
+	}),
 	/**
 	 * @param {Element} prev
 	 * @param {Element} formatEl
 	 * @param {Element} rangeEl
 	 * @returns {Action}
 	 */
-	backspaceListMergePrev: (prev, formatEl, rangeEl) => ({ t: 'backspace.list.mergePrev', p: { prev, formatEl, rangeEl } }),
+	backspaceListMergePrev: (prev, formatEl, rangeEl) => ({
+		t: 'backspace.list.mergePrev',
+		p: { prev, formatEl, rangeEl },
+	}),
 	/**
 	 * @param {Range} range
 	 * @returns {Action}
@@ -130,7 +139,10 @@ export const A = {
 	 * @param {SunEditor.ComponentInfo} fileComponentInfo
 	 * @returns {Action}
 	 */
-	deleteComponentSelect: (formatEl, fileComponentInfo) => ({ t: 'delete.component.select', p: { formatEl, fileComponentInfo } }),
+	deleteComponentSelect: (formatEl, fileComponentInfo) => ({
+		t: 'delete.component.select',
+		p: { formatEl, fileComponentInfo },
+	}),
 	/**
 	 * @param {Element} nextEl
 	 * @returns {Action}
@@ -142,7 +154,10 @@ export const A = {
 	 * @param {Element} rangeEl
 	 * @returns {Action}
 	 */
-	deleteListRemoveNested: (range, formatEl, rangeEl) => ({ t: 'delete.list.removeNested', p: { range, formatEl, rangeEl } }),
+	deleteListRemoveNested: (range, formatEl, rangeEl) => ({
+		t: 'delete.list.removeNested',
+		p: { range, formatEl, rangeEl },
+	}),
 
 	// === tab ===
 	/**
@@ -184,7 +199,10 @@ export const A = {
 	 * @param {number} offset
 	 * @returns {Action}
 	 */
-	enterFormatCleanBrAndZWS: (selectionNode, selectionFormat, brBlock, children, offset) => ({ t: 'enter.format.cleanBrAndZWS', p: { selectionNode, selectionFormat, brBlock, children, offset } }),
+	enterFormatCleanBrAndZWS: (selectionNode, selectionFormat, brBlock, children, offset) => ({
+		t: 'enter.format.cleanBrAndZWS',
+		p: { selectionNode, selectionFormat, brBlock, children, offset },
+	}),
 	/**
 	 * @param {Element} brBlock
 	 * @param {Range} range
@@ -192,7 +210,10 @@ export const A = {
 	 * @param {number} offset
 	 * @returns {Action}
 	 */
-	enterFormatInsertBrHtml: (brBlock, range, wSelection, offset) => ({ t: 'enter.format.insertBrHtml', p: { brBlock, range, wSelection, offset } }),
+	enterFormatInsertBrHtml: (brBlock, range, wSelection, offset) => ({
+		t: 'enter.format.insertBrHtml',
+		p: { brBlock, range, wSelection, offset },
+	}),
 	/**
 	 * @param {Selection} wSelection
 	 * @returns {Action}
@@ -206,7 +227,10 @@ export const A = {
 	 * @param {boolean} [bidiSwapped]
 	 * @returns {Action}
 	 */
-	enterFormatBreakAtEdge: (formatEl, selectionNode, formatStartEdge, formatEndEdge, bidiSwapped) => ({ t: 'enter.format.breakAtEdge', p: { formatEl, selectionNode, formatStartEdge, formatEndEdge, bidiSwapped } }),
+	enterFormatBreakAtEdge: (formatEl, selectionNode, formatStartEdge, formatEndEdge, bidiSwapped) => ({
+		t: 'enter.format.breakAtEdge',
+		p: { formatEl, selectionNode, formatStartEdge, formatEndEdge, bidiSwapped },
+	}),
 	/**
 	 * @param {Element} formatEl
 	 * @param {Range} range
@@ -214,7 +238,10 @@ export const A = {
 	 * @param {boolean} formatEndEdge
 	 * @returns {Action}
 	 */
-	enterFormatBreakWithSelection: (formatEl, range, formatStartEdge, formatEndEdge) => ({ t: 'enter.format.breakWithSelection', p: { formatEl, range, formatStartEdge, formatEndEdge } }),
+	enterFormatBreakWithSelection: (formatEl, range, formatStartEdge, formatEndEdge) => ({
+		t: 'enter.format.breakWithSelection',
+		p: { formatEl, range, formatStartEdge, formatEndEdge },
+	}),
 	/**
 	 * @param {Element} formatEl
 	 * @param {Range} range

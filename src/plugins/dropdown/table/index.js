@@ -4,7 +4,13 @@ import { Controller, Figure } from '../../../modules/contract';
 import { _DragHandle } from '../../../modules/ui';
 
 import * as Constants from './shared/table.constants';
-import { CreateCellsString, GetMaxColumns, IsResizeEls, IsTableCaption, GetLogicalCellIndex } from './shared/table.utils';
+import {
+	CreateCellsString,
+	GetMaxColumns,
+	IsResizeEls,
+	IsTableCaption,
+	GetLogicalCellIndex,
+} from './shared/table.utils';
 import { CreateHTML, CreateHTML_controller_table, CreateHTML_controller_cell } from './render/table.html';
 
 import TableCellService from './services/table.cell';
@@ -89,10 +95,18 @@ class Table extends PluginDropdownFree {
 		const controller_cell = CreateHTML_controller_cell(this.$, this.cellControllerTop);
 
 		this.$.contextProvider.applyToRoots((e) => {
-			e.get('wrapper').appendChild(dom.utils.createElement('DIV', { class: Constants.RESIZE_CELL_CLASS.replace(/^\./, '') }));
-			e.get('wrapper').appendChild(dom.utils.createElement('DIV', { class: Constants.RESIZE_CELL_PREV_CLASS.replace(/^\./, '') }));
-			e.get('wrapper').appendChild(dom.utils.createElement('DIV', { class: Constants.RESIZE_ROW_CLASS.replace(/^\./, '') }));
-			e.get('wrapper').appendChild(dom.utils.createElement('DIV', { class: Constants.RESIZE_ROW_PREV_CLASS.replace(/^\./, '') }));
+			e.get('wrapper').appendChild(
+				dom.utils.createElement('DIV', { class: Constants.RESIZE_CELL_CLASS.replace(/^\./, '') }),
+			);
+			e.get('wrapper').appendChild(
+				dom.utils.createElement('DIV', { class: Constants.RESIZE_CELL_PREV_CLASS.replace(/^\./, '') }),
+			);
+			e.get('wrapper').appendChild(
+				dom.utils.createElement('DIV', { class: Constants.RESIZE_ROW_CLASS.replace(/^\./, '') }),
+			);
+			e.get('wrapper').appendChild(
+				dom.utils.createElement('DIV', { class: Constants.RESIZE_ROW_PREV_CLASS.replace(/^\./, '') }),
+			);
 		});
 
 		// members - Controller
@@ -175,7 +189,12 @@ class Table extends PluginDropdownFree {
 
 		this.#maxWidth = this.state.figureElement?.style.width === '100%';
 		this.#fixedColumn = dom.utils.hasClass(target, 'se-table-layout-fixed') || target.style.tableLayout === 'fixed';
-		this.styleService.setTableLayout(this.#maxWidth ? 'width|column' : 'width', this.#maxWidth, this.#fixedColumn, true);
+		this.styleService.setTableLayout(
+			this.#maxWidth ? 'width|column' : 'width',
+			this.#maxWidth,
+			this.#fixedColumn,
+			true,
+		);
 
 		if (_DragHandle.get('__overInfo') === ON_OVER_COMPONENT) return;
 
@@ -185,12 +204,22 @@ class Table extends PluginDropdownFree {
 		// controller open
 		const btnDisabled = this.state.selectedCells?.length > 1;
 		const figureEl = dom.query.getParentElement(target, dom.check.isFigure);
-		this.controller_table.open(figureEl, null, { isWWTarget: false, initMethod: null, addOffset: null, disabled: btnDisabled });
+		this.controller_table.open(figureEl, null, {
+			isWWTarget: false,
+			initMethod: null,
+			addOffset: null,
+			disabled: btnDisabled,
+		});
 
 		if (!this.state.fixedCell) return;
 
 		this.cellService.setUnMergeButton();
-		this.controller_cell.open(this.state.tdElement, this.cellControllerTop ? figureEl : null, { isWWTarget: false, initMethod: null, addOffset: null, disabled: btnDisabled });
+		this.controller_cell.open(this.state.tdElement, this.cellControllerTop ? figureEl : null, {
+			isWWTarget: false,
+			initMethod: null,
+			addOffset: null,
+			disabled: btnDisabled,
+		});
 	}
 
 	/**
@@ -278,7 +307,9 @@ class Table extends PluginDropdownFree {
 			/** @param {HTMLTableElement} element */
 			method: (element) => {
 				const ColgroupEl = element.querySelector('colgroup');
-				let FigureEl = /** @type {HTMLElement} */ (dom.check.isFigure(element.parentNode) ? element.parentNode : null);
+				let FigureEl = /** @type {HTMLElement} */ (
+					dom.check.isFigure(element.parentNode) ? element.parentNode : null
+				);
 
 				// create colgroup
 				if (!ColgroupEl) {
@@ -318,7 +349,9 @@ class Table extends PluginDropdownFree {
 									if (existingWidth === null) {
 										colWidths[targetColIndex] = `width: ${cellWidth};`;
 									} else {
-										const existingPxWidth = parseFloat(existingWidth.replace('width: ', '').replace(';', ''));
+										const existingPxWidth = parseFloat(
+											existingWidth.replace('width: ', '').replace(';', ''),
+										);
 										if (colSpan === 1 && currentPxWidth !== existingPxWidth) {
 											colWidths[targetColIndex] = `width: ${cellWidth};`;
 										}
@@ -370,7 +403,10 @@ class Table extends PluginDropdownFree {
 				} else {
 					const scrollTypeClass = `se-scroll-figure-${this.figureScroll}`;
 					dom.utils.addClass(FigureEl, scrollTypeClass);
-					dom.utils.removeClass(FigureEl, this.figureScrollList.filter((v) => v !== scrollTypeClass).join('|'));
+					dom.utils.removeClass(
+						FigureEl,
+						this.figureScrollList.filter((v) => v !== scrollTypeClass).join('|'),
+					);
 				}
 			},
 		};
@@ -463,7 +499,13 @@ class Table extends PluginDropdownFree {
 
 		const keyCode = event.code;
 		const isTab = keyCodeMap.isTab(keyCode);
-		if (this.$.ui.selectMenuOn || this.resizeService.isResizing() || (!isTab && this.#_s) || keyCodeMap.isCtrl(event)) return;
+		if (
+			this.$.ui.selectMenuOn ||
+			this.resizeService.isResizing() ||
+			(!isTab && this.#_s) ||
+			keyCodeMap.isCtrl(event)
+		)
+			return;
 
 		if (!this.cellControllerTop) {
 			this.controller_cell.hide();
@@ -547,7 +589,10 @@ class Table extends PluginDropdownFree {
 	 */
 	onKeyUp({ line }) {
 		this.#_s = false;
-		if (this.state.isShiftPressed && dom.query.getParentElement(line, dom.check.isTableCell) === this.state.fixedCell) {
+		if (
+			this.state.isShiftPressed &&
+			dom.query.getParentElement(line, dom.check.isTableCell) === this.state.fixedCell
+		) {
 			this.selectionService.deleteStyleSelectedCells();
 			this._editorEnable(true);
 			this.#initService();
@@ -760,7 +805,8 @@ class Table extends PluginDropdownFree {
 		this.setState('tdElement', tdElement);
 		if (this.state.fixedCell === tdElement) dom.utils.addClass(tdElement, 'se-selected-cell-focus');
 		if (!this.state.selectedCells?.length) this.setState('selectedCells', [tdElement]);
-		const tableElement = this.state.selectedTable || this._element || dom.query.getParentElement(tdElement, 'TABLE');
+		const tableElement =
+			this.state.selectedTable || this._element || dom.query.getParentElement(tdElement, 'TABLE');
 		this.$.component.select(tableElement, Table.key, { isInput: true });
 	}
 
@@ -807,7 +853,13 @@ class Table extends PluginDropdownFree {
 	 * @param {Node} target - The target figure element.
 	 */
 	#figureOpen(target) {
-		this.figure.open(target, { nonResizing: true, nonSizeInfo: true, nonBorder: true, figureTarget: true, infoOnly: false });
+		this.figure.open(target, {
+			nonResizing: true,
+			nonSizeInfo: true,
+			nonBorder: true,
+			figureTarget: true,
+			infoOnly: false,
+		});
 	}
 
 	/**
@@ -885,7 +937,10 @@ class Table extends PluginDropdownFree {
 			scrollTypeClass = ` se-scroll-figure-${this.figureScroll}`;
 		}
 
-		const figure = dom.utils.createElement('FIGURE', { class: 'se-flex-component se-input-component' + scrollTypeClass, style: 'width: 100%;' });
+		const figure = dom.utils.createElement('FIGURE', {
+			class: 'se-flex-component se-input-component' + scrollTypeClass,
+			style: 'width: 100%;',
+		});
 		figure.appendChild(oTable);
 		this.#maxWidth = true;
 

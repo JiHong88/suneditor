@@ -45,4 +45,9 @@ export function setDefaultLine(ports: EventPorts, lineTagName: string): void;
  * @param {Document} doc - The document object
  * @returns {boolean} true if the detected edge doesn't match the visual position (bidi mismatch)
  */
-export function isRtlBidiMismatch(range: Range, formatEl: HTMLElement, detectedEdge: 'front' | 'end', doc: Document): boolean;
+export function isRtlBidiMismatch(
+	range: Range,
+	formatEl: HTMLElement,
+	detectedEdge: 'front' | 'end',
+	doc: Document,
+): boolean;

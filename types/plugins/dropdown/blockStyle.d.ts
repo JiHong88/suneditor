@@ -16,7 +16,9 @@ export type BlockStylePluginOptions = {
 	 * ['p', 'h1', 'h2', 'blockquote', { tag: 'div', command: 'block', name: 'Custom Block', class: 'my-block' }]
 	 * ```
 	 */
-	items?: Array<'p' | 'div' | 'blockquote' | 'pre' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | string | BlockStyleItem>;
+	items?: Array<
+		'p' | 'div' | 'blockquote' | 'pre' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | string | BlockStyleItem
+	>;
 };
 /**
  * @typedef {{tag: string, command: "line"|"br-line"|"block", name?: string, class?: string}} BlockStyleItem

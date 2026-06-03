@@ -23,7 +23,11 @@ export function reduceDeleteDown(actions, ports, ctx) {
 
 	const selectRange = !range.collapsed || range.startContainer !== range.endContainer;
 	// RTL bidi guard: if offset=length is actually at the visual start due to LTR text in RTL line, skip end-edge handling
-	const bidiNotEnd = ctx.options.get('_rtl') && !selectRange && range.endOffset >= (range.endContainer.textContent?.length || 0) && isRtlBidiMismatch(range, formatEl, 'end', fc.get('_wd'));
+	const bidiNotEnd =
+		ctx.options.get('_rtl') &&
+		!selectRange &&
+		range.endOffset >= (range.endContainer.textContent?.length || 0) &&
+		isRtlBidiMismatch(range, formatEl, 'end', fc.get('_wd'));
 
 	actions.push(A.componentDeselect());
 	actions.push(A.cacheStyleNode());
@@ -33,7 +37,12 @@ export function reduceDeleteDown(actions, ports, ctx) {
 		return true;
 	}
 
-	if (!selectRange && !bidiNotEnd && format.isEdgeLine(range.endContainer, range.endOffset, 'end') && !formatEl.nextSibling) {
+	if (
+		!selectRange &&
+		!bidiNotEnd &&
+		format.isEdgeLine(range.endContainer, range.endOffset, 'end') &&
+		!formatEl.nextSibling
+	) {
 		actions.push(A.preventStop());
 		return false;
 	}
@@ -54,7 +63,11 @@ export function reduceDeleteDown(actions, ports, ctx) {
 	}
 
 	// line component
-	if (!selectRange && formatEl && (range.endOffset === range.endContainer.textContent.length || selectionNode === formatEl)) {
+	if (
+		!selectRange &&
+		formatEl &&
+		(range.endOffset === range.endContainer.textContent.length || selectionNode === formatEl)
+	) {
 		const sel =
 			selectionNode === formatEl
 				? isUneditableNode(ports, range, false)
@@ -81,7 +94,9 @@ export function reduceDeleteDown(actions, ports, ctx) {
 
 	// component
 	if (
-		(format.isLine(selectionNode) || selectionNode.nextSibling === null || (dom.check.isZeroWidth(selectionNode.nextSibling) && selectionNode.nextSibling.nextSibling === null)) &&
+		(format.isLine(selectionNode) ||
+			selectionNode.nextSibling === null ||
+			(dom.check.isZeroWidth(selectionNode.nextSibling) && selectionNode.nextSibling.nextSibling === null)) &&
 		range.startOffset === selectionNode.textContent.length
 	) {
 		const nextEl = formatEl.nextElementSibling;
@@ -94,8 +109,13 @@ export function reduceDeleteDown(actions, ports, ctx) {
 		}
 	}
 
-	if (!selectRange && (dom.check.isEdgePoint(range.endContainer, range.endOffset) || (selectionNode === formatEl ? formatEl.childNodes[range.startOffset] : false))) {
-		const sel = selectionNode === formatEl ? formatEl.childNodes[range.startOffset] || selectionNode : selectionNode;
+	if (
+		!selectRange &&
+		(dom.check.isEdgePoint(range.endContainer, range.endOffset) ||
+			(selectionNode === formatEl ? formatEl.childNodes[range.startOffset] : false))
+	) {
+		const sel =
+			selectionNode === formatEl ? formatEl.childNodes[range.startOffset] || selectionNode : selectionNode;
 		// delete nonEditable
 		if (sel && dom.check.isNonEditable(sel.nextSibling)) {
 			actions.push(A.preventStop());
@@ -124,7 +144,9 @@ export function reduceDeleteDown(actions, ports, ctx) {
 		(selectionNode === formatEl ||
 			(selectionNode.nodeType === 3 &&
 				(!selectionNode.nextSibling || dom.check.isList(selectionNode.nextSibling)) &&
-				(format.getLine(range.startContainer, null) !== format.getLine(range.endContainer, null) ? rangeEl.contains(range.endContainer) : range.endOffset === selectionNode.textContent.length && range.collapsed && !bidiNotEnd)))
+				(format.getLine(range.startContainer, null) !== format.getLine(range.endContainer, null)
+					? rangeEl.contains(range.endContainer)
+					: range.endOffset === selectionNode.textContent.length && range.collapsed && !bidiNotEnd)))
 	) {
 		actions.push(A.deleteListRemoveNested(range, formatEl, rangeEl));
 		return true;

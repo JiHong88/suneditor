@@ -79,7 +79,10 @@ declare class Table extends PluginDropdownFree {
 	 * @param {K} key
 	 * @param {import('./shared/table.constants').TableState[K]} value
 	 */
-	setState<K extends keyof import('./shared/table.constants').TableState>(key: K, value: import('./shared/table.constants').TableState[K]): void;
+	setState<K extends keyof import('./shared/table.constants').TableState>(
+		key: K,
+		value: import('./shared/table.constants').TableState[K],
+	): void;
 	componentSelect(target: HTMLElement): void | boolean;
 	componentDeselect(target: HTMLElement): void;
 	componentDestroy(target: HTMLElement): Promise<void>;
