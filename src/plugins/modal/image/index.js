@@ -774,7 +774,7 @@ class Image_ extends PluginModal {
 
 		// link
 		let isNewAnchor = null;
-		const anchor = this.anchor.create(true);
+		const anchor = this.anchor.create(true, dom.check.isAnchor(this.#element.parentElement) ? this.#element.parentElement.href : null);
 		if (anchor) {
 			if (this.#linkElement !== anchor || (isNewContainer && !container.contains(anchor))) {
 				this.#linkElement = anchor.cloneNode(false);
@@ -839,6 +839,7 @@ class Image_ extends PluginModal {
 	 */
 	#setAnchor(imgTag, anchor) {
 		if (anchor) {
+			/** @type {HTMLAnchorElement} */ (anchor).setAttribute('data-se-non-link', 'true');
 			anchor.appendChild(imgTag);
 			return anchor;
 		}

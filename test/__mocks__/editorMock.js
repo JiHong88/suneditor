@@ -168,9 +168,10 @@ function createMockOptions() {
 		['_disallowedExtraTag', 'script|iframe|style'],
 		['attributeWhitelist', null],
 		['attributeBlacklist', null],
-		['tagStyles', {}],
-		['_lineStylesRegExp', /^(margin|padding|text-align|text-indent|line-height|letter-spacing|word-spacing|white-space):/i],
-		['_textStylesRegExp', /^(color|background-color|font-size|font-family|font-weight|font-style|text-decoration|letter-spacing):/i],
+		['tagStyles', {
+			'@text': 'color|background-color|font-size|font-family|font-weight|font-style|text-decoration|letter-spacing',
+			'@line': 'margin|padding|text-align|text-indent|line-height|letter-spacing|word-spacing|white-space',
+		}],
 		['autoStyleify', []],
 		['v2Migration', false],
 		['strictMode', {

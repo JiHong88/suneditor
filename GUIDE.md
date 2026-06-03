@@ -481,6 +481,7 @@ Project-specific slash commands for [Claude Code](https://claude.ai/claude-code)
 - Check element types with `dom.check` methods (iframe-safe)
 - Follow the Redux pattern for event handling (Handler → Reducer → Actions → Effects)
 - Use specific JSDoc types (`SunEditor.Kernel` for constructors, `SunEditor.Deps` for deps)
+- **Any UI handler that mutates persisted wysiwyg DOM must end its chain with `this.$.history.push(false)`** — this is what triggers the public `onChange` event. If you call a wrapper that already pushes (e.g., `this.$.inline.apply`, `this.$.format.setLine`), don't push again. When in doubt, check the wrapper's implementation.
 
 ---
 

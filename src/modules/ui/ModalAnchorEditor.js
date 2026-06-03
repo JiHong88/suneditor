@@ -209,6 +209,8 @@ class ModalAnchorEditor {
 	/**
 	 * @description Creates an anchor (`<a>`) element with the specified attributes.
 	 * @param {boolean} notText - If `true`, the anchor will not contain text content.
+	 * @param {?string} [urlOverride] - Fallback URL used when the modal's `linkValue` is empty
+	 * - (e.g., when called outside the modal lifecycle such as from `retainFormat`)
 	 * @returns {HTMLElement|null} - The newly created anchor element, or `null` if the URL is empty.
 	 * @example
 	 * // In a link plugin — create anchor with text content:
@@ -221,11 +223,14 @@ class ModalAnchorEditor {
 	 * if (anchor) {
 	 *   anchor.appendChild(imgElement);
 	 * }
+	 *
+	 * // Preserve an existing parent anchor's href when rebuilding outside the modal:
+	 * const anchor = this.anchor.create(true, parentAnchor.href);
 	 */
-	create(notText) {
-		if (this.linkValue.length === 0) return null;
+	create(notText, urlOverride) {
+		const url = this.linkValue || urlOverride || '';
+		if (url.length === 0) return null;
 
-		const url = this.linkValue;
 		const displayText = this.displayInput.value.length === 0 ? url : this.displayInput.value;
 
 		const oA = /** @type {HTMLAnchorElement} */ (this.currentTarget || dom.utils.createElement('A'));

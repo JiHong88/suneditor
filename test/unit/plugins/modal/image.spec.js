@@ -920,7 +920,8 @@ describe('Image Plugin', () => {
 			const anchor = {
 				cloneNode: jest.fn().mockReturnValue({
 					nodeName: 'A',
-					appendChild: jest.fn()
+					appendChild: jest.fn(),
+					setAttribute: jest.fn()
 				}),
 				nodeName: 'A'
 			};
@@ -963,7 +964,8 @@ describe('Image Plugin', () => {
 			const anchor = {
 				cloneNode: jest.fn().mockReturnValue({
 					nodeName: 'A',
-					appendChild: jest.fn()
+					appendChild: jest.fn(),
+					setAttribute: jest.fn()
 				}),
 				nodeName: 'A'
 			};
@@ -1353,6 +1355,12 @@ describe('Image Plugin', () => {
 			mockFigure.GetContainer.mockClear();
 			mockFigure.CreateContainer.mockClear();
 			mockFigure.CreateInlineContainer.mockClear();
+
+			// Reset dom.check mocks that earlier suites flip to true
+			const { dom } = require('../../../../src/helper');
+			dom.check.isAnchor.mockReturnValue(false);
+			dom.check.isFigure.mockReturnValue(false);
+			dom.check.isComponentContainer.mockReturnValue(false);
 		});
 
 		it('should create new container when cover is missing', () => {
@@ -1479,7 +1487,7 @@ describe('Image Plugin', () => {
 			});
 
 			const mockAnchor = {
-				cloneNode: jest.fn().mockReturnValue({ appendChild: jest.fn() }),
+				cloneNode: jest.fn().mockReturnValue({ appendChild: jest.fn(), setAttribute: jest.fn() }),
 				nodeName: 'A'
 			};
 			image.anchor = {
@@ -1494,7 +1502,8 @@ describe('Image Plugin', () => {
 
 			result.method(mockElement);
 
-			expect(image.anchor.create).toHaveBeenCalledWith(true);
+			// parentElement is null → no override URL is forwarded to anchor.create.
+			expect(image.anchor.create).toHaveBeenCalledWith(true, null);
 		});
 	});
 

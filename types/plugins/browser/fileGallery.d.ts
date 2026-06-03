@@ -30,6 +30,18 @@ export type FileGalleryPluginOptions = {
 		[x: string]: string;
 	};
 	/**
+	 * - Server-side search URL. When set, the keyword is sent to this URL
+	 * as `?keyword=<value>` and the server response replaces the list. When not set, search filters the
+	 * already-loaded items locally.
+	 */
+	searchUrl?: string;
+	/**
+	 * - Server-side search request headers
+	 */
+	searchHeaders?: {
+		[x: string]: string;
+	};
+	/**
 	 * - Default thumbnail
 	 */
 	thumbnail?: string | ((item: SunEditor.Module.Browser.File) => string);
@@ -53,6 +65,10 @@ export type FileGalleryPluginOptions = {
  * }
  * ```
  * @property {Object<string, string>} [headers] - Server request headers
+ * @property {string} [searchUrl] - Server-side search URL. When set, the keyword is sent to this URL
+ * as `?keyword=<value>` and the server response replaces the list. When not set, search filters the
+ * already-loaded items locally.
+ * @property {Object<string, string>} [searchHeaders] - Server-side search request headers
  * @property {string|((item: SunEditor.Module.Browser.File) => string)} [thumbnail] - Default thumbnail
  */
 /**

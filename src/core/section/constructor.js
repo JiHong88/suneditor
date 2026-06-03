@@ -549,8 +549,6 @@ export function InitOptions(options, editorTargets, plugins) {
 			return _default;
 		}, {}),
 	);
-	o.set('_textStylesRegExp', new RegExp(`\\s*[^-a-zA-Z](${DEFAULTS.SPAN_STYLES}${options.spanStyles ? '|' + options.spanStyles : ''})\\s*:[^;]+(?!;)*`, 'gi'));
-	o.set('_lineStylesRegExp', new RegExp(`\\s*[^-a-zA-Z](${DEFAULTS.LINE_STYLES}${options.lineStyles ? '|' + options.lineStyles : ''})\\s*:[^;]+(?!;)*`, 'gi'));
 	o.set('_defaultStyleTagMap', {
 		strong: textTags.bold,
 		b: textTags.bold,
@@ -794,20 +792,12 @@ export function InitOptions(options, editorTargets, plugins) {
 
 	/** Create all used styles  */
 	const allUsedStyles = new Set(DEFAULTS.CONTENT_STYLES.split('|'));
-	const _ss = options.spanStyles?.split('|') || [];
 	const _ls = o.get('__listCommonStyle');
-	const _dts = DEFAULTS.SPAN_STYLES.split('|');
-	for (let i = 0, len = _dts.length; i < len; i++) {
-		allUsedStyles.add(_dts[i]);
-	}
 	for (const _ts of Object.values(o.get('tagStyles'))) {
 		const _tss = _ts.split('|');
 		for (let i = 0, len = _tss.length; i < len; i++) {
 			allUsedStyles.add(_tss[i]);
 		}
-	}
-	for (let i = 0, len = _ss.length; i < len; i++) {
-		allUsedStyles.add(_ss[i]);
 	}
 	for (let i = 0, len = _ls.length; i < len; i++) {
 		allUsedStyles.add(_ls[i]);

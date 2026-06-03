@@ -77,18 +77,10 @@ class HTML {
 		}
 
 		const stylesMap = new Map();
-		const stylesObj = {
-			...splitTagStyles,
-			line: options.get('_lineStylesRegExp'),
-		};
-		this.#textStyleTags.forEach((v) => {
-			stylesObj[v] = options.get('_textStylesRegExp');
-		});
-
-		for (const key in stylesObj) {
-			stylesMap.set(new RegExp(`^(${key})$`), stylesObj[key]);
+		for (const key in splitTagStyles) {
+			stylesMap.set(new RegExp(`^(${key})$`), splitTagStyles[key]);
 		}
-		this.#cleanStyleTagKeyRegExp = new RegExp(`^(${Object.keys(stylesObj).join('|')})$`, 'i');
+		this.#cleanStyleTagKeyRegExp = new RegExp(`^(${Object.keys(splitTagStyles).join('|')})$`, 'i');
 		this.#cleanStyleRegExpMap = stylesMap;
 
 		// font size unit
@@ -1966,12 +1958,12 @@ class HTML {
 				v.push(sv[0]);
 			}
 		} else if (!v || !_RE_STYLE_EQ.test(v.toString())) {
-			if (this.#textStyleTags.includes(tagName)) {
+			if (this.#cleanStyleTagKeyRegExp.test(tagName)) {
 				v = this.#cleanStyle(m, v, tagName);
 			} else if (this.#$.format.isLine(tagName)) {
-				v = this.#cleanStyle(m, v, 'line');
-			} else if (this.#cleanStyleTagKeyRegExp.test(tagName)) {
-				v = this.#cleanStyle(m, v, tagName);
+				v = this.#cleanStyle(m, v, '@line');
+			} else if (this.#textStyleTags.includes(tagName)) {
+				v = this.#cleanStyle(m, v, '@text');
 			}
 		}
 

@@ -67,6 +67,8 @@ export const DEFAULTS = {
 		'vertical-align|visibility|' +
 		'white-space|word-break|word-wrap',
 	TAG_STYLES: {
+		'@text': 'font-family|font-size|color|background-color|width|height',
+		'@line': 'text-align|margin|margin-left|margin-right|line-height',
 		'table|th|td': 'border|border-[a-z]+|color|background-color|text-align|float|font-weight|text-decoration|font-style|vertical-align',
 		'table|td': 'width',
 		tr: 'height',
@@ -78,8 +80,6 @@ export const DEFAULTS = {
 		'img|video|iframe': 'transform|transform-origin|width|min-width|max-width|height|min-height|max-height|float|margin|margin-top',
 		hr: '',
 	},
-	SPAN_STYLES: 'font-family|font-size|color|background-color|width|height',
-	LINE_STYLES: 'text-align|margin|margin-left|margin-right|line-height',
 
 	RETAIN_STYLE_MODE: ['repeat', 'always', 'none'],
 };
@@ -333,7 +333,7 @@ export const DEFAULTS = {
  * - `classFilter`: Filters disallowed CSS class names (`allowedClassName`)
  * - `textStyleTagFilter`: Filters text style tags (b, i, u, span, etc.)
  * - `attrFilter`: Filters disallowed HTML attributes (`attributeWhitelist`/`attributeBlacklist`)
- * - `styleFilter`: Filters disallowed inline styles (`spanStyles`/`lineStyles`/`allUsedStyles`)
+ * - `styleFilter`: Filters disallowed inline styles (per-tag from `tagStyles`)
  * ```js
  * // disable only attribute and style filters
  * {
@@ -409,19 +409,23 @@ export const DEFAULTS = {
  * ```js
  * { allUsedStyles: 'color|background-color|text-shadow' }
  * ```
- * @property {Object<string, string>} [tagStyles={}] - Specifies allowed styles for HTML tags. Key is tag name(s), value is pipe-delimited allowed styles.
+ * @property {Object<string, string>} [tagStyles={}] - Specifies allowed CSS styles per HTML tag.
+ * - Key is a tag name, multiple tags joined with `|`, or a category sentinel (`@text`, `@line`).
+ * - Value is a pipe-delimited list of allowed style names.
+ * - Resolution order when filtering an element: explicit tag entry → `@line` (for formatLine elements) → `@text` (for textStyleTags).
+ * - An explicit tag entry **replaces** the category default — include category styles in the value if you want both.
+ * - Merged with {@link DEFAULTS.TAG_STYLES}; user-supplied keys win.
  * ```js
  * {
  *   tagStyles: {
- *     'table|td': 'border|color|background-color',
- *     hr: 'border-top'
+ *     '@text': 'color|font-size|background-color',  // default for span, b, i, em, ...
+ *     '@line': 'text-align|margin|line-height',     // default for p, h1-h6, div, li, ...
+ *     'table|td': 'border|color|background-color',  // per-tag whitelist
+ *     div: 'color',                                   // explicit override; ignores `@line` default
+ *     hr: 'border-top',
  *   }
  * }
  * ```
- * @property {string} [spanStyles=CONSTANTS.SPAN_STYLES] - Specifies allowed styles for the `span` tag.
- * - The default follows {@link DEFAULTS.SPAN_STYLES}
- * @property {string} [lineStyles=CONSTANTS.LINE_STYLES] - Specifies allowed styles for the `line` element (p..).
- * - The default follows {@link DEFAULTS.LINE_STYLES}
  * @property {Array<string>} [fontSizeUnits=CONSTANTS.SIZE_UNITS] - Allowed font size units.
  * - The default follows {@link DEFAULTS.SIZE_UNITS}
  * @property {"repeat"|"always"|"none"} [retainStyleMode="repeat"] - Determines how inline elements (e.g. `<span>`, `<strong>`) are handled when deleting text.
@@ -650,8 +654,6 @@ export const DEFAULTS = {
  * @property {string[]} [_reverseCommandArray] - Internal key shortcut matcher for reverse commands.
  * @property {string} [_subMode] - Sub toolbar mode (e.g., `balloon`).
  * @property {string[]} [_textStyleTags] - Tag names used for text styling, plus span/li.
- * @property {RegExp} [_textStylesRegExp] - Regex to match inline styles (e.g., fontSize, color).
- * @property {RegExp} [_lineStylesRegExp] - Regex to match line styles (e.g., text-align, padding).
  * @property {Object<string, string>} [_defaultStyleTagMap] - Mapping HTML tag => standard tag.
  * @property {Object<string, string>} [_styleCommandMap] - Mapping HTML tag => command (e.g., bold, underline).
  * @property {Object<string, string>} [_defaultTagCommand] - Mapping command => preferred tag.
@@ -750,8 +752,6 @@ export const OPTION_FIXED_FLAG = {
 	convertTextTags: 'fixed',
 	__tagStyles: 'fixed',
 	tagStyles: 'fixed',
-	spanStyles: 'fixed',
-	lineStyles: 'fixed',
 	textDirection: true,
 	reverseButtons: 'fixed',
 	historyStackDelayTime: true,
@@ -816,7 +816,7 @@ export const OPTION_FIXED_FLAG = {
  * @property {boolean} classFilter - Filters disallowed CSS class names (`allowedClassName`)
  * @property {boolean} textStyleTagFilter - Filters text style tags (b, i, u, span, etc.)
  * @property {boolean} attrFilter - Filters disallowed HTML attributes (`attributeWhitelist`/`attributeBlacklist`)
- * @property {boolean} styleFilter - Filters disallowed inline styles (`spanStyles`/`lineStyles`/`allUsedStyles`)
+ * @property {boolean} styleFilter - Filters disallowed inline styles (per-tag from `tagStyles`)
  */
 
 /**

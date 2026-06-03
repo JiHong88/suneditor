@@ -252,7 +252,7 @@ describe('Modules - Browser', () => {
                 headers: headers,
                 selectorHandler: jest.fn()
             });
-            expect(browser.urlHeader).toBe(headers);
+            expect(browser.headers).toBe(headers);
         });
 
         it('should accept searchUrl parameter', () => {
@@ -317,14 +317,14 @@ describe('Modules - Browser', () => {
             expect(browser.area.className).toContain('custom-browser');
         });
 
-        it('should accept searchUrlHeader parameter', () => {
+        it('should accept searchHeaders parameter', () => {
             const searchHeaders = { 'X-Search': 'true' };
             const browser = new Browser(mockInst, mockEditor.$, {
                 title: 'Test',
-                searchUrlHeader: searchHeaders,
+                searchHeaders: searchHeaders,
                 selectorHandler: jest.fn()
             });
-            expect(browser.searchUrlHeader).toBe(searchHeaders);
+            expect(browser.searchHeaders).toBe(searchHeaders);
         });
 
         it('should accept props parameter', () => {
@@ -439,10 +439,10 @@ describe('Modules - Browser', () => {
             );
         });
 
-        it('should use urlHeader when fetching from URL', () => {
+        it('should use headers when fetching from URL', () => {
             browser.directData = null;
             browser.url = 'https://api.example.com/files';
-            browser.urlHeader = { Authorization: 'Bearer token' };
+            browser.headers = { Authorization: 'Bearer token' };
             browser.open();
             expect(browser.apiManager.call).toHaveBeenCalledWith(
                 expect.objectContaining({
@@ -608,9 +608,9 @@ describe('Modules - Browser', () => {
             );
         });
 
-        it('should use searchUrlHeader when searchUrl is present', () => {
+        it('should use searchHeaders when searchUrl is present', () => {
             browser.searchUrl = 'https://example.com/search';
-            browser.searchUrlHeader = { 'X-Search': 'true' };
+            browser.searchHeaders = { 'X-Search': 'true' };
             browser.search('query');
             expect(browser.apiManager.call).toHaveBeenCalledWith(
                 expect.objectContaining({
@@ -1869,7 +1869,7 @@ describe('Modules - Browser', () => {
         it('should call apiManager with correct parameters', () => {
             browser.directData = null;
             browser.url = 'https://api.example.com/files';
-            browser.urlHeader = { 'X-Custom': 'header' };
+            browser.headers = { 'X-Custom': 'header' };
             browser.open();
 
             expect(browser.apiManager.call).toHaveBeenCalledWith(
