@@ -238,7 +238,6 @@ declare class Autocomplete extends PluginField {
 	 * @param {AutocompletePluginOptions} pluginOptions
 	 */
 	constructor(kernel: SunEditor.Kernel, pluginOptions: AutocompletePluginOptions);
-	title: any;
 	triggerContexts: Map<any, any>;
 	sortedTriggers: any[];
 	selectMenu: SelectMenu;

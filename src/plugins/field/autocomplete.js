@@ -128,8 +128,6 @@ class Autocomplete extends PluginField {
 	 */
 	constructor(kernel, pluginOptions) {
 		super(kernel);
-		this.title = this.$.lang.autocomplete;
-		this.icon = 'autocomplete';
 
 		// global defaults
 		const limitSize = pluginOptions.limitSize || 5;

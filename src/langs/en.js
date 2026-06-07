@@ -133,7 +133,6 @@
 		math_modal_title: 'Math',
 		maxSize: 'Max size',
 		mediaGallery: 'Media gallery',
-		autocomplete: 'Autocomplete',
 		menu_bordered: 'Bordered',
 		menu_code: 'Code',
 		menu_neon: 'Neon',

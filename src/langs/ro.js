@@ -134,7 +134,6 @@
 		math_modal_title: 'Matematică',
 		maxSize: 'Dimensiune maximă',
 		mediaGallery: 'Galeria media',
-		autocomplete: 'Completare automată',
 		mention: 'Mentiune',
 		menu_bordered: 'Mărginit',
 		menu_code: 'Citat',

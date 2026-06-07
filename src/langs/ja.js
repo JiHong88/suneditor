@@ -133,7 +133,6 @@
 		math_modal_title: '数学',
 		maxSize: '最大サイズ',
 		mediaGallery: 'メディア ギャラリー',
-		autocomplete: 'オートコンプリート',
 		mention: '言及する',
 		menu_bordered: '境界線',
 		menu_code: 'コード',

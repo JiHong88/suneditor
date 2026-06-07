@@ -118,7 +118,6 @@ export type _Lang = {
 	math_modal_title: string;
 	maxSize: string;
 	mediaGallery: string;
-	autocomplete: string;
 	menu_bordered: string;
 	menu_code: string;
 	menu_neon: string;

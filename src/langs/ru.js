@@ -134,7 +134,6 @@
 		math_modal_title: 'математический',
 		maxSize: 'Ширина по размеру страницы',
 		mediaGallery: 'Галерея мультимедиа',
-		autocomplete: 'Автозаполнение',
 		mention: 'Упоминание',
 		menu_bordered: 'Граничная Линия',
 		menu_code: 'Код',

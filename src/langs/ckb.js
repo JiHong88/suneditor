@@ -134,7 +134,6 @@
 		math_modal_title: 'بیركاری',
 		maxSize: 'گه‌وره‌ترین قه‌باره‌',
 		mediaGallery: 'گەلەری میدیا',
-		autocomplete: 'تەواوکردنی ئۆتۆماتیکی',
 		mention: 'تنويه ب',
 		menu_bordered: 'لێواری هه‌بێت',
 		menu_code: 'كۆد',
