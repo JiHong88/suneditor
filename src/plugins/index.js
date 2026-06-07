@@ -8,6 +8,7 @@ import list_numbered from './command/list_numbered';
 
 // field
 import autocomplete from './field/autocomplete';
+import slashCommand from './field/slashCommand';
 
 // dropdown
 import align from './dropdown/align';
@@ -55,6 +56,7 @@ export {
 	list_bulleted,
 	list_numbered,
 	autocomplete,
+	slashCommand,
 	align,
 	font,
 	fontColor,
@@ -92,6 +94,7 @@ export default {
 	list_bulleted,
 	list_numbered,
 	autocomplete,
+	slashCommand,
 	align,
 	font,
 	fontColor,

@@ -134,7 +134,6 @@
 		math_modal_title: 'Math',
 		maxSize: 'Max størrelse',
 		mediaGallery: 'Mediegalleri',
-		autocomplete: 'Autofuldførelse',
 		mention: 'Nævne',
 		menu_bordered: 'Afgrænsningslinje',
 		menu_code: 'Code',

@@ -134,7 +134,6 @@
 		math_modal_title: 'Matematyczne',
 		maxSize: 'Maksymalny rozmiar',
 		mediaGallery: 'Galeria multimediów',
-		autocomplete: 'Automatyczne uzupełnianie',
 		mention: 'Wzmianka',
 		menu_bordered: 'Z obwódką',
 		menu_code: 'Kod',
