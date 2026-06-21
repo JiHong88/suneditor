@@ -29,7 +29,7 @@ Defines the enforceable conventions: events through `eventManager`, DOM mutation
 ## changes.md Update
 
 After modifying code, you must update [changes.md](./changes.md).
-Refer to [guide/changes-guide.md](./prompts/changes-guide.md) for formatting rules.
+Refer to [prompts/changes-guide.md](./prompts/changes-guide.md) for formatting rules.
 
 ## Release Note
 
