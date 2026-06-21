@@ -19,6 +19,8 @@ node_modules/
 /.vs
 .claude/*
 !.claude/skills/
+!.claude/rules/
+!.claude/settings.json
 .work.md
 
 #jest
