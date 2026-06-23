@@ -6,3 +6,4 @@ See **[AGENTS.md](./AGENTS.md)** — the primary entry point for AI agents in th
 @.claude/rules/generated-files.md
 @.claude/rules/plugin-authoring.md
 @.claude/rules/core-changes.md
+@.claude/rules/options-changes.md
