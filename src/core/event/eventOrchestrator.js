@@ -933,6 +933,9 @@ class EventOrchestrator extends KernelInjector {
 		this.#store.set('_lastSelectionNode', null);
 		this.#eventManager.triggerEvent('onNativeBlur', { frameContext, event: e });
 
+		// Drop the per-line placeholder on blur; the empty-editor placeholder takes over if applicable.
+		this.#ui._updatePlaceholder(frameContext);
+
 		if (this._inputFocus || this.#store.get('_preventBlur')) return;
 		this.#store.set('_preventFocus', false);
 
@@ -1084,6 +1087,9 @@ class EventOrchestrator extends KernelInjector {
 				anchorNode = null;
 				this.$.selection.init();
 				this.applyTagEffect();
+
+				// Notion-style per-line placeholder follows the caret's line.
+				this.#ui._updatePlaceholder(root);
 
 				// balloon toolbar - touch devices
 				if (isTouchDevice && (this.#store.mode.isBalloon || this.#store.mode.isSubBalloon)) {

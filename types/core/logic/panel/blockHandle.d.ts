@@ -12,7 +12,9 @@ declare class BlockHandle {
 	 * @param {HTMLElement} blockHandle - Handle group (.se-block-handle)
 	 * @param {HTMLElement} blockHandlePlus - Plus button
 	 * @param {HTMLElement} blockHandleDrag - Drag button
-	 * @param {Array<string>|null} menuConfig - Array of plugin names (like buttonList), or null
+	 * @param {Array<string | { title: string, icon?: string, action: function(SunEditor.Deps, { block: HTMLElement }): void }>|null} menuConfig
+	 *   Menu entries. Strings resolve via `ResolveButton` (plugin names, built-in commands). Objects
+	 *   define a custom row whose `action` is invoked with the Deps bag and the current block element.
 	 */
 	constructor(
 		$: SunEditor.Deps,
@@ -20,7 +22,19 @@ declare class BlockHandle {
 		blockHandle: HTMLElement,
 		blockHandlePlus: HTMLElement,
 		blockHandleDrag: HTMLElement,
-		menuConfig: Array<string> | null,
+		menuConfig: Array<
+			| string
+			| {
+					title: string;
+					icon?: string;
+					action: (
+						arg0: SunEditor.Deps,
+						arg1: {
+							block: HTMLElement;
+						},
+					) => void;
+			  }
+		> | null,
 	);
 	/**
 	 * @description Position the block handle for the given mouse target. Uses rAF throttle.

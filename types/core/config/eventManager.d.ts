@@ -26,6 +26,22 @@ declare class EventManager {
 	 */
 	triggerEvent: (eventName: string, ...args: any) => Promise<any>;
 	/**
+	 * @internal
+	 * @description Bind the EventOrchestrator once it is constructed. Invoked by `coreKernel`
+	 * immediately after orchestrator creation so the public `applyTagEffect` method below can delegate.
+	 * @param {import('../event/eventOrchestrator').default} orchestrator
+	 */
+	_bindOrchestrator(orchestrator: import('../event/eventOrchestrator').default): void;
+	/**
+	 * @description Re-run the toolbar/menu active-state pass against the given selection node (or the
+	 * current selection if `null`). Thin pass-through to {@link EventOrchestrator#applyTagEffect};
+	 * exposed on `$.eventManager` so modules/plugins can request an immediate sync after they mutate
+	 * `commandDispatcher.targets` (e.g. CommandMenu pushing newly-rendered rows).
+	 * @param {?Node} [selectionNode]
+	 * @returns {Node | undefined}
+	 */
+	applyTagEffect(selectionNode?: Node | null): Node | undefined;
+	/**
 	 * @description Register for an event.
 	 * - Only events registered with this method are unregistered or re-registered when methods such as 'setOptions', 'destroy' are called.
 	 * @param {*} target Target element

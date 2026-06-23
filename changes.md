@@ -3,6 +3,8 @@
 - Block handle 기능 추가 — 라인 사이드 핸들에서 hover/drag/액션 메뉴 제공
 - SelectMenu 서브메뉴 지원
 - `toolbar_innerWidth` / `innerWidth` 옵션 추가
+- `slashCommand` 플러그인 추가 — Notion/Tiptap 스타일 명령 메뉴. 트리거 문자(기본 `/`)와 메뉴 아이템을 사용자가 지정 (`src/plugins/field/slashCommand.js`)
+- `placeholder_line` 옵션 추가 — Notion 스타일 라인 placeholder. 커서가 빈 라인에 있을 때 해당 라인 위치에 출력(헤딩 폰트·들여쓰기·LTR/RTL 정확히 매칭). 기존 `placeholder`와 함께 켜져 있으면 포커스된 빈 라인에서는 라인 placeholder가 우선
 
 ### change
 
@@ -21,3 +23,4 @@
 - SelectMenu: `left`/`right` 모드에서 좌우 flip이 좌표계 혼합으로 동작하지 않던 문제
 - `list-style-position: inside`로 변경 — 글머리기호가 바깥으로 넘치지 않도록
 - 컨트롤러가 wysiwyg-inner 내부 스크롤로 target이 가시 영역을 벗어나도 hide되지 않거나 에디터 가장자리에 걸려있던 문제 수정
+- `documentType`에서 placeholder 위치가 어긋나던 문제 수정

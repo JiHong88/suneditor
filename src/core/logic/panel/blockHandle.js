@@ -1,7 +1,7 @@
 import { dom, env } from '../../../helper';
 import { resolveBlock } from './blockResolver';
 import { ResolveButton } from '../../section/constructor';
-import SelectMenu from '../../../modules/ui/SelectMenu.js';
+import CommandMenu from '../../../modules/ui/CommandMenu.js';
 
 const { _w, _d } = env;
 
@@ -38,7 +38,7 @@ class BlockHandle {
 	#dragBtn;
 	#menuConfig;
 
-	/** @type {SelectMenu|null} */
+	/** @type {CommandMenu|null} */
 	#actionMenu = null;
 	/** @type {HTMLElement|null} */
 	#currentBlock = null;
@@ -67,10 +67,6 @@ class BlockHandle {
 	/** @type {HTMLElement[]|null} */
 	#dragChildren = null;
 
-	// Free dropdown (table, fontColor, etc.) — opened as a flyout next to the action menu
-	/** @type {{ dropdown: HTMLElement, plugin: Object|null, originalParent: Node|null, anchorLi: HTMLElement|null, evClick: ?SunEditor.Event.Info }|null} */
-	#freeDropdownState = null;
-
 	/**
 	 * @constructor
 	 * @param {SunEditor.Deps} $ - Kernel dependencies
@@ -78,7 +74,9 @@ class BlockHandle {
 	 * @param {HTMLElement} blockHandle - Handle group (.se-block-handle)
 	 * @param {HTMLElement} blockHandlePlus - Plus button
 	 * @param {HTMLElement} blockHandleDrag - Drag button
-	 * @param {Array<string>|null} menuConfig - Array of plugin names (like buttonList), or null
+	 * @param {Array<string | { title: string, icon?: string, action: function(SunEditor.Deps, { block: HTMLElement }): void }>|null} menuConfig
+	 *   Menu entries. Strings resolve via `ResolveButton` (plugin names, built-in commands). Objects
+	 *   define a custom row whose `action` is invoked with the Deps bag and the current block element.
 	 */
 	constructor($, blockHandleArea, blockHandle, blockHandlePlus, blockHandleDrag, menuConfig) {
 		this.#$ = $;
@@ -189,11 +187,11 @@ class BlockHandle {
 		}
 		this.#isDragging = false;
 		this.#cancelHide();
-		this.#closeFreeDropdown();
 
 		if (this.#dragBtn) this.#dragBtn.draggable = false;
 		this.#dragIndicator?.remove();
 		this.#handle?.remove();
+		// CommandMenu's closeMethod tears down its own flyout when the menu closes.
 		this.#actionMenu?.close();
 		this.#actionMenu = null;
 		this.#setCurrentBlock(null);
@@ -743,263 +741,44 @@ class BlockHandle {
 	}
 
 	/**
-	 * @description Build the action SelectMenu from menuConfig (plugin names / basic commands).
-	 * @returns {SelectMenu}
+	 * @description Build the action menu via {@link CommandMenu}.
+	 * @returns {CommandMenu}
 	 */
 	#buildActionMenu() {
-		const menu = new SelectMenu(this.#$, {
-			position: 'right-top',
-			dir: this.#$.options.get('_rtl') ? 'rtl' : 'ltr',
-			minWidth: '200px',
-			keydownTarget: _w,
-			closeMethod: () => {
-				dom.utils.removeClass(this.#dragBtn, 'on');
-				this.#closeFreeDropdown();
-				this.#clearHoverLines();
-			},
-			openMethod: () => {
-				dom.utils.addClass(this.#dragBtn, 'on');
+		const menu = new CommandMenu(this, this.#$, {
+			items: this.#menuConfig,
+			resolveButton: ResolveButton,
+			selectMenuParams: {
+				position: 'right-top',
+				dir: this.#$.options.get('_rtl') ? 'rtl' : 'ltr',
+				minWidth: '200px',
+				keydownTarget: _w,
+				closeMethod: () => {
+					dom.utils.removeClass(this.#dragBtn, 'on');
+					this.#clearHoverLines();
+				},
+				openMethod: () => {
+					dom.utils.addClass(this.#dragBtn, 'on');
+				},
 			},
 		});
 
-		menu.on(this.#dragBtn, this.#onActionSelect.bind(this), { class: 'se-block-action-menu' });
-
-		// Prevent blur on menu interaction — preserve selection range
-		this.#$.eventManager.addEvent(menu.form, 'mousedown', (e) => {
-			if (!env.isMobile) {
-				e.preventDefault();
-			} else {
-				this.#$.store.set('_preventBlur', true);
-			}
-		});
-
-		const items = [];
-		const menus = [];
-
-		for (const name of this.#menuConfig) {
-			const resolved = ResolveButton(name, this.#$.plugins, this.#$.options, this.#$.icons, this.#$.lang);
-			if (!resolved) continue;
-
-			const menuHTML = resolved.icon
-				? `<span class="se-block-menu-icon">${resolved.icon}</span><span class="se-block-menu-label">${resolved.title}</span>`
-				: `<span class="se-block-menu-label se-block-menu-label-full">${resolved.title}</span>`;
-			const type = resolved.type;
-
-			if (/dropdown-free/.test(type)) {
-				items.push({ pluginName: name, type });
-				menus.push(`${menuHTML}<span class="se-submenu-arrow">${this.#$.icons.menu_arrow_right}</span>`);
-			} else if (/dropdown/.test(type)) {
-				const menuItems = this.#$.menu?.itemsMap?.[name] || [];
-
-				const childItems = menuItems.map((item) => ({ pluginName: name, element: item._element }));
-				const childMenus = menuItems.map((item) => {
-					const iconEl = item._element?.querySelector('.se-list-icon') || item._element?.querySelector('svg');
-					const icon = iconEl ? iconEl.outerHTML : '';
-					const label = icon ? `${icon}<span>${item.title}</span>` : item.title;
-					return `<span class="se-block-submenu-item">${label}</span>`;
-				});
-
-				items.push({ children: childItems, childMenus });
-				menus.push(menuHTML);
-			} else if (/modal/.test(type) || /browser/.test(type) || /command/.test(type) || /popup/.test(type)) {
-				items.push({ pluginName: name, type });
-				menus.push(menuHTML);
-			} else {
-				items.push({ command: resolved.command });
-				menus.push(menuHTML);
-			}
-		}
-
-		menu.create(items, menus);
-		this.#installFreeDropdownHover(items, menu);
+		menu.attach(this.#dragBtn, this.#onActionSelect.bind(this), { class: 'se-block-action-menu' });
+		menu.createRows(menu.getItems());
 		return menu;
 	}
 
 	/**
-	 * @description Hover-to-open for dropdown-free items.
-	 * @param {Array<*>} items
-	 * @param {SelectMenu} menu
-	 */
-	#installFreeDropdownHover(items, menu) {
-		const freeMap = new Map();
-		for (let i = 0; i < items.length; i++) {
-			const it = items[i];
-			if (it && /dropdown-free/.test(it.type)) {
-				freeMap.set(i, {
-					pluginName: it.pluginName,
-					plugin: this.#$.plugins[it.pluginName],
-					li: menu.menus[i],
-				});
-			}
-		}
-		if (freeMap.size === 0) return;
-
-		this.#$.eventManager.addEvent(menu.form, 'mousemove', (e) => {
-			const target = /** @type {HTMLElement} */ (e.target);
-			if (this.#freeDropdownState?.dropdown?.contains(target)) return;
-
-			const li = target.closest?.('li[data-index]');
-			if (!li) return;
-
-			const idx = Number(li.getAttribute('data-index'));
-			const free = freeMap.get(idx);
-			if (free) {
-				if (this.#freeDropdownState?.plugin !== free.plugin) {
-					this.#openFreeDropdown(free.pluginName, free.plugin, free.li);
-				}
-			} else if (this.#freeDropdownState) {
-				this.#closeFreeDropdown();
-			}
-		});
-	}
-
-	/**
-	 * @description Open a dropdown-free plugin's dropdown (table, fontColor, etc.)
-	 * @param {string} pluginName
-	 * @param {Object} plugin
-	 * @param {HTMLElement} anchorLi
-	 */
-	#openFreeDropdown(pluginName, plugin, anchorLi) {
-		if (this.#freeDropdownState) this.#closeFreeDropdown();
-		const dropdown = this.#$.menu?.targetMap?.[pluginName];
-		if (!dropdown || !this.#actionMenu) return;
-
-		const originalParent = dropdown.parentNode;
-		this.#actionMenu.form.appendChild(dropdown);
-		this.#positionFlyout(dropdown, anchorLi, this.#actionMenu.form);
-
-		dom.utils.addClass(anchorLi, 'se-submenu-open');
-		plugin.on?.(anchorLi);
-
-		const evClick = this.#$.eventManager.addEvent(dropdown, 'click', () =>
-			_w.setTimeout(() => {
-				this.#closeFreeDropdown();
-				this.#actionMenu?.close();
-			}, 0),
-		);
-
-		this.#freeDropdownState = { dropdown, plugin, originalParent, anchorLi, evClick };
-	}
-
-	#closeFreeDropdown() {
-		const s = this.#freeDropdownState;
-		if (!s) return;
-		this.#freeDropdownState = null;
-
-		this.#$?.eventManager.removeEvent(s.evClick);
-		s.dropdown.style.cssText = '';
-		s.dropdown.style.display = 'none';
-
-		if (s.anchorLi) dom.utils.removeClass(s.anchorLi, 'se-submenu-open');
-
-		// Restore dropdown DOM to its original parent (menuTray)
-		if (s.originalParent && s.originalParent !== s.dropdown.parentNode) {
-			s.originalParent.appendChild(s.dropdown);
-		}
-
-		s.plugin?.off?.();
-	}
-
-	/**
-	 * @description Place `el` next to `anchor`, coordinates relative to `container`.
-	 * Mirrors `SelectMenu.#openSubmenu`: tries the preferred side first.
-	 * @param {HTMLElement} el
-	 * @param {HTMLElement} anchor
-	 * @param {HTMLElement} container
-	 */
-	#positionFlyout(el, anchor, container) {
-		const a = anchor.getBoundingClientRect();
-		const c = container.getBoundingClientRect();
-		const isRtl = !!this.#$.options.get('_rtl');
-
-		el.style.position = 'absolute';
-		el.style.right = '';
-		el.style.visibility = 'hidden';
-		el.style.display = 'block';
-
-		const elW = el.offsetWidth;
-		const elH = el.offsetHeight;
-		const vpW = _w.innerWidth;
-		const vpH = _w.innerHeight;
-		const gap = 4;
-
-		// Horizontal: preferred side follows text direction (right of anchor in LTR,
-		// left of anchor in RTL). Flip if it overflows; if both overflow, keep the
-		// smaller-overflow side and shift inward by the missing amount.
-		const rightVP = a.right + gap;
-		const leftVP = a.left - elW - gap;
-		const rightOverflow = Math.max(0, rightVP + elW - vpW);
-		const leftOverflow = Math.max(0, -leftVP);
-		const prefer = isRtl ? 'left' : 'right';
-		let leftPx;
-		if (prefer === 'right') {
-			if (rightOverflow === 0) leftPx = rightVP;
-			else if (leftOverflow === 0) leftPx = leftVP;
-			else if (rightOverflow <= leftOverflow) leftPx = rightVP - rightOverflow;
-			else leftPx = leftVP + leftOverflow;
-		} else {
-			if (leftOverflow === 0) leftPx = leftVP;
-			else if (rightOverflow === 0) leftPx = rightVP;
-			else if (leftOverflow <= rightOverflow) leftPx = leftVP + leftOverflow;
-			else leftPx = rightVP - rightOverflow;
-		}
-		el.style.left = leftPx - c.left + 'px';
-
-		// Vertical: try top-aligned with anchor; flip to bottom-anchored if it overflows
-		// downward; if both directions overflow, keep the smaller-overflow side and shift
-		// inward by the missing amount.
-		const topVP = a.top;
-		const bottomVP = a.bottom - elH;
-		const downOverflow = Math.max(0, topVP + elH - vpH);
-		const upOverflow = Math.max(0, -bottomVP);
-		let topPx;
-		if (downOverflow === 0) topPx = topVP;
-		else if (upOverflow === 0) topPx = bottomVP;
-		else if (downOverflow <= upOverflow) topPx = topVP - downOverflow;
-		else topPx = bottomVP + upOverflow;
-		el.style.top = topPx - c.top + 'px';
-
-		el.style.visibility = '';
-	}
-
-	/**
-	 * @description Handle action menu item selection.
-	 * @param {Object} item - The selected item value
+	 * @description Action menu click — delegates to CommandMenu.dispatch with `{block}` as the
+	 * custom-action context. CommandMenu handles plugin dispatch (modal/browser/popup/command,
+	 * built-ins via commandDispatcher) and dropdown-free toggling internally.
+	 * @param {*} item
 	 */
 	#onActionSelect(item) {
 		if (!this.#currentBlock || !this.#$ || !item) return;
-
-		if (item.element) {
-			const plugin = this.#$.plugins[item.pluginName];
-			plugin?.action?.(item.element);
-			this.#$.history.push(false);
-		} else if (item.pluginName) {
-			const plugin = this.#$.plugins[item.pluginName];
-			if (plugin) {
-				if (/dropdown-free/.test(item.type)) {
-					if (this.#freeDropdownState?.plugin === plugin) {
-						this.#closeFreeDropdown();
-					} else {
-						const idx = this.#actionMenu.items.indexOf(item);
-						const anchorLi = this.#actionMenu.menus[idx];
-						this.#openFreeDropdown(item.pluginName, plugin, anchorLi);
-					}
-					return;
-				}
-				if (/modal/.test(item.type)) {
-					plugin.open?.();
-				} else if (/browser/.test(item.type)) {
-					plugin.open?.(null);
-				} else {
-					plugin.action?.(dom.utils.createElement('BUTTON', { 'data-command': item.pluginName }));
-				}
-				this.#$.history.push(false);
-			}
-		} else if (item.command) {
-			this.#$.commandDispatcher.run(item.command, null, null);
-		}
-
-		this.#actionMenu?.close();
+		this.#actionMenu?.dispatch(item, { block: this.#currentBlock });
+		// Dropdown-free items keep the menu open (the flyout is the actual UI); other dispatches close.
+		if (item.kind !== 'dropdownFree') this.#actionMenu?.close();
 	}
 }
 

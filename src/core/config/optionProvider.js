@@ -228,6 +228,10 @@ export default class OptionProvider {
 					fc.get('placeholder').textContent = newRootOptions.get('placeholder');
 				}
 
+				if (diff.has('placeholder_line')) {
+					fc.get('placeholder_line').textContent = newRootOptions.get('placeholder_line');
+				}
+
 				// frame styles
 				ui.setEditorStyle(newRootOptions.get('editorStyle'), fc);
 

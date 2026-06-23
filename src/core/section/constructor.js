@@ -190,6 +190,7 @@ function Constructor(editorTargets, options) {
 		const statusbar = bottomBar.statusbar;
 		const wysiwyg_div = initElements.wysiwygFrame;
 		const placeholder_span = initElements.placeholder;
+		const placeholder_line_span = initElements.placeholderLine;
 		let textarea = initElements.codeView;
 
 		// line breaker
@@ -209,6 +210,7 @@ function Constructor(editorTargets, options) {
 
 		// append container
 		if (placeholder_span) editor_div.appendChild(placeholder_span);
+		if (placeholder_line_span) editor_div.appendChild(placeholder_line_span);
 		container.appendChild(dom.utils.createElement('DIV', { class: 'se-toolbar-sticky-dummy' }));
 		container.appendChild(editor_div);
 
@@ -1164,6 +1166,7 @@ function InitFrameOptions(o, origin) {
 	// members
 	const value = o.value === undefined ? origin.value : o.value;
 	const placeholder = o.placeholder === undefined ? origin.placeholder : o.placeholder;
+	const placeholder_line = o.placeholder_line === undefined ? origin.placeholder_line : o.placeholder_line;
 	const editableFrameAttributes =
 		o.editableFrameAttributes === undefined ? origin.editableFrameAttributes : o.editableFrameAttributes;
 	const width = o.width === undefined ? origin.width : o.width;
@@ -1202,6 +1205,7 @@ function InitFrameOptions(o, origin) {
 	// value
 	fo.set('value', value);
 	fo.set('placeholder', placeholder);
+	fo.set('placeholder_line', placeholder_line);
 	fo.set('editableFrameAttributes', { spellcheck: 'false', ...editableFrameAttributes });
 	// styles
 	fo.set('width', width ? String(numbers.is(width) ? width + 'px' : width) : '100%');
@@ -1253,7 +1257,7 @@ function InitFrameOptions(o, origin) {
  * @param {HTMLElement} topDiv - Top div
  * @param {SunEditor.FrameOptions} targetOptions - `editor.frameOptions`
  * @param {string} formFieldPrefix - Prefix for generated form field ids
- * @returns {{bottomBar: ReturnType<CreateStatusbar>, wysiwygFrame: HTMLElement, codeView: HTMLElement, markdownView: HTMLElement, placeholder: HTMLElement}}
+ * @returns {{bottomBar: ReturnType<CreateStatusbar>, wysiwygFrame: HTMLElement, codeView: HTMLElement, markdownView: HTMLElement, placeholder: HTMLElement, placeholderLine: HTMLElement}}
  */
 function _initTargetElements(key, options, topDiv, targetOptions, formFieldPrefix) {
 	const editorStyles = targetOptions.get('_defaultStyles');
@@ -1331,12 +1335,19 @@ function _initTargetElements(key, options, topDiv, targetOptions, formFieldPrefi
 		placeholder.textContent = targetOptions.get('placeholder');
 	}
 
+	// Notion-style per-line placeholder — positioned at runtime over the focused empty line.
+	const placeholderLine = dom.utils.createElement('SPAN', { class: 'se-placeholder se-placeholder-line' });
+	if (targetOptions.get('placeholder_line')) {
+		placeholderLine.textContent = targetOptions.get('placeholder_line');
+	}
+
 	return {
 		bottomBar: CreateStatusbar(targetOptions, null),
 		wysiwygFrame: wysiwygDiv,
 		codeView: textarea,
 		markdownView: markdownTextarea,
 		placeholder: placeholder,
+		placeholderLine: placeholderLine,
 	};
 }
 

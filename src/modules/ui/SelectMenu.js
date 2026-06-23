@@ -459,7 +459,7 @@ class SelectMenu {
 				} else {
 					data.element.style.display = '';
 				}
-				dom.utils.removeClass(data.element.querySelectorAll('.se-select-item'), 'active');
+				dom.utils.removeClass(data.element.querySelectorAll('.se-select-item'), 'se-select-cursor');
 			}
 		}
 		this.#activeSubmenuIndex = -1;
@@ -498,8 +498,8 @@ class SelectMenu {
 
 		dom.utils.removeClass(this.form, 'se-select-menu-mouse-move');
 		for (let i = 0; i < len; i++) {
-			if (i === idx) dom.utils.addClass(items[i], 'active');
-			else dom.utils.removeClass(items[i], 'active');
+			if (i === idx) dom.utils.addClass(items[i], 'se-select-cursor');
+			else dom.utils.removeClass(items[i], 'se-select-cursor');
 		}
 	}
 
@@ -548,9 +548,9 @@ class SelectMenu {
 		const len = this.menuLen;
 		for (let i = 0; i < len; i++) {
 			if (i === selectIndex) {
-				dom.utils.addClass(this.menus[i], 'active');
+				dom.utils.addClass(this.menus[i], 'se-select-cursor');
 			} else {
-				dom.utils.removeClass(this.menus[i], 'active');
+				dom.utils.removeClass(this.menus[i], 'se-select-cursor');
 			}
 		}
 
@@ -789,7 +789,10 @@ class SelectMenu {
 					{
 						const subData = this.#submenuData.get(this.#activeSubmenuIndex);
 						if (subData?.element)
-							dom.utils.removeClass(subData.element.querySelectorAll('.se-select-item'), 'active');
+							dom.utils.removeClass(
+								subData.element.querySelectorAll('.se-select-item'),
+								'se-select-cursor',
+							);
 					}
 					return;
 				case 'Enter':
@@ -883,20 +886,24 @@ class SelectMenu {
 		const eventTarget = dom.query.getEventTarget(e);
 		dom.utils.addClass(this.form, 'se-select-menu-mouse-move');
 
-		// hovering inside a submenu
-		const childIndex = eventTarget.getAttribute('data-child-index');
-		if (childIndex !== null) {
+		// `data-*` attrs live on `<li>`, but events may originate from nested children
+		// (e.g. CommandMenu wraps row content in a `<button>` for native :disabled). Walk
+		// up so the lookup still works when the target isn't the `<li>` itself.
+		const childTarget = eventTarget.closest?.('[data-child-index]');
+		const childIndex = childTarget?.getAttribute('data-child-index');
+		if (childIndex !== null && childIndex !== undefined) {
 			this.#submenuItemIndex = Number(childIndex);
 			const subData = this.#submenuData.get(this.#activeSubmenuIndex);
 			if (subData?.element) {
 				const items = subData.element.querySelectorAll('.se-select-item');
-				dom.utils.removeClass(items, 'active');
-				dom.utils.addClass(items[this.#submenuItemIndex], 'active');
+				dom.utils.removeClass(items, 'se-select-cursor');
+				dom.utils.addClass(items[this.#submenuItemIndex], 'se-select-cursor');
 			}
 			return;
 		}
 
-		const index = eventTarget.getAttribute('data-index');
+		const indexTarget = eventTarget.closest?.('[data-index]');
+		const index = indexTarget?.getAttribute('data-index');
 		if (!index) return;
 		const numIndex = Number(index);
 		this.index = numIndex;

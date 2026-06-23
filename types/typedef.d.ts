@@ -316,6 +316,7 @@ declare global {
 				| 'list_bulleted'
 				| 'list_numbered'
 				| 'autocomplete'
+				| 'slashCommand'
 				| 'align'
 				| 'font'
 				| 'fontColor'
