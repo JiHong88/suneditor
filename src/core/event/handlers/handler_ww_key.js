@@ -53,6 +53,19 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 	/** default key action */
 	if (keyCodeMap.isEnter(keyCode) && this.$.format.isLine(this.$.selection.getRange()?.startContainer)) {
 		this.$.selection.resetRangeToTextNode();
+
+		const r = this.$.selection.getRange();
+		if (
+			r.startContainer === r.endContainer &&
+			r.startOffset !== r.endOffset &&
+			r.startContainer.nodeType === 3 &&
+			dom.check.isZeroWidth(r.startContainer)
+		) {
+			const br = r.startContainer.nextSibling;
+			if (br && dom.check.isBreak(br)) this.$.selection.setRange(br, 0, br, 0);
+			else this.$.selection.setRange(r.endContainer, r.endOffset, r.endContainer, r.endOffset);
+		}
+
 		selectionNode = this.$.selection.getNode();
 	}
 

@@ -532,20 +532,15 @@ export default {
 			} else {
 				offset = rcon.offset;
 				if (formatStartEdge) {
-					const tempEl = newEl.parentNode.insertBefore(newFormat, newEl);
+					newEl.parentNode.insertBefore(newFormat, newEl);
 					if (formatEndEdge) {
-						newEl = tempEl;
 						offset = 0;
 					}
 				}
 			}
 		} else {
 			if (formatEndEdge && formatStartEdge) {
-				newEl.parentNode.insertBefore(
-					newFormat,
-					rcon.prevContainer && rcon.container === rcon.prevContainer ? newEl.nextElementSibling : newEl,
-				);
-				newEl = newFormat;
+				newEl.parentNode.insertBefore(newFormat, newEl);
 				offset = 0;
 			} else if (formatEndEdge) {
 				newEl = newEl.parentNode.insertBefore(newFormat, newEl.nextElementSibling);
