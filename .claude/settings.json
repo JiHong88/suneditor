@@ -24,6 +24,12 @@
 						"command": "f=$(jq -r \"(.tool_input.file_path) // empty\"); case \"$f\" in */src/*.js) out=$(npx eslint \"$f\" 2>&1) || { printf \"ESLint found issues in %s:\\n%s\\n\" \"$f\" \"$out\" >&2; exit 2; };; esac",
 						"timeout": 30,
 						"statusMessage": "ESLint (changed file)"
+					},
+					{
+						"type": "command",
+						"command": "f=$(jq -r \"(.tool_input.file_path) // empty\"); case \"$f\" in */src/core/schema/options.js) printf \"Option schema changed — if you added/renamed/changed an option, verify all three (see .claude/rules/options-changes.md):\\n  1) OptionProvider.reset() handling (src/core/config/optionProvider.js)\\n  2) OPTION_FIXED_FLAG (global) | OPTION_FRAME_FIXED_FLAG (per-frame)\\n  3) typedef @property, then: npm run ts-build\\n\" >&2; exit 2;; esac",
+						"timeout": 10,
+						"statusMessage": "Options checklist"
 					}
 				]
 			}
