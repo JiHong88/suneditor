@@ -863,20 +863,74 @@ class UIManager {
 	 */
 	_updatePlaceholder(fc) {
 		fc ||= this.#frameContext;
+		const isCodeView = fc.get('isCodeView');
+
+		const lineShown = !isCodeView && this.#updateLinePlaceholder(fc);
+
 		const placeholder = fc.get('placeholder');
-
 		if (placeholder) {
-			if (fc.get('isCodeView')) {
-				placeholder.style.display = 'none';
-				return;
-			}
-
-			if (this.#$.facade.isEmpty(fc)) {
-				placeholder.style.display = 'block';
-			} else {
-				placeholder.style.display = 'none';
-			}
+			placeholder.style.display = !isCodeView && !lineShown && this.#$.facade.isEmpty(fc) ? 'block' : 'none';
 		}
+	}
+
+	/**
+	 * @internal
+	 * @description per-line placeholder. Shown over the focused line while that line is empty
+	 * @param {SunEditor.FrameContext} fc - Frame context
+	 * @returns {boolean} Whether the line placeholder is currently visible.
+	 */
+	#updateLinePlaceholder(fc) {
+		const el = fc.get('placeholder_line');
+		if (!el) return false;
+
+		// Needs configured text and a live caret inside this frame's editable area.
+		const node = this.#$.selection.selectionNode;
+		if (!el.textContent || !this.#store.get('hasFocus') || !node || !fc.get('wysiwyg').contains(node)) {
+			el.style.display = 'none';
+			return false;
+		}
+
+		const line = this.#$.format.getLine(node);
+		if (!line || !this.#isLineEmpty(line)) {
+			el.style.display = 'none';
+			return false;
+		}
+
+		const pos = this.#$.offset.get(line);
+		const lineEl = /** @type {HTMLElement} */ (line);
+		const cs = (line.ownerDocument.defaultView || env._w).getComputedStyle(lineEl);
+		el.style.top = pos.top + 'px';
+		el.style.margin = '0';
+		el.style.fontSize = cs.fontSize;
+		el.style.lineHeight = cs.lineHeight;
+		if (this.#$.options.get('_rtl')) {
+			// `parentElement` (the positioned `.se-wrapper`) is the same containing block as
+			// `offsetParent`, but stays resolvable while the element is still `display:none`.
+			const wrapper = /** @type {HTMLElement} */ (el.parentElement);
+			el.style.left = 'auto';
+			el.style.right = wrapper.clientWidth - (pos.left + lineEl.offsetWidth) + 'px';
+			el.style.padding = `${cs.paddingTop} ${cs.paddingRight} 0 0`;
+		} else {
+			el.style.right = 'auto';
+			el.style.left = pos.left + 'px';
+			el.style.padding = `${cs.paddingTop} 0 0 ${cs.paddingLeft}`;
+		}
+		el.style.display = 'block';
+		return true;
+	}
+
+	/**
+	 * @internal
+	 * @description Whether a format line holds no text or void content — `facade.isEmpty` at line
+	 * granularity.
+	 * @param {Node} line - Format line element
+	 * @returns {boolean}
+	 */
+	#isLineEmpty(line) {
+		return (
+			dom.check.isZeroWidth(line.textContent) &&
+			!(/** @type {Element} */ (line).querySelector(this.#$.options.get('allowedEmptyTags')))
+		);
 	}
 
 	/**

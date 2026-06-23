@@ -121,7 +121,12 @@ function createMockDeps() {
 			}),
 			removeEvent: jest.fn((info) => {
 				info?.target?.removeEventListener?.(info.type, info.handler, info.useCapture);
-			})
+			}),
+			applyTagEffect: jest.fn()
+		},
+		commandDispatcher: {
+			registerTargets: jest.fn(),
+			unregisterTargets: jest.fn()
 		}
 	};
 }

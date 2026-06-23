@@ -211,6 +211,21 @@ export default class CommandDispatcher {
 		}
 	}
 
+	/**
+	 * @description Inverse of {@link registerTargets}. Removes a previously registered target so
+	 * ephemeral participants (e.g. CommandMenu rows) can opt out of the active-state pass on close.
+	 * Drops the command entry when its target array empties.
+	 * @param {string} cmd - The command identifier.
+	 * @param {HTMLElement} target - The target previously registered.
+	 */
+	unregisterTargets(cmd, target) {
+		const arr = this.#commandTargets.get(cmd);
+		if (!arr) return;
+		const i = arr.indexOf(/** @type {HTMLButtonElement} */ (target));
+		if (i !== -1) arr.splice(i, 1);
+		if (arr.length === 0) this.#commandTargets.delete(cmd);
+	}
+
 	resetTargets() {
 		this.#commandTargets = new Map();
 		this._initCommandButtons();

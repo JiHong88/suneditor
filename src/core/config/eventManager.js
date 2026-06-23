@@ -11,6 +11,9 @@ class EventManager {
 	#frameContext;
 	#frameOptions;
 
+	/** @type {?import('../event/eventOrchestrator').default} */
+	#orchestrator = null;
+
 	/** @type {?SunEditor.Event.GlobalInfo} */
 	#geckoActiveEvent = null;
 
@@ -54,6 +57,28 @@ class EventManager {
 
 			return NO_EVENT;
 		};
+	}
+
+	/**
+	 * @internal
+	 * @description Bind the EventOrchestrator once it is constructed. Invoked by `coreKernel`
+	 * immediately after orchestrator creation so the public `applyTagEffect` method below can delegate.
+	 * @param {import('../event/eventOrchestrator').default} orchestrator
+	 */
+	_bindOrchestrator(orchestrator) {
+		this.#orchestrator = orchestrator;
+	}
+
+	/**
+	 * @description Re-run the toolbar/menu active-state pass against the given selection node (or the
+	 * current selection if `null`). Thin pass-through to {@link EventOrchestrator#applyTagEffect};
+	 * exposed on `$.eventManager` so modules/plugins can request an immediate sync after they mutate
+	 * `commandDispatcher.targets` (e.g. CommandMenu pushing newly-rendered rows).
+	 * @param {?Node} [selectionNode]
+	 * @returns {Node | undefined}
+	 */
+	applyTagEffect(selectionNode) {
+		return this.#orchestrator?.applyTagEffect(selectionNode);
 	}
 
 	/**
