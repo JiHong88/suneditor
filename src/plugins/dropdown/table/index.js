@@ -282,7 +282,7 @@ class Table extends PluginDropdownFree {
 		if (domParserBody.childElementCount !== 1) return;
 
 		const componentInfo = this.$.component.get(domParserBody.firstElementChild);
-		if (componentInfo.pluginName !== Table.key) return;
+		if (componentInfo?.pluginName !== Table.key) return;
 
 		const copyTable = /** @type {HTMLTableElement} */ (componentInfo.target);
 		const selectedCells = this.clipboardService.pasteTableCellMatrix(copyTable, targetCell);
