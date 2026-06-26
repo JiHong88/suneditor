@@ -1713,7 +1713,7 @@ class HTML {
 			(current) => {
 				if (current.nodeType !== 1) {
 					if (formatFilter && dom.check.isList(current.parentElement)) removeTags.push(current);
-					if (current.nodeType === 3 && !current.textContent.trim()) removeTags.push(current);
+					if (current.nodeType === 3 && !current.textContent) removeTags.push(current);
 					return false;
 				}
 
