@@ -81,6 +81,10 @@ describe('Plugins - Dropdown - TextStyle', () => {
         jest.clearAllMocks();
 
         kernel = createMockEditor();
+        kernel.$.menu.initDropdownTarget = jest.fn().mockImplementation(() => {
+            const { dom } = require('../../../../src/helper');
+            return dom.utils.createElement('DIV', {}, '');
+        });
         kernel.$.lang.textStyle = 'Text Style';
         kernel.$.lang.menu_code = 'Code';
         kernel.$.lang.menu_underline = 'Underline';
@@ -99,17 +103,8 @@ describe('Plugins - Dropdown - TextStyle', () => {
 
     describe('Constructor', () => {
 
-        it('should create dropdown menu structure', () => {
-            const { dom } = require('../../../../src/helper');
-            expect(dom.utils.createElement).toHaveBeenCalledWith(
-                'DIV',
-                { class: 'se-dropdown se-list-layer se-list-format' },
-                expect.stringContaining('se-list-inner')
-            );
-        });
-
-        it('should initialize dropdown menu', () => {
-            expect(kernel.$.menu.initDropdownTarget).toHaveBeenCalledWith(TextStyle, expect.any(Object));
+        it('should initialize dropdown menu with items and options', () => {
+            expect(kernel.$.menu.initDropdownTarget).toHaveBeenCalledWith(TextStyle, expect.any(Array), expect.any(Object));
         });
 
         it('should initialize style list from menu', () => {
@@ -322,60 +317,57 @@ describe('Plugins - Dropdown - TextStyle', () => {
         });
     });
 
-    describe('CreateHTML function', () => {
-        it('should create dropdown menu with custom items', () => {
-            const { dom } = require('../../../../src/helper');
+    describe('CreateItems function', () => {
+        it('should pass correct items to initDropdownTarget', () => {
+            const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
 
-            const createCallArgs = dom.utils.createElement.mock.calls.find(
-                call => call[1]?.class === 'se-dropdown se-list-layer se-list-format'
-            );
+            expect(items).toBeInstanceOf(Array);
+            expect(items.length).toBe(2);
 
-            expect(createCallArgs[2]).toContain('se-list-inner');
-            expect(createCallArgs[2]).toContain('data-command="code"');
-            expect(createCallArgs[2]).toContain('data-command="span"');
-            expect(createCallArgs[2]).toContain('Custom Code');
-            expect(createCallArgs[2]).toContain('Custom Shadow');
+            const commands = items.map(item => item.command);
+            expect(commands).toContain('code');
+            expect(commands).toContain('span');
+
+            const titles = items.map(item => item.title);
+            expect(titles).toContain('Custom Code');
+            expect(titles).toContain('Custom Shadow');
         });
 
-
         it('should handle string items from default list', () => {
-            const { dom } = require('../../../../src/helper');
-            dom.utils.createElement.mockClear();
+            kernel.$.menu.initDropdownTarget.mockClear();
 
             const stringTextStyle = new TextStyle(kernel, {
                 items: ['code', 'shadow']
             });
 
-            const createCallArgs = dom.utils.createElement.mock.calls.find(
-                call => call[1]?.class === 'se-dropdown se-list-layer se-list-format'
-            );
+            const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
+            const commands = items.map(item => item.command);
 
-            expect(createCallArgs[2]).toContain('data-command="code"');
-            expect(createCallArgs[2]).toContain('data-command="span"');
-            expect(createCallArgs[2]).toContain('__se__t-code');
-            expect(createCallArgs[2]).toContain('__se__t-shadow');
+            expect(commands).toContain('code');
+            expect(commands).toContain('span');
+
+            const htmls = items.map(item => item.innerHTML);
+            expect(htmls.some(h => h.includes('__se__t-code'))).toBe(true);
+            expect(htmls.some(h => h.includes('__se__t-shadow'))).toBe(true);
         });
 
         it('should skip invalid string items', () => {
-            const { dom } = require('../../../../src/helper');
-            dom.utils.createElement.mockClear();
+            kernel.$.menu.initDropdownTarget.mockClear();
 
             const invalidTextStyle = new TextStyle(kernel, {
                 items: ['code', 'invalid-style', 'shadow']
             });
 
-            const createCallArgs = dom.utils.createElement.mock.calls.find(
-                call => call[1]?.class === 'se-dropdown se-list-layer se-list-format'
-            );
+            const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
+            const commands = items.map(item => item.command);
 
-            expect(createCallArgs[2]).toContain('data-command="code"');
-            expect(createCallArgs[2]).toContain('data-command="span"');
-            expect(createCallArgs[2]).not.toContain('invalid-style');
+            expect(commands).toContain('code');
+            expect(commands).toContain('span');
+            expect(items.every(item => !item.innerHTML.includes('invalid-style'))).toBe(true);
         });
 
         it('should handle items with multiple classes', () => {
-            const { dom } = require('../../../../src/helper');
-            dom.utils.createElement.mockClear();
+            kernel.$.menu.initDropdownTarget.mockClear();
 
             const multiClassTextStyle = new TextStyle(kernel, {
                 items: [
@@ -383,16 +375,15 @@ describe('Plugins - Dropdown - TextStyle', () => {
                 ]
             });
 
-            const createCallArgs = dom.utils.createElement.mock.calls.find(
-                call => call[1]?.class === 'se-dropdown se-list-layer se-list-format'
-            );
+            const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
 
-            expect(createCallArgs[2]).toContain('data-value=".__se__t-multi,.__se__t-class"');
+            expect(items).toHaveLength(1);
+            expect(items[0].value).toContain('.__se__t-multi');
+            expect(items[0].value).toContain('.__se__t-class');
         });
 
         it('should default to span tag when none provided', () => {
-            const { dom } = require('../../../../src/helper');
-            dom.utils.createElement.mockClear();
+            kernel.$.menu.initDropdownTarget.mockClear();
 
             const defaultTagTextStyle = new TextStyle(kernel, {
                 items: [
@@ -400,12 +391,11 @@ describe('Plugins - Dropdown - TextStyle', () => {
                 ]
             });
 
-            const createCallArgs = dom.utils.createElement.mock.calls.find(
-                call => call[1]?.class === 'se-dropdown se-list-layer se-list-format'
-            );
+            const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
 
-            expect(createCallArgs[2]).toContain('data-command="span"');
-            expect(createCallArgs[2]).toContain('<span class="__se__t-no-tag">');
+            expect(items).toHaveLength(1);
+            expect(items[0].command).toBe('span');
+            expect(items[0].innerHTML).toContain('__se__t-no-tag');
         });
     });
 

@@ -134,7 +134,6 @@
 		math_modal_title: 'Matematica',
 		maxSize: 'Dimensione massima',
 		mediaGallery: 'Galleria multimediale',
-		autocomplete: 'Completamento automatico',
 		mention: 'Menzione',
 		menu_bordered: 'Bordato',
 		menu_code: 'Codice',

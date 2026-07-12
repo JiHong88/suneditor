@@ -3,6 +3,42 @@ import { isRtlBidiMismatch } from '../effects/ruleHelpers';
 import { A } from '../actions';
 
 /**
+ * @description Decide what an Enter should do inside a normal brLine
+ * @param {Node} brBlock The brLine element (e.g. `PRE`).
+ * @param {Selection} sel The live DOM selection.
+ * @returns {{ shouldExit: boolean }}
+ */
+function analyzeBrLineEnter(brBlock, sel) {
+	const kids = Array.from(brBlock.childNodes);
+
+	// Split into rows by <br>; drop the trailing placeholder row (last child is a <br>).
+	const rows = [[]];
+	for (const n of kids) {
+		if (dom.check.isBreak(n)) rows.push([]);
+		else rows[rows.length - 1].push(n);
+	}
+	if (kids.length && dom.check.isBreak(kids[kids.length - 1])) rows.pop();
+	const rowEmpty = (row) => !row || row.every((n) => dom.check.isZeroWidth(n.textContent));
+
+	// Caret's row = number of <br>s strictly before the caret anchor.
+	const a = sel.anchorNode;
+	let brBefore = 0;
+	if (a === brBlock) {
+		for (let i = 0; i < sel.anchorOffset && i < kids.length; i++) if (dom.check.isBreak(kids[i])) brBefore++;
+	} else {
+		for (const n of kids) {
+			if (n === a || (n.nodeType === 1 && n.contains(a))) break;
+			if (dom.check.isBreak(n)) brBefore++;
+		}
+	}
+
+	const N = Math.max(rows.length, 1);
+	const R = Math.min(brBefore, N - 1);
+	const shouldExit = R === N - 1 && rowEmpty(rows[R]) && R >= 1 && rowEmpty(rows[R - 1]);
+	return { shouldExit };
+}
+
+/**
  * @typedef {import('../actions').Action[]} EventActions
  * @typedef {import('../ports').EventReducerPorts} EventPorts
  * @typedef {import('../reducers/keydown.reducer').KeydownReducerCtx} EventKeydownCtx
@@ -69,7 +105,10 @@ export function reduceEnterDown(actions, ports, ctx) {
 		} else if (rangeEl && formatEl && !dom.check.isTableCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
 			// add default List line
 			const rangeEnt = selection.getRange();
-			if (dom.check.isEdgePoint(rangeEnt.endContainer, rangeEnt.endOffset) && dom.check.isList(selectionNode.nextSibling)) {
+			if (
+				dom.check.isEdgePoint(rangeEnt.endContainer, rangeEnt.endOffset) &&
+				dom.check.isList(selectionNode.nextSibling)
+			) {
 				ports.enterPrevent(e);
 				actions.push(A.enterListAddItem(formatEl, selectionNode));
 				actions.push(A.enterScrollTo(range));
@@ -77,7 +116,9 @@ export function reduceEnterDown(actions, ports, ctx) {
 			}
 
 			if (
-				(rangeEnt.commonAncestorContainer.nodeType === 3 ? !(/** @type {HTMLElement} */ (rangeEnt.commonAncestorContainer).nextElementSibling) : true) &&
+				(rangeEnt.commonAncestorContainer.nodeType === 3
+					? !(/** @type {HTMLElement} */ (rangeEnt.commonAncestorContainer).nextElementSibling)
+					: true) &&
 				dom.check.isZeroWidth(formatEl.innerText.trim()) &&
 				!dom.check.isListCell(formatEl.nextElementSibling)
 			) {
@@ -91,40 +132,24 @@ export function reduceEnterDown(actions, ports, ctx) {
 		if (brBlock || (rangeEl === formatEl && format.isClosureBlock(rangeEl) && format.isLine(formatEl))) {
 			ports.enterPrevent(e);
 
-			const selectionFormat = selectionNode === brBlock;
-			const wSelection = selection.get();
-			const children = selectionNode.childNodes,
-				offset = wSelection.focusOffset,
-				prev = selectionNode.previousElementSibling,
-				next = selectionNode.nextSibling;
-
-			if (
-				!format.isClosureBrLine(brBlock) &&
-				children &&
-				((selectionFormat &&
-					range.collapsed &&
-					children.length - 1 <= offset + 1 &&
-					dom.check.isBreak(children[offset]) &&
-					(!children[offset + 1] || ((!children[offset + 2] || dom.check.isZeroWidth(children[offset + 2].textContent)) && children[offset + 1].nodeType === 3 && dom.check.isZeroWidth(children[offset + 1].textContent))) &&
-					offset > 0 &&
-					dom.check.isBreak(children[offset - 1])) ||
-					(!selectionFormat &&
-						dom.check.isZeroWidth(selectionNode.textContent) &&
-						dom.check.isBreak(prev) &&
-						(dom.check.isBreak(prev.previousSibling) || !dom.check.isZeroWidth(prev.previousSibling?.textContent)) &&
-						(!next || (!dom.check.isBreak(next) && dom.check.isZeroWidth(next.textContent)))))
-			) {
-				actions.push(A.enterFormatCleanBrAndZWS(selectionNode, selectionFormat, brBlock, children, offset));
+			// Normal brLine (e.g. PRE)
+			if (brBlock && !format.isClosureBrLine(brBlock)) {
+				if (analyzeBrLineEnter(brBlock, selection.get()).shouldExit) {
+					actions.push(A.enterBrLineExit(brBlock));
+				} else {
+					actions.push(A.enterBrLineInsert(range));
+				}
 				actions.push(A.enterScrollTo(range));
 				return true;
 			}
 
-			if (selectionFormat) {
-				actions.push(A.enterFormatInsertBrHtml(brBlock, range, wSelection, offset));
+			// Closure brLine / closure block
+			const wSelection = selection.get();
+			if (selectionNode === brBlock) {
+				actions.push(A.enterFormatInsertBrHtml(brBlock, range, wSelection, wSelection.focusOffset));
 			} else {
 				actions.push(A.enterFormatInsertBrNode(wSelection));
 			}
-
 			actions.push(A.enterScrollTo(range));
 			return true;
 		}
@@ -132,7 +157,9 @@ export function reduceEnterDown(actions, ports, ctx) {
 		// set format attrs - edge
 		if (range.collapsed && (formatStartEdge || formatEndEdge)) {
 			ports.enterPrevent(e);
-			actions.push(A.enterFormatBreakAtEdge(formatEl, selectionNode, formatStartEdge, formatEndEdge, bidiSwapped));
+			actions.push(
+				A.enterFormatBreakAtEdge(formatEl, selectionNode, formatStartEdge, formatEndEdge, bidiSwapped),
+			);
 			actions.push(A.enterScrollTo(range));
 			return true;
 		}
@@ -170,7 +197,11 @@ export function reduceEnterDown(actions, ports, ctx) {
 		return true;
 	}
 
-	if (rangeEl && dom.query.getParentElement(rangeEl, 'FIGCAPTION') && dom.query.getParentElement(rangeEl, dom.check.isList)) {
+	if (
+		rangeEl &&
+		dom.query.getParentElement(rangeEl, 'FIGCAPTION') &&
+		dom.query.getParentElement(rangeEl, dom.check.isList)
+	) {
 		ports.enterPrevent(e);
 		actions.push(A.enterFigcaptionExitInList(formatEl));
 		actions.push(A.enterScrollTo(range));

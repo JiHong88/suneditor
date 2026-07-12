@@ -5,7 +5,29 @@ import { SelectMenu } from '../../modules/ui';
 
 void PluginDropdown;
 
-const DEFAULT_LANGS = ['javascript', 'typescript', 'html', 'css', 'json', 'python', 'java', 'c', 'cpp', 'csharp', 'go', 'rust', 'ruby', 'php', 'swift', 'kotlin', 'sql', 'bash', 'markdown', 'xml', 'yaml'];
+const DEFAULT_LANGS = [
+	'javascript',
+	'typescript',
+	'html',
+	'css',
+	'json',
+	'python',
+	'java',
+	'c',
+	'cpp',
+	'csharp',
+	'go',
+	'rust',
+	'ruby',
+	'php',
+	'swift',
+	'kotlin',
+	'sql',
+	'bash',
+	'markdown',
+	'xml',
+	'yaml',
+];
 
 /**
  * @typedef {Object} CodeBlockPluginOptions
@@ -66,7 +88,12 @@ class CodeBlock extends PluginCommand {
 		// ───────────────── [[toolbar dropdown type]] ─────────────────
 		this.afterItem = dom.utils.createElement(
 			'button',
-			{ class: 'se-btn se-tooltip se-sub-arrow-btn', type: 'button', 'data-command': CodeBlock.key, 'data-type': 'dropdown' },
+			{
+				class: 'se-btn se-tooltip se-sub-arrow-btn',
+				type: 'button',
+				'data-command': CodeBlock.key,
+				'data-type': 'dropdown',
+			},
 			`${this.$.icons.arrow_down}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.$.lang.codeLanguage || 'Language'}</span></span>`,
 		);
 
@@ -242,11 +269,19 @@ class CodeBlock extends PluginCommand {
 	}
 
 	#addPreLeaveEvent() {
-		this.#mouseLeaveEvent ??= this.$.eventManager.addEvent(this.#hoverCurrentPre, 'mouseleave', this.#removeEventFunc);
+		this.#mouseLeaveEvent ??= this.$.eventManager.addEvent(
+			this.#hoverCurrentPre,
+			'mouseleave',
+			this.#removeEventFunc,
+		);
 	}
 
 	#addCtrlLeaveEvent() {
-		this.#mouseLeaveEvent ??= this.$.eventManager.addEvent(this.#hoverController.form, 'mouseleave', this.#removeEventFunc);
+		this.#mouseLeaveEvent ??= this.$.eventManager.addEvent(
+			this.#hoverController.form,
+			'mouseleave',
+			this.#removeEventFunc,
+		);
 	}
 
 	#buildHoverMenu(currentLang) {
@@ -271,7 +306,10 @@ class CodeBlock extends PluginCommand {
 	 * @returns {string}
 	 */
 	#getPreLang(preOrChild) {
-		const pre = preOrChild?.nodeName === 'PRE' ? preOrChild : dom.query.getParentElement(preOrChild, (el) => /^PRE$/i.test(el.nodeName));
+		const pre =
+			preOrChild?.nodeName === 'PRE'
+				? preOrChild
+				: dom.query.getParentElement(preOrChild, (el) => /^PRE$/i.test(el.nodeName));
 		if (!pre) return '';
 		return /** @type {HTMLElement} */ (pre).className.match(/language-(\S+)/)?.[1] || '';
 	}

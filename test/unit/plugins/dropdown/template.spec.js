@@ -42,6 +42,9 @@ describe('Plugins - Dropdown - Template', () => {
 
         kernel = createMockEditor();
 
+        const { dom } = require('../../../../src/helper');
+        kernel.$.menu.initDropdownTarget = jest.fn().mockImplementation(() => dom.utils.createElement('DIV', {}, ''));
+
         const pluginOptions = {
             items: [
                 { name: 'Template 1', html: '<div class="template-1"><h2>Template 1</h2><p>Content 1</p></div>' },
@@ -57,7 +60,7 @@ describe('Plugins - Dropdown - Template', () => {
     describe('Constructor', () => {
 
         it('should initialize dropdown menu', () => {
-            expect(kernel.$.menu.initDropdownTarget).toHaveBeenCalledWith(Template, expect.any(Object));
+            expect(kernel.$.menu.initDropdownTarget).toHaveBeenCalledWith(Template, expect.any(Array));
         });
 
         it('should create template items with correct structure', () => {
@@ -136,15 +139,14 @@ describe('Plugins - Dropdown - Template', () => {
         });
     });
 
-    describe('CreateHTML function', () => {
-        it('should create dropdown menu structure with template items', () => {
-            const { dom } = require('../../../../src/helper');
+    describe('CreateItems function', () => {
+        it('should pass correct items to initDropdownTarget for template items', () => {
+            const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
 
-            expect(dom.utils.createElement).toHaveBeenCalledWith(
-                'DIV',
-                { class: 'se-list-layer' },
-                expect.stringContaining('se-dropdown se-list-inner')
-            );
+            expect(items).toHaveLength(3);
+            expect(items[0]).toMatchObject({ command: 'template', title: 'Template 1', innerHTML: 'Template 1', value: '0' });
+            expect(items[1]).toMatchObject({ command: 'template', title: 'Template 2', innerHTML: 'Template 2', value: '1' });
+            expect(items[2]).toMatchObject({ command: 'template', title: 'Template 3', innerHTML: 'Template 3', value: '2' });
         });
 
         it('should warn when no template items provided', () => {

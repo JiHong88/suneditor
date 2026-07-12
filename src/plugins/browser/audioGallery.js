@@ -49,7 +49,8 @@ class AudioGallery extends PluginBrowser {
 		this.onSelectfunction = null;
 
 		// modules
-		const thumbnail = typeof pluginOptions.thumbnail === 'string' ? pluginOptions.thumbnail : this.$.icons.audio_thumbnail;
+		const thumbnail =
+			typeof pluginOptions.thumbnail === 'string' ? pluginOptions.thumbnail : this.$.icons.audio_thumbnail;
 		this.browser = new Browser(this, this.$, {
 			title: this.$.lang.audioGallery,
 			data: pluginOptions.data,

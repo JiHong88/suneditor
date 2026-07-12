@@ -137,26 +137,35 @@ export function entityToHTML(content) {
 }
 
 /**
- * @description Debounce function
+ * @description Debounce function. The returned function exposes a `cancel()` method that clears any
+ * pending invocation (useful when an event — e.g. ESC — should abort a scheduled callback).
  * @param {(...args: *) => void} func function
  * @param {number} wait delay ms
- * @returns {*} executedFunction
+ * @returns {*} executedFunction — the debounced function, with a `cancel()` method attached
  * @example
  * const debouncedSave = converter.debounce(() => save(), 300);
  * input.addEventListener('input', debouncedSave);
+ * // later: debouncedSave.cancel();
  */
 export function debounce(func, wait) {
 	let timeout;
 
-	return function executedFunction(...args) {
+	function executedFunction(...args) {
 		const later = () => {
-			_w.clearTimeout(timeout);
+			timeout = null;
 			func(...args);
 		};
 
 		_w.clearTimeout(timeout);
 		timeout = _w.setTimeout(later, wait);
+	}
+
+	executedFunction.cancel = () => {
+		_w.clearTimeout(timeout);
+		timeout = null;
 	};
+
+	return executedFunction;
 }
 
 /**
@@ -435,7 +444,11 @@ export function textToAnchor(node) {
  * @param {Node} node Node
  */
 export function spanToStyleNode(styleToTag, node) {
-	if (node.nodeType === 1 && /^SPAN$/i.test(node.nodeName) && /** @type {HTMLElement} */ (node).hasAttribute('style')) {
+	if (
+		node.nodeType === 1 &&
+		/^SPAN$/i.test(node.nodeName) &&
+		/** @type {HTMLElement} */ (node).hasAttribute('style')
+	) {
 		const style = /** @type {HTMLElement} */ (node).getAttribute('style');
 		const tags = [];
 		Object.keys(styleToTag).forEach((key) => {
@@ -572,7 +585,9 @@ export function _setIframeStyleLinks(linkNames) {
 			}
 
 			if (!path || path.length === 0) {
-				throw new Error('[SUNEDITOR.constructor.iframe.fail] The suneditor CSS files installation path could not be automatically detected. Please set the option property "iframe_cssFileName" before creating editor instances.');
+				throw new Error(
+					'[SUNEDITOR.constructor.iframe.fail] The suneditor CSS files installation path could not be automatically detected. Please set the option property "iframe_cssFileName" before creating editor instances.',
+				);
 			}
 
 			for (let i = 0, pLen = path.length; i < pLen; i++) {
@@ -590,7 +605,9 @@ export function _setIframeStyleLinks(linkNames) {
  * @returns {string} `"<style>...</style>"`
  */
 export function _setAutoHeightStyle(frameHeight) {
-	return frameHeight === 'auto' ? '<style>\n/** Iframe height auto */\nbody{height: min-content; overflow: hidden;}\n</style>' : '';
+	return frameHeight === 'auto'
+		? '<style>\n/** Iframe height auto */\nbody{height: min-content; overflow: hidden;}\n</style>'
+		: '';
 }
 
 const converter = {

@@ -146,3 +146,22 @@ if (typeof global.TextEncoder === 'undefined') {
 		window.TextDecoder = global.TextDecoder;
 	}
 }
+
+// jsdom does not implement HTMLElement.innerText (returns undefined). A few code paths read it
+// (e.g. Editor.isEmpty counts block newlines). Approximate it with textContent so those paths
+// don't throw in tests. Only define when missing so a future jsdom upgrade can take over.
+if (typeof window !== 'undefined' && window.HTMLElement) {
+	const proto = window.HTMLElement.prototype;
+	const desc = Object.getOwnPropertyDescriptor(proto, 'innerText');
+	if (!desc || !desc.get) {
+		Object.defineProperty(proto, 'innerText', {
+			configurable: true,
+			get() {
+				return this.textContent;
+			},
+			set(v) {
+				this.textContent = v;
+			},
+		});
+	}
+}

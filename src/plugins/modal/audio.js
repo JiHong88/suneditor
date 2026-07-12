@@ -76,16 +76,30 @@ class Audio_ extends PluginModal {
 
 		// define plugin options
 		this.pluginOptions = {
-			defaultWidth: !pluginOptions.defaultWidth ? '' : numbers.is(pluginOptions.defaultWidth) ? pluginOptions.defaultWidth + 'px' : pluginOptions.defaultWidth,
-			defaultHeight: !pluginOptions.defaultHeight ? '' : numbers.is(pluginOptions.defaultHeight) ? pluginOptions.defaultHeight + 'px' : pluginOptions.defaultHeight,
+			defaultWidth: !pluginOptions.defaultWidth
+				? ''
+				: numbers.is(pluginOptions.defaultWidth)
+					? pluginOptions.defaultWidth + 'px'
+					: pluginOptions.defaultWidth,
+			defaultHeight: !pluginOptions.defaultHeight
+				? ''
+				: numbers.is(pluginOptions.defaultHeight)
+					? pluginOptions.defaultHeight + 'px'
+					: pluginOptions.defaultHeight,
 			createFileInput: !!pluginOptions.createFileInput,
-			createUrlInput: pluginOptions.createUrlInput === undefined || !pluginOptions.createFileInput ? true : pluginOptions.createUrlInput,
+			createUrlInput:
+				pluginOptions.createUrlInput === undefined || !pluginOptions.createFileInput
+					? true
+					: pluginOptions.createUrlInput,
 			uploadUrl: typeof pluginOptions.uploadUrl === 'string' ? pluginOptions.uploadUrl : null,
 			uploadHeaders: pluginOptions.uploadHeaders || null,
 			uploadSizeLimit: numbers.get(pluginOptions.uploadSizeLimit, 0),
 			uploadSingleSizeLimit: numbers.get(pluginOptions.uploadSingleSizeLimit, 0),
 			allowMultiple: !!pluginOptions.allowMultiple,
-			acceptedFormats: typeof pluginOptions.acceptedFormats !== 'string' || pluginOptions.acceptedFormats.trim() === '*' ? 'audio/*' : pluginOptions.acceptedFormats.trim() || 'audio/*',
+			acceptedFormats:
+				typeof pluginOptions.acceptedFormats !== 'string' || pluginOptions.acceptedFormats.trim() === '*'
+					? 'audio/*'
+					: pluginOptions.acceptedFormats.trim() || 'audio/*',
 			audioTagAttributes: pluginOptions.audioTagAttributes || null,
 			insertBehavior: pluginOptions.insertBehavior,
 		};
@@ -124,7 +138,11 @@ class Audio_ extends PluginModal {
 
 		// init
 		if (this.audioInputFile) {
-			this.$.eventManager.addEvent(modalEl.querySelector('.se-modal-files-edge-button'), 'click', this.#RemoveSelectedFiles.bind(this, this.audioUrlFile, this.preview));
+			this.$.eventManager.addEvent(
+				modalEl.querySelector('.se-modal-files-edge-button'),
+				'click',
+				this.#RemoveSelectedFiles.bind(this, this.audioUrlFile, this.preview),
+			);
 			if (this.audioUrlFile) {
 				this.$.eventManager.addEvent(this.audioInputFile, 'change', this.#FileInputChange.bind(this));
 			}
@@ -177,12 +195,15 @@ class Audio_ extends PluginModal {
 	 */
 	modalOn(isUpdate) {
 		if (!isUpdate) {
-			if (this.audioInputFile && this.pluginOptions.allowMultiple) this.audioInputFile.setAttribute('multiple', 'multiple');
+			if (this.audioInputFile && this.pluginOptions.allowMultiple)
+				this.audioInputFile.setAttribute('multiple', 'multiple');
 		} else if (this.#element) {
 			this.#urlValue = this.preview.textContent = this.audioUrlFile.value = this.#element.src;
-			if (this.audioInputFile && this.pluginOptions.allowMultiple) this.audioInputFile.removeAttribute('multiple');
+			if (this.audioInputFile && this.pluginOptions.allowMultiple)
+				this.audioInputFile.removeAttribute('multiple');
 		} else {
-			if (this.audioInputFile && this.pluginOptions.allowMultiple) this.audioInputFile.removeAttribute('multiple');
+			if (this.audioInputFile && this.pluginOptions.allowMultiple)
+				this.audioInputFile.removeAttribute('multiple');
 		}
 	}
 
@@ -220,7 +241,8 @@ class Audio_ extends PluginModal {
 	controllerAction(target) {
 		switch (target.getAttribute('data-command')) {
 			case 'update':
-				if (this.audioUrlFile) this.#urlValue = this.preview.textContent = this.audioUrlFile.value = this.#element.src;
+				if (this.audioUrlFile)
+					this.#urlValue = this.preview.textContent = this.audioUrlFile.value = this.#element.src;
 				this.open();
 				break;
 			case 'copy': {
@@ -239,7 +261,13 @@ class Audio_ extends PluginModal {
 	 * @type {SunEditor.Hook.Component.Select}
 	 */
 	componentSelect(target) {
-		this.figure.open(target, { nonResizing: true, nonSizeInfo: true, nonBorder: true, figureTarget: true, infoOnly: false });
+		this.figure.open(target, {
+			nonResizing: true,
+			nonSizeInfo: true,
+			nonBorder: true,
+			figureTarget: true,
+			infoOnly: false,
+		});
 		this.#ready(target);
 	}
 
@@ -253,7 +281,11 @@ class Audio_ extends PluginModal {
 		const container = figure.container || element;
 		const focusEl = container.previousElementSibling || container.nextElementSibling;
 
-		const message = await this.$.eventManager.triggerEvent('onAudioDeleteBefore', { element: element, container: figure, url: element.getAttribute('src') });
+		const message = await this.$.eventManager.triggerEvent('onAudioDeleteBefore', {
+			element: element,
+			container: figure,
+			url: element.getAttribute('src'),
+		});
 		if (message === false) return;
 
 		const emptyDiv = container.parentNode;
@@ -293,7 +325,8 @@ class Audio_ extends PluginModal {
 
 			s = f.size;
 			if (singleSizeLimit > 0 && s > singleSizeLimit) {
-				const err = '[SUNEDITOR.audioUpload.fail] Size of uploadable single file: ' + singleSizeLimit / 1000 + 'KB';
+				const err =
+					'[SUNEDITOR.audioUpload.fail] Size of uploadable single file: ' + singleSizeLimit / 1000 + 'KB';
 				const message = await this.$.eventManager.triggerEvent('onAudioUploadError', {
 					error: err,
 					limitSize: singleSizeLimit,
@@ -313,7 +346,12 @@ class Audio_ extends PluginModal {
 		const limitSize = this.pluginOptions.uploadSizeLimit;
 		if (limitSize > 0 && fileSize + this.fileManager.getSize() > limitSize) {
 			const err = '[SUNEDITOR.audioUpload.fail] Size of uploadable total audios: ' + limitSize / 1000 + 'KB';
-			const message = await this.$.eventManager.triggerEvent('onAudioUploadError', { error: err, limitSize, currentSize: this.fileManager.getSize(), uploadSize: fileSize });
+			const message = await this.$.eventManager.triggerEvent('onAudioUploadError', {
+				error: err,
+				limitSize,
+				currentSize: this.fileManager.getSize(),
+				uploadSize: fileSize,
+			});
 
 			this.$.ui.alertOpen(message === NO_EVENT ? err : message || err, 'error');
 
@@ -396,7 +434,12 @@ class Audio_ extends PluginModal {
 			this.fileManager.setFileData(element, file);
 			element.src = src;
 			const figure = Figure.CreateContainer(element, 'se-flex-component');
-			if (!this.$.component.insert(figure.container, { scrollTo: isLast ? true : false, insertBehavior: isLast ? this.pluginOptions.insertBehavior : 'line' })) {
+			if (
+				!this.$.component.insert(figure.container, {
+					scrollTo: isLast ? true : false,
+					insertBehavior: isLast ? this.pluginOptions.insertBehavior : 'line',
+				})
+			) {
 				if (isLast) this.$.focusManager.focus();
 				return;
 			}
@@ -458,7 +501,9 @@ class Audio_ extends PluginModal {
 		const w = this.#defaultWidth;
 		const h = this.#defaultHeight;
 		/** @type {HTMLAudioElement} */
-		const oAudio = dom.utils.createElement('AUDIO', { style: (w ? 'width:' + w + '; ' : '') + (h ? 'height:' + h + ';' : '') });
+		const oAudio = dom.utils.createElement('AUDIO', {
+			style: (w ? 'width:' + w + '; ' : '') + (h ? 'height:' + h + ';' : ''),
+		});
 		this.#setTagAttrs(oAudio);
 		return oAudio;
 	}
@@ -489,7 +534,13 @@ class Audio_ extends PluginModal {
 		if (!files) return;
 
 		const uploadFiles = this.modal.isUpdate ? [files[0]] : files;
-		this.fileManager.upload(this.pluginOptions.uploadUrl, this.pluginOptions.uploadHeaders, uploadFiles, this.#UploadCallBack.bind(this, info), this.#error.bind(this));
+		this.fileManager.upload(
+			this.pluginOptions.uploadUrl,
+			this.pluginOptions.uploadHeaders,
+			uploadFiles,
+			this.#UploadCallBack.bind(this, info),
+			this.#error.bind(this),
+		);
 	}
 
 	/**
@@ -555,7 +606,10 @@ class Audio_ extends PluginModal {
 	 * @param {HTMLInputElement} target - The target element.
 	 */
 	#SetUrlInput(target) {
-		this.#urlValue = this.preview.textContent = this.audioUrlFile.value = target.getAttribute('data-command') || target.src;
+		this.#urlValue =
+			this.preview.textContent =
+			this.audioUrlFile.value =
+				target.getAttribute('data-command') || target.src;
 		this.audioUrlFile.focus();
 	}
 

@@ -75,6 +75,71 @@ describe('Backspace Rule', () => {
 		document.body.innerHTML = '';
 	});
 
+	it('merges an empty line into the previous normal line (deterministic empty-line backspace)', () => {
+		const wrap = document.createElement('div');
+		wrap.setAttribute('data-se-wysiwyg', 'true');
+		const prev = document.createElement('p');
+		prev.textContent = 'AAA';
+		const empty = document.createElement('p');
+		const zws = document.createTextNode('​');
+		empty.appendChild(zws);
+		empty.appendChild(document.createElement('br'));
+		wrap.appendChild(prev);
+		wrap.appendChild(empty);
+		document.body.appendChild(wrap);
+
+		const range = document.createRange();
+		range.setStart(zws, 1);
+		range.setEnd(zws, 1);
+
+		mockPorts.selection.getRange.mockReturnValue(range);
+		mockPorts.format.getLine.mockReturnValue(empty);
+		mockCtx.range = range;
+		mockCtx.formatEl = empty;
+		mockCtx.selectionNode = zws;
+		mockCtx.fc = new Map([['wysiwyg', wrap]]);
+
+		const result = reduceBackspaceDown(actions, mockPorts, mockCtx);
+
+		expect(result).toBe(false);
+		expect(actions).toContainEqual(A.backspaceEmptyLineMergePrev(empty, prev));
+	});
+
+	it('selects the previous component instead of merging when backspacing on an empty line after a component', () => {
+		const wrap = document.createElement('div');
+		wrap.setAttribute('data-se-wysiwyg', 'true');
+		const figure = document.createElement('figure');
+		figure.className = 'se-component';
+		const empty = document.createElement('p');
+		const zws = document.createTextNode('​');
+		empty.appendChild(zws);
+		empty.appendChild(document.createElement('br'));
+		wrap.appendChild(figure);
+		wrap.appendChild(empty);
+		document.body.appendChild(wrap);
+
+		const range = document.createRange();
+		range.setStart(zws, 1);
+		range.setEnd(zws, 1);
+
+		const fileInfo = { target: figure, pluginName: 'image' };
+		mockPorts.selection.getRange.mockReturnValue(range);
+		mockPorts.format.getLine.mockReturnValue(empty);
+		mockPorts.component.is.mockImplementation((el) => el === figure);
+		mockPorts.component.get.mockImplementation((el) => (el === figure ? fileInfo : null));
+		mockCtx.range = range;
+		mockCtx.formatEl = empty;
+		mockCtx.selectionNode = zws;
+		mockCtx.fc = new Map([['wysiwyg', wrap]]);
+
+		const result = reduceBackspaceDown(actions, mockPorts, mockCtx);
+
+		// existing "empty line adjacent to component" branch wins; merge branch never runs
+		expect(result).toBe(true);
+		expect(actions).toContainEqual(A.backspaceComponentRemove(false, empty.firstChild, empty, fileInfo));
+		expect(actions).not.toContainEqual(A.backspaceEmptyLineMergePrev(empty, figure));
+	});
+
 	it('should push componentDeselect and cacheStyleNode actions', () => {
 		const result = reduceBackspaceDown(actions, mockPorts, mockCtx);
 
@@ -464,6 +529,8 @@ describe('Backspace Rule', () => {
 		mockPorts.format.isLine.mockReturnValue(true);
 		mockPorts.format.isBrLine.mockReturnValue(true);
 		mockPorts.format.isClosureBrLine.mockReturnValue(false);
+		// a BR line is not a normal line, so the empty-line merge branch must not apply here
+		mockPorts.format.isNormalLine.mockReturnValue(false);
 
 		const result = reduceBackspaceDown(actions, mockPorts, mockCtx);
 
@@ -552,6 +619,65 @@ describe('Backspace Rule', () => {
 			const stripAction = actions.find((a) => a.t === 'backspace.brline.strip');
 			expect(stripAction).toBeUndefined();
 			expect(result).toBe(false);
+		});
+	});
+
+	describe('brLine empty row (PRE middle-row backspace)', () => {
+		let preEl, br1, br2;
+
+		beforeEach(() => {
+			// AAAA<br(br1)><br(br2)>BBBB — the empty row is between br1 and br2, caret on br2
+			preEl = document.createElement('pre');
+			preEl.innerHTML = 'AAAA<br><br>BBBB';
+			[br1, br2] = preEl.querySelectorAll('br');
+			wysiwygDiv.innerHTML = '';
+			wysiwygDiv.classList.add('se-wrapper-wysiwyg');
+			wysiwygDiv.appendChild(preEl);
+
+			const r = document.createRange();
+			r.setStart(br2, 0);
+			r.setEnd(br2, 0);
+			mockCtx.range = r;
+			mockCtx.formatEl = preEl;
+			mockCtx.selectionNode = br2;
+			mockPorts.selection.getRange.mockReturnValue(r);
+			mockPorts.format.getLine.mockReturnValue(preEl);
+			mockPorts.format.isBrLine.mockReturnValue(true);
+			mockPorts.format.isNormalLine.mockReturnValue(false);
+			mockPorts.format.isLine.mockReturnValue(true);
+		});
+
+		it('dispatches brLineRowMerge for an empty row (caret on the row-ending <br>)', () => {
+			const result = reduceBackspaceDown(actions, mockPorts, mockCtx);
+
+			const merge = actions.find((a) => a.t === 'backspace.brline.rowMerge');
+			expect(merge).toBeDefined();
+			expect(merge.p.rowEndBr).toBe(br2);
+			expect(merge.p.rowStartBr).toBe(br1); // the <br> that starts the empty row, removed to merge up
+			expect(result).toBe(false);
+		});
+
+		it('dispatches preventStop before, and historyPush after, the row merge', () => {
+			reduceBackspaceDown(actions, mockPorts, mockCtx);
+			const preventIdx = actions.findIndex((a) => a.t === 'prevent.stop');
+			const mergeIdx = actions.findIndex((a) => a.t === 'backspace.brline.rowMerge');
+			const historyIdx = actions.findIndex((a) => a.t === 'history.push');
+			expect(preventIdx).toBeLessThan(mergeIdx);
+			expect(historyIdx).toBeGreaterThan(mergeIdx);
+		});
+
+		it('does NOT merge when the caret <br> is the first node (no preceding <br> row to merge into)', () => {
+			preEl.innerHTML = '<br>BBBB'; // caret on the only leading <br>, nothing before it
+			const onlyBr = preEl.querySelector('br');
+			const r = document.createRange();
+			r.setStart(onlyBr, 0);
+			r.setEnd(onlyBr, 0);
+			mockCtx.range = r;
+			mockCtx.selectionNode = onlyBr;
+			mockPorts.selection.getRange.mockReturnValue(r);
+
+			reduceBackspaceDown(actions, mockPorts, mockCtx);
+			expect(actions.find((a) => a.t === 'backspace.brline.rowMerge')).toBeUndefined();
 		});
 	});
 });

@@ -79,7 +79,12 @@ export default class DefaultLineManager {
 			return;
 		}
 
-		if ((this.#$.format.isBlock(startCon) || dom.check.isWysiwygFrame(startCon)) && (this.#$.component.is(startCon.children[range.startOffset]) || this.#$.component.is(startCon.children[range.startOffset - 1]))) return;
+		if (
+			(this.#$.format.isBlock(startCon) || dom.check.isWysiwygFrame(startCon)) &&
+			(this.#$.component.is(startCon.children[range.startOffset]) ||
+				this.#$.component.is(startCon.children[range.startOffset - 1]))
+		)
+			return;
 		if (dom.query.getParentElement(commonCon, dom.check.isExcludeFormat)) return null;
 
 		if (this.#$.format.isBlock(commonCon) && commonCon.childNodes.length <= 1) {
@@ -110,7 +115,9 @@ export default class DefaultLineManager {
 				focusNode = zeroWidth;
 			}
 		} catch {
-			this.#$.frameContext.get('_wd').execCommand('formatBlock', false, `<${formatName || this.#$.options.get('defaultLine')}>`);
+			this.#$.frameContext
+				.get('_wd')
+				.execCommand('formatBlock', false, `<${formatName || this.#$.options.get('defaultLine')}>`);
 			this.#$.store.set('_lastSelectionNode', null);
 			this.#$.selection.init();
 			return;

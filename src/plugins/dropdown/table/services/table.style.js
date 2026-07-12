@@ -44,7 +44,11 @@ export class TableStyleService {
 		// props
 		const controller_props = CreateHTML_controller_properties(this.#$);
 		const propsTargets = [this.#main.controller_table, this.#main.controller_cell];
-		this.controller_props = new Controller(this, this.#$, controller_props.html, { position: 'bottom', parents: propsTargets, isInsideForm: true });
+		this.controller_props = new Controller(this, this.#$, controller_props.html, {
+			position: 'bottom',
+			parents: propsTargets,
+			isInsideForm: true,
+		});
 		this.controller_props_title = controller_props.controller_props_title;
 
 		// color picker
@@ -65,7 +69,9 @@ export class TableStyleService {
 			colorList: pluginOptions.colorList || Constants.DEFAULT_COLOR_LIST,
 			splitNum: 5,
 			disableRemove: true,
-			hueSliderOptions: { controllerOptions: { isOutsideForm: true, parents: [this.controller_colorPicker], parentsHide: true } },
+			hueSliderOptions: {
+				controllerOptions: { isOutsideForm: true, parents: [this.controller_colorPicker], parentsHide: true },
+			},
 		});
 
 		// members - SelectMenu - properties - border style
@@ -78,14 +84,34 @@ export class TableStyleService {
 		// members - SelectMenu - properties - border format
 		const borderFormatMenu = CreateBorderFormatMenu(this.#$.lang, this.#$.icons, []);
 		const borderFormatButton = controller_props.borderFormatButton;
-		this.selectMenu_props_border_format = new SelectMenu(this.#$, { checkList: false, position: 'bottom-left', dir: 'ltr', splitNum: 5 });
+		this.selectMenu_props_border_format = new SelectMenu(this.#$, {
+			checkList: false,
+			position: 'bottom-left',
+			dir: 'ltr',
+			splitNum: 5,
+		});
 		this.selectMenu_props_border_format.on(borderFormatButton, this.#OnPropsBorderFormatEdit.bind(this, 'all'));
 		this.selectMenu_props_border_format.create(borderFormatMenu.items, borderFormatMenu.menus);
 
-		const borderFormatMenu_oneCell = CreateBorderFormatMenu(this.#$.lang, this.#$.icons, Constants.BORDER_FORMAT_INSIDE);
-		this.selectMenu_props_border_format_oneCell = new SelectMenu(this.#$, { checkList: false, position: 'bottom-left', dir: 'ltr', splitNum: 6 });
-		this.selectMenu_props_border_format_oneCell.on(borderFormatButton, this.#OnPropsBorderFormatEdit.bind(this, 'outside'));
-		this.selectMenu_props_border_format_oneCell.create(borderFormatMenu_oneCell.items, borderFormatMenu_oneCell.menus);
+		const borderFormatMenu_oneCell = CreateBorderFormatMenu(
+			this.#$.lang,
+			this.#$.icons,
+			Constants.BORDER_FORMAT_INSIDE,
+		);
+		this.selectMenu_props_border_format_oneCell = new SelectMenu(this.#$, {
+			checkList: false,
+			position: 'bottom-left',
+			dir: 'ltr',
+			splitNum: 6,
+		});
+		this.selectMenu_props_border_format_oneCell.on(
+			borderFormatButton,
+			this.#OnPropsBorderFormatEdit.bind(this, 'outside'),
+		);
+		this.selectMenu_props_border_format_oneCell.create(
+			borderFormatMenu_oneCell.items,
+			borderFormatMenu_oneCell.menus,
+		);
 
 		// memberts - elements..
 		this.maxText = this.#$.lang.maxSize;
@@ -170,7 +196,11 @@ export class TableStyleService {
 		} else {
 			this.controller_props_title.textContent = this.#$.lang.tableProperties;
 			this.#setCtrlProps('table');
-			this.controller_props.open(target, this.#main.controller_table.form, { isWWTarget: false, initMethod: null, addOffset: null });
+			this.controller_props.open(target, this.#main.controller_table.form, {
+				isWWTarget: false,
+				initMethod: null,
+				addOffset: null,
+			});
 		}
 	}
 
@@ -184,7 +214,11 @@ export class TableStyleService {
 		} else {
 			this.controller_props_title.textContent = this.#$.lang.cellProperties;
 			this.#setCtrlProps('cell');
-			this.controller_props.open(target, this.#main.controller_cell.form, { isWWTarget: false, initMethod: null, addOffset: null });
+			this.controller_props.open(target, this.#main.controller_cell.form, {
+				isWWTarget: false,
+				initMethod: null,
+				addOffset: null,
+			});
 		}
 	}
 
@@ -268,7 +302,9 @@ export class TableStyleService {
 		const table = this.#main._element;
 
 		if (!active) {
-			const caption = dom.utils.createElement('CAPTION', { class: `se-table-caption-${this.#main.captionPosition}` });
+			const caption = dom.utils.createElement('CAPTION', {
+				class: `se-table-caption-${this.#main.captionPosition}`,
+			});
 			caption.innerHTML = '<div><br></div>';
 			table.insertBefore(caption, table.firstElementChild);
 		} else {
@@ -404,7 +440,16 @@ export class TableStyleService {
 			const targets = isTable ? [this.#main._element] : this.#state.selectedCells;
 			const tr = /** @type {HTMLTableCellElement} */ (targets[0]);
 			const trStyles = _w.getComputedStyle(tr);
-			const { border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment, cell_alignment_vertical } = this.propTargets;
+			const {
+				border_format,
+				border_color,
+				border_style,
+				border_width,
+				back_color,
+				font_color,
+				cell_alignment,
+				cell_alignment_vertical,
+			} = this.propTargets;
 
 			const borderFormat = border_format.getAttribute('se-border-format') || '';
 			const hasFormat = borderFormat !== 'all';
@@ -445,7 +490,11 @@ export class TableStyleService {
 				ce -= cs;
 				cs -= cs;
 				let prevRow = /** @type {HTMLElement} */ (trRow);
-				for (let i = 0, cellCnt = 0, len = targets.length, e, es, rowIndex = 0, cellIndex, colspan, rowspan; i < len; i++, cellCnt++) {
+				for (
+					let i = 0, cellCnt = 0, len = targets.length, e, es, rowIndex = 0, cellIndex, colspan, rowspan;
+					i < len;
+					i++, cellCnt++
+				) {
 					e = /** @type {HTMLTableCellElement} */ (targets[i]);
 					colspan = e.colSpan;
 					rowspan = e.rowSpan;
@@ -481,7 +530,8 @@ export class TableStyleService {
 					if (rowIndex === re || isBottom) cells.bottom.push(e);
 					if (cellIndex === cs) cells.left.push(e);
 					if (cellIndex === ce || cellIndex + colspan - 1 === ce) cells.right.push(e);
-					if (!isBottom && rowIndex !== rs && rowIndex !== re && cellIndex !== cs && cellIndex !== ce) cells.middle.push(e);
+					if (!isBottom && rowIndex !== rs && rowIndex !== re && cellIndex !== cs && cellIndex !== ce)
+						cells.middle.push(e);
 
 					// --- set styles
 					es = e.style;
@@ -575,11 +625,28 @@ export class TableStyleService {
 		const targets = isTable ? [this.#main._element] : this.#state.selectedCells;
 		if (!targets?.[0]) return;
 
-		const { border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment, cell_alignment_vertical, cell_alignment_table_text, font_bold, font_underline, font_italic, font_strike } = this.propTargets;
-		const { border, backgroundColor, color, textAlign, verticalAlign, fontWeight, textDecoration, fontStyle } = _w.getComputedStyle(targets[0]);
+		const {
+			border_format,
+			border_color,
+			border_style,
+			border_width,
+			back_color,
+			font_color,
+			cell_alignment,
+			cell_alignment_vertical,
+			cell_alignment_table_text,
+			font_bold,
+			font_underline,
+			font_italic,
+			font_strike,
+		} = this.propTargets;
+		const { border, backgroundColor, color, textAlign, verticalAlign, fontWeight, textDecoration, fontStyle } =
+			_w.getComputedStyle(targets[0]);
 		const cellBorder = this.#getBorderStyle(border);
 
-		/** @type {HTMLElement} */ (cell_alignment.querySelector('[data-value="justify"]')).style.display = isTable ? 'none' : '';
+		/** @type {HTMLElement} */ (cell_alignment.querySelector('[data-value="justify"]')).style.display = isTable
+			? 'none'
+			: '';
 		cell_alignment_table_text.style.display = isTable ? '' : 'none';
 		if (isTable) cell_alignment_vertical.style.display = 'none';
 		else cell_alignment_vertical.style.display = '';
@@ -640,7 +707,8 @@ export class TableStyleService {
 		}
 
 		// border - format
-		border_format.firstElementChild.innerHTML = this.#$.icons[Constants.BORDER_FORMATS[targets.length === 1 ? 'outside' : 'all']];
+		border_format.firstElementChild.innerHTML =
+			this.#$.icons[Constants.BORDER_FORMATS[targets.length === 1 ? 'outside' : 'all']];
 		border_format.setAttribute('se-border-format', 'all');
 		dom.utils.removeClass(border_format, 'active');
 
@@ -674,7 +742,10 @@ export class TableStyleService {
 		const { font_bold, font_italic, font_strike, font_underline } = this.propTargets;
 		styles.fontWeight = dom.utils.hasClass(font_bold, 'on') ? 'bold' : '';
 		styles.fontStyle = dom.utils.hasClass(font_italic, 'on') ? 'italic' : '';
-		styles.textDecoration = ((dom.utils.hasClass(font_strike, 'on') ? 'line-through ' : '') + (dom.utils.hasClass(font_underline, 'on') ? 'underline' : '')).trim();
+		styles.textDecoration = (
+			(dom.utils.hasClass(font_strike, 'on') ? 'line-through ' : '') +
+			(dom.utils.hasClass(font_underline, 'on') ? 'underline' : '')
+		).trim();
 	}
 
 	/**
@@ -841,8 +912,37 @@ export class TableStyleService {
 	 * @description Initialize the style service (resets properties).
 	 */
 	init() {
-		const { border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment, cell_alignment_vertical, font_bold, font_underline, font_italic, font_strike } = this.propTargets;
-		dom.utils.removeClass([border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment, cell_alignment_vertical, font_bold, font_underline, font_italic, font_strike], 'on');
+		const {
+			border_format,
+			border_color,
+			border_style,
+			border_width,
+			back_color,
+			font_color,
+			cell_alignment,
+			cell_alignment_vertical,
+			font_bold,
+			font_underline,
+			font_italic,
+			font_strike,
+		} = this.propTargets;
+		dom.utils.removeClass(
+			[
+				border_format,
+				border_color,
+				border_style,
+				border_width,
+				back_color,
+				font_color,
+				cell_alignment,
+				cell_alignment_vertical,
+				font_bold,
+				font_underline,
+				font_italic,
+				font_strike,
+			],
+			'on',
+		);
 	}
 }
 

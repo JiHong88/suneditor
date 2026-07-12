@@ -11,6 +11,9 @@ class EventManager {
 	#frameContext;
 	#frameOptions;
 
+	/** @type {?import('../event/eventOrchestrator').default} */
+	#orchestrator = null;
+
 	/** @type {?SunEditor.Event.GlobalInfo} */
 	#geckoActiveEvent = null;
 
@@ -57,6 +60,28 @@ class EventManager {
 	}
 
 	/**
+	 * @internal
+	 * @description Bind the EventOrchestrator once it is constructed. Invoked by `coreKernel`
+	 * immediately after orchestrator creation so the public `applyTagEffect` method below can delegate.
+	 * @param {import('../event/eventOrchestrator').default} orchestrator
+	 */
+	_bindOrchestrator(orchestrator) {
+		this.#orchestrator = orchestrator;
+	}
+
+	/**
+	 * @description Re-run the toolbar/menu active-state pass against the given selection node (or the
+	 * current selection if `null`). Thin pass-through to {@link EventOrchestrator#applyTagEffect};
+	 * exposed on `$.eventManager` so modules/plugins can request an immediate sync after they mutate
+	 * `commandDispatcher.targets` (e.g. CommandMenu pushing newly-rendered rows).
+	 * @param {?Node} [selectionNode]
+	 * @returns {Node | undefined}
+	 */
+	applyTagEffect(selectionNode) {
+		return this.#orchestrator?.applyTagEffect(selectionNode);
+	}
+
+	/**
 	 * @description Register for an event.
 	 * - Only events registered with this method are unregistered or re-registered when methods such as 'setOptions', 'destroy' are called.
 	 * @param {*} target Target element
@@ -67,7 +92,14 @@ class EventManager {
 	 */
 	addEvent(target, type, listener, useCapture) {
 		if (!target) return null;
-		if (target === _w || target === _d || typeof target.length !== 'number' || target.nodeType || (!Array.isArray(target) && target.length < 1)) target = [target];
+		if (
+			target === _w ||
+			target === _d ||
+			typeof target.length !== 'number' ||
+			target.nodeType ||
+			(!Array.isArray(target) && target.length < 1)
+		)
+			target = [target];
 		if (target.length === 0) return null;
 
 		const len = target.length;
@@ -103,7 +135,14 @@ class EventManager {
 		const useCapture = params.useCapture;
 
 		if (!target) return;
-		if (target === _w || target === _d || typeof target.length !== 'number' || target.nodeType || (!Array.isArray(target) && target.length < 1)) target = [target];
+		if (
+			target === _w ||
+			target === _d ||
+			typeof target.length !== 'number' ||
+			target.nodeType ||
+			(!Array.isArray(target) && target.length < 1)
+		)
+			target = [target];
 		if (target.length === 0) return;
 
 		for (let i = 0, len = target.length; i < len; i++) {

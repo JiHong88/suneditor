@@ -100,7 +100,10 @@ export default {
 		const multiTargets = [];
 		if (typeof target === 'string') {
 			const t = document.querySelector(target);
-			if (!t) throw Error(`[SUNEDITOR.create.fail]-[document.querySelector(${target})] Cannot find target element. Make sure "${target}" is a valid selector and exists in the document.`);
+			if (!t)
+				throw Error(
+					`[SUNEDITOR.create.fail]-[document.querySelector(${target})] Cannot find target element. Make sure "${target}" is a valid selector and exists in the document.`,
+				);
 			multiTargets.push({ key: null, target: t });
 		} else if (target.nodeType === 1) {
 			multiTargets.push({ key: null, target: target });
@@ -108,7 +111,10 @@ export default {
 			let props;
 			for (const key in target) {
 				props = target[key];
-				if (!props.target || props.target.nodeType !== 1) throw Error('[SUNEDITOR.create.fail] suneditor multi root requires textarea\'s element at the "target" property.');
+				if (!props.target || props.target.nodeType !== 1)
+					throw Error(
+						'[SUNEDITOR.create.fail] suneditor multi root requires textarea\'s element at the "target" property.',
+					);
 				props.key = key;
 				multiTargets.push(props);
 			}

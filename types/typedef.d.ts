@@ -17,6 +17,20 @@ declare global {
 		type EventWysiwyg = HTMLElement & Window;
 		type WysiwygFrame = HTMLElement & HTMLIFrameElement;
 		type GlobalWindow = Window & typeof globalThis;
+		type ComponentLauncher = {
+			/**
+			 * - Delete hook (invoked by the selected-component keydown handler).
+			 */
+			componentDestroy?: (target: any) => void | Promise<void>;
+			/**
+			 * - Optional select hook.
+			 */
+			componentSelect?: (target: any) => boolean | void;
+			/**
+			 * - Optional deselect hook.
+			 */
+			componentDeselect?: (target: any) => void;
+		};
 		type ComponentInfo = {
 			/**
 			 * - The target element associated with the component.
@@ -53,9 +67,9 @@ declare global {
 			 */
 			isFile: boolean;
 			/**
-			 * - The element that triggered the component, if applicable.
+			 * - Hook object for non-plugin components (e.g. `pageBreak`), if applicable.
 			 */
-			launcher: HTMLElement | null;
+			launcher: SunEditor.ComponentLauncher | null;
 			/**
 			 * - Whether the component is an input component (e.g., table).
 			 */
@@ -117,35 +131,35 @@ declare global {
 				type Init = typeof import('./hooks/base').Core.Init;
 			}
 			namespace Component {
-				type Select = typeof import('./interfaces/contracts').EditorComponent.prototype.componentSelect;
-				type Deselect = typeof import('./interfaces/contracts').EditorComponent.prototype.componentDeselect;
-				type Edit = typeof import('./interfaces/contracts').EditorComponent.prototype.componentEdit;
-				type Destroy = typeof import('./interfaces/contracts').EditorComponent.prototype.componentDestroy;
-				type Copy = typeof import('./interfaces/contracts').EditorComponent.prototype.componentCopy;
+				type Select = import('./interfaces/contracts').EditorComponent['componentSelect'];
+				type Deselect = import('./interfaces/contracts').EditorComponent['componentDeselect'];
+				type Edit = import('./interfaces/contracts').EditorComponent['componentEdit'];
+				type Destroy = import('./interfaces/contracts').EditorComponent['componentDestroy'];
+				type Copy = import('./interfaces/contracts').EditorComponent['componentCopy'];
 			}
 			namespace Modal {
-				type Action = typeof import('./interfaces/contracts').ModuleModal.prototype.modalAction;
-				type On = typeof import('./interfaces/contracts').ModuleModal.prototype.modalOn;
-				type Init = typeof import('./interfaces/contracts').ModuleModal.prototype.modalInit;
-				type Off = typeof import('./interfaces/contracts').ModuleModal.prototype.modalOff;
-				type Resize = typeof import('./interfaces/contracts').ModuleModal.prototype.modalResize;
+				type Action = import('./interfaces/contracts').ModuleModal['modalAction'];
+				type On = import('./interfaces/contracts').ModuleModal['modalOn'];
+				type Init = import('./interfaces/contracts').ModuleModal['modalInit'];
+				type Off = import('./interfaces/contracts').ModuleModal['modalOff'];
+				type Resize = import('./interfaces/contracts').ModuleModal['modalResize'];
 			}
 			namespace Controller {
-				type Action = typeof import('./interfaces/contracts').ModuleController.prototype.controllerAction;
-				type On = typeof import('./interfaces/contracts').ModuleController.prototype.controllerOn;
-				type Close = typeof import('./interfaces/contracts').ModuleController.prototype.controllerClose;
+				type Action = import('./interfaces/contracts').ModuleController['controllerAction'];
+				type On = import('./interfaces/contracts').ModuleController['controllerOn'];
+				type Close = import('./interfaces/contracts').ModuleController['controllerClose'];
 			}
 			namespace Browser {
-				type Init = typeof import('./interfaces/contracts').ModuleBrowser.prototype.browserInit;
+				type Init = import('./interfaces/contracts').ModuleBrowser['browserInit'];
 			}
 			namespace ColorPicker {
-				type Action = typeof import('./interfaces/contracts').ModuleColorPicker.prototype.colorPickerAction;
-				type HueSliderOpen = typeof import('./interfaces/contracts').ModuleColorPicker.prototype.colorPickerHueSliderOpen;
-				type HueSliderClose = typeof import('./interfaces/contracts').ModuleColorPicker.prototype.colorPickerHueSliderClose;
+				type Action = import('./interfaces/contracts').ModuleColorPicker['colorPickerAction'];
+				type HueSliderOpen = import('./interfaces/contracts').ModuleColorPicker['colorPickerHueSliderOpen'];
+				type HueSliderClose = import('./interfaces/contracts').ModuleColorPicker['colorPickerHueSliderClose'];
 			}
 			namespace HueSlider {
-				type Action = typeof import('./interfaces/contracts').ModuleHueSlider.prototype.hueSliderAction;
-				type CancelAction = typeof import('./interfaces/contracts').ModuleHueSlider.prototype.hueSliderCancelAction;
+				type Action = import('./interfaces/contracts').ModuleHueSlider['hueSliderAction'];
+				type CancelAction = import('./interfaces/contracts').ModuleHueSlider['hueSliderCancelAction'];
 			}
 		}
 		export namespace HookParams {
@@ -261,7 +275,13 @@ declare global {
 			 * - `"#fix"`: RTL direction fix
 			 * - `"%100"|"%50"`: Responsive breakpoint (percentage)
 			 */
-			type ButtonSpecial = '|' | '/' | `-${'left' | 'right' | 'center'}` | '#fix' | `:${string}-${string}` | `%${number}`;
+			type ButtonSpecial =
+				| '|'
+				| '/'
+				| `-${'left' | 'right' | 'center'}`
+				| '#fix'
+				| `:${string}-${string}`
+				| `%${number}`;
 			/**
 			 * Plugin buttons available in the toolbar
 			 */
@@ -307,6 +327,7 @@ declare global {
 				| 'list_bulleted'
 				| 'list_numbered'
 				| 'autocomplete'
+				| 'slashCommand'
 				| 'align'
 				| 'font'
 				| 'fontColor'
@@ -339,7 +360,11 @@ declare global {
 			 * Button list configuration for the toolbar
 			 * Supports nested arrays, special controls, and responsive breakpoint configurations
 			 */
-			type ButtonItem = SunEditor.UI.ButtonCommand | SunEditor.UI.ButtonPlugin | SunEditor.UI.ButtonSpecial | string;
+			type ButtonItem =
+				| SunEditor.UI.ButtonCommand
+				| SunEditor.UI.ButtonPlugin
+				| SunEditor.UI.ButtonSpecial
+				| string;
 			/**
 			 * ///
 			 * ---[ End of auto-generated button types ]---

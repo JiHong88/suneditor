@@ -6,12 +6,20 @@ import type {} from '../../../typedef';
  * @this {EventManagerThis_handler_ww_clipboard}
  * @param {ClipboardEvent} e - Event object
  */
-export function OnPaste_wysiwyg(this: import('../eventOrchestrator').default, frameContext: any, e: ClipboardEvent): true | Promise<boolean>;
+export function OnPaste_wysiwyg(
+	this: import('../eventOrchestrator').default,
+	frameContext: any,
+	e: ClipboardEvent,
+): true | Promise<boolean>;
 /**
  * @this {EventManagerThis_handler_ww_clipboard}
  * @param {ClipboardEvent} e - Event object
  */
-export function OnCopy_wysiwyg(this: import('../eventOrchestrator').default, frameContext: any, e: ClipboardEvent): Promise<boolean>;
+export function OnCopy_wysiwyg(
+	this: import('../eventOrchestrator').default,
+	frameContext: any,
+	e: ClipboardEvent,
+): Promise<boolean>;
 export class OnCopy_wysiwyg {
 	/**
 	 * @this {EventManagerThis_handler_ww_clipboard}
@@ -24,7 +32,11 @@ export class OnCopy_wysiwyg {
  * @this {EventManagerThis_handler_ww_clipboard}
  * @param {ClipboardEvent} e - Event object
  */
-export function OnCut_wysiwyg(this: import('../eventOrchestrator').default, frameContext: any, e: ClipboardEvent): Promise<boolean>;
+export function OnCut_wysiwyg(
+	this: import('../eventOrchestrator').default,
+	frameContext: any,
+	e: ClipboardEvent,
+): Promise<boolean>;
 export class OnCut_wysiwyg {
 	/**
 	 * @this {EventManagerThis_handler_ww_clipboard}

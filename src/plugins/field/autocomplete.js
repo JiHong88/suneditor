@@ -128,8 +128,6 @@ class Autocomplete extends PluginField {
 	 */
 	constructor(kernel, pluginOptions) {
 		super(kernel);
-		this.title = this.$.lang.autocomplete;
-		this.icon = 'autocomplete';
 
 		// global defaults
 		const limitSize = pluginOptions.limitSize || 5;
@@ -164,7 +162,11 @@ class Autocomplete extends PluginField {
 
 		// controller
 		const controllerEl = CreateHTML_controller();
-		this.selectMenu = new SelectMenu(this.$, { position: 'right-bottom', dir: 'ltr', closeMethod: () => this.controller.close() });
+		this.selectMenu = new SelectMenu(this.$, {
+			position: 'right-bottom',
+			dir: 'ltr',
+			closeMethod: () => this.controller.close(),
+		});
 		this.controller = new Controller(
 			this,
 			this.$,
@@ -263,7 +265,9 @@ class Autocomplete extends PluginField {
 
 		if (!response) {
 			if (ctx.directData) {
-				response = ctx.directData.filter((item) => item.key.toLowerCase().startsWith(lowerValue)).slice(0, limit);
+				response = ctx.directData
+					.filter((item) => item.key.toLowerCase().startsWith(lowerValue))
+					.slice(0, limit);
 			} else {
 				const xmlHttp = await ctx.apiManager.asyncCall({ method: 'GET', url: this.#createUrl(ctx, value) });
 				const json = JSON.parse(xmlHttp.responseText);

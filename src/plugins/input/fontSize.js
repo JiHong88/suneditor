@@ -131,7 +131,9 @@ class FontSize extends PluginInput {
 
 		// create HTML
 		this.unitMap = { ...DEFAULT_UNIT_MAP, ...(pluginOptions.unitMap || {}) };
-		this.sizeUnit = /text/.test(pluginOptions.sizeUnit) ? '' : pluginOptions.sizeUnit || this.$.options.get('fontSizeUnits')[0];
+		this.sizeUnit = /text/.test(pluginOptions.sizeUnit)
+			? ''
+			: pluginOptions.sizeUnit || this.$.options.get('fontSizeUnits')[0];
 
 		const unitMap = this.unitMap[this.sizeUnit || 'text'];
 		const menu = CreateHTML(this.$, unitMap, this.sizeUnit, pluginOptions.showDefaultSizeLabel);
@@ -152,25 +154,47 @@ class FontSize extends PluginInput {
 		if (showIncDec) {
 			this.beforeItem = dom.utils.createElement(
 				'button',
-				{ class: 'se-btn se-tooltip se-sub-btn', type: 'button', 'data-command': FontSize.key, 'data-type': 'command', 'data-value': 'dec' },
+				{
+					class: 'se-btn se-tooltip se-sub-btn',
+					type: 'button',
+					'data-command': FontSize.key,
+					'data-type': 'command',
+					'data-value': 'dec',
+				},
 				`${this.$.icons.minus}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.$.lang.decrease}</span></span>`,
 			);
 			this.afterItem = dom.utils.createElement(
 				'button',
-				{ class: 'se-btn se-tooltip se-sub-btn', type: 'button', 'data-command': FontSize.key, 'data-type': 'command', 'data-value': 'inc' },
+				{
+					class: 'se-btn se-tooltip se-sub-btn',
+					type: 'button',
+					'data-command': FontSize.key,
+					'data-type': 'command',
+					'data-value': 'inc',
+				},
 				`${this.$.icons.plus}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.$.lang.increase}</span></span>`,
 			);
 		} else if (!disableInput) {
 			this.afterItem = dom.utils.createElement(
 				'button',
-				{ class: 'se-btn se-tooltip se-sub-arrow-btn', type: 'button', 'data-command': FontSize.key, 'data-type': 'dropdown' },
+				{
+					class: 'se-btn se-tooltip se-sub-arrow-btn',
+					type: 'button',
+					'data-command': FontSize.key,
+					'data-type': 'dropdown',
+				},
 				`${this.$.icons.arrow_down}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.$.lang.fontSize}</span></span>`,
 			);
 			this.$.menu.initDropdownTarget({ key: FontSize.key, type: 'dropdown' }, menu);
 		} else if (disableInput && !showIncDec) {
 			this.replaceButton = dom.utils.createElement(
 				'button',
-				{ class: 'se-btn se-tooltip se-btn-select se-btn-tool-font-size', type: 'button', 'data-command': FontSize.key, 'data-type': 'dropdown' },
+				{
+					class: 'se-btn se-tooltip se-btn-select se-btn-tool-font-size',
+					type: 'button',
+					'data-command': FontSize.key,
+					'data-type': 'dropdown',
+				},
 				`<span class="se-txt __se__font_size">${this.$.lang.fontSize}</span>${this.$.icons.arrow_down}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.$.lang.fontSize}</span></span>`,
 			);
 			this.$.menu.initDropdownTarget({ key: FontSize.key, type: 'dropdown' }, menu);
@@ -268,7 +292,9 @@ class FontSize extends PluginInput {
 			const { max, min } = this.unitMap[unit];
 			value = value > max ? max : value < min ? min : value;
 
-			const newNode = dom.utils.createElement('SPAN', { style: 'font-size: ' + this.#setSize(target, value + unit) + ';' });
+			const newNode = dom.utils.createElement('SPAN', {
+				style: 'font-size: ' + this.#setSize(target, value + unit) + ';',
+			});
 			this.$.inline.apply(newNode, { stylesToModify: ['font-size'], nodesToRemove: null, strictRemove: null });
 		} finally {
 			this.isInputActive = false;
@@ -347,7 +373,8 @@ class FontSize extends PluginInput {
 				value: this.sizeUnit ? 0 : '',
 			};
 
-		const size = typeof target === 'string' ? target : dom.check.isInputElement(target) ? target.value : target.textContent;
+		const size =
+			typeof target === 'string' ? target : dom.check.isInputElement(target) ? target.value : target.textContent;
 		const splitValue = this.sizeUnit ? size.split(/(\d+)/) : [size, ''];
 
 		let unit = (splitValue.pop() || '').trim().toLowerCase();
@@ -375,7 +402,9 @@ class FontSize extends PluginInput {
 		if (dom.check.isInputElement(target)) {
 			return (target.value = String(value));
 		} else {
-			return (target.textContent = String(this.sizeUnit ? value : this.unitMap.text.list.find((v) => v.size === value)?.title || value));
+			return (target.textContent = String(
+				this.sizeUnit ? value : this.unitMap.text.list.find((v) => v.size === value)?.title || value,
+			));
 		}
 	}
 }

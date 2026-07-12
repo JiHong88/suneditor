@@ -46,13 +46,15 @@ export function htmlToEntity(content: string): string;
  */
 export function entityToHTML(content: string): string;
 /**
- * @description Debounce function
+ * @description Debounce function. The returned function exposes a `cancel()` method that clears any
+ * pending invocation (useful when an event — e.g. ESC — should abort a scheduled callback).
  * @param {(...args: *) => void} func function
  * @param {number} wait delay ms
- * @returns {*} executedFunction
+ * @returns {*} executedFunction — the debounced function, with a `cancel()` method attached
  * @example
  * const debouncedSave = converter.debounce(() => save(), 300);
  * input.addEventListener('input', debouncedSave);
+ * // later: debouncedSave.cancel();
  */
 export function debounce(func: (...args: any) => void, wait: number): any;
 /**

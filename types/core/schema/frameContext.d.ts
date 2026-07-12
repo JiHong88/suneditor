@@ -33,6 +33,7 @@ import type {} from '../../typedef';
  * @property {HTMLTextAreaElement} markdown - Markdown view editing element (a <textarea>).
  * @property {HTMLTextAreaElement} markdownNumbers - Element displaying line numbers in markdown view mode.
  * @property {HTMLElement} placeholder - Placeholder element shown when the editor is empty.
+ * @property {string} placeholder_line - Per-line placeholder text, rendered via a `::before` on the focused empty line.
  * @property {HTMLElement} statusbar - Editor status bar element (for resizing, info, etc.).
  * @property {HTMLElement} navigation - Navigation element (e.g., for outline or bookmarks).
  * @property {HTMLElement} charWrapper - Wrapper for the character counter element.
@@ -45,6 +46,10 @@ import type {} from '../../typedef';
  * === UI Utilities & Visual Components ===
  * @property {HTMLElement} lineBreaker_t - Top floating line-breaker UI element (for line insertion).
  * @property {HTMLElement} lineBreaker_b - Bottom floating line-breaker UI element (for line insertion).
+ * @property {?HTMLElement} blockHandleArea - Gutter container (`.se-block-handle-area`) holding the per-line block handle. `null` when the `blockHandle` option is disabled.
+ * @property {?HTMLElement} blockHandle - Block handle group (`.se-block-handle`) containing the plus and drag buttons. `null` when disabled.
+ * @property {?HTMLElement} blockHandlePlus - Plus button (`.se-block-handle-plus`) — inserts a new line after the current block. `null` when disabled.
+ * @property {?HTMLElement} blockHandleDrag - Drag button (`.se-block-handle-drag`) — opens the action menu / starts drag-to-reorder. `null` when disabled.
  * @property {HTMLElement} [_stickyDummy] - Placeholder element used for sticky toolbar behavior.
  * @property {HTMLElement} [_toolbarShadow] - Shadow element below the toolbar for visual effects.
  * @property {{main: HTMLElement, border: HTMLElement, display: HTMLElement, handles: HTMLElement[]}} [_figure] - Current active figure component (image, table, etc.).
@@ -88,8 +93,11 @@ import type {} from '../../typedef';
  * @param {HTMLElement} wwFrame Editor wysiwyg frame
  * @param {HTMLElement} codeWrapper Editor code view wrapper
  * @param {HTMLElement} codeFrame Editor code view frame
- * @param {{inner: HTMLElement, page: HTMLElement, pageMirror: HTMLElement}} documentTypeInner Document type elements
+ * @param {?HTMLElement} markdownWrapper Editor markdown view wrapper (only present when the markdown view button is enabled)
+ * @param {?HTMLElement} markdownFrame Editor markdown view frame (only present when the markdown view button is enabled)
  * @param {?HTMLElement} statusbar Editor statusbar
+ * @param {{inner: HTMLElement, page: HTMLElement, pageMirror: HTMLElement}} documentTypeInner Document type elements
+ * @param {?HTMLElement} blockHandleArea Block handle gutter (`.se-block-handle-area`). `null` when the `blockHandle` option is disabled.
  * @param {*} key root key
  * @returns {FrameContexType}
  */
@@ -103,14 +111,15 @@ export function CreateFrameContext(
 	wwFrame: HTMLElement,
 	codeWrapper: HTMLElement,
 	codeFrame: HTMLElement,
-	markdownWrapper: any,
-	markdownFrame: any,
+	markdownWrapper: HTMLElement | null,
+	markdownFrame: HTMLElement | null,
 	statusbar: HTMLElement | null,
 	documentTypeInner: {
 		inner: HTMLElement;
 		page: HTMLElement;
 		pageMirror: HTMLElement;
 	},
+	blockHandleArea: HTMLElement | null,
 	key: any,
 ): FrameContexType;
 /**
@@ -118,7 +127,10 @@ export function CreateFrameContext(
  * @param {HTMLElement} statusbar Statusbar element
  * @param {FrameContexType|import('../config/contextProvider').FrameContextMap} mapper FrameContext map
  */
-export function UpdateStatusbarContext(statusbar: HTMLElement, mapper: FrameContexType | import('../config/contextProvider').FrameContextMap): void;
+export function UpdateStatusbarContext(
+	statusbar: HTMLElement,
+	mapper: FrameContexType | import('../config/contextProvider').FrameContextMap,
+): void;
 /**
  * This object stores **all frame-specific states and DOM references** for a SunEditor instance.
  *
@@ -202,6 +214,10 @@ export type FrameContextStore = {
 	 */
 	placeholder: HTMLElement;
 	/**
+	 * - Per-line placeholder text, rendered via a `::before` on the focused empty line.
+	 */
+	placeholder_line: string;
+	/**
 	 * - Editor status bar element (for resizing, info, etc.).
 	 */
 	statusbar: HTMLElement;
@@ -243,6 +259,22 @@ export type FrameContextStore = {
 	 * - Bottom floating line-breaker UI element (for line insertion).
 	 */
 	lineBreaker_b: HTMLElement;
+	/**
+	 * - Gutter container (`.se-block-handle-area`) holding the per-line block handle. `null` when the `blockHandle` option is disabled.
+	 */
+	blockHandleArea: HTMLElement | null;
+	/**
+	 * - Block handle group (`.se-block-handle`) containing the plus and drag buttons. `null` when disabled.
+	 */
+	blockHandle: HTMLElement | null;
+	/**
+	 * - Plus button (`.se-block-handle-plus`) — inserts a new line after the current block. `null` when disabled.
+	 */
+	blockHandlePlus: HTMLElement | null;
+	/**
+	 * - Drag button (`.se-block-handle-drag`) — opens the action menu / starts drag-to-reorder. `null` when disabled.
+	 */
+	blockHandleDrag: HTMLElement | null;
 	/**
 	 * - Placeholder element used for sticky toolbar behavior.
 	 */

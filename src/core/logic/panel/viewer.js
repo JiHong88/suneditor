@@ -128,7 +128,8 @@ class Viewer {
 			codeWrapper.style.setProperty('display', 'none', 'important');
 			wysiwygFrame.style.display = 'block';
 
-			if (this.#frameOptions.get('height') === 'auto' && !this.#options.get('hasCodeMirror')) fc.get('code').style.height = '0px';
+			if (this.#frameOptions.get('height') === 'auto' && !this.#options.get('hasCodeMirror'))
+				fc.get('code').style.height = '0px';
 
 			if (!fc.get('isFullScreen')) {
 				this.#$.ui.preventToolbarHide(false);
@@ -200,7 +201,8 @@ class Viewer {
 			if (fc.get('isFullScreen')) {
 				markdownFrame.style.height = '100%';
 			} else if (this.#frameOptions.get('height') === 'auto') {
-				markdownFrame.style.height = markdownFrame.scrollHeight > 0 ? markdownFrame.scrollHeight + 'px' : 'auto';
+				markdownFrame.style.height =
+					markdownFrame.scrollHeight > 0 ? markdownFrame.scrollHeight + 'px' : 'auto';
 			}
 
 			if (!fc.get('isFullScreen')) {
@@ -294,7 +296,9 @@ class Viewer {
 		const arrow = this.#context.get('toolbar_arrow');
 
 		this.#$.ui.offCurrentController();
-		const wasToolbarHidden = toolbar.style.display === 'none' || (this.#store.mode.isInline && !this.#$.toolbar.inlineToolbarAttr.isShow);
+		const wasToolbarHidden =
+			toolbar.style.display === 'none' ||
+			(this.#store.mode.isInline && !this.#$.toolbar.inlineToolbarAttr.isShow);
 
 		if (value) {
 			this.#originCssText = topArea.style.cssText;
@@ -341,18 +345,25 @@ class Viewer {
 
 			// frame
 			editorArea.style.cssText = toolbar.style.cssText = '';
-			wysiwygFrame.style.cssText = (wysiwygFrame.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0] + this.#frameOptions.get('_defaultStyles').editor + (isCodeView || isMarkdownView ? 'display: none;' : '');
+			wysiwygFrame.style.cssText =
+				(wysiwygFrame.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0] +
+				this.#frameOptions.get('_defaultStyles').editor +
+				(isCodeView || isMarkdownView ? 'display: none;' : '');
 
 			// code wrapper
 			if (codeWrapper) {
-				codeWrapper.style.cssText = (codeWrapper.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0] + `display: ${!isCodeView ? 'none' : 'flex'} !important;`;
+				codeWrapper.style.cssText =
+					(codeWrapper.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0] +
+					`display: ${!isCodeView ? 'none' : 'flex'} !important;`;
 				codeWrapper.style.overflow = 'auto';
 				codeWrapper.style.height = '100%';
 			}
 
 			// markdown wrapper
 			if (markdownWrapper) {
-				markdownWrapper.style.cssText = (markdownWrapper.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0] + `display: ${!isMarkdownView ? 'none' : 'flex'} !important;`;
+				markdownWrapper.style.cssText =
+					(markdownWrapper.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0] +
+					`display: ${!isMarkdownView ? 'none' : 'flex'} !important;`;
 				markdownWrapper.style.overflow = 'auto';
 				markdownWrapper.style.height = '100%';
 			}
@@ -367,7 +378,11 @@ class Viewer {
 			toolbar.style.display = 'block';
 
 			this.#fullScreenInnerHeight = _w.innerHeight - toolbar.offsetHeight;
-			editorArea.style.height = this.#fullScreenInnerHeight - (fc.has('statusbar') ? fc.get('statusbar').offsetHeight : 0) - this.#options.get('fullScreenOffset') + 'px';
+			editorArea.style.height =
+				this.#fullScreenInnerHeight -
+				(fc.has('statusbar') ? fc.get('statusbar').offsetHeight : 0) -
+				this.#options.get('fullScreenOffset') +
+				'px';
 
 			if (this.#frameOptions.get('iframe') && this.#frameOptions.get('height') === 'auto') {
 				editorArea.style.overflow = 'auto';
@@ -383,11 +398,15 @@ class Viewer {
 			});
 		} else {
 			// frame
-			wysiwygFrame.style.cssText = this.#wysiwygOriginCssText.replace(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/, '') + (isCodeView || isMarkdownView ? 'display: none;' : '');
+			wysiwygFrame.style.cssText =
+				this.#wysiwygOriginCssText.replace(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/, '') +
+				(isCodeView || isMarkdownView ? 'display: none;' : '');
 
 			// code wrapper
 			if (codeWrapper) {
-				codeWrapper.style.cssText = this.#codeWrapperOriginCssText.replace(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/, '') + `display: ${!isCodeView ? 'none' : 'flex'} !important;`;
+				codeWrapper.style.cssText =
+					this.#codeWrapperOriginCssText.replace(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/, '') +
+					`display: ${!isCodeView ? 'none' : 'flex'} !important;`;
 			}
 
 			// code
@@ -396,7 +415,9 @@ class Viewer {
 
 			// markdown wrapper
 			if (markdownWrapper) {
-				markdownWrapper.style.cssText = this.#markdownWrapperOriginCssText.replace(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/, '') + `display: ${!isMarkdownView ? 'none' : 'flex'} !important;`;
+				markdownWrapper.style.cssText =
+					this.#markdownWrapperOriginCssText.replace(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/, '') +
+					`display: ${!isMarkdownView ? 'none' : 'flex'} !important;`;
 			}
 			if (markdownFrame) markdownFrame.style.cssText = this.#markdownOriginCssText;
 			if (markdownNumbers) markdownNumbers.style.cssText = this.#markdownNumberOriginCssText;
@@ -408,7 +429,8 @@ class Viewer {
 			if (arrow) arrow.style.cssText = this.#arrowOriginCssText;
 			_d.body.style.overflow = this.#bodyOverflow;
 
-			if (this.#frameOptions.get('height') === 'auto' && !this.#options.get('hasCodeMirror')) this._codeViewAutoHeight(fc.get('code'), fc.get('codeNumbers'), true);
+			if (this.#frameOptions.get('height') === 'auto' && !this.#options.get('hasCodeMirror'))
+				this._codeViewAutoHeight(fc.get('code'), fc.get('codeNumbers'), true);
 
 			if (this.#toolbarParent) {
 				this.#toolbarParent.appendChild(toolbar);
@@ -522,7 +544,9 @@ class Viewer {
 		_d.body.appendChild(iframe);
 
 		const innerPadding = _w.getComputedStyle(this.#frameContext.get('wysiwyg')).padding;
-		const contentHTML = this.#options.get('printTemplate') ? this.#options.get('printTemplate').replace(/\{\{\s*contents\s*\}\}/i, this.#$.html.get()) : this.#$.html.get();
+		const contentHTML = this.#options.get('printTemplate')
+			? this.#options.get('printTemplate').replace(/\{\{\s*contents\s*\}\}/i, this.#$.html.get())
+			: this.#$.html.get();
 		const printDocument = dom.query.getIframeDocument(iframe);
 		const wDoc = this.#frameContext.get('_wd');
 		const rtlClass = this.#options.get('_rtl') ? ' se-rtl' : '';
@@ -613,7 +637,11 @@ class Viewer {
 		this.#$.ui.offCurrentController();
 		this.#$.ui.offCurrentModal();
 
-		const contentHTML = this.#options.get('previewTemplate') ? this.#options.get('previewTemplate').replace(/\{\{\s*contents\s*\}\}/i, this.#$.html.get({ withFrame: true })) : this.#$.html.get({ withFrame: true });
+		const contentHTML = this.#options.get('previewTemplate')
+			? this.#options
+					.get('previewTemplate')
+					.replace(/\{\{\s*contents\s*\}\}/i, this.#$.html.get({ withFrame: true }))
+			: this.#$.html.get({ withFrame: true });
 		const windowObject = _w.open('', '_blank');
 		const wDoc = this.#frameContext.get('_wd');
 		const rtlClass = this.#options.get('_rtl') ? ' se-rtl' : '';
@@ -670,7 +698,11 @@ class Viewer {
 	 */
 	_resetFullScreenHeight() {
 		if (this.#frameContext.get('isFullScreen')) {
-			this.#fullScreenInnerHeight += _w.innerHeight - this.#context.get('toolbar_main').offsetHeight - (this.#frameContext.has('statusbar') ? this.#frameContext.get('statusbar').offsetHeight : 0) - this.#fullScreenInnerHeight;
+			this.#fullScreenInnerHeight +=
+				_w.innerHeight -
+				this.#context.get('toolbar_main').offsetHeight -
+				(this.#frameContext.has('statusbar') ? this.#frameContext.get('statusbar').offsetHeight : 0) -
+				this.#fullScreenInnerHeight;
 			this.#frameContext.get('wrapper').style.height = this.#fullScreenInnerHeight + 'px';
 			return true;
 		}
@@ -795,12 +827,22 @@ class Viewer {
 			}
 
 			let headers = parseDocument.head.innerHTML;
-			if (!parseDocument.head.querySelector('link[rel="stylesheet"]') || (this.#frameOptions.get('height') === 'auto' && !parseDocument.head.querySelector('style'))) {
-				headers += converter._setIframeStyleLinks(this.#frameOptions.get('iframe_cssFileName')) + converter._setAutoHeightStyle(this.#frameOptions.get('height'));
+			if (
+				!parseDocument.head.querySelector('link[rel="stylesheet"]') ||
+				(this.#frameOptions.get('height') === 'auto' && !parseDocument.head.querySelector('style'))
+			) {
+				headers +=
+					converter._setIframeStyleLinks(this.#frameOptions.get('iframe_cssFileName')) +
+					converter._setAutoHeightStyle(this.#frameOptions.get('height'));
 			}
 
 			wDoc.head.innerHTML = headers;
-			wDoc.body.innerHTML = this.#$.html.clean(parseDocument.body.innerHTML, { forceFormat: true, whitelist: null, blacklist: null, _freeCodeViewMode: this.#options.get('freeCodeViewMode') });
+			wDoc.body.innerHTML = this.#$.html.clean(parseDocument.body.innerHTML, {
+				forceFormat: true,
+				whitelist: null,
+				blacklist: null,
+				_freeCodeViewMode: this.#options.get('freeCodeViewMode'),
+			});
 
 			const attrs = parseDocument.body.attributes;
 			for (let i = 0, len = attrs.length; i < len; i++) {
@@ -816,7 +858,12 @@ class Viewer {
 		} else {
 			this.#frameContext.get('wysiwyg').innerHTML =
 				code_html.length > 0
-					? this.#$.html.clean(code_html, { forceFormat: true, whitelist: null, blacklist: null, _freeCodeViewMode: this.#options.get('freeCodeViewMode') })
+					? this.#$.html.clean(code_html, {
+							forceFormat: true,
+							whitelist: null,
+							blacklist: null,
+							_freeCodeViewMode: this.#options.get('freeCodeViewMode'),
+						})
 					: '<' + this.#options.get('defaultLine') + '><br></' + this.#options.get('defaultLine') + '>';
 		}
 	}
@@ -830,7 +877,14 @@ class Viewer {
 
 		if (this.#frameOptions.get('iframe_fullPage')) {
 			const attrs = dom.utils.getAttributesToString(this.#frameContext.get('_wd').body, null);
-			codeValue = '<!DOCTYPE html>\n<html>\n' + this.#frameContext.get('_wd').head.outerHTML.replace(/>(?!\n)/g, '>\n') + '<body ' + attrs + '>\n' + codeContent + '</body>\n</html>';
+			codeValue =
+				'<!DOCTYPE html>\n<html>\n' +
+				this.#frameContext.get('_wd').head.outerHTML.replace(/>(?!\n)/g, '>\n') +
+				'<body ' +
+				attrs +
+				'>\n' +
+				codeContent +
+				'</body>\n</html>';
 		} else {
 			codeValue = codeContent;
 		}
@@ -855,7 +909,9 @@ class Viewer {
 		const html = markdown.markdownToHtml(md, this.#options.get('defaultLine'));
 
 		this.#frameContext.get('wysiwyg').innerHTML =
-			html.length > 0 ? this.#$.html.clean(html, { forceFormat: true, whitelist: null, blacklist: null }) : '<' + this.#options.get('defaultLine') + '><br></' + this.#options.get('defaultLine') + '>';
+			html.length > 0
+				? this.#$.html.clean(html, { forceFormat: true, whitelist: null, blacklist: null })
+				: '<' + this.#options.get('defaultLine') + '><br></' + this.#options.get('defaultLine') + '>';
 	}
 
 	/**

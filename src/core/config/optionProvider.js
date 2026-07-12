@@ -215,7 +215,10 @@ export default class OptionProvider {
 					const docHead = fc.get('_wd').head;
 					const links = docHead.getElementsByTagName('link');
 					while (links[0]) docHead.removeChild(links[0]);
-					const parseDocument = new DOMParser().parseFromString(converter._setIframeStyleLinks(newRootOptions.get('iframe_cssFileName')), 'text/html');
+					const parseDocument = new DOMParser().parseFromString(
+						converter._setIframeStyleLinks(newRootOptions.get('iframe_cssFileName')),
+						'text/html',
+					);
 					const newLinks = parseDocument.head.children;
 					const sTag = docHead.querySelector('style');
 					while (newLinks[0]) docHead.insertBefore(newLinks[0], sTag);
@@ -223,6 +226,22 @@ export default class OptionProvider {
 
 				if (diff.has('placeholder')) {
 					fc.get('placeholder').textContent = newRootOptions.get('placeholder');
+				}
+
+				if (diff.has('placeholder_line')) {
+					const phLineText = newRootOptions.get('placeholder_line');
+					fc.set('placeholder_line', phLineText);
+
+					const marked = fc.get('wysiwyg').querySelector('.se-placeholder-line');
+					if (marked) {
+						if (phLineText) {
+							marked.setAttribute('data-se-placeholder-line', phLineText);
+						} else {
+							marked.classList.remove('se-placeholder-line');
+							marked.removeAttribute('data-se-placeholder-line');
+							if (!marked.getAttribute('class')) marked.removeAttribute('class');
+						}
+					}
 				}
 
 				// frame styles
@@ -339,7 +358,9 @@ export default class OptionProvider {
 		for (let i = 0, len = keys.length, k; i < len; i++) {
 			k = keys[i];
 			if (OPTION_FIXED_FLAG[k] === 'fixed' || OPTION_FRAME_FIXED_FLAG[k] === 'fixed' || (plugins && plugins[k])) {
-				console.warn(`[SUNEDITOR.warn.resetOptions] The "[${root + k}]" option cannot be changed after the editor is created.`);
+				console.warn(
+					`[SUNEDITOR.warn.resetOptions] The "[${root + k}]" option cannot be changed after the editor is created.`,
+				);
 				keys.splice(i--, 1);
 				len--;
 			}

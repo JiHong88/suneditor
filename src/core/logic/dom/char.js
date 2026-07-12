@@ -33,7 +33,13 @@ class Char {
 	check(html) {
 		const maxCharCount = this.#frameOptions.get('charCounter_max');
 		if (maxCharCount) {
-			const length = this.getLength(typeof html === 'string' ? html : this.#frameOptions.get('charCounter_type') === 'byte-html' && html.nodeType === 1 ? /** @type {HTMLElement} */ (html).outerHTML : html.textContent);
+			const length = this.getLength(
+				typeof html === 'string'
+					? html
+					: this.#frameOptions.get('charCounter_type') === 'byte-html' && html.nodeType === 1
+						? /** @type {HTMLElement} */ (html).outerHTML
+						: html.textContent,
+			);
 			if (length > 0 && length + this.getLength() > maxCharCount) {
 				CounterBlink(this.#frameContext.get('charWrapper'));
 				return false;
@@ -53,7 +59,10 @@ class Char {
 	 */
 	getLength(content) {
 		if (typeof content !== 'string') {
-			content = this.#frameOptions.get('charCounter_type') === 'byte-html' ? this.#frameContext.get('wysiwyg').innerHTML : this.#frameContext.get('wysiwyg').textContent;
+			content =
+				this.#frameOptions.get('charCounter_type') === 'byte-html'
+					? this.#frameContext.get('wysiwyg').innerHTML
+					: this.#frameContext.get('wysiwyg').textContent;
 		}
 		return /byte/.test(this.#frameOptions.get('charCounter_type')) ? this.getByteLength(content) : content.length;
 	}
@@ -160,7 +169,8 @@ class Char {
 					const text = this.#$.selection.getNode().textContent;
 					const slicePosition = range.endOffset - 1; // (count - maxCharCount);
 
-					this.#$.selection.getNode().textContent = text.slice(0, slicePosition < 0 ? 0 : slicePosition) + text.slice(range.endOffset, text.length);
+					this.#$.selection.getNode().textContent =
+						text.slice(0, slicePosition < 0 ? 0 : slicePosition) + text.slice(range.endOffset, text.length);
 					this.#$.selection.setRange(range.endContainer, endOff, range.endContainer, endOff);
 				}
 			} else if (count + nextCharCount > maxCharCount) {

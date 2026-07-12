@@ -160,7 +160,12 @@ declare class UIManager {
 	/**
 	 * @param {SunEditor.FrameContext} rt Root target[key] FrameContext
 	 */
-	reset(rt: SunEditor.FrameContext): void;
+	/**
+	 * @description Block handle instance for external access.
+	 * @type {BlockHandle}
+	 */
+	get blockHandle(): BlockHandle;
+	reset(rt: any): void;
 	/**
 	 * @internal
 	 * @description Closes all open controllers except those marked as `fixed`.
@@ -259,3 +264,4 @@ declare class UIManager {
 	opendBrowser: any;
 	#private;
 }
+import BlockHandle from '../panel/blockHandle.js';

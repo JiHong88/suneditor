@@ -154,7 +154,8 @@ export default class ContextProvider {
 			e.set('_wd', e.get('wysiwygFrame').contentDocument);
 			e.set('wysiwyg', e.get('_wd').body);
 			// e.get('wysiwyg').className += ' ' + options.get('_editableClass');
-			if (frameOptions.get('_defaultStyles').editor) e.get('wysiwyg').style.cssText = frameOptions.get('_defaultStyles').editor;
+			if (frameOptions.get('_defaultStyles').editor)
+				e.get('wysiwyg').style.cssText = frameOptions.get('_defaultStyles').editor;
 			if (frameOptions.get('height') === 'auto') e.set('_iframeAuto', e.get('_wd').body);
 		} else {
 			e.set('_ww', _w);

@@ -134,7 +134,6 @@
 		math_modal_title: 'Matematika',
 		maxSize: 'Max. velikost',
 		mediaGallery: 'Galerie médií',
-		autocomplete: 'Automatické doplňování',
 		mention: 'Zmínka',
 		menu_bordered: 'Ohraničené',
 		menu_code: 'Kód',

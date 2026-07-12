@@ -20,7 +20,12 @@ export default {
 		if (rInfo.commonCon !== rInfo.container && formatEl.parentElement) {
 			if (formatEl.contains(container)) {
 				const focusNode = LineDelete_next(formatEl);
-				ports.selection.setRange(focusNode, focusNode.textContent.length, focusNode, focusNode.textContent.length);
+				ports.selection.setRange(
+					focusNode,
+					focusNode.textContent.length,
+					focusNode,
+					focusNode.textContent.length,
+				);
 			} else {
 				const { focusNode, focusOffset } = LineDelete_prev(formatEl);
 				ports.selection.setRange(focusNode, focusOffset, focusNode, focusOffset);
@@ -64,7 +69,10 @@ export default {
 				formatEl.removeAttribute(attrs[0].name);
 			}
 		} else {
-			formatEl.parentNode.replaceChild(dom.utils.createElement(ctx.options.get('defaultLine'), null, '<br>'), formatEl);
+			formatEl.parentNode.replaceChild(
+				dom.utils.createElement(ctx.options.get('defaultLine'), null, '<br>'),
+				formatEl,
+			);
 		}
 	},
 
@@ -72,16 +80,19 @@ export default {
 	'backspace.component.select': ({ ports }, { selectionNode, range, fileComponentInfo }) => {
 		let currentZWS = null;
 		if (dom.check.isBreak(selectionNode)) dom.utils.removeItem(selectionNode);
-		else if (dom.check.isBreak((currentZWS = range.startContainer.childNodes?.[range.startOffset]))) dom.utils.removeItem(currentZWS);
+		else if (dom.check.isBreak((currentZWS = range.startContainer.childNodes?.[range.startOffset])))
+			dom.utils.removeItem(currentZWS);
 
-		if (ports.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) ports.focusManager.blur();
+		if (ports.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false)
+			ports.focusManager.blur();
 	},
 
 	/** @action backspaceComponentRemove */
 	'backspace.component.remove': ({ ports }, { isList, sel, formatEl, fileComponentInfo }) => {
 		if (isList) dom.utils.removeItem(sel);
 		if (formatEl.textContent.length === 0) dom.utils.removeItem(formatEl);
-		if (ports.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) ports.focusManager.blur();
+		if (ports.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false)
+			ports.focusManager.blur();
 	},
 
 	/** @action backspaceListMergePrev */
@@ -110,7 +121,37 @@ export default {
 	'backspace.list.removeNested': ({ ports }, { range }) => {
 		ports.html.remove();
 		if (range.startContainer.nodeType === 3) {
-			ports.selection.setRange(range.startContainer, range.startContainer.textContent.length, range.startContainer, range.startContainer.textContent.length);
+			ports.selection.setRange(
+				range.startContainer,
+				range.startContainer.textContent.length,
+				range.startContainer,
+				range.startContainer.textContent.length,
+			);
+		}
+	},
+
+	/** @action backspaceEmptyLineMergePrev */
+	'backspace.emptyLine.mergePrev': ({ ports }, { formatEl, prev }) => {
+		dom.utils.removeItem(formatEl);
+		caretToLineEdge(ports, prev, true);
+	},
+
+	/** @action backspaceBrLineRowMerge */
+	'backspace.brline.rowMerge': ({ ports }, { rowEndBr, rowStartBr }) => {
+		const between = rowStartBr.nextSibling;
+		if (between !== rowEndBr && between?.nodeType === 3 && dom.check.isZeroWidth(between)) {
+			dom.utils.removeItem(between);
+		}
+		const anchor = rowStartBr.previousSibling;
+		dom.utils.removeItem(rowStartBr);
+
+		if (anchor && anchor.nodeType === 3) {
+			ports.selection.setRange(anchor, anchor.textContent.length, anchor, anchor.textContent.length);
+		} else if (dom.check.isBreak(anchor)) {
+			ports.selection.setRange(rowEndBr, 0, rowEndBr, 0);
+		} else {
+			const pre = rowEndBr.parentNode;
+			ports.selection.setRange(pre, 0, pre, 0);
 		}
 	},
 
@@ -125,7 +166,8 @@ export default {
 			dom.utils.removeItem(formatEl);
 		}
 
-		if (ports.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) ports.focusManager.blur();
+		if (ports.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false)
+			ports.focusManager.blur();
 	},
 
 	/** @action deleteComponentSelectNext */
@@ -146,7 +188,8 @@ export default {
 		const fileComponentInfo = ports.component.get(nextEl);
 		if (fileComponentInfo) {
 			ctx.e.stopPropagation();
-			if (ports.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) ports.focusManager.blur();
+			if (ports.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false)
+				ports.focusManager.blur();
 		} else if (ports.component.is(nextEl)) {
 			ctx.e.stopPropagation();
 			dom.utils.removeItem(nextEl);
@@ -157,7 +200,11 @@ export default {
 	'delete.list.removeNested': ({ ports, ctx }, { range, formatEl, rangeEl }) => {
 		if (range.startContainer !== range.endContainer) ports.html.remove();
 
-		const next = /** @type {HTMLElement} */ (dom.utils.arrayFind(formatEl.children, dom.check.isList) || formatEl.nextElementSibling || rangeEl.parentElement.nextElementSibling);
+		const next = /** @type {HTMLElement} */ (
+			dom.utils.arrayFind(formatEl.children, dom.check.isList) ||
+				formatEl.nextElementSibling ||
+				rangeEl.parentElement.nextElementSibling
+		);
 		if (next && (dom.check.isList(next) || dom.utils.arrayFind(next.children, dom.check.isList))) {
 			ctx.e.preventDefault();
 
@@ -181,6 +228,27 @@ export default {
 
 			ports.selection.setRange(con, 0, con, 0);
 			ports.history.push(true);
+		}
+	},
+
+	/** @action deleteEmptyLineMergeNext — remove an empty line, move caret to the start of the next line */
+	'delete.emptyLine.mergeNext': ({ ports }, { formatEl, next }) => {
+		dom.utils.removeItem(formatEl);
+		caretToLineEdge(ports, next, false);
+	},
+
+	/** @action deleteBrLineRowMerge — remove an empty row inside a brLine (PRE), pull the next row up */
+	'delete.brline.rowMerge': ({ ports }, { rowEndBr }) => {
+		let next = rowEndBr.nextSibling;
+		if (next?.nodeType === 3 && dom.check.isZeroWidth(next)) next = next.nextSibling; // skip a trailing zero-width
+		const pre = rowEndBr.parentNode;
+		dom.utils.removeItem(rowEndBr);
+
+		// caret → start of the pulled-up row
+		if (next && (next.nodeType === 3 || dom.check.isBreak(next))) {
+			ports.selection.setRange(next, 0, next, 0);
+		} else {
+			ports.selection.setRange(pre, pre.childNodes.length, pre, pre.childNodes.length);
 		}
 	},
 
@@ -224,8 +292,15 @@ export default {
 				if (lines.length === 1) {
 					let tabSize = ctx.store.get('tabSize') + 1;
 					if (ctx.options.get('syncTabIndent')) {
-						const baseIndex = dom.query.findTextIndexOnLine(formatEl, range.startContainer, range.startOffset, (current) => ports.component.is(current));
-						const prevTabEndIndex = ports.format.isLine(formatEl.previousElementSibling) ? dom.query.findTabEndIndex(formatEl.previousElementSibling, baseIndex, 2) : 0;
+						const baseIndex = dom.query.findTextIndexOnLine(
+							formatEl,
+							range.startContainer,
+							range.startOffset,
+							(current) => ports.component.is(current),
+						);
+						const prevTabEndIndex = ports.format.isLine(formatEl.previousElementSibling)
+							? dom.query.findTabEndIndex(formatEl.previousElementSibling, baseIndex, 2)
+							: 0;
 						if (prevTabEndIndex > baseIndex) {
 							tabSize = prevTabEndIndex - baseIndex;
 						}
@@ -309,16 +384,10 @@ export default {
 	},
 
 	/** @action enterLineAddDefault */
-	'enter.line.addDefault': ({ ports, ctx }, { formatEl }) => {
-		const newFormat = ports.format.addLine(formatEl, ctx.options.get('defaultLine'));
+	'enter.line.addDefault': ({ ports }, { formatEl }) => {
+		const newFormat = ports.format.addLineAfter(formatEl);
 		const temp = newFormat.firstChild;
-		if (dom.check.isBreak(temp)) {
-			const zeroWidth = dom.utils.createTextNode(unicode.zeroWidthSpace);
-			temp.parentNode.insertBefore(zeroWidth, temp);
-			ports.selection.setRange(zeroWidth, 1, zeroWidth, 1);
-		} else {
-			ports.selection.setRange(temp, 0, temp, 0);
-		}
+		ports.selection.setRange(temp, 0, temp, 0);
 	},
 
 	/** @action enterListAddItem */
@@ -359,7 +428,12 @@ export default {
 			}
 
 			newEl = dom.utils.createElement(newFormat);
-			const edge = ports.format.removeBlock(rangeEl, { selectedFormats: [formatEl], newBlockElement: null, shouldDelete: true, skipHistory: true });
+			const edge = ports.format.removeBlock(rangeEl, {
+				selectedFormats: [formatEl],
+				newBlockElement: null,
+				shouldDelete: true,
+				skipHistory: true,
+			});
 			edge.cc.insertBefore(newEl, edge.ec);
 		}
 
@@ -380,7 +454,12 @@ export default {
 
 	/** @action enterFormatInsertBrHtml */
 	'enter.format.insertBrHtml': ({ ports }, { brBlock, range, wSelection, offset }) => {
-		ports.html.insert(range.collapsed && dom.check.isBreak(range.startContainer.childNodes[range.startOffset - 1]) ? '<br>' : '<br><br>', { selectInserted: false, skipCharCount: true, skipCleaning: true });
+		ports.html.insert(
+			range.collapsed && dom.check.isBreak(range.startContainer.childNodes[range.startOffset - 1])
+				? '<br>'
+				: '<br><br>',
+			{ selectInserted: false, skipCharCount: true, skipCleaning: true },
+		);
 
 		let focusNode = wSelection.focusNode;
 		const wOffset = wSelection.focusOffset;
@@ -390,6 +469,34 @@ export default {
 
 		ports.selection.setRange(focusNode, 1, focusNode, 1);
 		ports.setOnShortcutKey(true);
+	},
+
+	/** @action enterBrLineInsert — insert exactly one empty row at the caret inside a normal brLine. */
+	'enter.brline.insert': ({ ports }, { range }) => {
+		// Restore the caret captured at rule time (enterPrevent may have moved the live selection).
+		ports.selection.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
+		if (!range.collapsed) ports.html.remove();
+
+		const br = dom.utils.createElement('BR');
+		ports.html.insertNode(br, { afterNode: null, skipCharCount: true });
+
+		if (!br.nextSibling) br.parentNode.appendChild(dom.utils.createElement('BR'));
+		const lower = br.nextSibling;
+		ports.selection.setRange(lower, 0, lower, 0);
+		ports.setOnShortcutKey(true);
+	},
+
+	/** @action enterBrLineExit — consume only the caret's current (last) empty row and add a default line after the brLine. */
+	'enter.brline.exit': ({ ports }, { brBlock }) => {
+		const last = brBlock.lastChild;
+		if (last && (dom.check.isBreak(last) || dom.check.isZeroWidth(last.textContent))) {
+			dom.utils.removeItem(last);
+		}
+
+		const brBlockNext = /** @type {HTMLElement} */ (brBlock).nextElementSibling;
+		const newEl = ports.format.addLine(brBlock, ports.format.isLine(brBlockNext) ? brBlockNext : null);
+		dom.utils.copyFormatAttributes(newEl, brBlock);
+		ports.selection.setRange(newEl, 1, newEl, 1);
 	},
 
 	/** @action enterFormatInsertBrNode */
@@ -411,7 +518,10 @@ export default {
 	},
 
 	/** @action enterFormatBreakAtEdge */
-	'enter.format.breakAtEdge': ({ ports, ctx }, { formatEl, selectionNode, formatStartEdge, formatEndEdge, bidiSwapped }) => {
+	'enter.format.breakAtEdge': (
+		{ ports, ctx },
+		{ formatEl, selectionNode, formatStartEdge, formatEndEdge, bidiSwapped },
+	) => {
 		const focusBR = dom.utils.createElement('BR');
 		const newFormat = dom.utils.createElement(formatEl.nodeName, null, focusBR);
 
@@ -429,7 +539,10 @@ export default {
 		} while (formatEl !== sNode && formatEl.contains(sNode));
 
 		newFormat.appendChild(child);
-		formatEl.parentNode.insertBefore(newFormat, formatStartEdge && !formatEndEdge ? formatEl : formatEl.nextElementSibling);
+		formatEl.parentNode.insertBefore(
+			newFormat,
+			formatStartEdge && !formatEndEdge ? formatEl : formatEl.nextElementSibling,
+		);
 		if (formatEndEdge) {
 			ports.selection.setRange(focusBR, 1, focusBR, 1);
 		} else if (bidiSwapped) {
@@ -442,13 +555,19 @@ export default {
 
 	/** @action enterFormatBreakWithSelection */
 	'enter.format.breakWithSelection': ({ ports, ctx }, { formatEl, range, formatStartEdge, formatEndEdge }) => {
-		const isMultiLine = ports.format.getLine(range.startContainer, null) !== ports.format.getLine(range.endContainer, null);
+		const isMultiLine =
+			ports.format.getLine(range.startContainer, null) !== ports.format.getLine(range.endContainer, null);
 		const newFormat = /** @type {HTMLElement} */ (formatEl.cloneNode(false));
 		newFormat.innerHTML = '<br>';
 		const commonCon = /** @type {HTMLElement} */ (range.commonAncestorContainer);
 		const rcon =
 			commonCon === range.startContainer && commonCon === range.endContainer && dom.check.isZeroWidth(commonCon)
-				? { container: commonCon, offset: range.endOffset, prevContainer: commonCon.previousElementSibling, commonCon: commonCon }
+				? {
+						container: commonCon,
+						offset: range.endOffset,
+						prevContainer: commonCon.previousElementSibling,
+						commonCon: commonCon,
+					}
 				: ports.html.remove();
 
 		let newEl = ports.format.getLine(rcon.container, null);
@@ -467,26 +586,29 @@ export default {
 		}
 
 		const innerRange = ports.format.getBlock(rcon.container);
-		newEl = newEl.contains(innerRange) ? dom.query.getEdgeChild(innerRange, (current) => Boolean(ports.format.getLine(current)), false) : newEl;
+		newEl = newEl.contains(innerRange)
+			? dom.query.getEdgeChild(innerRange, (current) => Boolean(ports.format.getLine(current)), false)
+			: newEl;
 		if (isMultiLine) {
 			if (formatEndEdge && !formatStartEdge) {
-				newEl.parentNode.insertBefore(newFormat, !rcon.prevContainer || rcon.container === rcon.prevContainer ? newEl.nextElementSibling : newEl);
+				newEl.parentNode.insertBefore(
+					newFormat,
+					!rcon.prevContainer || rcon.container === rcon.prevContainer ? newEl.nextElementSibling : newEl,
+				);
 				newEl = newFormat;
 				offset = 0;
 			} else {
 				offset = rcon.offset;
 				if (formatStartEdge) {
-					const tempEl = newEl.parentNode.insertBefore(newFormat, newEl);
+					newEl.parentNode.insertBefore(newFormat, newEl);
 					if (formatEndEdge) {
-						newEl = tempEl;
 						offset = 0;
 					}
 				}
 			}
 		} else {
 			if (formatEndEdge && formatStartEdge) {
-				newEl.parentNode.insertBefore(newFormat, rcon.prevContainer && rcon.container === rcon.prevContainer ? newEl.nextElementSibling : newEl);
-				newEl = newFormat;
+				newEl.parentNode.insertBefore(newFormat, newEl);
 				offset = 0;
 			} else if (formatEndEdge) {
 				newEl = newEl.parentNode.insertBefore(newFormat, newEl.nextElementSibling);
@@ -526,7 +648,10 @@ export default {
 	/** [keydown reducer] */
 	/** @action keydownInputInsertNbsp */
 	'keydown.input.insertNbsp': ({ ports }) => {
-		const nbsp = ports.html.insertNode(dom.utils.createTextNode('\u00a0'), { afterNode: null, skipCharCount: true });
+		const nbsp = ports.html.insertNode(dom.utils.createTextNode('\u00a0'), {
+			afterNode: null,
+			skipCharCount: true,
+		});
 		if (nbsp) {
 			ports.selection.setRange(nbsp, nbsp.length, nbsp, nbsp.length);
 		}
@@ -539,6 +664,17 @@ export default {
 		ports.selection.setRange(zeroWidth, 1, zeroWidth, 1);
 	},
 };
+
+/**
+ * Place a collapsed caret at the start or end of a line after an empty line is removed.
+ * @param {import('../ports').EventReducerPorts} ports - Ports for interacting with editor
+ * @param {Element} line - The destination line element
+ * @param {boolean} toEnd - true → caret at the line end (backspace), false → line start (delete)
+ */
+function caretToLineEdge(ports, line, toEnd) {
+	const offset = toEnd ? line.childNodes.length : 0;
+	ports.selection.setRange(line, offset, line, offset);
+}
 
 /**
  * @param {HTMLElement} formatEl - Format element

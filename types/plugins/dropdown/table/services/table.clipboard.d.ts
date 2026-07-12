@@ -13,7 +13,11 @@ export class TableClipboardService {
 	 * @param {HTMLElement} container - The container element
 	 * @param {NodeListOf<HTMLTableCellElement>} selectedCells - The selected table cells
 	 */
-	copySelectedTableCells(e: ClipboardEvent, container: HTMLElement, selectedCells: NodeListOf<HTMLTableCellElement>): void;
+	copySelectedTableCells(
+		e: ClipboardEvent,
+		container: HTMLElement,
+		selectedCells: NodeListOf<HTMLTableCellElement>,
+	): void;
 	/**
 	 * @description Updates the target table's cells with the data from the copied table.
 	 * @param {HTMLTableElement} copyTable The table containing the copied data.

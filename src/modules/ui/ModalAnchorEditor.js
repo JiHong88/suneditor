@@ -195,7 +195,10 @@ class ModalAnchorEditor {
 			this.titleInput.value = '';
 		} else if (this.currentTarget) {
 			const href = this.currentTarget.href;
-			this.linkValue = this.preview.textContent = this.urlInput.value = this.#selfPathBookmark(href) ? href.substring(href.lastIndexOf('#')) : href;
+			this.linkValue =
+				this.preview.textContent =
+				this.urlInput.value =
+					this.#selfPathBookmark(href) ? href.substring(href.lastIndexOf('#')) : href;
 			this.displayInput.value = this.currentTarget.textContent;
 			this.titleInput.value = this.currentTarget.title;
 			this.newWindowCheck.checked = /_blank/i.test(this.currentTarget.target) ? true : false;
@@ -296,7 +299,11 @@ class ModalAnchorEditor {
 	 */
 	#selfPathBookmark(path) {
 		const href = _w.location.href.replace(/\/$/, '');
-		return path.indexOf('#') === 0 || (path.indexOf(href) === 0 && path.indexOf('#') === (!href.includes('#') ? href.length : href.substring(0, href.indexOf('#')).length));
+		return (
+			path.indexOf('#') === 0 ||
+			(path.indexOf(href) === 0 &&
+				path.indexOf('#') === (!href.includes('#') ? href.length : href.substring(0, href.indexOf('#')).length))
+		);
 	}
 
 	/**
@@ -330,7 +337,11 @@ class ModalAnchorEditor {
 	 * @param {string} urlValue - The current URL input value.
 	 */
 	#createBookmarkList(urlValue) {
-		const headers = dom.query.getListChildren(this.#$.frameContext.get('wysiwyg'), (current) => /h[1-6]/i.test(current.nodeName) || (dom.check.isAnchor(current) && !!current.id), null);
+		const headers = dom.query.getListChildren(
+			this.#$.frameContext.get('wysiwyg'),
+			(current) => /h[1-6]/i.test(current.nodeName) || (dom.check.isAnchor(current) && !!current.id),
+			null,
+		);
 		if (headers.length === 0) return;
 
 		const valueRegExp = new RegExp(`^${urlValue.replace(/^#/, '')}`, 'i');
@@ -340,7 +351,11 @@ class ModalAnchorEditor {
 			v = headers[i];
 			if (!valueRegExp.test(v.textContent)) continue;
 			list.push(v);
-			menus.push(dom.check.isAnchor(v) ? `<div><span class="se-text-prefix-icon">${this.#$.icons.bookmark_anchor}</span>${v.id}</div>` : `<div style="${v.style.cssText}">${v.textContent}</div>`);
+			menus.push(
+				dom.check.isAnchor(v)
+					? `<div><span class="se-text-prefix-icon">${this.#$.icons.bookmark_anchor}</span>${v.id}</div>`
+					: `<div style="${v.style.cssText}">${v.textContent}</div>`,
+			);
 		}
 
 		if (list.length === 0) {
@@ -360,12 +375,24 @@ class ModalAnchorEditor {
 		const protocol = this.#$.options.get('defaultUrlProtocol');
 		const noPrefix = this.noAutoPrefix;
 		const reservedProtocol = /^(mailto:|tel:|sms:|https*:\/\/|#)/.test(value) || value.indexOf(protocol) === 0;
-		const sameProtocol = !protocol ? false : RegExp('^' + unicode.escapeStringRegexp(value.substring(0, protocol.length))).test(protocol);
+		const sameProtocol = !protocol
+			? false
+			: RegExp('^' + unicode.escapeStringRegexp(value.substring(0, protocol.length))).test(protocol);
 
 		value =
 			this.linkValue =
 			preview.textContent =
-				!value ? '' : noPrefix ? value : protocol && !reservedProtocol && !sameProtocol ? protocol + value : reservedProtocol ? value : /^www\./.test(value) ? 'http://' + value : this.host + (/^\//.test(value) ? '' : '/') + value;
+				!value
+					? ''
+					: noPrefix
+						? value
+						: protocol && !reservedProtocol && !sameProtocol
+							? protocol + value
+							: reservedProtocol
+								? value
+								: /^www\./.test(value)
+									? 'http://' + value
+									: this.host + (/^\//.test(value) ? '' : '/') + value;
 
 		if (this.#selfPathBookmark(value)) {
 			this.bookmark.style.display = 'block';

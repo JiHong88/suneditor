@@ -468,14 +468,17 @@ describe('makePorts', () => {
 			expect(inst.$.ui._iframeAutoHeight).toHaveBeenCalledWith(inst.$.frameContext);
 		});
 
-		it('calls selection.scrollTo with range and scroll options when not mobile', () => {
+		it('calls selection.scrollTo with the LIVE caret range (not the pre-Enter snapshot) when not mobile', () => {
 			mockIsMobileValue = false;
+			const liveRange = document.createRange();
+			inst.$.selection.getRange.mockReturnValue(liveRange);
 			// Re-create ports with updated mock state
 			ports = makePorts(inst, { _styleNodes: styleNodes });
 
-			const mockRange = document.createRange();
-			ports.enterScrollTo(mockRange);
-			expect(inst.$.selection.scrollTo).toHaveBeenCalledWith(mockRange, {
+			const snapshot = document.createRange(); // pre-Enter snapshot — must be ignored in favor of the live range
+			ports.enterScrollTo(snapshot);
+			expect(inst.$.selection.getRange).toHaveBeenCalled(); // consulted the live caret, not just the snapshot
+			expect(inst.$.selection.scrollTo).toHaveBeenCalledWith(liveRange, {
 				behavior: 'auto',
 				block: 'nearest',
 				inline: 'nearest'
@@ -485,13 +488,14 @@ describe('makePorts', () => {
 		it('calls selection.scrollTo on mobile even when scrollparents has entries', () => {
 			mockIsMobileValue = true;
 			inst.scrollparents = [document.createElement('div')];
+			const liveRange = document.createRange();
+			inst.$.selection.getRange.mockReturnValue(liveRange);
 			ports = makePorts(inst, { _styleNodes: styleNodes });
 
-			const mockRange = document.createRange();
-			ports.enterScrollTo(mockRange);
+			ports.enterScrollTo(document.createRange());
 
 			expect(inst.$.ui._iframeAutoHeight).toHaveBeenCalledWith(inst.$.frameContext);
-			expect(inst.$.selection.scrollTo).toHaveBeenCalledWith(mockRange, {
+			expect(inst.$.selection.scrollTo).toHaveBeenCalledWith(liveRange, {
 				behavior: 'auto',
 				block: 'nearest',
 				inline: 'nearest'

@@ -39,7 +39,8 @@ export class VideoSizeService {
 		this.#defaultSizeX = '100%';
 		this.#defaultSizeY = this.#pluginOptions.defaultRatio * 100 + '%';
 		this.#origin_w = this.#pluginOptions.defaultWidth === '100%' ? '' : this.#pluginOptions.defaultWidth;
-		this.#origin_h = this.#pluginOptions.defaultHeight === this.#state.defaultRatio ? '' : this.#pluginOptions.defaultHeight;
+		this.#origin_h =
+			this.#pluginOptions.defaultHeight === this.#state.defaultRatio ? '' : this.#pluginOptions.defaultHeight;
 
 		if (this.#resizing) {
 			this.#proportion = modalEl.proportion;
@@ -236,7 +237,10 @@ export class VideoSizeService {
 		/** @type {HTMLSelectElement} */
 		const eventTarget = dom.query.getEventTarget(e);
 		const value = eventTarget.options[eventTarget.selectedIndex].value;
-		this.#defaultSizeY = this.#main.figure.autoRatio.current = this.#frameRatio = !value ? this.#defaultSizeY : Number(value) * 100 + '%';
+		this.#defaultSizeY =
+			this.#main.figure.autoRatio.current =
+			this.#frameRatio =
+				!value ? this.#defaultSizeY : Number(value) * 100 + '%';
 		this.#inputY.placeholder = !value ? '' : Number(value) * 100 + '%';
 		this.#inputY.value = '';
 	}
@@ -245,7 +249,9 @@ export class VideoSizeService {
 	 * @description Updates the ratio based on current input values.
 	 */
 	#OnChangeRatio() {
-		this.#ratio = this.#proportion.checked ? Figure.GetRatio(this.#inputX.value, this.#inputY.value, this.#state.sizeUnit) : { w: 0, h: 0 };
+		this.#ratio = this.#proportion.checked
+			? Figure.GetRatio(this.#inputX.value, this.#inputY.value, this.#state.sizeUnit)
+			: { w: 0, h: 0 };
 	}
 
 	/**
@@ -264,7 +270,12 @@ export class VideoSizeService {
 		if (xy === 'x' && this.#state.onlyPercentage && Number(eventTarget.value) > 100) {
 			eventTarget.value = '100';
 		} else if (this.#proportion.checked && !this.frameRatioOption?.value) {
-			const ratioSize = Figure.CalcRatio(this.#inputX.value, this.#inputY.value, this.#state.sizeUnit, this.#ratio);
+			const ratioSize = Figure.CalcRatio(
+				this.#inputX.value,
+				this.#inputY.value,
+				this.#state.sizeUnit,
+				this.#ratio,
+			);
 			if (xy === 'x') {
 				this.#inputY.value = String(ratioSize.h);
 			} else {

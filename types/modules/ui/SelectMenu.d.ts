@@ -31,6 +31,12 @@ export type SelectMenuParams = {
 	 */
 	closeMethod?: () => void;
 	/**
+	 * Optional owner hook invoked on ESC before the menu closes.
+	 * Return `true` if it dismissed an owner-managed sub-panel (e.g. CommandMenu's flyout), so ESC only
+	 * closes that sub-panel and keeps the menu open.
+	 */
+	subEscMethod?: () => boolean;
+	/**
 	 * Optional max-height CSS value (e.g. `"200px"`). Enables scrolling when items exceed this height.
 	 */
 	maxHeight?: string;
@@ -38,6 +44,14 @@ export type SelectMenuParams = {
 	 * Optional min-width CSS value (e.g. `"130px"`).
 	 */
 	minWidth?: string;
+	/**
+	 * Optional override for the keyboard navigation target. By default `on()` listens
+	 * - on the iframe `contentWindow` (`_ww`) when the refer isn't an input — appropriate when the
+	 * - refer is inside the wysiwyg. Set this to `window` (parent) for menus whose refer lives in
+	 * - the parent doc (e.g. BlockHandle's dragBtn in `carrierWrapper`). Also avoids
+	 * - cross-origin/sandboxed iframe `addEventListener` errors.
+	 */
+	keydownTarget?: any;
 };
 /**
  * @typedef {Object} SelectMenuParams
@@ -52,8 +66,16 @@ export type SelectMenuParams = {
  * @property {number} [splitNum=0] Optional split number for horizontal positioning; defines how many items per row
  * @property {() => void} [openMethod] Optional method to call when the menu is opened
  * @property {() => void} [closeMethod] Optional method to call when the menu is closed
+ * @property {() => boolean} [subEscMethod] Optional owner hook invoked on ESC before the menu closes.
+ * Return `true` if it dismissed an owner-managed sub-panel (e.g. CommandMenu's flyout), so ESC only
+ * closes that sub-panel and keeps the menu open.
  * @property {string} [maxHeight] Optional max-height CSS value (e.g. `"200px"`). Enables scrolling when items exceed this height.
  * @property {string} [minWidth] Optional min-width CSS value (e.g. `"130px"`).
+ * @property {*} [keydownTarget]  Optional override for the keyboard navigation target. By default `on()` listens
+ * - on the iframe `contentWindow` (`_ww`) when the refer isn't an input — appropriate when the
+ * - refer is inside the wysiwyg. Set this to `window` (parent) for menus whose refer lives in
+ * - the parent doc (e.g. BlockHandle's dragBtn in `carrierWrapper`). Also avoids
+ * - cross-origin/sandboxed iframe `addEventListener` errors.
  */
 /**
  * @class
@@ -81,14 +103,28 @@ declare class SelectMenu {
 	horizontal: boolean;
 	openMethod: () => void;
 	closeMethod: () => void;
+	subEscMethod: () => boolean;
 	maxHeight: string;
 	minWidth: string;
 	/**
 	 * @description Creates the select menu items.
-	 * @param {Array<string>|SunEditor.NodeCollection} items - Command list of selectable items.
-	 * @param {Array<string>|SunEditor.NodeCollection} [menus] - Optional list of menu display elements; defaults to `items`.
+	 * @param {Array<*>} items - Selectable items.
+	 * - Plain entry: any value (string/object); passed to the `selectMethod` callback when picked.
+	 * - Submenu entry: `{ children: Array<*>, childMenus?: Array<string|HTMLElement> }` —
+	 *   `children` are the child values delivered to `selectMethod` on selection; `childMenus`
+	 *   is the optional display content for each child (HTML string or `HTMLElement`). When
+	 *   omitted, `children` doubles as the display content.
+	 * @param {Array<string>|SunEditor.NodeCollection} [menus] - Optional list of display elements
+	 * (HTML strings or nodes) for the top-level rows. Defaults to `items`. For submenu entries
+	 * this controls the parent row's content; child rows use `childMenus` (or `children`).
+	 * @example
+	 * // Submenu — "List" opens a hover submenu of UL/OL options
+	 * selectMenu.create(
+	 *   [{ children: ['ul', 'ol'], childMenus: ['<i>•</i> Bulleted', '<i>1.</i> Numbered'] }],
+	 *   ['List']
+	 * );
 	 */
-	create(items: Array<string> | SunEditor.NodeCollection, menus?: Array<string> | SunEditor.NodeCollection): void;
+	create(items: Array<any>, menus?: Array<string> | SunEditor.NodeCollection): void;
 	/**
 	 * @description Initializes the select menu and attaches it to a reference element.
 	 * @param {Node} referElement - The element that triggers the select menu.
@@ -126,6 +162,17 @@ declare class SelectMenu {
 	 */
 	open(position?: string | null, onItemQuerySelector?: string | null): void;
 	/**
+	 * @description Re-runs positioning using the same direction the menu was opened with.
+	 * Use when the reference element has moved (e.g. scroll repositioned the trigger) but
+	 * the menu should stay open and follow.
+	 */
+	reposition(): void;
+	/**
+	 * @description Soft-hide / soft-show without changing open state.
+	 * close listeners (outside click, ESC) keep working, but is visually hidden until the trigger comes back.
+	 */
+	setHidden(hidden: any): void;
+	/**
 	 * @description Select menu close
 	 */
 	close(): void;
@@ -140,6 +187,12 @@ declare class SelectMenu {
 	 * @param {number} index Item index
 	 */
 	setItem(index: number): void;
+	/**
+	 * @description Whether a native submenu is currently open. Used by owners (e.g. a Controller) to
+	 * let ESC dismiss only the open submenu instead of the whole menu.
+	 * @returns {boolean}
+	 */
+	hasOpenSubmenu(): boolean;
 	_onItem: Element;
 	#private;
 }

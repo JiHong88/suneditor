@@ -52,7 +52,11 @@ export default class OptionProvider {
 	 * @param {SunEditor.Kernel} kernel
 	 * @param {import('../section/constructor').ConstructorReturnType} product
 	 */
-	constructor(kernel: SunEditor.Kernel, product: import('../section/constructor').ConstructorReturnType, options: any);
+	constructor(
+		kernel: SunEditor.Kernel,
+		product: import('../section/constructor').ConstructorReturnType,
+		options: any,
+	);
 	/**
 	 * @return {BaseOptionsMap}
 	 */

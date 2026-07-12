@@ -129,6 +129,7 @@ class CoreKernel {
 
 		// Event orchestrator
 		this._eventOrchestrator = new EventOrchestrator(this);
+		this.#config.get('eventManager')._bindOrchestrator(this._eventOrchestrator);
 	}
 
 	/**

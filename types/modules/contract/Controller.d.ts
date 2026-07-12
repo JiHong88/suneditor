@@ -47,6 +47,11 @@ export type ControllerParams = {
 	 */
 	initMethod?: () => void;
 	/**
+	 * Called on ESC before the controller closes. Return `true`
+	 * to keep it open (e.g. when an inner sub-panel should absorb the ESC instead).
+	 */
+	escGuard?: () => boolean;
+	/**
 	 * If `true`, When the `controller` is opened, buttons without the `se-component-enabled` class are disabled.
 	 */
 	disabled?: boolean;
@@ -93,6 +98,8 @@ export type ControllerParams = {
  * @property {"top"|"bottom"} [position="bottom"] Controller position
  * @property {boolean} [isWWTarget=true] If the controller is in the WYSIWYG area, set it to `true`.
  * @property {() => void} [initMethod=null] Method to be called when the controller is closed.
+ * @property {() => boolean} [escGuard=null] Called on ESC before the controller closes. Return `true`
+ * to keep it open (e.g. when an inner sub-panel should absorb the ESC instead).
  * @property {boolean} [disabled=false] If `true`, When the `controller` is opened, buttons without the `se-component-enabled` class are disabled.
  * @property {Array<Controller|HTMLElement>} [parents=[]] The parent `controller` instance array when `controller` is opened nested.
  * @property {boolean} [parentsHide=false] If `true`, the parent element is hidden when the controller is opened.

@@ -69,7 +69,8 @@ class Link extends PluginModal {
 			uploadHeaders: pluginOptions.uploadHeaders || null,
 			uploadSizeLimit: numbers.get(pluginOptions.uploadSizeLimit, 0),
 			uploadSingleSizeLimit: numbers.get(pluginOptions.uploadSingleSizeLimit, 0),
-			acceptedFormats: typeof pluginOptions.acceptedFormats === 'string' ? pluginOptions.acceptedFormats.trim() : null,
+			acceptedFormats:
+				typeof pluginOptions.acceptedFormats === 'string' ? pluginOptions.acceptedFormats.trim() : null,
 			enableFileUpload: !!uploadUrl,
 		};
 
@@ -135,7 +136,13 @@ class Link extends PluginModal {
 		if (!this.isUpdateState) {
 			const selectedFormats = this.$.format.getLines();
 			if (selectedFormats.length > 1) {
-				if (!this.$.html.insertNode(dom.utils.createElement(selectedFormats[0].nodeName, null, oA), { afterNode: null, skipCharCount: false })) return true;
+				if (
+					!this.$.html.insertNode(dom.utils.createElement(selectedFormats[0].nodeName, null, oA), {
+						afterNode: null,
+						skipCharCount: false,
+					})
+				)
+					return true;
 			} else {
 				if (!this.$.html.insertNode(oA, { afterNode: null, skipCharCount: false })) return true;
 			}

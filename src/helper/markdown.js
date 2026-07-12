@@ -60,7 +60,13 @@ function childrenToInline(children) {
 			// the previous part doesn't end with space and current doesn't start with space
 			if (parts.length > 0) {
 				const prev = parts[parts.length - 1];
-				if (prev && !prev.endsWith(' ') && !prev.endsWith('\n') && !part.startsWith(' ') && !part.startsWith('\n')) {
+				if (
+					prev &&
+					!prev.endsWith(' ') &&
+					!prev.endsWith('\n') &&
+					!part.startsWith(' ') &&
+					!part.startsWith('\n')
+				) {
 					parts.push(' ');
 				}
 			}
@@ -143,7 +149,12 @@ function listToMarkdown(node, indent, isOrdered) {
 		// GFM task list: check for checkbox input
 		let taskPrefix = '';
 		const firstChild = liChildren[0];
-		if (firstChild && firstChild.type === 'element' && firstChild.tag === 'input' && firstChild.attributes?.type === 'checkbox') {
+		if (
+			firstChild &&
+			firstChild.type === 'element' &&
+			firstChild.tag === 'input' &&
+			firstChild.attributes?.type === 'checkbox'
+		) {
 			taskPrefix = firstChild.attributes.checked !== undefined ? '[x] ' : '[ ] ';
 		}
 
@@ -537,7 +548,9 @@ function parseInline(text) {
 
 	// 5. Autolinks: <https://url> or <email@example.com>
 	text = text.replace(/<(https?:\/\/[^>]+)>/g, (_, url) => hold(`<a href="${url}">${url}</a>`));
-	text = text.replace(/<([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})>/g, (_, email) => hold(`<a href="mailto:${email}">${email}</a>`));
+	text = text.replace(/<([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})>/g, (_, email) =>
+		hold(`<a href="mailto:${email}">${email}</a>`),
+	);
 
 	// 6. GFM autolink: bare URLs (only when not already inside a tag attribute)
 	text = text.replace(/(?<![="'\w/])(https?:\/\/[^\s<>\])"]+)/g, (_, url) => hold(`<a href="${url}">${url}</a>`));
@@ -695,7 +708,11 @@ export function markdownToHtml(md, defaultLine) {
 
 		// Paragraph (default)
 		const paraLines = [];
-		while (i < lines.length && !isBlankLine(lines[i]) && !/^(#{1,6}\s|`{3,}|~{3,}|>|\||(\s*)([-*+]|\d+\.)\s|(\*{3,}|-{3,}|_{3,})\s*$)/.test(lines[i])) {
+		while (
+			i < lines.length &&
+			!isBlankLine(lines[i]) &&
+			!/^(#{1,6}\s|`{3,}|~{3,}|>|\||(\s*)([-*+]|\d+\.)\s|(\*{3,}|-{3,}|_{3,})\s*$)/.test(lines[i])
+		) {
 			paraLines.push(lines[i]);
 			i++;
 		}
@@ -859,7 +876,9 @@ function parseList(lines, startIndex, ordered) {
 			}
 
 			if (isTask) {
-				const checkbox = taskChecked ? '<input type="checkbox" checked disabled> ' : '<input type="checkbox" disabled> ';
+				const checkbox = taskChecked
+					? '<input type="checkbox" checked disabled> '
+					: '<input type="checkbox" disabled> ';
 				html += `<li class="task-list-item">${checkbox}${parseInline(displayContent)}${nestedHtml}</li>`;
 			} else {
 				html += `<li>${parseInline(content)}${nestedHtml}</li>`;

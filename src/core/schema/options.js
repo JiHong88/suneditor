@@ -39,7 +39,8 @@ export const DEFAULTS = {
 	FORMAT_BLOCK: 'BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|CAPTION|DETAILS',
 	FORMAT_CLOSURE_BLOCK: 'TH|TD',
 
-	ALLOWED_EMPTY_NODE_LIST: '.se-component, pre, blockquote, hr, li, table, img, iframe, video, audio, canvas, details',
+	ALLOWED_EMPTY_NODE_LIST:
+		'.se-component, pre, blockquote, hr, li, table, img, iframe, video, audio, canvas, details',
 
 	SIZE_UNITS: ['px', 'pt', 'em', 'rem'],
 
@@ -69,7 +70,8 @@ export const DEFAULTS = {
 	TAG_STYLES: {
 		'@text': 'font-family|font-size|color|background-color|width|height',
 		'@line': 'text-align|margin|margin-left|margin-right|line-height',
-		'table|th|td': 'border|border-[a-z]+|color|background-color|text-align|float|font-weight|text-decoration|font-style|vertical-align',
+		'table|th|td':
+			'border|border-[a-z]+|color|background-color|text-align|float|font-weight|text-decoration|font-style|vertical-align',
 		'table|td': 'width',
 		tr: 'height',
 		col: 'width',
@@ -77,7 +79,8 @@ export const DEFAULTS = {
 		'ol|ul': 'list-style-type',
 		figure: 'display|width|height|padding|padding-bottom',
 		figcaption: 'margin|margin-top|margin-bottom|text-align',
-		'img|video|iframe': 'transform|transform-origin|width|min-width|max-width|height|min-height|max-height|float|margin|margin-top',
+		'img|video|iframe':
+			'transform|transform-origin|width|min-width|max-width|height|min-height|max-height|float|margin|margin-top',
 		hr: '',
 	},
 
@@ -99,7 +102,9 @@ export const DEFAULTS = {
  *
  * === Content & Editing ===
  * @property {string} [value=""] - Initial value for the editor.
- * @property {string} [placeholder=""] - Placeholder text.
+ * @property {string} [placeholder=""] - Placeholder text shown when the whole editor is empty.
+ * @property {string} [placeholder_line=""] - per-line placeholder shown on the focused
+ * line when that line is empty. Takes priority over `placeholder` while a line is focused.
  * @property {Object<string, string>} [editableFrameAttributes={spellcheck: "false"}] - Attributes for the editable frame[.sun-editor-editable].
  * ```js
  * { editableFrameAttributes: { spellcheck: 'true', autocomplete: 'on' } }
@@ -110,6 +115,13 @@ export const DEFAULTS = {
  * @property {string|number} [width="100%"] - Width for the editor.
  * @property {string|number} [minWidth=""] - Min width for the editor.
  * @property {string|number} [maxWidth=""] - Max width for the editor.
+ * @property {string} [innerWidth=""] - Optional max-width for the editor body (`.se-wrapper`).
+ * - **CSS length** (`"740px"`, `"60ch"`): editor body's content is clamped to this width and centered horizontally; scroll container stays full width (scrollbar at the outer edge, wheel/touch active over the whole area).
+ * - **`"auto"`** or **empty string** (default): no constraint — natural full-width layout with default content padding.
+ * - In `blockHandle` mode, the gutter handle tracks the centered text band.
+ * ```js
+ * { innerWidth: '740px' }
+ * ```
  * @property {string|number} [height="auto"] - Height for the editor.
  * @property {string|number} [minHeight=""] - Min height for the editor.
  * @property {string|number} [maxHeight=""] - Max height for the editor.
@@ -287,6 +299,22 @@ export const DEFAULTS = {
  * === Modes & Themes ===
  * @property {boolean} [v2Migration=false] - Enables migration mode for SunEditor v2.
  * @property {"classic"|"inline"|"balloon"|"balloon-always"|"classic:bottom"|"inline:bottom"} [mode="classic"] - Toolbar mode: `classic`, `inline`, `balloon`, `balloon-always`. Append `:bottom` to place toolbar at the bottom (e.g. `classic:bottom`, `inline:bottom`).
+ * @property {Object} [blockHandle] - Block handle configuration. When provided, a per-line block handle UI is shown. Works independently of `mode`.
+ * @property {Array<string | { title: string, icon?: string, action: (deps: SunEditor.Deps, ctx: { block: HTMLElement }) => void }>} [blockHandle.menu] - Menu entries.
+ * - **String entries** — resolved via `ResolveButton`. Accepts the same values as toolbar `buttonList`:
+ *   - **Block format keys**: `p`, `h1`-`h6`, `heading` (H1-H6 submenu), `ul`, `ol`, `list` (UL/OL submenu), `blockquote`, `pre`.
+ *   - **Plugin names**: Any registered plugin name (e.g. `blockStyle`, `align`, `image`, `link`). Dropdown plugins display their items as a submenu. Modal plugins open the modal on click.
+ *   - **Built-in commands**: `bold`, `italic`, `underline`, `strike`, `undo`, `redo`, etc.
+ * - **Custom item objects** — `{ title, icon?, action }`. `icon` is an icon key from `$.icons` or a raw `<svg>` HTML string; `action` is invoked with `($, { block })`.
+ * - Defaults to `['p', 'heading', 'list', 'blockquote', 'pre']`.
+ * ```js
+ * blockHandle: {
+ *   menu: [
+ *     'p', 'heading', 'blockStyle',
+ *     { title: 'Duplicate', icon: 'copy', action: ($, { block }) => block.after(block.cloneNode(true)) },
+ *   ],
+ * }
+ * ```
  * @property {string} [type=""] - Editor type. Use `"document"` for a document-style layout, with optional sub-types after `:`.
  * ```js
  * // type
@@ -470,6 +498,15 @@ export const DEFAULTS = {
  * @property {boolean} [syncTabIndent=true] - Synchronizes tab indent with spaces.
  * @property {boolean} [tabDisable=false] - Disables tab key input.
  * @property {string} [toolbar_width="auto"] - Toolbar width.
+ * @property {string} [toolbar_innerWidth=""] - Center the toolbar's button row (`.se-btn-tray`) horizontally.
+ * - **CSS length** (e.g. `"500px"`, `"740px"`, `"60ch"`): toolbar background spans full width while the button row is capped at that width and centered. If buttons fit, the row stays on a single line; if they exceed the cap, they wrap inside it.
+ * - **`"auto"`**: no cap — the row is sized to its content and simply centered.
+ * - **Empty string** (default): no constraint.
+ * - **Note on `responsiveButtonList`**: thresholds compare against the toolbar's full width, not the band. When this option is set, calibrate `responsiveButtonList` keys around the toolbar size you actually want each button set to kick in at.
+ * ```js
+ * { toolbar_innerWidth: '740px' }
+ * { toolbar_innerWidth: 'auto' }
+ * ```
  * @property {?HTMLElement} [toolbar_container] - Container element for the toolbar.
  * @property {number|{top: number, offset: number}} [toolbar_sticky=0] - Enables sticky toolbar.
  * - `number`: Sets the sticky top position (px). Use `-1` to disable sticky.
@@ -604,6 +641,7 @@ export const DEFAULTS = {
  * @property {import('../../plugins/modal/link.js').LinkPluginOptions} [link]
  * @property {import('../../plugins/modal/math.js').MathPluginOptions} [math]
  * @property {import('../../plugins/dropdown/paragraphStyle.js').ParagraphStylePluginOptions} [paragraphStyle]
+ * @property {import('../../plugins/field/slashCommand.js').SlashCommandPluginOptions} [slashCommand]
  * @property {import('../../plugins/dropdown/table/index.js').TablePluginOptions} [table]
  * @property {import('../../plugins/dropdown/template.js').TemplatePluginOptions} [template]
  * @property {import('../../plugins/dropdown/textStyle.js').TextStylePluginOptions} [textStyle]
@@ -671,10 +709,12 @@ export const DEFAULTS = {
 export const OPTION_FRAME_FIXED_FLAG = {
 	value: 'fixed',
 	placeholder: true,
+	placeholder_line: true,
 	editableFrameAttributes: true,
 	width: true,
 	minWidth: true,
 	maxWidth: true,
+	innerWidth: 'fixed',
 	height: true,
 	minHeight: true,
 	maxHeight: true,
@@ -706,6 +746,7 @@ export const OPTION_FIXED_FLAG = {
 	v2Migration: 'fixed',
 	strictMode: 'fixed',
 	mode: 'fixed',
+	blockHandle: 'fixed',
 	type: 'fixed',
 	theme: true,
 	lang: 'fixed',
@@ -752,6 +793,7 @@ export const OPTION_FIXED_FLAG = {
 	formatClosureBlock: 'fixed',
 	allowedEmptyTags: true,
 	toolbar_width: true,
+	toolbar_innerWidth: 'fixed',
 	toolbar_container: 'fixed',
 	toolbar_sticky: true,
 	toolbar_hide: true,

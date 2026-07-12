@@ -39,7 +39,9 @@ class ListFormat {
 		const listStyle = type.split(':')[1] || '';
 
 		let range = this.#$.selection.getRange();
-		let selectedFormats = /** @type {Array<HTMLElement>} */ (!selectedCells ? this.#$.format.getLinesAndComponents(false) : selectedCells);
+		let selectedFormats = /** @type {Array<HTMLElement>} */ (
+			!selectedCells ? this.#$.format.getLinesAndComponents(false) : selectedCells
+		);
 
 		if (selectedFormats.length === 0) {
 			if (selectedCells) return;
@@ -53,13 +55,25 @@ class ListFormat {
 		// merge
 		const firstSel = selectedFormats[0];
 		const lastSel = selectedFormats.at(-1);
-		let topEl = (dom.check.isListCell(firstSel) || this.#$.component.is(firstSel)) && !firstSel.previousElementSibling ? firstSel.parentElement.previousElementSibling : firstSel.previousElementSibling;
-		let bottomEl = (dom.check.isListCell(lastSel) || this.#$.component.is(lastSel)) && !lastSel.nextElementSibling ? lastSel.parentElement.nextElementSibling : lastSel.nextElementSibling;
+		let topEl =
+			(dom.check.isListCell(firstSel) || this.#$.component.is(firstSel)) && !firstSel.previousElementSibling
+				? firstSel.parentElement.previousElementSibling
+				: firstSel.previousElementSibling;
+		let bottomEl =
+			(dom.check.isListCell(lastSel) || this.#$.component.is(lastSel)) && !lastSel.nextElementSibling
+				? lastSel.parentElement.nextElementSibling
+				: lastSel.nextElementSibling;
 
 		const isCollapsed = range.collapsed;
 		const originRange = {
 			sc: range.startContainer,
-			so: range.startContainer === range.endContainer && dom.check.isZeroWidth(range.startContainer) && range.startOffset === 0 && range.endOffset === 1 ? range.endOffset : range.startOffset,
+			so:
+				range.startContainer === range.endContainer &&
+				dom.check.isZeroWidth(range.startContainer) &&
+				range.startOffset === 0 &&
+				range.endOffset === 1
+					? range.endOffset
+					: range.startOffset,
 			ec: range.endContainer,
 			eo: range.endOffset,
 		};
@@ -67,13 +81,24 @@ class ListFormat {
 		let isRemove = true;
 
 		for (let i = 0, len = selectedFormats.length; i < len; i++) {
-			if (!dom.check.isList(this.#$.format.getBlock(selectedFormats[i], (current) => this.#$.format.getBlock(current) && current !== selectedFormats[i]))) {
+			if (
+				!dom.check.isList(
+					this.#$.format.getBlock(
+						selectedFormats[i],
+						(current) => this.#$.format.getBlock(current) && current !== selectedFormats[i],
+					),
+				)
+			) {
 				isRemove = false;
 				break;
 			}
 		}
 
-		if (isRemove && (!topEl || firstSel.tagName !== topEl.tagName || listTag !== topEl.tagName.toUpperCase()) && (!bottomEl || lastSel.tagName !== bottomEl.tagName || listTag !== bottomEl.tagName.toUpperCase())) {
+		if (
+			isRemove &&
+			(!topEl || firstSel.tagName !== topEl.tagName || listTag !== topEl.tagName.toUpperCase()) &&
+			(!bottomEl || lastSel.tagName !== bottomEl.tagName || listTag !== bottomEl.tagName.toUpperCase())
+		) {
 			if (nested) {
 				for (let i = 0, len = selectedFormats.length; i < len; i++) {
 					for (let j = i - 1; j >= 0; j--) {
@@ -113,7 +138,12 @@ class ListFormat {
 						if (nested && dom.check.isListCell(o.parentNode)) {
 							this.#detachNested(rangeArr.f);
 						} else {
-							afterRange = this.#$.format.removeBlock(rangeArr.f[0].parentElement, { selectedFormats: rangeArr.f, newBlockElement: tempList, shouldDelete: false, skipHistory: true });
+							afterRange = this.#$.format.removeBlock(rangeArr.f[0].parentElement, {
+								selectedFormats: rangeArr.f,
+								newBlockElement: tempList,
+								shouldDelete: false,
+								skipHistory: true,
+							});
 						}
 
 						o = selectedFormats[i].parentNode;
@@ -135,15 +165,28 @@ class ListFormat {
 					if (nested && dom.check.isListCell(o.parentNode)) {
 						this.#detachNested(rangeArr.f);
 					} else {
-						afterRange = this.#$.format.removeBlock(rangeArr.f[0].parentElement, { selectedFormats: rangeArr.f, newBlockElement: tempList, shouldDelete: false, skipHistory: true });
+						afterRange = this.#$.format.removeBlock(rangeArr.f[0].parentElement, {
+							selectedFormats: rangeArr.f,
+							newBlockElement: tempList,
+							shouldDelete: false,
+							skipHistory: true,
+						});
 					}
 				}
 			}
 		} else {
 			const topElParent = topEl ? topEl.parentNode : topEl;
 			const bottomElParent = bottomEl ? bottomEl.parentNode : bottomEl;
-			topEl = /** @type {HTMLElement} */ (topElParent && !dom.check.isWysiwygFrame(topElParent) && topElParent.nodeName === listTag ? topElParent : topEl);
-			bottomEl = /** @type {HTMLElement} */ (bottomElParent && !dom.check.isWysiwygFrame(bottomElParent) && bottomElParent.nodeName === listTag ? bottomElParent : bottomEl);
+			topEl = /** @type {HTMLElement} */ (
+				topElParent && !dom.check.isWysiwygFrame(topElParent) && topElParent.nodeName === listTag
+					? topElParent
+					: topEl
+			);
+			bottomEl = /** @type {HTMLElement} */ (
+				bottomElParent && !dom.check.isWysiwygFrame(bottomElParent) && bottomElParent.nodeName === listTag
+					? bottomElParent
+					: bottomEl
+			);
 
 			const mergeTop = topEl?.tagName === listTag;
 			const mergeBottom = bottomEl?.tagName === listTag;
@@ -158,7 +201,21 @@ class ListFormat {
 				return !dom.check.isComponentContainer(current) && !dom.check.isList(current);
 			};
 
-			for (let i = 0, len = selectedFormats.length, newCell, fTag, isCell, next, originParent, nextParent, parentTag, siblingTag, rangeTag; i < len; i++) {
+			for (
+				let i = 0,
+					len = selectedFormats.length,
+					newCell,
+					fTag,
+					isCell,
+					next,
+					originParent,
+					nextParent,
+					parentTag,
+					siblingTag,
+					rangeTag;
+				i < len;
+				i++
+			) {
 				fTag = selectedFormats[i];
 				if (fTag.childNodes.length === 0 && !this.#$.inline._isIgnoreNodeChange(fTag)) {
 					dom.utils.removeItem(fTag);
@@ -170,7 +227,12 @@ class ListFormat {
 				isCell = dom.check.isListCell(fTag);
 				rangeTag = this.#$.format.isBlock(originParent) ? originParent : null;
 				parentTag = isCell && !dom.check.isWysiwygFrame(originParent) ? originParent.parentNode : originParent;
-				siblingTag = isCell && !dom.check.isWysiwygFrame(originParent) ? (!next || dom.check.isListCell(parentTag) ? originParent : originParent.nextSibling) : fTag.nextSibling;
+				siblingTag =
+					isCell && !dom.check.isWysiwygFrame(originParent)
+						? !next || dom.check.isListCell(parentTag)
+							? originParent
+							: originParent.nextSibling
+						: fTag.nextSibling;
 
 				newCell = dom.utils.createElement('LI');
 
@@ -191,7 +253,10 @@ class ListFormat {
 				// if (!next) lastList = list;
 				if (!next || parentTag !== nextParent || this.#$.format.isBlock(siblingTag)) {
 					firstList ||= list;
-					if ((!mergeTop || !next || parentTag !== nextParent) && !(next && dom.check.isList(nextParent) && nextParent === originParent)) {
+					if (
+						(!mergeTop || !next || parentTag !== nextParent) &&
+						!(next && dom.check.isList(nextParent) && nextParent === originParent)
+					) {
 						if (list.parentNode !== parentTag) parentTag.insertBefore(list, siblingTag);
 					}
 				}
@@ -200,8 +265,11 @@ class ListFormat {
 				if (mergeTop && topNumber === null) topNumber = list.children.length - 1;
 				if (
 					next &&
-					(this.#$.format.getBlock(nextParent, passComponent) !== this.#$.format.getBlock(originParent, passComponent) ||
-						(dom.check.isList(nextParent) && dom.check.isList(originParent) && dom.query.getNodeDepth(nextParent) !== dom.query.getNodeDepth(originParent)))
+					(this.#$.format.getBlock(nextParent, passComponent) !==
+						this.#$.format.getBlock(originParent, passComponent) ||
+						(dom.check.isList(nextParent) &&
+							dom.check.isList(originParent) &&
+							dom.query.getNodeDepth(nextParent) !== dom.query.getNodeDepth(originParent)))
 				) {
 					list = dom.utils.createElement(listTag, { style: 'list-style-type: ' + listStyle });
 				}
@@ -257,7 +325,12 @@ class ListFormat {
 				if (i === 0) listFirst = true;
 			} else if (r && isList) {
 				if (r !== o) {
-					const edge = this.#$.format.removeBlock(rangeArr.f[0].parentNode, { selectedFormats: rangeArr.f, newBlockElement: null, shouldDelete, skipHistory: true });
+					const edge = this.#$.format.removeBlock(rangeArr.f[0].parentNode, {
+						selectedFormats: rangeArr.f,
+						newBlockElement: null,
+						shouldDelete,
+						skipHistory: true,
+					});
 					o = selectedCells[i].parentNode;
 					if (listFirst) {
 						first = edge.sc;
@@ -282,7 +355,12 @@ class ListFormat {
 			}
 
 			if (lastIndex && dom.check.isList(r)) {
-				const edge = this.#$.format.removeBlock(rangeArr.f[0].parentNode, { selectedFormats: rangeArr.f, newBlockElement: null, shouldDelete, skipHistory: true });
+				const edge = this.#$.format.removeBlock(rangeArr.f[0].parentNode, {
+					selectedFormats: rangeArr.f,
+					newBlockElement: null,
+					shouldDelete,
+					skipHistory: true,
+				});
 				if (listLast || len === 1) last = edge.ec;
 				if (listFirst) first = edge.sc || last;
 			}
@@ -317,7 +395,12 @@ class ListFormat {
 				})
 			: selectedCells;
 		const cellsLen = selectedCells.length;
-		if (cellsLen === 0 || (!nested && !dom.check.isListCell(selectedCells[0].previousElementSibling) && !dom.check.isListCell(selectedCells.at(-1).nextElementSibling))) {
+		if (
+			cellsLen === 0 ||
+			(!nested &&
+				!dom.check.isListCell(selectedCells[0].previousElementSibling) &&
+				!dom.check.isListCell(selectedCells.at(-1).nextElementSibling))
+		) {
 			return {
 				sc: selectedCells[0],
 				so: 0,
@@ -331,7 +414,11 @@ class ListFormat {
 		let range = null;
 
 		if (nested) {
-			if (originList !== lastCell.parentElement && dom.check.isList(lastCell.parentElement?.parentElement) && lastCell.nextElementSibling) {
+			if (
+				originList !== lastCell.parentElement &&
+				dom.check.isList(lastCell.parentElement?.parentElement) &&
+				lastCell.nextElementSibling
+			) {
 				lastCell = /** @type {HTMLElement} */ (lastCell.nextElementSibling);
 				while (lastCell) {
 					selectedCells.push(lastCell);
@@ -427,7 +514,11 @@ class ListFormat {
 			rChildren = dom.query.getListChildren(
 				baseNode,
 				(current) => {
-					return dom.check.isListCell(current) && !current.previousElementSibling && dom.query.getNodeDepth(current) === depth;
+					return (
+						dom.check.isListCell(current) &&
+						!current.previousElementSibling &&
+						dom.query.getNodeDepth(current) === depth
+					);
 				},
 				null,
 			);

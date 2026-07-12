@@ -36,7 +36,8 @@ export default function History(kernel) {
 		// user event
 		eventManager.triggerEvent('onChange', { frameContext: fc, data: fc.get('wysiwyg').innerHTML });
 		if (context.get('toolbar_main').style.display === 'block') $.toolbar._showBalloon();
-		else if (store.mode.isSubBalloon && context.get('toolbar_sub_main').style.display === 'block') $.subToolbar._showBalloon();
+		else if (store.mode.isSubBalloon && context.get('toolbar_sub_main').style.display === 'block')
+			$.subToolbar._showBalloon();
 	}
 
 	/**
@@ -48,14 +49,17 @@ export default function History(kernel) {
 		const prevRoot = rootStack[prevKey];
 
 		stackIndex += increase;
-		const rootKey = increase < 0 && prevKey !== stack[stackIndex] && prevRoot.index > 0 ? prevKey : stack[stackIndex];
+		const rootKey =
+			increase < 0 && prevKey !== stack[stackIndex] && prevRoot.index > 0 ? prevKey : stack[stackIndex];
 		const root = rootStack[rootKey];
 		root.index += increase;
 
 		const item = root.value[root.index];
 
 		if (!item) {
-			console.warn('[SunEditor.history.setContent.fail] History state desynchronized. Aborting undo/redo operation.');
+			console.warn(
+				'[SunEditor.history.setContent.fail] History state desynchronized. Aborting undo/redo operation.',
+			);
 			// Rollback to prevent stuck state
 			root.index -= increase;
 			stackIndex -= increase;
@@ -84,7 +88,12 @@ export default function History(kernel) {
 		}
 
 		$.facade.changeFrameContext(focusKey);
-		$.selection.setRange(getNodeFromPath(focusItem.s.path, focusItem.frame), focusItem.s.offset, getNodeFromPath(focusItem.e.path, focusItem.frame), focusItem.e.offset);
+		$.selection.setRange(
+			getNodeFromPath(focusItem.s.path, focusItem.frame),
+			focusItem.s.offset,
+			getNodeFromPath(focusItem.e.path, focusItem.frame),
+			focusItem.e.offset,
+		);
 		$.focusManager.focus();
 
 		if (stackIndex < 0) stackIndex = 0;
@@ -309,7 +318,12 @@ export default function History(kernel) {
 		 * @param {string} [rootKey] The key of the root frame to overwrite.
 		 */
 		overwrite(rootKey) {
-			setStack(frameRoots.get(rootKey || store.get('rootKey')).get('wysiwyg').innerHTML, null, store.get('rootKey'), 0);
+			setStack(
+				frameRoots.get(rootKey || store.get('rootKey')).get('wysiwyg').innerHTML,
+				null,
+				store.get('rootKey'),
+				0,
+			);
 		},
 
 		/**
@@ -385,7 +399,8 @@ export default function History(kernel) {
 
 			const savedIndex = target.get('savedIndex');
 			const historyIndex = target.get('historyIndex');
-			const isChanged = savedIndex > -1 ? savedIndex !== index : isReset ? root.index > 0 : index > 0 && historyIndex !== index;
+			const isChanged =
+				savedIndex > -1 ? savedIndex !== index : isReset ? root.index > 0 : index > 0 && historyIndex !== index;
 
 			target.set('historyIndex', index);
 			target.set('isChanged', isChanged);

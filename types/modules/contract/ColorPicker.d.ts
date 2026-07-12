@@ -78,7 +78,7 @@ declare class ColorPicker {
 	 * @description Displays or resets the currently selected color at color list.
 	 * @param {Node|string} nodeOrColor Current Selected node
 	 * @param {Node} target target
-	 * @param {?(current: Node) => boolean} [stopCondition] - A function used to stop traversing parent nodes while finding the color.
+	 * @param {?(current: *) => boolean} [stopCondition] - A function used to stop traversing parent nodes while finding the color.
 	 * - When this function returns `true`, the traversal ends at that node.
 	 * - e.g., `(node) => this.format.isLine(node)` stops at line-level elements like <p>, <div>.
 	 * @example
@@ -88,7 +88,7 @@ declare class ColorPicker {
 	 * // Initialize with a color string directly (e.g., from a table cell style)
 	 * this.colorPicker.init(color?.value || '', button);
 	 */
-	init(nodeOrColor: Node | string, target: Node, stopCondition?: ((current: Node) => boolean) | null): void;
+	init(nodeOrColor: Node | string, target: Node, stopCondition?: ((current: any) => boolean) | null): void;
 	/**
 	 * @description Store color values
 	 * @param {string} hexColorStr Hax color value

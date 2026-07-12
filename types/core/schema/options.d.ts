@@ -54,7 +54,9 @@ export namespace DEFAULTS {
  *
  * === Content & Editing ===
  * @property {string} [value=""] - Initial value for the editor.
- * @property {string} [placeholder=""] - Placeholder text.
+ * @property {string} [placeholder=""] - Placeholder text shown when the whole editor is empty.
+ * @property {string} [placeholder_line=""] - per-line placeholder shown on the focused
+ * line when that line is empty. Takes priority over `placeholder` while a line is focused.
  * @property {Object<string, string>} [editableFrameAttributes={spellcheck: "false"}] - Attributes for the editable frame[.sun-editor-editable].
  * ```js
  * { editableFrameAttributes: { spellcheck: 'true', autocomplete: 'on' } }
@@ -65,6 +67,13 @@ export namespace DEFAULTS {
  * @property {string|number} [width="100%"] - Width for the editor.
  * @property {string|number} [minWidth=""] - Min width for the editor.
  * @property {string|number} [maxWidth=""] - Max width for the editor.
+ * @property {string} [innerWidth=""] - Optional max-width for the editor body (`.se-wrapper`).
+ * - **CSS length** (`"740px"`, `"60ch"`): editor body's content is clamped to this width and centered horizontally; scroll container stays full width (scrollbar at the outer edge, wheel/touch active over the whole area).
+ * - **`"auto"`** or **empty string** (default): no constraint — natural full-width layout with default content padding.
+ * - In `blockHandle` mode, the gutter handle tracks the centered text band.
+ * ```js
+ * { innerWidth: '740px' }
+ * ```
  * @property {string|number} [height="auto"] - Height for the editor.
  * @property {string|number} [minHeight=""] - Min height for the editor.
  * @property {string|number} [maxHeight=""] - Max height for the editor.
@@ -233,6 +242,22 @@ export namespace DEFAULTS {
  * === Modes & Themes ===
  * @property {boolean} [v2Migration=false] - Enables migration mode for SunEditor v2.
  * @property {"classic"|"inline"|"balloon"|"balloon-always"|"classic:bottom"|"inline:bottom"} [mode="classic"] - Toolbar mode: `classic`, `inline`, `balloon`, `balloon-always`. Append `:bottom` to place toolbar at the bottom (e.g. `classic:bottom`, `inline:bottom`).
+ * @property {Object} [blockHandle] - Block handle configuration. When provided, a per-line block handle UI is shown. Works independently of `mode`.
+ * @property {Array<string | { title: string, icon?: string, action: (deps: SunEditor.Deps, ctx: { block: HTMLElement }) => void }>} [blockHandle.menu] - Menu entries.
+ * - **String entries** — resolved via `ResolveButton`. Accepts the same values as toolbar `buttonList`:
+ *   - **Block format keys**: `p`, `h1`-`h6`, `heading` (H1-H6 submenu), `ul`, `ol`, `list` (UL/OL submenu), `blockquote`, `pre`.
+ *   - **Plugin names**: Any registered plugin name (e.g. `blockStyle`, `align`, `image`, `link`). Dropdown plugins display their items as a submenu. Modal plugins open the modal on click.
+ *   - **Built-in commands**: `bold`, `italic`, `underline`, `strike`, `undo`, `redo`, etc.
+ * - **Custom item objects** — `{ title, icon?, action }`. `icon` is an icon key from `$.icons` or a raw `<svg>` HTML string; `action` is invoked with `($, { block })`.
+ * - Defaults to `['p', 'heading', 'list', 'blockquote', 'pre']`.
+ * ```js
+ * blockHandle: {
+ *   menu: [
+ *     'p', 'heading', 'blockStyle',
+ *     { title: 'Duplicate', icon: 'copy', action: ($, { block }) => block.after(block.cloneNode(true)) },
+ *   ],
+ * }
+ * ```
  * @property {string} [type=""] - Editor type. Use `"document"` for a document-style layout, with optional sub-types after `:`.
  * ```js
  * // type
@@ -416,6 +441,15 @@ export namespace DEFAULTS {
  * @property {boolean} [syncTabIndent=true] - Synchronizes tab indent with spaces.
  * @property {boolean} [tabDisable=false] - Disables tab key input.
  * @property {string} [toolbar_width="auto"] - Toolbar width.
+ * @property {string} [toolbar_innerWidth=""] - Center the toolbar's button row (`.se-btn-tray`) horizontally.
+ * - **CSS length** (e.g. `"500px"`, `"740px"`, `"60ch"`): toolbar background spans full width while the button row is capped at that width and centered. If buttons fit, the row stays on a single line; if they exceed the cap, they wrap inside it.
+ * - **`"auto"`**: no cap — the row is sized to its content and simply centered.
+ * - **Empty string** (default): no constraint.
+ * - **Note on `responsiveButtonList`**: thresholds compare against the toolbar's full width, not the band. When this option is set, calibrate `responsiveButtonList` keys around the toolbar size you actually want each button set to kick in at.
+ * ```js
+ * { toolbar_innerWidth: '740px' }
+ * { toolbar_innerWidth: 'auto' }
+ * ```
  * @property {?HTMLElement} [toolbar_container] - Container element for the toolbar.
  * @property {number|{top: number, offset: number}} [toolbar_sticky=0] - Enables sticky toolbar.
  * - `number`: Sets the sticky top position (px). Use `-1` to disable sticky.
@@ -550,6 +584,7 @@ export namespace DEFAULTS {
  * @property {import('../../plugins/modal/link.js').LinkPluginOptions} [link]
  * @property {import('../../plugins/modal/math.js').MathPluginOptions} [math]
  * @property {import('../../plugins/dropdown/paragraphStyle.js').ParagraphStylePluginOptions} [paragraphStyle]
+ * @property {import('../../plugins/field/slashCommand.js').SlashCommandPluginOptions} [slashCommand]
  * @property {import('../../plugins/dropdown/table/index.js').TablePluginOptions} [table]
  * @property {import('../../plugins/dropdown/template.js').TemplatePluginOptions} [template]
  * @property {import('../../plugins/dropdown/textStyle.js').TextStylePluginOptions} [textStyle]
@@ -626,9 +661,14 @@ export type EditorFrameOptions = {
 	 */
 	value?: string;
 	/**
-	 * - Placeholder text.
+	 * - Placeholder text shown when the whole editor is empty.
 	 */
 	placeholder?: string;
+	/**
+	 * - per-line placeholder shown on the focused
+	 * line when that line is empty. Takes priority over `placeholder` while a line is focused.
+	 */
+	placeholder_line?: string;
 	/**
 	 * - Attributes for the editable frame[.sun-editor-editable].
 	 * ```js
@@ -653,6 +693,16 @@ export type EditorFrameOptions = {
 	 * - Max width for the editor.
 	 */
 	maxWidth?: string | number;
+	/**
+	 * - Optional max-width for the editor body (`.se-wrapper`).
+	 * - **CSS length** (`"740px"`, `"60ch"`): editor body's content is clamped to this width and centered horizontally; scroll container stays full width (scrollbar at the outer edge, wheel/touch active over the whole area).
+	 * - **`"auto"`** or **empty string** (default): no constraint — natural full-width layout with default content padding.
+	 * - In `blockHandle` mode, the gutter handle tracks the centered text band.
+	 * ```js
+	 * { innerWidth: '740px' }
+	 * ```
+	 */
+	innerWidth?: string;
 	/**
 	 * - Height for the editor.
 	 */
@@ -941,6 +991,24 @@ export type EditorBaseOptions = {
 	 * - Toolbar mode: `classic`, `inline`, `balloon`, `balloon-always`. Append `:bottom` to place toolbar at the bottom (e.g. `classic:bottom`, `inline:bottom`).
 	 */
 	mode?: 'classic' | 'inline' | 'balloon' | 'balloon-always' | 'classic:bottom' | 'inline:bottom';
+	/**
+	 * - Block handle configuration. When provided, a per-line block handle UI is shown. Works independently of `mode`.
+	 */
+	blockHandle?: {
+		menu?: Array<
+			| string
+			| {
+					title: string;
+					icon?: string;
+					action: (
+						deps: SunEditor.Deps,
+						ctx: {
+							block: HTMLElement;
+						},
+					) => void;
+			  }
+		>;
+	};
 	/**
 	 * - Editor type. Use `"document"` for a document-style layout, with optional sub-types after `:`.
 	 * ```js
@@ -1232,6 +1300,18 @@ export type EditorBaseOptions = {
 	 */
 	toolbar_width?: string;
 	/**
+	 * - Center the toolbar's button row (`.se-btn-tray`) horizontally.
+	 * - **CSS length** (e.g. `"500px"`, `"740px"`, `"60ch"`): toolbar background spans full width while the button row is capped at that width and centered. If buttons fit, the row stays on a single line; if they exceed the cap, they wrap inside it.
+	 * - **`"auto"`**: no cap — the row is sized to its content and simply centered.
+	 * - **Empty string** (default): no constraint.
+	 * - **Note on `responsiveButtonList`**: thresholds compare against the toolbar's full width, not the band. When this option is set, calibrate `responsiveButtonList` keys around the toolbar size you actually want each button set to kick in at.
+	 * ```js
+	 * { toolbar_innerWidth: '740px' }
+	 * { toolbar_innerWidth: 'auto' }
+	 * ```
+	 */
+	toolbar_innerWidth?: string;
+	/**
 	 * - Container element for the toolbar.
 	 */
 	toolbar_container?: HTMLElement | null;
@@ -1450,6 +1530,7 @@ export type EditorBaseOptions = {
 	link?: import('../../plugins/modal/link.js').LinkPluginOptions;
 	math?: import('../../plugins/modal/math.js').MathPluginOptions;
 	paragraphStyle?: import('../../plugins/dropdown/paragraphStyle.js').ParagraphStylePluginOptions;
+	slashCommand?: import('../../plugins/field/slashCommand.js').SlashCommandPluginOptions;
 	table?: import('../../plugins/dropdown/table/index.js').TablePluginOptions;
 	template?: import('../../plugins/dropdown/template.js').TemplatePluginOptions;
 	textStyle?: import('../../plugins/dropdown/textStyle.js').TextStylePluginOptions;

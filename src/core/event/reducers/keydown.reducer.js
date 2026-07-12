@@ -79,13 +79,26 @@ export async function reduceKeydown(ports, ctx) {
 	}
 
 	const selectRange = !range.collapsed || range.startContainer !== range.endContainer;
-	if (!ctrl && !alt && !selectRange && !keyCodeMap.isNonTextKey(keyCode) && dom.check.isBreak(range.commonAncestorContainer)) {
+	if (
+		!ctrl &&
+		!alt &&
+		!selectRange &&
+		!keyCodeMap.isNonTextKey(keyCode) &&
+		dom.check.isBreak(range.commonAncestorContainer)
+	) {
 		actions.push(A.keydownInputInsertZWS());
 		return actions;
 	}
 
 	// document type
-	if (fc.has('documentType_use_header') && selectRange && !ctrl && !alt && !shift && !keyCodeMap.isDirectionKey(keyCode)) {
+	if (
+		fc.has('documentType_use_header') &&
+		selectRange &&
+		!ctrl &&
+		!alt &&
+		!shift &&
+		!keyCodeMap.isDirectionKey(keyCode)
+	) {
 		actions.push(A.documentTypeRefreshHeader());
 		return actions;
 	}

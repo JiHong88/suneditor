@@ -93,7 +93,10 @@ export class TableSelectionService {
 		}
 
 		// try cache
-		const cacheKey = getCacheKey(/** @type {HTMLTableCellElement} */ (startCell), /** @type {HTMLTableCellElement} */ (endCell));
+		const cacheKey = getCacheKey(
+			/** @type {HTMLTableCellElement} */ (startCell),
+			/** @type {HTMLTableCellElement} */ (endCell),
+		);
 		let tableCache = refCache.get(table);
 		const cachedRef = tableCache?.get(cacheKey);
 
@@ -186,7 +189,10 @@ export class TableSelectionService {
 					const newRs = ref.rs < i ? ref.rs : i;
 					const newRe = ref.re > i + rs ? ref.re : i + rs;
 
-					if (numbers.getOverlapRangeAtIndex(ref.cs, ref.ce, logcalIndex, logcalIndex + cs) && numbers.getOverlapRangeAtIndex(ref.rs, ref.re, i, i + rs)) {
+					if (
+						numbers.getOverlapRangeAtIndex(ref.cs, ref.ce, logcalIndex, logcalIndex + cs) &&
+						numbers.getOverlapRangeAtIndex(ref.rs, ref.re, i, i + rs)
+					) {
 						if (ref.cs !== newCs || ref.ce !== newCe || ref.rs !== newRs || ref.re !== newRe) {
 							ref.cs = newCs;
 							ref.ce = newCe;
@@ -262,7 +268,10 @@ export class TableSelectionService {
 					}
 				}
 
-				if (numbers.getOverlapRangeAtIndex(ref.cs, ref.ce, logcalIndex, logcalIndex + cs) && numbers.getOverlapRangeAtIndex(ref.rs, ref.re, i, i + rs)) {
+				if (
+					numbers.getOverlapRangeAtIndex(ref.cs, ref.ce, logcalIndex, logcalIndex + cs) &&
+					numbers.getOverlapRangeAtIndex(ref.rs, ref.re, i, i + rs)
+				) {
 					dom.utils.addClass(cell, 'se-selected-table-cell');
 				}
 
@@ -362,7 +371,9 @@ export class TableSelectionService {
 	 */
 	#OnCellMultiSelect(e) {
 		this.#$.store.set('_preventBlur', true);
-		const target = /** @type {HTMLTableCellElement} */ (dom.query.getParentElement(dom.query.getEventTarget(e), dom.check.isTableCell));
+		const target = /** @type {HTMLTableCellElement} */ (
+			dom.query.getParentElement(dom.query.getEventTarget(e), dom.check.isTableCell)
+		);
 
 		if (this.#state.isShiftPressed) {
 			if (target === this.#state.fixedCell) {
@@ -379,7 +390,12 @@ export class TableSelectionService {
 			else this.#main._editorEnable(false);
 		}
 
-		if (!target || target === this.#state.selectedCell || this.#fixedCellName !== target.nodeName || this.#state.selectedTable !== dom.query.getParentElement(target, 'TABLE')) {
+		if (
+			!target ||
+			target === this.#state.selectedCell ||
+			this.#fixedCellName !== target.nodeName ||
+			this.#state.selectedTable !== dom.query.getParentElement(target, 'TABLE')
+		) {
 			return;
 		}
 
@@ -405,7 +421,10 @@ export class TableSelectionService {
 		if (!fixedCell || !this.#state.selectedTable) return;
 
 		this.#cellService.setMergeSplitButton();
-		this.#main.setState('selectedCells', Array.from(this.#state.selectedTable.querySelectorAll('.se-selected-table-cell')));
+		this.#main.setState(
+			'selectedCells',
+			Array.from(this.#state.selectedTable.querySelectorAll('.se-selected-table-cell')),
+		);
 
 		if (this.#state.isShiftPressed) return;
 
@@ -432,7 +451,8 @@ export class TableSelectionService {
 
 			this.focusCellEdge(this.#state.fixedCell);
 
-			const displayCell = this.#state.selectedCells?.length > 0 ? this.#state.selectedCell : this.#state.fixedCell;
+			const displayCell =
+				this.#state.selectedCells?.length > 0 ? this.#state.selectedCell : this.#state.fixedCell;
 			this.#main._setController(displayCell);
 		}
 	}

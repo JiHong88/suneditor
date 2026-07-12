@@ -102,7 +102,10 @@ export const A = {
 	 * @param {SunEditor.ComponentInfo} fileComponentInfo
 	 * @returns {Action}
 	 */
-	backspaceComponentSelect: (selectionNode, range, fileComponentInfo) => ({ t: 'backspace.component.select', p: { selectionNode, range, fileComponentInfo } }),
+	backspaceComponentSelect: (selectionNode, range, fileComponentInfo) => ({
+		t: 'backspace.component.select',
+		p: { selectionNode, range, fileComponentInfo },
+	}),
 	/**
 	 * @param {boolean} isList
 	 * @param {Node} sel
@@ -110,19 +113,41 @@ export const A = {
 	 * @param {SunEditor.ComponentInfo} fileComponentInfo
 	 * @returns {Action}
 	 */
-	backspaceComponentRemove: (isList, sel, formatEl, fileComponentInfo) => ({ t: 'backspace.component.remove', p: { isList, sel, formatEl, fileComponentInfo } }),
+	backspaceComponentRemove: (isList, sel, formatEl, fileComponentInfo) => ({
+		t: 'backspace.component.remove',
+		p: { isList, sel, formatEl, fileComponentInfo },
+	}),
 	/**
 	 * @param {Element} prev
 	 * @param {Element} formatEl
 	 * @param {Element} rangeEl
 	 * @returns {Action}
 	 */
-	backspaceListMergePrev: (prev, formatEl, rangeEl) => ({ t: 'backspace.list.mergePrev', p: { prev, formatEl, rangeEl } }),
+	backspaceListMergePrev: (prev, formatEl, rangeEl) => ({
+		t: 'backspace.list.mergePrev',
+		p: { prev, formatEl, rangeEl },
+	}),
 	/**
 	 * @param {Range} range
 	 * @returns {Action}
 	 */
 	backspaceListRemoveNested: (range) => ({ t: 'backspace.list.removeNested', p: { range } }),
+	/**
+	 * @param {Element} formatEl - empty line to remove
+	 * @param {Element} prev - previous (normal) line to receive the caret
+	 * @returns {Action}
+	 */
+	backspaceEmptyLineMergePrev: (formatEl, prev) => ({ t: 'backspace.emptyLine.mergePrev', p: { formatEl, prev } }),
+
+	/**
+	 * @param {Node} rowEndBr - the `<br>` the caret sits on (end of the empty row)
+	 * @param {Node} rowStartBr - the `<br>` that starts the empty row (removed to merge it up)
+	 * @returns {Action}
+	 */
+	backspaceBrLineRowMerge: (rowEndBr, rowStartBr) => ({
+		t: 'backspace.brline.rowMerge',
+		p: { rowEndBr, rowStartBr },
+	}),
 
 	// === delete ===
 	/**
@@ -130,7 +155,10 @@ export const A = {
 	 * @param {SunEditor.ComponentInfo} fileComponentInfo
 	 * @returns {Action}
 	 */
-	deleteComponentSelect: (formatEl, fileComponentInfo) => ({ t: 'delete.component.select', p: { formatEl, fileComponentInfo } }),
+	deleteComponentSelect: (formatEl, fileComponentInfo) => ({
+		t: 'delete.component.select',
+		p: { formatEl, fileComponentInfo },
+	}),
 	/**
 	 * @param {Element} nextEl
 	 * @returns {Action}
@@ -142,7 +170,22 @@ export const A = {
 	 * @param {Element} rangeEl
 	 * @returns {Action}
 	 */
-	deleteListRemoveNested: (range, formatEl, rangeEl) => ({ t: 'delete.list.removeNested', p: { range, formatEl, rangeEl } }),
+	deleteListRemoveNested: (range, formatEl, rangeEl) => ({
+		t: 'delete.list.removeNested',
+		p: { range, formatEl, rangeEl },
+	}),
+	/**
+	 * @param {Element} formatEl - empty line to remove
+	 * @param {Element} next - next (normal) line to receive the caret
+	 * @returns {Action}
+	 */
+	deleteEmptyLineMergeNext: (formatEl, next) => ({ t: 'delete.emptyLine.mergeNext', p: { formatEl, next } }),
+
+	/**
+	 * @param {Node} rowEndBr - the `<br>` the caret sits on (end of the empty row); removed to pull the next row up
+	 * @returns {Action}
+	 */
+	deleteBrLineRowMerge: (rowEndBr) => ({ t: 'delete.brline.rowMerge', p: { rowEndBr } }),
 
 	// === tab ===
 	/**
@@ -184,7 +227,10 @@ export const A = {
 	 * @param {number} offset
 	 * @returns {Action}
 	 */
-	enterFormatCleanBrAndZWS: (selectionNode, selectionFormat, brBlock, children, offset) => ({ t: 'enter.format.cleanBrAndZWS', p: { selectionNode, selectionFormat, brBlock, children, offset } }),
+	enterFormatCleanBrAndZWS: (selectionNode, selectionFormat, brBlock, children, offset) => ({
+		t: 'enter.format.cleanBrAndZWS',
+		p: { selectionNode, selectionFormat, brBlock, children, offset },
+	}),
 	/**
 	 * @param {Element} brBlock
 	 * @param {Range} range
@@ -192,12 +238,27 @@ export const A = {
 	 * @param {number} offset
 	 * @returns {Action}
 	 */
-	enterFormatInsertBrHtml: (brBlock, range, wSelection, offset) => ({ t: 'enter.format.insertBrHtml', p: { brBlock, range, wSelection, offset } }),
+	enterFormatInsertBrHtml: (brBlock, range, wSelection, offset) => ({
+		t: 'enter.format.insertBrHtml',
+		p: { brBlock, range, wSelection, offset },
+	}),
 	/**
 	 * @param {Selection} wSelection
 	 * @returns {Action}
 	 */
 	enterFormatInsertBrNode: (wSelection) => ({ t: 'enter.format.insertBrNode', p: { wSelection } }),
+	/**
+	 * @description Insert one empty row at the caret inside a normal brLine (e.g. PRE).
+	 * @param {Range} range Caret range captured at rule time.
+	 * @returns {Action}
+	 */
+	enterBrLineInsert: (range) => ({ t: 'enter.brline.insert', p: { range } }),
+	/**
+	 * @description Exit a normal brLine — drop its trailing empty rows and add a default line after it.
+	 * @param {Element} brBlock
+	 * @returns {Action}
+	 */
+	enterBrLineExit: (brBlock) => ({ t: 'enter.brline.exit', p: { brBlock } }),
 	/**
 	 * @param {Element} formatEl
 	 * @param {Node} selectionNode
@@ -206,7 +267,10 @@ export const A = {
 	 * @param {boolean} [bidiSwapped]
 	 * @returns {Action}
 	 */
-	enterFormatBreakAtEdge: (formatEl, selectionNode, formatStartEdge, formatEndEdge, bidiSwapped) => ({ t: 'enter.format.breakAtEdge', p: { formatEl, selectionNode, formatStartEdge, formatEndEdge, bidiSwapped } }),
+	enterFormatBreakAtEdge: (formatEl, selectionNode, formatStartEdge, formatEndEdge, bidiSwapped) => ({
+		t: 'enter.format.breakAtEdge',
+		p: { formatEl, selectionNode, formatStartEdge, formatEndEdge, bidiSwapped },
+	}),
 	/**
 	 * @param {Element} formatEl
 	 * @param {Range} range
@@ -214,7 +278,10 @@ export const A = {
 	 * @param {boolean} formatEndEdge
 	 * @returns {Action}
 	 */
-	enterFormatBreakWithSelection: (formatEl, range, formatStartEdge, formatEndEdge) => ({ t: 'enter.format.breakWithSelection', p: { formatEl, range, formatStartEdge, formatEndEdge } }),
+	enterFormatBreakWithSelection: (formatEl, range, formatStartEdge, formatEndEdge) => ({
+		t: 'enter.format.breakWithSelection',
+		p: { formatEl, range, formatStartEdge, formatEndEdge },
+	}),
 	/**
 	 * @param {Element} formatEl
 	 * @param {Range} range

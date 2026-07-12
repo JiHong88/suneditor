@@ -50,6 +50,14 @@ export default class CommandDispatcher {
 	 * @param {HTMLButtonElement} target - The associated command button.
 	 */
 	registerTargets(cmd: string, target: HTMLButtonElement): void;
+	/**
+	 * @description Inverse of {@link registerTargets}. Removes a previously registered target so
+	 * ephemeral participants (e.g. CommandMenu rows) can opt out of the active-state pass on close.
+	 * Drops the command entry when its target array empties.
+	 * @param {string} cmd - The command identifier.
+	 * @param {HTMLElement} target - The target previously registered.
+	 */
+	unregisterTargets(cmd: string, target: HTMLElement): void;
 	resetTargets(): void;
 	/**
 	 * @internal

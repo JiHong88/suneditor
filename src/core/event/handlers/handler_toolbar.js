@@ -53,13 +53,15 @@ export function ButtonsHandler(e) {
 			if (this.__inputBlurEvent) this.__removeInput();
 
 			// blur event
-			if (typeof plugin.toolbarInputChange === 'function') this.__inputPlugin = { obj: plugin, target: eventTarget, value: eventTarget.value };
+			if (typeof plugin.toolbarInputChange === 'function')
+				this.__inputPlugin = { obj: plugin, target: eventTarget, value: eventTarget.value };
 			this.__inputBlurEvent = this.$.eventManager.addEvent(eventTarget, 'blur', (ev) => {
 				if (plugin.isInputActive) return;
 
 				try {
 					const value = eventTarget.value.trim();
-					if (typeof plugin.toolbarInputChange === 'function' && value !== this.__inputPlugin.value) plugin.toolbarInputChange({ target: eventTarget, value, event: ev });
+					if (typeof plugin.toolbarInputChange === 'function' && value !== this.__inputPlugin.value)
+						plugin.toolbarInputChange({ target: eventTarget, value, event: ev });
 				} finally {
 					// Defer flag reset — wysiwyg focus event fires synchronously during blur and checks this flag
 					_w.setTimeout(() => (this._inputFocus = false), 0);

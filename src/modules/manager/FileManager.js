@@ -75,7 +75,14 @@ class FileManager {
 			this.uploadFileLength = data.size;
 		}
 
-		this.apiManager.call({ method: 'POST', url: uploadUrl, headers: uploadHeader, data: formData, callBack, errorCallBack });
+		this.apiManager.call({
+			method: 'POST',
+			url: uploadUrl,
+			headers: uploadHeader,
+			data: formData,
+			callBack,
+			errorCallBack,
+		});
 	}
 
 	/**
@@ -105,7 +112,12 @@ class FileManager {
 			this.uploadFileLength = data.size;
 		}
 
-		return await this.apiManager.asyncCall({ method: 'POST', url: uploadUrl, headers: uploadHeader, data: formData });
+		return await this.apiManager.asyncCall({
+			method: 'POST',
+			url: uploadUrl,
+			headers: uploadHeader,
+			data: formData,
+		});
 	}
 
 	/**
@@ -196,7 +208,14 @@ class FileManager {
 
 			infoList.splice(i, 1);
 
-			const params = { element: null, index: dataIndex, state: 'delete', info: null, remainingFilesCount: 0, pluginName: this.kind };
+			const params = {
+				element: null,
+				index: dataIndex,
+				state: 'delete',
+				info: null,
+				remainingFilesCount: 0,
+				pluginName: this.kind,
+			};
 			if (this.actionEventName) {
 				this.#$.eventManager.triggerEvent(this.actionEventName, params);
 			}
@@ -214,9 +233,17 @@ class FileManager {
 		const params = { element: null, state: 'delete', info: null, remainingFilesCount: 0, pluginName: this.kind };
 		for (let i = 0, len = this.infoList.length; i < len; i++) {
 			if (this.actionEventName) {
-				this.#$.eventManager.triggerEvent(this.actionEventName, { ...params, index: this.infoList[i].index, pluginName: this.kind });
+				this.#$.eventManager.triggerEvent(this.actionEventName, {
+					...params,
+					index: this.infoList[i].index,
+					pluginName: this.kind,
+				});
 			}
-			this.#$.eventManager.triggerEvent('onFileManagerAction', { ...params, index: this.infoList[i].index, pluginName: this.kind });
+			this.#$.eventManager.triggerEvent('onFileManagerAction', {
+				...params,
+				index: this.infoList[i].index,
+				pluginName: this.kind,
+			});
 		}
 
 		this.infoList = [];
@@ -233,7 +260,14 @@ class FileManager {
 				if (index === this.infoList[i].index) {
 					this.infoList.splice(i, 1);
 					if (this.actionEventName) {
-						this.#$.eventManager.triggerEvent(this.actionEventName, { element: null, index, state: 'delete', info: null, remainingFilesCount: 0, pluginName: this.kind });
+						this.#$.eventManager.triggerEvent(this.actionEventName, {
+							element: null,
+							index,
+							state: 'delete',
+							info: null,
+							remainingFilesCount: 0,
+							pluginName: this.kind,
+						});
 					}
 					return;
 				}
@@ -252,7 +286,8 @@ class FileManager {
 		let state = '';
 
 		file ||= {
-			name: GetAttr(element, 'file-name') || (typeof element.src === 'string' ? element.src.split('/').pop() : ''),
+			name:
+				GetAttr(element, 'file-name') || (typeof element.src === 'string' ? element.src.split('/').pop() : ''),
 			size: Number(GetAttr(element, 'file-size')) || 0,
 		};
 
@@ -316,7 +351,14 @@ class FileManager {
 			}
 		}.bind(this, this.#$.component, element);
 
-		const params = { element, index: dataIndex, state, info, remainingFilesCount: --this.uploadFileLength < 0 ? 0 : this.uploadFileLength, pluginName: this.kind };
+		const params = {
+			element,
+			index: dataIndex,
+			state,
+			info,
+			remainingFilesCount: --this.uploadFileLength < 0 ? 0 : this.uploadFileLength,
+			pluginName: this.kind,
+		};
 		if (this.actionEventName) {
 			this.#$.eventManager.triggerEvent(this.actionEventName, params);
 		}

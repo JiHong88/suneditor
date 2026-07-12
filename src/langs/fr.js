@@ -134,7 +134,6 @@
 		math_modal_title: 'Math',
 		maxSize: 'Taille max',
 		mediaGallery: 'Galerie multimédia',
-		autocomplete: 'Saisie semi-automatique',
 		mention: 'Mention',
 		menu_bordered: 'Ligne de démarcation',
 		menu_code: 'Code',

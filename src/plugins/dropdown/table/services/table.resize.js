@@ -61,7 +61,12 @@ export class TableResizeService {
 			this.#removeGlobalEvents();
 			if (this.#resizeLine?.style.display === 'block') this.#resizeLine.style.display = 'none';
 			this.#resizeLine = this.#$.frameContext.get('wrapper').querySelector(Constants.RESIZE_CELL_CLASS);
-			this.#setResizeLinePosition(dom.query.getParentElement(target, dom.check.isTable), target, this.#resizeLine, cellEdge.isLeft);
+			this.#setResizeLinePosition(
+				dom.query.getParentElement(target, dom.check.isTable),
+				target,
+				this.#resizeLine,
+				cellEdge.isLeft,
+			);
 			this.#resizeLine.style.display = 'block';
 			return false;
 		}
@@ -98,12 +103,15 @@ export class TableResizeService {
 			try {
 				this.#selectionService.deleteStyleSelectedCells();
 				this.#main.setCellInfo(target, true);
-				const colIndex = this.#state.logical_cellIndex + this.#state.current_colSpan - (cellEdge.isLeft ? 1 : 0);
+				const colIndex =
+					this.#state.logical_cellIndex + this.#state.current_colSpan - (cellEdge.isLeft ? 1 : 0);
 
 				// ready
 				this.#$.ui.enableBackWrapper('ew-resize');
 				this.#resizeLine ||= this.#$.frameContext.get('wrapper').querySelector(Constants.RESIZE_CELL_CLASS);
-				this.#resizeLinePrev = this.#$.frameContext.get('wrapper').querySelector(Constants.RESIZE_CELL_PREV_CLASS);
+				this.#resizeLinePrev = this.#$.frameContext
+					.get('wrapper')
+					.querySelector(Constants.RESIZE_CELL_PREV_CLASS);
 
 				// select figure
 				if (colIndex < 0 || colIndex === this.#state.logical_cellCnt - 1) {
@@ -112,8 +120,15 @@ export class TableResizeService {
 					return false;
 				}
 
-				const col = this.#main._element.querySelector('colgroup').querySelectorAll('col')[colIndex < 0 ? 0 : colIndex];
-				this._startCellResizing(col, cellEdge.startX, numbers.get(_w.getComputedStyle(col).width, Constants.CELL_DECIMAL_END), cellEdge.isLeft);
+				const col = this.#main._element.querySelector('colgroup').querySelectorAll('col')[
+					colIndex < 0 ? 0 : colIndex
+				];
+				this._startCellResizing(
+					col,
+					cellEdge.startX,
+					numbers.get(_w.getComputedStyle(col).width, Constants.CELL_DECIMAL_END),
+					cellEdge.isLeft,
+				);
 				this.#main._editorEnable(false);
 			} catch (err) {
 				console.warn('[SUNEDITOR.plugins.table.error]', err);
@@ -148,9 +163,15 @@ export class TableResizeService {
 				// ready
 				this.#$.ui.enableBackWrapper('ns-resize');
 				this.#resizeLine ||= this.#$.frameContext.get('wrapper').querySelector(Constants.RESIZE_ROW_CLASS);
-				this.#resizeLinePrev = this.#$.frameContext.get('wrapper').querySelector(Constants.RESIZE_ROW_PREV_CLASS);
+				this.#resizeLinePrev = this.#$.frameContext
+					.get('wrapper')
+					.querySelector(Constants.RESIZE_ROW_PREV_CLASS);
 
-				this._startRowResizing(row, rowEdge.startY, numbers.get(_w.getComputedStyle(row).height, Constants.CELL_DECIMAL_END));
+				this._startRowResizing(
+					row,
+					rowEdge.startY,
+					numbers.get(_w.getComputedStyle(row).height, Constants.CELL_DECIMAL_END),
+				);
 				this.#main._editorEnable(false);
 			} catch (err) {
 				console.warn('[SUNEDITOR.plugins.table.error]', err);
@@ -204,7 +225,9 @@ export class TableResizeService {
 		const prevValue = col.style.width;
 		const nextCol = /** @type {HTMLElement} */ (col.nextElementSibling);
 		const nextColPrevValue = nextCol.style.width;
-		const realWidth = dom.utils.hasClass(this.#main._element, 'se-table-layout-fixed') ? nextColPrevValue : converter.getWidthInPercentage(nextCol || col);
+		const realWidth = dom.utils.hasClass(this.#main._element, 'se-table-layout-fixed')
+			? nextColPrevValue
+			: converter.getWidthInPercentage(nextCol || col);
 
 		if (_DragHandle.get('__dragHandler')) _DragHandle.get('__dragHandler').style.display = 'none';
 		this.#addResizeGlobalEvents(
@@ -251,7 +274,20 @@ export class TableResizeService {
 	 * @param {number} tableWidth The total width of the table.
 	 * @param {MouseEvent} e The mouse event.
 	 */
-	#cellResize(col, nextCol, figure, tdEl, resizeLine, isLeftEdge, startX, startWidth, prevWidthPercent, nextColWidthPercent, tableWidth, e) {
+	#cellResize(
+		col,
+		nextCol,
+		figure,
+		tdEl,
+		resizeLine,
+		isLeftEdge,
+		startX,
+		startWidth,
+		prevWidthPercent,
+		nextColWidthPercent,
+		tableWidth,
+		e,
+	) {
 		const deltaX = e.clientX - startX;
 		const newWidthPx = startWidth + deltaX;
 		const newWidthPercent = (newWidthPx / tableWidth) * 100;
@@ -324,7 +360,15 @@ export class TableResizeService {
 
 		if (_DragHandle.get('__dragHandler')) _DragHandle.get('__dragHandler').style.display = 'none';
 		this.#addResizeGlobalEvents(
-			this.#figureResize.bind(this, figure, this.#resizeLine, isLeftEdge, startX, figure.offsetWidth, numbers.get(realWidth, Constants.CELL_DECIMAL_END)),
+			this.#figureResize.bind(
+				this,
+				figure,
+				this.#resizeLine,
+				isLeftEdge,
+				startX,
+				figure.offsetWidth,
+				numbers.get(realWidth, Constants.CELL_DECIMAL_END),
+			),
 			() => {
 				this.#removeGlobalEvents();
 				if (numbers.get(figure.style.width, 0) > 100) figure.style.width = '100%';

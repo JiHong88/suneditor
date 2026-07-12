@@ -134,7 +134,6 @@
 		math_modal_title: 'Формула',
 		maxSize: 'Ширина за розміром сторінки',
 		mediaGallery: 'Медіа галерея',
-		autocomplete: 'Автозаповнення',
 		mention: 'Згадати',
 		menu_bordered: 'З лініями',
 		menu_code: 'Код',

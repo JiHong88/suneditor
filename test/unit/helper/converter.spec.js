@@ -191,6 +191,33 @@ describe('converter helper', () => {
 				done();
 			}, 100);
 		});
+
+		it('cancel() prevents a pending invocation from firing', (done) => {
+			let callCount = 0;
+			const debouncedFunc = converter.debounce(() => callCount++, 50);
+
+			debouncedFunc();
+			debouncedFunc.cancel();
+
+			setTimeout(() => {
+				expect(callCount).toBe(0);
+				done();
+			}, 100);
+		});
+
+		it('can be re-scheduled after cancel()', (done) => {
+			let callCount = 0;
+			const debouncedFunc = converter.debounce(() => callCount++, 50);
+
+			debouncedFunc();
+			debouncedFunc.cancel();
+			debouncedFunc(); // schedule again
+
+			setTimeout(() => {
+				expect(callCount).toBe(1);
+				done();
+			}, 100);
+		});
 	});
 
 	describe('syncMaps', () => {

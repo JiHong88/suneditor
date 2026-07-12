@@ -484,7 +484,12 @@ declare function onNativeBlur(params: BaseEvent): void;
  * @param {Event} params.event - event object
  * @param {Event} params.clipboardData - `clipboardData`
  */
-declare function onCopy(params: { $: SunEditor.Deps; frameContext: SunEditor.FrameContext; event: Event; clipboardData: Event }): void;
+declare function onCopy(params: {
+	$: SunEditor.Deps;
+	frameContext: SunEditor.FrameContext;
+	event: Event;
+	clipboardData: Event;
+}): void;
 /**
  * @callback
  * @description Fired when the user attempts to cut content from the editor.
@@ -496,7 +501,12 @@ declare function onCopy(params: { $: SunEditor.Deps; frameContext: SunEditor.Fra
  * @param {Event} params.event - event object
  * @param {Event} params.clipboardData - `clipboardData`
  */
-declare function onCut(params: { $: SunEditor.Deps; frameContext: SunEditor.FrameContext; event: Event; clipboardData: Event }): void;
+declare function onCut(params: {
+	$: SunEditor.Deps;
+	frameContext: SunEditor.FrameContext;
+	event: Event;
+	clipboardData: Event;
+}): void;
 /**
  * @callback
  * @description Fired when the editor content has changed.
@@ -520,7 +530,12 @@ declare function onChange(params: { $: SunEditor.Deps; frameContext: SunEditor.F
  * @param {string} params.mode - Toolbar mode
  * @param {SunEditor.FrameContext} params.frameContext - frame context
  */
-declare function onShowToolbar(params: { $: SunEditor.Deps; toolbar: HTMLElement; mode: string; frameContext: SunEditor.FrameContext }): void;
+declare function onShowToolbar(params: {
+	$: SunEditor.Deps;
+	toolbar: HTMLElement;
+	mode: string;
+	frameContext: SunEditor.FrameContext;
+}): void;
 /**
  * @callback
  * @description Fired after a component controller (floating toolbar) is displayed.
@@ -532,7 +547,12 @@ declare function onShowToolbar(params: { $: SunEditor.Deps; toolbar: HTMLElement
  * @param {string} params.caller - caller plugin name
  * @param {SunEditor.Module.Controller.Info} params.info - info object
  */
-declare function onShowController(params: { $: SunEditor.Deps; frameContext: SunEditor.FrameContext; caller: string; info: SunEditor.Module.Controller.Info }): void;
+declare function onShowController(params: {
+	$: SunEditor.Deps;
+	frameContext: SunEditor.FrameContext;
+	caller: string;
+	info: SunEditor.Module.Controller.Info;
+}): void;
 /**
  * @callback
  * @description Fired before a component controller (floating toolbar) is displayed.
@@ -544,7 +564,12 @@ declare function onShowController(params: { $: SunEditor.Deps; frameContext: Sun
  * @param {string} params.caller - caller plugin name
  * @param {SunEditor.Module.Controller.Info} params.info - info object
  */
-declare function onBeforeShowController(params: { $: SunEditor.Deps; frameContext: SunEditor.FrameContext; caller: string; info: SunEditor.Module.Controller.Info }): void;
+declare function onBeforeShowController(params: {
+	$: SunEditor.Deps;
+	frameContext: SunEditor.FrameContext;
+	caller: string;
+	info: SunEditor.Module.Controller.Info;
+}): void;
 /**
  * @callback
  * @description Fired when the editor switches between WYSIWYG view and code view.
@@ -554,7 +579,11 @@ declare function onBeforeShowController(params: { $: SunEditor.Deps; frameContex
  * @param {SunEditor.FrameContext} params.frameContext - frame context
  * @param {boolean} params.is - code view status
  */
-declare function onToggleCodeView(params: { $: SunEditor.Deps; frameContext: SunEditor.FrameContext; is: boolean }): void;
+declare function onToggleCodeView(params: {
+	$: SunEditor.Deps;
+	frameContext: SunEditor.FrameContext;
+	is: boolean;
+}): void;
 /**
  * @callback
  * @description Fired when the editor switches between WYSIWYG view and markdown view.
@@ -564,7 +593,11 @@ declare function onToggleCodeView(params: { $: SunEditor.Deps; frameContext: Sun
  * @param {SunEditor.FrameContext} params.frameContext - frame context
  * @param {boolean} params.is - markdown view status
  */
-declare function onToggleMarkdownView(params: { $: SunEditor.Deps; frameContext: SunEditor.FrameContext; is: boolean }): void;
+declare function onToggleMarkdownView(params: {
+	$: SunEditor.Deps;
+	frameContext: SunEditor.FrameContext;
+	is: boolean;
+}): void;
 /**
  * @callback
  * @description Fired when the editor enters or exits fullscreen mode.
@@ -574,7 +607,11 @@ declare function onToggleMarkdownView(params: { $: SunEditor.Deps; frameContext:
  * @param {SunEditor.FrameContext} params.frameContext - frame context
  * @param {boolean} params.is - full screen status
  */
-declare function onToggleFullScreen(params: { $: SunEditor.Deps; frameContext: SunEditor.FrameContext; is: boolean }): void;
+declare function onToggleFullScreen(params: {
+	$: SunEditor.Deps;
+	frameContext: SunEditor.FrameContext;
+	is: boolean;
+}): void;
 /**
  * @callback
  * @description Fired when the editor's wysiwyg area height changes.
@@ -588,7 +625,13 @@ declare function onToggleFullScreen(params: { $: SunEditor.Deps; frameContext: S
  * @param {boolean} params.prevHeight - wysiwyg area previous height
  * @param {ResizeObserverEntry} params.observerEntry - ResizeObserverEntry
  */
-declare function onResizeEditor(params: { $: SunEditor.Deps; frameContext: SunEditor.FrameContext; height: number; prevHeight: boolean; observerEntry: ResizeObserverEntry }): void;
+declare function onResizeEditor(params: {
+	$: SunEditor.Deps;
+	frameContext: SunEditor.FrameContext;
+	height: number;
+	prevHeight: boolean;
+	observerEntry: ResizeObserverEntry;
+}): void;
 /**
  * @callback
  * @description Fired after toolbar buttons are created and rendered.
@@ -599,7 +642,11 @@ declare function onResizeEditor(params: { $: SunEditor.Deps; frameContext: SunEd
  * @param {SunEditor.FrameContext} params.frameContext - frame context
  * @param {HTMLElement} params.buttonTray - button tray element
  */
-declare function onSetToolbarButtons(params: { $: SunEditor.Deps; frameContext: SunEditor.FrameContext; buttonTray: HTMLElement }): void;
+declare function onSetToolbarButtons(params: {
+	$: SunEditor.Deps;
+	frameContext: SunEditor.FrameContext;
+	buttonTray: HTMLElement;
+}): void;
 /**
  * @callback
  * @description Fired when the save command is executed (Ctrl+S or save button).
@@ -611,7 +658,11 @@ declare function onSetToolbarButtons(params: { $: SunEditor.Deps; frameContext: 
  * @param {Event} params.data - editor data
  * @returns {PromiseLike<boolean>}
  */
-declare function onSave(params: { $: SunEditor.Deps; frameContext: SunEditor.FrameContext; data: Event }): PromiseLike<boolean>;
+declare function onSave(params: {
+	$: SunEditor.Deps;
+	frameContext: SunEditor.FrameContext;
+	data: Event;
+}): PromiseLike<boolean>;
 /**
  * @callback
  * @description Fired when toolbar button states are reset.
@@ -663,7 +714,11 @@ declare function onPaste(params: ClipboardEvent): PromiseLike<boolean | string |
  * @param {ImageInfo} params.info - info object
  * @returns {PromiseLike<boolean | void>}
  */
-declare function imageUploadHandler(params: { $: SunEditor.Deps; xmlHttp: XMLHttpRequest; info: ImageInfo }): PromiseLike<boolean | void>;
+declare function imageUploadHandler(params: {
+	$: SunEditor.Deps;
+	xmlHttp: XMLHttpRequest;
+	info: ImageInfo;
+}): PromiseLike<boolean | void>;
 /**
  * @callback
  * @description Fired before an image is uploaded to the server.
@@ -676,7 +731,11 @@ declare function imageUploadHandler(params: { $: SunEditor.Deps; xmlHttp: XMLHtt
  * @param {(newInfo?: ImageInfo | null) => void} params.handler - handler function
  * @returns {PromiseLike<boolean | ImageInfo | void>}
  */
-declare function onImageUploadBefore(params: { $: SunEditor.Deps; info: ImageInfo; handler: (newInfo?: ImageInfo | null) => void }): PromiseLike<boolean | ImageInfo | void>;
+declare function onImageUploadBefore(params: {
+	$: SunEditor.Deps;
+	info: ImageInfo;
+	handler: (newInfo?: ImageInfo | null) => void;
+}): PromiseLike<boolean | ImageInfo | void>;
 /**
  * @callback
  * @description Fired after images are successfully loaded into the editor.
@@ -701,7 +760,15 @@ declare function onImageLoad(params: { $: SunEditor.Deps; infoList: Array<FileMa
  * @param {number} params.remainingFilesCount - remaining files count
  * @param {string} params.pluginName - plugin name
  */
-declare function onImageAction(params: { $: SunEditor.Deps; info: FileManagementInfo; element: HTMLElement | null; state: 'create' | 'update' | 'delete'; index: number; remainingFilesCount: number; pluginName: string }): void;
+declare function onImageAction(params: {
+	$: SunEditor.Deps;
+	info: FileManagementInfo;
+	element: HTMLElement | null;
+	state: 'create' | 'update' | 'delete';
+	index: number;
+	remainingFilesCount: number;
+	pluginName: string;
+}): void;
 /**
  * @callback
  * @description Fired when an image upload fails due to size limits, server errors, or other issues.
@@ -716,7 +783,14 @@ declare function onImageAction(params: { $: SunEditor.Deps; info: FileManagement
  * @param {File} [params.file] - File object
  * @returns {PromiseLike<string | void>}
  */
-declare function onImageUploadError(params: { $: SunEditor.Deps; error: string; limitSize?: number; uploadSize?: number; currentSize?: number; file?: File }): PromiseLike<string | void>;
+declare function onImageUploadError(params: {
+	$: SunEditor.Deps;
+	error: string;
+	limitSize?: number;
+	uploadSize?: number;
+	currentSize?: number;
+	file?: File;
+}): PromiseLike<string | void>;
 /**
  * @callback
  * @description Fired before an image is deleted from the editor.
@@ -731,7 +805,14 @@ declare function onImageUploadError(params: { $: SunEditor.Deps; error: string; 
  * @param {?string} params.url - Anchor url, if it exists
  * @returns {PromiseLike<boolean>}
  */
-declare function onImageDeleteBefore(params: { $: SunEditor.Deps; element: HTMLElement; container: HTMLElement; align: string; alt: string; url: string | null }): PromiseLike<boolean>;
+declare function onImageDeleteBefore(params: {
+	$: SunEditor.Deps;
+	element: HTMLElement;
+	container: HTMLElement;
+	align: string;
+	alt: string;
+	url: string | null;
+}): PromiseLike<boolean>;
 /**
  * @callback
  * @description Custom handler for video upload requests.
@@ -745,7 +826,11 @@ declare function onImageDeleteBefore(params: { $: SunEditor.Deps; element: HTMLE
  * @param {VideoInfo} params.info - info object
  * @returns {PromiseLike<boolean>}
  */
-declare function videoUploadHandler(params: { $: SunEditor.Deps; xmlHttp: XMLHttpRequest; info: VideoInfo }): PromiseLike<boolean>;
+declare function videoUploadHandler(params: {
+	$: SunEditor.Deps;
+	xmlHttp: XMLHttpRequest;
+	info: VideoInfo;
+}): PromiseLike<boolean>;
 /**
  * @callback
  * @description Fired before a video is uploaded to the server.
@@ -758,7 +843,11 @@ declare function videoUploadHandler(params: { $: SunEditor.Deps; xmlHttp: XMLHtt
  * @param {(newInfo?: VideoInfo | null) => void} params.handler - handler function
  * @returns {PromiseLike<boolean | VideoInfo | void>}
  */
-declare function onVideoUploadBefore(params: { $: SunEditor.Deps; info: VideoInfo; handler: (newInfo?: VideoInfo | null) => void }): PromiseLike<boolean | VideoInfo | void>;
+declare function onVideoUploadBefore(params: {
+	$: SunEditor.Deps;
+	info: VideoInfo;
+	handler: (newInfo?: VideoInfo | null) => void;
+}): PromiseLike<boolean | VideoInfo | void>;
 /**
  * @callback
  * @description Fired after videos are successfully loaded into the editor.
@@ -783,7 +872,15 @@ declare function onVideoLoad(params: { $: SunEditor.Deps; infoList: Array<FileMa
  * @param {number} params.remainingFilesCount - remaining files count
  * @param {string} params.pluginName - plugin name
  */
-declare function onVideoAction(params: { $: SunEditor.Deps; info: FileManagementInfo; element: HTMLElement | null; state: 'create' | 'update' | 'delete'; index: number; remainingFilesCount: number; pluginName: string }): void;
+declare function onVideoAction(params: {
+	$: SunEditor.Deps;
+	info: FileManagementInfo;
+	element: HTMLElement | null;
+	state: 'create' | 'update' | 'delete';
+	index: number;
+	remainingFilesCount: number;
+	pluginName: string;
+}): void;
 /**
  * @callback
  * @description Fired when a video upload fails due to size limits, server errors, or other issues.
@@ -798,7 +895,14 @@ declare function onVideoAction(params: { $: SunEditor.Deps; info: FileManagement
  * @param {File} [params.file] - File object
  * @returns {PromiseLike<string | void>}
  */
-declare function onVideoUploadError(params: { $: SunEditor.Deps; error: string; limitSize?: number; uploadSize?: number; currentSize?: number; file?: File }): PromiseLike<string | void>;
+declare function onVideoUploadError(params: {
+	$: SunEditor.Deps;
+	error: string;
+	limitSize?: number;
+	uploadSize?: number;
+	currentSize?: number;
+	file?: File;
+}): PromiseLike<string | void>;
 /**
  * @callback
  * @description Fired before a video is deleted from the editor.
@@ -812,7 +916,13 @@ declare function onVideoUploadError(params: { $: SunEditor.Deps; error: string; 
  * @param {string} params.url - video url
  * @returns {PromiseLike<boolean>}
  */
-declare function onVideoDeleteBefore(params: { $: SunEditor.Deps; element: HTMLElement; container: HTMLElement; align: string; url: string }): PromiseLike<boolean>;
+declare function onVideoDeleteBefore(params: {
+	$: SunEditor.Deps;
+	element: HTMLElement;
+	container: HTMLElement;
+	align: string;
+	url: string;
+}): PromiseLike<boolean>;
 /**
  * @callback
  * @description Custom handler for audio upload requests.
@@ -826,7 +936,11 @@ declare function onVideoDeleteBefore(params: { $: SunEditor.Deps; element: HTMLE
  * @param {AudioInfo} params.info - info object
  * @returns {PromiseLike<boolean>}
  */
-declare function audioUploadHandler(params: { $: SunEditor.Deps; xmlHttp: XMLHttpRequest; info: AudioInfo }): PromiseLike<boolean>;
+declare function audioUploadHandler(params: {
+	$: SunEditor.Deps;
+	xmlHttp: XMLHttpRequest;
+	info: AudioInfo;
+}): PromiseLike<boolean>;
 /**
  * @callback
  * @description Fired before an audio file is uploaded to the server.
@@ -839,7 +953,11 @@ declare function audioUploadHandler(params: { $: SunEditor.Deps; xmlHttp: XMLHtt
  * @param {(newInfo?: AudioInfo | null) => void} params.handler - handler function
  * @returns {PromiseLike<boolean | AudioInfo| void>}
  */
-declare function onAudioUploadBefore(params: { $: SunEditor.Deps; info: AudioInfo; handler: (newInfo?: AudioInfo | null) => void }): PromiseLike<boolean | AudioInfo | void>;
+declare function onAudioUploadBefore(params: {
+	$: SunEditor.Deps;
+	info: AudioInfo;
+	handler: (newInfo?: AudioInfo | null) => void;
+}): PromiseLike<boolean | AudioInfo | void>;
 /**
  * @callback
  * @description Fired when an audio upload fails due to size limits, server errors, or other issues.
@@ -854,7 +972,14 @@ declare function onAudioUploadBefore(params: { $: SunEditor.Deps; info: AudioInf
  * @param {File} [params.file] - File object
  * @returns {PromiseLike<string | void>}
  */
-declare function onAudioUploadError(params: { $: SunEditor.Deps; error: string; limitSize?: number; uploadSize?: number; currentSize?: number; file?: File }): PromiseLike<string | void>;
+declare function onAudioUploadError(params: {
+	$: SunEditor.Deps;
+	error: string;
+	limitSize?: number;
+	uploadSize?: number;
+	currentSize?: number;
+	file?: File;
+}): PromiseLike<string | void>;
 /**
  * @callback
  * @description Fired after audio files are successfully loaded into the editor.
@@ -879,7 +1004,15 @@ declare function onAudioLoad(params: { $: SunEditor.Deps; infoList: Array<FileMa
  * @param {number} params.remainingFilesCount - remaining files count
  * @param {string} params.pluginName - plugin name
  */
-declare function onAudioAction(params: { $: SunEditor.Deps; info: FileManagementInfo; element: HTMLElement | null; state: 'create' | 'update' | 'delete'; index: number; remainingFilesCount: number; pluginName: string }): void;
+declare function onAudioAction(params: {
+	$: SunEditor.Deps;
+	info: FileManagementInfo;
+	element: HTMLElement | null;
+	state: 'create' | 'update' | 'delete';
+	index: number;
+	remainingFilesCount: number;
+	pluginName: string;
+}): void;
 /**
  * @callback
  * @description Fired before an audio element is deleted from the editor.
@@ -892,7 +1025,12 @@ declare function onAudioAction(params: { $: SunEditor.Deps; info: FileManagement
  * @param {string} params.url - audio url
  * @returns {PromiseLike<boolean>}
  */
-declare function onAudioDeleteBefore(params: { $: SunEditor.Deps; element: HTMLElement; container: HTMLElement; url: string }): PromiseLike<boolean>;
+declare function onAudioDeleteBefore(params: {
+	$: SunEditor.Deps;
+	element: HTMLElement;
+	container: HTMLElement;
+	url: string;
+}): PromiseLike<boolean>;
 /**
  * @callback
  * @description Fired before a file is uploaded to the server (via `fileUpload` plugin).
@@ -905,7 +1043,11 @@ declare function onAudioDeleteBefore(params: { $: SunEditor.Deps; element: HTMLE
  * @param {(newInfo?: FileInfo | null) => void} params.handler - handler function
  * @returns {PromiseLike<boolean | FileInfo | void>}
  */
-declare function onFileUploadBefore(params: { $: SunEditor.Deps; info: FileInfo; handler: (newInfo?: FileInfo | null) => void }): PromiseLike<boolean | FileInfo | void>;
+declare function onFileUploadBefore(params: {
+	$: SunEditor.Deps;
+	info: FileInfo;
+	handler: (newInfo?: FileInfo | null) => void;
+}): PromiseLike<boolean | FileInfo | void>;
 /**
  * @callback
  * @description Fired after files are successfully uploaded and loaded into the editor.
@@ -930,7 +1072,15 @@ declare function onFileLoad(params: { $: SunEditor.Deps; infoList: Array<FileMan
  * @param {number} params.remainingFilesCount - remaining files count
  * @param {string} params.pluginName - plugin name
  */
-declare function onFileAction(params: { $: SunEditor.Deps; info: FileManagementInfo; element: HTMLElement | null; state: 'create' | 'update' | 'delete'; index: number; remainingFilesCount: number; pluginName: string }): void;
+declare function onFileAction(params: {
+	$: SunEditor.Deps;
+	info: FileManagementInfo;
+	element: HTMLElement | null;
+	state: 'create' | 'update' | 'delete';
+	index: number;
+	remainingFilesCount: number;
+	pluginName: string;
+}): void;
 /**
  * @callback
  * @description Fired when a file upload fails due to size limits, server errors, or other issues.
@@ -945,7 +1095,14 @@ declare function onFileAction(params: { $: SunEditor.Deps; info: FileManagementI
  * @param {File} [params.file] - File object
  * @returns {PromiseLike<string | void>}
  */
-declare function onFileUploadError(params: { $: SunEditor.Deps; error: string; limitSize?: number; uploadSize?: number; currentSize?: number; file?: File }): PromiseLike<string | void>;
+declare function onFileUploadError(params: {
+	$: SunEditor.Deps;
+	error: string;
+	limitSize?: number;
+	uploadSize?: number;
+	currentSize?: number;
+	file?: File;
+}): PromiseLike<string | void>;
 /**
  * @callback
  * @description Fired before a file link is deleted from the editor.
@@ -958,7 +1115,12 @@ declare function onFileUploadError(params: { $: SunEditor.Deps; error: string; l
  * @param {string} params.url - file url
  * @returns {PromiseLike<boolean>}
  */
-declare function onFileDeleteBefore(params: { $: SunEditor.Deps; element: HTMLElement; container: HTMLElement; url: string }): PromiseLike<boolean>;
+declare function onFileDeleteBefore(params: {
+	$: SunEditor.Deps;
+	element: HTMLElement;
+	container: HTMLElement;
+	url: string;
+}): PromiseLike<boolean>;
 /**
  * @callback
  * @description Fired before the editor content is exported to PDF.
@@ -984,7 +1146,15 @@ declare function onExportPDFBefore(params: { $: SunEditor.Deps; target: HTMLElem
  * @param {number} params.remainingFilesCount - remaining files count
  * @param {string} params.pluginName - plugin name
  */
-declare function onFileManagerAction(params: { $: SunEditor.Deps; info: FileManagementInfo; element: HTMLElement | null; state: 'create' | 'update' | 'delete'; index: number; remainingFilesCount: number; pluginName: string }): void;
+declare function onFileManagerAction(params: {
+	$: SunEditor.Deps;
+	info: FileManagementInfo;
+	element: HTMLElement | null;
+	state: 'create' | 'update' | 'delete';
+	index: number;
+	remainingFilesCount: number;
+	pluginName: string;
+}): void;
 /**
  * @callback
  * @description Fired before an embed URL is processed and inserted into the editor.
@@ -1013,5 +1183,11 @@ declare function onEmbedInputBefore(
  * @param {string} params.url - embed url
  * @returns {PromiseLike<boolean>}
  */
-declare function onEmbedDeleteBefore(params: { $: SunEditor.Deps; element: HTMLElement; container: HTMLElement; align: string; url: string }): PromiseLike<boolean>;
+declare function onEmbedDeleteBefore(params: {
+	$: SunEditor.Deps;
+	element: HTMLElement;
+	container: HTMLElement;
+	align: string;
+	url: string;
+}): PromiseLike<boolean>;
 export {};

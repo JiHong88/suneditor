@@ -58,7 +58,8 @@ export default {
 	'selection.setRange': ({ ports }, { sc, so, ec, eo }) => ports.selection.setRange(sc, so, ec, eo),
 
 	/** @action formatRemoveBlock */
-	'format.removeBlock': ({ ports }, { rangeEl, selectedFormats, newBlockElement, shouldDelete, skipHistory }) => ports.format.removeBlock(rangeEl, { selectedFormats, newBlockElement, shouldDelete, skipHistory }),
+	'format.removeBlock': ({ ports }, { rangeEl, selectedFormats, newBlockElement, shouldDelete, skipHistory }) =>
+		ports.format.removeBlock(rangeEl, { selectedFormats, newBlockElement, shouldDelete, skipHistory }),
 
 	/** [helper] */
 

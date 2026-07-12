@@ -216,7 +216,9 @@ class PluginManager {
 	register(pluginName, targets, pluginOptions) {
 		let plugin = this.#plugins[pluginName];
 		if (!plugin) {
-			throw Error(`[SUNEDITOR.registerPlugin.fail] The called plugin does not exist or is in an invalid format. (pluginName: "${pluginName}")`);
+			throw Error(
+				`[SUNEDITOR.registerPlugin.fail] The called plugin does not exist or is in an invalid format. (pluginName: "${pluginName}")`,
+			);
 		} else if (typeof this.#plugins[pluginName] === 'function') {
 			plugin = this.#plugins[pluginName] = new this.#plugins[pluginName](this.#kernel, pluginOptions || {});
 		}
@@ -227,7 +229,10 @@ class PluginManager {
 				UpdateButton(targets[i], plugin, icons, lang);
 			}
 
-			if (!this.#$.commandDispatcher.activeCommands.includes(pluginName) && typeof this.#plugins[pluginName].active === 'function') {
+			if (
+				!this.#$.commandDispatcher.activeCommands.includes(pluginName) &&
+				typeof this.#plugins[pluginName].active === 'function'
+			) {
 				this.#$.commandDispatcher.activeCommands.push(pluginName);
 			}
 		}
@@ -308,24 +313,27 @@ class PluginManager {
 			this.#componentCheckers.push(
 				function (focusManager, history, element) {
 					if (!element || !dom.utils.hasClass(element, 'se-page-break')) return null;
-					return {
-						target: element,
-						launcher: {
-							destroy: (target) => {
-								const focusEl = target.previousElementSibling || target.nextElementSibling;
-								dom.utils.removeItem(target);
-								// focus
-								focusManager.focusEdge(focusEl);
-								history.push(false);
-							},
+					// Typed as an assignment (not a cast) so a mis-named hook (e.g. `destroy`) is a tsc excess-property error.
+					/** @type {SunEditor.ComponentLauncher} */
+					const launcher = {
+						componentDestroy: (target) => {
+							const focusEl = target.previousElementSibling || target.nextElementSibling;
+							dom.utils.removeItem(target);
+							// focus
+							focusManager.focusEdge(focusEl);
+							history.push(false);
 						},
 					};
+					return { target: element, launcher };
 				}.bind(null, this.#$.focusManager, this.#$.history),
 			);
 		}
 
 		this.#fileInfo.regExp = new RegExp(`^(${this.#fileInfo.tags.join('|') || '\\^'})$`, 'i');
-		this.#fileInfo.pluginRegExp = new RegExp(`^(${filePluginRegExp.length === 0 ? '\\^' : filePluginRegExp.join('|')})$`, 'i');
+		this.#fileInfo.pluginRegExp = new RegExp(
+			`^(${filePluginRegExp.length === 0 ? '\\^' : filePluginRegExp.join('|')})$`,
+			'i',
+		);
 
 		this.#pluginCallButtons = null;
 		this.#pluginCallButtons_sub = null;

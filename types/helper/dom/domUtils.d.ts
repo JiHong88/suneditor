@@ -53,7 +53,10 @@ export function getAttributesToString(element: Node, exceptAttrs: Array<string> 
  * @param {?(current: *) => boolean} validation Conditional function
  * @returns {Array<Node>|null}
  */
-export function arrayFilter(array: SunEditor.NodeCollection, validation: ((current: any) => boolean) | null): Array<Node> | null;
+export function arrayFilter(
+	array: SunEditor.NodeCollection,
+	validation: ((current: any) => boolean) | null,
+): Array<Node> | null;
 /**
  * @description Get the item from the array that matches the condition.
  * @param {SunEditor.NodeCollection} array Array to get item

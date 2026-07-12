@@ -47,12 +47,22 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 		if (!this.$.store.mode.isSubBalloonAlways) this._hideToolbar_sub();
 	}
 
-	// user event
-	if ((await this.$.eventManager.triggerEvent('onKeyDown', { frameContext: fc, event: e })) === false) return;
-
-	/** default key action */
+	/** default key action — normalize the Enter range before the reducer reads it */
 	if (keyCodeMap.isEnter(keyCode) && this.$.format.isLine(this.$.selection.getRange()?.startContainer)) {
 		this.$.selection.resetRangeToTextNode();
+
+		const r = this.$.selection.getRange();
+		if (
+			r.startContainer === r.endContainer &&
+			r.startOffset !== r.endOffset &&
+			r.startContainer.nodeType === 3 &&
+			dom.check.isZeroWidth(r.startContainer)
+		) {
+			const br = r.startContainer.nextSibling;
+			if (br && dom.check.isBreak(br)) this.$.selection.setRange(br, 0, br, 0);
+			else this.$.selection.setRange(r.endContainer, r.endOffset, r.endContainer, r.endOffset);
+		}
+
 		selectionNode = this.$.selection.getNode();
 	}
 
@@ -60,12 +70,22 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 	const formatEl = /** @type {HTMLElement} */ (this.$.format.getLine(selectionNode, null) || selectionNode);
 
 	/** Shortcuts */
-	if (ctrl && !keyCodeMap.isNonTextKey(keyCode) && this.$.shortcuts.command(e, ctrl, shift, keyCode, '', false, null, null)) {
+	if (
+		ctrl &&
+		!keyCodeMap.isNonTextKey(keyCode) &&
+		this.$.shortcuts.command(e, ctrl, shift, keyCode, '', false, null, null)
+	) {
 		this._onShortcutKey = true;
 		e.preventDefault();
 		e.stopPropagation();
 		return false;
-	} else if (!ctrl && !keyCodeMap.isNonTextKey(keyCode) && this.$.format.isLine(formatEl) && range.collapsed && dom.check.isEdgePoint(range.startContainer, 0, 'front')) {
+	} else if (
+		!ctrl &&
+		!keyCodeMap.isNonTextKey(keyCode) &&
+		this.$.format.isLine(formatEl) &&
+		range.collapsed &&
+		dom.check.isEdgePoint(range.startContainer, 0, 'front')
+	) {
 		const keyword = /** @type {Text} */ (range.startContainer).substringData?.(0, range.startOffset);
 		if (keyword && this.$.shortcuts.command(e, false, shift, keyCode, keyword, true, formatEl, range)) {
 			this._onShortcutKey = true;
@@ -77,16 +97,36 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 		this._onShortcutKey = false;
 	}
 
-	// plugin event
-	if ((await this._callPluginEventAsync('onKeyDown', { frameContext: fc, event: e, range, line: formatEl })) === false) return;
-
 	// reducer / actions
 	/** @type {import('../reducers/keydown.reducer').KeydownReducerCtx} */
-	const ctx = { e, fc, store: this.$.store, options: this.$.options, frameOptions: this.$.frameOptions, range, selectionNode, formatEl, keyCode, ctrl, alt, shift };
+	const ctx = {
+		e,
+		fc,
+		store: this.$.store,
+		options: this.$.options,
+		frameOptions: this.$.frameOptions,
+		range,
+		selectionNode,
+		formatEl,
+		keyCode,
+		ctrl,
+		alt,
+		shift,
+	};
 	const ports = makePorts(this, { _styleNodes });
 
 	// action execute
 	const actions = await reduceKeydown(ports, ctx);
+
+	if ((await this.$.eventManager.triggerEvent('onKeyDown', { frameContext: fc, event: e })) === false) return;
+
+	// plugin event
+	if (
+		(await this._callPluginEventAsync('onKeyDown', { frameContext: fc, event: e, range, line: formatEl })) === false
+	)
+		return;
+
+	// action execute
 	await actionExecutor(actions, { ports, ctx });
 }
 
@@ -110,7 +150,11 @@ export async function OnKeyUp_wysiwyg(fc, e) {
 	const range = this.$.selection.getRange();
 	let selectionNode = this.$.selection.getNode();
 
-	if ((this.$.store.mode.isBalloon || this.$.store.mode.isSubBalloon) && (((this.$.store.mode.isBalloonAlways || this.$.store.mode.isSubBalloonAlways) && !keyCodeMap.isEsc(keyCode)) || !range.collapsed)) {
+	if (
+		(this.$.store.mode.isBalloon || this.$.store.mode.isSubBalloon) &&
+		(((this.$.store.mode.isBalloonAlways || this.$.store.mode.isSubBalloonAlways) && !keyCodeMap.isEsc(keyCode)) ||
+			!range.collapsed)
+	) {
 		if (this.$.store.mode.isBalloonAlways || this.$.store.mode.isSubBalloonAlways) {
 			if (!keyCodeMap.isEsc(keyCode)) this._showToolbarBalloonDelay();
 		} else {
@@ -121,14 +165,25 @@ export async function OnKeyUp_wysiwyg(fc, e) {
 	}
 
 	/** when format tag deleted */
-	if (keyCodeMap.isBackspace(keyCode) && dom.check.isWysiwygFrame(selectionNode) && selectionNode.textContent === '' && selectionNode.children.length === 0) {
+	if (
+		keyCodeMap.isBackspace(keyCode) &&
+		dom.check.isWysiwygFrame(selectionNode) &&
+		selectionNode.textContent === '' &&
+		selectionNode.children.length === 0
+	) {
 		e.preventDefault();
 		e.stopPropagation();
 
 		selectionNode.innerHTML = '';
 
 		const currentNodeName = this.$.store.get('currentNodes')[0];
-		const oFormatTag = dom.utils.createElement(this.$.format.isLine(currentNodeName) && !dom.check.isListCell(currentNodeName) ? currentNodeName : this.$.options.get('defaultLine'), null, '<br>');
+		const oFormatTag = dom.utils.createElement(
+			this.$.format.isLine(currentNodeName) && !dom.check.isListCell(currentNodeName)
+				? currentNodeName
+				: this.$.options.get('defaultLine'),
+			null,
+			'<br>',
+		);
 		selectionNode.appendChild(oFormatTag);
 		this.$.selection.setRange(oFormatTag, 0, oFormatTag, 0);
 		this.applyTagEffect();
@@ -172,7 +227,12 @@ export async function OnKeyUp_wysiwyg(fc, e) {
 	}
 
 	const textKey = !keyState.ctrl && !keyState.alt && !keyCodeMap.isNonTextKey(keyCode);
-	if (textKey && selectionNode.nodeType === 3 && unicode.zeroWidthRegExp.test(selectionNode.textContent) && !(e.isComposing !== undefined ? e.isComposing : this.isComposing)) {
+	if (
+		textKey &&
+		selectionNode.nodeType === 3 &&
+		unicode.zeroWidthRegExp.test(selectionNode.textContent) &&
+		!(e.isComposing !== undefined ? e.isComposing : this.isComposing)
+	) {
 		let so = range.startOffset,
 			eo = range.endOffset;
 		const frontZeroWidthCnt = (selectionNode.textContent.substring(0, eo).match(FRONT_ZEROWIDTH) || '').length;
@@ -182,7 +242,12 @@ export async function OnKeyUp_wysiwyg(fc, e) {
 		this.$.selection.setRange(selectionNode, so < 0 ? 0 : so, selectionNode, eo < 0 ? 0 : eo);
 	}
 
-	if (keyCodeMap.isRemoveKey(keyCode) && dom.check.isZeroWidth(formatEl?.textContent) && !formatEl.previousElementSibling && !dom.check.isListCell(formatEl)) {
+	if (
+		keyCodeMap.isRemoveKey(keyCode) &&
+		dom.check.isZeroWidth(formatEl?.textContent) &&
+		!formatEl.previousElementSibling &&
+		!dom.check.isListCell(formatEl)
+	) {
 		const rsMode = this.$.options.get('retainStyleMode');
 		if (rsMode !== 'none' && _styleNodes.value?.length > 0) {
 			if (rsMode === 'repeat') {
@@ -209,7 +274,10 @@ export async function OnKeyUp_wysiwyg(fc, e) {
 	if (fc.has('documentType_use_header')) {
 		if (keyCodeMap.isDocumentTypeObserverKey(keyCode)) {
 			fc.get('documentType').reHeader();
-			const el = dom.query.getParentElement(this.$.selection.selectionNode, this.$.format.isLine.bind(this.$.format));
+			const el = dom.query.getParentElement(
+				this.$.selection.selectionNode,
+				this.$.format.isLine.bind(this.$.format),
+			);
 			fc.get('documentType').on(el);
 		} else {
 			const el = dom.query.getParentElement(selectionNode, (current) => current.nodeType === 1);
@@ -220,7 +288,8 @@ export async function OnKeyUp_wysiwyg(fc, e) {
 	// user event
 	if ((await this.$.eventManager.triggerEvent('onKeyUp', { frameContext: fc, event: e })) === false) return;
 	// plugin event
-	if ((await this._callPluginEventAsync('onKeyUp', { frameContext: fc, event: e, range, line: formatEl })) === false) return;
+	if ((await this._callPluginEventAsync('onKeyUp', { frameContext: fc, event: e, range, line: formatEl })) === false)
+		return;
 
 	if (keyCodeMap.isHistoryRelevantKey(keyCode)) {
 		this.$.history.push(true);

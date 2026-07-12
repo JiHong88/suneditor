@@ -106,7 +106,7 @@ describe('Enter Rule', () => {
 		const result = reduceEnterDown(actions, mockPorts, mockCtx);
 
 		expect(result).toBe(true);
-		expect(actions.some(a => a.t === 'enter.format.insertBrNode')).toBe(true);
+		expect(actions.some(a => a.t === 'enter.brline.insert')).toBe(true);
 	});
 
 	it('should handle normal enter in paragraph', () => {

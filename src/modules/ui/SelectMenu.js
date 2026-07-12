@@ -16,8 +16,16 @@ const MENU_MIN_HEIGHT = 38;
  * @property {number} [splitNum=0] Optional split number for horizontal positioning; defines how many items per row
  * @property {() => void} [openMethod] Optional method to call when the menu is opened
  * @property {() => void} [closeMethod] Optional method to call when the menu is closed
+ * @property {() => boolean} [subEscMethod] Optional owner hook invoked on ESC before the menu closes.
+ * Return `true` if it dismissed an owner-managed sub-panel (e.g. CommandMenu's flyout), so ESC only
+ * closes that sub-panel and keeps the menu open.
  * @property {string} [maxHeight] Optional max-height CSS value (e.g. `"200px"`). Enables scrolling when items exceed this height.
  * @property {string} [minWidth] Optional min-width CSS value (e.g. `"130px"`).
+ * @property {*} [keydownTarget]  Optional override for the keyboard navigation target. By default `on()` listens
+ * - on the iframe `contentWindow` (`_ww`) when the refer isn't an input — appropriate when the
+ * - refer is inside the wysiwyg. Set this to `window` (parent) for menus whose refer lives in
+ * - the parent doc (e.g. BlockHandle's dragBtn in `carrierWrapper`). Also avoids
+ * - cross-origin/sandboxed iframe `addEventListener` errors.
  */
 
 /**
@@ -35,11 +43,22 @@ class SelectMenu {
 
 	#refer = null;
 	#keydownTarget = null;
+	#keydownTargetOverride = null;
 	#selectMethod = null;
 	#bindClose_key = null;
 	#bindClose_mousedown = null;
 	#bindClose_click = null;
+	#bindSubmenuReposition = null;
 	#events = null;
+	#lastMainPosition = null;
+	#lastSubPosition = null;
+
+	// submenu
+	#submenuData = new Map();
+	#activeSubmenuIndex = -1;
+	#submenuItemIndex = -1;
+	#inSubmenu = false;
+	#submenuHoverTimer = null;
 
 	/**
 	 * @constructor
@@ -66,11 +85,21 @@ class SelectMenu {
 		this.horizontal = !!this.splitNum;
 		this.openMethod = params.openMethod;
 		this.closeMethod = params.closeMethod;
+		this.subEscMethod = params.subEscMethod || null;
 		this.maxHeight = params.maxHeight || '';
 		this.minWidth = params.minWidth || '';
+		this.#keydownTargetOverride = params.keydownTarget || null;
 
-		this.#dirPosition = /^(left|right)$/.test(this.position) ? (this.position === 'left' ? 'right' : 'left') : this.position;
-		this.#dirSubPosition = /^(left|right)$/.test(this.subPosition) ? (this.subPosition === 'left' ? 'right' : 'left') : this.subPosition;
+		this.#dirPosition = /^(left|right)$/.test(this.position)
+			? this.position === 'left'
+				? 'right'
+				: 'left'
+			: this.position;
+		this.#dirSubPosition = /^(left|right)$/.test(this.subPosition)
+			? this.subPosition === 'left'
+				? 'right'
+				: 'left'
+			: this.subPosition;
 		this.#textDirDiff = params.dir === 'ltr' ? false : params.dir === 'rtl' ? true : null;
 
 		this.#eventHandlers = {
@@ -79,16 +108,41 @@ class SelectMenu {
 			click: this.#OnClick_list.bind(this),
 			keydown: this.#OnKeyDown_refer.bind(this),
 		};
-		this.#globalEventHandlers = { keydown: this.#CloseListener_key.bind(this), mousedown: this.#CloseListener_mousedown.bind(this), click: this.#CloseListener_click.bind(this) };
+		this.#globalEventHandlers = {
+			keydown: this.#CloseListener_key.bind(this),
+			mousedown: this.#CloseListener_mousedown.bind(this),
+			click: this.#CloseListener_click.bind(this),
+			submenuReposition: this.#OnSubmenuReposition.bind(this),
+		};
 	}
 
 	/**
 	 * @description Creates the select menu items.
-	 * @param {Array<string>|SunEditor.NodeCollection} items - Command list of selectable items.
-	 * @param {Array<string>|SunEditor.NodeCollection} [menus] - Optional list of menu display elements; defaults to `items`.
+	 * @param {Array<*>} items - Selectable items.
+	 * - Plain entry: any value (string/object); passed to the `selectMethod` callback when picked.
+	 * - Submenu entry: `{ children: Array<*>, childMenus?: Array<string|HTMLElement> }` —
+	 *   `children` are the child values delivered to `selectMethod` on selection; `childMenus`
+	 *   is the optional display content for each child (HTML string or `HTMLElement`). When
+	 *   omitted, `children` doubles as the display content.
+	 * @param {Array<string>|SunEditor.NodeCollection} [menus] - Optional list of display elements
+	 * (HTML strings or nodes) for the top-level rows. Defaults to `items`. For submenu entries
+	 * this controls the parent row's content; child rows use `childMenus` (or `children`).
+	 * @example
+	 * // Submenu — "List" opens a hover submenu of UL/OL options
+	 * selectMenu.create(
+	 *   [{ children: ['ul', 'ol'], childMenus: ['<i>•</i> Bulleted', '<i>1.</i> Numbered'] }],
+	 *   ['List']
+	 * );
 	 */
 	create(items, menus) {
 		this.form.firstElementChild.innerHTML = '';
+
+		// remove existing submenu elements from form
+		for (const [, data] of this.#submenuData) {
+			data.element?.remove();
+		}
+		this.#submenuData.clear();
+
 		menus ||= items;
 		let html = '';
 		for (let i = 0, len = menus.length; i < len; i++) {
@@ -96,12 +150,46 @@ class SelectMenu {
 				this.#createFormat(html);
 				html = '';
 			}
-			html += `<li class="se-select-item" data-index="${i}">${typeof menus[i] === 'string' ? menus[i] : /** @type {HTMLElement} */ (menus[i]).outerHTML}</li>`;
+
+			const item = items[i];
+			const menuContent =
+				typeof menus[i] === 'string' ? menus[i] : /** @type {HTMLElement} */ (menus[i]).outerHTML;
+			const itemObj = /** @type {{children?: Array, childMenus?: Array}} */ (
+				item && typeof item === 'object' ? item : {}
+			);
+			const hasChildren = itemObj.children?.length > 0;
+
+			if (hasChildren) {
+				let subHtml = '';
+				const childMenus = itemObj.childMenus || itemObj.children;
+				for (let c = 0; c < childMenus.length; c++) {
+					subHtml += `<li class="se-select-item" data-parent-index="${i}" data-child-index="${c}">${typeof childMenus[c] === 'string' ? childMenus[c] : childMenus[c].outerHTML}</li>`;
+				}
+				html +=
+					`<li class="se-select-item se-has-submenu" data-index="${i}">${menuContent}` +
+					`<span class="se-submenu-arrow">${this.#$.icons.menu_arrow_right}</span></li>`;
+
+				// `popover: manual` lifts the submenu into the top layer so it escapes any
+				// `overflow: hidden` on the form's ancestors (toolbar, dropdown panels, ...).
+				const subEl = dom.utils.createElement(
+					'DIV',
+					{ class: 'se-select-submenu', popover: 'manual', 'data-parent-index': String(i) },
+					`<ul class="se-list-basic se-list-checked">${subHtml}</ul>`,
+				);
+				this.#submenuData.set(i, { items: itemObj.children, menus: childMenus, element: subEl });
+			} else {
+				html += `<li class="se-select-item" data-index="${i}">${menuContent}</li>`;
+			}
 		}
 		this.#createFormat(html);
 
+		// append submenu elements to form (outside se-list-inner)
+		for (const [, data] of this.#submenuData) {
+			this.form.appendChild(data.element);
+		}
+
 		this.items = /** @type {Array<string|Node>} */ (items);
-		this.menus = Array.from(this.form.querySelectorAll('li'));
+		this.menus = Array.from(this.form.querySelectorAll('li[data-index]'));
 		this.menuLen = this.menus.length;
 	}
 
@@ -119,7 +207,9 @@ class SelectMenu {
 	 */
 	on(referElement, selectMethod, attr = {}) {
 		this.#refer = /** @type {HTMLElement} */ (referElement);
-		this.#keydownTarget = dom.check.isInputElement(referElement) ? referElement : this.#$.frameContext.get('_ww');
+		this.#keydownTarget =
+			this.#keydownTargetOverride ||
+			(dom.check.isInputElement(referElement) ? referElement : this.#$.frameContext.get('_ww'));
 		this.#selectMethod = selectMethod;
 
 		let innerStyle = '';
@@ -129,7 +219,10 @@ class SelectMenu {
 		this.form = dom.utils.createElement(
 			'DIV',
 			{
-				class: 'se-select-menu' + (attr.class ? ' ' + attr.class : ''),
+				class:
+					'se-select-menu' +
+					(this.#textDirDiff === true ? ' se-rtl' : '') +
+					(attr.class ? ' ' + attr.class : ''),
 				style: attr.style || '',
 			},
 			'<div class="se-list-inner"' + (innerStyle ? ' style="' + innerStyle + '"' : '') + '></div>',
@@ -161,10 +254,44 @@ class SelectMenu {
 		this.#addEvents();
 		this.#addGlobalEvent();
 		const positionItems = position ? position.split('-') : [];
-		const mainPosition = positionItems[0] || (this.#textDirDiff !== null && this.#textDirDiff !== this.#$.options.get('_rtl') ? this.#dirPosition : this.position);
-		const subPosition = positionItems[1] || (this.#textDirDiff !== null && this.#textDirDiff !== this.#$.options.get('_rtl') ? this.#dirSubPosition : this.subPosition);
+		const mainPosition =
+			positionItems[0] ||
+			(this.#textDirDiff !== null && this.#textDirDiff !== this.#$.options.get('_rtl')
+				? this.#dirPosition
+				: this.position);
+		const subPosition =
+			positionItems[1] ||
+			(this.#textDirDiff !== null && this.#textDirDiff !== this.#$.options.get('_rtl')
+				? this.#dirSubPosition
+				: this.subPosition);
+		this.#lastMainPosition = mainPosition;
+		this.#lastSubPosition = subPosition;
 		this.#setPosition(mainPosition, subPosition, onItemQuerySelector);
 		this.isOpen = true;
+	}
+
+	/**
+	 * @description Re-runs positioning using the same direction the menu was opened with.
+	 * Use when the reference element has moved (e.g. scroll repositioned the trigger) but
+	 * the menu should stay open and follow.
+	 */
+	reposition() {
+		if (!this.isOpen || !this.#lastMainPosition) return;
+		this.#setPosition(this.#lastMainPosition, this.#lastSubPosition);
+	}
+
+	/**
+	 * @description Soft-hide / soft-show without changing open state.
+	 * close listeners (outside click, ESC) keep working, but is visually hidden until the trigger comes back.
+	 */
+	setHidden(hidden) {
+		if (!this.isOpen) return;
+		if (hidden) {
+			this.#closeSubmenu();
+			this.form.style.display = 'none';
+		} else {
+			this.reposition();
+		}
 	}
 
 	/**
@@ -198,6 +325,198 @@ class SelectMenu {
 	}
 
 	/**
+	 * @description Whether a native submenu is currently open. Used by owners (e.g. a Controller) to
+	 * let ESC dismiss only the open submenu instead of the whole menu.
+	 * @returns {boolean}
+	 */
+	hasOpenSubmenu() {
+		return this.#activeSubmenuIndex > -1;
+	}
+
+	/**
+	 * @description Opens the submenu for the given parent index.
+	 * @param {number} parentIndex
+	 */
+	#openSubmenu(parentIndex) {
+		if (this.#activeSubmenuIndex === parentIndex) return;
+		this.#closeSubmenu();
+
+		const parentLi = this.menus[parentIndex];
+		if (!parentLi || !dom.utils.hasClass(parentLi, 'se-has-submenu')) return;
+
+		dom.utils.addClass(parentLi, 'se-submenu-open');
+		this.#activeSubmenuIndex = parentIndex;
+		this.#submenuItemIndex = -1;
+		this.#inSubmenu = false;
+
+		const data = this.#submenuData.get(parentIndex);
+		const sub = data?.element;
+		if (sub) {
+			// Show first so the top-layer containing block (viewport) is in effect when we
+			const supportsPopover = typeof sub.showPopover === 'function';
+			sub.style.visibility = 'hidden';
+
+			if (supportsPopover) {
+				if (!sub.matches(':popover-open')) sub.showPopover();
+			} else {
+				sub.style.display = 'block';
+			}
+
+			this.#positionSubmenu(parentLi, sub, supportsPopover);
+			sub.style.visibility = '';
+
+			// Submenu is top-layer popover (viewport-fixed), but the parent form is in document
+			// flow (absolute) and scrolls with the page/container. Re-run positioning on scroll
+			// so the submenu stays anchored to the parent LI as it moves.
+			this.#bindSubmenuReposition = this.#$.eventManager.addGlobalEvent(
+				'scroll',
+				this.#globalEventHandlers.submenuReposition,
+				true,
+			);
+		}
+	}
+
+	/**
+	 * @description Position the submenu element next to the parent menu
+	 * @param {HTMLElement} parentLi
+	 * @param {HTMLElement} sub
+	 * @param {boolean} supportsPopover
+	 */
+	#positionSubmenu(parentLi, sub, supportsPopover) {
+		// In the top layer the containing block is the viewport; otherwise it's the form.
+		const formRect = supportsPopover ? { top: 0, left: 0 } : this.form.getBoundingClientRect();
+
+		const parentRect = parentLi.getBoundingClientRect();
+		const subW = sub.offsetWidth;
+		const subH = sub.offsetHeight;
+		const vpW = _w.innerWidth;
+		const vpH = _w.innerHeight;
+
+		// Horizontal: open in the arrow's direction — RTL prefers left of parent, LTR prefers
+		// right. Flip to the opposite side if the preferred side overflows; if both overflow,
+		// keep the smaller-overflow side and shift inward by exactly that amount.
+		const rightVP = parentRect.right;
+		const leftVP = parentRect.left - subW;
+		const rightOverflow = Math.max(0, rightVP + subW - vpW);
+		const leftOverflow = Math.max(0, -leftVP);
+		const preferLeft = this.#textDirDiff === true;
+
+		let leftPx;
+		if (preferLeft) {
+			if (leftOverflow === 0) leftPx = leftVP;
+			else if (rightOverflow === 0) leftPx = rightVP;
+			else if (leftOverflow <= rightOverflow) leftPx = leftVP + leftOverflow;
+			else leftPx = rightVP - rightOverflow;
+		} else {
+			if (rightOverflow === 0) leftPx = rightVP;
+			else if (leftOverflow === 0) leftPx = leftVP;
+			else if (rightOverflow <= leftOverflow) leftPx = rightVP - rightOverflow;
+			else leftPx = leftVP + leftOverflow;
+		}
+
+		sub.style.left = leftPx - formRect.left + 'px';
+		sub.style.right = '';
+
+		// Vertical: try top-aligned with parent; flip to bottom-anchored if it overflows
+		// downward; if both directions overflow (submenu taller than viewport), keep the
+		// side with the smaller overflow and shift inward by exactly that amount.
+		const topVP = parentRect.top;
+		const bottomVP = parentRect.bottom - subH;
+		const downOverflow = Math.max(0, topVP + subH - vpH);
+		const upOverflow = Math.max(0, -bottomVP);
+
+		let topPx;
+		if (downOverflow === 0) {
+			topPx = topVP;
+		} else if (upOverflow === 0) {
+			topPx = bottomVP;
+		} else if (downOverflow <= upOverflow) {
+			topPx = topVP - downOverflow;
+		} else {
+			topPx = bottomVP + upOverflow;
+		}
+
+		sub.style.top = topPx - formRect.top + 'px';
+	}
+
+	/**
+	 * @description Scroll/resize callback while submenu is open — re-runs positioning so the
+	 * top-layer popover follows the parent LI which scrolls with the document.
+	 */
+	#OnSubmenuReposition() {
+		if (this.#activeSubmenuIndex < 0) return;
+		const data = this.#submenuData.get(this.#activeSubmenuIndex);
+		const sub = data?.element;
+		const parentLi = this.menus[this.#activeSubmenuIndex];
+		if (!sub || !parentLi) return;
+		this.#positionSubmenu(parentLi, sub, typeof sub.showPopover === 'function');
+	}
+
+	/**
+	 * @description Closes any open submenu.
+	 */
+	#closeSubmenu() {
+		if (this.#submenuHoverTimer) {
+			_w.clearTimeout(this.#submenuHoverTimer);
+			this.#submenuHoverTimer = null;
+		}
+		this.#bindSubmenuReposition &&= this.#$.eventManager.removeGlobalEvent(this.#bindSubmenuReposition);
+		if (this.#activeSubmenuIndex > -1) {
+			const parentLi = this.menus[this.#activeSubmenuIndex];
+			if (parentLi) dom.utils.removeClass(parentLi, 'se-submenu-open');
+
+			const data = this.#submenuData.get(this.#activeSubmenuIndex);
+			if (data?.element) {
+				if (typeof data.element.hidePopover === 'function') {
+					if (data.element.matches(':popover-open')) data.element.hidePopover();
+				} else {
+					data.element.style.display = '';
+				}
+				dom.utils.removeClass(data.element.querySelectorAll('.se-select-item'), 'se-select-cursor');
+			}
+		}
+		this.#activeSubmenuIndex = -1;
+		this.#submenuItemIndex = -1;
+		this.#inSubmenu = false;
+	}
+
+	/**
+	 * @description Selects a child item from an open submenu.
+	 * @param {number} parentIndex
+	 * @param {number} childIndex
+	 */
+	#selectChild(parentIndex, childIndex) {
+		const data = this.#submenuData.get(parentIndex);
+		if (!data) return;
+		if (this.checkList) {
+			const childLi = data.element?.querySelectorAll('.se-select-item')[childIndex];
+			if (childLi) dom.utils.toggleClass(childLi, 'se-checked');
+		}
+		this.#selectMethod(data.items[childIndex]);
+	}
+
+	/**
+	 * @description Moves selection within an open submenu.
+	 * @param {number} num Direction (-1 up, +1 down)
+	 */
+	#moveSubmenuItem(num) {
+		const data = this.#submenuData.get(this.#activeSubmenuIndex);
+		if (!data?.element) return;
+		const items = data.element.querySelectorAll('.se-select-item');
+		const len = items.length;
+		if (!len) return;
+
+		num = this.#submenuItemIndex + num;
+		const idx = (this.#submenuItemIndex = num >= len ? 0 : num < 0 ? len - 1 : num);
+
+		dom.utils.removeClass(this.form, 'se-select-menu-mouse-move');
+		for (let i = 0; i < len; i++) {
+			if (i === idx) dom.utils.addClass(items[i], 'se-select-cursor');
+			else dom.utils.removeClass(items[i], 'se-select-cursor');
+		}
+	}
+
+	/**
 	 * @description Appends a formatted list of items to the menu.
 	 * @param {string} html - The HTML string representing the menu items.
 	 */
@@ -211,6 +530,7 @@ class SelectMenu {
 	#init() {
 		this.#removeEvents();
 		this.#removeGlobalEvent();
+		this.#closeSubmenu();
 		this.index = -1;
 		this.item = null;
 		if (this._onItem) {
@@ -241,9 +561,9 @@ class SelectMenu {
 		const len = this.menuLen;
 		for (let i = 0; i < len; i++) {
 			if (i === selectIndex) {
-				dom.utils.addClass(this.menus[i], 'active');
+				dom.utils.addClass(this.menus[i], 'se-select-cursor');
 			} else {
-				dom.utils.removeClass(this.menus[i], 'active');
+				dom.utils.removeClass(this.menus[i], 'se-select-cursor');
 			}
 		}
 
@@ -362,31 +682,28 @@ class SelectMenu {
 		}
 
 		form.style.left = l + 'px';
-		const fl = this.#$.offset.getGlobal(form).left;
+		let fixedLeft = this.#$.offset.getGlobal(form).fixedLeft;
 		let overW = 0;
 		switch (side + '-' + (side ? originP : subPosition)) {
 			case 'true-left':
-				overW = globalTarget.left - _w.scrollX + fl;
-				if (overW < 0) l = l = targetL + targetW + 1;
+				if (fixedLeft < 0) l = targetL + targetW + 1;
 				break;
 			case 'true-right':
-				overW = _w.innerWidth - (fl + formW);
-				if (overW < 0) l = targetL - formW - 1;
+				if (fixedLeft + formW > _w.innerWidth) l = targetL - formW - 1;
 				break;
-			case 'false-center': {
-				overW = _w.innerWidth - (fl + formW);
+			case 'false-center':
+				overW = _w.innerWidth - (fixedLeft + formW);
 				if (overW < 0) l += overW - 4;
 				form.style.left = l + 'px';
-				const centerfl = this.#$.offset.getGlobal(form).left;
-				if (centerfl < 0) l -= centerfl - 4;
+				fixedLeft = this.#$.offset.getGlobal(form).fixedLeft;
+				if (fixedLeft < 0) l -= fixedLeft - 4;
 				break;
-			}
 			case 'false-left':
-				overW = _w.innerWidth - (globalTarget.left - _w.scrollX + formW);
+				overW = _w.innerWidth - (fixedLeft + formW);
 				if (overW < 0) l += overW - 4;
 				break;
 			case 'false-right':
-				if (fl < 0) l -= fl - 4;
+				if (fixedLeft < 0) l -= fixedLeft - 4;
 				break;
 		}
 
@@ -443,7 +760,11 @@ class SelectMenu {
 	#addGlobalEvent() {
 		this.#removeGlobalEvent();
 		this.#bindClose_key = this.#$.eventManager.addGlobalEvent('keydown', this.#globalEventHandlers.keydown, true);
-		this.#bindClose_mousedown = this.#$.eventManager.addGlobalEvent('mousedown', this.#globalEventHandlers.mousedown, true);
+		this.#bindClose_mousedown = this.#$.eventManager.addGlobalEvent(
+			'mousedown',
+			this.#globalEventHandlers.mousedown,
+			true,
+		);
 	}
 
 	/**
@@ -459,6 +780,45 @@ class SelectMenu {
 	 * @param {KeyboardEvent} e - Event object
 	 */
 	#OnKeyDown_refer(e) {
+		// submenu keyboard navigation
+		if (this.#inSubmenu) {
+			switch (e.code) {
+				case 'ArrowUp':
+					e.preventDefault();
+					e.stopPropagation();
+					this.#moveSubmenuItem(-1);
+					return;
+				case 'ArrowDown':
+					e.preventDefault();
+					e.stopPropagation();
+					this.#moveSubmenuItem(1);
+					return;
+				case 'ArrowLeft':
+					e.preventDefault();
+					e.stopPropagation();
+					// exit submenu back to parent
+					this.#inSubmenu = false;
+					this.#submenuItemIndex = -1;
+					{
+						const subData = this.#submenuData.get(this.#activeSubmenuIndex);
+						if (subData?.element)
+							dom.utils.removeClass(
+								subData.element.querySelectorAll('.se-select-item'),
+								'se-select-cursor',
+							);
+					}
+					return;
+				case 'Enter':
+				case 'Space':
+					if (this.#submenuItemIndex > -1) {
+						e.preventDefault();
+						e.stopPropagation();
+						this.#selectChild(this.#activeSubmenuIndex, this.#submenuItemIndex);
+					}
+					return;
+			}
+		}
+
 		let moveIndex;
 		switch (e.code) {
 			case 'ArrowUp': // up
@@ -486,9 +846,15 @@ class SelectMenu {
 				e.stopPropagation();
 				moveIndex = -1;
 				break;
-			case 'ArrowRight': //right
+			case 'ArrowRight': // right — enter submenu if available
 				e.preventDefault();
 				e.stopPropagation();
+				if (this.index > -1 && this.#submenuData.has(this.index)) {
+					this.#openSubmenu(this.index);
+					this.#inSubmenu = true;
+					this.#moveSubmenuItem(1);
+					return;
+				}
 				moveIndex = 1;
 				break;
 			case 'Enter':
@@ -496,14 +862,21 @@ class SelectMenu {
 				if (this.index > -1) {
 					e.preventDefault();
 					e.stopPropagation();
-					this.#select(this.index);
-				} else {
-					this.close();
+					if (this.#submenuData.has(this.index)) {
+						this.#openSubmenu(this.index);
+						this.#inSubmenu = true;
+						this.#moveSubmenuItem(1);
+					} else {
+						this.#select(this.index);
+					}
 				}
 				break;
 		}
 
-		if (moveIndex) this.#moveItem(moveIndex);
+		if (moveIndex) {
+			this.#closeSubmenu();
+			this.#moveItem(moveIndex);
+		}
 	}
 
 	/**
@@ -523,9 +896,40 @@ class SelectMenu {
 	#OnMouseMove_list(e) {
 		const eventTarget = dom.query.getEventTarget(e);
 		dom.utils.addClass(this.form, 'se-select-menu-mouse-move');
-		const index = eventTarget.getAttribute('data-index');
+
+		// `data-*` attrs live on `<li>`, but events may originate from nested children
+		// (e.g. CommandMenu wraps row content in a `<button>` for native :disabled). Walk
+		// up so the lookup still works when the target isn't the `<li>` itself.
+		const childTarget = eventTarget.closest?.('[data-child-index]');
+		const childIndex = childTarget?.getAttribute('data-child-index');
+		if (childIndex !== null && childIndex !== undefined) {
+			this.#submenuItemIndex = Number(childIndex);
+			const subData = this.#submenuData.get(this.#activeSubmenuIndex);
+			if (subData?.element) {
+				const items = subData.element.querySelectorAll('.se-select-item');
+				dom.utils.removeClass(items, 'se-select-cursor');
+				dom.utils.addClass(items[this.#submenuItemIndex], 'se-select-cursor');
+			}
+			return;
+		}
+
+		const indexTarget = eventTarget.closest?.('[data-index]');
+		const index = indexTarget?.getAttribute('data-index');
 		if (!index) return;
-		this.index = Number(index);
+		const numIndex = Number(index);
+		this.index = numIndex;
+
+		// submenu hover logic
+		if (this.#submenuData.has(numIndex)) {
+			if (this.#submenuHoverTimer) _w.clearTimeout(this.#submenuHoverTimer);
+			this.#openSubmenu(numIndex);
+		} else if (this.#activeSubmenuIndex > -1) {
+			// check if mouse is inside the active submenu
+			const activeData = this.#submenuData.get(this.#activeSubmenuIndex);
+			if (!activeData?.element?.contains(eventTarget)) {
+				this.#closeSubmenu();
+			}
+		}
 	}
 
 	/**
@@ -534,14 +938,37 @@ class SelectMenu {
 	#OnClick_list(e) {
 		let target = dom.query.getEventTarget(e);
 		let index = null;
+		let childIndex = null;
 
-		while (!index && !/UL/i.test(target.tagName) && !dom.utils.hasClass(target, 'se-select-menu')) {
-			index = target.getAttribute('data-index');
+		while (!index && !childIndex && !/UL/i.test(target.tagName) && !dom.utils.hasClass(target, 'se-select-menu')) {
+			childIndex = target.getAttribute('data-child-index');
+			if (!childIndex) index = target.getAttribute('data-index');
 			target = target.parentElement;
 		}
 
+		// child item click
+		if (childIndex !== null) {
+			let parentTarget = target;
+			let parentIndex = null;
+			while (!parentIndex && parentTarget) {
+				parentIndex = parentTarget.getAttribute('data-parent-index') || parentTarget.getAttribute('data-index');
+				parentTarget = parentTarget.parentElement;
+			}
+			if (parentIndex !== null) this.#selectChild(Number(parentIndex), Number(childIndex));
+			return;
+		}
+
 		if (!index) return;
-		this.#select(Number(index));
+		const numIndex = Number(index);
+
+		// parent with children — toggle submenu instead of selecting
+		if (this.#submenuData.has(numIndex)) {
+			if (this.#activeSubmenuIndex === numIndex) this.#closeSubmenu();
+			else this.#openSubmenu(numIndex);
+			return;
+		}
+
+		this.#select(numIndex);
 	}
 
 	/**
@@ -549,6 +976,24 @@ class SelectMenu {
 	 */
 	#CloseListener_key(e) {
 		if (!keyCodeMap.isEsc(e.code)) return;
+
+		if (this.#activeSubmenuIndex > -1) {
+			e.preventDefault();
+			e.stopPropagation();
+
+			const parentIndex = this.#activeSubmenuIndex;
+			this.#closeSubmenu();
+			this.#selectItem(parentIndex);
+
+			return;
+		}
+
+		if (this.subEscMethod?.()) {
+			e.preventDefault();
+			e.stopPropagation();
+			return;
+		}
+
 		this.close();
 	}
 

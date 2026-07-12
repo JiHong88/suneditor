@@ -248,6 +248,9 @@ describe('Delete Rule - Edge Cases', () => {
 
 		mockPorts.format.isEdgeLine.mockReturnValue(true);
 		mockPorts.format.isLine.mockReturnValue(true);
+		// caret is in the text line (p1); getLine resolves to it so the empty-line merge branch
+		// (which targets an empty current line) correctly does not apply here
+		mockPorts.format.getLine.mockReturnValue(p1);
 
 		const result = reduceDeleteDown(actions, mockPorts, mockCtx);
 

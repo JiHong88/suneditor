@@ -29,6 +29,11 @@ describe('keydown.registry effects', () => {
 					p.innerHTML = '<br>';
 					return p;
 				}),
+				addLineAfter: jest.fn().mockImplementation(() => {
+					const p = document.createElement('p');
+					p.innerHTML = '<br>';
+					return p;
+				}),
 				getLine: jest.fn(),
 				getLines: jest.fn().mockReturnValue([]),
 				isLine: jest.fn().mockReturnValue(false),
@@ -232,6 +237,113 @@ describe('keydown.registry effects', () => {
 		});
 	});
 
+	describe('backspace.emptyLine.mergePrev', () => {
+		it('removes the empty line and moves the caret to the end of the previous line', () => {
+			const wrap = document.createElement('div');
+			const prev = document.createElement('p');
+			prev.textContent = 'AAA';
+			const empty = document.createElement('p');
+			empty.innerHTML = '<br>';
+			wrap.appendChild(prev);
+			wrap.appendChild(empty);
+
+			effects['backspace.emptyLine.mergePrev']({ ports: mockPorts }, { formatEl: empty, prev });
+
+			expect(wrap.children.length).toBe(1);
+			expect(wrap.firstElementChild).toBe(prev);
+			// caret at the end of prev (its single child node)
+			expect(mockPorts.selection.setRange).toHaveBeenCalledWith(prev, 1, prev, 1);
+		});
+
+		it('places the caret at the end of the previous line when it is also empty (no zwsp)', () => {
+			const wrap = document.createElement('div');
+			const prev = document.createElement('p');
+			prev.innerHTML = '<br>';
+			const empty = document.createElement('p');
+			empty.innerHTML = '<br>';
+			wrap.appendChild(prev);
+			wrap.appendChild(empty);
+
+			effects['backspace.emptyLine.mergePrev']({ ports: mockPorts }, { formatEl: empty, prev });
+
+			expect(wrap.children.length).toBe(1);
+			// caret at the previous (empty) line, offset = its child count — no zero-width text node inserted
+			const call = mockPorts.selection.setRange.mock.calls[0];
+			expect(call[0]).toBe(prev);
+			expect(call[1]).toBe(prev.childNodes.length);
+		});
+	});
+
+	describe('backspace.brline.rowMerge', () => {
+		it('removes the empty row inside a PRE and moves the caret to the end of the previous row', () => {
+			const pre = document.createElement('pre');
+			pre.innerHTML = 'AAAA<br><br>BBBB'; // AAAA, br1, br2, BBBB — empty row between br1 and br2
+			const [br1, br2] = pre.querySelectorAll('br');
+			const aaaa = pre.firstChild;
+
+			effects['backspace.brline.rowMerge']({ ports: mockPorts }, { rowEndBr: br2, rowStartBr: br1 });
+
+			expect(pre.querySelectorAll('br').length).toBe(1); // br1 removed → AAAA<br>BBBB
+			expect(pre.textContent.replace(/​/g, '')).toBe('AAAABBBB');
+			expect(mockPorts.selection.setRange).toHaveBeenCalledWith(aaaa, 4, aaaa, 4);
+		});
+
+		it('moves the caret to the start of the PRE when the empty row is the first row', () => {
+			const pre = document.createElement('pre');
+			pre.innerHTML = '<br><br>BBBB';
+			const [br1, br2] = pre.querySelectorAll('br');
+
+			effects['backspace.brline.rowMerge']({ ports: mockPorts }, { rowEndBr: br2, rowStartBr: br1 });
+
+			expect(pre.querySelectorAll('br').length).toBe(1);
+			expect(mockPorts.selection.setRange).toHaveBeenCalledWith(pre, 0, pre, 0);
+		});
+	});
+
+	describe('delete.emptyLine.mergeNext', () => {
+		it('removes the empty line and moves the caret to the start of the next line', () => {
+			const wrap = document.createElement('div');
+			const empty = document.createElement('p');
+			empty.innerHTML = '<br>';
+			const next = document.createElement('p');
+			next.textContent = 'BBB';
+			wrap.appendChild(empty);
+			wrap.appendChild(next);
+
+			effects['delete.emptyLine.mergeNext']({ ports: mockPorts }, { formatEl: empty, next });
+
+			expect(wrap.children.length).toBe(1);
+			expect(wrap.firstElementChild).toBe(next);
+			expect(mockPorts.selection.setRange).toHaveBeenCalledWith(next, 0, next, 0);
+		});
+	});
+
+	describe('delete.brline.rowMerge', () => {
+		it('removes the empty row inside a PRE and pulls the next row up (caret at its start)', () => {
+			const pre = document.createElement('pre');
+			pre.innerHTML = 'AAAA<br><br>BBBB'; // AAAA, br1, br2, BBBB — caret on br2 (the row-ending <br>)
+			const br2 = pre.querySelectorAll('br')[1];
+			const bbbb = br2.nextSibling;
+
+			effects['delete.brline.rowMerge']({ ports: mockPorts }, { rowEndBr: br2 });
+
+			expect(pre.querySelectorAll('br').length).toBe(1); // br2 removed → AAAA<br>BBBB
+			expect(pre.textContent.replace(/​/g, '')).toBe('AAAABBBB');
+			expect(mockPorts.selection.setRange).toHaveBeenCalledWith(bbbb, 0, bbbb, 0); // caret at start of pulled-up row
+		});
+
+		it('caret to the end of the PRE when nothing follows the empty last row', () => {
+			const pre = document.createElement('pre');
+			pre.innerHTML = 'AAAA<br><br>';
+			const br2 = pre.querySelectorAll('br')[1];
+
+			effects['delete.brline.rowMerge']({ ports: mockPorts }, { rowEndBr: br2 });
+
+			expect(pre.querySelectorAll('br').length).toBe(1);
+			expect(mockPorts.selection.setRange).toHaveBeenCalledWith(pre, pre.childNodes.length, pre, pre.childNodes.length);
+		});
+	});
+
 	describe('delete.component.select', () => {
 		it('should call component.select', () => {
 			const formatEl = document.createElement('p');
@@ -267,12 +379,12 @@ describe('keydown.registry effects', () => {
 	});
 
 	describe('enter.line.addDefault', () => {
-		it('should call format.addLine with defaultLine', () => {
+		it('should call format.addLineAfter', () => {
 			const formatEl = document.createElement('h1');
 
 			effects['enter.line.addDefault']({ ports: mockPorts, ctx: mockCtx }, { formatEl });
 
-			expect(mockPorts.format.addLine).toHaveBeenCalledWith(formatEl, 'P');
+			expect(mockPorts.format.addLineAfter).toHaveBeenCalledWith(formatEl);
 			expect(mockPorts.selection.setRange).toHaveBeenCalled();
 		});
 	});
@@ -669,9 +781,11 @@ describe('keydown.registry effects', () => {
 			// A new LI should be inserted into outerUl as a direct child
 			const directChildren = Array.from(outerUl.children).filter(c => c.nodeName === 'LI');
 			expect(directChildren.length).toBe(2);
-			expect(directChildren[1].innerHTML).toBe('<br>');
+			// caret placed at the start of the new empty line (element offset 1, no zwsp)
+			expect(directChildren[1].innerHTML.replace(/​/g, '')).toBe('<br>');
 			expect(mockPorts.nodeTransform.removeAllParents).toHaveBeenCalledWith(innerLi, null, null);
-			expect(mockPorts.selection.setRange).toHaveBeenCalled();
+			expect(mockPorts.selection.setRange.mock.calls[0][0].nodeType).toBe(1); // new empty line element (no zwsp)
+			expect(mockPorts.selection.setRange.mock.calls[0][1]).toBe(1);
 		});
 
 		it('should create DIV when formatEl is in a table cell', () => {
@@ -708,8 +822,9 @@ describe('keydown.registry effects', () => {
 			expect(mockPorts.format.removeBlock).toHaveBeenCalled();
 			const newEl = wrapper.querySelector('div');
 			expect(newEl).toBeTruthy();
-			expect(newEl.innerHTML).toBe('<br>');
-			expect(mockPorts.selection.setRange).toHaveBeenCalled();
+			expect(newEl.innerHTML.replace(/​/g, '')).toBe('<br>');
+			expect(mockPorts.selection.setRange.mock.calls[0][0].nodeType).toBe(1); // new empty line element (no zwsp)
+			expect(mockPorts.selection.setRange.mock.calls[0][1]).toBe(1);
 		});
 
 		it('should use next sibling nodeName when next sibling is a line', () => {
@@ -739,8 +854,9 @@ describe('keydown.registry effects', () => {
 			expect(allH2s.length).toBe(2);
 			// The new one should have <br> inside
 			const newH2 = allH2s[allH2s.length - 1];
-			expect(newH2.innerHTML).toBe('<br>');
-			expect(mockPorts.selection.setRange).toHaveBeenCalled();
+			expect(newH2.innerHTML.replace(/​/g, '')).toBe('<br>');
+			expect(mockPorts.selection.setRange.mock.calls[0][0].nodeType).toBe(1); // new empty line element (no zwsp)
+			expect(mockPorts.selection.setRange.mock.calls[0][1]).toBe(1);
 		});
 	});
 

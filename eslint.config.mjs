@@ -132,7 +132,7 @@ export default [
 					insertPragma: false,
 					jsxBracketSameLine: false,
 					jsxSingleQuote: true,
-					printWidth: 240,
+					printWidth: 120,
 					proseWrap: 'preserve',
 					quoteProps: 'as-needed',
 					requirePragma: false,

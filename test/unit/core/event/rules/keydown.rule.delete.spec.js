@@ -81,6 +81,69 @@ describe('Delete Rule', () => {
 		expect(result).toBe(true);
 	});
 
+	it('merges the next normal line up when deleting on an empty line (deterministic empty-line delete)', () => {
+		const wrap = document.createElement('div');
+		wrap.setAttribute('data-se-wysiwyg', 'true');
+		const empty = document.createElement('p');
+		const zws = document.createTextNode('​');
+		empty.appendChild(zws);
+		empty.appendChild(document.createElement('br'));
+		const next = document.createElement('p');
+		next.textContent = 'BBB';
+		wrap.appendChild(empty);
+		wrap.appendChild(next);
+		document.body.appendChild(wrap);
+
+		const range = document.createRange();
+		range.setStart(zws, 1);
+		range.setEnd(zws, 1);
+
+		mockPorts.selection.getRange.mockReturnValue(range);
+		mockPorts.format.getLine.mockReturnValue(empty);
+		mockCtx.range = range;
+		mockCtx.formatEl = empty;
+		mockCtx.selectionNode = zws;
+		mockCtx.fc = new Map([['wysiwyg', wrap]]);
+
+		const result = reduceDeleteDown(actions, mockPorts, mockCtx);
+
+		expect(result).toBe(false);
+		expect(actions).toContainEqual(A.deleteEmptyLineMergeNext(empty, next));
+	});
+
+	it('selects the next component instead of merging when deleting on an empty line before a component', () => {
+		const wrap = document.createElement('div');
+		wrap.setAttribute('data-se-wysiwyg', 'true');
+		const empty = document.createElement('p');
+		const zws = document.createTextNode('​');
+		empty.appendChild(zws);
+		empty.appendChild(document.createElement('br'));
+		const figure = document.createElement('figure');
+		figure.className = 'se-component';
+		wrap.appendChild(empty);
+		wrap.appendChild(figure);
+		document.body.appendChild(wrap);
+
+		const range = document.createRange();
+		range.setStart(zws, 1);
+		range.setEnd(zws, 1);
+
+		mockPorts.selection.getRange.mockReturnValue(range);
+		mockPorts.format.getLine.mockReturnValue(empty);
+		mockPorts.component.is.mockImplementation((el) => el === figure);
+		mockCtx.range = range;
+		mockCtx.formatEl = empty;
+		mockCtx.selectionNode = zws;
+		mockCtx.fc = new Map([['wysiwyg', wrap]]);
+
+		const result = reduceDeleteDown(actions, mockPorts, mockCtx);
+
+		// existing component branch wins (returns true); the empty-line merge branch never runs
+		expect(result).toBe(true);
+		expect(actions).toContainEqual(A.deleteComponentSelectNext(empty, figure));
+		expect(actions).not.toContainEqual(A.deleteEmptyLineMergeNext(empty, figure));
+	});
+
 	it('should return true for normal delete', () => {
 		const result = reduceDeleteDown(actions, mockPorts, mockCtx);
 		expect(result).toBe(true);
@@ -331,5 +394,79 @@ describe('Delete Rule', () => {
 
 		const result = reduceDeleteDown(actions, mockPorts, mockCtx);
 		expect(result).not.toBeUndefined();
+	});
+
+	describe('brLine empty row (PRE middle-row delete)', () => {
+		let preEl, br1, br2;
+
+		beforeEach(() => {
+			// AAAA<br(br1)><br(br2)>BBBB — empty row between br1 and br2, caret on br2
+			preEl = document.createElement('pre');
+			preEl.innerHTML = 'AAAA<br><br>BBBB';
+			[br1, br2] = preEl.querySelectorAll('br');
+			wysiwygDiv.innerHTML = '';
+			wysiwygDiv.appendChild(preEl);
+
+			const r = document.createRange();
+			r.setStart(br2, 0);
+			r.setEnd(br2, 0);
+			mockCtx.range = r;
+			mockCtx.formatEl = preEl;
+			mockCtx.selectionNode = br2;
+			mockPorts.selection.getRange.mockReturnValue(r);
+			mockPorts.format.getLine.mockReturnValue(preEl);
+			mockPorts.format.isBrLine.mockReturnValue(true);
+			mockPorts.format.isNormalLine.mockReturnValue(false);
+			mockPorts.format.isLine.mockImplementation((el) => el === preEl); // a <br> is not a line
+		});
+
+		it('dispatches deleteBrLineRowMerge for an empty row (caret on the row-ending <br>)', () => {
+			const result = reduceDeleteDown(actions, mockPorts, mockCtx);
+
+			const merge = actions.find((a) => a.t === 'delete.brline.rowMerge');
+			expect(merge).toBeDefined();
+			expect(merge.p.rowEndBr).toBe(br2); // the <br> ending the empty row, removed to pull the next row up
+			expect(result).toBe(false);
+		});
+
+		it('dispatches preventStop before, and historyPush after, the row merge', () => {
+			reduceDeleteDown(actions, mockPorts, mockCtx);
+			const preventIdx = actions.findIndex((a) => a.t === 'prevent.stop');
+			const mergeIdx = actions.findIndex((a) => a.t === 'delete.brline.rowMerge');
+			const historyIdx = actions.findIndex((a) => a.t === 'history.push');
+			expect(preventIdx).toBeLessThan(mergeIdx);
+			expect(historyIdx).toBeGreaterThan(mergeIdx);
+		});
+	});
+
+	describe('empty line before a brLine (PRE)', () => {
+		it('merges the empty line into the following PRE (deterministic, not native)', () => {
+			// <p>(empty)</p><pre>...</pre> — caret in the empty <p>, next sibling is a brLine
+			const empty = document.createElement('p');
+			const zws = document.createTextNode('​');
+			empty.appendChild(zws);
+			empty.appendChild(document.createElement('br'));
+			const pre = document.createElement('pre');
+			pre.innerHTML = 'code<br>line';
+			wysiwygDiv.innerHTML = '';
+			wysiwygDiv.appendChild(empty);
+			wysiwygDiv.appendChild(pre);
+
+			const r = document.createRange();
+			r.setStart(zws, 1);
+			r.setEnd(zws, 1);
+			mockCtx.range = r;
+			mockCtx.formatEl = empty;
+			mockCtx.selectionNode = zws;
+			mockPorts.selection.getRange.mockReturnValue(r);
+			mockPorts.format.getLine.mockReturnValue(empty);
+			mockPorts.format.isNormalLine.mockImplementation((el) => el === empty);
+			mockPorts.format.isBrLine.mockImplementation((el) => el === pre);
+
+			const result = reduceDeleteDown(actions, mockPorts, mockCtx);
+
+			expect(actions).toContainEqual(A.deleteEmptyLineMergeNext(empty, pre));
+			expect(result).toBe(false);
+		});
 	});
 });

@@ -96,11 +96,28 @@ export type FigureTargetInfo = {
 /**
  * Figure control button type
  */
-export type FigureControlButton = 'mirror_h' | 'mirror_v' | 'rotate_l' | 'rotate_r' | 'caption' | 'revert' | 'edit' | 'copy' | 'remove' | 'as' | 'align' | 'onalign' | 'onresize';
+export type FigureControlButton =
+	| 'mirror_h'
+	| 'mirror_v'
+	| 'rotate_l'
+	| 'rotate_r'
+	| 'caption'
+	| 'revert'
+	| 'edit'
+	| 'copy'
+	| 'remove'
+	| 'as'
+	| 'align'
+	| 'onalign'
+	| 'onresize';
 /**
  * Figure control resize value type (auto, or percentage numbers)
  */
-export type FigureControlResize = `resize_auto,${number}` | `resize_auto,${number},${number}` | `resize_auto,${number},${number},${number}` | `resize_auto,${number},${number},${number},${number}`;
+export type FigureControlResize =
+	| `resize_auto,${number}`
+	| `resize_auto,${number},${number}`
+	| `resize_auto,${number},${number},${number}`
+	| `resize_auto,${number},${number},${number},${number}`;
 /**
  * Figure control custom action object
  */
@@ -513,7 +530,12 @@ declare class Figure {
 	 * // Replace with anchor cover (e.g., image wrapped in a link)
 	 * this.figure.retainFigureFormat(container, this.#element, anchorEl, this.fileManager);
 	 */
-	retainFigureFormat(container: Node, originEl: Node, anchorCover: Node, fileManagerInst?: import('../manager/FileManager').default): void;
+	retainFigureFormat(
+		container: Node,
+		originEl: Node,
+		anchorCover: Node,
+		fileManagerInst?: import('../manager/FileManager').default,
+	): void;
 	/**
 	 * @description Initialize the transform style (rotation) of the element.
 	 * @param {?Node} [node] Target element, default is the current element
@@ -532,7 +554,12 @@ declare class Figure {
 	 * // Apply size without additional rotation (deg=0 preserves current rotation)
 	 * this.figure.setTransform(oFrame, width, height, 0);
 	 */
-	setTransform(node: Node, width: (string | number) | null, height: (string | number) | null, deg: number | null): void;
+	setTransform(
+		node: Node,
+		width: (string | number) | null,
+		height: (string | number) | null,
+		deg: number | null,
+	): void;
 	/**
 	 * @internal
 	 * @description Displays or hides the resize handles of the figure component.

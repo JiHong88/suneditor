@@ -5,13 +5,17 @@ const DIR_KEYCODE = _arrow.split('|');
 // const DELETE_KEYCODE = /^(8|46)$/;
 const DELETE_KEYCODE = 'Backspace|Delete'.split('|');
 // const NON_TEXT_KEYCODE = /^(8|9|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145|229)$/;
-const NON_TEXT_KEYCODE = `Backspace|Tab|Enter|ShiftLeft|ShiftRight|ControlLeft|ControlRight|AltLeft|AltRight|Pause|CapsLock|Escape|PageUp|PageDown|End|Home|${_arrow}|Insert|Delete|${_fN}|NumLock|ScrollLock`.split('|');
+const NON_TEXT_KEYCODE =
+	`Backspace|Tab|Enter|ShiftLeft|ShiftRight|ControlLeft|ControlRight|AltLeft|AltRight|Pause|CapsLock|Escape|PageUp|PageDown|End|Home|${_arrow}|Insert|Delete|${_fN}|NumLock|ScrollLock`.split(
+		'|',
+	);
 // const HISTORY_RELEVANT_KEYS = /^(9|13|46)$/;
 const HISTORY_RELEVANT_KEYS = `Backspace|Enter|Delete`.split('|');
 // const DOCUMENT_TYPE_OBSERVER_KEYCODE = /^(8|13|46)$/;
 const DOCUMENT_TYPE_OBSERVER_KEYCODE = 'Backspace|Enter|Delete'.split('|');
 // const NON_RESPONSE_KEYCODE = /^(1[7-9]|20|27|45|11[2-9]|12[0-3]|144|145)$/;
-const NON_RESPONSE_CODE = `ControlLeft|ControlRight|AltLeft|AltRight|Pause|CapsLock|Escape|Insert|${_fN}|NumLock|ScrollLock`.split('|');
+const NON_RESPONSE_CODE =
+	`ControlLeft|ControlRight|AltLeft|AltRight|Pause|CapsLock|Escape|Insert|${_fN}|NumLock|ScrollLock`.split('|');
 
 /** ------------------------------------------------------- [meta] -------------------------------------------------------  */
 /**

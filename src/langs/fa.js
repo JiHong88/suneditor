@@ -134,7 +134,6 @@
 		math_modal_title: 'فرمول ریاضی',
 		maxSize: 'حداکثر اندازه',
 		mediaGallery: 'گالری رسانه',
-		autocomplete: 'تکمیل خودکار',
 		mention: 'ذکر کردن',
 		menu_bordered: 'لبه‌دار',
 		menu_code: 'کُد',

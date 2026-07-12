@@ -54,7 +54,8 @@ class Finder {
 		Finder.#highlightStyleInjected = true;
 		const style = _d.createElement('style');
 		style.textContent =
-			'::highlight(se-find-match){background-color:var(--se-find-match-color,rgba(255,213,0,.4));color:inherit}' + '::highlight(se-find-current){background-color:var(--se-find-current-color,rgba(255,150,50,.7));color:inherit}';
+			'::highlight(se-find-match){background-color:var(--se-find-match-color,rgba(255,213,0,.4));color:inherit}' +
+			'::highlight(se-find-current){background-color:var(--se-find-current-color,rgba(255,150,50,.7));color:inherit}';
 		_d.head.appendChild(style);
 	}
 
@@ -99,7 +100,9 @@ class Finder {
 
 			// Update sticky top (responsive resize, more layer, etc.)
 			if (env.isResizeObserverSupported) {
-				this.#resizeObserver = new ResizeObserver(() => this.#updateStickyTop()).observe(this.#$.context.get('toolbar_main'));
+				this.#resizeObserver = new ResizeObserver(() => this.#updateStickyTop()).observe(
+					this.#$.context.get('toolbar_main'),
+				);
 			}
 		}
 	}
@@ -157,9 +160,11 @@ class Finder {
 		const stickyTop = this.#$.options.get('_toolbar_sticky');
 		if (this.#store.mode.isBottom) {
 			this.#panel.style.top = 'auto';
-			this.#panel.style.bottom = stickyTop >= 0 ? stickyTop + this.#$.context.get('toolbar_main').offsetHeight + 'px' : '0px';
+			this.#panel.style.bottom =
+				stickyTop >= 0 ? stickyTop + this.#$.context.get('toolbar_main').offsetHeight + 'px' : '0px';
 		} else {
-			this.#panel.style.top = stickyTop >= 0 ? stickyTop + this.#$.context.get('toolbar_main').offsetHeight + 'px' : '0px';
+			this.#panel.style.top =
+				stickyTop >= 0 ? stickyTop + this.#$.context.get('toolbar_main').offsetHeight + 'px' : '0px';
 		}
 	}
 
@@ -753,7 +758,9 @@ class Finder {
 			// Mark fallback: update active mark
 			this.#updateCurrentMarkHighlight();
 
-			const currentMark = this.#markElements.find((m) => m.getAttribute('data-se-find-idx') === String(this.#currentIndex));
+			const currentMark = this.#markElements.find(
+				(m) => m.getAttribute('data-se-find-idx') === String(this.#currentIndex),
+			);
 			if (currentMark) {
 				this.#$.selection.scrollTo(currentMark, { behavior: 'auto', noFocus: true });
 			}
@@ -780,7 +787,10 @@ class Finder {
 		const freshMatches = this.#findAllMatches(this.#searchTerm, wysiwyg);
 		if (this.#currentIndex >= freshMatches.length) return;
 
-		this.#replaceRange(freshMatches[this.#currentIndex], replaceText ?? (this.#replaceInput ? this.#replaceInput.value : ''));
+		this.#replaceRange(
+			freshMatches[this.#currentIndex],
+			replaceText ?? (this.#replaceInput ? this.#replaceInput.value : ''),
+		);
 		this.#$.history.push(false);
 
 		// Re-search

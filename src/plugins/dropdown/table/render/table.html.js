@@ -158,7 +158,9 @@ export function CreateHTML_controller_cell({ lang, icons }, cellControllerTop) {
  * @returns {TableCtrlProps}
  */
 export function CreateHTML_controller_properties({ lang, icons, options }) {
-	const alignItems = options.get('_rtl') ? ['right', 'center', 'left', 'justify'] : ['left', 'center', 'right', 'justify'];
+	const alignItems = options.get('_rtl')
+		? ['right', 'center', 'left', 'justify']
+		: ['left', 'center', 'right', 'justify'];
 	let alignHtml = '';
 	for (let i = 0, item, text; i < alignItems.length; i++) {
 		item = alignItems[i];

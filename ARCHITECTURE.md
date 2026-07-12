@@ -502,6 +502,15 @@ class MyPlugin extends PluginCommand {
 
 Because plugins extend `KernelInjector`, they receive `this.$` — the same Deps bag that core modules use. Note that `$` is the dependency context provided by the Kernel, not the Kernel itself.
 
+### Selectable Components: Two Registration Paths
+
+An in-content component (image, table, `pageBreak`, …) reaches `component.select()` through one of two paths:
+
+1. **Full plugin** — implements `static component(node)` + the `EditorComponent` hooks; owns any controller/actions.
+2. **Launcher** — a lightweight object (`SunEditor.ComponentLauncher`) pushed to `pluginManager`'s component-checkers, for components with no UI beyond delete (e.g. `pageBreak`). It carries the same **hook names** a plugin would (`componentDestroy`/`componentSelect`/`componentDeselect`), since `select()` stores it as `currentPlugin`. Mis-naming a hook silently breaks the component (bug #1670); the `ComponentLauncher` typedef enforces the names at build time.
+
+See `guide/custom-plugin.md` → "Non-plugin components (the launcher path)" for the full contract.
+
 ---
 
 ## 9. Event System

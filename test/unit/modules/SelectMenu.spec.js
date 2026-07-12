@@ -654,15 +654,31 @@ describe('Modules - SelectMenu', () => {
 			expect(selectMenu.isOpen).toBe(true);
 		});
 
-		it('should close with Enter when no item selected', () => {
-			selectMenu.open();
+		it('Enter/Space with no item focused (index -1) does NOT close the menu', () => {
+			for (const code of ['Enter', 'Space']) {
+				selectMenu.open();
+				expect(selectMenu.index).toBe(-1);
 
-			const event = new KeyboardEvent('keydown', { code: 'Enter', bubbles: true });
-			Object.defineProperty(event, 'preventDefault', { value: jest.fn() });
-			Object.defineProperty(event, 'stopPropagation', { value: jest.fn() });
+				const event = new KeyboardEvent('keydown', { code, bubbles: true });
+				Object.defineProperty(event, 'preventDefault', { value: jest.fn() });
+				Object.defineProperty(event, 'stopPropagation', { value: jest.fn() });
 
-			mockEditor.frameContext.get('_ww').dispatchEvent(event);
-			expect(selectMenu.index).toBe(-1);
+				mockEditor.frameContext.get('_ww').dispatchEvent(event);
+				expect(selectMenu.isOpen).toBe(true); // stays open (previously closed)
+				expect(selectMenu.index).toBe(-1);
+			}
+		});
+
+		it('hasOpenSubmenu reflects native submenu state', () => {
+			const menu = new SelectMenu(mockEditor.$, { position: 'top-center' });
+			const parent = document.createElement('div');
+			const ref = document.createElement('button');
+			parent.appendChild(ref);
+			document.body.appendChild(parent);
+			menu.on(ref, jest.fn());
+			menu.create(['a', 'b']);
+			menu.open();
+			expect(menu.hasOpenSubmenu()).toBe(false);
 		});
 	});
 
@@ -761,6 +777,271 @@ describe('Modules - SelectMenu', () => {
 			selectMenu.form.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 
 			expect(dom.utils.toggleClass).toHaveBeenCalled();
+		});
+	});
+
+	describe('Submenu support', () => {
+		let selectMenu;
+		let referElement;
+
+		beforeEach(() => {
+			// Provide an icon used by the parent row arrow
+			mockEditor.$.icons = { menu_arrow_right: '<svg></svg>' };
+
+			selectMenu = new SelectMenu(mockEditor.$, { position: 'right-middle' });
+
+			const parent = document.createElement('div');
+			referElement = document.createElement('button');
+			parent.appendChild(referElement);
+			document.body.appendChild(parent);
+
+			selectMenu.on(referElement, jest.fn());
+		});
+
+		afterEach(() => {
+			document.body.innerHTML = '';
+		});
+
+		it('creates parent row with submenu element for items that have children', () => {
+			selectMenu.create([
+				{ children: ['ul', 'ol'], childMenus: ['<i>Bulleted</i>', '<i>Numbered</i>'] },
+				'plain item'
+			]);
+
+			// Two top-level rows
+			expect(selectMenu.menuLen).toBe(2);
+
+			// First row marks itself as having a submenu and gets the arrow icon
+			const parentRow = selectMenu.menus[0];
+			expect(parentRow.className).toContain('se-has-submenu');
+			expect(parentRow.innerHTML).toContain('se-submenu-arrow');
+
+			// Submenu element appended to the form (outside the inner list)
+			const submenu = selectMenu.form.querySelector('.se-select-submenu[data-parent-index="0"]');
+			expect(submenu).not.toBeNull();
+			expect(submenu.getAttribute('popover')).toBe('manual');
+
+			// Child rows: one per `childMenus` entry, all carrying parent/child indexes
+			const childRows = submenu.querySelectorAll('li.se-select-item');
+			expect(childRows.length).toBe(2);
+			expect(childRows[0].getAttribute('data-parent-index')).toBe('0');
+			expect(childRows[0].getAttribute('data-child-index')).toBe('0');
+			expect(childRows[0].innerHTML).toContain('Bulleted');
+		});
+
+		it('falls back to children as display content when childMenus is omitted', () => {
+			selectMenu.create([{ children: ['A', 'B'] }]);
+
+			const childRows = selectMenu.form.querySelectorAll('.se-select-submenu li.se-select-item');
+			expect(childRows.length).toBe(2);
+			expect(childRows[0].textContent).toBe('A');
+			expect(childRows[1].textContent).toBe('B');
+		});
+
+		it('clears existing submenu elements when create is called again', () => {
+			selectMenu.create([{ children: ['x'] }]);
+			expect(selectMenu.form.querySelectorAll('.se-select-submenu').length).toBe(1);
+
+			selectMenu.create(['plain']);
+			expect(selectMenu.form.querySelectorAll('.se-select-submenu').length).toBe(0);
+		});
+
+		it('ESC closes only the open submenu and returns the cursor to its trigger row (menu stays open)', () => {
+			const { dom, keyCodeMap } = require('../../../src/helper');
+			keyCodeMap.isEsc.mockImplementation((code) => code === 'Escape');
+			// This suite stubs dom.utils class helpers as no-ops; make them real so submenu/cursor
+			// class state is observable, then restore the suite defaults afterwards.
+			dom.utils.hasClass.mockImplementation((el, cls) => !!el?.classList?.contains(cls));
+			dom.utils.addClass.mockImplementation((el, cls) => el?.classList?.add(cls));
+			dom.utils.removeClass.mockImplementation((els, cls) => {
+				const list = !els ? [] : els.nodeType ? [els] : Array.from(els);
+				list.forEach((e) => e.classList?.remove(cls));
+			});
+
+			try {
+				selectMenu.create([{ children: ['ul', 'ol'], childMenus: ['<i>Bulleted</i>', '<i>Numbered</i>'] }, 'plain']);
+				selectMenu.open();
+
+				// Open the submenu on the first (trigger) row via keyboard nav (call the registered handler).
+				const kdCall = mockEditor.$.eventManager.addEvent.mock.calls.find((c) => c[1] === 'keydown');
+				expect(kdCall).toBeTruthy();
+				const keydownHandler = kdCall[2];
+				const key = (code) => keydownHandler({ code, preventDefault: jest.fn(), stopPropagation: jest.fn() });
+				key('ArrowDown'); // cursor → row 0
+				key('ArrowRight'); // open submenu of row 0
+				const parentRow = selectMenu.menus[0];
+				expect(parentRow.classList.contains('se-submenu-open')).toBe(true);
+
+				// Retrieve the ESC (global keydown) handler and fire Escape.
+				const escCall = mockEditor.$.eventManager.addGlobalEvent.mock.calls.find((c) => c[0] === 'keydown');
+				expect(escCall).toBeTruthy();
+				const escHandler = escCall[1];
+				const escEvent = { code: 'Escape', preventDefault: jest.fn(), stopPropagation: jest.fn() };
+				escHandler(escEvent);
+
+				// Only the submenu closed; the menu itself stays open.
+				expect(selectMenu.isOpen).toBe(true);
+				expect(parentRow.classList.contains('se-submenu-open')).toBe(false);
+				// Cursor/focus returned to the trigger row.
+				expect(parentRow.classList.contains('se-select-cursor')).toBe(true);
+				expect(selectMenu.index).toBe(0);
+				// ESC was consumed (did not bubble to close the whole menu / editor).
+				expect(escEvent.stopPropagation).toHaveBeenCalled();
+			} finally {
+				dom.utils.hasClass.mockReset();
+				dom.utils.hasClass.mockReturnValue(false);
+				dom.utils.addClass.mockReset();
+				dom.utils.removeClass.mockReset();
+			}
+		});
+
+		function openMenuWith(subEscMethod, items) {
+			const menu = new SelectMenu(mockEditor.$, { position: 'right-middle', subEscMethod });
+			const parent = document.createElement('div');
+			const ref = document.createElement('button');
+			parent.appendChild(ref);
+			document.body.appendChild(parent);
+			menu.on(ref, jest.fn());
+			menu.create(items);
+			menu.open();
+			return menu;
+		}
+
+		it('ESC delegates to subEscMethod (owner flyout) and keeps the menu open when it returns true', () => {
+			const { keyCodeMap } = require('../../../src/helper');
+			keyCodeMap.isEsc.mockImplementation((code) => code === 'Escape');
+
+			const subEscMethod = jest.fn(() => true); // owner dismissed its own sub-panel (e.g. flyout)
+			const menu = openMenuWith(subEscMethod, ['a', 'b']);
+
+			const escHandler = mockEditor.$.eventManager.addGlobalEvent.mock.calls.find((c) => c[0] === 'keydown')[1];
+			const escEvent = { code: 'Escape', preventDefault: jest.fn(), stopPropagation: jest.fn() };
+			escHandler(escEvent);
+
+			expect(subEscMethod).toHaveBeenCalled();
+			expect(menu.isOpen).toBe(true); // menu stays open
+			expect(escEvent.stopPropagation).toHaveBeenCalled();
+		});
+
+		it('ESC closes the menu when subEscMethod returns false (no sub-panel open)', () => {
+			const { keyCodeMap } = require('../../../src/helper');
+			keyCodeMap.isEsc.mockImplementation((code) => code === 'Escape');
+
+			const subEscMethod = jest.fn(() => false);
+			const menu = openMenuWith(subEscMethod, ['a']);
+
+			const escHandler = mockEditor.$.eventManager.addGlobalEvent.mock.calls.find((c) => c[0] === 'keydown')[1];
+			escHandler({ code: 'Escape', preventDefault: jest.fn(), stopPropagation: jest.fn() });
+
+			expect(subEscMethod).toHaveBeenCalled();
+			expect(menu.isOpen).toBe(false); // no sub-panel — whole menu closes
+		});
+	});
+
+	describe('reposition method', () => {
+		let selectMenu;
+
+		beforeEach(() => {
+			selectMenu = new SelectMenu(mockEditor.$, { position: 'top-center' });
+			const parent = document.createElement('div');
+			const ref = document.createElement('button');
+			Object.defineProperty(ref, 'offsetWidth', { value: 100 });
+			Object.defineProperty(ref, 'offsetHeight', { value: 30 });
+			parent.appendChild(ref);
+			document.body.appendChild(parent);
+			selectMenu.on(ref, jest.fn());
+			selectMenu.create(['Item 1']);
+			Object.defineProperty(selectMenu.form, 'offsetWidth', { value: 150, configurable: true });
+			Object.defineProperty(selectMenu.form, 'offsetHeight', { value: 100, configurable: true });
+		});
+
+		afterEach(() => {
+			document.body.innerHTML = '';
+		});
+
+		it('no-op when menu is not open', () => {
+			expect(() => selectMenu.reposition()).not.toThrow();
+			expect(selectMenu.isOpen).toBe(false);
+		});
+
+		it('re-applies positioning when menu is open', () => {
+			selectMenu.open('bottom-left');
+			// Wipe any inline style so we can detect that reposition re-sets it
+			selectMenu.form.removeAttribute('style');
+			selectMenu.reposition();
+			// `_setPosition` writes `display`/`top`/`left` (or right) onto the form
+			expect(selectMenu.form.getAttribute('style')).not.toBeNull();
+			expect(selectMenu.form.style.display).not.toBe('');
+		});
+	});
+
+	describe('setHidden method', () => {
+		let selectMenu;
+
+		beforeEach(() => {
+			selectMenu = new SelectMenu(mockEditor.$, { position: 'top-center' });
+			const parent = document.createElement('div');
+			const ref = document.createElement('button');
+			Object.defineProperty(ref, 'offsetWidth', { value: 100 });
+			Object.defineProperty(ref, 'offsetHeight', { value: 30 });
+			parent.appendChild(ref);
+			document.body.appendChild(parent);
+			selectMenu.on(ref, jest.fn());
+			selectMenu.create(['Item 1']);
+			Object.defineProperty(selectMenu.form, 'offsetWidth', { value: 150, configurable: true });
+			Object.defineProperty(selectMenu.form, 'offsetHeight', { value: 100, configurable: true });
+		});
+
+		afterEach(() => {
+			document.body.innerHTML = '';
+		});
+
+		it('no-op when menu is not open', () => {
+			selectMenu.setHidden(true);
+			// Should not toggle open state nor throw
+			expect(selectMenu.isOpen).toBe(false);
+		});
+
+		it('soft-hides the form without closing', () => {
+			selectMenu.open();
+			expect(selectMenu.isOpen).toBe(true);
+
+			selectMenu.setHidden(true);
+			expect(selectMenu.form.style.display).toBe('none');
+			// Still considered open — close listeners stay active
+			expect(selectMenu.isOpen).toBe(true);
+		});
+
+		it('re-shows the form via reposition', () => {
+			selectMenu.open();
+			selectMenu.setHidden(true);
+			expect(selectMenu.form.style.display).toBe('none');
+
+			selectMenu.setHidden(false);
+			expect(selectMenu.form.style.display).not.toBe('none');
+		});
+	});
+
+	describe('keydownTarget override', () => {
+		it('uses provided target for keydown listener instead of frameContext _ww', () => {
+			const customTarget = document.createElement('div');
+			customTarget.addEventListener = jest.fn();
+
+			const selectMenu = new SelectMenu(mockEditor.$, { position: 'top-center', keydownTarget: customTarget });
+
+			const parent = document.createElement('div');
+			const ref = document.createElement('button');
+			parent.appendChild(ref);
+			selectMenu.on(ref, jest.fn());
+			selectMenu.create(['Item 1']);
+			selectMenu.open();
+
+			// addEvent on the kernel's eventManager is called with the keydown target;
+			// when keydownTarget is set the override wins over the iframe contentWindow.
+			const calls = mockEditor.$.eventManager.addEvent?.mock?.calls || [];
+			const keydownCall = calls.find((c) => c[1] === 'keydown' && c[0] === customTarget);
+			// Either the addEvent path captured it, or the underlying addEventListener was called.
+			expect(keydownCall || customTarget.addEventListener.mock.calls.length > 0).toBeTruthy();
 		});
 	});
 });

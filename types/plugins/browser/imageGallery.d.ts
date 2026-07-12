@@ -78,7 +78,7 @@ declare class ImageGallery extends PluginBrowser {
 	 */
 	constructor(kernel: SunEditor.Kernel, pluginOptions: ImageGalleryPluginOptions);
 	title: any;
-	onSelectfunction: (target: Node) => any;
+	onSelectfunction: (target: any) => any;
 	browser: Browser;
 	width: any;
 	height: any;

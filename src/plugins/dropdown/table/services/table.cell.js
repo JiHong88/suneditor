@@ -34,7 +34,12 @@ export class TableCellService {
 
 		// members - SelectMenu - split
 		const splitMenu = CreateSplitMenu(this.#$.lang);
-		this.selectMenu_split = new SelectMenu(this.#$, { checkList: false, position: 'bottom-center', openMethod: openCellMenuFunc, closeMethod: closeCellMenuFunc });
+		this.selectMenu_split = new SelectMenu(this.#$, {
+			checkList: false,
+			position: 'bottom-center',
+			openMethod: openCellMenuFunc,
+			closeMethod: closeCellMenuFunc,
+		});
 		this.selectMenu_split.on(this.splitButton, this._OnSplitCells.bind(this));
 		this.selectMenu_split.create(splitMenu.items, splitMenu.menus);
 	}
@@ -59,7 +64,9 @@ export class TableCellService {
 	mergeCells(selectedCells, skipPostProcess = false) {
 		const originTable = selectedCells[0].closest('table');
 		InvalidateTableCache(originTable);
-		const { clonedTable, clonedSelectedCells } = skipPostProcess ? { clonedTable: originTable, clonedSelectedCells: selectedCells } : CloneTable(originTable, selectedCells);
+		const { clonedTable, clonedSelectedCells } = skipPostProcess
+			? { clonedTable: originTable, clonedSelectedCells: selectedCells }
+			: CloneTable(originTable, selectedCells);
 
 		this.#main.setTableInfo(clonedTable);
 		selectedCells = clonedSelectedCells;
@@ -160,7 +167,9 @@ export class TableCellService {
 
 		const originTable = selectedCells[0].closest('table');
 		InvalidateTableCache(originTable);
-		const { clonedTable, clonedSelectedCells } = skipPostProcess ? { clonedTable: originTable, clonedSelectedCells: selectedCells } : CloneTable(originTable, selectedCells);
+		const { clonedTable, clonedSelectedCells } = skipPostProcess
+			? { clonedTable: originTable, clonedSelectedCells: selectedCells }
+			: CloneTable(originTable, selectedCells);
 
 		this.#main.setState('ref', null);
 		this.#main.setTableInfo(clonedTable);
@@ -217,7 +226,12 @@ export class TableCellService {
 
 		// set info
 		if (firstCell !== lastCell) {
-			lastCell = !newLastCell || lastCell.closest('tr').rowIndex > newLastCell.closest('tr').rowIndex || lastCell.cellIndex > newLastCell.cellIndex ? lastCell : newLastCell;
+			lastCell =
+				!newLastCell ||
+				lastCell.closest('tr').rowIndex > newLastCell.closest('tr').rowIndex ||
+				lastCell.cellIndex > newLastCell.cellIndex
+					? lastCell
+					: newLastCell;
 			this.#selectionService.setMultiCells(firstCell, lastCell);
 			this.#main.setState('selectedCells', Array.from(table.querySelectorAll('.se-selected-table-cell')));
 		} else {
@@ -265,7 +279,11 @@ export class TableCellService {
 	 * @description Sets the unmerge button visibility.
 	 */
 	setUnMergeButton() {
-		if (this.findMergedCells(!this.#state.selectedCells?.length ? [this.#state.fixedCell] : this.#state.selectedCells).length > 0) {
+		if (
+			this.findMergedCells(
+				!this.#state.selectedCells?.length ? [this.#state.fixedCell] : this.#state.selectedCells,
+			).length > 0
+		) {
 			this.unmergeButton.disabled = false;
 		} else {
 			this.unmergeButton.disabled = true;
@@ -345,7 +363,11 @@ export class TableCellService {
 							});
 						}
 
-						if (cell !== currentCell && logcalIndex <= index && logcalIndex + cs >= index + currentColSpan - 1) {
+						if (
+							cell !== currentCell &&
+							logcalIndex <= index &&
+							logcalIndex + cs >= index + currentColSpan - 1
+						) {
 							cell.colSpan += 1;
 							break;
 						}
@@ -399,7 +421,11 @@ export class TableCellService {
 				const nextCells = nextRow.cells;
 				let rs = rowSpanArr.shift();
 
-				for (let c = 0, cLen = nextCells.length, colSpan = 0, cell, cs, logcalIndex, insertIndex; c < cLen; c++) {
+				for (
+					let c = 0, cLen = nextCells.length, colSpan = 0, cell, cs, logcalIndex, insertIndex;
+					c < cLen;
+					c++
+				) {
 					logcalIndex = c + colSpan;
 					cell = nextCells[c];
 					cs = cell.colSpan - 1;

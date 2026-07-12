@@ -16,6 +16,13 @@ module.exports = defineConfig({
 		{
 			name: 'chromium',
 			use: { ...devices['Desktop Chrome'] }
+		},
+		{
+			// Firefox only runs *.firefox.spec.js — the rest of the suite relies on chromium-specific
+			// native focus/selection behavior that is unstable under headless Firefox.
+			name: 'firefox',
+			use: { ...devices['Desktop Firefox'] },
+			testMatch: /\.firefox\.spec\.js$/
 		}
 	],
 

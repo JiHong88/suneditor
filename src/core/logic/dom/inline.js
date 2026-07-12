@@ -84,9 +84,18 @@ class Inline {
 		let endCon = range.endContainer;
 		let endOff = range.endOffset;
 
-		if ((isRemoveFormat && range.collapsed && this.#$.format.isLine(startCon.parentNode) && this.#$.format.isLine(endCon.parentNode)) || (startCon === endCon && startCon.nodeType === 1 && dom.check.isNonEditable(startCon))) {
+		if (
+			(isRemoveFormat &&
+				range.collapsed &&
+				this.#$.format.isLine(startCon.parentNode) &&
+				this.#$.format.isLine(endCon.parentNode)) ||
+			(startCon === endCon && startCon.nodeType === 1 && dom.check.isNonEditable(startCon))
+		) {
 			const format = startCon.parentNode;
-			if (!dom.check.isListCell(format) || !converter.getValues(format.style).some((k) => this.#listKebab.includes(k))) {
+			if (
+				!dom.check.isListCell(format) ||
+				!converter.getValues(format.style).some((k) => this.#listKebab.includes(k))
+			) {
 				return;
 			}
 		}
@@ -154,12 +163,21 @@ class Inline {
 					for (let i = 0; i < checkAttrs.length; i++) {
 						if (sNode.nodeType === 1) {
 							const s = checkAttrs[i];
-							const classReg = /^\./.test(s) ? new wRegExp('\\s*' + s.replace(/^\./, '') + '(\\s+|$)', 'ig') : false;
+							const classReg = /^\./.test(s)
+								? new wRegExp('\\s*' + s.replace(/^\./, '') + '(\\s+|$)', 'ig')
+								: false;
 							const sNodeStyle = /** @type {HTMLElement} */ (sNode).style;
 							const sNodeClassName = /** @type {HTMLElement} */ (sNode).className;
 
-							const styleCheck = isRemoveNode ? !!sNodeStyle[s] : !!sNodeStyle[s] && !!checkStyles[s] && sNodeStyle[s] === checkStyles[s];
-							const classCheck = classReg === false ? false : isRemoveNode ? !!sNodeClassName.match(classReg) : !!sNodeClassName.match(classReg) && !!checkClassName.match(classReg);
+							const styleCheck = isRemoveNode
+								? !!sNodeStyle[s]
+								: !!sNodeStyle[s] && !!checkStyles[s] && sNodeStyle[s] === checkStyles[s];
+							const classCheck =
+								classReg === false
+									? false
+									: isRemoveNode
+										? !!sNodeClassName.match(classReg)
+										: !!sNodeClassName.match(classReg) && !!checkClassName.match(classReg);
 							if (styleCheck || classCheck) {
 								checkCnt++;
 							}
@@ -228,7 +246,8 @@ class Inline {
 			if (isRemoveFormat) return null;
 
 			// remove node check
-			const tagRemove = (!removeNodeRegExp && isRemoveNode) || /** @type {RegExp} */ (removeNodeRegExp)?.test(vNode.nodeName);
+			const tagRemove =
+				(!removeNodeRegExp && isRemoveNode) || /** @type {RegExp} */ (removeNodeRegExp)?.test(vNode.nodeName);
 
 			// tag remove
 			if (tagRemove && !strictRemove) {
@@ -254,14 +273,26 @@ class Inline {
 
 			// remove only
 			if (isRemoveNode) {
-				if ((classRegExp || !originClasses) && (styleRegExp || !originStyle) && !style && !classes && tagRemove) {
+				if (
+					(classRegExp || !originClasses) &&
+					(styleRegExp || !originStyle) &&
+					!style &&
+					!classes &&
+					tagRemove
+				) {
 					_removeCheck.v = true;
 					return null;
 				}
 			}
 
 			// change
-			if (style || classes || vNode.nodeName !== newNodeName || Boolean(styleRegExp) !== Boolean(originStyle) || Boolean(classRegExp) !== Boolean(originClasses)) {
+			if (
+				style ||
+				classes ||
+				vNode.nodeName !== newNodeName ||
+				Boolean(styleRegExp) !== Boolean(originStyle) ||
+				Boolean(classRegExp) !== Boolean(originClasses)
+			) {
 				if (styleRegExp && originStyle.length > 0) vNode.style.cssText = style;
 				if (!vNode.style.cssText) {
 					vNode.removeAttribute('style');
@@ -341,9 +372,24 @@ class Inline {
 
 		// one line
 		if (oneLine) {
-			if (this.#sn_resetCommonListCell(lineNodes[0], stylesToModify)) range = this.#$.selection.setRange(startCon, startOff, endCon, endOff);
+			if (this.#sn_resetCommonListCell(lineNodes[0], stylesToModify))
+				range = this.#$.selection.setRange(startCon, startOff, endCon, endOff);
 
-			const newRange = this.#setNode_oneLine(lineNodes[0], newNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, range.collapsed, _removeCheck, _getMaintainedNode, _isMaintainedNode);
+			const newRange = this.#setNode_oneLine(
+				lineNodes[0],
+				newNode,
+				validation,
+				startCon,
+				startOff,
+				endCon,
+				endOff,
+				isRemoveFormat,
+				isRemoveNode,
+				range.collapsed,
+				_removeCheck,
+				_getMaintainedNode,
+				_isMaintainedNode,
+			);
 			start.container = newRange.startContainer;
 			start.offset = newRange.startOffset;
 			end.container = newRange.endContainer;
@@ -356,21 +402,41 @@ class Inline {
 		} else {
 			// multi line
 			let appliedCommonList = false;
-			if (endLength > 0 && this.#sn_resetCommonListCell(lineNodes[endLength], stylesToModify)) appliedCommonList = true;
+			if (endLength > 0 && this.#sn_resetCommonListCell(lineNodes[endLength], stylesToModify))
+				appliedCommonList = true;
 			if (this.#sn_resetCommonListCell(lineNodes[0], stylesToModify)) appliedCommonList = true;
 			if (appliedCommonList) this.#$.selection.setRange(startCon, startOff, endCon, endOff);
 
 			// end
 			if (endLength > 0) {
 				newNode = styleNode.cloneNode(false);
-				end = this.#setNode_endLine(lineNodes[endLength], newNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode);
+				end = this.#setNode_endLine(
+					lineNodes[endLength],
+					newNode,
+					validation,
+					endCon,
+					endOff,
+					isRemoveFormat,
+					isRemoveNode,
+					_removeCheck,
+					_getMaintainedNode,
+					_isMaintainedNode,
+				);
 			}
 
 			// mid
 			for (let i = endLength - 1, newRange; i > 0; i--) {
 				this.#sn_resetCommonListCell(lineNodes[i], stylesToModify);
 				newNode = styleNode.cloneNode(false);
-				newRange = this.#setNode_middleLine(lineNodes[i], newNode, validation, isRemoveFormat, isRemoveNode, _removeCheck, end.container);
+				newRange = this.#setNode_middleLine(
+					lineNodes[i],
+					newNode,
+					validation,
+					isRemoveFormat,
+					isRemoveNode,
+					_removeCheck,
+					end.container,
+				);
 				if (newRange.endContainer && newRange.ancestor.contains(newRange.endContainer)) {
 					end.ancestor = null;
 					end.container = newRange.endContainer;
@@ -380,7 +446,19 @@ class Inline {
 
 			// start
 			newNode = styleNode.cloneNode(false);
-			start = this.#setNode_startLine(lineNodes[0], newNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode, end.container);
+			start = this.#setNode_startLine(
+				lineNodes[0],
+				newNode,
+				validation,
+				startCon,
+				startOff,
+				isRemoveFormat,
+				isRemoveNode,
+				_removeCheck,
+				_getMaintainedNode,
+				_isMaintainedNode,
+				end.container,
+			);
 
 			if (start.endContainer) {
 				end.ancestor = null;
@@ -438,7 +516,13 @@ class Inline {
 	 * @returns {boolean}
 	 */
 	_isIgnoreNodeChange(element) {
-		return element && element.nodeType === 1 && (dom.check.isNonEditable(element) || !this.#$.format.isTextStyleNode(element) || this.#$.component.is(element));
+		return (
+			element &&
+			element.nodeType === 1 &&
+			(dom.check.isNonEditable(element) ||
+				!this.#$.format.isTextStyleNode(element) ||
+				this.#$.component.is(element))
+		);
 	}
 
 	/**
@@ -458,16 +542,43 @@ class Inline {
 	 * @param {(element: Node) => boolean} _isMaintainedNode Function to check if node should be maintained.
 	 * @returns {{ancestor: *, startContainer: *, startOffset: *, endContainer: *, endOffset: *}}
 	 */
-	#setNode_oneLine(element, newInnerNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, collapsed, _removeCheck, _getMaintainedNode, _isMaintainedNode) {
+	#setNode_oneLine(
+		element,
+		newInnerNode,
+		validation,
+		startCon,
+		startOff,
+		endCon,
+		endOff,
+		isRemoveFormat,
+		isRemoveNode,
+		collapsed,
+		_removeCheck,
+		_getMaintainedNode,
+		_isMaintainedNode,
+	) {
 		// not add tag
 		let parentCon = startCon.parentNode;
-		while (!parentCon.nextSibling && !parentCon.previousSibling && !this.#$.format.isLine(parentCon.parentNode) && !dom.check.isWysiwygFrame(parentCon.parentNode)) {
+		while (
+			!parentCon.nextSibling &&
+			!parentCon.previousSibling &&
+			!this.#$.format.isLine(parentCon.parentNode) &&
+			!dom.check.isWysiwygFrame(parentCon.parentNode)
+		) {
 			if (parentCon.nodeName === newInnerNode.nodeName) break;
 			parentCon = parentCon.parentNode;
 		}
 
-		if (!isRemoveNode && !isRemoveFormat && parentCon === endCon.parentNode && parentCon.nodeName === newInnerNode.nodeName) {
-			if (dom.check.isZeroWidth(startCon.textContent.slice(0, startOff)) && dom.check.isZeroWidth(endCon.textContent.slice(endOff))) {
+		if (
+			!isRemoveNode &&
+			!isRemoveFormat &&
+			parentCon === endCon.parentNode &&
+			parentCon.nodeName === newInnerNode.nodeName
+		) {
+			if (
+				dom.check.isZeroWidth(startCon.textContent.slice(0, startOff)) &&
+				dom.check.isZeroWidth(endCon.textContent.slice(endOff))
+			) {
 				const children = parentCon.childNodes;
 				let sameTag = true;
 
@@ -545,7 +656,14 @@ class Inline {
 					if (startContainer.nodeType === 3) {
 						const sText = /** @type {Text} */ (startContainer);
 						_prevText = sText.substringData(0, startOffset);
-						_nextText = sText.substringData(startOffset, isSameNode ? (endOffset >= startOffset ? endOffset - startOffset : sText.data.length - startOffset) : sText.data.length - startOffset);
+						_nextText = sText.substringData(
+							startOffset,
+							isSameNode
+								? endOffset >= startOffset
+									? endOffset - startOffset
+									: sText.data.length - startOffset
+								: sText.data.length - startOffset,
+						);
 					}
 
 					const prevNode = dom.utils.createTextNode(_prevText);
@@ -756,7 +874,11 @@ class Inline {
 						appendNode = newNode;
 					}
 
-					if (_isMaintainedNode(newInnerNode.parentNode) && !_isMaintainedNode(childNode) && !dom.check.isZeroWidth(newInnerNode)) {
+					if (
+						_isMaintainedNode(newInnerNode.parentNode) &&
+						!_isMaintainedNode(childNode) &&
+						!dom.check.isZeroWidth(newInnerNode)
+					) {
 						newInnerNode = newInnerNode.cloneNode(false);
 						pNode.appendChild(newInnerNode);
 						nNodeArray.push(newInnerNode);
@@ -891,7 +1013,13 @@ class Inline {
 		const endPath = dom.query.getNodePath(endContainer, pNode, !mergeEndCon && !endConReset ? newEndOffset : null);
 
 		startOffset += newStartOffset.s;
-		endOffset = collapsed ? startOffset : mergeEndCon ? startContainer.textContent.length : endConReset ? endOffset + newStartOffset.s : endOffset + newEndOffset.s;
+		endOffset = collapsed
+			? startOffset
+			: mergeEndCon
+				? startContainer.textContent.length
+				: endConReset
+					? endOffset + newStartOffset.s
+					: endOffset + newEndOffset.s;
 
 		// tag merge
 		const newOffsets = this.#$.nodeTransform.mergeSameTags(pNode, [startPath, endPath], true);
@@ -925,15 +1053,39 @@ class Inline {
 	 * @param {Node} _endContainer End container node.
 	 * @returns {NodeStyleContainerType} { ancestor, container, offset, endContainer }
 	 */
-	#setNode_startLine(element, newInnerNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode, _endContainer) {
+	#setNode_startLine(
+		element,
+		newInnerNode,
+		validation,
+		startCon,
+		startOff,
+		isRemoveFormat,
+		isRemoveNode,
+		_removeCheck,
+		_getMaintainedNode,
+		_isMaintainedNode,
+		_endContainer,
+	) {
 		// not add tag
 		let parentCon = startCon.parentNode;
-		while (!parentCon.nextSibling && !parentCon.previousSibling && !this.#$.format.isLine(parentCon.parentNode) && !dom.check.isWysiwygFrame(parentCon.parentNode)) {
+		while (
+			!parentCon.nextSibling &&
+			!parentCon.previousSibling &&
+			!this.#$.format.isLine(parentCon.parentNode) &&
+			!dom.check.isWysiwygFrame(parentCon.parentNode)
+		) {
 			if (parentCon.nodeName === newInnerNode.nodeName) break;
 			parentCon = parentCon.parentNode;
 		}
 
-		if (!isRemoveNode && !isRemoveFormat && parentCon.nodeName === newInnerNode.nodeName && !this.#$.format.isLine(parentCon) && !parentCon.nextSibling && dom.check.isZeroWidth(startCon.textContent.slice(0, startOff))) {
+		if (
+			!isRemoveNode &&
+			!isRemoveFormat &&
+			parentCon.nodeName === newInnerNode.nodeName &&
+			!this.#$.format.isLine(parentCon) &&
+			!parentCon.nextSibling &&
+			dom.check.isZeroWidth(startCon.textContent.slice(0, startOff))
+		) {
 			let sameTag = true;
 			let s = startCon.previousSibling;
 			while (s) {
@@ -1234,7 +1386,8 @@ class Inline {
 		if (!isRemoveNode) {
 			// end container path
 			let endPath = null;
-			if (_endContainer && element.contains(_endContainer)) endPath = dom.query.getNodePath(_endContainer, element);
+			if (_endContainer && element.contains(_endContainer))
+				endPath = dom.query.getNodePath(_endContainer, element);
 
 			const tempNode = element.cloneNode(true);
 			const newNodeName = /** @type {HTMLElement} */ (newInnerNode).nodeName;
@@ -1369,15 +1522,38 @@ class Inline {
 	 * @param {(element: Node) => boolean} _isMaintainedNode Function to check if node should be maintained.
 	 * @returns {NodeStyleContainerType} { ancestor, container, offset }
 	 */
-	#setNode_endLine(element, newInnerNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode) {
+	#setNode_endLine(
+		element,
+		newInnerNode,
+		validation,
+		endCon,
+		endOff,
+		isRemoveFormat,
+		isRemoveNode,
+		_removeCheck,
+		_getMaintainedNode,
+		_isMaintainedNode,
+	) {
 		// not add tag
 		let parentCon = endCon.parentNode;
-		while (!parentCon.nextSibling && !parentCon.previousSibling && !this.#$.format.isLine(parentCon.parentNode) && !dom.check.isWysiwygFrame(parentCon.parentNode)) {
+		while (
+			!parentCon.nextSibling &&
+			!parentCon.previousSibling &&
+			!this.#$.format.isLine(parentCon.parentNode) &&
+			!dom.check.isWysiwygFrame(parentCon.parentNode)
+		) {
 			if (parentCon.nodeName === newInnerNode.nodeName) break;
 			parentCon = parentCon.parentNode;
 		}
 
-		if (!isRemoveNode && !isRemoveFormat && parentCon.nodeName === newInnerNode.nodeName && !this.#$.format.isLine(parentCon) && !parentCon.previousSibling && dom.check.isZeroWidth(endCon.textContent.slice(endOff))) {
+		if (
+			!isRemoveNode &&
+			!isRemoveFormat &&
+			parentCon.nodeName === newInnerNode.nodeName &&
+			!this.#$.format.isLine(parentCon) &&
+			!parentCon.previousSibling &&
+			dom.check.isZeroWidth(endCon.textContent.slice(endOff))
+		) {
 			let sameTag = true;
 			let e = endCon.nextSibling;
 			while (e) {
@@ -1684,7 +1860,13 @@ class Inline {
 	 * @returns {boolean}
 	 */
 	#sn_isSizeNode(element) {
-		return element && typeof element !== 'string' && element.nodeType !== 3 && this.#$.format.isTextStyleNode(element) && !!element.style.fontSize;
+		return (
+			element &&
+			typeof element !== 'string' &&
+			element.nodeType !== 3 &&
+			this.#$.format.isTextStyleNode(element) &&
+			!!element.style.fontSize
+		);
 	}
 
 	/**
@@ -1696,7 +1878,10 @@ class Inline {
 	 */
 	#sn_getMaintainedNode(_isRemove, _isSizeNode, element) {
 		if (!element || _isRemove) return null;
-		return dom.query.getParentElement(element, this._isNonSplitNode.bind(this)) || (!_isSizeNode ? dom.query.getParentElement(element, this.#sn_isSizeNode.bind(this)) : null);
+		return (
+			dom.query.getParentElement(element, this._isNonSplitNode.bind(this)) ||
+			(!_isSizeNode ? dom.query.getParentElement(element, this.#sn_isSizeNode.bind(this)) : null)
+		);
 	}
 
 	/**
@@ -1709,7 +1894,9 @@ class Inline {
 	#sn_isMaintainedNode(_isRemove, _isSizeNode, element) {
 		if (!element || _isRemove || element.nodeType !== 1) return false;
 		const anchor = this._isNonSplitNode(element);
-		return dom.query.getParentElement(element, this._isNonSplitNode.bind(this)) ? anchor : anchor || (!_isSizeNode ? this.#sn_isSizeNode(element) : false);
+		return dom.query.getParentElement(element, this._isNonSplitNode.bind(this))
+			? anchor
+			: anchor || (!_isSizeNode ? this.#sn_isSizeNode(element) : false);
 	}
 
 	/**
@@ -1732,8 +1919,16 @@ class Inline {
 		let appliedEl = false;
 
 		// bold, italic
-		if (this.#options.get('_defaultStyleTagMap')[nodeName] === this.#options.get('_defaultTagCommand').bold.toLowerCase()) elStyle.fontWeight = 'bold';
-		if (this.#options.get('_defaultStyleTagMap')[nodeName] === this.#options.get('_defaultTagCommand').italic.toLowerCase()) elStyle.fontStyle = 'italic';
+		if (
+			this.#options.get('_defaultStyleTagMap')[nodeName] ===
+			this.#options.get('_defaultTagCommand').bold.toLowerCase()
+		)
+			elStyle.fontWeight = 'bold';
+		if (
+			this.#options.get('_defaultStyleTagMap')[nodeName] ===
+			this.#options.get('_defaultTagCommand').italic.toLowerCase()
+		)
+			elStyle.fontStyle = 'italic';
 
 		// styles
 		const cKeys = converter.getValues(childStyle);

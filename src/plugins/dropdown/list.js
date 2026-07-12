@@ -22,18 +22,15 @@ class List extends PluginDropdown {
 		this.title = this.$.lang.list;
 		this.icon = 'list_numbered';
 
-		// create HTML
-		const menu = CreateHTML(this.$);
-
 		// members
-		this.#listItems = menu.querySelectorAll('li button');
 		this.#listIcons = {
 			bulleted: this.$.icons.list_bulleted,
 			numbered: this.$.icons.list_numbered,
 		};
 
-		// init
-		this.$.menu.initDropdownTarget(List, menu);
+		// create menu from items
+		const menu = this.$.menu.initDropdownTarget(List, CreateItems(this.$));
+		this.#listItems = menu.querySelectorAll('li button');
 	}
 
 	/**
@@ -97,26 +94,23 @@ class List extends PluginDropdown {
 
 /**
  * @param {SunEditor.Deps} $ - Kernel dependencies
- * @returns {HTMLElement}
+ * @returns {Array<import('../../core/logic/panel/menu').DropdownItem>}
  */
-function CreateHTML({ lang, icons }) {
-	const html = /*html*/ `
-	<div class="se-list-inner">
-		<ul class="se-list-basic">
-			<li>
-				<button type="button" class="se-btn se-btn-list se-tooltip se-icon-flip-rtl" data-command="ol" title="${lang.numberedList}" aria-label="${lang.numberedList}">
-					${icons.list_numbered}
-				</button>
-			</li>
-			<li>
-				<button type="button" class="se-btn se-btn-list se-tooltip se-icon-flip-rtl" data-command="ul" title="${lang.bulletedList}" aria-label="${lang.bulletedList}">
-					${icons.list_bulleted}
-				</button>
-			</li>
-		</ul>
-	</div>`;
-
-	return dom.utils.createElement('DIV', { class: 'se-dropdown se-list-layer' }, html);
+function CreateItems({ lang, icons }) {
+	return [
+		{
+			command: 'ol',
+			title: lang.numberedList,
+			innerHTML: icons.list_numbered,
+			className: 'se-tooltip se-icon-flip-rtl',
+		},
+		{
+			command: 'ul',
+			title: lang.bulletedList,
+			innerHTML: icons.list_bulleted,
+			className: 'se-tooltip se-icon-flip-rtl',
+		},
+	];
 }
 
 export default List;

@@ -36,7 +36,8 @@ class NodeTransform {
 	 * const splitResult = editor.nodeTransform.split(parentNode, childNode, 1);
 	 */
 	split(baseNode, offset, depth) {
-		if (dom.check.isWysiwygFrame(baseNode) || this.#$.component.is(baseNode) || !baseNode) return /** @type {T} */ (baseNode);
+		if (dom.check.isWysiwygFrame(baseNode) || this.#$.component.is(baseNode) || !baseNode)
+			return /** @type {T} */ (baseNode);
 
 		if (offset && !numbers.is(offset)) {
 			const children = baseNode.childNodes;
@@ -53,7 +54,8 @@ class NodeTransform {
 			}
 
 			if (prev.childNodes.length > 0) baseNode.parentNode.insertBefore(prev, baseNode);
-			if (next.childNodes.length > 0) baseNode.parentNode.insertBefore(next, /** @type {HTMLElement|Text} */ (baseNode).nextElementSibling);
+			if (next.childNodes.length > 0)
+				baseNode.parentNode.insertBefore(next, /** @type {HTMLElement|Text} */ (baseNode).nextElementSibling);
 
 			return /** @type {T} */ (baseNode);
 		}
@@ -117,7 +119,8 @@ class NodeTransform {
 			}
 		}
 
-		if (depthEl.nodeType === 1 && depthEl.childNodes.length <= 1 && !depthEl.firstChild?.textContent?.length) /** @type {HTMLElement} */ (depthEl).innerHTML = '<br>';
+		if (depthEl.nodeType === 1 && depthEl.childNodes.length <= 1 && !depthEl.firstChild?.textContent?.length)
+			/** @type {HTMLElement} */ (depthEl).innerHTML = '<br>';
 
 		const pElement = depthEl.parentNode;
 		if (next) depthEl = depthEl.nextSibling;
@@ -175,7 +178,13 @@ class NodeTransform {
 				next = /** @type {HTMLElement} */ (children[i + 1]);
 				if (!child) break;
 				if (dom.check.isBreak(child) || dom.check.isMedia(child) || dom.check.isInputElement(child)) continue;
-				if ((onlyText && this.#$.inline._isIgnoreNodeChange(child)) || (!onlyText && (dom.check.isTableElements(child) || dom.check.isListCell(child) || (this.#$.format.isLine(child) && !this.#$.format.isBrLine(child))))) {
+				if (
+					(onlyText && this.#$.inline._isIgnoreNodeChange(child)) ||
+					(!onlyText &&
+						(dom.check.isTableElements(child) ||
+							dom.check.isListCell(child) ||
+							(this.#$.format.isLine(child) && !this.#$.format.isBrLine(child))))
+				) {
 					if (dom.check.isTableElements(child) || dom.check.isListCell(child)) {
 						recursionFunc(child, depth + 1, i);
 					}
@@ -220,7 +229,11 @@ class NodeTransform {
 					break;
 				}
 
-				if (child.nodeName === next.nodeName && dom.check.isSameAttributes(child, next) && child.getAttribute?.('href') === next.getAttribute?.('href')) {
+				if (
+					child.nodeName === next.nodeName &&
+					dom.check.isSameAttributes(child, next) &&
+					child.getAttribute?.('href') === next.getAttribute?.('href')
+				) {
 					const childs = child.childNodes;
 					let childLength = 0;
 					for (let n = 0, nLen = childs.length; n < nLen; n++) {
@@ -239,7 +252,13 @@ class NodeTransform {
 							tempL = tempL.previousSibling;
 						}
 
-						if (childLength > 0 && l.nodeType === 3 && r.nodeType === 3 && (l.textContent.length > 0 || r.textContent.length > 0)) childLength--;
+						if (
+							childLength > 0 &&
+							l.nodeType === 3 &&
+							r.nodeType === 3 &&
+							(l.textContent.length > 0 || r.textContent.length > 0)
+						)
+							childLength--;
 
 						if (nodePathLen) {
 							let path = null;
@@ -300,7 +319,7 @@ class NodeTransform {
 	/**
 	 * @description Remove nested tags without other child nodes.
 	 * @param {Node} element Element object
-	 * @param {?(((current: Node) => boolean)|string)} [validation] Validation function / String(`tag1|tag2..`) / If `null`, all tags are applicable.
+	 * @param {?(((current: *) => boolean)|string)} [validation] Validation function / String(`tag1|tag2..`) / If `null`, all tags are applicable.
 	 * @example
 	 * editor.$.nodeTransform.mergeNestedTags(parentElement, (current) => current.nodeName === 'SPAN');
 	 */
@@ -333,7 +352,7 @@ class NodeTransform {
 	 * @description Delete itself and all parent nodes that match the condition.
 	 * - Returns an {sc: previousSibling, ec: nextSibling}(the deleted node reference) or `null`.
 	 * @param {Node} item Node to be remove
-	 * @param {?(current: Node) => boolean} [validation] Validation function. default(Deleted if it only have `breakLine` and blanks)
+	 * @param {?(current: *) => boolean} [validation] Validation function. default(Deleted if it only have `breakLine` and blanks)
 	 * @param {?Node} [stopParent] Stop when the parent node reaches `stopParent`
 	 * @returns {{sc: Node|null, ec: Node|null}|null} {sc: previousSibling, ec: nextSibling} (the deleted node reference) or `null`.
 	 * @example
@@ -389,8 +408,14 @@ class NodeTransform {
 		notRemoveNode &&= dom.query.getParentElement(notRemoveNode, (current) => element === current.parentElement);
 
 		const recursionFunc = (current) => {
-			if (this.#$.format._isNotTextNode(current) || current === notRemoveNode || dom.check.isNonEditable(current)) return 0;
-			if (current !== element && dom.check.isZeroWidth(current.textContent) && (!current.firstChild || !dom.check.isBreak(current.firstChild)) && !current.querySelector(allowedEmptyTags)) {
+			if (this.#$.format._isNotTextNode(current) || current === notRemoveNode || dom.check.isNonEditable(current))
+				return 0;
+			if (
+				current !== element &&
+				dom.check.isZeroWidth(current.textContent) &&
+				(!current.firstChild || !dom.check.isBreak(current.firstChild)) &&
+				!current.querySelector(allowedEmptyTags)
+			) {
 				if (current.parentNode) {
 					current.parentNode.removeChild(current);
 					return -1;
@@ -419,7 +444,7 @@ class NodeTransform {
 	/**
 	 * @description Creates a nested node structure from the given array of nodes.
 	 * @param {SunEditor.NodeCollection} nodeArray An array of nodes to clone. The first node in the array will be the top-level parent.
-	 * @param {?(current: Node) => boolean} [validate] A validate function.
+	 * @param {?(current: *) => boolean} [validate] A validate function.
 	 * @returns {{ parent: Node, inner: Node }} An object containing the top-level parent node and the innermost child node.
 	 * @example
 	 * // [div, span, em] → <div><span><em></em></span></div> (cloned)

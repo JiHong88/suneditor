@@ -10,7 +10,14 @@ import type {} from '../../../typedef';
  * @param {?HTMLElement} _innerToolbar - Inner toolbar element
  * @param {DragEvent} e - Event object
  */
-export function OnDragOver_wysiwyg(this: import('../eventOrchestrator').default, fc: SunEditor.FrameContext, dragCursor: HTMLElement, _iframeTopArea: HTMLElement | null, _innerToolbar: HTMLElement | null, e: DragEvent): void;
+export function OnDragOver_wysiwyg(
+	this: import('../eventOrchestrator').default,
+	fc: SunEditor.FrameContext,
+	dragCursor: HTMLElement,
+	_iframeTopArea: HTMLElement | null,
+	_innerToolbar: HTMLElement | null,
+	e: DragEvent,
+): void;
 /**
  * @this {EventManagerThis_handler_ww_dragDrop}
  * @param {HTMLElement} dragCursor - Drag cursor element
@@ -22,5 +29,10 @@ export function OnDragEnd_wysiwyg(this: import('../eventOrchestrator').default, 
  * @param {HTMLElement} dragCursor - Drag cursor element
  * @param {DragEvent} e - Event object
  */
-export function OnDrop_wysiwyg(this: import('../eventOrchestrator').default, fc: SunEditor.FrameContext, dragCursor: HTMLElement, e: DragEvent): boolean | Promise<boolean>;
+export function OnDrop_wysiwyg(
+	this: import('../eventOrchestrator').default,
+	fc: SunEditor.FrameContext,
+	dragCursor: HTMLElement,
+	e: DragEvent,
+): boolean | Promise<boolean>;
 export type EventManagerThis_handler_ww_dragDrop = import('../eventOrchestrator').default;

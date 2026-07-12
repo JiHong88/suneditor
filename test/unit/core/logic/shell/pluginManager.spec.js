@@ -733,7 +733,7 @@ describe('PluginManager', () => {
 			expect(result).not.toBeNull();
 			expect(result.target).toBe(pageBreakEl);
 			expect(result.launcher).toBeDefined();
-			expect(typeof result.launcher.destroy).toBe('function');
+			expect(typeof result.launcher.componentDestroy).toBe('function');
 		});
 
 		it('should add pageBreak componentChecker when buttons_sub has pageBreak', () => {
@@ -795,7 +795,7 @@ describe('PluginManager', () => {
 			const result = pm.findComponentInfo(pageBreakEl);
 
 			// Call destroy
-			result.launcher.destroy(pageBreakEl);
+			result.launcher.componentDestroy(pageBreakEl);
 
 			expect(dom.utils.removeItem).toHaveBeenCalledWith(pageBreakEl);
 			expect(kernel.$.focusManager.focusEdge).toHaveBeenCalledWith(prevSibling);
@@ -821,7 +821,7 @@ describe('PluginManager', () => {
 			dom.utils.hasClass.mockReturnValue(true);
 			const result = pm.findComponentInfo(pageBreakEl);
 
-			result.launcher.destroy(pageBreakEl);
+			result.launcher.componentDestroy(pageBreakEl);
 
 			expect(kernel.$.focusManager.focusEdge).toHaveBeenCalledWith(nextSibling);
 		});

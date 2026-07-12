@@ -1,5 +1,6 @@
 import { dom, converter, keyCodeMap, env, numbers } from '../../../helper';
 import { _DragHandle } from '../../../modules/ui';
+import BlockHandle from '../panel/blockHandle.js';
 import { COMMAND_BUTTONS } from './commandDispatcher';
 
 const DISABLE_BUTTONS_CODEVIEW = `${COMMAND_BUTTONS}:not([class~="se-code-view-enabled"]):not([data-type="MORE"])`;
@@ -64,6 +65,12 @@ class UIManager {
 	 * @type {HTMLElement}
 	 */
 	#lineBreaker_b = null;
+
+	/**
+	 * @description Block handle instance
+	 * @type {BlockHandle}
+	 */
+	#blockHandle = null;
 
 	/**
 	 * @constructor
@@ -216,10 +223,17 @@ class UIManager {
 			this.#options.set('textDirection', dir);
 
 			// update _editableClass / printClass
-			const editableClass = rtl ? this.#options.get('_editableClass').replace(/\s*se-rtl/, '') + ' se-rtl' : this.#options.get('_editableClass').replace(/\s*se-rtl/, '');
+			const editableClass = rtl
+				? this.#options.get('_editableClass').replace(/\s*se-rtl/, '') + ' se-rtl'
+				: this.#options.get('_editableClass').replace(/\s*se-rtl/, '');
 			this.#options.set('_editableClass', editableClass);
 			if (this.#options.get('printClass')) {
-				this.#options.set('printClass', rtl ? this.#options.get('printClass').replace(/\s*se-rtl/, '') + ' se-rtl' : this.#options.get('printClass').replace(/\s*se-rtl/, ''));
+				this.#options.set(
+					'printClass',
+					rtl
+						? this.#options.get('printClass').replace(/\s*se-rtl/, '') + ' se-rtl'
+						: this.#options.get('printClass').replace(/\s*se-rtl/, ''),
+				);
 			}
 
 			this.offCurrentController();
@@ -240,7 +254,10 @@ class UIManager {
 				dom.utils.addClass([this.#carrierWrapper, toolbarWrapper, statusbarWrapper], 'se-rtl');
 			} else {
 				this.#contextProvider.applyToRoots((e) => {
-					dom.utils.removeClass([e.get('topArea'), e.get('wysiwyg'), e.get('documentTypePageMirror')], 'se-rtl');
+					dom.utils.removeClass(
+						[e.get('topArea'), e.get('wysiwyg'), e.get('documentTypePageMirror')],
+						'se-rtl',
+					);
 					e.get('wysiwyg').removeAttribute('dir');
 				});
 				dom.utils.removeClass([this.#carrierWrapper, toolbarWrapper, statusbarWrapper], 'se-rtl');
@@ -249,7 +266,10 @@ class UIManager {
 			const lineNodes = dom.query.getListChildren(
 				fc.get('wysiwyg'),
 				(current) => {
-					return this.#$.format.isLine(current) && !!(current.style.marginRight || current.style.marginLeft || current.style.textAlign);
+					return (
+						this.#$.format.isLine(current) &&
+						!!(current.style.marginRight || current.style.marginLeft || current.style.textAlign)
+					);
 				},
 				null,
 			);
@@ -275,16 +295,6 @@ class UIManager {
 			this.#reverseToolbarButtons(this.#context.get('toolbar_buttonTray'));
 			if (this.#context.has('toolbar_sub_buttonTray')) {
 				this.#reverseToolbarButtons(this.#context.get('toolbar_sub_buttonTray'));
-			}
-
-			// document type
-			if (fc.has('documentType_use_header')) {
-				if (rtl) fc.get('wrapper').appendChild(fc.get('documentTypeInner'));
-				else fc.get('wrapper').insertBefore(fc.get('documentTypeInner'), fc.get('wysiwygFrame'));
-			}
-			if (fc.has('documentType_use_page')) {
-				if (rtl) fc.get('wrapper').insertBefore(fc.get('documentTypePage'), fc.get('wysiwygFrame'));
-				else fc.get('wrapper').appendChild(fc.get('documentTypePage'));
 			}
 
 			if (this.#store.mode.isBalloon) this.#$.toolbar._showBalloon();
@@ -397,7 +407,11 @@ class UIManager {
 	 * @param {string} [rootKey] Root key
 	 */
 	showLoading(rootKey) {
-		const el = /** @type {HTMLElement} */ ((rootKey ? this.#frameRoots.get(rootKey).get('container') : this.#carrierWrapper).querySelector('.se-loading-box'));
+		const el = /** @type {HTMLElement} */ (
+			(rootKey ? this.#frameRoots.get(rootKey).get('container') : this.#carrierWrapper).querySelector(
+				'.se-loading-box',
+			)
+		);
 		el.style.display = 'block';
 		el.showPopover?.();
 	}
@@ -407,7 +421,11 @@ class UIManager {
 	 * @param {string} [rootKey] Root key
 	 */
 	hideLoading(rootKey) {
-		const el = /** @type {HTMLElement} */ ((rootKey ? this.#frameRoots.get(rootKey).get('container') : this.#carrierWrapper).querySelector('.se-loading-box'));
+		const el = /** @type {HTMLElement} */ (
+			(rootKey ? this.#frameRoots.get(rootKey).get('container') : this.#carrierWrapper).querySelector(
+				'.se-loading-box',
+			)
+		);
 		el.hidePopover?.();
 		el.style.display = 'none';
 	}
@@ -423,7 +441,8 @@ class UIManager {
 		dom.utils.removeClass(this.alertModal, 'se-alert-error|se-alert-success');
 		if (type) dom.utils.addClass(this.alertModal, `se-alert-${type}`);
 
-		if (this.#closeSignal) this.#bindAlertClick = this.#eventManager.addEvent(this.#alertInner, 'click', this.#closeListener[1]);
+		if (this.#closeSignal)
+			this.#bindAlertClick = this.#eventManager.addEvent(this.#alertInner, 'click', this.#closeListener[1]);
 		this.#bindClose &&= this.#eventManager.removeGlobalEvent(this.#bindClose);
 		this.#bindClose = this.#eventManager.addGlobalEvent('keydown', this.#closeListener[0]);
 
@@ -573,10 +592,31 @@ class UIManager {
 	/**
 	 * @param {SunEditor.FrameContext} rt Root target[key] FrameContext
 	 */
+	/**
+	 * @description Block handle instance for external access.
+	 * @type {BlockHandle}
+	 */
+	get blockHandle() {
+		return this.#blockHandle;
+	}
+
 	reset(rt) {
 		rt.set('_editorHeight', rt.get('wysiwygFrame').offsetHeight);
 		this.#lineBreaker_t = rt.get('lineBreaker_t');
 		this.#lineBreaker_b = rt.get('lineBreaker_b');
+
+		// block handle init
+		const blockHandleOpt = this.#options.get('blockHandle');
+		if (blockHandleOpt && rt.get('blockHandleArea') && !this.#blockHandle) {
+			this.#blockHandle = new BlockHandle(
+				this.#$,
+				rt.get('blockHandleArea'),
+				rt.get('blockHandle'),
+				rt.get('blockHandlePlus'),
+				rt.get('blockHandleDrag'),
+				blockHandleOpt.menu,
+			);
+		}
 	}
 
 	/**
@@ -623,6 +663,9 @@ class UIManager {
 			this.#context.get('toolbar_sub_main').style.top = this.#$.subToolbar.balloonOffset.top - y + 'px';
 			this.#context.get('toolbar_sub_main').style.left = this.#$.subToolbar.balloonOffset.left - x + 'px';
 		}
+
+		// block handle scroll sync
+		this.#blockHandle?.syncScroll();
 
 		if (this.controllerTargetContext !== this.#frameContext.get('topArea')) {
 			this.offCurrentController();
@@ -724,7 +767,10 @@ class UIManager {
 
 		// change dir buttons
 		this.#$.commandDispatcher.applyTargets('dir', (e) => {
-			dom.utils.changeTxt(e.querySelector('.se-tooltip-text'), this.#contextProvider.lang[rtl ? 'dir_ltr' : 'dir_rtl']);
+			dom.utils.changeTxt(
+				e.querySelector('.se-tooltip-text'),
+				this.#contextProvider.lang[rtl ? 'dir_ltr' : 'dir_rtl'],
+			);
 			dom.utils.changeElement(e.firstElementChild, icons[rtl ? 'dir_ltr' : 'dir_rtl']);
 		});
 
@@ -758,12 +804,22 @@ class UIManager {
 	_initToggleButtons() {
 		const ctx = this.#context;
 
-		this.#codeViewDisabledButtons = converter.nodeListToArray(ctx.get('toolbar_buttonTray').querySelectorAll(DISABLE_BUTTONS_CODEVIEW));
-		this.#controllerOnDisabledButtons = converter.nodeListToArray(ctx.get('toolbar_buttonTray').querySelectorAll(DISABLE_BUTTONS_CONTROLLER));
+		this.#codeViewDisabledButtons = converter.nodeListToArray(
+			ctx.get('toolbar_buttonTray').querySelectorAll(DISABLE_BUTTONS_CODEVIEW),
+		);
+		this.#controllerOnDisabledButtons = converter.nodeListToArray(
+			ctx.get('toolbar_buttonTray').querySelectorAll(DISABLE_BUTTONS_CONTROLLER),
+		);
 
 		if (this.#options.has('_subMode')) {
-			this.#codeViewDisabledButtons = this.#codeViewDisabledButtons.concat(converter.nodeListToArray(ctx.get('toolbar_sub_buttonTray').querySelectorAll(DISABLE_BUTTONS_CODEVIEW)));
-			this.#controllerOnDisabledButtons = this.#controllerOnDisabledButtons.concat(converter.nodeListToArray(ctx.get('toolbar_sub_buttonTray').querySelectorAll(DISABLE_BUTTONS_CONTROLLER)));
+			this.#codeViewDisabledButtons = this.#codeViewDisabledButtons.concat(
+				converter.nodeListToArray(ctx.get('toolbar_sub_buttonTray').querySelectorAll(DISABLE_BUTTONS_CODEVIEW)),
+			);
+			this.#controllerOnDisabledButtons = this.#controllerOnDisabledButtons.concat(
+				converter.nodeListToArray(
+					ctx.get('toolbar_sub_buttonTray').querySelectorAll(DISABLE_BUTTONS_CONTROLLER),
+				),
+			);
 		}
 	}
 
@@ -790,7 +846,10 @@ class UIManager {
 	 * @returns {boolean}
 	 */
 	isButtonDisabled(button) {
-		if (this.#frameContext.get('isReadOnly') && dom.utils.arrayIncludes(this.#controllerOnDisabledButtons, button)) {
+		if (
+			this.#frameContext.get('isReadOnly') &&
+			dom.utils.arrayIncludes(this.#controllerOnDisabledButtons, button)
+		) {
 			return true;
 		}
 		return false;
@@ -804,20 +863,45 @@ class UIManager {
 	 */
 	_updatePlaceholder(fc) {
 		fc ||= this.#frameContext;
+		const isCodeView = fc.get('isMarkdownView') || fc.get('isCodeView');
+
+		const lineShown = !isCodeView && this.#updateLinePlaceholder(fc);
+
 		const placeholder = fc.get('placeholder');
-
 		if (placeholder) {
-			if (fc.get('isCodeView')) {
-				placeholder.style.display = 'none';
-				return;
-			}
-
-			if (this.#$.facade.isEmpty(fc)) {
-				placeholder.style.display = 'block';
-			} else {
-				placeholder.style.display = 'none';
-			}
+			placeholder.style.display = !isCodeView && !lineShown && this.#$.facade.isEmpty(fc) ? 'block' : 'none';
 		}
+	}
+
+	/**
+	 * @internal
+	 * @description Notion-style per-line placeholder. Marks the focused empty line so a CSS `::before`
+	 * renders the hint text on it.
+	 * @param {SunEditor.FrameContext} fc - Frame context
+	 * @returns {boolean} Whether the line placeholder is currently shown.
+	 */
+	#updateLinePlaceholder(fc) {
+		const text = fc.get('placeholder_line');
+		if (!text) return false;
+
+		const wysiwyg = fc.get('wysiwyg');
+		const prev = wysiwyg.querySelector('.se-placeholder-line');
+
+		const line = this.#store.get('hasFocus') ? this.#$.format.getLine(this.#$.selection.selectionNode) : null;
+		const target = dom.check.isEmptyLine(line) && !dom.check.isListCell(line) ? line : null;
+
+		// Single-marker invariant: drop the previous marker unless it is still the target line.
+		if (prev && prev !== target) {
+			prev.classList.remove('se-placeholder-line');
+			prev.removeAttribute('data-se-placeholder-line');
+			if (!prev.getAttribute('class')) prev.removeAttribute('class');
+		}
+
+		if (!target) return false;
+
+		target.classList.add('se-placeholder-line');
+		target.setAttribute('data-se-placeholder-line', text);
+		return true;
 	}
 
 	/**
@@ -887,10 +971,17 @@ class UIManager {
 			h === -1
 				? resizeObserverEntry?.borderBoxSize && resizeObserverEntry.borderBoxSize[0]
 					? resizeObserverEntry.borderBoxSize[0].blockSize
-					: resizeObserverEntry.contentRect.height + numbers.get(fc.get('wwComputedStyle').getPropertyValue('padding-left')) + numbers.get(fc.get('wwComputedStyle').getPropertyValue('padding-right'))
+					: resizeObserverEntry.contentRect.height +
+						numbers.get(fc.get('wwComputedStyle').getPropertyValue('padding-left')) +
+						numbers.get(fc.get('wwComputedStyle').getPropertyValue('padding-right'))
 				: h;
 		if (fc.get('_editorHeight') !== h) {
-			this.#eventManager.triggerEvent('onResizeEditor', { height: h, prevHeight: fc.get('_editorHeight'), frameContext: fc, observerEntry: resizeObserverEntry });
+			this.#eventManager.triggerEvent('onResizeEditor', {
+				height: h,
+				prevHeight: fc.get('_editorHeight'),
+				frameContext: fc,
+				observerEntry: resizeObserverEntry,
+			});
 			fc.set('_editorHeight', h);
 		}
 
@@ -901,7 +992,11 @@ class UIManager {
 	}
 
 	init() {
-		this.#closeSignal = !this.#eventManager.addEvent(this.alertModal.querySelector('[data-command="close"]'), 'click', this.alertClose.bind(this));
+		this.#closeSignal = !this.#eventManager.addEvent(
+			this.alertModal.querySelector('[data-command="close"]'),
+			'click',
+			this.alertClose.bind(this),
+		);
 		this._initToggleButtons();
 	}
 
@@ -943,13 +1038,20 @@ class UIManager {
 		this.opendBrowser = null;
 		this.#lineBreaker_t = null;
 		this.#lineBreaker_b = null;
+		this.#blockHandle?.destroy();
+		this.#blockHandle = null;
 		this.#controllerOnDisabledButtons = null;
 		this.#codeViewDisabledButtons = null;
 	}
 }
 
 function CreateAlertHTML({ lang, icons }) {
-	const html = '<div><button class="close" data-command="close" title="' + lang.close + '">' + icons.cancel + '</button></div><div><span></span></div>';
+	const html =
+		'<div><button class="close" data-command="close" title="' +
+		lang.close +
+		'">' +
+		icons.cancel +
+		'</button></div><div><span></span></div>';
 	return dom.utils.createElement('DIV', { class: 'se-alert-content' }, html);
 }
 

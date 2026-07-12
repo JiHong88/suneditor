@@ -108,7 +108,10 @@ class Video extends PluginModal {
 	 */
 	static #checkContentType(url) {
 		url = url?.toLowerCase() || '';
-		if (this.#extensions.some((ext) => url.endsWith(ext)) || this.#urlPatterns.some((pattern) => pattern.test(url))) {
+		if (
+			this.#extensions.some((ext) => url.endsWith(ext)) ||
+			this.#urlPatterns.some((pattern) => pattern.test(url))
+		) {
 			return true;
 		}
 
@@ -157,17 +160,33 @@ class Video extends PluginModal {
 		this.pluginOptions = {
 			canResize: pluginOptions.canResize === undefined ? true : pluginOptions.canResize,
 			showHeightInput: pluginOptions.showHeightInput === undefined ? true : !!pluginOptions.showHeightInput,
-			defaultWidth: !pluginOptions.defaultWidth || !numbers.get(pluginOptions.defaultWidth, 0) ? '' : numbers.is(pluginOptions.defaultWidth) ? pluginOptions.defaultWidth + 'px' : pluginOptions.defaultWidth,
-			defaultHeight: !pluginOptions.defaultHeight || !numbers.get(pluginOptions.defaultHeight, 0) ? '' : numbers.is(pluginOptions.defaultHeight) ? pluginOptions.defaultHeight + 'px' : pluginOptions.defaultHeight,
+			defaultWidth:
+				!pluginOptions.defaultWidth || !numbers.get(pluginOptions.defaultWidth, 0)
+					? ''
+					: numbers.is(pluginOptions.defaultWidth)
+						? pluginOptions.defaultWidth + 'px'
+						: pluginOptions.defaultWidth,
+			defaultHeight:
+				!pluginOptions.defaultHeight || !numbers.get(pluginOptions.defaultHeight, 0)
+					? ''
+					: numbers.is(pluginOptions.defaultHeight)
+						? pluginOptions.defaultHeight + 'px'
+						: pluginOptions.defaultHeight,
 			percentageOnlySize: !!pluginOptions.percentageOnlySize,
 			createFileInput: !!pluginOptions.createFileInput,
-			createUrlInput: pluginOptions.createUrlInput === undefined || !pluginOptions.createFileInput ? true : pluginOptions.createUrlInput,
+			createUrlInput:
+				pluginOptions.createUrlInput === undefined || !pluginOptions.createFileInput
+					? true
+					: pluginOptions.createUrlInput,
 			uploadUrl: typeof pluginOptions.uploadUrl === 'string' ? pluginOptions.uploadUrl : null,
 			uploadHeaders: pluginOptions.uploadHeaders || null,
 			uploadSizeLimit: numbers.get(pluginOptions.uploadSizeLimit, 0),
 			uploadSingleSizeLimit: numbers.get(pluginOptions.uploadSingleSizeLimit, 0),
 			allowMultiple: !!pluginOptions.allowMultiple,
-			acceptedFormats: typeof pluginOptions.acceptedFormats !== 'string' || pluginOptions.acceptedFormats.trim() === '*' ? 'video/*' : pluginOptions.acceptedFormats.trim() || 'video/*',
+			acceptedFormats:
+				typeof pluginOptions.acceptedFormats !== 'string' || pluginOptions.acceptedFormats.trim() === '*'
+					? 'video/*'
+					: pluginOptions.acceptedFormats.trim() || 'video/*',
 			defaultRatio: numbers.get(pluginOptions.defaultRatio, 4) || 0.5625,
 			showRatioOption: pluginOptions.showRatioOption === undefined ? true : !!pluginOptions.showRatioOption,
 			ratioOptions: !pluginOptions.ratioOptions ? null : pluginOptions.ratioOptions,
@@ -181,7 +200,11 @@ class Video extends PluginModal {
 		// create HTML
 		const sizeUnit = this.pluginOptions.percentageOnlySize ? '%' : 'px';
 		const modalEl = CreateHTML_modal(this.$, this.pluginOptions);
-		const figureControls = pluginOptions.controls || (!this.pluginOptions.canResize ? [['align', 'edit', 'copy', 'remove']] : [['resize_auto,75,50', 'align', 'edit', 'revert', 'copy', 'remove']]);
+		const figureControls =
+			pluginOptions.controls ||
+			(!this.pluginOptions.canResize
+				? [['align', 'edit', 'copy', 'remove']]
+				: [['resize_auto,75,50', 'align', 'edit', 'revert', 'copy', 'remove']]);
 
 		// show align
 		if (!figureControls.some((subArray) => subArray.includes('align'))) modalEl.alignForm.style.display = 'none';
@@ -189,7 +212,10 @@ class Video extends PluginModal {
 		// modules
 		const defaultRatio = this.pluginOptions.defaultRatio * 100 + '%';
 		this.modal = new Modal(this, this.$, modalEl.html);
-		this.figure = new Figure(this, this.$, figureControls, { sizeUnit: sizeUnit, autoRatio: { current: defaultRatio, default: defaultRatio } });
+		this.figure = new Figure(this, this.$, figureControls, {
+			sizeUnit: sizeUnit,
+			autoRatio: { current: defaultRatio, default: defaultRatio },
+		});
 		this.fileManager = new FileManager(this, this.$, {
 			query: 'iframe, video',
 			loadEventName: 'onVideoLoad',
@@ -204,7 +230,8 @@ class Video extends PluginModal {
 		this.previewSrc = modalEl.previewSrc;
 
 		this.#resizing = this.pluginOptions.canResize;
-		this.#nonResizing = !this.#resizing || !this.pluginOptions.showHeightInput || this.pluginOptions.percentageOnlySize;
+		this.#nonResizing =
+			!this.#resizing || !this.pluginOptions.showHeightInput || this.pluginOptions.percentageOnlySize;
 
 		this.query = {
 			youtube: {
@@ -247,9 +274,11 @@ class Video extends PluginModal {
 		const galleryButton = modalEl.galleryButton;
 		if (galleryButton) this.$.eventManager.addEvent(galleryButton, 'click', this.#OpenGallery.bind(this));
 
-		if (this.videoInputFile) this.$.eventManager.addEvent(modalEl.fileRemoveBtn, 'click', this.#RemoveSelectedFiles.bind(this));
+		if (this.videoInputFile)
+			this.$.eventManager.addEvent(modalEl.fileRemoveBtn, 'click', this.#RemoveSelectedFiles.bind(this));
 		if (this.videoUrlFile) this.$.eventManager.addEvent(this.videoUrlFile, 'input', this.#OnLinkPreview.bind(this));
-		if (this.videoInputFile && this.videoUrlFile) this.$.eventManager.addEvent(this.videoInputFile, 'change', this.#OnfileInputChange.bind(this));
+		if (this.videoInputFile && this.videoUrlFile)
+			this.$.eventManager.addEvent(this.videoInputFile, 'change', this.#OnfileInputChange.bind(this));
 	}
 
 	/**
@@ -311,9 +340,11 @@ class Video extends PluginModal {
 	 */
 	modalOn(isUpdate) {
 		if (!isUpdate) {
-			if (this.videoInputFile && this.pluginOptions.allowMultiple) this.videoInputFile.setAttribute('multiple', 'multiple');
+			if (this.videoInputFile && this.pluginOptions.allowMultiple)
+				this.videoInputFile.setAttribute('multiple', 'multiple');
 		} else {
-			if (this.videoInputFile && this.pluginOptions.allowMultiple) this.videoInputFile.removeAttribute('multiple');
+			if (this.videoInputFile && this.pluginOptions.allowMultiple)
+				this.videoInputFile.removeAttribute('multiple');
 		}
 
 		this.sizeService.on(isUpdate);
@@ -324,7 +355,9 @@ class Video extends PluginModal {
 	 * @type {SunEditor.Hook.Modal.Action}
 	 */
 	async modalAction() {
-		this.#align = /** @type {HTMLInputElement} */ (this.modal.form.querySelector('input[name="suneditor_video_radio"]:checked')).value;
+		this.#align = /** @type {HTMLInputElement} */ (
+			this.modal.form.querySelector('input[name="suneditor_video_radio"]:checked')
+		).value;
 
 		let result = false;
 		if (this.videoInputFile && this.videoInputFile.files.length > 0) {
@@ -351,7 +384,9 @@ class Video extends PluginModal {
 			this.previewSrc.style.textDecoration = '';
 		}
 
-		/** @type {HTMLInputElement} */ (this.modal.form.querySelector('input[name="suneditor_video_radio"][value="none"]')).checked = true;
+		/** @type {HTMLInputElement} */ (
+			this.modal.form.querySelector('input[name="suneditor_video_radio"][value="none"]')
+		).checked = true;
 		this.#nonResizing = false;
 
 		this.sizeService.init();
@@ -384,7 +419,12 @@ class Video extends PluginModal {
 		const focusEl = container.previousElementSibling || container.nextElementSibling;
 		const emptyDiv = container.parentNode;
 
-		const message = await this.$.eventManager.triggerEvent('onVideoDeleteBefore', { element: targetEl, container, align: this.#align, url: this.#linkValue });
+		const message = await this.$.eventManager.triggerEvent('onVideoDeleteBefore', {
+			element: targetEl,
+			container,
+			align: this.#align,
+			url: this.#linkValue,
+		});
 		if (message === false) return;
 
 		dom.utils.removeItem(container);
@@ -524,7 +564,13 @@ class Video extends PluginModal {
 		/** rendering */
 		this.#element = oFrame;
 		this.#container = container;
-		this.figure.open(oFrame, { nonResizing: this.#nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, infoOnly: true });
+		this.figure.open(oFrame, {
+			nonResizing: this.#nonResizing,
+			nonSizeInfo: false,
+			nonBorder: false,
+			figureTarget: false,
+			infoOnly: true,
+		});
 
 		// set size
 		const resolved = this.sizeService.resolveSize(width, height, oFrame, isUpdate);
@@ -539,11 +585,15 @@ class Video extends PluginModal {
 		this.fileManager.setFileData(oFrame, file);
 
 		if (!isUpdate) {
-			this.$.component.insert(container, { scrollTo: isLast ? true : false, insertBehavior: isLast ? this.pluginOptions.insertBehavior : 'line' });
+			this.$.component.insert(container, {
+				scrollTo: isLast ? true : false,
+				insertBehavior: isLast ? this.pluginOptions.insertBehavior : 'line',
+			});
 			return;
 		}
 
-		if (!this.#resizing || !resolved.isChanged || !this.figure.isVertical) this.figure.setTransform(oFrame, width, height, 0);
+		if (!this.#resizing || !resolved.isChanged || !this.figure.isVertical)
+			this.figure.setTransform(oFrame, width, height, 0);
 		this.$.history.push(false);
 	}
 
@@ -600,7 +650,8 @@ class Video extends PluginModal {
 
 			s = f.size;
 			if (singleSizeLimit > 0 && s > singleSizeLimit) {
-				const err = '[SUNEDITOR.videoUpload.fail] Size of uploadable single file: ' + singleSizeLimit / 1000 + 'KB';
+				const err =
+					'[SUNEDITOR.videoUpload.fail] Size of uploadable single file: ' + singleSizeLimit / 1000 + 'KB';
 				const message = await this.$.eventManager.triggerEvent('onVideoUploadError', {
 					error: err,
 					limitSize: singleSizeLimit,
@@ -621,7 +672,12 @@ class Video extends PluginModal {
 		const currentSize = this.fileManager.getSize();
 		if (limitSize > 0 && fileSize + currentSize > limitSize) {
 			const err = '[SUNEDITOR.videoUpload.fail] Size of uploadable total videos: ' + limitSize / 1000 + 'KB';
-			const message = await this.$.eventManager.triggerEvent('onVideoUploadError', { error: err, limitSize, currentSize, uploadSize: fileSize });
+			const message = await this.$.eventManager.triggerEvent('onVideoUploadError', {
+				error: err,
+				limitSize,
+				currentSize,
+				uploadSize: fileSize,
+			});
 
 			this.$.ui.alertOpen(message === NO_EVENT ? err : message || err, 'error');
 
@@ -676,7 +732,16 @@ class Video extends PluginModal {
 
 		const handler = function (infos, newInfos) {
 			infos = newInfos || infos;
-			this.create(this[/^iframe$/i.test(infos.process?.tag) ? 'createIframeTag' : 'createVideoTag'](), infos.url, infos.inputWidth, infos.inputHeight, infos.align, infos.isUpdate, infos.files, true);
+			this.create(
+				this[/^iframe$/i.test(infos.process?.tag) ? 'createIframeTag' : 'createVideoTag'](),
+				infos.url,
+				infos.inputWidth,
+				infos.inputHeight,
+				infos.align,
+				infos.isUpdate,
+				infos.files,
+				true,
+			);
 		}.bind(this, videoInfo);
 
 		const result = await this.$.eventManager.triggerEvent('onVideoUploadBefore', {
@@ -702,7 +767,13 @@ class Video extends PluginModal {
 	 */
 	#ready(target, infoOnly = false) {
 		if (!target) return;
-		const figureInfo = this.figure.open(target, { nonResizing: this.#nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, infoOnly });
+		const figureInfo = this.figure.open(target, {
+			nonResizing: this.#nonResizing,
+			nonSizeInfo: false,
+			nonBorder: false,
+			figureTarget: false,
+			infoOnly,
+		});
 
 		this.#element = target;
 		this.#container = figureInfo.container;
@@ -713,10 +784,16 @@ class Video extends PluginModal {
 		const originHeight = String(figureInfo.height || figureInfo.originHeight || figureInfo.h || '');
 		this.sizeService.setOriginSize(originWidth, originHeight);
 
-		if (this.videoUrlFile) this.#linkValue = this.previewSrc.textContent = this.videoUrlFile.value = this.#element.src || this.#element.querySelector('source')?.src || '';
+		if (this.videoUrlFile)
+			this.#linkValue =
+				this.previewSrc.textContent =
+				this.videoUrlFile.value =
+					this.#element.src || this.#element.querySelector('source')?.src || '';
 
 		/** @type {HTMLInputElement} */
-		const activeAlign = this.modal.form.querySelector('input[name="suneditor_video_radio"][value="' + this.#align + '"]') || this.modal.form.querySelector('input[name="suneditor_video_radio"][value="none"]');
+		const activeAlign =
+			this.modal.form.querySelector('input[name="suneditor_video_radio"][value="' + this.#align + '"]') ||
+			this.modal.form.querySelector('input[name="suneditor_video_radio"][value="none"]');
 		activeAlign.checked = true;
 
 		if (!this.#resizing) return;
@@ -768,7 +845,13 @@ class Video extends PluginModal {
 		}
 
 		// size
-		this.figure.open(cloneFrame, { nonResizing: this.#nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, infoOnly: true });
+		this.figure.open(cloneFrame, {
+			nonResizing: this.#nonResizing,
+			nonSizeInfo: false,
+			nonBorder: false,
+			figureTarget: false,
+			infoOnly: true,
+		});
 		const size = (cloneFrame.getAttribute('data-se-size') || ',').split(',');
 
 		const width = size[0] || prevFrame.width || '';
@@ -864,7 +947,10 @@ class Video extends PluginModal {
 	 * @param {HTMLInputElement} target - The selected video element.
 	 */
 	#SetUrlInput(target) {
-		this.#linkValue = this.previewSrc.textContent = this.videoUrlFile.value = target.getAttribute('data-command') || target.src;
+		this.#linkValue =
+			this.previewSrc.textContent =
+			this.videoUrlFile.value =
+				target.getAttribute('data-command') || target.src;
 		this.videoUrlFile.focus();
 	}
 

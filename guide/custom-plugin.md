@@ -977,6 +977,38 @@ First non-null result wins → { target, pluginName, options }
 plugin.componentSelect(target) called
 ```
 
+### Non-plugin components (the launcher path)
+
+Not every selectable component is a full plugin. Lightweight components with no UI beyond
+delete — e.g. the built-in **`pageBreak`** — are registered directly as a **component-checker**
+in `pluginManager`, returning `{ target, launcher }` instead of `{ target, pluginName, options }`:
+
+```javascript
+// src/core/logic/shell/pluginManager.js
+this.#componentCheckers.push((element) => {
+	if (!element || !dom.utils.hasClass(element, 'se-page-break')) return null;
+	/** @type {SunEditor.ComponentLauncher} */
+	const launcher = {
+		componentDestroy: (target) => {
+			/* remove + refocus + history.push */
+		},
+	};
+	return { target: element, launcher };
+});
+```
+
+On selection, `component.select()` assigns `currentPlugin = info.launcher || plugins[pluginName]`,
+so a **launcher is a stand-in for a plugin**. The selected-component keydown handler then calls
+`currentPlugin.componentDestroy(target)`.
+
+> **Hook-name contract.** A launcher **must use the same hook names a plugin would** —
+> `componentDestroy` / `componentSelect` / `componentDeselect`.
+> The `SunEditor.ComponentLauncher` typedef (`src/typedef.js`) enforces the names at build time via
+> the excess-property check — annotate the launcher as a typed `const` (an assignment, not a cast).
+>
+> **Full plugin vs launcher:** promote to a full plugin only when the component needs a controller
+> or actions beyond delete; a controller can only be owned by a full plugin instance, never a launcher.
+
 ---
 
 ## Multi-Interface Pattern
@@ -1359,7 +1391,11 @@ class QuickStyle extends PluginDropdown {
         style="background:${style.bg};padding:4px 8px">${style.name}</button></li>`;
 		}
 
-		const menu = dom.utils.createElement('div', { class: 'se-dropdown se-list-layer' }, `<div class="se-list-inner"><ul class="se-list-basic">${html}</ul></div>`);
+		const menu = dom.utils.createElement(
+			'div',
+			{ class: 'se-dropdown se-list-layer' },
+			`<div class="se-list-inner"><ul class="se-list-basic">${html}</ul></div>`,
+		);
 
 		this.$.menu.initDropdownTarget(QuickStyle, menu);
 	}
@@ -1397,7 +1433,10 @@ import Modal from 'suneditor/src/modules/contract/Modal';
 import Controller from 'suneditor/src/modules/contract/Controller';
 import { dom } from 'suneditor/src/helper';
 
-class Embed extends interfaces.PluginModal implements interfaces.ModuleModal, interfaces.ModuleController, interfaces.EditorComponent {
+class Embed
+	extends interfaces.PluginModal
+	implements interfaces.ModuleModal, interfaces.ModuleController, interfaces.EditorComponent
+{
 	static key = 'embed';
 
 	_element: HTMLIFrameElement | null = null;

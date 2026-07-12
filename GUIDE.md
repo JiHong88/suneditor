@@ -12,14 +12,26 @@
 - [Directory Structure](#directory-structure)
 - [Technical Requirements](#technical-requirements)
 - [Architecture](#architecture) (overview) | [ARCHITECTURE.md](./ARCHITECTURE.md) (deep dive)
-- [Plugin System](#plugin-system-srcplugins)
-- [Modules](#modules-srcmodules)
-- [Essential Commands](#essential-commands) | [Claude Code Skills](#claude-code-skills-claudeskills)
+    - [Plugin System](#plugin-system-srcplugins)
+    - [Modules](#modules-srcmodules)
+- [Essential Commands](#essential-commands)
+    - [Claude Code Skills](#claude-code-skills-claudeskills)
+- [Naming Conventions](#naming-conventions)
+- [Common Pitfalls](#common-pitfalls)
+- [Plugin Registration Flow](#plugin-registration-flow)
+- [Example Implementations](#example-implementations)
 - [Testing Strategy](#testing-strategy)
+- [Initialization: `onload` Event](#initialization-onload-event)
+- [iframe Mode](#iframe-mode)
 - [Markdown View](#markdown-view)
-- Supplementary Guides
+- [Build System](#build-system)
+- [Changes Log](#changes-log)
+- [Supplementary Guides](#supplementary-guides)
+    - [Coding Rules](./prompts/coding-rules.md) - Enforceable conventions for `src/*.js`
+    - [Editing Rules](./prompts/editing-rules.md) - File-level edit restrictions
+    - [Custom Plugin Guide](./guide/custom-plugin.md) - Creating custom plugins
     - [External Libraries](./guide/external-libraries.md) - CodeMirror, KaTeX, MathJax
-    - [Changes Guide](#changes-log) - changes.md writing rules and how to use releases.
+    - [Type Definitions](./guide/typedef-guide.md) - SunEditor namespace types
 
 ---
 
@@ -719,6 +731,8 @@ This file is used to generate the demo site's changelog. Keep entries concise an
 
 ## Supplementary Guides
 
+- [Coding Rules](./prompts/coding-rules.md) - Enforceable conventions for `src/*.js` (events, DOM, state, history, plugin shape)
+- [Editing Rules](./prompts/editing-rules.md) - File-level edit restrictions (generated files, lang files, sync rules)
 - [Custom Plugin Guide](./guide/custom-plugin.md) - Creating custom plugins
 - [External Libraries](./guide/external-libraries.md) - CodeMirror, KaTeX, MathJax integration
 - [Type Definitions](./guide/typedef-guide.md) - SunEditor namespace types reference

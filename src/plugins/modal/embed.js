@@ -181,8 +181,18 @@ class Embed extends PluginModal {
 		this.pluginOptions = {
 			canResize: pluginOptions.canResize === undefined ? true : pluginOptions.canResize,
 			showHeightInput: pluginOptions.showHeightInput === undefined ? true : !!pluginOptions.showHeightInput,
-			defaultWidth: !pluginOptions.defaultWidth || !numbers.get(pluginOptions.defaultWidth, 0) ? '' : numbers.is(pluginOptions.defaultWidth) ? pluginOptions.defaultWidth + 'px' : pluginOptions.defaultWidth,
-			defaultHeight: !pluginOptions.defaultHeight || !numbers.get(pluginOptions.defaultHeight, 0) ? '' : numbers.is(pluginOptions.defaultHeight) ? pluginOptions.defaultHeight + 'px' : pluginOptions.defaultHeight,
+			defaultWidth:
+				!pluginOptions.defaultWidth || !numbers.get(pluginOptions.defaultWidth, 0)
+					? ''
+					: numbers.is(pluginOptions.defaultWidth)
+						? pluginOptions.defaultWidth + 'px'
+						: pluginOptions.defaultWidth,
+			defaultHeight:
+				!pluginOptions.defaultHeight || !numbers.get(pluginOptions.defaultHeight, 0)
+					? ''
+					: numbers.is(pluginOptions.defaultHeight)
+						? pluginOptions.defaultHeight + 'px'
+						: pluginOptions.defaultHeight,
 			percentageOnlySize: !!pluginOptions.percentageOnlySize,
 			uploadUrl: typeof pluginOptions.uploadUrl === 'string' ? pluginOptions.uploadUrl : null,
 			uploadHeaders: pluginOptions.uploadHeaders || null,
@@ -198,10 +208,15 @@ class Embed extends PluginModal {
 		// create HTML
 		const sizeUnit = this.pluginOptions.percentageOnlySize ? '%' : 'px';
 		const modalEl = CreateHTML_modal(this.$, this.pluginOptions);
-		const figureControls = pluginOptions.controls || (!this.pluginOptions.canResize ? [['align', 'edit', 'copy', 'remove']] : [['resize_auto,75,50', 'align', 'edit', 'revert', 'copy', 'remove']]);
+		const figureControls =
+			pluginOptions.controls ||
+			(!this.pluginOptions.canResize
+				? [['align', 'edit', 'copy', 'remove']]
+				: [['resize_auto,75,50', 'align', 'edit', 'revert', 'copy', 'remove']]);
 
 		// show align
-		if (!figureControls.some((subArray) => subArray.includes('align'))) modalEl.figureAlignBtn.style.display = 'none';
+		if (!figureControls.some((subArray) => subArray.includes('align')))
+			modalEl.figureAlignBtn.style.display = 'none';
 
 		// modules
 		this.modal = new Modal(this, this.$, modalEl.html);
@@ -234,7 +249,8 @@ class Embed extends PluginModal {
 				tag: 'iframe',
 			},
 			twitter: {
-				pattern: /^(?:https?:\/\/)?(?:(?:www\.)?(?:twitter\.com|x\.com)\/(?:[^/?#]+\/)?status\/\d+(?:[/?#]|$)|platform\.twitter\.com\/embed\/Tweet\.html(?:[?#].*)?$)/i,
+				pattern:
+					/^(?:https?:\/\/)?(?:(?:www\.)?(?:twitter\.com|x\.com)\/(?:[^/?#]+\/)?status\/\d+(?:[/?#]|$)|platform\.twitter\.com\/embed\/Tweet\.html(?:[?#].*)?$)/i,
 				action: (url) => {
 					return `https://platform.twitter.com/embed/Tweet.html?url=${encodeURIComponent(url)}`;
 				},
@@ -343,11 +359,16 @@ class Embed extends PluginModal {
 	 */
 	modalOn(isUpdate) {
 		if (!isUpdate && this.#resizing) {
-			this.inputX.value = this.#origin_w = this.pluginOptions.defaultWidth === 'auto' ? '' : this.pluginOptions.defaultWidth;
-			this.inputY.value = this.#origin_h = this.pluginOptions.defaultHeight === 'auto' ? '' : this.pluginOptions.defaultHeight;
+			this.inputX.value = this.#origin_w =
+				this.pluginOptions.defaultWidth === 'auto' ? '' : this.pluginOptions.defaultWidth;
+			this.inputY.value = this.#origin_h =
+				this.pluginOptions.defaultHeight === 'auto' ? '' : this.pluginOptions.defaultHeight;
 			this.proportion.disabled = true;
 		} else if (isUpdate) {
-			this.#linkValue = this.previewSrc.textContent = this.embedInput.value = this.#cover.getAttribute('data-se-origin') || '';
+			this.#linkValue =
+				this.previewSrc.textContent =
+				this.embedInput.value =
+					this.#cover.getAttribute('data-se-origin') || '';
 		}
 	}
 
@@ -356,7 +377,9 @@ class Embed extends PluginModal {
 	 * @type {SunEditor.Hook.Modal.Action}
 	 */
 	async modalAction() {
-		this.#align = /** @type {HTMLInputElement} */ (this.modal.form.querySelector('input[name="suneditor_embed_radio"]:checked')).value;
+		this.#align = /** @type {HTMLInputElement} */ (
+			this.modal.form.querySelector('input[name="suneditor_embed_radio"]:checked')
+		).value;
 
 		let result = false;
 		if (this.#linkValue.length > 0) {
@@ -376,13 +399,17 @@ class Embed extends PluginModal {
 		Modal.OnChangeFile(this.fileModalWrapper, []);
 		this.#linkValue = this.previewSrc.textContent = this.embedInput.value = '';
 
-		/** @type {HTMLInputElement} */ (this.modal.form.querySelector('input[name="suneditor_embed_radio"][value="none"]')).checked = true;
+		/** @type {HTMLInputElement} */ (
+			this.modal.form.querySelector('input[name="suneditor_embed_radio"][value="none"]')
+		).checked = true;
 		this.#ratio = { w: 0, h: 0 };
 		this.#nonResizing = false;
 
 		if (this.#resizing) {
-			this.inputX.value = this.pluginOptions.defaultWidth === this.#defaultSizeX ? '' : this.pluginOptions.defaultWidth;
-			this.inputY.value = this.pluginOptions.defaultHeight === this.#defaultSizeY ? '' : this.pluginOptions.defaultHeight;
+			this.inputX.value =
+				this.pluginOptions.defaultWidth === this.#defaultSizeX ? '' : this.pluginOptions.defaultWidth;
+			this.inputY.value =
+				this.pluginOptions.defaultHeight === this.#defaultSizeY ? '' : this.pluginOptions.defaultHeight;
 			this.proportion.checked = false;
 			this.proportion.disabled = true;
 		}
@@ -414,7 +441,12 @@ class Embed extends PluginModal {
 		const focusEl = container.previousElementSibling || container.nextElementSibling;
 		const emptyDiv = container.parentNode;
 
-		const message = await this.$.eventManager.triggerEvent('onEmbedDeleteBefore', { element: targetEl, container, align: this.#align, url: this.#linkValue });
+		const message = await this.$.eventManager.triggerEvent('onEmbedDeleteBefore', {
+			element: targetEl,
+			container,
+			align: this.#align,
+			url: this.#linkValue,
+		});
 		if (message === false) return;
 
 		dom.utils.removeItem(container);
@@ -474,7 +506,8 @@ class Embed extends PluginModal {
 			// Validate every iframe in the raw HTML against the URL whitelist.
 			for (let i = 0; i < embedDOM.length; i++) {
 				const node = /** @type {Element} */ (embedDOM[i]);
-				if (/^iframe$/i.test(node.nodeName) && !Embed.#checkContentType(node.getAttribute('src') || '')) return false;
+				if (/^iframe$/i.test(node.nodeName) && !Embed.#checkContentType(node.getAttribute('src') || ''))
+					return false;
 				const nested = node.querySelectorAll?.('iframe');
 				if (nested) {
 					for (let j = 0; j < nested.length; j++) {
@@ -498,7 +531,16 @@ class Embed extends PluginModal {
 
 		const handler = function (uploadCallback, infos, newInfos) {
 			infos = newInfos || infos;
-			uploadCallback(src, infos.process, infos.url, infos.children, infos.inputWidth, infos.inputHeight, infos.align, infos.isUpdate);
+			uploadCallback(
+				src,
+				infos.process,
+				infos.url,
+				infos.children,
+				infos.inputWidth,
+				infos.inputHeight,
+				infos.align,
+				infos.isUpdate,
+			);
 		}.bind(this, this.#create.bind(this), embedInfo);
 
 		const result = await this.$.eventManager.triggerEvent('onEmbedInputBefore', {
@@ -524,7 +566,13 @@ class Embed extends PluginModal {
 	 */
 	#ready(target, infoOnly = false) {
 		if (!target) return;
-		const figureInfo = this.figure.open(target, { nonResizing: this.#nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, infoOnly });
+		const figureInfo = this.figure.open(target, {
+			nonResizing: this.#nonResizing,
+			nonSizeInfo: false,
+			nonBorder: false,
+			figureTarget: false,
+			infoOnly,
+		});
 
 		this.#element = target;
 		this.#cover = figureInfo.cover;
@@ -545,7 +593,9 @@ class Embed extends PluginModal {
 		this.#origin_h = String(figureInfo.originHeight || figureInfo.h || '');
 
 		/** @type {HTMLInputElement} */
-		const activeAlign = this.modal.form.querySelector('input[name="suneditor_embed_radio"][value="' + this.#align + '"]') || this.modal.form.querySelector('input[name="suneditor_embed_radio"][value="none"]');
+		const activeAlign =
+			this.modal.form.querySelector('input[name="suneditor_embed_radio"][value="' + this.#align + '"]') ||
+			this.modal.form.querySelector('input[name="suneditor_embed_radio"][value="none"]');
 		activeAlign.checked = true;
 
 		if (!this.#resizing) return;
@@ -658,7 +708,13 @@ class Embed extends PluginModal {
 		this.#element = oFrame;
 		this.#cover = cover;
 		this.#container = container;
-		this.figure.open(oFrame, { nonResizing: this.#nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, infoOnly: true });
+		this.figure.open(oFrame, {
+			nonResizing: this.#nonResizing,
+			nonSizeInfo: false,
+			nonBorder: false,
+			figureTarget: false,
+			infoOnly: true,
+		});
 
 		width ||= this.#defaultSizeX;
 		height ||= this.#defaultSizeY;
@@ -679,7 +735,11 @@ class Embed extends PluginModal {
 		cover.setAttribute('data-se-origin', originSrc);
 
 		if (!isUpdate) {
-			this.$.component.insert(container, { skipHistory: true, scrollTo: false, insertBehavior: this.pluginOptions.insertBehavior });
+			this.$.component.insert(container, {
+				skipHistory: true,
+				scrollTo: false,
+				insertBehavior: this.pluginOptions.insertBehavior,
+			});
 
 			if (scriptTag) {
 				try {
@@ -721,7 +781,8 @@ class Embed extends PluginModal {
 			return;
 		}
 
-		if (!this.#resizing || !changeSize || !this.figure.isVertical) this.figure.setTransform(oFrame, width, height, 0);
+		if (!this.#resizing || !changeSize || !this.figure.isVertical)
+			this.figure.setTransform(oFrame, width, height, 0);
 		if (!scriptTag) this.$.history.push(false);
 	}
 
@@ -740,7 +801,13 @@ class Embed extends PluginModal {
 		const container = figure.container;
 
 		// size
-		this.figure.open(oFrame, { nonResizing: this.#nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, infoOnly: true });
+		this.figure.open(oFrame, {
+			nonResizing: this.#nonResizing,
+			nonSizeInfo: false,
+			nonBorder: false,
+			figureTarget: false,
+			infoOnly: true,
+		});
 		const size = (oFrame.getAttribute('data-se-size') || ',').split(',');
 
 		const width = size[0] || prevFrame.width || '';
@@ -900,7 +967,10 @@ function CreateHTML_modal({ lang, icons }, pluginOptions) {
 		const onlyPercentDisplay = onlyPercentage ? ' style="display: none !important;"' : '';
 		const heightDisplay = !pluginOptions.showHeightInput ? ' style="display: none !important;"' : '';
 		const ratioDisplay = !pluginOptions.showRatioOption ? ' style="display: none !important;"' : '';
-		const onlyWidthDisplay = !onlyPercentage && !pluginOptions.showHeightInput && !pluginOptions.showRatioOption ? ' style="display: none !important;"' : '';
+		const onlyWidthDisplay =
+			!onlyPercentage && !pluginOptions.showHeightInput && !pluginOptions.showRatioOption
+				? ' style="display: none !important;"'
+				: '';
 		html += /*html*/ `
 			<div class="se-modal-form">
 				<div class="se-modal-size-text">

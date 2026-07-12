@@ -161,4 +161,16 @@
 	--se-show-blocks-li-color: #8844dd;
 	--se-show-blocks-pre-color: #1a8c3a;
 	--se-show-blocks-component-color: #e8a020;
+
+	/* block handle */
+	--se-block-handle-color: var(--se-main-color-lighter);
+	--se-block-handle-btn-hover-bg: rgba(55, 53, 47, 0.08);
+	--se-block-handle-btn-active-bg: rgba(55, 53, 47, 0.14);
+	--se-block-hover-bg: rgba(55, 53, 47, 0.04);
+	--se-block-hover-outline: rgba(55, 53, 47, 0.04);
+	--se-block-drag-indicator-color: var(--se-active-dark3-color);
+
+	/* select menu interactive states */
+	--se-select-menu-hover-bg: #eef3f9;
+	--se-select-menu-active-bg: #dde7f3;
 }

@@ -1708,6 +1708,38 @@ describe('Modules - Controller', () => {
 		});
 	});
 
+	describe('escGuard (via CloseListener_keydown)', () => {
+		let ctrl;
+		let escGuard;
+
+		beforeEach(() => {
+			escGuard = jest.fn().mockReturnValue(true);
+			ctrl = new Controller(mockInst, $, createMockElement(), { escGuard });
+			const target = createTarget();
+			ctrl.open(target, target, {});
+			$.ui.selectMenuOn = false;
+			$.ui.opendControllers = [{ inst: ctrl, fixed: false, form: ctrl.form }];
+			mockKeyCodeMap.isNonResponseKey.mockReturnValue(true);
+			mockKeyCodeMap.isCtrl.mockReturnValue(false);
+			mockKeyCodeMap.isEsc.mockReturnValue(true);
+		});
+
+		const fireEsc = () => getGlobalEventHandlers($).keydown({ target: document.createElement('div'), code: 'Escape' });
+
+		it('returning true keeps the controller open on ESC (inner sub-panel absorbs it)', () => {
+			expect(ctrl.isOpen).toBe(true);
+			fireEsc();
+			expect(escGuard).toHaveBeenCalled();
+			expect(ctrl.isOpen).toBe(true);
+		});
+
+		it('returning false lets ESC close the controller', () => {
+			escGuard.mockReturnValue(false);
+			fireEsc();
+			expect(ctrl.isOpen).toBe(false);
+		});
+	});
+
 	// ==================== #CloseListener_keydown ====================
 
 	describe('#CloseListener_keydown', () => {

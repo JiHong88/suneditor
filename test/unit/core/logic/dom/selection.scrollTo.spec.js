@@ -316,6 +316,115 @@ describe('Selection - scrollTo', () => {
 
 			expect(scrollToSpy).toHaveBeenCalled();
 		});
+
+		// Regression: a caret already visible in the top comfort band (elH < innerTop <= PADDING)
+		// must NOT scroll the frame down. Previously `keepLocalScroll` required innerTop > PADDING, so
+		// a caret at innerTop 20~40 got pushed to `toolbarHeight + elH`, scrolling the frame DOWN — and
+		// repeated Enter near the top drifted the scroll down while the caret stayed pinned at the top.
+		it('should not scroll down when the caret sits in the top comfort band', () => {
+			kernel._eventOrchestrator.scrollparents = [];
+			selection.__init(); // #scrollMargin(PADDING) = 40, #hasScrollParents = false
+			setProp(wwFrame, 'scrollTop', 500);
+
+			wysiwyg.innerHTML = '<p>near top</p>';
+			const p = wysiwyg.querySelector('p');
+			// innerTop = 130 - 100 = 30, which is in the band (elH=20 < 30 <= PADDING=40)
+			mockRect(p, { top: 130, left: 20, right: 800, bottom: 150 });
+			mockSize(p, 780, 20);
+
+			selection.scrollTo(createRangeForNode(p.firstChild), { behavior: 'auto' });
+
+			// No downward scroll: either not called, or not scrolled past the current 500.
+			if (scrollToSpy.mock.calls.length) {
+				expect(scrollToSpy.mock.calls[0][0].top).toBeLessThanOrEqual(500);
+			}
+		});
+	});
+
+	describe('brLine (PRE) caret-based scroll', () => {
+		function buildPre() {
+			// childNodes: [0]"line1" [1]BR [2]"caret line" [3]BR [4]"line3"
+			wysiwyg.innerHTML = '<pre>line1<br>caret line<br>line3</pre>';
+			const pre = wysiwyg.querySelector('pre');
+			return { pre, textNode: pre.childNodes[2] };
+		}
+
+		function caretRange(textNode, rect) {
+			const range = document.createRange();
+			range.setStart(textNode, 0);
+			range.setEnd(textNode, 1);
+			range.getBoundingClientRect = jest.fn(() => ({
+				top: rect.top, left: rect.left, right: rect.right, bottom: rect.bottom,
+				width: rect.right - rect.left, height: rect.bottom - rect.top, x: rect.left, y: rect.top,
+			}));
+			return range;
+		}
+
+		it('auto-height: scrolls to the caret row, not the whole PRE top', () => {
+			// auto-height editor (no internal scroll), non-iframe
+			kernel.store.get = jest.fn((key) => {
+				if (key === 'isScrollable') return () => false; // auto-height
+				if (key === 'currentViewportHeight') return LAYOUT.viewportHeight; // 768
+				return undefined;
+			});
+			// el (PRE) is reported near the top & in view — the OLD el-based code would NOT scroll at all.
+			kernel.$.offset.getGlobal = jest.fn(() => ({
+				top: 100, left: 20, fixedTop: 100, fixedLeft: 20, width: 800, height: 400,
+			}));
+
+			const { textNode } = buildPre();
+			// caret row is far below the viewport (top=1000) → must scroll down to reveal it
+			const range = caretRange(textNode, { top: 1000, left: 20, right: 120, bottom: 1020 });
+
+			selection.scrollTo(range, { behavior: 'auto' });
+
+			// caret-based: window scrolled down (old behavior: getGlobal(PRE).top=100 → in view → no scroll)
+			expect(window.scrollTo).toHaveBeenCalled();
+			expect(window.scrollTo.mock.calls[0][0].top).toBeGreaterThan(0);
+		});
+
+		it('scroll-parent: scrolls the caret row into the scroll container, not el.scrollIntoView', () => {
+			// editor embedded in an external scroll container
+			const container = document.createElement('div');
+			container.scrollBy = jest.fn();
+			window.scrollBy = jest.fn();
+			mockRect(container, { top: 100, left: 0, right: 800, bottom: 500, width: 800, height: 400 });
+			kernel._eventOrchestrator.scrollparents = [container];
+			selection.__init(); // picks up #hasScrollParents = true
+
+			kernel.$.format.isBrLine.mockReturnValue(true);
+
+			const { pre, textNode } = buildPre();
+			pre.scrollIntoView = jest.fn();
+			// caret row sits below the container's visible bottom (500), at top=600
+			const range = caretRange(textNode, { top: 600, left: 20, right: 120, bottom: 620 });
+
+			selection.scrollTo(range);
+
+			// caret-based: scroll the container by (caret.bottom 620 - container.bottom 500) = 120, never el.scrollIntoView
+			expect(pre.scrollIntoView).not.toHaveBeenCalled();
+			expect(container.scrollBy).toHaveBeenCalled();
+			expect(container.scrollBy.mock.calls[0][0].top).toBe(120);
+		});
+
+		it('scroll-parent: normal (non-brLine) line still uses el.scrollIntoView', () => {
+			const container = document.createElement('div');
+			container.scrollBy = jest.fn();
+			mockRect(container, { top: 100, left: 0, right: 800, bottom: 500, width: 800, height: 400 });
+			kernel._eventOrchestrator.scrollparents = [container];
+			selection.__init();
+
+			// isBrLine stays false (mock default) → regression guard for normal lines
+			wysiwyg.innerHTML = '<p>normal line</p>';
+			const p = wysiwyg.querySelector('p');
+			p.scrollIntoView = jest.fn();
+			const range = createRangeForNode(p.firstChild);
+
+			selection.scrollTo(range);
+
+			expect(p.scrollIntoView).toHaveBeenCalled();
+			expect(container.scrollBy).not.toHaveBeenCalled();
+		});
 	});
 
 	describe('edge cases', () => {

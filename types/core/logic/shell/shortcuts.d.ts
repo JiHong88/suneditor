@@ -107,7 +107,16 @@ declare class Shortcuts {
 	 * @param {Range} range The current range object
 	 * @returns {boolean} Whether to execute shortcuts
 	 */
-	command(event: KeyboardEvent, ctrl: boolean, shift: boolean, keyCode: string, text: string, edge: boolean, line: HTMLElement, range: Range): boolean;
+	command(
+		event: KeyboardEvent,
+		ctrl: boolean,
+		shift: boolean,
+		keyCode: string,
+		text: string,
+		edge: boolean,
+		line: HTMLElement,
+		range: Range,
+	): boolean;
 	/**
 	 * @description Disable the shortcut activation.
 	 */

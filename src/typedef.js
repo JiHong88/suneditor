@@ -45,6 +45,17 @@
 
 // --------------------------------------------------------- [Component Types] ---------------------------------------------------------------------------------------------------
 /**
+ * @typedef {Object} SunEditor.ComponentLauncher
+ * @property {(target: any) => (void | Promise<void>)} [componentDestroy] - Delete hook (invoked by the selected-component keydown handler).
+ * @property {(target: any) => (boolean | void)} [componentSelect] - Optional select hook.
+ * @property {(target: any) => void} [componentDeselect] - Optional deselect hook.
+ * @description Lightweight plugin stand-in for non-plugin components (e.g. `pageBreak`) registered
+ * via `pluginManager` component-checkers. Assigned to `component.currentPlugin` on selection, so its
+ * hook names MUST mirror the plugin component hooks — e.g. `componentDestroy`, not `destroy`.
+ * NOTE: `@property` tags must precede `@description`, or TS drops them and the excess-property check is lost.
+ */
+
+/**
  * @typedef {Object} SunEditor.ComponentInfo
  * @property {HTMLElement} target - The target element associated with the component.
  * @property {string} pluginName - The name of the plugin related to the component.
@@ -54,7 +65,7 @@
  * @property {?HTMLElement} inlineCover - The inline cover element, if applicable.
  * @property {?HTMLElement} caption - The caption element, if applicable.
  * @property {boolean} isFile - Whether the component is a file-related component.
- * @property {?HTMLElement} launcher - The element that triggered the component, if applicable.
+ * @property {?SunEditor.ComponentLauncher} launcher - Hook object for non-plugin components (e.g. `pageBreak`), if applicable.
  * @property {boolean} isInputType - Whether the component is an input component (e.g., table).
  */
 
@@ -135,33 +146,33 @@
 
 // component
 /**
- * @typedef {typeof import('./interfaces/contracts').EditorComponent.prototype.componentSelect} SunEditor.Hook.Component.Select
- * @typedef {typeof import('./interfaces/contracts').EditorComponent.prototype.componentDeselect} SunEditor.Hook.Component.Deselect
- * @typedef {typeof import('./interfaces/contracts').EditorComponent.prototype.componentEdit} SunEditor.Hook.Component.Edit
- * @typedef {typeof import('./interfaces/contracts').EditorComponent.prototype.componentDestroy} SunEditor.Hook.Component.Destroy
- * @typedef {typeof import('./interfaces/contracts').EditorComponent.prototype.componentCopy} SunEditor.Hook.Component.Copy
+ * @typedef {import('./interfaces/contracts').EditorComponent['componentSelect']} SunEditor.Hook.Component.Select
+ * @typedef {import('./interfaces/contracts').EditorComponent['componentDeselect']} SunEditor.Hook.Component.Deselect
+ * @typedef {import('./interfaces/contracts').EditorComponent['componentEdit']} SunEditor.Hook.Component.Edit
+ * @typedef {import('./interfaces/contracts').EditorComponent['componentDestroy']} SunEditor.Hook.Component.Destroy
+ * @typedef {import('./interfaces/contracts').EditorComponent['componentCopy']} SunEditor.Hook.Component.Copy
  */
 
 // Module hooks - Called by Module instances (defined in interfaces/contracts.js)
 /**
- * @typedef {typeof import('./interfaces/contracts').ModuleModal.prototype.modalAction} SunEditor.Hook.Modal.Action
- * @typedef {typeof import('./interfaces/contracts').ModuleModal.prototype.modalOn} SunEditor.Hook.Modal.On
- * @typedef {typeof import('./interfaces/contracts').ModuleModal.prototype.modalInit} SunEditor.Hook.Modal.Init
- * @typedef {typeof import('./interfaces/contracts').ModuleModal.prototype.modalOff} SunEditor.Hook.Modal.Off
- * @typedef {typeof import('./interfaces/contracts').ModuleModal.prototype.modalResize} SunEditor.Hook.Modal.Resize
+ * @typedef {import('./interfaces/contracts').ModuleModal['modalAction']} SunEditor.Hook.Modal.Action
+ * @typedef {import('./interfaces/contracts').ModuleModal['modalOn']} SunEditor.Hook.Modal.On
+ * @typedef {import('./interfaces/contracts').ModuleModal['modalInit']} SunEditor.Hook.Modal.Init
+ * @typedef {import('./interfaces/contracts').ModuleModal['modalOff']} SunEditor.Hook.Modal.Off
+ * @typedef {import('./interfaces/contracts').ModuleModal['modalResize']} SunEditor.Hook.Modal.Resize
  *
- * @typedef {typeof import('./interfaces/contracts').ModuleController.prototype.controllerAction} SunEditor.Hook.Controller.Action
- * @typedef {typeof import('./interfaces/contracts').ModuleController.prototype.controllerOn} SunEditor.Hook.Controller.On
- * @typedef {typeof import('./interfaces/contracts').ModuleController.prototype.controllerClose} SunEditor.Hook.Controller.Close
+ * @typedef {import('./interfaces/contracts').ModuleController['controllerAction']} SunEditor.Hook.Controller.Action
+ * @typedef {import('./interfaces/contracts').ModuleController['controllerOn']} SunEditor.Hook.Controller.On
+ * @typedef {import('./interfaces/contracts').ModuleController['controllerClose']} SunEditor.Hook.Controller.Close
  *
- * @typedef {typeof import('./interfaces/contracts').ModuleBrowser.prototype.browserInit} SunEditor.Hook.Browser.Init
+ * @typedef {import('./interfaces/contracts').ModuleBrowser['browserInit']} SunEditor.Hook.Browser.Init
  *
- * @typedef {typeof import('./interfaces/contracts').ModuleColorPicker.prototype.colorPickerAction} SunEditor.Hook.ColorPicker.Action
- * @typedef {typeof import('./interfaces/contracts').ModuleColorPicker.prototype.colorPickerHueSliderOpen} SunEditor.Hook.ColorPicker.HueSliderOpen
- * @typedef {typeof import('./interfaces/contracts').ModuleColorPicker.prototype.colorPickerHueSliderClose} SunEditor.Hook.ColorPicker.HueSliderClose
+ * @typedef {import('./interfaces/contracts').ModuleColorPicker['colorPickerAction']} SunEditor.Hook.ColorPicker.Action
+ * @typedef {import('./interfaces/contracts').ModuleColorPicker['colorPickerHueSliderOpen']} SunEditor.Hook.ColorPicker.HueSliderOpen
+ * @typedef {import('./interfaces/contracts').ModuleColorPicker['colorPickerHueSliderClose']} SunEditor.Hook.ColorPicker.HueSliderClose
  *
- * @typedef {typeof import('./interfaces/contracts').ModuleHueSlider.prototype.hueSliderAction} SunEditor.Hook.HueSlider.Action
- * @typedef {typeof import('./interfaces/contracts').ModuleHueSlider.prototype.hueSliderCancelAction} SunEditor.Hook.HueSlider.CancelAction
+ * @typedef {import('./interfaces/contracts').ModuleHueSlider['hueSliderAction']} SunEditor.Hook.HueSlider.Action
+ * @typedef {import('./interfaces/contracts').ModuleHueSlider['hueSliderCancelAction']} SunEditor.Hook.HueSlider.CancelAction
  */
 
 // --------------------------------------------------------- [Plugin Hook parameter types] ---------------------------------------------------------------------------------------------------
@@ -268,7 +279,7 @@
  * @typedef {"bold"|"underline"|"italic"|"strike"|"subscript"|"superscript"|"removeFormat"|"copyFormat"|"indent"|"outdent"|"fullScreen"|"showBlocks"|"codeView"|"markdownView"|"undo"|"redo"|"preview"|"print"|"copy"|"dir"|"dir_ltr"|"dir_rtl"|"finder"|"save"|"newDocument"|"selectAll"|"pageBreak"|"pageUp"|"pageDown"|"pageNavigator"} SunEditor.UI.ButtonCommand
  *
  * Plugin buttons available in the toolbar
- * @typedef {"blockquote"|"codeBlock"|"exportPDF"|"fileUpload"|"list_bulleted"|"list_numbered"|"autocomplete"|"align"|"font"|"fontColor"|"backgroundColor"|"list"|"table"|"blockStyle"|"hr"|"layout"|"lineHeight"|"template"|"paragraphStyle"|"textStyle"|"link"|"image"|"video"|"audio"|"embed"|"math"|"drawing"|"imageGallery"|"videoGallery"|"audioGallery"|"fileGallery"|"fileBrowser"|"fontSize"|"pageNavigator"|"anchor"} SunEditor.UI.ButtonPlugin
+ * @typedef {"blockquote"|"codeBlock"|"exportPDF"|"fileUpload"|"list_bulleted"|"list_numbered"|"autocomplete"|"slashCommand"|"align"|"font"|"fontColor"|"backgroundColor"|"list"|"table"|"blockStyle"|"hr"|"layout"|"lineHeight"|"template"|"paragraphStyle"|"textStyle"|"link"|"image"|"video"|"audio"|"embed"|"math"|"drawing"|"imageGallery"|"videoGallery"|"audioGallery"|"fileGallery"|"fileBrowser"|"fontSize"|"pageNavigator"|"anchor"} SunEditor.UI.ButtonPlugin
  *
  * Single button item in the toolbar (includes special controls and custom strings)
  * @typedef {SunEditor.UI.ButtonCommand|SunEditor.UI.ButtonPlugin|SunEditor.UI.ButtonSpecial|string} SunEditor.UI.ButtonItem

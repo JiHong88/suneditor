@@ -35,13 +35,18 @@ export default class FocusManager {
 		if (this.#frameContext.get('wysiwygFrame').style.display === 'none') return;
 		this.#store.set('_preventBlur', false);
 
-		if (this.#frameOptions.get('iframe') || !this.#frameContext.get('wysiwyg').contains(this.#$.selection.getNode())) {
+		if (
+			this.#frameOptions.get('iframe') ||
+			!this.#frameContext.get('wysiwyg').contains(this.#$.selection.getNode())
+		) {
 			this.nativeFocus();
 		} else {
 			try {
 				const range = this.#$.selection.getRange();
 				if (range.startContainer === range.endContainer && dom.check.isWysiwygFrame(range.startContainer)) {
-					const currentNode = /** @type {HTMLElement} */ (range.commonAncestorContainer).children[range.startOffset];
+					const currentNode = /** @type {HTMLElement} */ (range.commonAncestorContainer).children[
+						range.startOffset
+					];
 					if (!this.#$.format.isLine(currentNode) && !this.#$.component.is(currentNode)) {
 						const br = dom.utils.createElement('BR');
 						const format = dom.utils.createElement(this.#options.get('defaultLine'), null, br);
@@ -50,7 +55,12 @@ export default class FocusManager {
 						return;
 					}
 				}
-				this.#$.selection.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
+				this.#$.selection.setRange(
+					range.startContainer,
+					range.startOffset,
+					range.endContainer,
+					range.endOffset,
+				);
 			} catch (e) {
 				console.warn('[SUNEDITOR.focus.warn] ', e);
 				this.nativeFocus();

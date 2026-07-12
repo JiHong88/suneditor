@@ -29,7 +29,13 @@ export class VideoUploadService {
 
 		const videoUploadUrl = this.#pluginOptions.uploadUrl;
 		if (typeof videoUploadUrl === 'string' && videoUploadUrl.length > 0) {
-			this.#main.fileManager.upload(videoUploadUrl, this.#pluginOptions.uploadHeaders, files, this.#UploadCallBack.bind(this, info), this.#error.bind(this));
+			this.#main.fileManager.upload(
+				videoUploadUrl,
+				this.#pluginOptions.uploadHeaders,
+				files,
+				this.#UploadCallBack.bind(this, info),
+				this.#error.bind(this),
+			);
 		}
 	}
 
@@ -43,7 +49,9 @@ export class VideoUploadService {
 		const videoTag = this.#main.createVideoTag();
 
 		for (let i = 0, len = fileList.length; i < len; i++) {
-			const ctag = info.isUpdate ? info.element : /** @type {HTMLIFrameElement|HTMLVideoElement} */ (videoTag.cloneNode(false));
+			const ctag = info.isUpdate
+				? info.element
+				: /** @type {HTMLIFrameElement|HTMLVideoElement} */ (videoTag.cloneNode(false));
 			this.#main.create(
 				ctag,
 				fileList[i].url,

@@ -31,7 +31,11 @@ export function isZeroWidth(text) {
  * @returns {boolean}
  */
 export function isEdgePoint(container, offset, dir) {
-	return (dir !== 'end' && offset === 0) || ((!dir || dir !== 'front') && !container.nodeValue && offset <= 1) || ((!dir || dir === 'end') && container.nodeValue && offset >= container.nodeValue.length);
+	return (
+		(dir !== 'end' && offset === 0) ||
+		((!dir || dir !== 'front') && !container.nodeValue && offset <= 1) ||
+		((!dir || dir === 'end') && container.nodeValue && offset >= container.nodeValue.length)
+	);
 }
 
 /**
@@ -175,7 +179,9 @@ export function isFigure(node) {
  * @returns {boolean}
  */
 export function isContentLess(node) {
-	return /^(BR|COLGROUP|COL|THEAD|TBODY|TFOOT|TR|AREA|BASE|EMBED|HR|IMG|INPUT|KEYGEN|LINK|META|PARAM|SOURCE|TRACK|WBR)$/i.test(typeof node === 'string' ? node : node?.nodeName);
+	return /^(BR|COLGROUP|COL|THEAD|TBODY|TFOOT|TR|AREA|BASE|EMBED|HR|IMG|INPUT|KEYGEN|LINK|META|PARAM|SOURCE|TRACK|WBR)$/i.test(
+		typeof node === 'string' ? node : node?.nodeName,
+	);
 }
 
 /**
@@ -186,7 +192,11 @@ export function isContentLess(node) {
 export function isEmptyLine(node) {
 	if (!node?.parentNode) return true;
 	const el = /** @type {HTMLElement} */ (node);
-	return !el.querySelector('IMG, IFRAME, AUDIO, VIDEO, CANVAS, TABLE') && (el.children.length <= 1 || isBreak(el.firstElementChild)) && isZeroWidth(el.textContent);
+	return (
+		!el.querySelector('IMG, IFRAME, AUDIO, VIDEO, CANVAS, TABLE') &&
+		(el.children.length <= 1 || isBreak(el.firstElementChild)) &&
+		isZeroWidth(el.textContent)
+	);
 }
 
 /**
@@ -216,7 +226,12 @@ export function isWysiwygFrame(node) {
 	const cls = el.classList;
 
 	if (!cls) return false;
-	return node.nodeName.toUpperCase() === 'BODY' || cls.contains('se-wrapper-wysiwyg') || cls.contains('sun-editor-carrier-wrapper') || cls.contains('se-wrapper');
+	return (
+		node.nodeName.toUpperCase() === 'BODY' ||
+		cls.contains('se-wrapper-wysiwyg') ||
+		cls.contains('sun-editor-carrier-wrapper') ||
+		cls.contains('se-wrapper')
+	);
 }
 
 /**
@@ -267,7 +282,12 @@ export function isSameAttributes(a, b) {
 		if (class_b.contains(class_a[i])) compClass++;
 	}
 
-	return compStyle === style_b.length && compStyle === style_a.length && compClass === class_b.length && compClass === class_a.length;
+	return (
+		compStyle === style_b.length &&
+		compStyle === style_a.length &&
+		compClass === class_b.length &&
+		compClass === class_a.length
+	);
 }
 
 /**

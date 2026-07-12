@@ -7,6 +7,7 @@ declare namespace _default {
 	export { list_bulleted };
 	export { list_numbered };
 	export { autocomplete };
+	export { slashCommand };
 	export { align };
 	export { font };
 	export { fontColor };
@@ -62,6 +63,7 @@ import table from './dropdown/table';
 import template from './dropdown/template';
 import textStyle from './dropdown/textStyle';
 import autocomplete from './field/autocomplete';
+import slashCommand from './field/slashCommand';
 import fontSize from './input/fontSize';
 import pageNavigator from './input/pageNavigator';
 import audio from './modal/audio';
@@ -103,6 +105,7 @@ export {
 	math,
 	pageNavigator,
 	paragraphStyle,
+	slashCommand,
 	table,
 	template,
 	textStyle,

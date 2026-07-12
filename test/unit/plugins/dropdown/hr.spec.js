@@ -59,6 +59,10 @@ describe('Plugins - Dropdown - HR', () => {
 		jest.clearAllMocks();
 
 		kernel = createMockEditor();
+		kernel.$.menu.initDropdownTarget = jest.fn().mockImplementation(() => {
+			const { dom } = require('../../../../src/helper');
+			return dom.utils.createElement('DIV', {}, '');
+		});
 		kernel.$.lang.horizontalLine = 'Horizontal Line';
 		kernel.$.lang.hr_solid = 'Solid';
 		kernel.$.lang.hr_dashed = 'Dashed';
@@ -113,13 +117,8 @@ describe('Plugins - Dropdown - HR', () => {
 			expect(hr.list).toBeDefined();
 		});
 
-		it('should create dropdown menu structure', () => {
-			const { dom } = require('../../../../src/helper');
-			expect(dom.utils.createElement).toHaveBeenCalledWith('DIV', { class: 'se-dropdown se-list-layer se-list-line' }, expect.stringContaining('se-list-inner'));
-		});
-
-		it('should initialize dropdown menu', () => {
-			expect(kernel.$.menu.initDropdownTarget).toHaveBeenCalledWith(HR, expect.any(Object));
+		it('should initialize dropdown menu with items and options', () => {
+			expect(kernel.$.menu.initDropdownTarget).toHaveBeenCalledWith(HR, expect.any(Array), expect.any(Object));
 		});
 
 		it('should initialize list from menu', () => {
@@ -357,83 +356,82 @@ describe('Plugins - Dropdown - HR', () => {
 		});
 	});
 
-	describe('CreateHTML function', () => {
-		it('should create dropdown menu with custom items', () => {
-			const { dom } = require('../../../../src/helper');
+	describe('CreateItems function', () => {
+		it('should pass correct items to initDropdownTarget', () => {
+			const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
 
-			const createCallArgs = dom.utils.createElement.mock.calls.find((call) => call[1]?.class === 'se-dropdown se-list-layer se-list-line');
-
-			expect(createCallArgs[2]).toContain('se-list-inner');
-			expect(createCallArgs[2]).toContain('data-command="hr"');
-			expect(createCallArgs[2]).toContain('Custom Solid');
-			expect(createCallArgs[2]).toContain('Custom Dashed');
-			expect(createCallArgs[2]).toContain('__se__custom-solid');
-			expect(createCallArgs[2]).toContain('__se__custom-dashed');
+			expect(items).toBeInstanceOf(Array);
+			expect(items.length).toBe(2);
+			expect(items[0].command).toBe('hr');
+			expect(items[1].command).toBe('hr');
+			expect(items[0].title).toBe('Custom Solid');
+			expect(items[1].title).toBe('Custom Dashed');
+			expect(items[0].innerHTML).toContain('__se__custom-solid');
+			expect(items[1].innerHTML).toContain('__se__custom-dashed');
 		});
 
 		it('should include default HR styles when no items provided', () => {
-			const { dom } = require('../../../../src/helper');
-			dom.utils.createElement.mockClear();
+			kernel.$.menu.initDropdownTarget.mockClear();
 
 			const defaultHR = new HR(kernel, {});
 
-			const createCallArgs = dom.utils.createElement.mock.calls.find((call) => call[1]?.class === 'se-dropdown se-list-layer se-list-line');
+			const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
+			const titles = items.map(item => item.title);
 
-			expect(createCallArgs[2]).toContain('__se__solid');
-			expect(createCallArgs[2]).toContain('__se__dashed');
-			expect(createCallArgs[2]).toContain('__se__dotted');
-			expect(createCallArgs[2]).toContain('Solid');
-			expect(createCallArgs[2]).toContain('Dashed');
-			expect(createCallArgs[2]).toContain('Dotted');
+			expect(titles).toContain('Solid');
+			expect(titles).toContain('Dashed');
+			expect(titles).toContain('Dotted');
+
+			const htmls = items.map(item => item.innerHTML);
+			expect(htmls.some(h => h.includes('__se__solid'))).toBe(true);
+			expect(htmls.some(h => h.includes('__se__dashed'))).toBe(true);
+			expect(htmls.some(h => h.includes('__se__dotted'))).toBe(true);
 		});
 
 		it('should handle items with style attribute', () => {
-			const { dom } = require('../../../../src/helper');
+			const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
 
-			const createCallArgs = dom.utils.createElement.mock.calls.find((call) => call[1]?.class === 'se-dropdown se-list-layer se-list-line');
-
-			expect(createCallArgs[2]).toContain('style="border-top: 2px dashed red;"');
+			expect(items[1].innerHTML).toContain('border-top: 2px dashed red;');
 		});
 
 		it('should handle items without class', () => {
-			const { dom } = require('../../../../src/helper');
-			dom.utils.createElement.mockClear();
+			kernel.$.menu.initDropdownTarget.mockClear();
 
 			const noClassHR = new HR(kernel, {
 				items: [{ name: 'No Class HR' }],
 			});
 
-			const createCallArgs = dom.utils.createElement.mock.calls.find((call) => call[1]?.class === 'se-dropdown se-list-layer se-list-line');
+			const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
 
-			expect(createCallArgs[2]).toContain('No Class HR');
-			expect(createCallArgs[2]).toContain('<hr/>'); // No class attribute
+			expect(items).toHaveLength(1);
+			expect(items[0].title).toBe('No Class HR');
+			expect(items[0].innerHTML).toContain('<hr/>');
 		});
 
 		it('should handle items without style', () => {
-			const { dom } = require('../../../../src/helper');
-			dom.utils.createElement.mockClear();
+			kernel.$.menu.initDropdownTarget.mockClear();
 
 			const noStyleHR = new HR(kernel, {
 				items: [{ name: 'No Style HR', class: '__se__no-style' }],
 			});
 
-			const createCallArgs = dom.utils.createElement.mock.calls.find((call) => call[1]?.class === 'se-dropdown se-list-layer se-list-line');
+			const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
 
-			expect(createCallArgs[2]).toContain('No Style HR');
-			expect(createCallArgs[2]).toContain('class="__se__no-style"');
-			expect(createCallArgs[2]).not.toContain('style=');
+			expect(items).toHaveLength(1);
+			expect(items[0].title).toBe('No Style HR');
+			expect(items[0].innerHTML).toContain('__se__no-style');
+			expect(items[0].innerHTML).not.toContain('style=');
 		});
 
 		it('should handle empty items array', () => {
-			const { dom } = require('../../../../src/helper');
-			dom.utils.createElement.mockClear();
+			kernel.$.menu.initDropdownTarget.mockClear();
 
 			const emptyItemsHR = new HR(kernel, { items: [] });
 
-			const createCallArgs = dom.utils.createElement.mock.calls.find((call) => call[1]?.class === 'se-dropdown se-list-layer se-list-line');
+			const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
 
-			expect(createCallArgs[2]).toContain('se-list-inner');
-			expect(createCallArgs[2]).toContain('se-list-basic');
+			// Empty items should fall back to defaults
+			expect(items).toBeInstanceOf(Array);
 		});
 	});
 

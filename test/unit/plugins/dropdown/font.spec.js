@@ -68,6 +68,9 @@ describe('Plugins - Dropdown - Font', () => {
         kernel.$.lang.default = 'Default';
         kernel.$.frameContext.set('wwComputedStyle', { fontFamily: 'Arial' });
 
+        const { dom } = require('../../../../src/helper');
+        kernel.$.menu.initDropdownTarget = jest.fn().mockImplementation(() => dom.utils.createElement('DIV', {}, ''));
+
         pluginOptions = {
             items: ['Arial', 'Georgia', 'Times New Roman']
         };
@@ -78,17 +81,16 @@ describe('Plugins - Dropdown - Font', () => {
 
     describe('Constructor', () => {
 
-        it('should create dropdown menu structure', () => {
-            const { dom } = require('../../../../src/helper');
-            expect(dom.utils.createElement).toHaveBeenCalledWith(
-                'DIV',
-                { class: 'se-dropdown se-list-layer se-list-font-family' },
-                expect.stringContaining('se-list-inner')
+        it('should create dropdown menu via initDropdownTarget', () => {
+            expect(kernel.$.menu.initDropdownTarget).toHaveBeenCalledWith(
+                Font,
+                expect.any(Array),
+                expect.objectContaining({ className: 'se-list-font-family' })
             );
         });
 
         it('should initialize dropdown menu', () => {
-            expect(kernel.$.menu.initDropdownTarget).toHaveBeenCalledWith(Font, expect.any(Object));
+            expect(kernel.$.menu.initDropdownTarget).toHaveBeenCalledWith(Font, expect.any(Array), expect.any(Object));
         });
 
         it('should initialize font list from menu', () => {
@@ -396,53 +398,40 @@ describe('Plugins - Dropdown - Font', () => {
         });
     });
 
-    describe('CreateHTML function', () => {
-        it('should create dropdown menu with custom fonts', () => {
-            const { dom } = require('../../../../src/helper');
+    describe('CreateItems function', () => {
+        it('should pass correct items to initDropdownTarget for custom fonts', () => {
+            const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
 
-            const createCallArgs = dom.utils.createElement.mock.calls.find(
-                call => call[1]?.class === 'se-dropdown se-list-layer se-list-font-family'
-            );
-
-            expect(createCallArgs[2]).toContain('se-list-inner');
-            expect(createCallArgs[2]).toContain('default_value');
-            expect(createCallArgs[2]).toContain('Default'); // Uses lang.default
-            expect(createCallArgs[2]).toContain('data-command="Arial"');
-            expect(createCallArgs[2]).toContain('data-command="Georgia"');
-            expect(createCallArgs[2]).toContain('data-command="Times New Roman"');
+            expect(items).toHaveLength(3);
+            expect(items[0]).toMatchObject({ command: 'Arial', title: 'Arial', innerHTML: 'Arial' });
+            expect(items[1]).toMatchObject({ command: 'Georgia', title: 'Georgia', innerHTML: 'Georgia' });
+            expect(items[2]).toMatchObject({ command: 'Times New Roman', title: 'Times New Roman', innerHTML: 'Times New Roman' });
         });
 
-        it('should include default fonts when no items provided', () => {
-            const { dom } = require('../../../../src/helper');
-            dom.utils.createElement.mockClear();
+        it('should pass default font items when no items provided', () => {
+            kernel.$.menu.initDropdownTarget.mockClear();
 
             const defaultFont = new Font(kernel, {});
 
-            const createCallArgs = dom.utils.createElement.mock.calls.find(
-                call => call[1]?.class === 'se-dropdown se-list-layer se-list-font-family'
-            );
+            const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
 
-            expect(createCallArgs[2]).toContain('data-command="Arial"');
-            expect(createCallArgs[2]).toContain('data-command="Comic Sans MS"');
-            expect(createCallArgs[2]).toContain('data-command="Courier New"');
-            expect(createCallArgs[2]).toContain('data-command="Verdana"');
+            expect(items.find(i => i.command === 'Arial')).toBeDefined();
+            expect(items.find(i => i.command === 'Comic Sans MS')).toBeDefined();
+            expect(items.find(i => i.command === 'Courier New')).toBeDefined();
+            expect(items.find(i => i.command === 'Verdana')).toBeDefined();
         });
 
-        it('should handle font names with commas in CreateHTML', () => {
-            const { dom } = require('../../../../src/helper');
-            dom.utils.createElement.mockClear();
+        it('should handle font names with commas in CreateItems', () => {
+            kernel.$.menu.initDropdownTarget.mockClear();
 
             new Font(kernel, {
                 items: ['Arial, sans-serif', 'Times New Roman, serif']
             });
 
-            const createCallArgs = dom.utils.createElement.mock.calls.find(
-                call => call[1]?.class === 'se-dropdown se-list-layer se-list-font-family'
-            );
+            const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
 
-            expect(createCallArgs[2]).toContain('data-command="Arial, sans-serif"');
-            expect(createCallArgs[2]).toContain('data-txt="Arial"'); // First part before comma
-            expect(createCallArgs[2]).toContain('>Arial</button>'); // Display text
+            expect(items[0]).toMatchObject({ command: 'Arial, sans-serif', title: 'Arial', innerHTML: 'Arial' });
+            expect(items[1]).toMatchObject({ command: 'Times New Roman, serif', title: 'Times New Roman', innerHTML: 'Times New Roman' });
         });
     });
 

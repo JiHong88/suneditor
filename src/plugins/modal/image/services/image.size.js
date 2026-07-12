@@ -166,7 +166,12 @@ export class ImageSizeService {
 		if (xy === 'x' && this.#state.onlyPercentage && Number(target.value) > 100) {
 			target.value = '100';
 		} else if (this.#proportion.checked) {
-			const ratioSize = Figure.CalcRatio(this.#inputX.value, this.#inputY.value, this.#state.sizeUnit, this.#ratio);
+			const ratioSize = Figure.CalcRatio(
+				this.#inputX.value,
+				this.#inputY.value,
+				this.#state.sizeUnit,
+				this.#ratio,
+			);
 			if (xy === 'x') {
 				this.#inputY.value = String(ratioSize.h);
 			} else {
@@ -179,7 +184,9 @@ export class ImageSizeService {
 	 * @description Updates the ratio based on current input values.
 	 */
 	#OnChangeRatio() {
-		this.#ratio = this.#proportion.checked ? Figure.GetRatio(this.#inputX.value, this.#inputY.value, this.#state.sizeUnit) : { w: 0, h: 0 };
+		this.#ratio = this.#proportion.checked
+			? Figure.GetRatio(this.#inputX.value, this.#inputY.value, this.#state.sizeUnit)
+			: { w: 0, h: 0 };
 	}
 
 	/**

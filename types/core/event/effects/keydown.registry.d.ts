@@ -9,13 +9,23 @@ declare const _default: {
 	/** @action backspaceFormatMaintain */
 	'backspace.format.maintain': ({ ctx }: EffectContext_keydown, { formatEl }: any) => void;
 	/** @action backspaceComponentSelect */
-	'backspace.component.select': ({ ports }: EffectContext_keydown, { selectionNode, range, fileComponentInfo }: any) => void;
+	'backspace.component.select': (
+		{ ports }: EffectContext_keydown,
+		{ selectionNode, range, fileComponentInfo }: any,
+	) => void;
 	/** @action backspaceComponentRemove */
-	'backspace.component.remove': ({ ports }: EffectContext_keydown, { isList, sel, formatEl, fileComponentInfo }: any) => void;
+	'backspace.component.remove': (
+		{ ports }: EffectContext_keydown,
+		{ isList, sel, formatEl, fileComponentInfo }: any,
+	) => void;
 	/** @action backspaceListMergePrev */
 	'backspace.list.mergePrev': ({ ports }: EffectContext_keydown, { prev, formatEl, rangeEl }: any) => void;
 	/** @action backspaceListRemoveNested */
 	'backspace.list.removeNested': ({ ports }: EffectContext_keydown, { range }: any) => void;
+	/** @action backspaceEmptyLineMergePrev */
+	'backspace.emptyLine.mergePrev': ({ ports }: EffectContext_keydown, { formatEl, prev }: any) => void;
+	/** @action backspaceBrLineRowMerge */
+	'backspace.brline.rowMerge': ({ ports }: EffectContext_keydown, { rowEndBr, rowStartBr }: any) => void;
 	/** [delete] */
 	/** @action deleteComponentSelect */
 	'delete.component.select': ({ ports }: EffectContext_keydown, { formatEl, fileComponentInfo }: any) => void;
@@ -23,6 +33,10 @@ declare const _default: {
 	'delete.component.selectNext': ({ ports, ctx }: EffectContext_keydown, { formatEl, nextEl }: any) => void;
 	/** @action deleteListRemoveNested */
 	'delete.list.removeNested': ({ ports, ctx }: EffectContext_keydown, { range, formatEl, rangeEl }: any) => void;
+	/** @action deleteEmptyLineMergeNext — remove an empty line, move caret to the start of the next line */
+	'delete.emptyLine.mergeNext': ({ ports }: EffectContext_keydown, { formatEl, next }: any) => void;
+	/** @action deleteBrLineRowMerge — remove an empty row inside a brLine (PRE), pull the next row up */
+	'delete.brline.rowMerge': ({ ports }: EffectContext_keydown, { rowEndBr }: any) => void;
 	/** [tab] */
 	/** @action tabFormatIndent */
 	'tab.format.indent': ({ ports, ctx }: EffectContext_keydown, { range, formatEl, shift }: any) => boolean;
@@ -30,21 +44,37 @@ declare const _default: {
 	/** @action enterScrollTo */
 	'enter.scrollTo': ({ ports }: EffectContext_keydown, { range }: any) => void;
 	/** @action enterLineAddDefault */
-	'enter.line.addDefault': ({ ports, ctx }: EffectContext_keydown, { formatEl }: any) => void;
+	'enter.line.addDefault': ({ ports }: EffectContext_keydown, { formatEl }: any) => void;
 	/** @action enterListAddItem */
 	'enter.list.addItem': ({ ports }: EffectContext_keydown, { formatEl, selectionNode }: any) => void;
 	/** @action enterFormatExitEmpty */
 	'enter.format.exitEmpty': ({ ports, ctx }: EffectContext_keydown, { formatEl, rangeEl }: any) => void;
 	/** @action enterFormatCleanBrAndZWS */
-	'enter.format.cleanBrAndZWS': ({ ports }: EffectContext_keydown, { selectionNode, selectionFormat, brBlock, children, offset }: any) => void;
+	'enter.format.cleanBrAndZWS': (
+		{ ports }: EffectContext_keydown,
+		{ selectionNode, selectionFormat, brBlock, children, offset }: any,
+	) => void;
 	/** @action enterFormatInsertBrHtml */
-	'enter.format.insertBrHtml': ({ ports }: EffectContext_keydown, { brBlock, range, wSelection, offset }: any) => void;
+	'enter.format.insertBrHtml': (
+		{ ports }: EffectContext_keydown,
+		{ brBlock, range, wSelection, offset }: any,
+	) => void;
+	/** @action enterBrLineInsert — insert exactly one empty row at the caret inside a normal brLine. */
+	'enter.brline.insert': ({ ports }: EffectContext_keydown, { range }: any) => void;
+	/** @action enterBrLineExit — consume only the caret's current (last) empty row and add a default line after the brLine. */
+	'enter.brline.exit': ({ ports }: EffectContext_keydown, { brBlock }: any) => void;
 	/** @action enterFormatInsertBrNode */
 	'enter.format.insertBrNode': ({ ports }: EffectContext_keydown, { wSelection }: any) => void;
 	/** @action enterFormatBreakAtEdge */
-	'enter.format.breakAtEdge': ({ ports, ctx }: EffectContext_keydown, { formatEl, selectionNode, formatStartEdge, formatEndEdge, bidiSwapped }: any) => void;
+	'enter.format.breakAtEdge': (
+		{ ports, ctx }: EffectContext_keydown,
+		{ formatEl, selectionNode, formatStartEdge, formatEndEdge, bidiSwapped }: any,
+	) => void;
 	/** @action enterFormatBreakWithSelection */
-	'enter.format.breakWithSelection': ({ ports, ctx }: EffectContext_keydown, { formatEl, range, formatStartEdge, formatEndEdge }: any) => void;
+	'enter.format.breakWithSelection': (
+		{ ports, ctx }: EffectContext_keydown,
+		{ formatEl, range, formatStartEdge, formatEndEdge }: any,
+	) => void;
 	/** @action enterFormatBreakAtCursor */
 	'enter.format.breakAtCursor': ({ ports, ctx }: EffectContext_keydown, { formatEl, range }: any) => void;
 	/** @action enterFigcaptionExitInList */

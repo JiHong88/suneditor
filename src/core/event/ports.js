@@ -37,6 +37,7 @@ import { isMobile } from '../../helper/env';
  * @property {(...args: Parameters<Format['isEdgeLine']>) => ReturnType<Format['isEdgeLine']>} isEdgeLine
  * @property {(...args: Parameters<Format['removeBlock']>) => ReturnType<Format['removeBlock']>} removeBlock
  * @property {(...args: Parameters<Format['addLine']>) => ReturnType<Format['addLine']>} addLine
+ * @property {(...args: Parameters<Format['addLineAfter']>) => ReturnType<Format['addLineAfter']>} addLineAfter
  */
 
 /**
@@ -82,7 +83,20 @@ import { isMobile } from '../../helper/env';
  * @param {*} param1._styleNodes - Style nodes reference object
  */
 export function makePorts(inst, { _styleNodes }) {
-	const { frameContext, ui, focusManager, selection, format, listFormat, component, html, nodeTransform, history, char, menu } = inst.$;
+	const {
+		frameContext,
+		ui,
+		focusManager,
+		selection,
+		format,
+		listFormat,
+		component,
+		html,
+		nodeTransform,
+		history,
+		char,
+		menu,
+	} = inst.$;
 
 	return {
 		// focusManager
@@ -112,6 +126,7 @@ export function makePorts(inst, { _styleNodes }) {
 			isEdgeLine: (node, offset, dir) => format.isEdgeLine(node, offset, dir),
 			removeBlock: (n, p) => format.removeBlock(n, p),
 			addLine: (el, nextOrTag) => format.addLine(el, nextOrTag),
+			addLineAfter: (el) => format.addLineAfter(el),
 		},
 
 		listFormat: {
@@ -159,14 +174,17 @@ export function makePorts(inst, { _styleNodes }) {
 		// === enter event specific ===
 		/**
 		 * @description Scrolls the editor view to the caret position after pressing `Enter`.
-		 * @param {Range} range Range object
+		 * @param {Range} range Pre-Enter snapshot range (fallback only).
 		 */
 		enterScrollTo(range) {
 			ui._iframeAutoHeight(frameContext);
 
-			// scroll to
-			// if (isMobile && inst.scrollparents.length > 0) return;
-			selection.scrollTo(range, { behavior: 'auto', block: 'nearest', inline: 'nearest' });
+			// Scroll to the *live* post-Enter caret, not the pre-Enter `range` snapshot.
+			selection.scrollTo(selection.getRange() || range, {
+				behavior: 'auto',
+				block: 'nearest',
+				inline: 'nearest',
+			});
 		},
 		/**
 		 * @description Prevents the default behavior of the `Enter` key and refocuses the editor.
