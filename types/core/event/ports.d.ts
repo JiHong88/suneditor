@@ -173,8 +173,10 @@ export function makePorts(
 	 */
 	enterScrollTo(range: Range): void;
 	/**
-	 * @description Prevents the default behavior of the `Enter` key and refocuses the editor.
-	 * @param {Event} e The keyboard event
+	 * @description Prevents the default behavior of the `Enter` key.
+	 * Enter now runs from `beforeinput` (post-IME-commit), so the former mobile focus-shuffle
+	 * (temp-focus → refocus, to force-end a virtual-keyboard IME session) is unnecessary.
+	 * @param {Event} e The keyboard/input event
 	 */
 	enterPrevent(e: Event): void;
 };

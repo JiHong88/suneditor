@@ -112,9 +112,6 @@ class EventOrchestrator extends KernelInjector {
 		this.__eventDoc = null;
 		/** @type {string} */
 		this.__secopy = null;
-
-		/** @type {HTMLInputElement} */
-		this.__focusTemp = this.#contextProvider.carrierWrapper.querySelector('.__se__focus__temp__');
 	}
 
 	/**
@@ -204,6 +201,32 @@ class EventOrchestrator extends KernelInjector {
 	 */
 	_setDefaultLine(formatName) {
 		return this.defaultLineManager.execute(formatName);
+	}
+
+	/**
+	 * @internal
+	 * @description Normalize the Enter range before the reducer reads it: reset to a text node, and when the
+	 * caret sits inside a zero-width text node adjacent to a `<br>`, move it onto the `<br>`.
+	 * @returns {?(HTMLElement|Text)} The updated selection node, or `null` when the caret is not on a line (no normalization ran).
+	 */
+	_normalizeEnterRange() {
+		if (!this.$.format.isLine(this.$.selection.getRange()?.startContainer)) return null;
+
+		this.$.selection.resetRangeToTextNode();
+
+		const r = this.$.selection.getRange();
+		if (
+			r.startContainer === r.endContainer &&
+			r.startOffset !== r.endOffset &&
+			r.startContainer.nodeType === 3 &&
+			dom.check.isZeroWidth(r.startContainer)
+		) {
+			const br = r.startContainer.nextSibling;
+			if (br && dom.check.isBreak(br)) this.$.selection.setRange(br, 0, br, 0);
+			else this.$.selection.setRange(r.endContainer, r.endOffset, r.endContainer, r.endOffset);
+		}
+
+		return this.$.selection.getNode();
 	}
 
 	/**
@@ -579,9 +602,6 @@ class EventOrchestrator extends KernelInjector {
 			this.#eventManager.addEvent(parent, 'scroll', OnScrollAbs, false);
 		}
 
-		/** focus temp (mobile) */
-		this.#eventManager.addEvent(this.__focusTemp, 'focus', (e) => e.preventDefault(), false);
-
 		/** document event */
 		if (this.__eventDoc !== fc.get('_wd')) {
 			this.__eventDoc = fc.get('_wd');
@@ -658,7 +678,6 @@ class EventOrchestrator extends KernelInjector {
 		this.__inputPlugin = null;
 		this.__inputBlurEvent = null;
 		this.__inputKeyEvent = null;
-		this.__focusTemp = null;
 		this.__eventDoc = null;
 		this.__secopy = null;
 		this._lineBreakComp = null;

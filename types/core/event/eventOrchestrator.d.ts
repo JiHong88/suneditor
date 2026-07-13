@@ -51,8 +51,6 @@ declare class EventOrchestrator extends KernelInjector {
 	__eventDoc: Document;
 	/** @type {string} */
 	__secopy: string;
-	/** @type {HTMLInputElement} */
-	__focusTemp: HTMLInputElement;
 	/**
 	 * @description Activates the corresponding button with the tags information of the current cursor position,
 	 * - such as `bold`, `underline`, etc., and executes the `active` method of the plugins.
@@ -86,6 +84,13 @@ declare class EventOrchestrator extends KernelInjector {
 	 * @param {?string} formatName Format tag name (default: `P`)
 	 */
 	_setDefaultLine(formatName: string | null): void;
+	/**
+	 * @internal
+	 * @description Normalize the Enter range before the reducer reads it: reset to a text node, and when the
+	 * caret sits inside a zero-width text node adjacent to a `<br>`, move it onto the `<br>`.
+	 * @returns {?(HTMLElement|Text)} The updated selection node, or `null` when the caret is not on a line (no normalization ran).
+	 */
+	_normalizeEnterRange(): (HTMLElement | Text) | null;
 	/**
 	 * @internal
 	 * @description Handles data transfer actions for `paste` and `drop` events.

@@ -1,7 +1,7 @@
 import { dom, env, unicode, keyCodeMap } from '../../../helper';
 import { actionExecutor } from '../executor';
 import { makePorts } from '../ports';
-import { reduceKeydown } from '../reducers/keydown.reducer';
+import { reduceKeydown, ENTER_FROM_BEFOREINPUT } from '../reducers/keydown.reducer';
 
 const { _w } = env;
 const FRONT_ZEROWIDTH = new RegExp(unicode.zeroWidthSpace + '+', '');
@@ -47,23 +47,15 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 		if (!this.$.store.mode.isSubBalloonAlways) this._hideToolbar_sub();
 	}
 
-	/** default key action — normalize the Enter range before the reducer reads it */
-	if (keyCodeMap.isEnter(keyCode) && this.$.format.isLine(this.$.selection.getRange()?.startContainer)) {
-		this.$.selection.resetRangeToTextNode();
-
-		const r = this.$.selection.getRange();
-		if (
-			r.startContainer === r.endContainer &&
-			r.startOffset !== r.endOffset &&
-			r.startContainer.nodeType === 3 &&
-			dom.check.isZeroWidth(r.startContainer)
-		) {
-			const br = r.startContainer.nextSibling;
-			if (br && dom.check.isBreak(br)) this.$.selection.setRange(br, 0, br, 0);
-			else this.$.selection.setRange(r.endContainer, r.endOffset, r.endContainer, r.endOffset);
-		}
-
-		selectionNode = this.$.selection.getNode();
+	/**
+	 * default key action — normalize the Enter range before the reducer reads it.
+	 * Skipped when Enter is handled from `beforeinput` (ENTER_FROM_BEFOREINPUT): mutating the DOM here
+	 * on keydown re-traps the iOS/mobile IME marked-text — `dispatchEnter` runs this same normalization
+	 * later, after the IME has committed.
+	 */
+	if (!ENTER_FROM_BEFOREINPUT && keyCodeMap.isEnter(keyCode)) {
+		const normalized = this._normalizeEnterRange();
+		if (normalized) selectionNode = normalized;
 	}
 
 	const range = this.$.selection.getRange();

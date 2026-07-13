@@ -38,22 +38,18 @@ git pull --ff-only
 git checkout --quiet "$RELEASE_BRANCH"
 git pull --ff-only
 
-# --- squash-merge: stage the full delta as one changeset (no commit yet) ---
-if ! git merge --squash "$SOURCE_BRANCH"; then
-	echo "✗ Squash-merge hit conflicts. Resolve manually, or discard with:" >&2
-	echo "    git reset --hard @{u} && git checkout $START_BRANCH" >&2
-	trap - EXIT   # leave the tree as-is for inspection
-	exit 1
-fi
-
-# --- nothing new? bail cleanly ---
-if git diff --cached --quiet; then
+# --- nothing new? (release tree already identical to master's) bail cleanly ---
+if [ "$(git rev-parse "$SOURCE_BRANCH^{tree}")" = "$(git rev-parse 'HEAD^{tree}')" ]; then
 	echo "✓ $RELEASE_BRANCH already matches $SOURCE_BRANCH — nothing to archive."
 	exit 0
 fi
 
-# --- one commit with the version as the message, then push ---
-git commit -m "$VERSION"
+# --- snapshot master's tree as ONE commit on top of release ---
+# This is NOT a 3-way content merge: the new commit's tree IS master's tree, so it can
+# never conflict — no matter how many versions release has diverged. It records no master
+# parent (like a squash-merge), so release stays one clean commit per version.
+NEW_COMMIT="$(git commit-tree "$SOURCE_BRANCH^{tree}" -p HEAD -m "$VERSION")"
+git merge --ff-only "$NEW_COMMIT"   # fast-forward release onto the snapshot (updates worktree)
 git push origin "$RELEASE_BRANCH"
 
 echo "✓ Pushed $RELEASE_BRANCH commit \"$VERSION\""

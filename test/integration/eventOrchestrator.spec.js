@@ -365,6 +365,47 @@ describe('EventOrchestrator Integration Tests', () => {
 			expect(true).toBe(true);
 		});
 
+		it('dispatches Enter from beforeinput(insertParagraph) — cancels native and adds one line', async () => {
+			// Enter moved from keydown to beforeinput (ENTER_FROM_BEFOREINPUT). A native insertParagraph at
+			// a line end must be cancelled synchronously and SunEditor must add exactly one new line.
+			wysiwyg.innerHTML = '<p>AB</p>';
+			const textNode = wysiwyg.querySelector('p').firstChild;
+			editor.$.selection.setRange(textNode, 2, textNode, 2); // caret at the end edge
+
+			const before = wysiwyg.querySelectorAll('p').length;
+			const event = new InputEvent('beforeinput', {
+				bubbles: true,
+				cancelable: true,
+				inputType: 'insertParagraph',
+				data: null,
+			});
+			wysiwyg.dispatchEvent(event);
+			await wait();
+
+			expect(event.defaultPrevented).toBe(true); // native insert cancelled synchronously
+			expect(wysiwyg.querySelectorAll('p').length).toBe(before + 1); // exactly one line added
+		});
+
+		it('beforeinput(insertParagraph) on readOnly editor is blocked (no line added)', async () => {
+			editor.$.ui.readOnly(true);
+			wysiwyg.innerHTML = '<p>AB</p>';
+			const textNode = wysiwyg.querySelector('p').firstChild;
+			editor.$.selection.setRange(textNode, 2, textNode, 2);
+
+			const before = wysiwyg.querySelectorAll('p').length;
+			const event = new InputEvent('beforeinput', {
+				bubbles: true,
+				cancelable: true,
+				inputType: 'insertParagraph',
+				data: null,
+			});
+			wysiwyg.dispatchEvent(event);
+			await wait();
+
+			expect(wysiwyg.querySelectorAll('p').length).toBe(before); // readOnly early-return, no Enter handling
+			editor.$.ui.readOnly(false);
+		});
+
 		it('should prevent input on readOnly editor', async () => {
 			editor.$.ui.readOnly(true);
 			wysiwyg.innerHTML = '<p>Text</p>';

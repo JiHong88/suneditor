@@ -4,7 +4,7 @@ import type {} from '../../../typedef';
  */
 /**
  * @typedef {Object} KeydownReducerCtx - Keydown Reducer Context object
- * @property {KeyboardEvent} ctx.e - The keyboard event
+ * @property {KeyboardEvent|InputEvent} ctx.e - The keyboard event (or the `beforeinput` InputEvent when Enter is dispatched from `beforeinput`)
  * @property {SunEditor.FrameContext} ctx.fc - Frame context object
  * @property {SunEditor.Store} ctx.store - Editor store object
  * @property {SunEditor.Options} ctx.options - Options object
@@ -27,15 +27,24 @@ import type {} from '../../../typedef';
  * @returns {Promise<EventActions>} Action list
  */
 export function reduceKeydown(ports: EventPorts, ctx: KeydownReducerCtx): Promise<EventActions>;
+/**
+ * @description Enter is processed from the `beforeinput` event (post-IME-commit) instead of `keydown`,
+ * to avoid trapping iOS/mobile IME marked-text when `keydown` mutates the DOM (see `handler_ww_input.js`).
+ * Flip to `false` to instantly restore the legacy synchronous `keydown` Enter path — no other file needs
+ * touching for rollback (the `keydown` Enter gate, the `handler_ww_key` normalization guard, and the
+ * `beforeinput` dispatch all key off this single flag).
+ * @type {boolean}
+ */
+export const ENTER_FROM_BEFOREINPUT: boolean;
 export type EventPorts = import('../ports').EventReducerPorts;
 /**
  * - Keydown Reducer Context object
  */
 export type KeydownReducerCtx = {
 	/**
-	 * - The keyboard event
+	 * - The keyboard event (or the `beforeinput` InputEvent when Enter is dispatched from `beforeinput`)
 	 */
-	e: KeyboardEvent;
+	e: KeyboardEvent | InputEvent;
 	/**
 	 * - Frame context object
 	 */

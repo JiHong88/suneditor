@@ -2,7 +2,7 @@
  * @fileoverview Unit tests for keydown reducer
  */
 
-import { reduceKeydown } from '../../../../../src/core/event/reducers/keydown.reducer';
+import { reduceKeydown, ENTER_FROM_BEFOREINPUT } from '../../../../../src/core/event/reducers/keydown.reducer';
 
 describe('Keydown Reducer', () => {
 	let mockPorts;
@@ -101,13 +101,22 @@ describe('Keydown Reducer', () => {
 		expect(actions.length).toBeGreaterThan(0);
 	});
 
-	it('should handle Enter keyCode', async () => {
+	it('gates Enter — deferred to the beforeinput dispatcher, no keydown enter actions', async () => {
 		mockCtx.keyCode = 'Enter';
 
 		const actions = await reduceKeydown(mockPorts, mockCtx);
 
 		expect(Array.isArray(actions)).toBe(true);
-		expect(actions.length).toBeGreaterThan(0);
+		if (ENTER_FROM_BEFOREINPUT) {
+			// Enter is handled in `beforeinput` (handler_ww_input.js `dispatchEnter`). For a plain collapsed
+			// Enter the keydown reducer must neither run the enter rule (no synchronous preventer) nor emit
+			// any enter action — the DOM stays untouched on keydown so the IME can commit first.
+			expect(mockPorts.enterPrevent).not.toHaveBeenCalled();
+			expect(actions.length).toBe(0);
+		} else {
+			// Legacy synchronous keydown path (flag rolled back).
+			expect(actions.length).toBeGreaterThan(0);
+		}
 	});
 
 	it('should handle Tab keyCode', async () => {

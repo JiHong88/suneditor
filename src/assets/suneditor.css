@@ -1044,9 +1044,10 @@
 	color: var(--se-block-handle-color);
 	z-index: 10;
 	transition:
-		top 0.15s ease-out,
-		left 0.15s ease-out,
-		right 0.15s ease-out;
+		top 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+		left 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+		right 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+	will-change: top, left, right;
 }
 
 .sun-editor .se-block-handle.se-no-transition {

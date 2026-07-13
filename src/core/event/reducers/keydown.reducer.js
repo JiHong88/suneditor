@@ -10,12 +10,22 @@ import { A } from '../actions';
 const { isOSX_IOS } = env;
 
 /**
+ * @description Enter is processed from the `beforeinput` event (post-IME-commit) instead of `keydown`,
+ * to avoid trapping iOS/mobile IME marked-text when `keydown` mutates the DOM (see `handler_ww_input.js`).
+ * Flip to `false` to instantly restore the legacy synchronous `keydown` Enter path — no other file needs
+ * touching for rollback (the `keydown` Enter gate, the `handler_ww_key` normalization guard, and the
+ * `beforeinput` dispatch all key off this single flag).
+ * @type {boolean}
+ */
+export const ENTER_FROM_BEFOREINPUT = true;
+
+/**
  * @typedef {import('../ports').EventReducerPorts} EventPorts
  */
 
 /**
  * @typedef {Object} KeydownReducerCtx - Keydown Reducer Context object
- * @property {KeyboardEvent} ctx.e - The keyboard event
+ * @property {KeyboardEvent|InputEvent} ctx.e - The keyboard event (or the `beforeinput` InputEvent when Enter is dispatched from `beforeinput`)
  * @property {SunEditor.FrameContext} ctx.fc - Frame context object
  * @property {SunEditor.Store} ctx.store - Editor store object
  * @property {SunEditor.Options} ctx.options - Options object
@@ -62,8 +72,13 @@ export async function reduceKeydown(ports, ctx) {
 			break;
 		}
 		case 'Enter' /** enter key */: {
-			if (reduceEnterDown(actions, ports, ctx) === false) {
-				return actions;
+			// Enter is handled in `beforeinput` (IME stability) — see ENTER_FROM_BEFOREINPUT.
+			// Gate only (not an early-return) so the post-switch `documentTypeRefreshHeader`
+			// still runs for a selectRange + Enter on keydown.
+			if (!ENTER_FROM_BEFOREINPUT) {
+				if (reduceEnterDown(actions, ports, ctx) === false) {
+					return actions;
+				}
 			}
 			break;
 		}

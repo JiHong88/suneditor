@@ -76,19 +76,6 @@ function Constructor(editorTargets, options) {
 	// menuTray
 	const menuTray = dom.utils.createElement('DIV', { class: 'se-menu-tray', popover: 'manual' });
 	editor_carrier_wrapper.appendChild(menuTray);
-	// focus temp element
-	const focusTemp = /** @type {HTMLInputElement} */ (
-		dom.utils.createElement('INPUT', {
-			type: 'text',
-			id: editorFormFieldPrefix + '-focus-temp',
-			class: '__se__focus__temp__',
-			autocomplete: 'off',
-			'aria-hidden': 'true',
-			style: 'position: fixed !important; top: -10000px !important; left: -10000px !important; display: block !important; width: 0 !important; height: 0 !important; margin: 0 !important; padding: 0 !important;',
-		})
-	);
-	focusTemp.tabIndex = 0;
-	editor_carrier_wrapper.appendChild(focusTemp);
 
 	// modal
 	const modal = dom.utils.createElement('DIV', {

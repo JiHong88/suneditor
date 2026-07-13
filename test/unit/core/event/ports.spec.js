@@ -528,24 +528,25 @@ describe('makePorts', () => {
 			expect(inst.__focusTemp.focus).not.toHaveBeenCalled();
 		});
 
-		it('on mobile, calls preventDefault then focuses __focusTemp and wysiwyg', () => {
+		it('never focus-shuffles, even on mobile — Enter now runs from beforeinput', () => {
+			// The former virtual-keyboard IME focus-shuffle (temp-focus → refocus) was removed: Enter is
+			// dispatched from `beforeinput` (post-IME-commit), where a refocus would re-arm the IME.
+			// `enterPrevent` must only cancel the native insert.
 			mockIsMobileValue = true;
-			ports = makePorts(inst, { _styleNodes: styleNodes });
 
 			const wysiwyg = { focus: jest.fn() };
 			inst.$.frameContext.get = jest.fn((key) => {
 				if (key === 'wysiwyg') return wysiwyg;
 				return undefined;
 			});
-			// Re-create ports to pick up new frameContext.get
 			ports = makePorts(inst, { _styleNodes: styleNodes });
 
 			const mockEvent = { preventDefault: jest.fn() };
 			ports.enterPrevent(mockEvent);
 
 			expect(mockEvent.preventDefault).toHaveBeenCalledTimes(1);
-			expect(inst.__focusTemp.focus).toHaveBeenCalledWith({ preventScroll: true });
-			expect(wysiwyg.focus).toHaveBeenCalledWith({ preventScroll: true });
+			expect(inst.__focusTemp.focus).not.toHaveBeenCalled();
+			expect(wysiwyg.focus).not.toHaveBeenCalled();
 		});
 	});
 
