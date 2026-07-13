@@ -299,7 +299,7 @@ function Constructor(editorTargets, options) {
 		if (isBlockHandle) {
 			blockHandleArea = dom.utils.createElement('DIV', { class: 'se-block-handle-area' });
 
-			const blockHandleGroup = dom.utils.createElement('DIV', { class: 'se-block-handle' });
+			const blockHandleGroup = dom.utils.createElement('DIV', { class: 'se-block-handle', popover: 'manual' });
 			const blockHandlePlus = dom.utils.createElement(
 				'DIV',
 				{ class: 'se-block-handle-btn se-block-handle-plus' },

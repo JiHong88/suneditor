@@ -1348,6 +1348,7 @@
 
 /** --- popover UA override ---------------------------------------------------- */
 .sun-editor .se-controller[popover],
+.sun-editor .se-block-handle[popover],
 .sun-editor.sun-editor-carrier-wrapper .se-drag-cursor[popover] {
 	inset: unset;
 	margin: 0;
@@ -1358,6 +1359,7 @@
 .sun-editor .se-loading-box[popover],
 .sun-editor .se-toast[popover],
 .sun-editor .se-browser[popover],
+.sun-editor .se-block-handle[popover],
 .sun-editor .se-menu-tray[popover] {
 	background: none;
 	border: none;

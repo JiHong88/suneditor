@@ -120,6 +120,30 @@ class BlockHandle {
 	}
 
 	/**
+	 * @description Show the handle.
+	 */
+	#showHandle() {
+		this.#handle.style.display = 'flex';
+		try {
+			this.#handle.showPopover?.();
+		} catch {
+			// already open
+		}
+	}
+
+	/**
+	 * @description Hide the handle and drop it out of the top layer.
+	 */
+	#hideHandle() {
+		try {
+			this.#handle.hidePopover?.();
+		} catch {
+			// already hidden
+		}
+		this.#handle.style.display = 'none';
+	}
+
+	/**
 	 * @description Position the block handle for the given mouse target. Uses rAF throttle.
 	 * Called from wysiwyg mousemove.
 	 * @param {Node} eventTarget - The element under the mouse cursor
@@ -156,7 +180,7 @@ class BlockHandle {
 	 */
 	hideNow() {
 		this.#cancelHide();
-		this.#handle.style.display = 'none';
+		this.#hideHandle();
 		this.#actionMenu?.close();
 		this.#setCurrentBlock(null);
 	}
@@ -267,7 +291,7 @@ class BlockHandle {
 		if (this.#hideTimer) return;
 		this.#hideTimer = _w.setTimeout(() => {
 			this.#hideTimer = null;
-			this.#handle.style.display = 'none';
+			this.#hideHandle();
 			this.#actionMenu?.close();
 			this.#setCurrentBlock(null);
 		}, 200);
@@ -323,11 +347,8 @@ class BlockHandle {
 	 */
 	#onAreaMouseLeave(e) {
 		if (this.#actionMenu?.isOpen) return;
-
-		const related = /** @type {Node} */ (e?.relatedTarget);
-		if (related && this.#handle?.contains(related)) return;
-
-		this.#scheduleHide();
+		if (this.#stayAlive(/** @type {Node} */ (e?.relatedTarget))) return;
+		this.hideNow();
 	}
 
 	/**
@@ -335,11 +356,19 @@ class BlockHandle {
 	 */
 	#onWrapperMouseLeave(e) {
 		if (this.#actionMenu?.isOpen) return;
-		const related = /** @type {Node} */ (e?.relatedTarget);
-		if (related && this.#handle?.contains(related)) return;
-		this.#cancelHide();
-		this.#handle.style.display = 'none';
-		this.#setCurrentBlock(null);
+		if (this.#stayAlive(/** @type {Node} */ (e?.relatedTarget))) return;
+		this.hideNow();
+	}
+
+	/**
+	 * @description Whether a mouseleave's `relatedTarget` is still within the editor interaction zone
+	 * @param {Node|null} related - `relatedTarget` of the mouseleave event
+	 * @returns {boolean}
+	 */
+	#stayAlive(related) {
+		if (!related) return false;
+		const wrapper = this.#area?.parentElement;
+		return !!(this.#handle?.contains(related) || wrapper?.contains(related));
 	}
 
 	/**
@@ -412,13 +441,13 @@ class BlockHandle {
 		if (isIframe) {
 			const iframeH = wysiwygFrameEl.clientHeight || 0;
 			if (blockRect.bottom <= 0 || blockRect.top >= iframeH) {
-				this.#handle.style.display = 'none';
+				this.#hideHandle();
 				return;
 			}
 		} else {
 			const wwFrameRect = wysiwygFrameEl.getBoundingClientRect();
 			if (blockRect.bottom <= wwFrameRect.top || blockRect.top >= wwFrameRect.bottom) {
-				this.#handle.style.display = 'none';
+				this.#hideHandle();
 				return;
 			}
 		}
@@ -460,7 +489,7 @@ class BlockHandle {
 			this.#handle.style.right = '';
 			this.#handle.style.left = areaRect.left + scrollX + totalOffset + 'px';
 		}
-		this.#handle.style.display = 'flex';
+		this.#showHandle();
 
 		if (wasHidden) {
 			void this.#handle.offsetHeight;

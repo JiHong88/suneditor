@@ -109,6 +109,13 @@ async function manageIssues() {
 
 	for (const item of issues) {
 		const isPR = !!item.pull_request;
+
+		// Skip items assigned to a milestone — exempt from both stale-marking and closing
+		if (item.milestone) {
+			console.log(`${isPR ? 'PR' : 'Issue'} #${item.number} — in milestone "${item.milestone.title}", skipping`);
+			continue;
+		}
+
 		const hasStale = item.labels.some((l) => l.name === STALE_LABEL);
 		const lastUpdated = new Date(item.updated_at);
 		const warnThreshold = daysAgo(isPR ? PR_WARN_DAYS : ISSUE_WARN_DAYS);
