@@ -4764,7 +4764,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @private
          */
         _setCodeDataToEditor: function () {
-            const code_html = this._getCodeView();
+            const code_html = this._deleteDisallowedTags(this._getCodeView());
 
             if (options.fullPage) {
                 const parseDocument = this._parser.parseFromString(code_html, 'text/html');
@@ -5901,9 +5901,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 return this.test(v) ? v : '';
             }.bind(options.allowedClassNames);
 
-            const sPrefix = (options.__allowedScriptTag ? '' : 'script|');
+            const sPrefix = (options.__allowedScriptTag ? '' : 'script|') + 'style|meta|link|[a-z]+:[a-z]+';
             this.__scriptTagRegExp = new wRegExp('<(script)[^>]*>([\\s\\S]*?)<\\/\\1>|<script[^>]*\\/?>', 'gi');
-            this.__disallowedTagsRegExp = new wRegExp('<(' + sPrefix + 'style)[^>]*>([\\s\\S]*?)<\\/\\1>|<(' + sPrefix + 'style)[^>]*\\/?>', 'gi');
+            this.__disallowedTagsRegExp = new wRegExp('<(' + sPrefix + ')[^>]*>([\\s\\S]*?)<\\/\\1>|<(' + sPrefix + ')[^>]*\\/?>', 'gi');
             this.__disallowedTagNameRegExp = new wRegExp('^(' + sPrefix + 'meta|link|style|[a-z]+\:[a-z]+)$', 'i');
             this.__allowedScriptRegExp = new wRegExp('^' + (options.__allowedScriptTag ? 'script' : '') + '$', 'i');
 
