@@ -74,7 +74,7 @@ export default {
         // enter line
         const line_breaker = doc.createElement('DIV');
         line_breaker.className = 'se-line-breaker';
-        line_breaker.innerHTML = '<button class="se-btn">' + options.icons.line_break + '</button>';
+        line_breaker.innerHTML = '<button type="button" class="se-btn">' + options.icons.line_break + '</button>';
         const line_breaker_t = doc.createElement('DIV');
         line_breaker_t.className += 'se-line-breaker-component';
         const line_breaker_b = line_breaker_t.cloneNode(true);

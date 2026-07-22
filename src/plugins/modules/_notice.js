@@ -24,6 +24,7 @@ export default {
 
         notice_div.className = 'se-notice';
         notice_button.className = 'close';
+        notice_button.setAttribute('type', 'button');
         notice_button.setAttribute('aria-label', 'Close');
         notice_button.setAttribute('title', core.lang.dialogBox.close);
         notice_button.innerHTML = core.icons.cancel;
