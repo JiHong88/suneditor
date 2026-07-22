@@ -155,6 +155,19 @@ export default {
 		}
 	},
 
+	/** @action backspaceSoftBreakMerge */
+	'backspace.softBreak.merge': ({ ports }, { zws }) => {
+		const br = zws.previousSibling;
+		const parent = zws.parentNode;
+		const before = br?.previousSibling;
+
+		dom.utils.removeItem(zws);
+		if (br) dom.utils.removeItem(br);
+
+		if (before) caretToNodeEnd(ports, before);
+		else if (parent) ports.selection.setRange(parent, 0, parent, 0);
+	},
+
 	/** [delete] */
 
 	/** @action deleteComponentSelect */
@@ -250,6 +263,19 @@ export default {
 		} else {
 			ports.selection.setRange(pre, pre.childNodes.length, pre, pre.childNodes.length);
 		}
+	},
+
+	/** @action deleteSoftBreakMerge */
+	'delete.softBreak.merge': ({ ports }, { br }) => {
+		const before = br.previousSibling;
+		const parent = br.parentNode;
+		const zws = br.nextSibling;
+
+		if (zws && zws.nodeType === 3 && dom.check.isZeroWidth(zws.textContent)) dom.utils.removeItem(zws);
+		dom.utils.removeItem(br);
+
+		if (before) caretToNodeEnd(ports, before);
+		else if (parent) ports.selection.setRange(parent, 0, parent, 0);
 	},
 
 	/** [tab] */
@@ -486,6 +512,46 @@ export default {
 		ports.setOnShortcutKey(true);
 	},
 
+	/** @action enterShiftBr — soft line break (Shift+Enter): insert a `<br>` at the caret, splitting the line. */
+	'enter.shift.br': ({ ports, ctx }, { range }) => {
+		const wd = ctx.fc.get('_wd');
+
+		const domSel = ports.selection.get();
+		const live = domSel?.rangeCount > 0 && ctx.fc.get('wysiwyg').contains(domSel.focusNode);
+		const src = live ? domSel.getRangeAt(0) : range;
+
+		const r = wd.createRange();
+		r.setStart(src.startContainer, src.startOffset);
+		r.setEnd(src.endContainer, src.endOffset);
+		if (!src.collapsed) {
+			r.deleteContents();
+			r.collapse(true);
+		}
+
+		if (r.startContainer.nodeType === 1 && dom.check.isBreak(r.startContainer)) {
+			const brNode = r.startContainer;
+			r.setStart(
+				brNode.parentNode,
+				dom.utils.getArrayIndex(brNode.parentNode.childNodes, brNode) + r.startOffset,
+			);
+			r.collapse(true);
+		}
+
+		const br = dom.utils.createElement('BR');
+		r.insertNode(br);
+
+		const next = br.nextSibling;
+		if (next && next.nodeType === 3 && !dom.check.isZeroWidth(next.textContent)) {
+			ports.selection.setRange(next, 0, next, 0);
+		} else {
+			const zws = dom.utils.createTextNode(unicode.zeroWidthSpace);
+			br.parentNode.insertBefore(zws, br.nextSibling);
+			ports.selection.setRange(zws, 1, zws, 1);
+		}
+
+		ports.history.push(false);
+	},
+
 	/** @action enterBrLineExit — consume only the caret's current (last) empty row and add a default line after the brLine. */
 	'enter.brline.exit': ({ ports }, { brBlock }) => {
 		const last = brBlock.lastChild;
@@ -674,6 +740,17 @@ export default {
 function caretToLineEdge(ports, line, toEnd) {
 	const offset = toEnd ? line.childNodes.length : 0;
 	ports.selection.setRange(line, offset, line, offset);
+}
+
+/**
+ * @description Place a collapsed caret at the END of `node`, whether it is a Text node (end of its text)
+ * or an element (after its last child). A fixed offset would land mid-node for a multi-child inline wrapper.
+ * @param {import('../ports').EventReducerPorts} ports
+ * @param {Node} node
+ */
+function caretToNodeEnd(ports, node) {
+	const offset = node.nodeType === 3 ? node.textContent.length : node.childNodes.length;
+	ports.selection.setRange(node, offset, node, offset);
 }
 
 /**

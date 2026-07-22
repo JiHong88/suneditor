@@ -26,6 +26,8 @@ declare const _default: {
 	'backspace.emptyLine.mergePrev': ({ ports }: EffectContext_keydown, { formatEl, prev }: any) => void;
 	/** @action backspaceBrLineRowMerge */
 	'backspace.brline.rowMerge': ({ ports }: EffectContext_keydown, { rowEndBr, rowStartBr }: any) => void;
+	/** @action backspaceSoftBreakMerge */
+	'backspace.softBreak.merge': ({ ports }: EffectContext_keydown, { zws }: any) => void;
 	/** [delete] */
 	/** @action deleteComponentSelect */
 	'delete.component.select': ({ ports }: EffectContext_keydown, { formatEl, fileComponentInfo }: any) => void;
@@ -37,6 +39,8 @@ declare const _default: {
 	'delete.emptyLine.mergeNext': ({ ports }: EffectContext_keydown, { formatEl, next }: any) => void;
 	/** @action deleteBrLineRowMerge — remove an empty row inside a brLine (PRE), pull the next row up */
 	'delete.brline.rowMerge': ({ ports }: EffectContext_keydown, { rowEndBr }: any) => void;
+	/** @action deleteSoftBreakMerge */
+	'delete.softBreak.merge': ({ ports }: EffectContext_keydown, { br }: any) => void;
 	/** [tab] */
 	/** @action tabFormatIndent */
 	'tab.format.indent': ({ ports, ctx }: EffectContext_keydown, { range, formatEl, shift }: any) => boolean;
@@ -61,6 +65,8 @@ declare const _default: {
 	) => void;
 	/** @action enterBrLineInsert — insert exactly one empty row at the caret inside a normal brLine. */
 	'enter.brline.insert': ({ ports }: EffectContext_keydown, { range }: any) => void;
+	/** @action enterShiftBr — soft line break (Shift+Enter): insert a `<br>` at the caret, splitting the line. */
+	'enter.shift.br': ({ ports, ctx }: EffectContext_keydown, { range }: any) => void;
 	/** @action enterBrLineExit — consume only the caret's current (last) empty row and add a default line after the brLine. */
 	'enter.brline.exit': ({ ports }: EffectContext_keydown, { brBlock }: any) => void;
 	/** @action enterFormatInsertBrNode */

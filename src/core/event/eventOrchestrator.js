@@ -67,6 +67,12 @@ class EventOrchestrator extends KernelInjector {
 		this.isComposing = false;
 
 		/**
+		 * @description Real Shift-key state of the most recent Enter keydown.
+		 * @type {boolean}
+		 */
+		this._enterKeyShift = false;
+
+		/**
 		 * @description An array of parent containers that can be scrolled (in descending order)
 		 * @type {Array<Element>}
 		 */
@@ -112,6 +118,9 @@ class EventOrchestrator extends KernelInjector {
 		this.__eventDoc = null;
 		/** @type {string} */
 		this.__secopy = null;
+
+		/** @type {HTMLInputElement} */
+		this.__focusTemp = this.#contextProvider.carrierWrapper.querySelector('.__se__focus__temp__');
 	}
 
 	/**
@@ -602,6 +611,9 @@ class EventOrchestrator extends KernelInjector {
 			this.#eventManager.addEvent(parent, 'scroll', OnScrollAbs, false);
 		}
 
+		/** focus temp (mobile) — used by the legacy `keydown` Enter path to force-end a virtual-keyboard IME session */
+		this.#eventManager.addEvent(this.__focusTemp, 'focus', (e) => e.preventDefault(), false);
+
 		/** document event */
 		if (this.__eventDoc !== fc.get('_wd')) {
 			this.__eventDoc = fc.get('_wd');
@@ -678,6 +690,7 @@ class EventOrchestrator extends KernelInjector {
 		this.__inputPlugin = null;
 		this.__inputBlurEvent = null;
 		this.__inputKeyEvent = null;
+		this.__focusTemp = null;
 		this.__eventDoc = null;
 		this.__secopy = null;
 		this._lineBreakComp = null;

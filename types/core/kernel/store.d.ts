@@ -65,6 +65,10 @@ export type StoreState = {
 	 * - Suppress `focus` event handling.
 	 */
 	_preventFocus: boolean;
+	/**
+	 * - Whether this environment actually delivers `beforeinput` at runtime (probed once at editor load; some corporate security SW / DLP / VDI drop it). Defaults `true`.
+	 */
+	_canUseBeforeInput: boolean;
 };
 /**
  * - Toolbar display mode flags (immutable after init).
@@ -117,6 +121,7 @@ export type StoreMode = {
  * @property {boolean} _mousedown - Whether `mousedown` is pressed.
  * @property {boolean} _preventBlur - Suppress `blur` event handling.
  * @property {boolean} _preventFocus - Suppress `focus` event handling.
+ * @property {boolean} _canUseBeforeInput - Whether this environment actually delivers `beforeinput` at runtime (probed once at editor load; some corporate security SW / DLP / VDI drop it). Defaults `true`.
  */
 /**
  * @typedef {Object} StoreMode - Toolbar display mode flags (immutable after init).

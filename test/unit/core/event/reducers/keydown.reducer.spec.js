@@ -57,6 +57,8 @@ describe('Keydown Reducer', () => {
 
 		mockCtx = {
 			fc: new Map([['wysiwyg', wysiwygDiv]]),
+			// beforeinput available by default (matches ENTER_FROM_BEFOREINPUT master switch on)
+			store: new Map([['_canUseBeforeInput', true]]),
 			options: new Map([
 				['defaultLine', 'P'],
 				['tabDisable', false]
@@ -117,6 +119,18 @@ describe('Keydown Reducer', () => {
 			// Legacy synchronous keydown path (flag rolled back).
 			expect(actions.length).toBeGreaterThan(0);
 		}
+	});
+
+	it('runs the synchronous keydown Enter path when the environment does not deliver beforeinput', async () => {
+		mockCtx.keyCode = 'Enter';
+		// Environment drops `beforeinput` at runtime (probed by helper/env.canUseBeforeInput) — Enter must be
+		// handled synchronously on keydown, regardless of the ENTER_FROM_BEFOREINPUT master switch.
+		mockCtx.store = new Map([['_canUseBeforeInput', false]]);
+
+		const actions = await reduceKeydown(mockPorts, mockCtx);
+
+		expect(Array.isArray(actions)).toBe(true);
+		expect(actions.length).toBeGreaterThan(0);
 	});
 
 	it('should handle Tab keyCode', async () => {

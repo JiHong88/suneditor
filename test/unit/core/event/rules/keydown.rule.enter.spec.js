@@ -109,6 +109,20 @@ describe('Enter Rule', () => {
 		expect(actions.some(a => a.t === 'enter.brline.insert')).toBe(true);
 	});
 
+	it('should insert a soft line break (enterShiftBr) for Shift+Enter instead of delegating to native', () => {
+		// Regression: Shift+Enter used to fall through to the browser's native `insertLineBreak`, which is
+		// inconsistent across browsers (Safari splits into a paragraph, empty lines no-op, held key drops).
+		mockCtx.shift = true;
+
+		const result = reduceEnterDown(actions, mockPorts, mockCtx);
+
+		expect(result).toBe(true);
+		expect(mockPorts.enterPrevent).toHaveBeenCalled();
+		expect(actions.some((a) => a.t === 'enter.shift.br')).toBe(true);
+		// Must NOT fall through to the plain-Enter paragraph-split path.
+		expect(actions.some((a) => a.t === 'enter.format.breakAtCursor')).toBe(false);
+	});
+
 	it('should handle normal enter in paragraph', () => {
 		const newRange = document.createRange();
 		newRange.setStart(textNode, 5);

@@ -304,6 +304,20 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 		}
 	}
 
+	// soft line break (Shift+Enter)
+	if (
+		!selectRange &&
+		range.startContainer.nodeType === 3 &&
+		dom.check.isZeroWidth(range.startContainer) &&
+		range.startOffset <= 1 &&
+		dom.check.isBreak(range.startContainer.previousSibling)
+	) {
+		actions.push(A.preventStop());
+		actions.push(A.backspaceSoftBreakMerge(range.startContainer));
+		actions.push(A.historyPush(true));
+		return false;
+	}
+
 	// empty line: merge into the previous line
 	const emptyLinePrev = formatEl?.previousElementSibling;
 	if (

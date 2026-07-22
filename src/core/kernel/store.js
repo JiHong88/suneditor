@@ -18,6 +18,7 @@ import { numbers } from '../../helper';
  * @property {boolean} _mousedown - Whether `mousedown` is pressed.
  * @property {boolean} _preventBlur - Suppress `blur` event handling.
  * @property {boolean} _preventFocus - Suppress `focus` event handling.
+ * @property {boolean} _canUseBeforeInput - Whether this environment actually delivers `beforeinput` at runtime (probed once at editor load; some corporate security SW / DLP / VDI drop it). Defaults `true`.
  */
 
 /**
@@ -100,6 +101,7 @@ class Store {
 			_mousedown: false,
 			_preventBlur: false,
 			_preventFocus: false,
+			_canUseBeforeInput: true,
 		};
 	}
 

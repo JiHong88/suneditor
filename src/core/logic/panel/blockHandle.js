@@ -1,4 +1,4 @@
-import { dom, env } from '../../../helper';
+import { dom, env, numbers } from '../../../helper';
 import { resolveBlock } from './blockResolver';
 import { ResolveButton } from '../../section/constructor';
 import CommandMenu from '../../../modules/ui/CommandMenu.js';
@@ -14,13 +14,13 @@ const { _w, _d } = env;
  */
 function _resolveLengthPx(value, contextStyle) {
 	const trimmed = (value || '').trim();
-	const num = parseFloat(trimmed);
+	const num = numbers.get(trimmed, -1);
 	if (!num) return 0;
 	if (/rem$/.test(trimmed)) {
-		return num * (parseFloat(_w.getComputedStyle(_d.documentElement).fontSize) || 16);
+		return num * (numbers.get(_w.getComputedStyle(_d.documentElement).fontSize, -1) || 16);
 	}
 	if (/em$/.test(trimmed)) {
-		return num * (parseFloat(contextStyle.fontSize) || 16);
+		return num * (numbers.get(contextStyle.fontSize, -1) || 16);
 	}
 	return num;
 }
@@ -455,9 +455,18 @@ class BlockHandle {
 		const scrollX = _w.scrollX;
 		const scrollY = _w.scrollY;
 
-		// parent-viewport top to convert to parent coordinates
-		const blockTopVP = isIframe ? blockRect.top + iframeRect.top : blockRect.top;
-		const top = blockTopVP + scrollY;
+		// First appearance after being hidden — skip transition. Make the handle
+		// measurable (display) before reading its height so we can center it.
+		const wasHidden = this.#handle.style.display !== 'flex';
+		if (wasHidden) {
+			dom.utils.addClass(this.#handle, 'se-no-transition');
+			this.#handle.style.display = 'flex';
+		}
+
+		const handleHeight = this.#handle.offsetHeight || 0;
+		const firstLineCenter = this.#getFirstLineCenter(blockElement, blockRect);
+		const firstLineCenterVP = isIframe ? firstLineCenter + iframeRect.top : firstLineCenter;
+		const top = firstLineCenterVP + scrollY - handleHeight / 2;
 
 		// Handle inline offset
 		const isRtl = !!this.#$.options.get('_rtl');
@@ -469,17 +478,13 @@ class BlockHandle {
 			const wysiwygFrame = this.#$.frameContext.get('wysiwyg');
 			if (wysiwygFrame) {
 				const cs = _w.getComputedStyle(wysiwygFrame);
-				const padStart = parseFloat(isRtl ? cs.paddingRight : cs.paddingLeft) || 0;
+				const padStart = numbers.get(isRtl ? cs.paddingRight : cs.paddingLeft, -1) || 0;
 				const baseline = _resolveLengthPx(cs.getPropertyValue('--se-edit-inner-padding'), cs);
 				centeringExtra = Math.max(0, padStart - baseline);
 			}
 		}
 
 		const totalOffset = indent + centeringExtra;
-
-		// First appearance after being hidden — skip transition
-		const wasHidden = this.#handle.style.display !== 'flex';
-		if (wasHidden) dom.utils.addClass(this.#handle, 'se-no-transition');
 
 		this.#handle.style.top = top + 'px';
 		if (isRtl) {
@@ -498,6 +503,37 @@ class BlockHandle {
 	}
 
 	/**
+	 * @description Viewport-Y center of the block's first line box (in the block's own document coordinates).
+	 * @param {HTMLElement} blockElement
+	 * @param {DOMRect} blockRect - `blockElement.getBoundingClientRect()`
+	 * @returns {number} Viewport-Y coordinate of the first line's vertical center
+	 */
+	#getFirstLineCenter(blockElement, blockRect) {
+		try {
+			const doc = blockElement.ownerDocument;
+			const walker = doc.createTreeWalker(blockElement, NodeFilter.SHOW_TEXT, null);
+
+			let textNode = /** @type {Text|null} */ (null);
+			while ((textNode = /** @type {Text} */ (walker.nextNode()))) {
+				if (textNode.textContent?.trim()) break;
+			}
+
+			if (textNode) {
+				const range = doc.createRange();
+				range.setStart(textNode, 0);
+				range.setEnd(textNode, Math.min(1, textNode.length));
+				const rects = range.getClientRects();
+				if (rects.length) return (rects[0].top + rects[0].bottom) / 2;
+			}
+		} catch {
+			// Fall through to the line-height estimate below
+		}
+
+		const lineHeight = numbers.get(_w.getComputedStyle(blockElement).lineHeight, -1) || blockRect.height;
+		return blockRect.top + Math.min(lineHeight, blockRect.height) / 2;
+	}
+
+	/**
 	 * @description Calculate the handle's inline indent.
 	 * @param {HTMLElement} blockElement
 	 * @param {boolean} isRtl
@@ -512,13 +548,13 @@ class BlockHandle {
 		const paddingKey = isRtl ? 'paddingRight' : 'paddingLeft';
 		let indent = 0;
 
-		indent += parseFloat(_w.getComputedStyle(blockElement)[marginKey]) || 0;
+		indent += numbers.get(_w.getComputedStyle(blockElement)[marginKey], -1) || 0;
 
 		let el = blockElement.parentElement;
 		while (el && el !== wysiwyg) {
 			if (format.isBlock(el)) {
 				const s = _w.getComputedStyle(el);
-				indent += (parseFloat(s[paddingKey]) || 0) + (parseFloat(s[marginKey]) || 0);
+				indent += (numbers.get(s[paddingKey], -1) || 0) + (numbers.get(s[marginKey], -1) || 0);
 			}
 			el = el.parentElement;
 		}

@@ -1,7 +1,7 @@
 import { dom, env, unicode, keyCodeMap } from '../../../helper';
 import { actionExecutor } from '../executor';
 import { makePorts } from '../ports';
-import { reduceKeydown, ENTER_FROM_BEFOREINPUT } from '../reducers/keydown.reducer';
+import { reduceKeydown, useEnterFromBeforeInput } from '../reducers/keydown.reducer';
 
 const { _w } = env;
 const FRONT_ZEROWIDTH = new RegExp(unicode.zeroWidthSpace + '+', '');
@@ -34,6 +34,8 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 	const ctrl = (keyState.ctrl = keyCodeMap.isCtrl(e));
 	const alt = (keyState.alt = keyCodeMap.isAlt(e));
 
+	if (keyCodeMap.isEnter(keyCode)) this._enterKeyShift = shift;
+
 	if (!ctrl && fc.get('isReadOnly') && !keyCodeMap.isDirectionKey(keyCode)) {
 		e.preventDefault();
 		return false;
@@ -49,11 +51,11 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 
 	/**
 	 * default key action — normalize the Enter range before the reducer reads it.
-	 * Skipped when Enter is handled from `beforeinput` (ENTER_FROM_BEFOREINPUT): mutating the DOM here
+	 * Skipped when Enter is handled from `beforeinput` (useEnterFromBeforeInput): mutating the DOM here
 	 * on keydown re-traps the iOS/mobile IME marked-text — `dispatchEnter` runs this same normalization
 	 * later, after the IME has committed.
 	 */
-	if (!ENTER_FROM_BEFOREINPUT && keyCodeMap.isEnter(keyCode)) {
+	if (!useEnterFromBeforeInput(this.$.store, e) && keyCodeMap.isEnter(keyCode)) {
 		const normalized = this._normalizeEnterRange();
 		if (normalized) selectionNode = normalized;
 	}

@@ -10,6 +10,11 @@ declare class EventOrchestrator extends KernelInjector {
 	 */
 	isComposing: boolean;
 	/**
+	 * @description Real Shift-key state of the most recent Enter keydown.
+	 * @type {boolean}
+	 */
+	_enterKeyShift: boolean;
+	/**
 	 * @description An array of parent containers that can be scrolled (in descending order)
 	 * @type {Array<Element>}
 	 */
@@ -51,6 +56,8 @@ declare class EventOrchestrator extends KernelInjector {
 	__eventDoc: Document;
 	/** @type {string} */
 	__secopy: string;
+	/** @type {HTMLInputElement} */
+	__focusTemp: HTMLInputElement;
 	/**
 	 * @description Activates the corresponding button with the tags information of the current cursor position,
 	 * - such as `bold`, `underline`, etc., and executes the `active` method of the plugins.

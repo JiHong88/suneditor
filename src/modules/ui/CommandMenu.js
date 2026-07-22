@@ -448,7 +448,7 @@ class CommandMenu {
 			if (/modal/.test(type)) plugin.open?.();
 			else if (/browser/.test(type)) plugin.open?.(null);
 			else if (/popup/.test(type)) plugin.show?.();
-			else plugin.action?.(dom.utils.createElement('BUTTON', { 'data-command': resolved.name }));
+			else plugin.action?.(dom.utils.createElement('BUTTON', { type: 'button', 'data-command': resolved.name }));
 			this.#$.history.push(false);
 			return true;
 		}

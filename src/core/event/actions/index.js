@@ -149,6 +149,13 @@ export const A = {
 		p: { rowEndBr, rowStartBr },
 	}),
 
+	/**
+	 * @description Soft line break merge (Backspace): the caret sits in the zero-width anchor right after a soft-break `<br>` (a Shift+Enter).
+	 * @param {Node} zws - the zero-width Text node holding the caret (its `previousSibling` is the `<br>`)
+	 * @returns {Action}
+	 */
+	backspaceSoftBreakMerge: (zws) => ({ t: 'backspace.softBreak.merge', p: { zws } }),
+
 	// === delete ===
 	/**
 	 * @param {Element} formatEl
@@ -186,6 +193,13 @@ export const A = {
 	 * @returns {Action}
 	 */
 	deleteBrLineRowMerge: (rowEndBr) => ({ t: 'delete.brline.rowMerge', p: { rowEndBr } }),
+
+	/**
+	 * @description Soft line break merge (Delete): the caret sits just before a soft-break `<br>`.
+	 * @param {Node} br - the soft-break `<br>` to remove
+	 * @returns {Action}
+	 */
+	deleteSoftBreakMerge: (br) => ({ t: 'delete.softBreak.merge', p: { br } }),
 
 	// === tab ===
 	/**
@@ -253,6 +267,13 @@ export const A = {
 	 * @returns {Action}
 	 */
 	enterBrLineInsert: (range) => ({ t: 'enter.brline.insert', p: { range } }),
+	/**
+	 * @description Soft line break (Shift+Enter) — insert a `<br>` at the caret, splitting the line.
+	 * Used instead of the browser's native `insertLineBreak`, which is inconsistent across browsers.
+	 * @param {Range} range Caret range captured at rule time.
+	 * @returns {Action}
+	 */
+	enterShiftBr: (range) => ({ t: 'enter.shift.br', p: { range } }),
 	/**
 	 * @description Exit a normal brLine — drop its trailing empty rows and add a default line after it.
 	 * @param {Element} brBlock

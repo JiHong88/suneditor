@@ -3,6 +3,7 @@ import { dom, converter, markdown, numbers, unicode, clipboard, env } from '../.
 const { _d } = env;
 const REQUIRED_DATA_ATTRS = 'data-se-[^\\s]+';
 const V2_MIG_DATA_ATTRS = '|data-index|data-file-size|data-file-name|data-exp|data-font-size';
+const ZWS_RUN_REGEXP = new RegExp(unicode.zeroWidthSpace + '+', 'g');
 
 /**
  * @description All HTML related classes involved in the editing area
@@ -363,6 +364,14 @@ class HTML {
 
 		if (textStyleTagFilter) {
 			cleanData = this.#styleNodeConvertor(cleanData);
+		}
+
+		if (!_freeCodeViewMode && cleanData.includes(unicode.zeroWidthSpace)) {
+			cleanData = cleanData.replace(ZWS_RUN_REGEXP, (m, offset, str) => {
+				const boundedStart = offset === 0 || str[offset - 1] === '>';
+				const boundedEnd = offset + m.length === str.length || str[offset + m.length] === '<';
+				return boundedStart && boundedEnd ? m : '';
+			});
 		}
 
 		return cleanData;
@@ -2228,7 +2237,9 @@ class HTML {
 				v.push(sv[0]);
 			}
 		} else if (!v || !_RE_STYLE_EQ.test(v.toString())) {
-			if (this.#cleanStyleTagKeyRegExp.test(tagName)) {
+			if (_RE_SE_COMPONENT.test(m)) {
+				v = this.#cleanStyle(m, v, '@component');
+			} else if (this.#cleanStyleTagKeyRegExp.test(tagName)) {
 				v = this.#cleanStyle(m, v, tagName);
 			} else if (this.#$.format.isLine(tagName)) {
 				v = this.#cleanStyle(m, v, '@line');
@@ -2356,6 +2367,7 @@ const _RE_TAG_NAME = /(?!<)[a-zA-Z0-9-]+/;
 const _RE_ON_HANDLER = /\s(?:on[a-z]+)\s*=\s*(?:(["'])[^"']*\1|\S+)/gi;
 const _RE_STYLE_EQ = /style=/i;
 const _RE_STYLE_ATTR = /style\s*=\s*(?:"|')[^"']*(?:"|')/;
+const _RE_SE_COMPONENT = /class\s*=\s*("|')(?:[^"']*\s)?se-component(?=[\s"'])/i;
 const _RE_LEADING_SPACE = /^\s/;
 
 // #cleanStyle

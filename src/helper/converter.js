@@ -1,4 +1,5 @@
 import { _d, _w } from './env';
+import { get as getNumber } from './numbers';
 
 const _RE_HTML_CHARS = /&|\u00A0|'|"|<|>/g;
 const _RE_HTML_ENTITIES = /&amp;|&nbsp;|&apos;|&quot;|&lt;|&gt;/g;
@@ -392,8 +393,8 @@ export function rgb2hex(rgba) {
 export function getWidthInPercentage(target, parentTarget) {
 	const parent = /** @type {HTMLElement} */ (parentTarget || target.parentElement);
 	const parentStyle = _w.getComputedStyle(parent);
-	const parentPaddingLeft = parseFloat(parentStyle.paddingLeft);
-	const parentPaddingRight = parseFloat(parentStyle.paddingRight);
+	const parentPaddingLeft = getNumber(parentStyle.paddingLeft, -1);
+	const parentPaddingRight = getNumber(parentStyle.paddingRight, -1);
 	const scrollbarWidth = parent.offsetWidth - parent.clientWidth;
 	const parentWidth = parent.offsetWidth - parentPaddingLeft - parentPaddingRight - scrollbarWidth;
 	const widthInPercentage = (target.offsetWidth / parentWidth) * 100;

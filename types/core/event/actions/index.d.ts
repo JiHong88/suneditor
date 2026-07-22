@@ -37,11 +37,13 @@ export namespace A {
 	function backspaceListRemoveNested(range: Range): Action;
 	function backspaceEmptyLineMergePrev(formatEl: Element, prev: Element): Action;
 	function backspaceBrLineRowMerge(rowEndBr: Node, rowStartBr: Node): Action;
+	function backspaceSoftBreakMerge(zws: Node): Action;
 	function deleteComponentSelect(formatEl: Element, fileComponentInfo: SunEditor.ComponentInfo): Action;
 	function deleteComponentSelectNext(formatEl: any, nextEl: Element): Action;
 	function deleteListRemoveNested(range: Range, formatEl: Element, rangeEl: Element): Action;
 	function deleteEmptyLineMergeNext(formatEl: Element, next: Element): Action;
 	function deleteBrLineRowMerge(rowEndBr: Node): Action;
+	function deleteSoftBreakMerge(br: Node): Action;
 	function tabFormatIndent(range: Range, formatEl: Element, shift: boolean): Action;
 	function enterScrollTo(range: Range): Action;
 	function enterLineAddDefault(formatEl: Element): Action;
@@ -57,6 +59,7 @@ export namespace A {
 	function enterFormatInsertBrHtml(brBlock: Element, range: Range, wSelection: Selection, offset: number): Action;
 	function enterFormatInsertBrNode(wSelection: Selection): Action;
 	function enterBrLineInsert(range: Range): Action;
+	function enterShiftBr(range: Range): Action;
 	function enterBrLineExit(brBlock: Element): Action;
 	function enterFormatBreakAtEdge(
 		formatEl: Element,

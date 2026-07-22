@@ -76,6 +76,13 @@ export function reduceEnterDown(actions, ports, ctx) {
 		}
 	}
 
+	if (shift) {
+		ports.enterPrevent(e);
+		actions.push(A.enterShiftBr(range));
+		actions.push(A.enterScrollTo(range));
+		return true;
+	}
+
 	if (!shift) {
 		let formatEndEdge = format.isEdgeLine(range.endContainer, range.endOffset, 'end');
 		let formatStartEdge = format.isEdgeLine(range.startContainer, range.startOffset, 'front');

@@ -31,7 +31,17 @@ jest.mock('../../../../../src/helper', () => ({
 			getListChildren: jest.fn().mockReturnValue([])
 		}
 	},
-	env: { _w: { requestAnimationFrame: jest.fn((cb) => { cb(); return 1; }), cancelAnimationFrame: jest.fn(), setTimeout: jest.fn((cb) => { cb(); return 1; }), clearTimeout: jest.fn(), innerWidth: 1024, innerHeight: 768, getComputedStyle: jest.fn(() => ({ marginLeft: '0px', paddingLeft: '0px', marginRight: '0px', paddingRight: '0px', fontSize: '16px', getPropertyValue: () => '' })), scrollX: 0, scrollY: 0 }, _d: { documentElement: {} } }
+	env: { _w: { requestAnimationFrame: jest.fn((cb) => { cb(); return 1; }), cancelAnimationFrame: jest.fn(), setTimeout: jest.fn((cb) => { cb(); return 1; }), clearTimeout: jest.fn(), innerWidth: 1024, innerHeight: 768, getComputedStyle: jest.fn(() => ({ marginLeft: '0px', paddingLeft: '0px', marginRight: '0px', paddingRight: '0px', fontSize: '16px', getPropertyValue: () => '' })), scrollX: 0, scrollY: 0 }, _d: { documentElement: {} } },
+	numbers: {
+		// Faithful mirror of helper/numbers.get: first number match, maxDec<0 keeps decimals.
+		get: (value, maxDec = 0) => {
+			if (!value) return 0;
+			const matched = (value + '').match(/-?\d+(\.\d+)?/);
+			if (!matched || !matched[0]) return 0;
+			const number = Number(matched[0]);
+			return maxDec < 0 ? number : maxDec === 0 ? Math.round(number) : Number(number.toFixed(maxDec));
+		}
+	}
 }));
 
 // Mock resolveBlock — blockHandle imports it directly from `./blockResolver`
@@ -195,7 +205,10 @@ describe('BlockHandle', () => {
 
 			expect(resolveBlock).toHaveBeenCalled();
 			expect(els.handle.style.display).toBe('flex');
-			expect(els.handle.style.top).toBe('100px'); // blockRect.top + scrollY (handle lives in carrierWrapper)
+			// Handle is centered on the block's first line. jsdom has no line-box
+			// measurement, so the empty-block fallback applies: blockRect.top(100) +
+			// height(20)/2 - handleHeight(0)/2 = 110.
+			expect(els.handle.style.top).toBe('110px');
 		});
 
 		it('hides handle when resolveBlock returns null', () => {
@@ -269,7 +282,8 @@ describe('BlockHandle', () => {
 			p.getBoundingClientRect.mockReturnValue({ top: 80, left: 0, bottom: 100, right: 400, width: 400, height: 20 });
 			blockHandle.syncScroll();
 
-			expect(els.handle.style.top).toBe('80px'); // blockRect.top + scrollY (handle lives in carrierWrapper)
+			// Centered on the first line: blockRect.top(80) + height(20)/2 - handleHeight(0)/2 = 90.
+			expect(els.handle.style.top).toBe('90px');
 		});
 
 		it('does nothing when no current block', () => {

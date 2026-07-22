@@ -19,6 +19,15 @@ export function getPageStyle(doc: Document | null): string;
  * @returns {string} If not found, return the first found value.
  */
 export function getIncludePath(nameArray: Array<string>, extension: string): string;
+/**
+ * @description Runtime probe: does this environment actually deliver input events for edits?
+ * Some managed/corporate environments (keyboard-hooking security SW, DLP, VDI) silently drop `beforeinput`
+ * **and** `input` at runtime even though the browser statically supports them — static feature-detection
+ * (`window.InputEvent`) cannot see that. This synthetically triggers an edit (`execCommand('insertText')`)
+ * on an offscreen contenteditable and observes whether an input-family event fires **synchronously**.
+ * @returns {boolean} `true` if an input-family event fired (environment delivers edits), else `false`.
+ */
+export function canUseBeforeInput(): boolean;
 /** @type {SunEditor.GlobalWindow} */
 export const _w: SunEditor.GlobalWindow;
 /** @type {Document} */
@@ -127,6 +136,7 @@ declare namespace env {
 	export { isAndroid };
 	export { isMobile };
 	export { isTouchDevice };
+	export { canUseBeforeInput };
 	export { cmdIcon };
 	export { shiftIcon };
 	export { DPI };

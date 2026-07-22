@@ -70,6 +70,7 @@ export const DEFAULTS = {
 	TAG_STYLES: {
 		'@text': 'font-family|font-size|color|background-color|width|height',
 		'@line': 'text-align|margin|margin-left|margin-right|line-height',
+		'@component': 'width|height|min-width',
 		'table|th|td':
 			'border|border-[a-z]+|color|background-color|text-align|float|font-weight|text-decoration|font-style|vertical-align',
 		'table|td': 'width',
@@ -422,9 +423,10 @@ export const DEFAULTS = {
  * { allUsedStyles: 'color|background-color|text-shadow' }
  * ```
  * @property {Object<string, string>} [tagStyles={}] - Specifies allowed CSS styles per HTML tag.
- * - Key is a tag name, multiple tags joined with `|`, or a category sentinel (`@text`, `@line`).
+ * - Key is a tag name, multiple tags joined with `|`, or a category sentinel (`@text`, `@line`, `@component`).
  * - Value is a pipe-delimited list of allowed style names.
- * - Resolution order when filtering an element: explicit tag entry → `@line` (for formatLine elements) → `@text` (for textStyleTags).
+ * - Resolution order when filtering an element: `@component` (for `.se-component` containers) → explicit tag entry → `@line` (for formatLine elements) → `@text` (for textStyleTags).
+ * - `@component` guards the inline sizing (`width`/`height`/`min-width`) the editor writes on a media component's container for percentage-based sizes; keep these so a clean() round-trip does not reset the component to full width.
  * - An explicit tag entry **replaces** the category default — include category styles in the value if you want both.
  * - Merged with {@link DEFAULTS.TAG_STYLES}; user-supplied keys win.
  * ```js

@@ -376,8 +376,9 @@ describe('HTML API integration tests', () => {
 			expect(outputHTML).toContain('Cell 2-2');
 			expect(outputHTML).toContain('Cell 3-3');
 
-			// 4. Paragraph with zero-width space entity
-			expect(outputHTML).toContain('<p>​Sample paragraph</p>');
+			// 4. Paragraph text preserved; a ZWSP mixed into real text is normalized away by html.clean
+			// (only standalone ZWSP anchors are kept), so the leading ZWSP entity is stripped here.
+			expect(outputHTML).toContain('<p>Sample paragraph</p>');
 
 			// 5. Nested ordered lists - structure preserved
 			expect(outputHTML).toContain('<ol>');

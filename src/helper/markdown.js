@@ -322,9 +322,11 @@ function nodeToMarkdown(node, indent, isBlock) {
 	// Headings
 	const headingMatch = /^h([1-6])$/.exec(tag);
 	if (headingMatch) {
+		const content = childrenToInline(children).trim();
+		if (!content) return '\n';
 		const level = parseInt(headingMatch[1], 10);
 		const prefix = '#'.repeat(level);
-		return `${prefix} ${childrenToInline(children).trim()}\n\n`;
+		return `${prefix} ${content}\n\n`;
 	}
 
 	if (tag === 'p') {

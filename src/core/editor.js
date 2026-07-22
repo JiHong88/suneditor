@@ -139,6 +139,8 @@ class Editor {
 		this.$.store.set('initViewportHeight', env._w.visualViewport.height);
 		this.#kernel._eventOrchestrator.__setViewportSize();
 
+		this.$.store.set('_canUseBeforeInput', env.canUseBeforeInput());
+
 		this.$.contextProvider.init();
 
 		// initialize core and add event listeners

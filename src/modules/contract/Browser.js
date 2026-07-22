@@ -516,7 +516,7 @@ class Browser {
 				const folderDiv = dom.utils.createElement('div', { class: 'se-menu-folder' }, folderLabel);
 
 				folderLabel.insertBefore(
-					dom.utils.createElement('button', null, expanded ? this.openArrow : this.closeArrow),
+					dom.utils.createElement('button', { type: 'button' }, expanded ? this.openArrow : this.closeArrow),
 					folderLabel.firstElementChild,
 				);
 				const childContainer = document.createElement('div');
@@ -762,7 +762,7 @@ function CreateHTMLInfos($, useSearch) {
 				<div class="se-browser-main"> 
 					<div class="se-browser-bar">
 						<div class="se-browser-search">
-							<button class="se-btn se-side-open-btn">${icons.side_menu_hamburger}</button>
+							<button type="button" class="se-btn se-side-open-btn">${icons.side_menu_hamburger}</button>
 							${
 								useSearch
 									? /*html*/ `

@@ -75,7 +75,23 @@ export type SlashCommandPluginOptions = {
 	 * title: 'Heading 1',
 	 * icon: 'h1',
 	 * keywords: ['header', 'title'],
-	 * action: ($) => $.format.applyBlock(document.createElement('H1')),
+	 * // A line-level tag (H1-H6, P): `setLine` CHANGES the current line's tag → `<h1>…</h1>`.
+	 * // Do NOT use `applyBlock` here — it WRAPS (`<h1><p>…</p></h1>`) and traps Enter inside.
+	 * action: ($) => $.format.setLine(document.createElement('H1')),
+	 * },
+	 * {
+	 * key: 'code',
+	 * title: 'Code block',
+	 * keywords: ['pre'],
+	 * // A br-line block (PRE): `setBrLine` converts the line to a `<br>`-separated code block.
+	 * action: ($) => $.format.setBrLine(document.createElement('PRE')),
+	 * },
+	 * {
+	 * key: 'quote',
+	 * title: 'Quote',
+	 * keywords: ['blockquote'],
+	 * // A container block (BLOCKQUOTE, DIV…): `applyBlock` WRAPS the selected lines → `<blockquote>…</blockquote>`.
+	 * action: ($) => $.format.applyBlock(document.createElement('BLOCKQUOTE')),
 	 * },
 	 * 'bold',
 	 * 'image',
@@ -130,7 +146,23 @@ export type SlashCommandPluginOptions = {
  *         title: 'Heading 1',
  *         icon: 'h1',
  *         keywords: ['header', 'title'],
- *         action: ($) => $.format.applyBlock(document.createElement('H1')),
+ *         // A line-level tag (H1-H6, P): `setLine` CHANGES the current line's tag → `<h1>…</h1>`.
+ *         // Do NOT use `applyBlock` here — it WRAPS (`<h1><p>…</p></h1>`) and traps Enter inside.
+ *         action: ($) => $.format.setLine(document.createElement('H1')),
+ *       },
+ *       {
+ *         key: 'code',
+ *         title: 'Code block',
+ *         keywords: ['pre'],
+ *         // A br-line block (PRE): `setBrLine` converts the line to a `<br>`-separated code block.
+ *         action: ($) => $.format.setBrLine(document.createElement('PRE')),
+ *       },
+ *       {
+ *         key: 'quote',
+ *         title: 'Quote',
+ *         keywords: ['blockquote'],
+ *         // A container block (BLOCKQUOTE, DIV…): `applyBlock` WRAPS the selected lines → `<blockquote>…</blockquote>`.
+ *         action: ($) => $.format.applyBlock(document.createElement('BLOCKQUOTE')),
  *       },
  *       'bold',
  *       'image',

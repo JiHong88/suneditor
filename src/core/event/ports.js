@@ -1,3 +1,6 @@
+import { isMobile } from '../../helper/env';
+import { useEnterFromBeforeInput } from './reducers/keydown.reducer';
+
 /**
  * @typedef {import('./eventOrchestrator').default} EventManagerInstanceType
  */
@@ -94,6 +97,7 @@ export function makePorts(inst, { _styleNodes }) {
 		history,
 		char,
 		menu,
+		store,
 	} = inst.$;
 
 	return {
@@ -186,12 +190,18 @@ export function makePorts(inst, { _styleNodes }) {
 		},
 		/**
 		 * @description Prevents the default behavior of the `Enter` key.
-		 * Enter now runs from `beforeinput` (post-IME-commit), so the former mobile focus-shuffle
-		 * (temp-focus → refocus, to force-end a virtual-keyboard IME session) is unnecessary.
+		 * On the `beforeinput` Enter path the IME has already committed, so a plain `preventDefault` suffices.
+		 * On the legacy `keydown` path (environment doesn't deliver `beforeinput` — see `useEnterFromBeforeInput`)
+		 * a mobile virtual keyboard can leave an open IME session, so we force it to end with a focus-shuffle
+		 * (temp-focus → refocus wysiwyg); otherwise the just-committed marked-text is re-trapped.
 		 * @param {Event} e The keyboard/input event
 		 */
 		enterPrevent(e) {
 			e.preventDefault();
+			if (!isMobile || useEnterFromBeforeInput(store)) return;
+
+			inst.__focusTemp.focus({ preventScroll: true });
+			frameContext.get('wysiwyg').focus({ preventScroll: true });
 		},
 	};
 }

@@ -339,7 +339,7 @@ class Table extends PluginDropdownFree {
 								if (currentLogicalCol + i >= maxColumnCount || !cellWidth) continue;
 
 								rowColOccupancy[currentLogicalCol + i] = true;
-								const currentPxWidth = parseFloat(cellWidth);
+								const currentPxWidth = numbers.get(cellWidth, -1);
 
 								for (let j = 0; j < colSpan; j++) {
 									const targetColIndex = currentLogicalCol + j;
@@ -349,8 +349,9 @@ class Table extends PluginDropdownFree {
 									if (existingWidth === null) {
 										colWidths[targetColIndex] = `width: ${cellWidth};`;
 									} else {
-										const existingPxWidth = parseFloat(
+										const existingPxWidth = numbers.get(
 											existingWidth.replace('width: ', '').replace(';', ''),
+											-1,
 										);
 										if (colSpan === 1 && currentPxWidth !== existingPxWidth) {
 											colWidths[targetColIndex] = `width: ${cellWidth};`;

@@ -216,6 +216,56 @@ export const shiftIcon = isOSX_IOS ? '⇧' : '+SHIFT';
  */
 export const DPI = _w.devicePixelRatio;
 
+/** @type {?boolean} */
+let _canUseBeforeInputCache = null;
+
+/**
+ * @description Runtime probe: does this environment actually deliver input events for edits?
+ * Some managed/corporate environments (keyboard-hooking security SW, DLP, VDI) silently drop `beforeinput`
+ * **and** `input` at runtime even though the browser statically supports them — static feature-detection
+ * (`window.InputEvent`) cannot see that. This synthetically triggers an edit (`execCommand('insertText')`)
+ * on an offscreen contenteditable and observes whether an input-family event fires **synchronously**.
+ * @returns {boolean} `true` if an input-family event fired (environment delivers edits), else `false`.
+ */
+export function canUseBeforeInput() {
+	if (_canUseBeforeInputCache !== null) return _canUseBeforeInputCache;
+	if (!_d.body || typeof _d.execCommand !== 'function') return true;
+
+	let seen = false;
+
+	try {
+		const probe = _d.createElement('div');
+		probe.setAttribute('contenteditable', 'true');
+		probe.setAttribute('aria-hidden', 'true');
+		probe.style.cssText =
+			'position: fixed; top: 0; left: -9999px; width: 1px; height: 1px; opacity: 0; pointer-events: none;';
+
+		const active = /** @type {?HTMLElement} */ (_d.activeElement);
+		_d.body.appendChild(probe);
+
+		const onInput = () => {
+			seen = true;
+		};
+
+		probe.addEventListener('beforeinput', onInput, true);
+		probe.addEventListener('input', onInput, true);
+
+		probe.focus({ preventScroll: true });
+		_d.execCommand('insertText', false, '\u200b');
+
+		probe.removeEventListener('beforeinput', onInput, true);
+		probe.removeEventListener('input', onInput, true);
+
+		probe.remove();
+
+		if (active && active !== _d.body && typeof active.focus === 'function') active.focus({ preventScroll: true });
+	} catch {
+		seen = true;
+	}
+
+	return (_canUseBeforeInputCache = seen);
+}
+
 /** --- editor env --- */
 export const KATEX_WEBSITE = 'https://katex.org/docs/supported.html';
 export const MATHJAX_WEBSITE = 'https://www.mathjax.org/';
@@ -239,6 +289,7 @@ const env = {
 	isAndroid,
 	isMobile,
 	isTouchDevice,
+	canUseBeforeInput,
 	cmdIcon,
 	shiftIcon,
 	DPI,

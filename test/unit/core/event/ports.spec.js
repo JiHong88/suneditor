@@ -4,6 +4,8 @@
 
 // Variable to control mocked isMobile value per test
 let mockIsMobileValue = false;
+// Variable to control the runtime beforeinput availability (store `_canUseBeforeInput`) per test
+let mockCanUseBeforeInput = true;
 
 // Mock the env module before importing ports
 jest.mock('../../../../src/helper/env', () => {
@@ -103,6 +105,10 @@ function createMockInst() {
 		_iframeAutoHeight: jest.fn()
 	};
 
+	const store = {
+		get: jest.fn((key) => (key === '_canUseBeforeInput' ? mockCanUseBeforeInput : undefined))
+	};
+
 	const $ = {
 		frameContext,
 		ui,
@@ -115,7 +121,8 @@ function createMockInst() {
 		history,
 		nodeTransform,
 		char,
-		menu
+		menu,
+		store
 	};
 
 	return {
@@ -138,6 +145,7 @@ describe('makePorts', () => {
 
 	beforeEach(() => {
 		mockIsMobileValue = false;
+		mockCanUseBeforeInput = true;
 		inst = createMockInst();
 		styleNodes = { value: [] };
 		ports = makePorts(inst, { _styleNodes: styleNodes });
@@ -528,17 +536,14 @@ describe('makePorts', () => {
 			expect(inst.__focusTemp.focus).not.toHaveBeenCalled();
 		});
 
-		it('never focus-shuffles, even on mobile — Enter now runs from beforeinput', () => {
-			// The former virtual-keyboard IME focus-shuffle (temp-focus → refocus) was removed: Enter is
-			// dispatched from `beforeinput` (post-IME-commit), where a refocus would re-arm the IME.
-			// `enterPrevent` must only cancel the native insert.
+		it('does NOT focus-shuffle on mobile when Enter runs from beforeinput (IME already committed)', () => {
+			// beforeinput path (`_canUseBeforeInput` true): a refocus would re-arm the IME, so `enterPrevent`
+			// must only cancel the native insert.
 			mockIsMobileValue = true;
+			mockCanUseBeforeInput = true;
 
 			const wysiwyg = { focus: jest.fn() };
-			inst.$.frameContext.get = jest.fn((key) => {
-				if (key === 'wysiwyg') return wysiwyg;
-				return undefined;
-			});
+			inst.$.frameContext.get = jest.fn((key) => (key === 'wysiwyg' ? wysiwyg : undefined));
 			ports = makePorts(inst, { _styleNodes: styleNodes });
 
 			const mockEvent = { preventDefault: jest.fn() };
@@ -547,6 +552,24 @@ describe('makePorts', () => {
 			expect(mockEvent.preventDefault).toHaveBeenCalledTimes(1);
 			expect(inst.__focusTemp.focus).not.toHaveBeenCalled();
 			expect(wysiwyg.focus).not.toHaveBeenCalled();
+		});
+
+		it('focus-shuffles on mobile when the environment does not deliver beforeinput (legacy keydown path)', () => {
+			// keydown path (`_canUseBeforeInput` false): force-end the virtual-keyboard IME session with a
+			// temp-focus → refocus so the just-committed marked-text is not re-trapped.
+			mockIsMobileValue = true;
+			mockCanUseBeforeInput = false;
+
+			const wysiwyg = { focus: jest.fn() };
+			inst.$.frameContext.get = jest.fn((key) => (key === 'wysiwyg' ? wysiwyg : undefined));
+			ports = makePorts(inst, { _styleNodes: styleNodes });
+
+			const mockEvent = { preventDefault: jest.fn() };
+			ports.enterPrevent(mockEvent);
+
+			expect(mockEvent.preventDefault).toHaveBeenCalledTimes(1);
+			expect(inst.__focusTemp.focus).toHaveBeenCalledWith({ preventScroll: true });
+			expect(wysiwyg.focus).toHaveBeenCalledWith({ preventScroll: true });
 		});
 	});
 

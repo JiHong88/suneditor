@@ -26,6 +26,16 @@ describe('markdown helper', () => {
 			expect(htmlToMd('<h6>H6</h6>')).toBe('###### H6\n');
 		});
 
+		it('should NOT emit a bare heading prefix for an empty heading line', () => {
+			// Regression: an empty heading (blank line still carrying an h-tag) used to serialize to a
+			// bare '####' instead of nothing. Empty headings become a blank line, like empty paragraphs.
+			expect(htmlToMd('<h4><br></h4>')).toBe('\n');
+			expect(htmlToMd('<h4>​</h4>')).toBe('\n');
+			expect(htmlToMd('<h4></h4>')).toBe('\n');
+			// surrounded by real content: the empty heading collapses to a separator, not '####'
+			expect(htmlToMd('<h1>A</h1><h4><br></h4><p>B</p>')).toBe('# A\n\nB\n');
+		});
+
 		it('should convert bold', () => {
 			expect(htmlToMd('<p><strong>bold</strong></p>')).toBe('**bold**\n');
 			expect(htmlToMd('<p><b>bold</b></p>')).toBe('**bold**\n');

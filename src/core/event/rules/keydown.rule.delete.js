@@ -169,6 +169,35 @@ export function reduceDeleteDown(actions, ports, ctx) {
 		}
 	}
 
+	// soft line break (Shift+Enter)
+	if (!selectRange) {
+		const dcon = range.startContainer;
+		let softBr = null;
+
+		if (
+			dcon.nodeType === 3 &&
+			range.startOffset >= dcon.textContent.length &&
+			dom.check.isBreak(dcon.nextSibling)
+		) {
+			const br = dcon.nextSibling;
+			if (br.nextSibling?.nodeType === 3 && dom.check.isZeroWidth(br.nextSibling.textContent)) softBr = br;
+		} else if (
+			dcon.nodeType === 3 &&
+			dom.check.isZeroWidth(dcon) &&
+			range.startOffset === 0 &&
+			dom.check.isBreak(dcon.previousSibling)
+		) {
+			softBr = dcon.previousSibling;
+		}
+
+		if (softBr) {
+			actions.push(A.preventStop());
+			actions.push(A.deleteSoftBreakMerge(softBr));
+			actions.push(A.historyPush(true));
+			return false;
+		}
+	}
+
 	// empty line
 	const emptyLineNext = formatEl?.nextElementSibling;
 	if (

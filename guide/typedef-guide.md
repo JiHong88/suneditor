@@ -15,6 +15,7 @@ This document provides a comprehensive overview of all TypeScript types availabl
     - [SunEditor.Event](#suneditorevent)
     - [SunEditor.EventParams](#suneditoreventparams)
     - [SunEditor.UI](#suneditorui)
+    - [DOM & Window Aliases](#dom--window-aliases)
 
 ---
 
@@ -24,21 +25,23 @@ This document provides a comprehensive overview of all TypeScript types availabl
 
 Core types for editor initialization and usage.
 
-| Type                            | Description                                           |
-| ------------------------------- | ----------------------------------------------------- |
-| `SunEditor.Instance`            | Main editor instance                                  |
-| `SunEditor.InitOptions`         | Full initialization options (`EditorInitOptions`)     |
-| `SunEditor.InitFrameOptions`    | Frame-specific initialization options                 |
-| `SunEditor.Context`             | Editor context (Map-based)                            |
-| `SunEditor.Options`             | Base options map (runtime)                            |
-| `SunEditor.FrameContext`        | Frame context utility                                 |
-| `SunEditor.FrameOptions`        | Frame options map (runtime)                           |
-| `SunEditor.Injector`            | Editor injector for dependency injection              |
-| `SunEditor.Status`              | Editor status object (focus, nodes, viewport, etc.)   |
-| `SunEditor.ComponentInfo`       | Component metadata (target, container, caption, etc.) |
-| `SunEditor.ComponentInsertType` | `"auto"` \| `"select"` \| `"line"` \| `"none"`        |
-| `SunEditor.NodeCollection`      | `Array<Node>` \| `HTMLCollection` \| `NodeList`       |
-| `SunEditor.Core`                | **@deprecated** Use `SunEditor.Instance` instead      |
+| Type                            | Description                                              |
+| ------------------------------- | ------------------------------------------------------- |
+| `SunEditor.Instance`            | Main editor instance                                    |
+| `SunEditor.Kernel`              | Core kernel (DI container); used for constructor params |
+| `SunEditor.Deps`                | Shared dependency bag (`this.$`) for cross-module access |
+| `SunEditor.Store`               | Central runtime state store (`kernel.store`)            |
+| `SunEditor.StorePathMap`        | Store state shape (state path → value map)              |
+| `SunEditor.InitOptions`         | Full initialization options (`EditorInitOptions`)       |
+| `SunEditor.InitFrameOptions`    | Frame-specific initialization options                   |
+| `SunEditor.Context`             | Editor context (Map-based)                              |
+| `SunEditor.Options`             | Base options map (runtime)                              |
+| `SunEditor.FrameContext`        | Frame context utility                                   |
+| `SunEditor.FrameOptions`        | Frame options map (runtime)                             |
+| `SunEditor.ComponentInfo`       | Component metadata (target, container, caption, etc.)   |
+| `SunEditor.ComponentLauncher`   | Lightweight plugin stand-in for non-plugin components (e.g. `pageBreak`) |
+| `SunEditor.ComponentInsertType` | `"auto"` \| `"select"` \| `"line"` \| `"none"`          |
+| `SunEditor.NodeCollection`      | `Array<Node>` \| `HTMLCollection` \| `NodeList`         |
 
 ---
 
@@ -209,6 +212,7 @@ Event callback parameter types.
 | Type                                       | Description                |
 | ------------------------------------------ | -------------------------- |
 | `SunEditor.EventParams.BaseEvent`          | Base event parameters      |
+| `SunEditor.EventParams.PluginEvent`        | Plugin event parameters (frameContext, event, data, line, range, file, doc) |
 | `SunEditor.EventParams.ClipboardEvent`     | Clipboard event parameters |
 | `SunEditor.EventParams.FileManagementInfo` | File management info       |
 | `SunEditor.EventParams.ProcessInfo`        | Process info               |
@@ -242,6 +246,18 @@ UI and toolbar configuration types.
 | `"#fix"`                               | RTL direction fix         |
 | `":Title-icon"`                        | More button with dropdown |
 | `"%50"` \| `"%100"`                    | Responsive breakpoint     |
+
+---
+
+### DOM & Window Aliases
+
+DOM/window intersection types used across the editor and iframe-safe code.
+
+| Type                       | Description                                         |
+| -------------------------- | --------------------------------------------------- |
+| `SunEditor.EventWysiwyg`   | WYSIWYG element intersected with `Window` (`HTMLElement & Window`) |
+| `SunEditor.WysiwygFrame`   | WYSIWYG iframe element (`HTMLElement & HTMLIFrameElement`) |
+| `SunEditor.GlobalWindow`   | Global window (`Window & typeof globalThis`)        |
 
 ---
 

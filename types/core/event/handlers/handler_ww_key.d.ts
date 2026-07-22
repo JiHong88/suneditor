@@ -23,6 +23,7 @@ export class OnKeyDown_wysiwyg {
 	 */
 	constructor(this: import('../eventOrchestrator').default, fc: SunEditor.FrameContext, e: KeyboardEvent);
 	isComposing: boolean;
+	_enterKeyShift: boolean;
 	_onShortcutKey: boolean;
 }
 /**

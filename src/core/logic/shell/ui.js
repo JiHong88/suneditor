@@ -888,7 +888,8 @@ class UIManager {
 		const prev = wysiwyg.querySelector('.se-placeholder-line');
 
 		const line = this.#store.get('hasFocus') ? this.#$.format.getLine(this.#$.selection.selectionNode) : null;
-		const target = dom.check.isEmptyLine(line) && !dom.check.isListCell(line) ? line : null;
+		const inTableCell = !!line && !!dom.query.getParentElement(line, dom.check.isTableCell);
+		const target = dom.check.isEmptyLine(line) && !dom.check.isListCell(line) && !inTableCell ? line : null;
 
 		// Single-marker invariant: drop the previous marker unless it is still the target line.
 		if (prev && prev !== target) {
@@ -1047,7 +1048,7 @@ class UIManager {
 
 function CreateAlertHTML({ lang, icons }) {
 	const html =
-		'<div><button class="close" data-command="close" title="' +
+		'<div><button type="button" class="close" data-command="close" title="' +
 		lang.close +
 		'">' +
 		icons.cancel +

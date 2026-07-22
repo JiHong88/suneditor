@@ -26,6 +26,10 @@ describe('handler_ww_input', () => {
 		mockThis = {
 			_handledInBefore: false,
 			$: {
+				store: {
+					// beforeinput available by default (Enter routed through beforeinput)
+					get: jest.fn((key) => (key === '_canUseBeforeInput' ? true : undefined))
+				},
 				char: {
 					test: jest.fn().mockReturnValue(true)
 				},

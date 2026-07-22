@@ -18,6 +18,7 @@ export const env: {
 	isAndroid: boolean;
 	isMobile: boolean;
 	isTouchDevice: boolean;
+	canUseBeforeInput: typeof import('./env').canUseBeforeInput;
 	cmdIcon: string;
 	shiftIcon: string;
 	DPI: number;
