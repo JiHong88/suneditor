@@ -531,8 +531,9 @@ class Selection_ {
 				if (topMargin >= 0 && bottomMargin >= 0) return;
 
 				const newScrollTop = scrollY - (topMargin < 0 ? -(topMargin - PADDING) : bottomMargin);
+				const clearTopToolbar = topToolbarH > 0 && topMargin < 0;
 				_w.scrollTo({
-					top: newScrollTop < scrollY ? newScrollTop - topToolbarH : newScrollTop,
+					top: clearTopToolbar ? newScrollTop - topToolbarH : newScrollTop,
 					behavior,
 				});
 			} else {
@@ -549,8 +550,9 @@ class Selection_ {
 					scrollMargin <= PADDING
 						? scrollY - scrollMargin + PADDING + statusbarHeight
 						: scrollY - scrollMargin + (viewHeight - elH - PADDING);
+				const clearTopToolbar = topToolbarH > 0 && !topClear;
 				_w.scrollTo({
-					top: newScrollTop < scrollY ? newScrollTop - topToolbarH : newScrollTop,
+					top: clearTopToolbar ? newScrollTop - topToolbarH : newScrollTop,
 					behavior,
 				});
 			}

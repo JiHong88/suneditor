@@ -639,6 +639,30 @@ describe('Selection - scrollTo', () => {
 			expect(window.scrollTo).toHaveBeenCalled();
 		});
 
+		// Regression (Backspace-up, sticky top): a caret entering the toolbar band needs only a small,
+		// net-DOWNWARD correction (newScrollTop >= scrollY). The old `newScrollTop < scrollY` gate skipped the
+		// `- topToolbarH` clearance there, so the caret landed a sticky-offset short — still under the toolbar —
+		// and only cleared it once further Backspace pushed it off the top (a clear upward scroll). The actual
+		// `_w.scrollTo` destination must include the toolbar offset regardless of the net scroll direction.
+		it('clears the toolbar on a net-downward correction while the caret is under it', () => {
+			setupAutoHeightSticky({ stickyOffset: 20 }); // topToolbarH = 40 + 20 = 60, PADDING = 40
+			Object.defineProperty(window, 'scrollY', { value: 200, configurable: true, writable: true });
+
+			wysiwyg.innerHTML = '<p>merged line</p>';
+			const p = wysiwyg.querySelector('p');
+			// caret viewport top=50 -> inside the band [20, 60]; rectTop = 50 + scrollY(200) = 250.
+			// scrollMargin large -> branch B; newScrollTop = rectTop - PADDING = 210 >= scrollY(200), so the old
+			// direction gate skipped the toolbar offset and left the caret viewport at 40 (still under the band).
+			selection.scrollTo(caretRangeAt(p.firstChild, 50), { behavior: 'auto' });
+
+			expect(window.scrollTo).toHaveBeenCalled();
+			const dest = window.scrollTo.mock.calls[0][0].top;
+			// caret's resulting viewport position must clear the toolbar band (>= topToolbarH), not sit under it
+			const caretViewportTop = 250 - dest; // rectTop - scrollDest
+			expect(caretViewportTop).toBeGreaterThanOrEqual(60);
+			expect(dest).toBe(150); // 210 - topToolbarH(60) -> caret at 60 + PADDING(40) = 100
+		});
+
 		// The top-clearance change (caretTop >= topToolbarH) is only the SECOND operand of the early-return; the
 		// bottom PADDING check `scrollMargin - PADDING > 0` is independent and still applies with a sticky toolbar.
 		// So Enter-down overshoot past the viewport bottom still scrolls, honoring the bottom PADDING.
