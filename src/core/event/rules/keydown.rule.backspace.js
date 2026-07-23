@@ -40,6 +40,7 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 
 	if (selectRange && hardDelete(ports)) {
 		actions.push(A.preventStop());
+		actions.push(A.caretScrollTo(range));
 		return true;
 	}
 
@@ -66,6 +67,7 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 		actions.push(A.preventStop());
 		actions.push(A.delFormatRemoveAndMove(range.startContainer, formatEl));
 		actions.push(A.historyPush(true));
+		actions.push(A.caretScrollTo(range));
 		return false;
 	}
 
@@ -107,6 +109,7 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 		}
 
 		actions.push(A.editorNativeFocus());
+		actions.push(A.caretScrollTo(range));
 		return false;
 	}
 
@@ -201,6 +204,7 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 				}
 			}
 
+			actions.push(A.caretScrollTo(range));
 			return true;
 		}
 
@@ -233,6 +237,7 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 					),
 				);
 				actions.push(A.historyPush(true));
+				actions.push(A.caretScrollTo(range));
 				return true;
 			}
 		}
@@ -244,6 +249,7 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 		if (fileComponentInfo) {
 			actions.push(A.preventStop());
 			actions.push(A.backspaceComponentRemove(false, formatEl.firstChild, formatEl, fileComponentInfo));
+			actions.push(A.caretScrollTo(range));
 			return true;
 		}
 	}
@@ -276,6 +282,7 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 				actions.push(A.preventStop());
 				actions.push(A.domUtilsRemoveItem(prev));
 			}
+			actions.push(A.caretScrollTo(range));
 			return true;
 		}
 
@@ -283,6 +290,7 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 		if (sel && dom.check.isNonEditable(sel.previousSibling)) {
 			actions.push(A.preventStop());
 			actions.push(A.domUtilsRemoveItem(sel.previousSibling));
+			actions.push(A.caretScrollTo(range));
 			return true;
 		}
 	}
@@ -300,6 +308,7 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 			actions.push(A.preventStop());
 			actions.push(A.backspaceBrLineRowMerge(range.startContainer, rowStartBr));
 			actions.push(A.historyPush(true));
+			actions.push(A.caretScrollTo(range));
 			return false;
 		}
 	}
@@ -315,6 +324,7 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 		actions.push(A.preventStop());
 		actions.push(A.backspaceSoftBreakMerge(range.startContainer));
 		actions.push(A.historyPush(true));
+		actions.push(A.caretScrollTo(range));
 		return false;
 	}
 
@@ -331,6 +341,7 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 		actions.push(A.preventStop());
 		actions.push(A.backspaceEmptyLineMergePrev(formatEl, emptyLinePrev));
 		actions.push(A.historyPush(true));
+		actions.push(A.caretScrollTo(range));
 		return false;
 	}
 

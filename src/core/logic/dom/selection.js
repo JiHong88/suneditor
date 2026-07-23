@@ -482,21 +482,28 @@ class Selection_ {
 				el?.scrollIntoView(scrollOption);
 			}
 
-			if (scrollOption?.behavior === 'auto' && scrollY !== _w.scrollY) {
-				if (positionToolbarHeight) {
-					if (isBottom) {
+			if (scrollOption?.behavior === 'auto') {
+				if (positionToolbarHeight && !isBottom) {
+					// A sticky toolbar overlays the viewport band [0 .. positionToolbarHeight].
+					// caret on a wrapped line — and nudge it below the toolbar. Guards:
+					//   height > 0 — skip a collapsed range's zero rect (phantom full-toolbar scroll)
+					//   top >= 0   — skip off-screen / mid-animation rects; `behavior:'auto'` follows
+					//                the page's CSS scroll-behavior, so on `smooth` hosts it's async
+					//   top < band — only correct when actually under the toolbar; caps the nudge at
+					//                toolbar height so a stale measurement can't overshoot
+					const caretNow = ref?.getBoundingClientRect?.();
+					if (caretNow?.height > 0 && caretNow.top >= 0 && caretNow.top < positionToolbarHeight) {
+						_w.scrollBy(0, -(positionToolbarHeight - caretNow.top));
+					}
+				} else if (scrollY !== _w.scrollY) {
+					if (positionToolbarHeight) {
 						// bottom toolbar covers the bottom — scroll down more so the element clears the toolbar
 						if (scrollY < _w.scrollY) {
 							_w.scrollBy(0, positionToolbarHeight);
 						}
-					} else {
-						// top toolbar covers the top — scroll up more so the element clears the toolbar
-						if (scrollY > _w.scrollY) {
-							_w.scrollBy(0, -positionToolbarHeight);
-						}
+					} else if (isAutoHeight) {
+						_w.scrollBy(0, statusbarHeight);
 					}
-				} else if (isAutoHeight) {
-					_w.scrollBy(0, statusbarHeight);
 				}
 			}
 
@@ -532,7 +539,11 @@ class Selection_ {
 				const rectTop = refRect?.height > 0 ? refRect.top + scrollY : this.#$.offset.getGlobal(el).top;
 				const scrollMargin = viewHeight + scrollY - rectTop - elH;
 
-				if (scrollMargin - PADDING > 0 && viewHeight > scrollMargin + PADDING + topToolbarH) return;
+				// Top clearance: with a sticky toolbar, the caret is already clear once its top
+				// felt right. With no toolbar (topToolbarH === 0), keep the original PADDING.
+				const caretTop = rectTop - scrollY;
+				const topClear = topToolbarH > 0 ? caretTop >= topToolbarH : viewHeight > scrollMargin + PADDING;
+				if (scrollMargin - PADDING > 0 && topClear) return;
 
 				const newScrollTop =
 					scrollMargin <= PADDING

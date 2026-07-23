@@ -1,7 +1,7 @@
-## 3.2.4
+## 3.2.5
 
 ### Bugfix
 
-* Fixed a bug where the caret was not scrolled into view after Backspace when deleting a character or merging a line at the edge of the viewport.
-* Fixed a bug where Backspace or Delete broke deletion when the caret container was the line element instead of a text node.
-* Fixed a bug where the per-line placeholder (`placeholder_line`) lingered on multiple lines after a batched multi-line insert.
+* Fixed a bug where the caret was not scrolled into view after Backspace in additional delete and merge cases (selection delete, list merge, component delete, `<br>`-line, soft break, and empty-line merges).
+* Fixed a bug where the caret could be hidden under the top sticky toolbar (`_toolbar_sticky`) when the editor was placed inside an outer scroll container.
+* Fixed a bug where an already-visible caret was pulled downward on Backspace in auto-height mode after it had already cleared the top sticky toolbar.

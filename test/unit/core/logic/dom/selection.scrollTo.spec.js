@@ -447,4 +447,224 @@ describe('Selection - scrollTo', () => {
 			expect(scrollToSpy).not.toHaveBeenCalled();
 		});
 	});
+
+	// Regression: a top sticky toolbar occupies the viewport band [0, positionToolbarHeight] (sticky offset +
+	// toolbar height). In the scroll-parent branch, `scrollIntoView` / `#scrollCaretIntoView` are unaware of that
+	// overlay, so a caret that renders just under the toolbar (e.g. after Backspace merges a line and the browser
+	// considers it "already visible") was never nudged clear — the old compensation only ran when the window
+	// itself scrolled. The nudge measures the CARET rect (not the block) and only acts when the caret sits inside
+	// the band `0 <= top < positionToolbarHeight`, so it is bounded by the toolbar height and never over-scrolls.
+	describe('sticky top toolbar (scroll-parent branch)', () => {
+		let container;
+
+		// positionToolbarHeight = (isSticky ? toolbar.offsetHeight(40) : 0) + _toolbar_sticky
+		function setupSticky({ stickyOffset = 60, isSticky = true } = {}) {
+			kernel.$.toolbar.isSticky = isSticky;
+			kernel.$.options.set('_toolbar_sticky', stickyOffset);
+
+			container = document.createElement('div');
+			container.scrollBy = jest.fn();
+			mockRect(container, { top: 0, left: 0, right: 800, bottom: 500, width: 800, height: 500 });
+			kernel._eventOrchestrator.scrollparents = [container];
+			selection.__init(); // #hasScrollParents = true
+
+			window.scrollBy = jest.fn();
+		}
+
+		// The nudge reads the CARET (range) rect, not the element rect — mock it explicitly.
+		function caretRangeAt(textNode, top, height = 20) {
+			const range = document.createRange();
+			range.setStart(textNode, 0);
+			range.setEnd(textNode, 1);
+			range.getBoundingClientRect = jest.fn(() => ({
+				top, left: 20, right: 120, bottom: top + height, width: 100, height, x: 20, y: top,
+			}));
+			return range;
+		}
+
+		it('nudges the caret down when it renders under the sticky toolbar (window did not scroll)', () => {
+			setupSticky({ stickyOffset: 60 }); // positionToolbarHeight = 40 + 60 = 100
+
+			wysiwyg.innerHTML = '<p>merged line</p>';
+			const p = wysiwyg.querySelector('p');
+			p.scrollIntoView = jest.fn(); // no-op (jsdom + browser treats it as "already visible")
+
+			// caret line at viewport top=90 → inside the toolbar band [0, 100]
+			selection.scrollTo(caretRangeAt(p.firstChild, 90), { behavior: 'auto' });
+
+			// overlap = positionToolbarHeight(100) - top(90) = 10 → scroll window up by 10 so the caret clears it
+			expect(window.scrollBy).toHaveBeenCalledWith(0, -10);
+		});
+
+		it('does not scroll when the caret already sits below the sticky toolbar', () => {
+			setupSticky({ stickyOffset: 60 }); // positionToolbarHeight = 100
+
+			wysiwyg.innerHTML = '<p>safe line</p>';
+			const p = wysiwyg.querySelector('p');
+			p.scrollIntoView = jest.fn();
+
+			// caret line at viewport top=200, well below the toolbar band → no overlap
+			selection.scrollTo(caretRangeAt(p.firstChild, 200), { behavior: 'auto' });
+
+			expect(window.scrollBy).not.toHaveBeenCalled();
+		});
+
+		it('does not nudge when the toolbar is not sticky (no overlay to clear)', () => {
+			setupSticky({ stickyOffset: 60, isSticky: false }); // positionToolbarHeight = 0
+
+			wysiwyg.innerHTML = '<p>line</p>';
+			const p = wysiwyg.querySelector('p');
+			p.scrollIntoView = jest.fn();
+
+			selection.scrollTo(caretRangeAt(p.firstChild, 90), { behavior: 'auto' });
+
+			expect(window.scrollBy).not.toHaveBeenCalled();
+		});
+
+		// Guard: use the CARET rect, not the block. A tall wrapped paragraph's top can sit far above the caret;
+		// measuring the block would compute a huge overlap and scroll the caret off the BOTTOM of the viewport.
+		it('does not over-scroll a tall block whose caret is already below the toolbar', () => {
+			setupSticky({ stickyOffset: 60 }); // positionToolbarHeight = 100
+
+			wysiwyg.innerHTML = '<p>tall wrapped paragraph</p>';
+			const p = wysiwyg.querySelector('p');
+			p.scrollIntoView = jest.fn();
+			// Block spans far above the viewport (top=-300), but the caret's visual line is at top=250 (below band).
+			mockRect(p, { top: -300, left: 20, right: 780, bottom: 260 });
+			mockSize(p, 760, 560);
+
+			selection.scrollTo(caretRangeAt(p.firstChild, 250), { behavior: 'auto' });
+
+			expect(window.scrollBy).not.toHaveBeenCalled();
+		});
+
+		// Guard: skip an off-screen / mid-animation caret rect (top < 0). `behavior:'auto'` obeys the page's CSS
+		// `scroll-behavior`; under `smooth` the scroll above is async and the rect can be stale/negative. Nudging
+		// on a negative top would jump the viewport by more than the toolbar height.
+		it('does not nudge when the caret rect is above the viewport (stale/off-screen)', () => {
+			setupSticky({ stickyOffset: 60 }); // positionToolbarHeight = 100
+
+			wysiwyg.innerHTML = '<p>line</p>';
+			const p = wysiwyg.querySelector('p');
+			p.scrollIntoView = jest.fn();
+
+			selection.scrollTo(caretRangeAt(p.firstChild, -40), { behavior: 'auto' });
+
+			expect(window.scrollBy).not.toHaveBeenCalled();
+		});
+
+		// Guard: a collapsed range can return an all-zero rect (top:0, height:0). `height > 0` skips it, otherwise
+		// top=0 would trigger a spurious full-toolbar-height scroll.
+		it('does not nudge on a zero-height (collapsed/degenerate) caret rect', () => {
+			setupSticky({ stickyOffset: 60 }); // positionToolbarHeight = 100
+
+			wysiwyg.innerHTML = '<p>line</p>';
+			const p = wysiwyg.querySelector('p');
+			p.scrollIntoView = jest.fn();
+
+			selection.scrollTo(caretRangeAt(p.firstChild, 0, 0), { behavior: 'auto' });
+
+			expect(window.scrollBy).not.toHaveBeenCalled();
+		});
+
+		it('nudges the brLine caret row clear of the sticky toolbar', () => {
+			setupSticky({ stickyOffset: 60 }); // positionToolbarHeight = 100
+			kernel.$.format.isBrLine.mockReturnValue(true);
+
+			wysiwyg.innerHTML = '<pre>line1<br>caret line<br>line3</pre>';
+			const pre = wysiwyg.querySelector('pre');
+			pre.scrollIntoView = jest.fn();
+
+			// caret row at viewport top=85 → within the container [0,500] & window view (so #scrollCaretIntoView is
+			// a no-op), but inside the toolbar band [0, 100]
+			const range = caretRangeAt(pre.childNodes[2], 85);
+			selection.scrollTo(range, { behavior: 'auto' });
+
+			// #scrollCaretIntoView leaves the caret at top=85; nudge by overlap = 100 - 85 = 15
+			expect(container.scrollBy).not.toHaveBeenCalled(); // already within the container view
+			expect(window.scrollBy).toHaveBeenCalledWith(0, -15);
+		});
+	});
+
+	// Regression: in the auto-height (page-scroll) non-iframe branch, the top-clearance check added PADDING on
+	// top of the sticky toolbar height. That pulled a still-visible caret downward on Backspace-up (it had to sit
+	// PADDING below the toolbar to avoid a scroll), while Enter-down felt fine. The caret only needs to clear the
+	// toolbar (caretTop >= topToolbarH); no extra PADDING gap.
+	describe('sticky top toolbar (auto-height, non-iframe)', () => {
+		function setupAutoHeightSticky({ stickyOffset = 20 } = {}) {
+			kernel.store.get = jest.fn((key) => {
+				if (key === 'isScrollable') return () => false; // auto-height (page scrolls, not the frame)
+				if (key === 'currentViewportHeight') return 768;
+				return undefined;
+			});
+			kernel.$.toolbar.isSticky = true;
+			kernel.$.options.set('_toolbar_sticky', stickyOffset); // positionToolbarHeight = 40 + offset
+			kernel._eventOrchestrator.scrollparents = [];
+			selection.__init(); // #hasScrollParents = false, #scrollMargin (PADDING) = 40
+			window.scrollTo = jest.fn();
+			Object.defineProperty(window, 'scrollY', { value: 0, configurable: true, writable: true });
+		}
+
+		function caretRangeAt(textNode, top, height = 20) {
+			const range = document.createRange();
+			range.setStart(textNode, 0);
+			range.setEnd(textNode, 1);
+			range.getBoundingClientRect = jest.fn(() => ({
+				top, left: 20, right: 120, bottom: top + height, width: 100, height, x: 20, y: top,
+			}));
+			return range;
+		}
+
+		it('does not pull a visible caret that already clears the sticky toolbar (Backspace-up)', () => {
+			setupAutoHeightSticky({ stickyOffset: 20 }); // topToolbarH = 40 + 20 = 60
+
+			wysiwyg.innerHTML = '<p>near top line</p>';
+			const p = wysiwyg.querySelector('p');
+			// caret top=70 → just below the toolbar band bottom (60); fully visible.
+			// Old check: vBot(90) > PADDING(40) + topToolbarH(60) = 100 → false → scrolled down (the "pull").
+			// Fixed: caretTop(70) >= topToolbarH(60) → clear → no scroll.
+			selection.scrollTo(caretRangeAt(p.firstChild, 70), { behavior: 'auto' });
+
+			expect(window.scrollTo).not.toHaveBeenCalled();
+		});
+
+		it('still scrolls to reveal a caret hidden under the sticky toolbar', () => {
+			setupAutoHeightSticky({ stickyOffset: 20 }); // topToolbarH = 60
+
+			wysiwyg.innerHTML = '<p>hidden line</p>';
+			const p = wysiwyg.querySelector('p');
+			// caret top=30 → inside the toolbar band [0, 60] → must scroll down to reveal it
+			selection.scrollTo(caretRangeAt(p.firstChild, 30), { behavior: 'auto' });
+
+			expect(window.scrollTo).toHaveBeenCalled();
+		});
+
+		// The top-clearance change (caretTop >= topToolbarH) is only the SECOND operand of the early-return; the
+		// bottom PADDING check `scrollMargin - PADDING > 0` is independent and still applies with a sticky toolbar.
+		// So Enter-down overshoot past the viewport bottom still scrolls, honoring the bottom PADDING.
+		it('still honors the bottom PADDING when the caret overshoots below the viewport (Enter-down)', () => {
+			setupAutoHeightSticky({ stickyOffset: 20 }); // topToolbarH = 60, viewHeight = 768, PADDING = 40
+
+			wysiwyg.innerHTML = '<p>bottom line</p>';
+			const p = wysiwyg.querySelector('p');
+			// caret top=750 → vBot=770, past the bottom PADDING band (viewHeight - PADDING = 728). caretTop(750)
+			// clears the toolbar, but the bottom check fails → must scroll DOWN to keep the PADDING gap.
+			selection.scrollTo(caretRangeAt(p.firstChild, 750), { behavior: 'auto' });
+
+			expect(window.scrollTo).toHaveBeenCalled();
+			expect(window.scrollTo.mock.calls[0][0].top).toBeGreaterThan(0); // scrolled down
+		});
+
+		it('is unchanged when the toolbar is not sticky (topToolbarH === 0 keeps the PADDING comfort margin)', () => {
+			setupAutoHeightSticky({ stickyOffset: 20 });
+			kernel.$.toolbar.isSticky = false; // topToolbarH = 0 → original PADDING-based top check
+
+			wysiwyg.innerHTML = '<p>line</p>';
+			const p = wysiwyg.querySelector('p');
+			// caret top=10 → within the top PADDING(40) band, no toolbar → original behavior scrolls it clear
+			selection.scrollTo(caretRangeAt(p.firstChild, 10), { behavior: 'auto' });
+
+			expect(window.scrollTo).toHaveBeenCalled();
+		});
+	});
 });
