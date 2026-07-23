@@ -298,7 +298,7 @@ describe('Enter Rule', () => {
 	it('should add scrollTo action', () => {
 		const result = reduceEnterDown(actions, mockPorts, mockCtx);
 
-		expect(actions.some(a => a.t === 'enter.scrollTo')).toBe(true);
+		expect(actions.some(a => a.t === 'caret.scrollTo')).toBe(true);
 		expect(result).toBe(true);
 	});
 
@@ -517,7 +517,7 @@ describe('Enter Rule', () => {
 
 		const result = reduceEnterDown(actions, mockPorts, mockCtx);
 
-		expect(actions.some(a => a.t === 'enter.scrollTo')).toBe(true);
+		expect(actions.some(a => a.t === 'caret.scrollTo')).toBe(true);
 		expect(result).toBe(true);
 	});
 

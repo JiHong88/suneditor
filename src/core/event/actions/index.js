@@ -210,12 +210,15 @@ export const A = {
 	 */
 	tabFormatIndent: (range, formatEl, shift) => ({ t: 'tab.format.indent', p: { range, formatEl, shift } }),
 
-	// === enter ===
+	// === caret ===
 	/**
+	 * @description Scroll the editor view to the caret. Used after Enter, Backspace, and any edit that can move the caret out of view.
 	 * @param {Range} range Range object
 	 * @returns {Action}
 	 */
-	enterScrollTo: (range) => ({ t: 'enter.scrollTo', p: { range } }),
+	caretScrollTo: (range) => ({ t: 'caret.scrollTo', p: { range } }),
+
+	// === enter ===
 	/**
 	 * @param {Element} formatEl
 	 * @returns {Action}

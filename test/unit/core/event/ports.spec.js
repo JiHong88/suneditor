@@ -467,12 +467,12 @@ describe('makePorts', () => {
 	});
 
 	// ============================================================
-	// enterScrollTo
+	// caretScrollTo
 	// ============================================================
-	describe('enterScrollTo', () => {
+	describe('caretScrollTo', () => {
 		it('calls ui._iframeAutoHeight with frameContext', () => {
 			const mockRange = document.createRange();
-			ports.enterScrollTo(mockRange);
+			ports.caretScrollTo(mockRange);
 			expect(inst.$.ui._iframeAutoHeight).toHaveBeenCalledWith(inst.$.frameContext);
 		});
 
@@ -484,7 +484,7 @@ describe('makePorts', () => {
 			ports = makePorts(inst, { _styleNodes: styleNodes });
 
 			const snapshot = document.createRange(); // pre-Enter snapshot — must be ignored in favor of the live range
-			ports.enterScrollTo(snapshot);
+			ports.caretScrollTo(snapshot);
 			expect(inst.$.selection.getRange).toHaveBeenCalled(); // consulted the live caret, not just the snapshot
 			expect(inst.$.selection.scrollTo).toHaveBeenCalledWith(liveRange, {
 				behavior: 'auto',
@@ -500,7 +500,7 @@ describe('makePorts', () => {
 			inst.$.selection.getRange.mockReturnValue(liveRange);
 			ports = makePorts(inst, { _styleNodes: styleNodes });
 
-			ports.enterScrollTo(document.createRange());
+			ports.caretScrollTo(document.createRange());
 
 			expect(inst.$.ui._iframeAutoHeight).toHaveBeenCalledWith(inst.$.frameContext);
 			expect(inst.$.selection.scrollTo).toHaveBeenCalledWith(liveRange, {
@@ -594,7 +594,7 @@ describe('makePorts', () => {
 			expect(ports).toHaveProperty('styleNodeCache');
 			expect(ports).toHaveProperty('formatAttrsTempCache');
 			expect(ports).toHaveProperty('setOnShortcutKey');
-			expect(ports).toHaveProperty('enterScrollTo');
+			expect(ports).toHaveProperty('caretScrollTo');
 			expect(ports).toHaveProperty('enterPrevent');
 		});
 

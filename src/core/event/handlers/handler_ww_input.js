@@ -81,7 +81,7 @@ async function dispatchEnter(fc, e) {
 	this._enterKeyShift = false;
 
 	if (!shift) {
-		const normalized = this._normalizeEnterRange();
+		const normalized = this._normalizeEditRange();
 		if (normalized) selectionNode = normalized;
 	}
 

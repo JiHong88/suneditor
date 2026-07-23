@@ -79,7 +79,7 @@ export function reduceEnterDown(actions, ports, ctx) {
 	if (shift) {
 		ports.enterPrevent(e);
 		actions.push(A.enterShiftBr(range));
-		actions.push(A.enterScrollTo(range));
+		actions.push(A.caretScrollTo(range));
 		return true;
 	}
 
@@ -107,7 +107,7 @@ export function reduceEnterDown(actions, ports, ctx) {
 		if (formatEndEdge && (/^H[1-6]$/i.test(formatEl.nodeName) || /^HR$/i.test(formatEl.nodeName))) {
 			ports.enterPrevent(e);
 			actions.push(A.enterLineAddDefault(formatEl));
-			actions.push(A.enterScrollTo(range));
+			actions.push(A.caretScrollTo(range));
 			return true;
 		} else if (rangeEl && formatEl && !dom.check.isTableCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
 			// add default List line
@@ -118,7 +118,7 @@ export function reduceEnterDown(actions, ports, ctx) {
 			) {
 				ports.enterPrevent(e);
 				actions.push(A.enterListAddItem(formatEl, selectionNode));
-				actions.push(A.enterScrollTo(range));
+				actions.push(A.caretScrollTo(range));
 				return true;
 			}
 
@@ -146,7 +146,7 @@ export function reduceEnterDown(actions, ports, ctx) {
 				} else {
 					actions.push(A.enterBrLineInsert(range));
 				}
-				actions.push(A.enterScrollTo(range));
+				actions.push(A.caretScrollTo(range));
 				return true;
 			}
 
@@ -157,7 +157,7 @@ export function reduceEnterDown(actions, ports, ctx) {
 			} else {
 				actions.push(A.enterFormatInsertBrNode(wSelection));
 			}
-			actions.push(A.enterScrollTo(range));
+			actions.push(A.caretScrollTo(range));
 			return true;
 		}
 
@@ -167,7 +167,7 @@ export function reduceEnterDown(actions, ports, ctx) {
 			actions.push(
 				A.enterFormatBreakAtEdge(formatEl, selectionNode, formatStartEdge, formatEndEdge, bidiSwapped),
 			);
-			actions.push(A.enterScrollTo(range));
+			actions.push(A.caretScrollTo(range));
 			return true;
 		}
 
@@ -194,13 +194,13 @@ export function reduceEnterDown(actions, ports, ctx) {
 				actions.push(A.enterFormatBreakAtCursor(formatEl, range));
 			}
 
-			actions.push(A.enterScrollTo(range));
+			actions.push(A.caretScrollTo(range));
 			return true;
 		}
 	}
 
 	if (selectRange) {
-		actions.push(A.enterScrollTo(range));
+		actions.push(A.caretScrollTo(range));
 		return true;
 	}
 
@@ -211,7 +211,7 @@ export function reduceEnterDown(actions, ports, ctx) {
 	) {
 		ports.enterPrevent(e);
 		actions.push(A.enterFigcaptionExitInList(formatEl));
-		actions.push(A.enterScrollTo(range));
+		actions.push(A.caretScrollTo(range));
 	}
 
 	return true;

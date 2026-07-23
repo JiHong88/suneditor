@@ -173,15 +173,13 @@ export function makePorts(inst, { _styleNodes }) {
 		formatAttrsTempCache: (attrs) => (inst._formatAttrsTemp = attrs),
 		setOnShortcutKey: (v) => (inst._onShortcutKey = v),
 
-		// === enter event specific ===
 		/**
-		 * @description Scrolls the editor view to the caret position after pressing `Enter`.
-		 * @param {Range} range Pre-Enter snapshot range (fallback only).
+		 * @description Scrolls the editor view to the caret position after an edit (Enter, Backspace, ...).
+		 * @param {Range} range Pre-edit snapshot range (fallback only).
 		 */
-		enterScrollTo(range) {
+		caretScrollTo(range) {
 			ui._iframeAutoHeight(frameContext);
 
-			// Scroll to the *live* post-Enter caret, not the pre-Enter `range` snapshot.
 			selection.scrollTo(selection.getRange() || range, {
 				behavior: 'auto',
 				block: 'nearest',
@@ -231,5 +229,5 @@ export function makePorts(inst, { _styleNodes }) {
  * @property {(v: boolean) => void} setOnShortcutKey
  *
  * @property {(e: Event) => void} enterPrevent
- * @property {(range: Range) => void} enterScrollTo
+ * @property {(range: Range) => void} caretScrollTo
  */

@@ -44,9 +44,10 @@ declare const _default: {
 	/** [tab] */
 	/** @action tabFormatIndent */
 	'tab.format.indent': ({ ports, ctx }: EffectContext_keydown, { range, formatEl, shift }: any) => boolean;
+	/** [caret] */
+	/** @action caretScrollTo */
+	'caret.scrollTo': ({ ports }: EffectContext_keydown, { range }: any) => void;
 	/** [enter] */
-	/** @action enterScrollTo */
-	'enter.scrollTo': ({ ports }: EffectContext_keydown, { range }: any) => void;
 	/** @action enterLineAddDefault */
 	'enter.line.addDefault': ({ ports }: EffectContext_keydown, { formatEl }: any) => void;
 	/** @action enterListAddItem */

@@ -885,14 +885,15 @@ class UIManager {
 		if (!text) return false;
 
 		const wysiwyg = fc.get('wysiwyg');
-		const prev = wysiwyg.querySelector('.se-placeholder-line');
 
 		const line = this.#store.get('hasFocus') ? this.#$.format.getLine(this.#$.selection.selectionNode) : null;
 		const inTableCell = !!line && !!dom.query.getParentElement(line, dom.check.isTableCell);
 		const target = dom.check.isEmptyLine(line) && !dom.check.isListCell(line) && !inTableCell ? line : null;
 
-		// Single-marker invariant: drop the previous marker unless it is still the target line.
-		if (prev && prev !== target) {
+		const prevMarkers = wysiwyg.querySelectorAll('.se-placeholder-line');
+		for (let i = 0; i < prevMarkers.length; i++) {
+			const prev = prevMarkers[i];
+			if (prev === target) continue;
 			prev.classList.remove('se-placeholder-line');
 			prev.removeAttribute('data-se-placeholder-line');
 			if (!prev.getAttribute('class')) prev.removeAttribute('class');

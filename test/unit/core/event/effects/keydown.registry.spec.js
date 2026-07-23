@@ -63,7 +63,7 @@ describe('keydown.registry effects', () => {
 				}),
 				removeAllParents: jest.fn(),
 			},
-			enterScrollTo: jest.fn(),
+			caretScrollTo: jest.fn(),
 			enterPrevent: jest.fn(),
 			setOnShortcutKey: jest.fn(),
 		};
@@ -368,13 +368,13 @@ describe('keydown.registry effects', () => {
 		});
 	});
 
-	describe('enter.scrollTo', () => {
-		it('should call enterScrollTo with range', () => {
+	describe('caret.scrollTo', () => {
+		it('should call caretScrollTo with range', () => {
 			const range = { startContainer: document.createElement('p'), startOffset: 0 };
 
-			effects['enter.scrollTo']({ ports: mockPorts }, { range });
+			effects['caret.scrollTo']({ ports: mockPorts }, { range });
 
-			expect(mockPorts.enterScrollTo).toHaveBeenCalledWith(range);
+			expect(mockPorts.caretScrollTo).toHaveBeenCalledWith(range);
 		});
 	});
 

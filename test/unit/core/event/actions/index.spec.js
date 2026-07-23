@@ -240,11 +240,11 @@ describe('Event Actions', () => {
 	});
 
 	describe('Enter actions', () => {
-		it('should create enterScrollTo action', () => {
+		it('should create caretScrollTo action', () => {
 			const range = document.createRange();
-			const action = A.enterScrollTo(range);
+			const action = A.caretScrollTo(range);
 			expect(action).toEqual({
-				t: 'enter.scrollTo',
+				t: 'caret.scrollTo',
 				p: { range }
 			});
 		});

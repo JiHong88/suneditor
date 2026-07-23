@@ -192,6 +192,46 @@ describe('Keyboard Integration Tests', () => {
 		});
 	});
 
+	// Regression: the browser sometimes reports the caret container as the line element (P) with a
+	// child-index offset, not a text node. Backspace/Delete rules do text-offset arithmetic, so without
+	// `_normalizeEditRange` running for these keys the edit misfires. See eventOrchestrator._normalizeEditRange.
+	// (The line-*merge* itself is a native contentEditable action jsdom can't perform, so we assert the fix's
+	// mechanism — the range gets normalized off the line element onto a text node before the reducer reads it —
+	// and cover the real merge in the e2e suite.)
+	describe('Line-element range normalization (Backspace/Delete)', () => {
+		it('should normalize a line-element caret to a text node on Delete (end of line)', async () => {
+			wysiwyg.innerHTML = '<p>First</p><p>Second</p>';
+			const firstP = wysiwyg.querySelector('p');
+			// container = P (line), offset 1 = after its only text child → logical end of the line
+			editor.$.selection.setRange(firstP, 1, firstP, 1);
+
+			dispatchKey(wysiwyg, 'Delete');
+			await wait();
+
+			expect(editor.$.selection.getRange().startContainer.nodeType).toBe(3);
+		});
+
+		it('should normalize a line-element caret to a text node on Backspace (start of line)', async () => {
+			wysiwyg.innerHTML = '<p>First</p><p>Second</p>';
+			const secondP = wysiwyg.querySelectorAll('p')[1];
+			// container = P (line), offset 0 = before its first child → logical start of the line
+			editor.$.selection.setRange(secondP, 0, secondP, 0);
+
+			dispatchKey(wysiwyg, 'Backspace');
+			await wait();
+
+			expect(editor.$.selection.getRange().startContainer.nodeType).toBe(3);
+		});
+
+		it('should not throw on Delete when the line-element caret sits next to a component', async () => {
+			wysiwyg.innerHTML = '<p>Text</p><hr><p>After</p>';
+			const firstP = wysiwyg.querySelector('p');
+			editor.$.selection.setRange(firstP, 1, firstP, 1);
+
+			expect(() => dispatchKey(wysiwyg, 'Delete')).not.toThrow();
+		});
+	});
+
 	describe('Escape key', () => {
 		it('should fire keydown event for Escape', async () => {
 			wysiwyg.innerHTML = '<p>Text</p>';

@@ -168,10 +168,10 @@ export function makePorts(
 	formatAttrsTempCache: (attrs: any) => any;
 	setOnShortcutKey: (v: any) => any;
 	/**
-	 * @description Scrolls the editor view to the caret position after pressing `Enter`.
-	 * @param {Range} range Pre-Enter snapshot range (fallback only).
+	 * @description Scrolls the editor view to the caret position after an edit (Enter, Backspace, ...).
+	 * @param {Range} range Pre-edit snapshot range (fallback only).
 	 */
-	enterScrollTo(range: Range): void;
+	caretScrollTo(range: Range): void;
 	/**
 	 * @description Prevents the default behavior of the `Enter` key.
 	 * On the `beforeinput` Enter path the IME has already committed, so a plain `preventDefault` suffices.
@@ -261,5 +261,5 @@ export type EventReducerPorts = {
 	formatAttrsTempCache: (attrs: { [x: string]: any }) => void;
 	setOnShortcutKey: (v: boolean) => void;
 	enterPrevent: (e: Event) => void;
-	enterScrollTo: (range: Range) => void;
+	caretScrollTo: (range: Range) => void;
 };

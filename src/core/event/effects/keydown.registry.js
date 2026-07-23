@@ -402,12 +402,14 @@ export default {
 		ports.selection.setRange(r.sc, r.so, r.ec, r.eo);
 	},
 
-	/** [enter] */
+	/** [caret] */
 
-	/** @action enterScrollTo */
-	'enter.scrollTo': ({ ports }, { range }) => {
-		ports.enterScrollTo(range);
+	/** @action caretScrollTo */
+	'caret.scrollTo': ({ ports }, { range }) => {
+		ports.caretScrollTo(range);
 	},
+
+	/** [enter] */
 
 	/** @action enterLineAddDefault */
 	'enter.line.addDefault': ({ ports }, { formatEl }) => {

@@ -334,5 +334,6 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 		return false;
 	}
 
+	actions.push(A.caretScrollTo(range));
 	return true;
 }

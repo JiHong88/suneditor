@@ -93,11 +93,15 @@ declare class EventOrchestrator extends KernelInjector {
 	_setDefaultLine(formatName: string | null): void;
 	/**
 	 * @internal
-	 * @description Normalize the Enter range before the reducer reads it: reset to a text node, and when the
-	 * caret sits inside a zero-width text node adjacent to a `<br>`, move it onto the `<br>`.
+	 * @description Normalize the edit range before the reducer reads it, for every key we custom-handle
+	 * (Enter, Backspace, Delete). Resets an element-level container (a `line` such as `P`) to a text node so
+	 * the rules' text-offset arithmetic (`isEdgePoint`, `endOffset === textContent.length`, ...) is valid; and
+	 * when the caret sits inside a zero-width text node adjacent to a `<br>`, moves it onto the `<br>`.
+	 * Without this, Backspace/Delete misfire whenever the browser reports the container as the line itself
+	 * (child-index offset) instead of a `<br>`/ZWS text node.
 	 * @returns {?(HTMLElement|Text)} The updated selection node, or `null` when the caret is not on a line (no normalization ran).
 	 */
-	_normalizeEnterRange(): (HTMLElement | Text) | null;
+	_normalizeEditRange(): (HTMLElement | Text) | null;
 	/**
 	 * @internal
 	 * @description Handles data transfer actions for `paste` and `drop` events.

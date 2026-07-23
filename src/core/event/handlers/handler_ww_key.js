@@ -50,13 +50,14 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 	}
 
 	/**
-	 * default key action — normalize the Enter range before the reducer reads it.
-	 * Skipped when Enter is handled from `beforeinput` (useEnterFromBeforeInput): mutating the DOM here
-	 * on keydown re-traps the iOS/mobile IME marked-text — `dispatchEnter` runs this same normalization
-	 * later, after the IME has committed.
+	 * default key action — normalize the edit range before the reducer reads it, for every custom-handled key.
+	 * - Enter: skipped when handled from `beforeinput` (useEnterFromBeforeInput),
+	 * - because mutating the DOM here on keydown re-traps the iOS/mobile IME marked-text.
+	 * - Backspace/Delete: always normalize on keydown (they have no `beforeinput` route).
 	 */
-	if (!useEnterFromBeforeInput(this.$.store, e) && keyCodeMap.isEnter(keyCode)) {
-		const normalized = this._normalizeEnterRange();
+	const enterOnKeydown = keyCodeMap.isEnter(keyCode) && !useEnterFromBeforeInput(this.$.store, e);
+	if (enterOnKeydown || keyCodeMap.isRemoveKey(keyCode)) {
+		const normalized = this._normalizeEditRange();
 		if (normalized) selectionNode = normalized;
 	}
 
