@@ -1003,6 +1003,7 @@ class SelectMenu {
 	#CloseListener_mousedown(e) {
 		const eventTarget = dom.query.getEventTarget(e);
 		if (this.form.contains(eventTarget)) return;
+		if (this.#$.ui.opendControllers?.some(({ form }) => form?.contains?.(eventTarget))) return;
 		if (!this.#refer.contains(eventTarget)) {
 			this.close();
 		} else if (!dom.check.isInputElement(eventTarget)) {

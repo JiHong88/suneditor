@@ -27,6 +27,8 @@ class Menu {
 	#deferredShowTimer = null;
 	#viewportListener = null;
 	#visualViewport = null;
+	/** @type {Set<() => void>} */
+	#dropdownOffSubs = new Set();
 
 	/**
 	 * @constructor
@@ -208,6 +210,20 @@ class Menu {
 
 		this.#store.set('_preventBlur', false);
 		this.currentDropdownPlugin = null;
+
+		for (const cb of [...this.#dropdownOffSubs]) cb();
+	}
+
+	/**
+	 * @description Subscribe to be notified after a dropdown is turned off — i.e. a dropdown-free
+	 * plugin committed and closed itself via {@link dropdownOff}. Mirrors {@link Store#subscribe}:
+	 * returns an unsubscribe function.
+	 * @param {() => void} callback
+	 * @returns {() => void} Unsubscribe function
+	 */
+	subscribeDropdownOff(callback) {
+		this.#dropdownOffSubs.add(callback);
+		return () => this.#dropdownOffSubs.delete(callback);
 	}
 
 	/**
