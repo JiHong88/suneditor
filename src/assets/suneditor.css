@@ -627,8 +627,8 @@
 
 .sun-editor button > svg,
 .sun-editor .se-svg {
-	width: 20px;
-	height: 20px;
+	width: var(--se-icon-size);
+	height: var(--se-icon-size);
 	margin: auto;
 	fill: currentColor;
 	display: block;
@@ -648,8 +648,8 @@
 	stroke-linejoin: round;
 }
 .sun-editor .se-text-prefix-icon {
-	width: 20px;
-	height: 20px;
+	width: var(--se-icon-size);
+	height: var(--se-icon-size);
 	float: left;
 }
 .sun-editor .se-text-prefix-icon svg {
@@ -1131,8 +1131,8 @@
 .sun-editor .se-block-menu-icon {
 	display: inline-flex;
 	align-items: center;
-	width: 16px;
-	height: 16px;
+	width: var(--se-icon-size-command-menu);
+	height: var(--se-icon-size-command-menu);
 	margin-right: 12px;
 	margin-left: 4px;
 	vertical-align: middle;
@@ -1163,8 +1163,8 @@
 .sun-editor .se-block-submenu-item .se-list-icon,
 .sun-editor .se-block-submenu-item svg {
 	display: inline-block;
-	width: 16px;
-	height: 16px;
+	width: var(--se-icon-size-command-menu);
+	height: var(--se-icon-size-command-menu);
 	margin: 0 6px 0 0;
 	flex-shrink: 0;
 	vertical-align: middle;

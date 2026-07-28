@@ -19,6 +19,10 @@
 	/* input:btn */
 	--se-input-btn-size: 32px;
 
+	/* icon */
+	--se-icon-size: 18px;
+	--se-icon-size-command-menu: 16px;
+
 	/* block handle */
 	--se-block-handle-area-width: 52px;
 	--se-block-handle-btn-size: 24px;
