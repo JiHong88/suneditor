@@ -9,6 +9,11 @@ const INDEX_1 = '2147483641';
 const ADD_OFFSET_VALUE = { left: 0, right: 0, top: 0 };
 
 /**
+ * @type {?Controller}
+ */
+let _topHoverController = null;
+
+/**
  * Controller information object
  * @typedef {Object} ControllerInfo
  * @property {*} inst - The controller instance
@@ -414,6 +419,7 @@ class Controller {
 	 * @description Hide controller at editor area (link button, image resize button..)
 	 */
 	#controllerOff() {
+		if (_topHoverController === this) _topHoverController = null;
 		this.form.hidePopover?.();
 		this.form.style.display = 'none';
 		this.#$.ui.opendControllers = this.#$.ui.opendControllers.filter((v) => v.form !== this.form);
@@ -586,6 +592,14 @@ class Controller {
 
 		const eventTarget = dom.query.getEventTarget(e);
 		eventTarget.style.zIndex = this.toTop ? INDEX_00 : INDEX_0;
+
+		// The z-index above governs only the no-popover fallback. In the popover top layer, stacking follows
+		// show order — so to lift the hovered controller (and its tooltips) above an overlapping sibling, re-show it.
+		if (this.sibling && _topHoverController !== this && this.form.matches?.(':popover-open')) {
+			_topHoverController = this;
+			this.form.hidePopover();
+			this.form.showPopover();
+		}
 	}
 
 	/**
