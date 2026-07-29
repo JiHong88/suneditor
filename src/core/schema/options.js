@@ -460,6 +460,13 @@ export const DEFAULTS = {
  * - Formats that include `line`, such as "Quote", still operate on a `line` basis.
  * - suneditor processes work in `line` units.
  * - When set to `br`, performance may decrease when editing a lot of data.
+ * @property {boolean} [lineBreakClearStyle=false] - When `true`, pressing Enter at the **end** of a line
+ * starts a fresh line that does not carry the caret's inline style nodes (e.g. bold/italic/color spans, links);
+ * the line-level element and its attributes are preserved.
+ * Only affects the end-of-line case — mid-line splits, start-of-line breaks, and Shift+Enter are unchanged.
+ * ```js
+ * { lineBreakClearStyle: true }
+ * ```
  * @property {string} [lineAttrReset=""] - Line properties that should be reset when changing lines. Delimiter: `"|"`.
  * ```js
  * { lineAttrReset: 'id|name' }
@@ -510,12 +517,16 @@ export const DEFAULTS = {
  * { toolbar_innerWidth: 'auto' }
  * ```
  * @property {?HTMLElement} [toolbar_container] - Container element for the toolbar.
- * @property {number|{top: number, offset: number}} [toolbar_sticky=0] - Enables sticky toolbar.
+ * @property {number|{top: number, offset?: number, position?: "sticky"|"fixed"}} [toolbar_sticky=0] - Enables sticky toolbar.
  * - `number`: Sets the sticky top position (px). Use `-1` to disable sticky.
  * - `{top, offset}`: `top` is the sticky position when the page header is visible.
  * - `offset` is the sticky position when a virtual keyboard shifts the viewport (e.g., on tablets, touch devices).
  * - When the virtual keyboard is active, `offset` replaces `top` so the toolbar doesn't leave a gap
  * - for a page header that has scrolled out of view. Default `offset` is `0`.
+ * - `position` (default `"sticky"`): the positioning engine.
+ * - `"sticky"` uses native CSS `position: sticky` (with a JS `position: fixed` fallback where unsupported).
+ * `"fixed"` forces the JS `position: fixed` engine
+ * - even when CSS sticky is supported — for environments where CSS sticky silently misbehaves and can't be
  * ```js
  * // Basic usage — sticky at top with 0px offset
  * toolbar_sticky: 0
@@ -525,6 +536,9 @@ export const DEFAULTS = {
  *
  * // 92px header on desktop, but 0px when virtual keyboard pushes the viewport
  * toolbar_sticky: { top: 92, offset: 0 }
+ *
+ * // Force the JS position:fixed engine (CSS sticky unreliable in this environment)
+ * toolbar_sticky: { top: 0, position: 'fixed' }
  * ```
  * @property {boolean} [toolbar_hide=false] - Hides toolbar initially.
  * @property {Object} [subToolbar={}] - Sub-toolbar configuration. A secondary toolbar that appears on text selection.
@@ -776,6 +790,7 @@ export const OPTION_FIXED_FLAG = {
 	printClass: true,
 	defaultLine: 'fixed',
 	defaultLineBreakFormat: true,
+	lineBreakClearStyle: true,
 	scopeSelectionTags: true,
 	__defaultElementWhitelist: 'fixed',
 	elementWhitelist: 'fixed',
@@ -822,7 +837,7 @@ export const OPTION_FIXED_FLAG = {
 };
 
 /**
- * @typedef {'formatClosureBrLine' | 'formatBrLine' | 'formatLine' | 'formatClosureBlock' | 'formatBlock' | 'toolbar_width' | 'toolbar_container' | '_toolbar_sticky' | '_toolbar_sticky_offset' | 'strictMode' | 'lineAttrReset'} TransformedOptionKeys
+ * @typedef {'formatClosureBrLine' | 'formatBrLine' | 'formatLine' | 'formatClosureBlock' | 'formatBlock' | 'toolbar_width' | 'toolbar_container' | '_toolbar_sticky' | '_toolbar_sticky_offset' | '_toolbar_sticky_fixed' | 'strictMode' | 'lineAttrReset'} TransformedOptionKeys
  */
 
 /**
@@ -846,6 +861,7 @@ export const OPTION_FIXED_FLAG = {
  * @property {HTMLElement|null} toolbar_container
  * @property {number} _toolbar_sticky
  * @property {number} _toolbar_sticky_offset
+ * @property {boolean} _toolbar_sticky_fixed
  * @property {StrictModeOptions} strictMode
  * @property {string[]} lineAttrReset
  */

@@ -1,7 +1,8 @@
 ### feat
 
 - `menu.subscribeDropdownOff(cb)`: subscribe to dropdown-off events, returns an unsubscribe (mirrors `store.subscribe()`) (`src/core/logic/panel/menu.js`)
-- Customizable icon-size tokens in `size.css`: `--se-icon-size` (18px, main toolbar icons) and `--se-icon-size-command-menu` (16px, blockHandle/slashCommand menu icons) (`src/assets/design/size.css`)
+- `lineBreakClearStyle` option: when `true`, pressing Enter at the end of a line starts a fresh line without carrying inline style nodes (bold/italic/color/links); line-level element/attrs preserved. End-of-line only; mid-line splits, start-of-line breaks, and Shift+Enter unchanged (`src/core/event/effects/keydown.registry.js`)
+- `toolbar_sticky` object form gains `position: 'sticky' | 'fixed'` (default `'sticky'`): `'fixed'` forces the JS `position: fixed` sticky engine over native CSS `position: sticky`, for environments where CSS sticky misbehaves and can't be feature-detected (`src/core/logic/panel/toolbar.js`)
 
 ### fix
 

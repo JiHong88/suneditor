@@ -596,15 +596,17 @@ export default {
 		dom.utils.copyTagAttributes(newFormat, formatEl, ctx.options.get('lineAttrReset'));
 
 		let child = focusBR;
-		let sNode = selectionNode;
-		do {
-			if (!dom.check.isBreak(sNode) && sNode.nodeType === 1) {
-				const f = /** @type {HTMLElement} */ (sNode.cloneNode(false));
-				f.appendChild(child);
-				child = f;
-			}
-			sNode = sNode.parentElement;
-		} while (formatEl !== sNode && formatEl.contains(sNode));
+		if (!(formatEndEdge && ctx.options.get('lineBreakClearStyle'))) {
+			let sNode = selectionNode;
+			do {
+				if (!dom.check.isBreak(sNode) && sNode.nodeType === 1) {
+					const f = /** @type {HTMLElement} */ (sNode.cloneNode(false));
+					f.appendChild(child);
+					child = f;
+				}
+				sNode = sNode.parentElement;
+			} while (formatEl !== sNode && formatEl.contains(sNode));
+		}
 
 		newFormat.appendChild(child);
 		formatEl.parentNode.insertBefore(

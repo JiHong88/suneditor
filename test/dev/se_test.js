@@ -1648,8 +1648,9 @@ const options1 = {
 	},
 	// iframe: true,
 	// maxHeight: 600,
-	// toolbar_sticky: 50,
+	toolbar_sticky: { top: 50, position: 'fixed' },
 	iframe_attributes: { frameborder: '1' },
+	lineBreakClearStyle: true,
 	mode: 'classic',
 	// textDirection: 'rtl',
 	// iframe: true,
@@ -2623,6 +2624,7 @@ const options_test = {
 			{ text: '16pt', value: '16pt' },
 		],
 		default: '12pt',
+		showIncDecControls: true,
 	},
 	hr: {
 		_default: 'solid',

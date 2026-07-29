@@ -749,6 +749,7 @@ export function InitOptions(options, editorTargets, plugins) {
 		typeof options.defaultLine === 'string' && options.defaultLine.length > 0 ? options.defaultLine : 'p',
 	);
 	o.set('defaultLineBreakFormat', options.defaultLineBreakFormat || 'line');
+	o.set('lineBreakClearStyle', !!options.lineBreakClearStyle);
 	o.set('scopeSelectionTags', options.scopeSelectionTags || DEFAULTS.SCOPE_SELECTION_TAGS);
 	// element
 	const elw = (typeof options.elementWhitelist === 'string' ? options.elementWhitelist : '').toLowerCase();
@@ -893,12 +894,15 @@ export function InitOptions(options, editorTargets, plugins) {
 	if (_isBalloon) {
 		o.set('_toolbar_sticky', -1);
 		o.set('_toolbar_sticky_offset', 0);
+		o.set('_toolbar_sticky_fixed', false);
 	} else if (_stickyOpt !== null && typeof _stickyOpt === 'object') {
 		o.set('_toolbar_sticky', numbers.get(_stickyOpt.top, 0));
 		o.set('_toolbar_sticky_offset', numbers.get(_stickyOpt.offset, 0));
+		o.set('_toolbar_sticky_fixed', _stickyOpt.position === 'fixed');
 	} else {
 		o.set('_toolbar_sticky', _stickyOpt === undefined ? 0 : numbers.is(_stickyOpt) ? _stickyOpt : -1);
 		o.set('_toolbar_sticky_offset', 0);
+		o.set('_toolbar_sticky_fixed', false);
 	}
 
 	o.set('toolbar_hide', !!options.toolbar_hide);
