@@ -34,6 +34,7 @@ import { useEnterFromBeforeInput } from './reducers/keydown.reducer';
  * @property {(...args: Parameters<Format['isNormalLine']>) => ReturnType<Format['isNormalLine']>} isNormalLine
  * @property {(...args: Parameters<Format['isBrLine']>) => ReturnType<Format['isBrLine']>} isBrLine
  * @property {(...args: Parameters<Format['isClosureBrLine']>) => ReturnType<Format['isClosureBrLine']>} isClosureBrLine
+ * @property {(...args: Parameters<Format['isBlock']>) => ReturnType<Format['isBlock']>} isBlock
  * @property {(...args: Parameters<Format['isClosureBlock']>) => ReturnType<Format['isClosureBlock']>} isClosureBlock
  * @property {(...args: Parameters<Format['isEdgeLine']>) => ReturnType<Format['isEdgeLine']>} isEdgeLine
  * @property {(...args: Parameters<Format['removeBlock']>) => ReturnType<Format['removeBlock']>} removeBlock
@@ -124,6 +125,7 @@ export function makePorts(inst, { _styleNodes }) {
 			isNormalLine: (n) => format.isNormalLine(n),
 			isBrLine: (n) => format.isBrLine(n),
 			isClosureBrLine: (n) => format.isClosureBrLine(n),
+			isBlock: (n) => format.isBlock(n),
 			isClosureBlock: (n) => format.isClosureBlock(n),
 			isEdgeLine: (node, offset, dir) => format.isEdgeLine(node, offset, dir),
 			removeBlock: (n, p) => format.removeBlock(n, p),

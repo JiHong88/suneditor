@@ -139,8 +139,11 @@ describe('Keydown Rules - Complex Scenarios', () => {
 
 		const result = reduceDeleteDown(actions, mockPorts, mockCtx);
 
+		// End edge with no next sibling and nothing behavioral to do → native-fallback marker,
+		// no prevent (reconcileNativeFallback later strips the marker so the browser handles Delete).
 		expect(result).toBe(false);
-		expect(actions.some(a => a.t === 'event.prevent.stop')).toBe(true);
+		expect(actions.some(a => a.t === 'event.native')).toBe(true);
+		expect(actions.some(a => a.t === 'event.prevent.stop')).toBe(false);
 	});
 
 	it('should handle enter in list with component', () => {

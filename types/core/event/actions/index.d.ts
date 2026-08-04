@@ -3,6 +3,7 @@ export namespace A {
 	function prevent(): Action;
 	function stop(): Action;
 	function preventStop(): Action;
+	function native(): Action;
 	function cacheStyleNode(): Action;
 	function cacheFormatAttrsTemp(attrs: NamedNodeMap): Action;
 	function componentDeselect(): Action;
@@ -44,6 +45,7 @@ export namespace A {
 	function deleteEmptyLineMergeNext(formatEl: Element, next: Element): Action;
 	function deleteBrLineRowMerge(rowEndBr: Node): Action;
 	function deleteSoftBreakMerge(br: Node): Action;
+	function mergeLineInto(into: HTMLElement, from: HTMLElement): Action;
 	function tabFormatIndent(range: Range, formatEl: Element, shift: boolean): Action;
 	function caretScrollTo(range: Range): Action;
 	function enterLineAddDefault(formatEl: Element): Action;

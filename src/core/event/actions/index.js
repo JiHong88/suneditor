@@ -18,6 +18,12 @@ export const A = {
 	stop: () => ({ t: 'event.stop' }),
 	/** @returns {Action} */
 	preventStop: () => ({ t: 'event.prevent.stop' }),
+	/**
+	 * @description Native-fallback marker. A key rule (Enter/Backspace/Delete)
+	 * pushes this when a branch has nothing to do — so the browser's native key behavior runs.
+	 * @returns {Action}
+	 */
+	native: () => ({ t: 'event.native' }),
 	/** @returns {Action} */
 	cacheStyleNode: () => ({ t: 'cache.styleNode' }),
 	/**
@@ -138,7 +144,6 @@ export const A = {
 	 * @returns {Action}
 	 */
 	backspaceEmptyLineMergePrev: (formatEl, prev) => ({ t: 'backspace.emptyLine.mergePrev', p: { formatEl, prev } }),
-
 	/**
 	 * @param {Node} rowEndBr - the `<br>` the caret sits on (end of the empty row)
 	 * @param {Node} rowStartBr - the `<br>` that starts the empty row (removed to merge it up)
@@ -148,7 +153,6 @@ export const A = {
 		t: 'backspace.brline.rowMerge',
 		p: { rowEndBr, rowStartBr },
 	}),
-
 	/**
 	 * @description Soft line break merge (Backspace): the caret sits in the zero-width anchor right after a soft-break `<br>` (a Shift+Enter).
 	 * @param {Node} zws - the zero-width Text node holding the caret (its `previousSibling` is the `<br>`)
@@ -187,19 +191,25 @@ export const A = {
 	 * @returns {Action}
 	 */
 	deleteEmptyLineMergeNext: (formatEl, next) => ({ t: 'delete.emptyLine.mergeNext', p: { formatEl, next } }),
-
 	/**
 	 * @param {Node} rowEndBr - the `<br>` the caret sits on (end of the empty row); removed to pull the next row up
 	 * @returns {Action}
 	 */
 	deleteBrLineRowMerge: (rowEndBr) => ({ t: 'delete.brline.rowMerge', p: { rowEndBr } }),
-
 	/**
 	 * @description Soft line break merge (Delete): the caret sits just before a soft-break `<br>`.
 	 * @param {Node} br - the soft-break `<br>` to remove
 	 * @returns {Action}
 	 */
 	deleteSoftBreakMerge: (br) => ({ t: 'delete.softBreak.merge', p: { br } }),
+
+	// === line ===
+	/**
+	 * @param {HTMLElement} into - Line that receives the content (caret lands at its original end).
+	 * @param {HTMLElement} from - Line whose content is moved into `into`, then removed.
+	 * @returns {Action}
+	 */
+	mergeLineInto: (into, from) => ({ t: 'line.merge', p: { into, from } }),
 
 	// === tab ===
 	/**

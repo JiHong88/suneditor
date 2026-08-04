@@ -40,10 +40,27 @@ export function reduceDeleteDown(actions, ports, ctx) {
 	if (
 		!selectRange &&
 		!bidiNotEnd &&
+		formatEl &&
+		format.isNormalLine(formatEl) &&
+		!dom.check.isListCell(formatEl) &&
+		format.isEdgeLine(range.endContainer, range.endOffset, 'end')
+	) {
+		const targetLine = findNextMergeLine(format, formatEl);
+		if (targetLine) {
+			actions.push(A.preventStop());
+			actions.push(A.mergeLineInto(formatEl, targetLine));
+			actions.push(A.historyPush(true));
+			return false;
+		}
+	}
+
+	if (
+		!selectRange &&
+		!bidiNotEnd &&
 		format.isEdgeLine(range.endContainer, range.endOffset, 'end') &&
 		!formatEl.nextSibling
 	) {
-		actions.push(A.preventStop());
+		actions.push(A.native());
 		return false;
 	}
 
@@ -215,4 +232,38 @@ export function reduceDeleteDown(actions, ports, ctx) {
 	}
 
 	return true;
+}
+
+/**
+ * @description Finds the line to merge up when Delete is pressed at the end of `formatEl` and the next line in
+ * document order lies across a block boundary. Returns `null` for a plain line→line neighbour (left to native)
+ * or when there is nothing safely mergeable (list cell, closure, brLine, end of document).
+ * @param {EventPorts['format']} format
+ * @param {HTMLElement} formatEl
+ * @returns {?HTMLElement}
+ */
+function findNextMergeLine(format, formatEl) {
+	let next = formatEl.nextElementSibling;
+	if (!next) {
+		// `formatEl` is the last line of its block — look at what follows the block.
+		const block = formatEl.parentElement;
+		if (!format.isBlock(block) || format.isClosureBlock(block)) return null;
+		next = block.nextElementSibling;
+		if (!next) return null;
+	} else if (!format.isBlock(next)) {
+		return null; // plain line→line — let the browser merge it natively
+	}
+
+	// Descend into blocks to the first line; only merge a simple, non-list, non-closure, non-brLine line.
+	let line = next;
+	while (line && format.isBlock(line) && !format.isClosureBlock(line)) line = line.firstElementChild;
+	if (
+		!format.isNormalLine(line) ||
+		dom.check.isListCell(line) ||
+		format.isBrLine(line) ||
+		format.isClosureBrLine(line)
+	) {
+		return null;
+	}
+	return /** @type {HTMLElement} */ (line);
 }

@@ -56,8 +56,22 @@ export namespace DEFAULTS {
  * === Content & Editing ===
  * @property {string} [value=""] - Initial value for the editor.
  * @property {string} [placeholder=""] - Placeholder text shown when the whole editor is empty.
- * @property {string} [placeholder_line=""] - per-line placeholder shown on the focused
+ * @property {string|Object<string, string>} [placeholder_line=""] - per-line placeholder shown on the focused
  * line when that line is empty. Takes priority over `placeholder` while a line is focused.
+ * - **string**: one hint for every empty line (list cells and table cells excluded).
+ * - **object**: per-type hints keyed by tag name (`p`, `pre`, `blockquote`, ...) or a category sentinel
+ * matching the editor's format classification: `@line`, `@normalLine`, `@list`, `@brLine`, `@closureBrLine`,
+ * `@block`, `@closureBlock`. Resolved most-specific → least, like `tagStyles`:
+ * `<tag>` → `@list` → `@closureBrLine` → `@brLine` → block container (`<blockTag>` → `@closureBlock` → `@block`)
+ * → `@normalLine` → `@line`. A missing key = no placeholder for that type; an explicit `''` suppresses it.
+ * ```js
+ * // one hint everywhere
+ * placeholder_line: 'Type something…'
+ * // per-type
+ * placeholder_line: {
+ *   '@normalLine': 'Type…', '@list': 'List item', '@block': 'Quote…', '@closureBlock': 'Cell', pre: '// code'
+ * }
+ * ```
  * @property {Object<string, string>} [editableFrameAttributes={spellcheck: "false"}] - Attributes for the editable frame[.sun-editor-editable].
  * ```js
  * { editableFrameAttributes: { spellcheck: 'true', autocomplete: 'on' } }
@@ -683,8 +697,26 @@ export type EditorFrameOptions = {
 	/**
 	 * - per-line placeholder shown on the focused
 	 * line when that line is empty. Takes priority over `placeholder` while a line is focused.
+	 * - **string**: one hint for every empty line (list cells and table cells excluded).
+	 * - **object**: per-type hints keyed by tag name (`p`, `pre`, `blockquote`, ...) or a category sentinel
+	 * matching the editor's format classification: `@line`, `@normalLine`, `@list`, `@brLine`, `@closureBrLine`,
+	 * `@block`, `@closureBlock`. Resolved most-specific → least, like `tagStyles`:
+	 * `<tag>` → `@list` → `@closureBrLine` → `@brLine` → block container (`<blockTag>` → `@closureBlock` → `@block`)
+	 * → `@normalLine` → `@line`. A missing key = no placeholder for that type; an explicit `''` suppresses it.
+	 * ```js
+	 * // one hint everywhere
+	 * placeholder_line: 'Type something…'
+	 * // per-type
+	 * placeholder_line: {
+	 * '@normalLine': 'Type…', '@list': 'List item', '@block': 'Quote…', '@closureBlock': 'Cell', pre: '// code'
+	 * }
+	 * ```
 	 */
-	placeholder_line?: string;
+	placeholder_line?:
+		| string
+		| {
+				[x: string]: string;
+		  };
 	/**
 	 * - Attributes for the editable frame[.sun-editor-editable].
 	 * ```js

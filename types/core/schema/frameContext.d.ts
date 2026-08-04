@@ -33,7 +33,7 @@ import type {} from '../../typedef';
  * @property {HTMLTextAreaElement} markdown - Markdown view editing element (a <textarea>).
  * @property {HTMLTextAreaElement} markdownNumbers - Element displaying line numbers in markdown view mode.
  * @property {HTMLElement} placeholder - Placeholder element shown when the editor is empty.
- * @property {string} placeholder_line - Per-line placeholder text, rendered via a `::before` on the focused empty line.
+ * @property {string|Object<string, string>} placeholder_line - Per-line placeholder text, rendered via a `::before` on the focused empty line.
  * @property {HTMLElement} statusbar - Editor status bar element (for resizing, info, etc.).
  * @property {HTMLElement} navigation - Navigation element (e.g., for outline or bookmarks).
  * @property {HTMLElement} charWrapper - Wrapper for the character counter element.
@@ -216,7 +216,11 @@ export type FrameContextStore = {
 	/**
 	 * - Per-line placeholder text, rendered via a `::before` on the focused empty line.
 	 */
-	placeholder_line: string;
+	placeholder_line:
+		| string
+		| {
+				[x: string]: string;
+		  };
 	/**
 	 * - Editor status bar element (for resizing, info, etc.).
 	 */

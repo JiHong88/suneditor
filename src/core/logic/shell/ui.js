@@ -874,21 +874,57 @@ class UIManager {
 	}
 
 	/**
+	 * @description Resolves the per-line placeholder text for an empty line from the `placeholder_line` option.
+	 * - String option: one hint for every empty line — except list cells and table cells (backward compatible).
+	 * - Object option: keyed by tag name or a category sentinel matching the editor's format classification
+	 *   ({@link Format#isNormalLine}, `isBrLine`, `isClosureBrLine`, `isBlock`, `isClosureBlock`, list cells).
+	 * @param {?Node} line - The (empty) line element.
+	 * @param {string|Object<string, string>} opt - The `placeholder_line` option value.
+	 * @returns {string} The resolved placeholder text (`''` = none).
+	 */
+	resolveLinePlaceholder(line, opt) {
+		if (!line || !opt) return '';
+
+		if (typeof opt !== 'object') {
+			return dom.check.isListCell(line) || dom.query.getParentElement(line, dom.check.isTableCell) ? '' : opt;
+		}
+
+		const format = this.#$.format;
+		const tag = line.nodeName.toLowerCase();
+
+		if (typeof opt[tag] === 'string') return opt[tag];
+		if (dom.check.isListCell(line) && typeof opt['@list'] === 'string') return opt['@list'];
+		if (format.isClosureBrLine(line) && typeof opt['@closureBrLine'] === 'string') return opt['@closureBrLine'];
+		if (format.isBrLine(line) && typeof opt['@brLine'] === 'string') return opt['@brLine'];
+
+		const block = format.getBlock(line);
+		if (block && block !== line) {
+			const blockTag = block.nodeName.toLowerCase();
+			if (typeof opt[blockTag] === 'string') return opt[blockTag];
+			if (format.isClosureBlock(block) && typeof opt['@closureBlock'] === 'string') return opt['@closureBlock'];
+			if (typeof opt['@block'] === 'string') return opt['@block'];
+		}
+
+		if (format.isNormalLine(line) && typeof opt['@normalLine'] === 'string') return opt['@normalLine'];
+		return typeof opt['@line'] === 'string' ? opt['@line'] : '';
+	}
+
+	/**
 	 * @internal
 	 * @description Notion-style per-line placeholder. Marks the focused empty line so a CSS `::before`
-	 * renders the hint text on it.
+	 * renders the hint text resolved for that line's type (see {@link resolveLinePlaceholder}).
 	 * @param {SunEditor.FrameContext} fc - Frame context
 	 * @returns {boolean} Whether the line placeholder is currently shown.
 	 */
 	#updateLinePlaceholder(fc) {
-		const text = fc.get('placeholder_line');
-		if (!text) return false;
+		const opt = fc.get('placeholder_line');
+		if (!opt) return false;
 
 		const wysiwyg = fc.get('wysiwyg');
 
 		const line = this.#store.get('hasFocus') ? this.#$.format.getLine(this.#$.selection.selectionNode) : null;
-		const inTableCell = !!line && !!dom.query.getParentElement(line, dom.check.isTableCell);
-		const target = dom.check.isEmptyLine(line) && !dom.check.isListCell(line) && !inTableCell ? line : null;
+		const text = dom.check.isEmptyLine(line) ? this.resolveLinePlaceholder(line, opt) : '';
+		const target = text ? line : null;
 
 		const prevMarkers = wysiwyg.querySelectorAll('.se-placeholder-line');
 		for (let i = 0; i < prevMarkers.length; i++) {

@@ -29,6 +29,7 @@ import type {} from '../../typedef';
  * @property {(...args: Parameters<Format['isNormalLine']>) => ReturnType<Format['isNormalLine']>} isNormalLine
  * @property {(...args: Parameters<Format['isBrLine']>) => ReturnType<Format['isBrLine']>} isBrLine
  * @property {(...args: Parameters<Format['isClosureBrLine']>) => ReturnType<Format['isClosureBrLine']>} isClosureBrLine
+ * @property {(...args: Parameters<Format['isBlock']>) => ReturnType<Format['isBlock']>} isBlock
  * @property {(...args: Parameters<Format['isClosureBlock']>) => ReturnType<Format['isClosureBlock']>} isClosureBlock
  * @property {(...args: Parameters<Format['isEdgeLine']>) => ReturnType<Format['isEdgeLine']>} isEdgeLine
  * @property {(...args: Parameters<Format['removeBlock']>) => ReturnType<Format['removeBlock']>} removeBlock
@@ -98,6 +99,7 @@ export function makePorts(
 		isNormalLine: (n: any) => n is HTMLElement;
 		isBrLine: (n: any) => n is HTMLElement;
 		isClosureBrLine: (n: any) => n is HTMLElement;
+		isBlock: (n: any) => n is HTMLElement;
 		isClosureBlock: (n: any) => n is HTMLElement;
 		isEdgeLine: (node: any, offset: any, dir: any) => node is HTMLElement;
 		removeBlock: (
@@ -206,6 +208,7 @@ export type FormatPorts = {
 	isNormalLine: (...args: Parameters<Format['isNormalLine']>) => ReturnType<Format['isNormalLine']>;
 	isBrLine: (...args: Parameters<Format['isBrLine']>) => ReturnType<Format['isBrLine']>;
 	isClosureBrLine: (...args: Parameters<Format['isClosureBrLine']>) => ReturnType<Format['isClosureBrLine']>;
+	isBlock: (...args: Parameters<Format['isBlock']>) => ReturnType<Format['isBlock']>;
 	isClosureBlock: (...args: Parameters<Format['isClosureBlock']>) => ReturnType<Format['isClosureBlock']>;
 	isEdgeLine: (...args: Parameters<Format['isEdgeLine']>) => ReturnType<Format['isEdgeLine']>;
 	removeBlock: (...args: Parameters<Format['removeBlock']>) => ReturnType<Format['removeBlock']>;

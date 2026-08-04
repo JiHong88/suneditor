@@ -71,6 +71,23 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 		return false;
 	}
 
+	if (
+		!selectRange &&
+		!bidiNotFront &&
+		formatEl &&
+		format.isNormalLine(formatEl) &&
+		!dom.check.isListCell(formatEl) &&
+		format.isEdgeLine(range.startContainer, range.startOffset, 'front')
+	) {
+		const prevLine = findPrevMergeLine(format, formatEl);
+		if (prevLine) {
+			actions.push(A.preventStop());
+			actions.push(A.mergeLineInto(prevLine, formatEl));
+			actions.push(A.historyPush(true));
+			return false;
+		}
+	}
+
 	// closure, default
 	if (
 		!selectRange &&
@@ -84,9 +101,8 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 			format.isClosureBrLine(formatEl) ||
 			dom.check.isWysiwygFrame(formatEl.parentNode))
 	) {
-		// closure range
 		if (format.isClosureBlock(formatEl.parentNode)) {
-			actions.push(A.preventStop());
+			actions.push(A.native());
 			return false;
 		}
 
@@ -347,4 +363,39 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 
 	actions.push(A.caretScrollTo(range));
 	return true;
+}
+
+/**
+ * @description Mirror of the Delete rule's `findNextMergeLine`: finds the previous line to merge INTO when
+ * Backspace is pressed at the start of `formatEl` and the previous line in document order lies across a block
+ * boundary. Returns `null` for a plain line→line neighbour (left to native) or when nothing is safely mergeable
+ * (list cell, closure, brLine, start of document).
+ * @param {EventPorts['format']} format
+ * @param {HTMLElement} formatEl
+ * @returns {?HTMLElement}
+ */
+function findPrevMergeLine(format, formatEl) {
+	let prev = formatEl.previousElementSibling;
+	if (!prev) {
+		// `formatEl` is the first line of its block — look at what precedes the block.
+		const block = formatEl.parentElement;
+		if (!format.isBlock(block) || format.isClosureBlock(block)) return null;
+		prev = block.previousElementSibling;
+		if (!prev) return null;
+	} else if (!format.isBlock(prev)) {
+		return null; // plain line→line — let the browser merge it natively
+	}
+
+	// Descend into blocks to the LAST line; only merge into a simple, non-list, non-closure, non-brLine line.
+	let line = prev;
+	while (line && format.isBlock(line) && !format.isClosureBlock(line)) line = line.lastElementChild;
+	if (
+		!format.isNormalLine(line) ||
+		dom.check.isListCell(line) ||
+		format.isBrLine(line) ||
+		format.isClosureBrLine(line)
+	) {
+		return null;
+	}
+	return /** @type {HTMLElement} */ (line);
 }

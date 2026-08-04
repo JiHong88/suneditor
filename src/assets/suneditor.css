@@ -2107,22 +2107,16 @@
 	-moz-backface-visibility: hidden;
 }
 
-.sun-editor .se-wrapper .se-placeholder-line {
-	position: relative;
-}
-
 .sun-editor .se-wrapper .se-placeholder-line::before {
 	content: attr(data-se-placeholder-line);
-	position: absolute;
-	inset: 0;
-	box-sizing: border-box;
-	padding: inherit;
+	display: inline-block;
+	width: 0;
+	overflow: visible;
 	color: var(--se-main-outline-color);
 	pointer-events: none;
+	user-select: none;
+	-webkit-user-select: none;
 	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	text-align: inherit;
 }
 
 /** --- status bar */
