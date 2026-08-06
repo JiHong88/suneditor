@@ -102,7 +102,7 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 			dom.check.isWysiwygFrame(formatEl.parentNode))
 	) {
 		if (format.isClosureBlock(formatEl.parentNode)) {
-			actions.push(A.native());
+			actions.push(A.preventStop());
 			return false;
 		}
 

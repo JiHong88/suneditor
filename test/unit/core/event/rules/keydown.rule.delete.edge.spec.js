@@ -33,6 +33,7 @@ describe('Delete Rule - Edge Cases', () => {
 			format: {
 				isNormalLine: jest.fn().mockReturnValue(true),
 				isBrLine: jest.fn().mockReturnValue(false),
+				isBlock: jest.fn().mockReturnValue(false),
 				isLine: jest.fn().mockReturnValue(true),
 				getLine: jest.fn().mockReturnValue(formatEl),
 				getBlock: jest.fn().mockReturnValue(null),
@@ -81,6 +82,7 @@ describe('Delete Rule - Edge Cases', () => {
 
 		const result = reduceDeleteDown(actions, mockPorts, mockCtx);
 
+		// last line with no next sibling: block the key (end-of-document Delete is a no-op)
 		expect(result).toBe(false);
 		expect(actions.some(a => a.t === 'event.prevent.stop')).toBe(true);
 	});
@@ -223,6 +225,7 @@ describe('Delete Rule - Edge Cases', () => {
 
 		const result = reduceDeleteDown(actions, mockPorts, mockCtx);
 
+		// last BR line with no next sibling: block the key
 		expect(result).toBe(false);
 		expect(actions.some(a => a.t === 'event.prevent.stop')).toBe(true);
 	});

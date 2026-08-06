@@ -264,14 +264,20 @@ export default {
 		while (from.firstChild) into.appendChild(from.firstChild);
 		dom.utils.removeItem(from);
 
-		if (
-			container &&
-			container !== into.parentElement &&
-			format.isBlock(container) &&
-			!container.firstElementChild
+		let block = container;
+		while (
+			block &&
+			block !== into.parentElement &&
+			format.isBlock(block) &&
+			!format.isClosureBlock(block) &&
+			dom.check.isZeroWidth(block)
 		) {
-			dom.utils.removeItem(container);
+			const parent = block.parentElement;
+			dom.utils.removeItem(block);
+			block = parent;
 		}
+
+		if (!into.firstChild) into.appendChild(dom.utils.createElement('BR'));
 
 		if (focusNode) caretToNodeEnd(ports, focusNode);
 		else ports.selection.setRange(into, 0, into, 0);

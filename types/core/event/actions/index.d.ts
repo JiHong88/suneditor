@@ -3,7 +3,6 @@ export namespace A {
 	function prevent(): Action;
 	function stop(): Action;
 	function preventStop(): Action;
-	function native(): Action;
 	function cacheStyleNode(): Action;
 	function cacheFormatAttrsTemp(attrs: NamedNodeMap): Action;
 	function componentDeselect(): Action;

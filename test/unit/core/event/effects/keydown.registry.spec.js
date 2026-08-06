@@ -318,6 +318,100 @@ describe('keydown.registry effects', () => {
 		});
 	});
 
+	describe('line.merge', () => {
+		beforeEach(() => {
+			// BLOCKQUOTE is a block container; nothing here is a closure block (table cell).
+			mockPorts.format.isBlock = jest.fn((n) => !!n && n.nodeName === 'BLOCKQUOTE');
+			mockPorts.format.isClosureBlock = jest.fn().mockReturnValue(false);
+		});
+
+		it('merges from into into across a block boundary, removes the emptied block, caret at the join', () => {
+			const wrap = document.createElement('div');
+			const into = document.createElement('p');
+			into.textContent = 'Hello';
+			const bq = document.createElement('blockquote');
+			const from = document.createElement('p');
+			from.textContent = 'World';
+			bq.appendChild(from);
+			wrap.appendChild(into);
+			wrap.appendChild(bq);
+
+			const helloText = into.firstChild; // captured as focusNode (into.lastChild before append)
+
+			effects['line.merge']({ ports: mockPorts }, { into, from });
+
+			expect(into.textContent).toBe('HelloWorld');
+			expect(wrap.contains(bq)).toBe(false); // emptied blockquote removed
+			expect(wrap.children.length).toBe(1);
+			// caret at the end of into's original content (the join point)
+			expect(mockPorts.selection.setRange).toHaveBeenCalledWith(helloText, 5, helloText, 5);
+		});
+
+		it('cascades removal up through multiple nested empty blocks (blockquote-in-blockquote)', () => {
+			const wrap = document.createElement('div');
+			const into = document.createElement('p');
+			into.textContent = 'a';
+			const outer = document.createElement('blockquote');
+			const inner = document.createElement('blockquote');
+			const from = document.createElement('p');
+			from.textContent = 'b';
+			inner.appendChild(from);
+			outer.appendChild(inner);
+			wrap.appendChild(into);
+			wrap.appendChild(outer);
+
+			effects['line.merge']({ ports: mockPorts }, { into, from });
+
+			expect(into.textContent).toBe('ab');
+			// both the inner AND the outer blockquote are gone — no stranded empty block
+			expect(wrap.contains(inner)).toBe(false);
+			expect(wrap.contains(outer)).toBe(false);
+			expect(wrap.children.length).toBe(1);
+			expect(wrap.firstElementChild).toBe(into);
+		});
+
+		it('restores a filler <br> when merging one empty line into another (caret stays reachable)', () => {
+			const wrap = document.createElement('div');
+			const into = document.createElement('p');
+			into.innerHTML = '<br>';
+			const bq = document.createElement('blockquote');
+			const from = document.createElement('p');
+			from.innerHTML = '<br>';
+			bq.appendChild(from);
+			wrap.appendChild(into);
+			wrap.appendChild(bq);
+
+			effects['line.merge']({ ports: mockPorts }, { into, from });
+
+			// stripped both fillers, nothing to move → into would be empty; a <br> is restored
+			expect(into.innerHTML).toBe('<br>');
+			expect(into.childNodes.length).toBe(1);
+			expect(wrap.contains(bq)).toBe(false);
+			// into was empty (focusNode null) → caret at its start
+			expect(mockPorts.selection.setRange).toHaveBeenCalledWith(into, 0, into, 0);
+		});
+
+		it('stops the cascade at a block that still holds content — stray text is never deleted', () => {
+			const wrap = document.createElement('div');
+			const into = document.createElement('p');
+			into.textContent = 'a';
+			const bq = document.createElement('blockquote');
+			const from = document.createElement('p');
+			from.textContent = 'b';
+			bq.appendChild(from);
+			bq.appendChild(document.createTextNode('leftover')); // stray text directly in the block
+			wrap.appendChild(into);
+			wrap.appendChild(bq);
+
+			effects['line.merge']({ ports: mockPorts }, { into, from });
+
+			expect(into.textContent).toBe('ab');
+			// blockquote still has non-blank text → kept, and the text survives
+			expect(wrap.contains(bq)).toBe(true);
+			expect(bq.textContent).toBe('leftover');
+		});
+	});
+
 	describe('delete.brline.rowMerge', () => {
 		it('removes the empty row inside a PRE and pulls the next row up (caret at its start)', () => {
 			const pre = document.createElement('pre');
@@ -852,8 +946,9 @@ describe('keydown.registry effects', () => {
 			// Should create element with nextH2's nodeName (H2)
 			const allH2s = container.querySelectorAll('h2');
 			expect(allH2s.length).toBe(2);
-			// The new one should have <br> inside
-			const newH2 = allH2s[allH2s.length - 1];
+			// The new empty line is inserted before rangeEl (edge.cc.firstChild, since the mock edge has no `sc`),
+			// so it is the FIRST h2 in document order; nextH2 ('heading') stays second.
+			const newH2 = allH2s[0];
 			expect(newH2.innerHTML.replace(/​/g, '')).toBe('<br>');
 			expect(mockPorts.selection.setRange.mock.calls[0][0].nodeType).toBe(1); // new empty line element (no zwsp)
 			expect(mockPorts.selection.setRange.mock.calls[0][1]).toBe(1);

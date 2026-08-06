@@ -18,12 +18,6 @@ export const A = {
 	stop: () => ({ t: 'event.stop' }),
 	/** @returns {Action} */
 	preventStop: () => ({ t: 'event.prevent.stop' }),
-	/**
-	 * @description Native-fallback marker. A key rule (Enter/Backspace/Delete)
-	 * pushes this when a branch has nothing to do — so the browser's native key behavior runs.
-	 * @returns {Action}
-	 */
-	native: () => ({ t: 'event.native' }),
 	/** @returns {Action} */
 	cacheStyleNode: () => ({ t: 'cache.styleNode' }),
 	/**

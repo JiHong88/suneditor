@@ -27,12 +27,6 @@ export default {
 		ctx.e.stopPropagation();
 	},
 
-	/**
-	 * @action native
-	 * @description Native-fallback marker. A key rule pushes this when a branch has nothing to do, so the browser's native key behavior runs.
-	 */
-	'event.native': () => {},
-
 	/** @action cacheStyleNode */
 	'cache.styleNode': ({ ports }) => ports.styleNodeCache(),
 

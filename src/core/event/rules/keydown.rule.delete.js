@@ -60,7 +60,7 @@ export function reduceDeleteDown(actions, ports, ctx) {
 		format.isEdgeLine(range.endContainer, range.endOffset, 'end') &&
 		!formatEl.nextSibling
 	) {
-		actions.push(A.native());
+		actions.push(A.preventStop());
 		return false;
 	}
 

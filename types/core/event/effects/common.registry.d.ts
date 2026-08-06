@@ -7,11 +7,6 @@ declare const _default: {
 	'event.stop': ({ ctx }: EffectContext) => void;
 	/** @action preventStop */
 	'event.prevent.stop': ({ ctx }: EffectContext) => void;
-	/**
-	 * @action native
-	 * @description Native-fallback marker. A key rule pushes this when a branch has nothing to do, so the browser's native key behavior runs.
-	 */
-	'event.native': () => void;
 	/** @action cacheStyleNode */
 	'cache.styleNode': ({ ports }: EffectContext) => void;
 	/** @action cacheFormatAttrsTemp */
