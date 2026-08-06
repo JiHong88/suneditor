@@ -13,6 +13,8 @@
 
 ### fix
 
+- Finder toolbar button now toggles
+
 - Enter/Backspace/Delete: a key-rule branch with nothing to do now falls back to the browser's native behavior instead of a dead `preventDefault`.
 
 - Enter on an empty line inside a block (e.g. blockquote) with content below now splits the block and puts the new line — and the caret — **between** the two chunks, instead of below the lower chunk (`src/core/event/effects/keydown.registry.js`)
