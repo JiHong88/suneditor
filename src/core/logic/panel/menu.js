@@ -1,4 +1,4 @@
-import { dom, converter, env } from '../../../helper';
+import { dom, converter, env, keyCodeMap } from '../../../helper';
 
 const { isMobile, _w } = env;
 
@@ -19,6 +19,7 @@ class Menu {
 	#dropdownCommands = [];
 	#bindClose_dropdown_mouse = null;
 	#bindClose_dropdown_key = null;
+	#bindClose_dropdown_esc = null;
 	#bindClose_cons_mouse = null;
 	#bindMenu_mousemove = null;
 	#bindMenu_mouseout = null;
@@ -27,6 +28,8 @@ class Menu {
 	#deferredShowTimer = null;
 	#viewportListener = null;
 	#visualViewport = null;
+	/** @type {Set<() => void>} */
+	#dropdownOffSubs = new Set();
 
 	/**
 	 * @constructor
@@ -64,11 +67,13 @@ class Menu {
 			mousedown: this.#OnMouseDown_dropdown.bind(this),
 			containerDown: this.containerOff.bind(this),
 			keydown: this.#OnKeyDown_dropdown.bind(this),
+			esc: this.#OnKeyDown_dropdown_esc.bind(this),
 			mousemove: this.#OnMousemove_dropdown.bind(this),
 			mouseout: this.#OnMouseout_dropdown.bind(this),
 		};
 		this.#bindClose_dropdown_mouse = null;
 		this.#bindClose_dropdown_key = null;
+		this.#bindClose_dropdown_esc = null;
 		this.#bindClose_cons_mouse = null;
 
 		// eventManager member (viewport)
@@ -150,6 +155,9 @@ class Menu {
 			this.#globalEventHandler.mousedown,
 			false,
 		);
+
+		this.#bindClose_dropdown_esc = this.#eventManager.addGlobalEvent('keydown', this.#globalEventHandler.esc, true);
+
 		if (this.#dropdownCommands.includes(dropdownName)) {
 			this.menus = converter.nodeListToArray(menu.querySelectorAll('[data-command]'));
 			if (this.menus.length > 0) {
@@ -208,6 +216,20 @@ class Menu {
 
 		this.#store.set('_preventBlur', false);
 		this.currentDropdownPlugin = null;
+
+		for (const cb of [...this.#dropdownOffSubs]) cb();
+	}
+
+	/**
+	 * @description Subscribe to be notified after a dropdown is turned off — i.e. a dropdown-free
+	 * plugin committed and closed itself via {@link dropdownOff}. Mirrors {@link Store#subscribe}:
+	 * returns an unsubscribe function.
+	 * @param {() => void} callback
+	 * @returns {() => void} Unsubscribe function
+	 */
+	subscribeDropdownOff(callback) {
+		this.#dropdownOffSubs.add(callback);
+		return () => this.#dropdownOffSubs.delete(callback);
 	}
 
 	/**
@@ -424,6 +446,7 @@ class Menu {
 	 */
 	#removeGlobalEvent() {
 		this.#bindClose_dropdown_mouse &&= this.#eventManager.removeGlobalEvent(this.#bindClose_dropdown_mouse);
+		this.#bindClose_dropdown_esc &&= this.#eventManager.removeGlobalEvent(this.#bindClose_dropdown_esc);
 		this.#bindClose_cons_mouse &&= this.#eventManager.removeGlobalEvent(this.#bindClose_cons_mouse);
 		if (this.#bindClose_dropdown_key) {
 			this.#bindClose_dropdown_key = this.#eventManager.removeGlobalEvent(this.#bindClose_dropdown_key);
@@ -489,6 +512,20 @@ class Menu {
 				break;
 			}
 		}
+	}
+
+	/**
+	 * @description Closes the open dropdown on ESC. Bound as a capture-phase global listener for every dropdown.
+	 * @param {KeyboardEvent} e - Event object
+	 */
+	#OnKeyDown_dropdown_esc(e) {
+		if (!keyCodeMap.isEsc(e.code)) return;
+		if (this.#$.ui.opendControllers?.some(({ form }) => form && dom.utils.hasClass(form, 'se-dropdown'))) return;
+
+		e.preventDefault();
+		e.stopPropagation();
+
+		this.dropdownOff();
 	}
 
 	/**

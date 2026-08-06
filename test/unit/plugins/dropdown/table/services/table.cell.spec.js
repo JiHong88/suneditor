@@ -360,11 +360,11 @@ describe('TableCellService', () => {
              mainState.selectedCells = [];
              mainState.fixedCell = { rowSpan: 2 };
              cellService.setUnMergeButton();
-             expect(cellService.unmergeButton.disabled).toBe(false);
+             expect(cellService.unmergeButton.style.display).toBe('block');
 
              mainState.fixedCell = { rowSpan: 1, colSpan: 1 };
              cellService.setUnMergeButton();
-             expect(cellService.unmergeButton.disabled).toBe(true);
+             expect(cellService.unmergeButton.style.display).toBe('none');
         });
     });
 

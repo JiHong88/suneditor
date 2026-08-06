@@ -95,6 +95,7 @@ class Toolbar {
 			isStickyPosible &&
 			stickyTop >= 0 &&
 			!this.#options.get('toolbar_container') &&
+			!this.#options.get('_toolbar_sticky_fixed') &&
 			typeof CSS !== 'undefined' &&
 			CSS.supports('position', 'sticky');
 

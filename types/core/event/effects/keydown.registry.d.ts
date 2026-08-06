@@ -37,6 +37,10 @@ declare const _default: {
 	'delete.list.removeNested': ({ ports, ctx }: EffectContext_keydown, { range, formatEl, rangeEl }: any) => void;
 	/** @action deleteEmptyLineMergeNext — remove an empty line, move caret to the start of the next line */
 	'delete.emptyLine.mergeNext': ({ ports }: EffectContext_keydown, { formatEl, next }: any) => void;
+	/**
+	 * @action mergeLineInto — Merge one line into another across a block boundary.
+	 */
+	'line.merge': ({ ports }: EffectContext_keydown, { into, from }: any) => void;
 	/** @action deleteBrLineRowMerge — remove an empty row inside a brLine (PRE), pull the next row up */
 	'delete.brline.rowMerge': ({ ports }: EffectContext_keydown, { rowEndBr }: any) => void;
 	/** @action deleteSoftBreakMerge */

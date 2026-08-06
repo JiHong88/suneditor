@@ -37,7 +37,7 @@
 	/** --------------------------- layout - [colors] ----------- */
 	/* main shell and typography */
 	--se-main-out-color: #dadada;
-	--se-main-color: #000;
+	--se-main-color: #18181b;
 	--se-main-color-lighter: #4c4c4d;
 	--se-main-background-color: #fff;
 	--se-code-view-color: #24292f;
@@ -54,7 +54,7 @@
 	--se-main-outline-color: #b1b1b1;
 	--se-main-shadow-color: #ececec;
 	--se-statusbar-font-color: #666;
-	--se-overlay-background-color: #222;
+	--se-overlay-background-color: #000;
 
 	/* finder */
 	--se-find-match-color: rgba(255, 213, 0, 0.4);
@@ -89,6 +89,9 @@
 
 	/* floating layer shadow */
 	--se-shadow-layer-color: rgba(0, 0, 0, 0.25);
+	/* modern layered soft shadows (dropdowns/modals/menus vs. compact controllers) */
+	--se-shadow-layer: 0 1px 2px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.12);
+	--se-shadow-controller: 0 1px 2px rgba(0, 0, 0, 0.06), 0 4px 14px rgba(0, 0, 0, 0.12);
 
 	/* drag feedback */
 	--se-drag-over-color: #f0c20a;

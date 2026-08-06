@@ -229,13 +229,14 @@ export default class OptionProvider {
 				}
 
 				if (diff.has('placeholder_line')) {
-					const phLineText = newRootOptions.get('placeholder_line');
-					fc.set('placeholder_line', phLineText);
+					const phLine = newRootOptions.get('placeholder_line');
+					fc.set('placeholder_line', phLine);
 
 					const marked = fc.get('wysiwyg').querySelector('.se-placeholder-line');
 					if (marked) {
-						if (phLineText) {
-							marked.setAttribute('data-se-placeholder-line', phLineText);
+						const phText = ui.resolveLinePlaceholder(marked, phLine);
+						if (phText) {
+							marked.setAttribute('data-se-placeholder-line', phText);
 						} else {
 							marked.classList.remove('se-placeholder-line');
 							marked.removeAttribute('data-se-placeholder-line');

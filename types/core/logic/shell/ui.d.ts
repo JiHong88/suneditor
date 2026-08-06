@@ -232,6 +232,23 @@ declare class UIManager {
 	 */
 	_updatePlaceholder(fc?: SunEditor.FrameContext): void;
 	/**
+	 * @description Resolves the per-line placeholder text for an empty line from the `placeholder_line` option.
+	 * - String option: one hint for every empty line — except list cells and table cells (backward compatible).
+	 * - Object option: keyed by tag name or a category sentinel matching the editor's format classification
+	 *   ({@link Format#isNormalLine}, `isBrLine`, `isClosureBrLine`, `isBlock`, `isClosureBlock`, list cells).
+	 * @param {?Node} line - The (empty) line element.
+	 * @param {string|Object<string, string>} opt - The `placeholder_line` option value.
+	 * @returns {string} The resolved placeholder text (`''` = none).
+	 */
+	resolveLinePlaceholder(
+		line: Node | null,
+		opt:
+			| string
+			| {
+					[x: string]: string;
+			  },
+	): string;
+	/**
 	 * @internal
 	 * @description Synchronizes frame UI state after content changes.
 	 * Coordinates `iframe` height adjustment, `placeholder` visibility, and document type page sync.

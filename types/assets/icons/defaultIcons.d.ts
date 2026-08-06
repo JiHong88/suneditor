@@ -20,6 +20,7 @@ declare namespace _default {
 	export let print: string;
 	export let template: string;
 	export let layout: string;
+	export let ai: string;
 	export let new_document: string;
 	export let select_all: string;
 	export let line_height: string;

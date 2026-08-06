@@ -93,7 +93,8 @@ export default class CommandExecutor {
 				}
 				break;
 			case 'finder':
-				this.#$.finder.open(true);
+				if (this.#$.finder.isOpen) this.#$.finder.close();
+				else this.#$.finder.open(true);
 				break;
 			case 'codeView':
 				this.#$.viewer.codeView(!this.#frameContext.get('isCodeView'));

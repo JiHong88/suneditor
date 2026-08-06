@@ -263,9 +263,9 @@
 	border-color: var(--se-input-btn-border-color);
 	border-radius: var(--se-border-radius);
 	transition:
-		border-color 0.3s ease,
-		background-color 0.3s ease,
-		color 0.3s ease;
+		border-color 0.13s ease,
+		background-color 0.13s ease,
+		color 0.13s ease;
 }
 
 .sun-editor .se-form-group button.se-btn {
@@ -281,11 +281,8 @@
 
 .sun-editor .se-btn:not(.on):not(.active):enabled:active,
 .sun-editor .se-btn:not(.on):not(.active):enabled.__se__active {
-	background-color: var(--se-hover-light2-color);
-	border-color: var(--se-hover-dark2-color) !important;
-	outline: 1px solid var(--se-hover-dark3-color) !important;
-	box-shadow: 0 0 0 0.3rem var(--se-hover-light2-color);
-	transition: box-shadow 0.1s ease-in-out;
+	background-color: var(--se-hover-light3-color);
+	transition: background-color 0.08s ease;
 }
 
 /*  after, before button : hover */
@@ -338,8 +335,8 @@
 
 /* se-btn.on */
 .sun-editor .se-btn:enabled.on {
-	background-color: var(--se-active-light2-color);
-	color: var(--se-active-dark3-color);
+	background-color: var(--se-active-light4-color);
+	color: var(--se-active-dark5-color);
 	border-color: var(--se-active-light5-color);
 }
 
@@ -352,13 +349,9 @@
 
 .sun-editor .se-btn:enabled.on:active,
 .sun-editor .se-btn:enabled.on.__se__active {
-	background-color: var(--se-active-light3-color);
-	color: var(--se-active-color);
-	border-color: var(--se-active-light3-color) !important;
-	outline: 1px solid var(--se-active-color) !important;
-	color: 1px solid var(--se-active-color);
-	box-shadow: 0 0 0 0.3rem var(--se-active-light3-color);
-	transition: box-shadow 0.1s ease-in-out;
+	background-color: var(--se-active-light5-color);
+	color: var(--se-active-hover-color);
+	transition: background-color 0.08s ease;
 }
 
 /* se-btn.active */
@@ -377,12 +370,9 @@
 
 .sun-editor .se-btn:enabled.active:active,
 .sun-editor .se-btn:enabled.active.__se__active {
-	background-color: var(--se-active-light5-color);
+	background-color: var(--se-active-light6-color);
 	color: var(--se-active-hover-color);
-	border-color: var(--se-active-dark5-color) !important;
-	outline: 1px solid var(--se-active-dark5-color) !important;
-	box-shadow: 0 0 0 0.3rem var(--se-active-light5-color);
-	transition: box-shadow 0.1s ease-in-out;
+	transition: background-color 0.08s ease;
 	z-index: 1;
 }
 
@@ -408,28 +398,29 @@
 
 /** --- primary button */
 .sun-editor .se-btn-primary {
-	background-color: var(--se-active-light2-color);
+	background-color: var(--se-active-dark5-color);
 	border: 1px solid var(--se-active-dark5-color);
+	color: #fff;
+	font-weight: 500;
 	border-radius: var(--se-border-radius);
 	outline: 0 none;
 	transition:
-		border-color 0.3s ease,
-		background-color 0.3s ease,
-		color 0.3s ease;
+		border-color 0.13s ease,
+		background-color 0.13s ease,
+		color 0.13s ease;
 }
 
 .sun-editor .se-btn-primary:hover,
 .sun-editor .se-btn-primary:focus {
-	background-color: var(--se-active-light5-color);
+	background-color: var(--se-active-hover-color);
+	border-color: var(--se-active-hover-color);
+	color: #fff;
 }
 
 .sun-editor .se-btn-primary:active,
 .sun-editor .se-btn-primary.__se__active {
-	background-color: var(--se-active-light2-color);
-	border-color: var(--se-active-light2-color) !important;
-	outline: 1px solid var(--se-active-dark5-color) !important;
-	box-shadow: 0 0 0 0.3rem var(--se-active-light2-color);
-	transition: box-shadow 0.1s ease-in-out;
+	background-color: var(--se-active-hover-color);
+	transition: background-color 0.08s ease;
 }
 
 /* --- se-btn.success */
@@ -446,10 +437,7 @@
 .sun-editor .se-btn.se-btn-success:not(.on):not(.active):enabled:active,
 .sun-editor .se-btn.se-btn-success:not(.on):not(.active):enabled.__se__active {
 	background-color: var(--se-success-light-color);
-	border-color: var(--se-success-light-color) !important;
-	outline: 1px solid var(--se-success-light5-color) !important;
-	box-shadow: 0 0 0 0.3rem var(--se-success-light-color);
-	transition: box-shadow 0.1s ease-in-out;
+	transition: background-color 0.08s ease;
 }
 
 /* se-btn.success.on */
@@ -470,11 +458,7 @@
 .sun-editor .se-btn.se-btn-success:enabled.on.__se__active {
 	background-color: var(--se-success-light2-color);
 	color: var(--se-success-color);
-	border-color: var(--se-success-light2-color) !important;
-	outline: 1px solid var(--se-success-dark-color) !important;
-	color: 1px solid var(--se-success-color);
-	box-shadow: 0 0 0 0.3rem var(--se-success-light2-color);
-	transition: box-shadow 0.1s ease-in-out;
+	transition: background-color 0.08s ease;
 }
 
 /* se-btn.success.active */
@@ -495,10 +479,7 @@
 .sun-editor .se-btn.se-btn-success:enabled.active.__se__active {
 	background-color: var(--se-success-light3-color);
 	color: var(--se-success-dark3-color);
-	border-color: var(--se-success-light3-color) !important;
-	outline: 1px solid var(--se-success-dark2-color) !important;
-	box-shadow: 0 0 0 0.3rem var(--se-success-light3-color);
-	transition: box-shadow 0.1s ease-in-out;
+	transition: background-color 0.08s ease;
 }
 
 /* --- se-btn.danger */
@@ -516,10 +497,7 @@
 .sun-editor .se-btn.se-btn-danger:not(.on):not(.active):enabled:active,
 .sun-editor .se-btn.se-btn-danger:not(.on):not(.active):enabled.__se__active {
 	background-color: var(--se-error-light5-color);
-	border-color: var(--se-error-light5-color) !important;
-	outline: 1px solid var(--se-error-dark-color) !important;
-	box-shadow: 0 0 0 0.3rem var(--se-error-light5-color);
-	transition: box-shadow 0.1s ease-in-out;
+	transition: background-color 0.08s ease;
 }
 
 /* se-btn.danger.on */
@@ -540,10 +518,7 @@
 .sun-editor .se-btn.se-btn-danger:enabled.on.__se__active {
 	background-color: var(--se-error-light-color);
 	color: var(--se-error-color);
-	border-color: var(--se-error-light-color) !important;
-	outline: 1px solid var(--se-error-dark3-color) !important;
-	box-shadow: 0 0 0 0.3rem var(--se-error-light4-color);
-	transition: box-shadow 0.1s ease-in-out;
+	transition: background-color 0.08s ease;
 }
 
 /* se-btn.danger.active */
@@ -564,10 +539,7 @@
 .sun-editor .se-btn.se-btn-danger:enabled.active.__se__active {
 	background-color: var(--se-error-light-color);
 	color: var(--se-error-color);
-	border-color: var(--se-error-light-color) !important;
-	outline: 1px solid var(--se-error-dark3-color) !important;
-	box-shadow: 0 0 0 0.3rem var(--se-error-light-color);
-	transition: box-shadow 0.1s ease-in-out;
+	transition: background-color 0.08s ease;
 }
 
 /** --- Input */
@@ -655,8 +627,8 @@
 
 .sun-editor button > svg,
 .sun-editor .se-svg {
-	width: 20px;
-	height: 20px;
+	width: var(--se-icon-size);
+	height: var(--se-icon-size);
 	margin: auto;
 	fill: currentColor;
 	display: block;
@@ -667,9 +639,22 @@
 	width: 15px;
 	height: 15px;
 }
+/* outline (stroke-based) icons — Lucide/Tabler set */
+.sun-editor svg.se-io {
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 2;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+/* Opt-in crispness for straight-stroke outline icons */
+.sun-editor svg.se-io-sharp {
+	transform: translateZ(0);
+}
 .sun-editor .se-text-prefix-icon {
-	width: 20px;
-	height: 20px;
+	width: var(--se-icon-size);
+	height: var(--se-icon-size);
 	float: left;
 }
 .sun-editor .se-text-prefix-icon svg {
@@ -691,29 +676,38 @@
 }
 
 /* side button */
-.sun-editor button.se-side-btn {
+.sun-editor .se-side-btn {
 	border-radius: 0;
 	margin-left: 0;
 	margin-right: 0;
 }
-.sun-editor button.se-side-btn-a {
+.sun-editor .se-side-btn-a {
 	float: left;
 	border-radius: var(--se-border-radius) 0 0 var(--se-border-radius);
 	margin-right: 0;
 }
-.sun-editor button.se-side-btn-b {
+.sun-editor .se-side-btn-b {
 	float: left;
 	border-radius: 0 var(--se-border-radius) var(--se-border-radius) 0;
 	margin-left: 0;
 }
-.sun-editor button.se-side-btn-before {
+.sun-editor .se-side-btn-before {
 	float: left;
 	margin-right: 0;
 	border-radius: var(--se-border-radius) 0 0 var(--se-border-radius);
 }
-.sun-editor button.se-side-btn-after {
+.sun-editor .se-side-btn-after {
 	margin-left: 0;
 	border-radius: 0 var(--se-border-radius) var(--se-border-radius) 0;
+}
+
+.sun-editor .se-menu-list li:has(> button.se-side-btn-before) .se-btn-input input {
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+}
+.sun-editor .se-menu-list li:has(> button.se-side-btn-after) .se-btn-input input {
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
 }
 
 /* list button icons */
@@ -928,8 +922,8 @@
 	position: absolute;
 	z-index: 2147483646;
 	width: auto;
-	box-shadow: 0 3px 9px var(--se-shadow-layer-color);
-	-webkit-box-shadow: 0 3px 9px var(--se-shadow-layer-color);
+	box-shadow: var(--se-shadow-layer);
+	-webkit-box-shadow: var(--se-shadow-layer);
 }
 
 /* JS fallback: initial state — override CSS sticky */
@@ -1141,8 +1135,8 @@
 .sun-editor .se-block-menu-icon {
 	display: inline-flex;
 	align-items: center;
-	width: 16px;
-	height: 16px;
+	width: var(--se-icon-size-command-menu);
+	height: var(--se-icon-size-command-menu);
 	margin-right: 12px;
 	margin-left: 4px;
 	vertical-align: middle;
@@ -1173,8 +1167,8 @@
 .sun-editor .se-block-submenu-item .se-list-icon,
 .sun-editor .se-block-submenu-item svg {
 	display: inline-block;
-	width: 16px;
-	height: 16px;
+	width: var(--se-icon-size-command-menu);
+	height: var(--se-icon-size-command-menu);
 	margin: 0 6px 0 0;
 	flex-shrink: 0;
 	vertical-align: middle;
@@ -1319,6 +1313,7 @@
 	font-size: var(--se-main-font-size);
 	height: var(--se-input-btn-size);
 	border: 0;
+	border-radius: var(--se-border-radius);
 }
 .sun-editor .se-btn-input input:hover {
 	border: 1px solid var(--se-main-border-color);
@@ -1390,7 +1385,7 @@
 	border-radius: var(--se-border-radius-lg);
 	padding: 4px;
 	background-color: var(--se-main-background-color);
-	box-shadow: 0 3px 9px var(--se-shadow-layer-color);
+	box-shadow: var(--se-shadow-layer);
 	outline: 0 none;
 }
 
@@ -1697,7 +1692,7 @@
 	background-clip: padding-box;
 	border: 1px solid var(--se-input-btn-border-color);
 	border-radius: var(--se-border-radius);
-	box-shadow: 0 6px 12px var(--se-shadow-layer-color);
+	box-shadow: var(--se-shadow-layer);
 }
 
 .sun-editor .se-selector-table .se-table-size {
@@ -2117,22 +2112,16 @@
 	-moz-backface-visibility: hidden;
 }
 
-.sun-editor .se-wrapper .se-placeholder-line {
-	position: relative;
-}
-
 .sun-editor .se-wrapper .se-placeholder-line::before {
 	content: attr(data-se-placeholder-line);
-	position: absolute;
-	inset: 0;
-	box-sizing: border-box;
-	padding: inherit;
+	display: inline-block;
+	width: 0;
+	overflow: visible;
 	color: var(--se-main-outline-color);
 	pointer-events: none;
+	user-select: none;
+	-webkit-user-select: none;
 	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	text-align: inherit;
 }
 
 /** --- status bar */
@@ -2282,7 +2271,7 @@
 	border: 1px solid rgba(0, 0, 0, 0.2);
 	border-radius: var(--se-border-radius-lg);
 	outline: 0;
-	box-shadow: 0 3px 9px var(--se-shadow-layer-color);
+	box-shadow: var(--se-shadow-layer);
 }
 .sun-editor .se-modal-area .se-modal-inner .se-modal-content.se-modal-show {
 	display: block;
@@ -2418,7 +2407,8 @@
 	padding: 5px 11px;
 	margin: 0 0 10px 0 !important;
 	font-size: var(--se-modal-input-font-size);
-	font-weight: normal;
+	font-weight: 500;
+	color: #fff;
 	line-height: 1.4;
 	text-align: center;
 	white-space: nowrap;
@@ -2895,7 +2885,7 @@
 }
 
 .sun-editor .se-controller:not(.se-resizing-container) {
-	box-shadow: 0 5px 10px var(--se-shadow-controller-color);
+	box-shadow: var(--se-shadow-controller);
 }
 
 .sun-editor-editable[contenteditable='true'] figure a,
@@ -3291,7 +3281,7 @@
 	padding: 4px 0;
 	margin: 0;
 	border: 1px solid var(--se-main-divider-color);
-	box-shadow: 0 3px 9px var(--se-shadow-layer-color);
+	box-shadow: var(--se-shadow-layer);
 	outline: 0 none;
 }
 
@@ -3424,7 +3414,7 @@
 	border: 1px solid var(--se-main-divider-color);
 	border-radius: var(--se-border-radius-lg);
 	padding: 4px 0;
-	box-shadow: 0 3px 9px var(--se-shadow-layer-color);
+	box-shadow: var(--se-shadow-layer);
 	z-index: 1;
 }
 
@@ -3516,7 +3506,7 @@
 	border: 1px solid rgba(0, 0, 0, 0.2);
 	border-radius: var(--se-border-radius-lg);
 	outline: 0;
-	box-shadow: 0 3px 9px var(--se-shadow-layer-color);
+	box-shadow: var(--se-shadow-layer);
 }
 
 /* --- browser - header */
@@ -3898,7 +3888,7 @@
 	margin: auto;
 	top: 35%;
 	border-radius: var(--se-border-radius);
-	box-shadow: 0 3px 9px var(--se-shadow-layer-color);
+	box-shadow: var(--se-shadow-layer);
 	word-break: break-all;
 	background-color: var(--se-main-background-color);
 	padding: 15px;
@@ -3955,7 +3945,7 @@
 	margin: auto;
 	top: 35%;
 	border-radius: var(--se-border-radius);
-	box-shadow: 0 3px 9px var(--se-shadow-layer-color);
+	box-shadow: var(--se-shadow-layer);
 	word-break: break-all;
 	background-color: var(--se-main-font-color);
 	color: var(--se-main-background-color);
@@ -4022,7 +4012,7 @@
 	opacity: 0;
 	z-index: 1;
 	line-height: 1.5;
-	transition: opacity 0.5s;
+	transition: opacity 0.13s ease;
 	margin: 0;
 	padding: 0;
 	bottom: auto;
@@ -4408,27 +4398,37 @@
 }
 
 /* side button */
-.sun-editor.se-rtl button.se-side-btn {
+.sun-editor.se-rtl .se-side-btn {
 	float: right;
 }
-.sun-editor.se-rtl button.se-side-btn-b {
+.sun-editor.se-rtl .se-side-btn-b {
 	float: right;
 	margin-right: 0;
 	border-radius: var(--se-border-radius) 0 0 var(--se-border-radius);
 }
-.sun-editor.se-rtl button.se-side-btn-a {
+.sun-editor.se-rtl .se-side-btn-a {
 	float: right;
 	margin-left: 0;
 	border-radius: 0 var(--se-border-radius) var(--se-border-radius) 0;
 }
-.sun-editor.se-rtl button.se-side-btn-after {
+.sun-editor.se-rtl .se-side-btn-after {
 	margin-right: 0;
 	border-radius: var(--se-border-radius) 0 0 var(--se-border-radius);
 }
-.sun-editor.se-rtl button.se-side-btn-before {
+.sun-editor.se-rtl .se-side-btn-before {
 	float: right;
 	margin-left: 0;
 	border-radius: 0 var(--se-border-radius) var(--se-border-radius) 0;
+}
+
+/* side button - input  */
+.sun-editor.se-rtl .se-menu-list li:has(> button.se-side-btn-before) .se-btn-input input {
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+}
+.sun-editor.se-rtl .se-menu-list li:has(> button.se-side-btn-after) .se-btn-input input {
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
 }
 
 /* after, before button:hover - on, active - border */

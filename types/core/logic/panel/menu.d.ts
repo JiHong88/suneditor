@@ -119,6 +119,14 @@ declare class Menu {
 	 */
 	dropdownOff(): void;
 	/**
+	 * @description Subscribe to be notified after a dropdown is turned off — i.e. a dropdown-free
+	 * plugin committed and closed itself via {@link dropdownOff}. Mirrors {@link Store#subscribe}:
+	 * returns an unsubscribe function.
+	 * @param {() => void} callback
+	 * @returns {() => void} Unsubscribe function
+	 */
+	subscribeDropdownOff(callback: () => void): () => void;
+	/**
 	 * @description Shows a previously hidden dropdown menu that is still in `on` state.
 	 * - Only works when a dropdown is active (`currentButton` exists)
 	 * - Re-displays the dropdown that was hidden by `dropdownHide()`

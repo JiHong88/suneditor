@@ -60,6 +60,20 @@ describe('Core Section - Constructor', () => {
                 expect(field.getAttribute('autocomplete')).toBe('off');
             });
         });
+
+        it('keeps the off-screen focus-temp input out of sequential Tab order (tabindex=-1)', () => {
+            const target = document.createElement('textarea');
+
+            const result = Constructor([{ target, key: null, options: {} }], {
+                buttonList: [['bold']]
+            });
+
+            const focusTemp = result.carrierWrapper.querySelector('.__se__focus__temp__');
+            // it exists (used for the mobile IME force-end focus-shuffle) but must never be a keyboard tab stop:
+            // it is off-screen and focused only programmatically, so tabindex 0 would be an invisible dead tab stop.
+            expect(focusTemp).not.toBeNull();
+            expect(focusTemp.tabIndex).toBe(-1);
+        });
     });
 
     describe('CreateShortcuts', () => {

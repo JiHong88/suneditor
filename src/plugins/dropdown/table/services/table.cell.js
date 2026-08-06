@@ -279,15 +279,12 @@ export class TableCellService {
 	 * @description Sets the unmerge button visibility.
 	 */
 	setUnMergeButton() {
-		if (
+		const hasMergedCells =
 			this.findMergedCells(
 				!this.#state.selectedCells?.length ? [this.#state.fixedCell] : this.#state.selectedCells,
-			).length > 0
-		) {
-			this.unmergeButton.disabled = false;
-		} else {
-			this.unmergeButton.disabled = true;
-		}
+			).length > 0;
+
+		this.unmergeButton.style.display = hasMergedCells ? 'block' : 'none';
 	}
 
 	/**
