@@ -647,6 +647,11 @@
 	stroke-linecap: round;
 	stroke-linejoin: round;
 }
+
+/* Opt-in crispness for straight-stroke outline icons */
+.sun-editor svg.se-io-sharp {
+	transform: translateZ(0);
+}
 .sun-editor .se-text-prefix-icon {
 	width: var(--se-icon-size);
 	height: var(--se-icon-size);
