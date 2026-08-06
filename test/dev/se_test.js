@@ -1648,8 +1648,9 @@ const options1 = {
 	},
 	// iframe: true,
 	// maxHeight: 600,
-	// toolbar_sticky: 50,
+	toolbar_sticky: { top: 50, position: 'fixed' },
 	iframe_attributes: { frameborder: '1' },
+	lineBreakClearStyle: true,
 	mode: 'classic',
 	// textDirection: 'rtl',
 	// iframe: true,
@@ -2167,7 +2168,18 @@ const options1 = {
 </p>
 	`,
 	placeholder: 'Start typing here...',
-	placeholder_line: "Type '/' for commands",
+	placeholder_line: {
+		'@normalLine': "Type '/' for commands",
+		'@list': 'List item',
+		'@brLine': 'Code line',
+		'@closureBrLine': 'Closure code',
+		'@block': 'Write a quote…',
+		'@closureBlock': 'Cell…',
+		'@line': 'Type…',
+		blockquote: 'Blockquote…', // tag override wins over @block
+		pre: '// code', // tag override wins over @brLine
+		h1: 'Heading 1',
+	},
 	height: 'auto',
 	// textDirection: 'rtl',
 	// value: `<a href="https://example.com"><img alt="Logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==" /></a>`,
@@ -2623,6 +2635,7 @@ const options_test = {
 			{ text: '16pt', value: '16pt' },
 		],
 		default: '12pt',
+		showIncDecControls: true,
 	},
 	hr: {
 		_default: 'solid',

@@ -43,8 +43,8 @@
 		"./package.json": "./package.json"
 	},
 	"sideEffects": [
-		"./src/assets/*.css",
-		"./src/themes/*.css"
+		"./src/assets/**/*.css",
+		"./src/themes/**/*.css"
 	],
 	"engines": {
 		"node": ">=14.0.0"

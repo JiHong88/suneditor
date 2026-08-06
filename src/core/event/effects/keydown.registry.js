@@ -250,6 +250,39 @@ export default {
 		caretToLineEdge(ports, next, false);
 	},
 
+	/**
+	 * @action mergeLineInto — Merge one line into another across a block boundary.
+	 */
+	'line.merge': ({ ports }, { into, from }) => {
+		const format = ports.format;
+		const container = from.parentElement;
+
+		stripTrailingBreaks(into);
+		const focusNode = into.lastChild;
+		stripTrailingBreaks(from);
+
+		while (from.firstChild) into.appendChild(from.firstChild);
+		dom.utils.removeItem(from);
+
+		let block = container;
+		while (
+			block &&
+			block !== into.parentElement &&
+			format.isBlock(block) &&
+			!format.isClosureBlock(block) &&
+			dom.check.isZeroWidth(block)
+		) {
+			const parent = block.parentElement;
+			dom.utils.removeItem(block);
+			block = parent;
+		}
+
+		if (!into.firstChild) into.appendChild(dom.utils.createElement('BR'));
+
+		if (focusNode) caretToNodeEnd(ports, focusNode);
+		else ports.selection.setRange(into, 0, into, 0);
+	},
+
 	/** @action deleteBrLineRowMerge — remove an empty row inside a brLine (PRE), pull the next row up */
 	'delete.brline.rowMerge': ({ ports }, { rowEndBr }) => {
 		let next = rowEndBr.nextSibling;
@@ -462,7 +495,8 @@ export default {
 				shouldDelete: true,
 				skipHistory: true,
 			});
-			edge.cc.insertBefore(newEl, edge.ec);
+
+			edge.cc.insertBefore(newEl, edge.sc ? edge.sc.nextSibling : edge.cc.firstChild);
 		}
 
 		newEl.innerHTML = '<br>';
@@ -596,15 +630,17 @@ export default {
 		dom.utils.copyTagAttributes(newFormat, formatEl, ctx.options.get('lineAttrReset'));
 
 		let child = focusBR;
-		let sNode = selectionNode;
-		do {
-			if (!dom.check.isBreak(sNode) && sNode.nodeType === 1) {
-				const f = /** @type {HTMLElement} */ (sNode.cloneNode(false));
-				f.appendChild(child);
-				child = f;
-			}
-			sNode = sNode.parentElement;
-		} while (formatEl !== sNode && formatEl.contains(sNode));
+		if (!(formatEndEdge && ctx.options.get('lineBreakClearStyle'))) {
+			let sNode = selectionNode;
+			do {
+				if (!dom.check.isBreak(sNode) && sNode.nodeType === 1) {
+					const f = /** @type {HTMLElement} */ (sNode.cloneNode(false));
+					f.appendChild(child);
+					child = f;
+				}
+				sNode = sNode.parentElement;
+			} while (formatEl !== sNode && formatEl.contains(sNode));
+		}
 
 		newFormat.appendChild(child);
 		formatEl.parentNode.insertBefore(
@@ -753,6 +789,19 @@ function caretToLineEdge(ports, line, toEnd) {
 function caretToNodeEnd(ports, node) {
 	const offset = node.nodeType === 3 ? node.textContent.length : node.childNodes.length;
 	ports.selection.setRange(node, offset, node, offset);
+}
+
+/**
+ * @description Removes trailing `<br>` elements and zero-width text nodes from `el`.
+ * @param {HTMLElement} el
+ */
+function stripTrailingBreaks(el) {
+	let last = el.lastChild;
+	while (last && (dom.check.isBreak(last) || (last.nodeType === 3 && dom.check.isZeroWidth(last)))) {
+		const prev = last.previousSibling;
+		dom.utils.removeItem(last);
+		last = prev;
+	}
 }
 
 /**

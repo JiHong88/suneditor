@@ -97,7 +97,7 @@ class CommandMenu {
 
 	/** @type {Map<number, { name: string, plugin: any, li: HTMLElement }>} */
 	#freeMap = new Map();
-	/** @type {?{ dropdown: HTMLElement, plugin: any, originalParent: ?Node, anchorLi: HTMLElement, evClick: ?SunEditor.Event.Info }} */
+	/** @type {?{ dropdown: HTMLElement, plugin: any, originalParent: ?Node, anchorLi: HTMLElement, unsub: () => void }} */
 	#flyoutState = null;
 
 	/**
@@ -499,16 +499,13 @@ class CommandMenu {
 		dom.utils.addClass(anchorLi, 'se-submenu-open');
 		plugin.on?.(anchorLi);
 
-		// Clicking inside the flyout's dropdown should dismiss both the flyout and the parent menu —
-		// matches the toolbar behavior where a click commits the selection.
-		const evClick = this.#$.eventManager.addEvent(dropdown, 'click', () =>
-			_w.setTimeout(() => {
-				this.#closeFlyout();
-				this.selectMenu.close();
-			}, 0),
-		);
+		// dropdown-off event and unsubscribe on close (see `#closeFlyout`) rather than patching core.
+		const unsub = this.#$.menu.subscribeDropdownOff(() => {
+			this.#closeFlyout();
+			this.selectMenu.close();
+		});
 
-		this.#flyoutState = { dropdown, plugin, originalParent, anchorLi, evClick };
+		this.#flyoutState = { dropdown, plugin, originalParent, anchorLi, unsub };
 	}
 
 	/**
@@ -520,7 +517,7 @@ class CommandMenu {
 		if (!s) return;
 		this.#flyoutState = null;
 
-		this.#$?.eventManager.removeEvent(s.evClick);
+		s.unsub?.();
 		s.dropdown.style.cssText = '';
 		s.dropdown.style.display = 'none';
 

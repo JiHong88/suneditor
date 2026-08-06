@@ -33,6 +33,7 @@ describe('Delete Rule', () => {
 			format: {
 				isNormalLine: jest.fn().mockReturnValue(true),
 				isBrLine: jest.fn().mockReturnValue(false),
+				isBlock: jest.fn().mockReturnValue(false),
 				isLine: jest.fn().mockReturnValue(true),
 				getLine: jest.fn().mockReturnValue(formatEl),
 				getBlock: jest.fn().mockReturnValue(null),

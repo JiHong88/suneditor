@@ -125,6 +125,8 @@ class Finder {
 
 		this.#isOpen = true;
 
+		dom.utils.addClass(this.#$.commandDispatcher.targets.get('finder'), 'active');
+
 		// Listen for wysiwyg content changes to refresh highlights
 		this.#addContentInputListener();
 
@@ -175,6 +177,7 @@ class Finder {
 		if (!this.#isOpen) return;
 
 		this.#isOpen = false;
+		dom.utils.removeClass(this.#$.commandDispatcher.targets.get('finder'), 'active');
 		this.#clearHighlights();
 		this.#matches = [];
 		this.#currentIndex = -1;

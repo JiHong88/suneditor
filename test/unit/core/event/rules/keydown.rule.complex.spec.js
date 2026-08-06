@@ -34,6 +34,7 @@ describe('Keydown Rules - Complex Scenarios', () => {
 			format: {
 				isNormalLine: jest.fn().mockReturnValue(true),
 				isBrLine: jest.fn().mockReturnValue(false),
+				isBlock: jest.fn().mockReturnValue(false),
 				isLine: jest.fn().mockReturnValue(true),
 				getLine: jest.fn(),
 				getBlock: jest.fn().mockReturnValue(null),
@@ -139,6 +140,7 @@ describe('Keydown Rules - Complex Scenarios', () => {
 
 		const result = reduceDeleteDown(actions, mockPorts, mockCtx);
 
+		// End edge with no next sibling and no safe cross-block merge → block the key.
 		expect(result).toBe(false);
 		expect(actions.some(a => a.t === 'event.prevent.stop')).toBe(true);
 	});
