@@ -89,7 +89,7 @@ function Constructor(editorTargets, options) {
 			style: 'position: fixed !important; top: -10000px !important; left: -10000px !important; display: block !important; width: 0 !important; height: 0 !important; margin: 0 !important; padding: 0 !important;',
 		})
 	);
-	focusTemp.tabIndex = 0;
+	focusTemp.tabIndex = -1;
 	editor_carrier_wrapper.appendChild(focusTemp);
 
 	// modal

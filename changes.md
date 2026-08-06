@@ -13,6 +13,8 @@
 
 ### fix
 
+- Focus-temp input (`.__se__focus__temp__`) is now `tabindex="-1"` — no longer reachable by Tab (`src/core/section/constructor.js`) #1677
+
 - Finder toolbar button now toggles
 
 - Enter/Backspace/Delete: a key-rule branch with nothing to do now falls back to the browser's native behavior instead of a dead `preventDefault`.
