@@ -700,6 +700,111 @@ describe('Modules - SelectMenu', () => {
 		});
 	});
 
+	describe('Scroll into view (maxHeight list)', () => {
+		const ROW_H = 30;
+		const VIEW_H = 90; // 3 rows visible out of 6
+
+		let selectMenu;
+		let inner;
+		let scrollTop;
+
+		/**
+		 * jsdom has no layout: give the scroll container and every row a fake geometry
+		 * driven by the current `scrollTop`, so the rects move like a real scrolled list.
+		 */
+		function layout() {
+			inner.getBoundingClientRect = () => ({ top: 0, bottom: VIEW_H, left: 0, right: 100, width: 100, height: VIEW_H });
+			selectMenu.menus.forEach((li, i) => {
+				li.getBoundingClientRect = () => ({
+					top: i * ROW_H - scrollTop,
+					bottom: (i + 1) * ROW_H - scrollTop,
+					left: 0,
+					right: 100,
+					width: 100,
+					height: ROW_H
+				});
+			});
+		}
+
+		beforeEach(() => {
+			selectMenu = new SelectMenu(mockEditor.$, { position: 'bottom-left', maxHeight: VIEW_H + 'px' });
+
+			const parent = document.createElement('div');
+			const ref = document.createElement('button');
+			parent.appendChild(ref);
+			document.body.appendChild(parent);
+
+			selectMenu.on(ref, jest.fn());
+			selectMenu.create(['1', '2', '3', '4', '5', '6']);
+
+			inner = selectMenu.form.firstElementChild;
+			scrollTop = 0;
+			Object.defineProperty(inner, 'scrollTop', {
+				configurable: true,
+				get: () => scrollTop,
+				set: (v) => {
+					scrollTop = v;
+				}
+			});
+			Object.defineProperty(inner, 'scrollHeight', { configurable: true, value: ROW_H * 6 });
+			Object.defineProperty(inner, 'clientHeight', { configurable: true, value: VIEW_H });
+			Object.defineProperty(inner, 'clientTop', { configurable: true, value: 0 });
+			layout();
+		});
+
+		afterEach(() => {
+			document.body.innerHTML = '';
+		});
+
+		it('scrolls down when the cursor moves onto a row below the visible area', () => {
+			selectMenu.setItem(2); // last fully visible row
+			expect(scrollTop).toBe(0);
+
+			selectMenu.setItem(3);
+			expect(scrollTop).toBe(ROW_H); // moved by exactly one row
+
+			selectMenu.setItem(5); // last row
+			expect(scrollTop).toBe(ROW_H * 3);
+		});
+
+		it('scrolls up when the cursor moves onto a row above the visible area', () => {
+			selectMenu.setItem(5);
+			expect(scrollTop).toBe(ROW_H * 3);
+
+			selectMenu.setItem(0); // wrap to the top
+			expect(scrollTop).toBe(0);
+		});
+
+		it('does not scroll when the row is already fully visible', () => {
+			selectMenu.setItem(3);
+			const before = scrollTop;
+
+			selectMenu.setItem(2);
+			expect(scrollTop).toBe(before);
+		});
+
+		it('does nothing for a menu without `maxHeight` (never scrolls)', () => {
+			const plain = new SelectMenu(mockEditor.$, { position: 'bottom-left' });
+			const ref = document.createElement('button');
+			document.createElement('div').appendChild(ref);
+			document.body.appendChild(ref.parentElement);
+			plain.on(ref, jest.fn());
+			plain.create(['1', '2', '3', '4', '5', '6']);
+
+			let plainScrollTop = 0;
+			Object.defineProperty(plain.form.firstElementChild, 'scrollTop', {
+				configurable: true,
+				get: () => plainScrollTop,
+				set: (v) => {
+					plainScrollTop = v;
+				}
+			});
+
+			plain.setItem(5);
+			expect(plainScrollTop).toBe(0);
+		});
+	});
+
 	describe('Horizontal navigation', () => {
 		let selectMenu;
 

@@ -10,6 +10,7 @@
 - Fixed `html.clean` leaving empty caret-less lines behind (a `<p></p>` with no `<br>`) (`core/logic/dom/html`)
 - Fixed a dropdown-free flyout (table, fontColor, ...) staying open while the arrow keys kept walking the parent menu behind it (`modules/ui/SelectMenu`)
 - Fixed a menu's sub-panel (submenu or dropdown-free flyout) tearing the whole menu down on the next keypress when a second `SelectMenu` existed.
+- Fixed arrow-key navigation in a scrollable menu (`maxHeight`, e.g. the slash command list) moving the cursor onto rows outside the visible area without scrolling to them (`modules/ui/SelectMenu`)
 
 ### change
 

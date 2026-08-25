@@ -42,6 +42,7 @@ class SelectMenu {
 	#eventHandlers;
 	#globalEventHandlers;
 
+	#listInner = null;
 	#refer = null;
 	#keydownTarget = null;
 	#keydownTargetOverride = null;
@@ -137,7 +138,7 @@ class SelectMenu {
 	 * );
 	 */
 	create(items, menus) {
-		this.form.firstElementChild.innerHTML = '';
+		this.#listInner.innerHTML = '';
 
 		// remove existing submenu elements from form
 		for (const [, data] of this.#submenuData) {
@@ -229,6 +230,8 @@ class SelectMenu {
 			},
 			'<div class="se-list-inner"' + (innerStyle ? ' style="' + innerStyle + '"' : '') + '></div>',
 		);
+
+		this.#listInner = /** @type {HTMLElement} */ (this.form.firstElementChild);
 
 		referElement.parentNode.insertBefore(this.form, referElement);
 	}
@@ -523,7 +526,7 @@ class SelectMenu {
 	 * @param {string} html - The HTML string representing the menu items.
 	 */
 	#createFormat(html) {
-		this.form.firstElementChild.innerHTML += `<ul class="se-list-basic se-list-checked${this.horizontal ? ' se-list-horizontal' : ''}">${html}</ul>`;
+		this.#listInner.innerHTML += `<ul class="se-list-basic se-list-checked${this.horizontal ? ' se-list-horizontal' : ''}">${html}</ul>`;
 	}
 
 	/**
@@ -554,6 +557,22 @@ class SelectMenu {
 	}
 
 	/**
+	 * @description Scrolls the list so the given item is fully visible.
+	 * @param {Element} item - The item element to reveal.
+	 */
+	#scrollToItem(item) {
+		if (!this.maxHeight || !item) return;
+
+		const list = this.#listInner;
+		const top = list.getBoundingClientRect().top + list.clientTop;
+		const bottom = top + list.clientHeight;
+		const { top: itemTop, bottom: itemBottom } = item.getBoundingClientRect();
+
+		if (itemTop < top) list.scrollTop -= top - itemTop;
+		else if (itemBottom > bottom) list.scrollTop += itemBottom - bottom;
+	}
+
+	/**
 	 * @description Highlights and selects an item by index.
 	 * @param {number} selectIndex - The index of the item to select.
 	 */
@@ -571,6 +590,7 @@ class SelectMenu {
 
 		this.index = selectIndex;
 		this.item = this.items[selectIndex];
+		this.#scrollToItem(this.menus[selectIndex]);
 	}
 
 	/**
@@ -710,7 +730,7 @@ class SelectMenu {
 		}
 
 		if (onItemQuerySelector) {
-			const item = form.firstElementChild.querySelector(onItemQuerySelector);
+			const item = this.#listInner.querySelector(onItemQuerySelector);
 			if (item) {
 				this._onItem = item;
 				dom.utils.addClass(item, 'se-select-on');
