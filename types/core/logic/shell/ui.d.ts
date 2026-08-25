@@ -16,11 +16,6 @@ declare class UIManager {
 	toastContainer: Element;
 	toastMessage: HTMLSpanElement;
 	/**
-	 * @description Whether `SelectMenu` is open
-	 * @type {boolean}
-	 */
-	selectMenuOn: boolean;
-	/**
 	 * @description Currently open `Controller` info array
 	 * @type {Array<SunEditor.Module.Controller.Info>}
 	 */
@@ -36,6 +31,20 @@ declare class UIManager {
 	 * @type {?HTMLElement}
 	 */
 	_figureContainer: HTMLElement | null;
+	/**
+	 * @description Whether any `SelectMenu` is currently open.
+	 * - Read-only: a menu announces itself through {@link setSelectMenuOpen}. Derived from the set of
+	 * open instances so an unrelated menu closing cannot clear the flag for a menu that is still open.
+	 * @returns {boolean}
+	 */
+	get selectMenuOn(): boolean;
+	/**
+	 * @internal
+	 * @description `SelectMenu` open-state notification. Called by `SelectMenu.open()` / `.close()`.
+	 * @param {*} instance The `SelectMenu` instance changing state
+	 * @param {boolean} open `true` on open, `false` on close
+	 */
+	setSelectMenuOpen(instance: any, open: boolean): void;
 	/**
 	 * @description Set editor frame styles.
 	 * - Define the style of the edit area

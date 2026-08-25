@@ -1,6 +1,18 @@
+### feat
+
+- Added `blockHandle.onPlusClick` — runs after the plus button inserted a new line, so a host can decide what opens next. Inserting the line stays fixed behavior, and nothing opens by default. The context carries the new `block` plus an `openMenu()` helper for the block handle's own menu (`core/logic/panel/blockHandle`)
+- Block handle is now shown for top-level components (image, table, ...) so they can be reordered like any other block; its handle button opens that component's own controller (`core/logic/panel/blockResolver`, `blockHandle`)
+
 ### fix
 
-- 하나의 인라인 래퍼가 이미지를 여러 개 감쌀 때(`<span><img><img></span>`) code view 전환이 실패하고 두 번째 이후 이미지가 유실되던 문제 수정 (`modules/contract/Figure` - `retainFigureFormat`)
-- `plugins` 옵션을 배열 형식(`plugins: [image, link]`)으로 전달하면 플러그인이 등록되지 않고 에디터 생성이 실패하던 문제 수정 (`core/section/constructor`)
-- `html.clean`이 커서가 들어갈 수 없는 빈 줄(`<br>` 없는 `<p></p>`)을 남기던 문제 수정 (`core/logic/dom/html`)
-- 플러그인 `retainFormat` 훅에서 예외가 발생하면 `html.clean` 전체가 중단되던 문제 수정 — 이제 해당 요소만 건너뛰고 경고를 남긴 뒤 나머지를 계속 처리 (`core/logic/shell/pluginManager`) #1679
+- Fixed code view failing to close and dropping every image after the first when one inline wrapper held multiple images (`<span><img><img></span>`) (`modules/contract/Figure` - `retainFigureFormat`)
+- Fixed the `plugins` option in array form (`plugins: [image, link]`) registering nothing, which made editor creation fail (`core/section/constructor`)
+- Fixed `html.clean` leaving empty caret-less lines behind (a `<p></p>` with no `<br>`) (`core/logic/dom/html`)
+- Fixed a dropdown-free flyout (table, fontColor, ...) staying open while the arrow keys kept walking the parent menu behind it (`modules/ui/SelectMenu`)
+- Fixed a menu's sub-panel (submenu or dropdown-free flyout) tearing the whole menu down on the next keypress when a second `SelectMenu` existed.
+
+### change
+
+- Fixed global (`window`) listeners surviving `destroy()` when the module that owned them never closed (an open menu or controller). They kept firing against the destroyed editor and threw (`core/config/eventManager`)
+- Fixed picking a dropdown-free plugin (table, fontColor, ...) from the slash command menu with the keyboard: Enter closed the menu before the flyout could anchor to it, so the picker vanished and the plugin's dropdown was stranded outside the toolbar menu tray (`plugins/field/slashCommand`)
+- Fixed an exception thrown from a plugin `retainFormat` hook aborting the whole `html.clean` — the failing element is now skipped with a warning and the rest are still processed (`core/logic/shell/pluginManager`) #1679

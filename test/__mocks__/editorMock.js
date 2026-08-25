@@ -898,6 +898,10 @@ export function createMockEditor(customOptions = {}) {
 		destroy: jest.fn()
 	};
 
+	// `selectMenuOn` is derived from the set of open SelectMenu instances (see `UIManager`), so a menu
+	// closing cannot clear the flag for another menu that is still open.
+	const openSelectMenus = new Set();
+
 	const ui = {
 		setEditorStyle: jest.fn(),
 		setTheme: jest.fn(),
@@ -942,7 +946,13 @@ export function createMockEditor(customOptions = {}) {
 		currentControllerName: '',
 		opendModal: null,
 		opendBrowser: null,
-		selectMenuOn: false,
+		setSelectMenuOpen: jest.fn((instance, open) => {
+			if (open) openSelectMenus.add(instance);
+			else openSelectMenus.delete(instance);
+		}),
+		get selectMenuOn() {
+			return openSelectMenus.size > 0;
+		},
 		_controllerOnDisabledButtons: [],
 		_codeViewDisabledButtons: [],
 		_notHideToolbar: false,

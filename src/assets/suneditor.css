@@ -3304,8 +3304,8 @@
 .sun-editor .se-select-menu .se-select-item {
 	position: relative;
 	list-style: none;
-	line-height: 28px;
-	min-height: 28px;
+	line-height: 32px;
+	min-height: 32px;
 	font-size: var(--se-btn-font-size);
 	padding: 0 6px;
 	margin: 1px 4px;
@@ -3317,7 +3317,7 @@
 .sun-editor .se-select-menu .se-select-item .se-btn-list {
 	padding: 0;
 	margin: 0;
-	min-height: 28px;
+	min-height: 32px;
 }
 .sun-editor .se-select-menu .se-select-item .se-btn-list > span {
 	padding: 0;
@@ -3343,7 +3343,7 @@
 	display: flex;
 	align-items: center;
 	width: 100%;
-	min-height: 28px;
+	min-height: 32px;
 	padding: 0;
 	margin: 0;
 	background: transparent;

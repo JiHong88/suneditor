@@ -1675,9 +1675,14 @@ const options1 = {
 			'table',
 			'fontColor',
 		],
+		onPlusClick: ($, { block, openMenu }) => {
+			// openMenu();
+			$.plugins.slashCommand.open(block);
+		},
 	},
 	slashCommand: {
 		// triggerChar: '/',
+		limitSize: 17,
 		items: [
 			{
 				key: 'h1',
@@ -1698,6 +1703,7 @@ const options1 = {
 				group: 'Media',
 				action: ($) => $.plugins.image?.open(),
 			},
+			'table',
 			'bold',
 			'blockStyle',
 			'blockquote',

@@ -191,6 +191,17 @@ declare class SlashCommand extends PluginField {
 	controller: Controller;
 	onInput(params: SunEditor.HookParams.InputWithData): void;
 	onKeyDown(params: SunEditor.HookParams.KeyEvent): void | boolean;
+	/**
+	 * @description Open the command menu programmatically, with no trigger character typed and the full tem list shown.
+	 * - Intended for host UI that wants the same menu without the `/` shortcut — e.g. the
+	 * - block handle's plus button:
+	 * ```js
+	 * blockHandle: { onPlusClick: ($, { block }) => $.plugins.slashCommand.open(block) }
+	 * ```
+	 * @param {Node} anchorNode - Node the menu anchors to (typically the line the caret sits on).
+	 * @returns {boolean} `true` if the menu was opened
+	 */
+	open(anchorNode: Node): boolean;
 	#private;
 }
 import { PluginField } from '../../interfaces';

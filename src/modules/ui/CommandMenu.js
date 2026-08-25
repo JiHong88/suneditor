@@ -69,6 +69,10 @@ export function buildRowHTML(label, iconHTML) {
  * @property {Object} selectMenuParams - Base SelectMenu params (`position`, `minWidth`, `keydownTarget`, etc.).
  * @property {function(CommandMenuItem, { icons: Object }): string} [renderCustomItem] - Optional renderer
  *   applied to custom (object) items only. Plugin-string items always render with `buildRowHTML`.
+ * @property {function(): void} [prepareCommit] - Optional owner hook run once,
+ * - immediately before the user commits inside a dropdown-free flyout (SlashCommand uses it to delete the typed `/query`).
+ * - A native submenu gets this for free — its commit routes back through `SelectMenu`'s select callback —
+ * - but a flyout is the plugin's own DOM, so the moment has to be intercepted.
  */
 
 /**
@@ -97,8 +101,9 @@ class CommandMenu {
 
 	/** @type {Map<number, { name: string, plugin: any, li: HTMLElement }>} */
 	#freeMap = new Map();
-	/** @type {?{ dropdown: HTMLElement, plugin: any, originalParent: ?Node, anchorLi: HTMLElement, unsub: () => void }} */
+	/** @type {?{ dropdown: HTMLElement, plugin: any, originalParent: ?Node, anchorLi: HTMLElement, unsub: () => void, offCommit: () => void }} */
 	#flyoutState = null;
+	#prepareCommit = null;
 
 	/**
 	 * @type {Array<{ name: string, idx: number }>}
@@ -124,6 +129,7 @@ class CommandMenu {
 		this.#resolveButton = params.resolveButton;
 		this.#rawItems = Array.isArray(params.items) ? params.items : [];
 		this.#renderCustomItem = typeof params.renderCustomItem === 'function' ? params.renderCustomItem : null;
+		this.#prepareCommit = typeof params.prepareCommit === 'function' ? params.prepareCommit : null;
 
 		// Wrap the host's closeMethod so the flyout is always torn down with the menu.
 		const userClose = params.selectMenuParams?.closeMethod;
@@ -134,6 +140,7 @@ class CommandMenu {
 				this.#unregisterAll();
 				userClose?.();
 			},
+			subCheckMethod: (index) => this.#freeMap.has(index),
 			subEscMethod: () => {
 				if (!this.#flyoutState) return false;
 				const anchorLi = this.#flyoutState.anchorLi;
@@ -499,13 +506,46 @@ class CommandMenu {
 		dom.utils.addClass(anchorLi, 'se-submenu-open');
 		plugin.on?.(anchorLi);
 
+		const offCommit = this.#bindFlyoutCommit(dropdown);
+
 		// dropdown-off event and unsubscribe on close (see `#closeFlyout`) rather than patching core.
 		const unsub = this.#$.menu.subscribeDropdownOff(() => {
 			this.#closeFlyout();
 			this.selectMenu.close();
 		});
 
-		this.#flyoutState = { dropdown, plugin, originalParent, anchorLi, unsub };
+		this.#flyoutState = { dropdown, plugin, originalParent, anchorLi, unsub, offCommit };
+	}
+
+	/**
+	 * @description Run the owner's `prepareCommit` on the first commit gesture inside `dropdown`.
+	 * - Text inputs are skipped: `prepareCommit` moves the caret back into the wysiwyg, which would pull
+	 * focus out of a field the user is still typing in (e.g. the color picker's hex box). Those commit
+	 * through their own submit, and the hook runs on that instead.
+	 * @param {HTMLElement} dropdown
+	 * @returns {() => void} Unbind function
+	 */
+	#bindFlyoutCommit(dropdown) {
+		if (!this.#prepareCommit) return () => {};
+
+		let done = false;
+		const onCommit = (e) => {
+			if (done) return;
+			const target = /** @type {HTMLElement} */ (dom.query.getEventTarget(e));
+			if (dom.check.isInputElement(target) && e.type === 'mousedown') return;
+			done = true;
+			this.#prepareCommit();
+		};
+
+		dropdown.addEventListener('mousedown', onCommit, true);
+		dropdown.addEventListener('keydown', onCommit, true);
+		dropdown.addEventListener('submit', onCommit, true);
+
+		return () => {
+			dropdown.removeEventListener('mousedown', onCommit, true);
+			dropdown.removeEventListener('keydown', onCommit, true);
+			dropdown.removeEventListener('submit', onCommit, true);
+		};
 	}
 
 	/**
@@ -518,6 +558,7 @@ class CommandMenu {
 		this.#flyoutState = null;
 
 		s.unsub?.();
+		s.offCommit?.();
 		s.dropdown.style.cssText = '';
 		s.dropdown.style.display = 'none';
 

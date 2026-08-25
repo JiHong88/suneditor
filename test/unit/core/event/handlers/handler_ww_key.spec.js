@@ -47,7 +47,7 @@ describe('Key Handler', () => {
 
 			it('should return early if selectMenuOn', async () => {
 				jest.spyOn(keyCodeMap, 'isComposing').mockReturnValue(false);
-				mockThis.uiManager.selectMenuOn = true;
+				mockThis.uiManager.setSelectMenuOpen({}, true);
 
 				await OnKeyDown_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 

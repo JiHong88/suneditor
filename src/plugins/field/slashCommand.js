@@ -119,6 +119,7 @@ class SlashCommand extends PluginField {
 			items: Array.isArray(pluginOptions.items) ? pluginOptions.items : [],
 			resolveButton: ResolveButton,
 			renderCustomItem: typeof pluginOptions.renderItem === 'function' ? pluginOptions.renderItem : null,
+			prepareCommit: () => this.#removeTrigger(),
 			selectMenuParams: {
 				position: 'bottom-left',
 				dir: 'ltr',
@@ -220,6 +221,32 @@ class SlashCommand extends PluginField {
 	}
 
 	/**
+	 * @description Open the command menu programmatically, with no trigger character typed and the full tem list shown.
+	 * - Intended for host UI that wants the same menu without the `/` shortcut — e.g. the
+	 * - block handle's plus button:
+	 * ```js
+	 * blockHandle: { onPlusClick: ($, { block }) => $.plugins.slashCommand.open(block) }
+	 * ```
+	 * @param {Node} anchorNode - Node the menu anchors to (typically the line the caret sits on).
+	 * @returns {boolean} `true` if the menu was opened
+	 */
+	open(anchorNode) {
+		if (!anchorNode) return false;
+
+		const filtered = this.#menu.filter('', this.#limitSize);
+		if (filtered.length === 0) return false;
+
+		this.controller.open(anchorNode, null, { isWWTarget: true, initMethod: null, addOffset: null });
+		this.#menu.createRows(filtered);
+		this.#menu.open();
+		this.#menu.setItem(0);
+
+		this.#cacheAnchor(anchorNode, 0, 0);
+
+		return true;
+	}
+
+	/**
 	 * @description Close the menu from the plugin itself (invalid query, or after a selection). Flags
 	 * the close as internal so `#onMenuClose` does not treat it as a user dismiss.
 	 */
@@ -289,17 +316,23 @@ class SlashCommand extends PluginField {
 		if (!anchorNode) return false;
 
 		const triggerChar = this.#triggerChar;
-		const query = anchorNode.textContent.substring(this.#lastTriggerPos + triggerChar.length, this.#anchorOffset);
+		const query = (anchorNode.textContent || '').substring(
+			this.#lastTriggerPos + triggerChar.length,
+			this.#anchorOffset,
+		);
 
-		// Remove the trigger + query, leaving the caret at the trigger position so the action
-		// (insert block, run command, etc.) operates from a clean cursor.
-		this.$.selection.setRange(anchorNode, this.#lastTriggerPos, anchorNode, this.#anchorOffset);
-		const range = this.$.selection.getRange();
-		if (range && !range.collapsed) this.$.html.remove();
+		if (item.kind !== 'dropdownFree') {
+			this.#removeTrigger();
+			this.#closeMenu();
+			this.#menu.dispatch(item, { triggerChar, query, item: item.raw });
+			return;
+		}
 
-		this.#closeMenu();
-
+		// `dispatch` toggles, so picking the row whose flyout is already up (hovered, then picked) closes
+		// it and keeps the menu — as BlockHandle does. Only a flyout that never opened leaves nothing to show.
+		const hadSubPanel = this.#menu.hasOpenSubPanel();
 		this.#menu.dispatch(item, { triggerChar, query, item: item.raw });
+		if (!hadSubPanel && !this.#menu.hasOpenSubPanel()) this.#closeMenu();
 	}
 }
 

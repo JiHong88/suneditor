@@ -16,9 +16,10 @@ const MENU_MIN_HEIGHT = 38;
  * @property {number} [splitNum=0] Optional split number for horizontal positioning; defines how many items per row
  * @property {() => void} [openMethod] Optional method to call when the menu is opened
  * @property {() => void} [closeMethod] Optional method to call when the menu is closed
- * @property {() => boolean} [subEscMethod] Optional owner hook invoked on ESC before the menu closes.
- * Return `true` if it dismissed an owner-managed sub-panel (e.g. CommandMenu's flyout), so ESC only
- * closes that sub-panel and keeps the menu open.
+ * @property {() => boolean} [subEscMethod] Optional owner hook that dismisses an owner-managed sub-panel (e.g. CommandMenu's dropdown-free flyout) and puts the cursor back on its row.
+ * Return `true` when a sub-panel was actually dismissed.
+ * @property {(index: number) => boolean} [subCheckMethod] Optional owner hook answering "does the row at `index` own a sub-panel?".
+ * - A query only — it must not open anything.
  * @property {string} [maxHeight] Optional max-height CSS value (e.g. `"200px"`). Enables scrolling when items exceed this height.
  * @property {string} [minWidth] Optional min-width CSS value (e.g. `"130px"`).
  * @property {*} [keydownTarget]  Optional override for the keyboard navigation target. By default `on()` listens
@@ -86,6 +87,7 @@ class SelectMenu {
 		this.openMethod = params.openMethod;
 		this.closeMethod = params.closeMethod;
 		this.subEscMethod = params.subEscMethod || null;
+		this.subCheckMethod = params.subCheckMethod || null;
 		this.maxHeight = params.maxHeight || '';
 		this.minWidth = params.minWidth || '';
 		this.#keydownTargetOverride = params.keydownTarget || null;
@@ -247,7 +249,7 @@ class SelectMenu {
 	 * selectMenu.open('', '[data-command="' + this.align + '"]');
 	 */
 	open(position, onItemQuerySelector) {
-		this.#$.ui.selectMenuOn = true;
+		this.#$.ui.setSelectMenuOpen(this, true);
 
 		this.openMethod?.();
 
@@ -298,7 +300,7 @@ class SelectMenu {
 	 * @description Select menu close
 	 */
 	close() {
-		this.#$.ui.selectMenuOn = false;
+		this.#$.ui.setSelectMenuOpen(this, false);
 		dom.utils.removeClass(this.#refer, 'on');
 		this.#init();
 		this.form?.removeAttribute('style');
@@ -794,22 +796,18 @@ class SelectMenu {
 					this.#moveSubmenuItem(1);
 					return;
 				case 'ArrowLeft':
+				case 'ArrowRight': {
 					e.preventDefault();
 					e.stopPropagation();
-					// exit submenu back to parent
-					this.#inSubmenu = false;
-					this.#submenuItemIndex = -1;
-					{
-						const subData = this.#submenuData.get(this.#activeSubmenuIndex);
-						if (subData?.element)
-							dom.utils.removeClass(
-								subData.element.querySelectorAll('.se-select-item'),
-								'se-select-cursor',
-							);
-					}
+					// Close the submenu and put the cursor back on its trigger row — the same thing ESC
+					// does. Either direction closes, so the gesture reads the same in LTR and RTL and
+					// there is no writing-direction branch to keep in sync.
+					const parentIndex = this.#activeSubmenuIndex;
+					this.#closeSubmenu();
+					if (parentIndex > -1) this.#selectItem(parentIndex);
 					return;
+				}
 				case 'Enter':
-				case 'Space':
 					if (this.#submenuItemIndex > -1) {
 						e.preventDefault();
 						e.stopPropagation();
@@ -841,24 +839,40 @@ class SelectMenu {
 					moveIndex = 1;
 				}
 				break;
-			case 'ArrowLeft': // left
+			case 'ArrowLeft':
+			case 'ArrowRight':
 				e.preventDefault();
 				e.stopPropagation();
-				moveIndex = -1;
-				break;
-			case 'ArrowRight': // right — enter submenu if available
-				e.preventDefault();
-				e.stopPropagation();
-				if (this.index > -1 && this.#submenuData.has(this.index)) {
-					this.#openSubmenu(this.index);
-					this.#inSubmenu = true;
-					this.#moveSubmenuItem(1);
+
+				if (this.#activeSubmenuIndex > -1) {
+					const parentIndex = this.#activeSubmenuIndex;
+					this.#closeSubmenu();
+					this.#selectItem(parentIndex);
 					return;
 				}
-				moveIndex = 1;
+
+				if (this.subEscMethod?.()) return;
+
+				if (this.index > -1) {
+					if (this.#submenuData.has(this.index)) {
+						this.#openSubmenu(this.index);
+						this.#inSubmenu = true;
+						this.#moveSubmenuItem(1);
+						return;
+					}
+
+					if (this.subCheckMethod?.(this.index)) {
+						this.#select(this.index);
+						return;
+					}
+				}
+
+				if (!this.horizontal) return;
+
+				moveIndex = e.code === 'ArrowLeft' ? -1 : 1;
+
 				break;
 			case 'Enter':
-			case 'Space': // enter, space
 				if (this.index > -1) {
 					e.preventDefault();
 					e.stopPropagation();
@@ -875,6 +889,9 @@ class SelectMenu {
 
 		if (moveIndex) {
 			this.#closeSubmenu();
+			// Moving off a row must take its sub-panel with it, otherwise the flyout stays open while the
+			// cursor is somewhere else entirely.
+			this.subEscMethod?.();
 			this.#moveItem(moveIndex);
 		}
 	}
