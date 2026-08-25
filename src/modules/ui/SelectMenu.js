@@ -307,6 +307,7 @@ class SelectMenu {
 		dom.utils.removeClass(this.#refer, 'on');
 		this.#init();
 		this.form?.removeAttribute('style');
+		if (this.#listInner) this.#resetClamp();
 		this.isOpen = false;
 
 		this.closeMethod?.();
@@ -557,13 +558,35 @@ class SelectMenu {
 	}
 
 	/**
+	 * @description Restores the list box to its `maxHeight` param, dropping any previous viewport clamp.
+	 * - `#setPosition` may run twice (the `_re` retry), so the clamp must not accumulate.
+	 */
+	#resetClamp() {
+		this.form.style.height = '';
+		this.#listInner.style.maxHeight = this.maxHeight;
+		this.#listInner.style.overflowY = this.maxHeight ? 'auto' : '';
+	}
+
+	/**
+	 * @description Clamps the menu to `h` when it doesn't fit the viewport.
+	 * @param {number} h - Target form height in px.
+	 */
+	#clampHeight(h) {
+		const chrome = this.form.offsetHeight - this.#listInner.offsetHeight; // padding + border
+		this.form.style.height = h + 'px';
+		this.#listInner.style.maxHeight = (h - chrome > 0 ? h - chrome : 0) + 'px';
+		this.#listInner.style.overflowY = 'auto';
+	}
+
+	/**
 	 * @description Scrolls the list so the given item is fully visible.
 	 * @param {Element} item - The item element to reveal.
 	 */
 	#scrollToItem(item) {
-		if (!this.maxHeight || !item) return;
+		if (!item) return;
 
 		const list = this.#listInner;
+		if (!list.style.maxHeight) return;
 		const top = list.getBoundingClientRect().top + list.clientTop;
 		const bottom = top + list.clientHeight;
 		const { top: itemTop, bottom: itemBottom } = item.getBoundingClientRect();
@@ -606,7 +629,8 @@ class SelectMenu {
 		const target = this.#refer;
 		form.style.visibility = 'hidden';
 		form.style.display = 'block';
-		dom.utils.removeClass(form, 'se-select-menu-scroll');
+
+		this.#resetClamp();
 		dom.utils.addClass(target, 'on');
 
 		const formW = form.offsetWidth;
@@ -657,7 +681,7 @@ class SelectMenu {
 					h += formT - 4;
 					t -= formT - 4;
 				}
-				form.style.height = h + 'px';
+				this.#clampHeight(h);
 				break;
 			}
 			case 'top':
@@ -667,7 +691,7 @@ class SelectMenu {
 						break;
 					}
 					overH = targetGlobalTop - 4 + sideAddH;
-					if (overH >= MENU_MIN_HEIGHT) form.style.height = overH + 'px';
+					if (overH >= MENU_MIN_HEIGHT) this.#clampHeight(overH);
 				}
 				t = targetOffsetTop - form.offsetHeight + sideAddH;
 				break;
@@ -678,7 +702,7 @@ class SelectMenu {
 						break;
 					}
 					overH = wbottom - 4 + sideAddH;
-					if (overH >= MENU_MIN_HEIGHT) form.style.height = overH + 'px';
+					if (overH >= MENU_MIN_HEIGHT) this.#clampHeight(overH);
 				}
 				t = targetOffsetTop + (side ? 0 : targetHeight);
 				break;

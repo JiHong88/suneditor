@@ -31,7 +31,10 @@ const { debounce } = converter;
  *   (plugin names, built-in commands like `'bold'`); objects are custom items with their own `action`.
  *   Required.
  * @property {number} [delayTime=120] - Debounce delay (ms) before the input is inspected for the trigger.
- * @property {number} [limitSize=10] - Maximum number of items shown in the dropdown.
+ * @property {number} [limitSize=0] - Maximum number of items kept after filtering. `0` (default) keeps every match
+ *   - the list scrolls within `maxHeight`, so a cap only hides matches the user can no longer reach.
+ * @property {string} [maxHeight='320px'] - Max height of the menu list. Any CSS length; the list scrolls past it.
+ * @property {string} [minWidth='200px'] - Min width of the menu.
  * @property {string} [emptyMessage] - Message shown when no items match the query. If unset, the menu closes on no match.
  * @property {function(SlashCommandItem, { icons: Object }): string} [renderItem] - Custom item HTML renderer.
  *   Applied only to custom item objects; plugin-name entries always render with the canonical BlockHandle row.
@@ -111,7 +114,9 @@ class SlashCommand extends PluginField {
 				? pluginOptions.triggerChar
 				: '/';
 		this.#limitSize =
-			typeof pluginOptions.limitSize === 'number' && pluginOptions.limitSize > 0 ? pluginOptions.limitSize : 10;
+			typeof pluginOptions.limitSize === 'number' && pluginOptions.limitSize > 0
+				? pluginOptions.limitSize
+				: Infinity;
 		this.#emptyMessage = typeof pluginOptions.emptyMessage === 'string' ? pluginOptions.emptyMessage : '';
 		const delayTime = typeof pluginOptions.delayTime === 'number' ? pluginOptions.delayTime : 120;
 
@@ -123,8 +128,8 @@ class SlashCommand extends PluginField {
 			selectMenuParams: {
 				position: 'bottom-left',
 				dir: 'ltr',
-				minWidth: '200px',
-				maxHeight: '320px',
+				minWidth: typeof pluginOptions.minWidth === 'string' ? pluginOptions.minWidth : '200px',
+				maxHeight: typeof pluginOptions.maxHeight === 'string' ? pluginOptions.maxHeight : '320px',
 				closeMethod: () => this.#onMenuClose(),
 			},
 		});

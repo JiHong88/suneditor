@@ -37,6 +37,8 @@ class BlockHandle {
 	#plusBtn;
 	#dragBtn;
 	#menuConfig;
+	#menuMaxHeight;
+	#menuMinWidth;
 	/** @type {?function(SunEditor.Deps, { block: HTMLElement, openMenu: function(): void }): void} */
 	#onPlusClickHook;
 
@@ -76,7 +78,7 @@ class BlockHandle {
 	 * @param {HTMLElement} blockHandle - Handle group (.se-block-handle)
 	 * @param {HTMLElement} blockHandlePlus - Plus button
 	 * @param {HTMLElement} blockHandleDrag - Drag button
-	 * @param {Object|Array<*>|null} blockHandleOptions - The `blockHandle` option object (`{ menu, onPlusClick }`).
+	 * @param {Object|Array<*>|null} blockHandleOptions - The `blockHandle` option object (`{ menu, onPlusClick, maxHeight, minWidth }`).
 	 * - An array is accepted as a shorthand for `{ menu: [...] }`.
 	 */
 	constructor($, blockHandleArea, blockHandle, blockHandlePlus, blockHandleDrag, blockHandleOptions) {
@@ -88,6 +90,8 @@ class BlockHandle {
 
 		const opts = Array.isArray(blockHandleOptions) ? { menu: blockHandleOptions } : blockHandleOptions || {};
 		this.#menuConfig = opts.menu || null;
+		this.#menuMaxHeight = typeof opts.maxHeight === 'string' ? opts.maxHeight : '';
+		this.#menuMinWidth = typeof opts.minWidth === 'string' ? opts.minWidth : '200px';
 		this.#onPlusClickHook = typeof opts.onPlusClick === 'function' ? opts.onPlusClick : null;
 
 		this.#$.contextProvider.carrierWrapper.appendChild(this.#handle);
@@ -848,7 +852,8 @@ class BlockHandle {
 			selectMenuParams: {
 				position: 'right-top',
 				dir: this.#$.options.get('_rtl') ? 'rtl' : 'ltr',
-				minWidth: '200px',
+				minWidth: this.#menuMinWidth,
+				maxHeight: this.#menuMaxHeight,
 				keydownTarget: _w,
 				closeMethod: () => {
 					dom.utils.removeClass(this.#dragBtn, 'on');

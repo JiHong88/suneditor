@@ -330,6 +330,9 @@ export const DEFAULTS = {
  *   ],
  * }
  * ```
+ * @property {string} [blockHandle.maxHeight=""] - Max height of the menu list. Any CSS length; the list scrolls past it.
+ * - Unset by default: the menu grows with its items and is only clamped when it would overflow the viewport.
+ * @property {string} [blockHandle.minWidth="200px"] - Min width of the menu.
  * @property {function(SunEditor.Deps, { block: HTMLElement, openMenu: function(): void }): void} [blockHandle.onPlusClick] - Runs after the plus button inserted a new line.
  * - Adding the line is fixed behavior; this hook decides what happens next. Nothing does by default.
  * - `block` is the new line, already focused. `openMenu()` opens the block handle's own `menu`.
