@@ -12,7 +12,7 @@ declare class BlockHandle {
 	 * @param {HTMLElement} blockHandle - Handle group (.se-block-handle)
 	 * @param {HTMLElement} blockHandlePlus - Plus button
 	 * @param {HTMLElement} blockHandleDrag - Drag button
-	 * @param {Object|Array<*>|null} blockHandleOptions - The `blockHandle` option object (`{ menu, onPlusClick }`).
+	 * @param {Object|Array<*>|null} blockHandleOptions - The `blockHandle` option object (`{ menu, onPlusClick, maxHeight, minWidth }`).
 	 * - An array is accepted as a shorthand for `{ menu: [...] }`.
 	 */
 	constructor(

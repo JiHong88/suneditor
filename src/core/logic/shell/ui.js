@@ -316,12 +316,6 @@ class UIManager {
 
 			this.#activeDirBtn(rtl);
 
-			// reverse toolbar buttons
-			this.#reverseToolbarButtons(this.#context.get('toolbar_buttonTray'));
-			if (this.#context.has('toolbar_sub_buttonTray')) {
-				this.#reverseToolbarButtons(this.#context.get('toolbar_sub_buttonTray'));
-			}
-
 			if (this.#store.mode.isBalloon) this.#$.toolbar._showBalloon();
 			else if (this.#store.mode.isSubBalloon) this.#$.subToolbar._showBalloon();
 		} catch (e) {
@@ -806,20 +800,6 @@ class UIManager {
 			dom.utils.addClass(commandTargets.get('dir_ltr'), 'active');
 			dom.utils.removeClass(commandTargets.get('dir_rtl'), 'active');
 		}
-	}
-
-	/**
-	 * @description Reverse the order of toolbar button groups (excluding the more-layer).
-	 * @param {HTMLElement} buttonTray - The `.se-btn-tray` element.
-	 */
-	#reverseToolbarButtons(buttonTray) {
-		if (!buttonTray) return;
-		const moreLayer = buttonTray.querySelector('.se-toolbar-more-layer');
-		const children = Array.from(buttonTray.children).filter((c) => c !== moreLayer);
-		for (let i = children.length - 1; i >= 0; i--) {
-			buttonTray.appendChild(children[i]);
-		}
-		if (moreLayer) buttonTray.appendChild(moreLayer);
 	}
 
 	/**

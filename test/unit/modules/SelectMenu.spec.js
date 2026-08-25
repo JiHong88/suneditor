@@ -783,7 +783,46 @@ describe('Modules - SelectMenu', () => {
 			expect(scrollTop).toBe(before);
 		});
 
-		it('does nothing for a menu without `maxHeight` (never scrolls)', () => {
+		it('scrolls a viewport-clamped list that has no `maxHeight` param', () => {
+			const clamped = new SelectMenu(mockEditor.$, { position: 'bottom-left' });
+			const ref = document.createElement('button');
+			document.createElement('div').appendChild(ref);
+			document.body.appendChild(ref.parentElement);
+			clamped.on(ref, jest.fn());
+			clamped.create(['1', '2', '3', '4', '5', '6']);
+
+			// what `#clampHeight` leaves behind when the menu doesn't fit the viewport
+			const list = clamped.form.firstElementChild;
+			list.style.maxHeight = VIEW_H + 'px';
+			list.style.overflowY = 'auto';
+
+			let clampedScrollTop = 0;
+			Object.defineProperty(list, 'scrollTop', {
+				configurable: true,
+				get: () => clampedScrollTop,
+				set: (v) => {
+					clampedScrollTop = v;
+				}
+			});
+			Object.defineProperty(list, 'clientHeight', { configurable: true, value: VIEW_H });
+			Object.defineProperty(list, 'clientTop', { configurable: true, value: 0 });
+			list.getBoundingClientRect = () => ({ top: 0, bottom: VIEW_H, left: 0, right: 100, width: 100, height: VIEW_H });
+			clamped.menus.forEach((li, i) => {
+				li.getBoundingClientRect = () => ({
+					top: i * ROW_H - clampedScrollTop,
+					bottom: (i + 1) * ROW_H - clampedScrollTop,
+					left: 0,
+					right: 100,
+					width: 100,
+					height: ROW_H
+				});
+			});
+
+			clamped.setItem(5);
+			expect(clampedScrollTop).toBe(ROW_H * 3);
+		});
+
+		it('does nothing for a menu that neither has `maxHeight` nor was clamped', () => {
 			const plain = new SelectMenu(mockEditor.$, { position: 'bottom-left' });
 			const ref = document.createElement('button');
 			document.createElement('div').appendChild(ref);

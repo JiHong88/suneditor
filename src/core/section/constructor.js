@@ -925,7 +925,7 @@ export function InitOptions(options, editorTargets, plugins) {
 				'toolbar_sub_width',
 				subbar.width ? (numbers.is(subbar.width) ? subbar.width + 'px' : subbar.width) : 'auto',
 			);
-			subButtons = o.get('_rtl') ? subbar.buttonList.reverse() : subbar.buttonList;
+			subButtons = subbar.buttonList;
 			o.set('buttons_sub', new Set(subButtons.toString().split(',')));
 		}
 	}
@@ -1058,7 +1058,7 @@ export function InitOptions(options, editorTargets, plugins) {
 		i: icons,
 		l: /** @type {Object<string, string>} */ (options.lang || _defaultLang),
 		v: (options.value = typeof options.value === 'string' ? options.value : null),
-		buttons: o.get('_rtl') ? buttonList.reverse() : buttonList,
+		buttons: buttonList,
 		subButtons: subButtons,
 		statusbarContainer:
 			typeof options.statusbar_container === 'string'

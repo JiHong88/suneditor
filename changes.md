@@ -11,6 +11,7 @@
 - Fixed `html.clean` leaving empty caret-less lines behind (a `<p></p>` with no `<br>`) (`core/logic/dom/html`)
 - Fixed a dropdown-free flyout (table, fontColor, ...) staying open while the arrow keys kept walking the parent menu behind it (`modules/ui/SelectMenu`)
 - Fixed a menu's sub-panel (submenu or dropdown-free flyout) tearing the whole menu down on the next keypress when a second `SelectMenu` existed.
+- Fixed `textDirection: 'rtl'` scrambling the toolbar button group order. The groups were reordered in the DOM on top of the CSS mirroring (`.se-btn-tray { direction: rtl }`), so the groups were mirrored twice while the buttons inside each group were mirrored once. Both paths did it - at create time, and again in `ui.setDir` on every runtime direction switch, which also left the order scrambled after switching back to `ltr`. The DOM now keeps the order `buttonList` declares in both directions, and the user's `buttonList` array is no longer reversed in place (`core/section/constructor`, `core/logic/shell/ui`)
 
 ### change
 
