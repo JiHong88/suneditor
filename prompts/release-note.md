@@ -21,6 +21,7 @@ Always classify each item into exactly one of the following categories:
 
 | Category         | When to use                                                              |
 | ---------------- | ------------------------------------------------------------------------ |
+| Design           | Changes the visual design of the editor UI (icons, spacing, theme)       |
 | New Feature      | Introduces a new capability, option, or plugin that did not exist before |
 | Enhancement      | Improves existing behavior, performance, or UX without adding a new API  |
 | Bugfix           | Corrects incorrect or unexpected behavior                                |
@@ -31,6 +32,29 @@ Always classify each item into exactly one of the following categories:
 ---
 
 ## MESSAGE WRITING RULES
+
+### Condense First (most common mistake)
+
+Entries arrive verbose. Rewrite every one of them - never copy an entry through unchanged.
+
+Keep only what a developer integrating the library needs to decide "does this affect me?":
+
+- **the user-visible symptom or capability**, and
+- **the API surface it touches** - option / method / plugin name, in backticks.
+
+Drop everything else:
+
+| Drop                                                | Example of what to cut                                     |
+| --------------------------------------------------- | ---------------------------------------------------------- |
+| Source file / module / directory references          | `` (`core/section/constructor`, `core/logic/shell/ui`) ``   |
+| Root cause and implementation detail                 | "the groups were reversed in the DOM on top of the CSS ..." |
+| Internal identifiers users never call                | `#reverseToolbarButtons`, `#setPosition`, `InitOptions`     |
+| Internal CSS selectors and DOM structure             | `` `.se-btn-tray { direction: rtl }` ``                     |
+| Which code paths were involved, how it was fixed     | "both paths did it - at create time, and again in ..."      |
+
+**One sentence per item.** Split into two bullets only when one change has two genuinely
+independent user-visible effects. If an item still needs a second sentence, it is carrying
+root cause - cut it.
 
 ### General Rules
 
@@ -123,7 +147,27 @@ Group items under their category label. Use this exact heading format:
 
 ## INPUT FORMAT
 
-You will receive one of the following:
+### `changes.md` (the usual source)
+
+`changes.md` is an internal engineering log, not a draft release note. Per
+`prompts/changes-guide.md` every entry ends with the **source file or plugin it touched**, in
+parentheses - `` (`core/logic/shell/ui`) ``. That reference exists for the demo/maintenance
+workflow and **must not reach the release note**. Entries also tend to explain the root cause,
+because they are written right after the fix. Condense as described above.
+
+Map its section headings onto categories:
+
+| `changes.md` | Release note                                                                  |
+| ------------ | ------------------------------------------------------------------------------ |
+| `feat`       | **New Feature** - or **Design** if it is purely visual                          |
+| `fix`        | **Bugfix**                                                                      |
+| `change`     | **Enhancement** - or **Breaking Changes** if a default/API changed for existing users |
+| `breaking`   | **Breaking Changes**                                                            |
+
+Issue numbers appear bare (`#1679`). Expand them to
+`[#1679](https://github.com/JiHong88/suneditor/issues/1679)`.
+
+### Other sources
 
 1. **Raw changelog / commit messages** — parse and rewrite into the format above.
 2. **PR description or issue summary** — extract the relevant facts and classify.
@@ -177,6 +221,46 @@ fixed Enter key bug in certain situations (#1505)
 
 ---
 
+### Input (`changes.md` - note the file references and root cause)
+
+```
+### fix
+
+- Fixed `textDirection: 'rtl'` scrambling the toolbar button group order. The groups were
+  reordered in the DOM on top of the CSS mirroring (`.se-btn-tray { direction: rtl }`), so the
+  groups were mirrored twice while the buttons inside each group were mirrored once. Both paths
+  did it - at create time, and again in `ui.setDir` on every runtime direction switch. The DOM
+  now keeps the order `buttonList` declares in both directions (`core/section/constructor`,
+  `core/logic/shell/ui`)
+- Fixed a menu that doesn't fit the viewport having its height cut without ever becoming
+  scrollable, so the rows past the cut spilled outside the menu box and were unreachable. The
+  clamp now applies to the inner list, which scrolls (`modules/ui/SelectMenu`)
+
+### change
+
+- `slashCommand.limitSize` now defaults to no limit (was `10`). The list scrolls within
+  `maxHeight`, so a count cap only dropped matches the user could otherwise reach; set it
+  explicitly to restore a cap (`plugins/field/slashCommand`)
+```
+
+### Output
+
+```
+### Enhancement
+
+* The default value of the `slashCommand.limitSize` option has been changed to no limit.
+
+### Bugfix
+
+* Fixed a bug where the toolbar button group order was scrambled when `textDirection` was set to `rtl`.
+* Fixed an issue where a menu too tall for the viewport was cut off instead of scrolling, leaving the items below the cut unreachable.
+```
+
+Note what survived: the symptom and the option name. Every file path, CSS selector, internal
+method, and root-cause clause is gone, and each item is one sentence.
+
+---
+
 ## ANTI-PATTERNS (never do these)
 
 - `We added support for dark mode` → no "we"
@@ -185,3 +269,6 @@ fixed Enter key bug in certain situations (#1505)
 - `Bug fix for mobile` → too vague, no "Fixed a bug where..."
 - `New awesome feature: drawing!` → no marketing tone
 - Mixing multiple changes in one bullet point
+- ``Fixed the RTL toolbar order (`core/section/constructor`)`` → never carry the source file reference over from `changes.md`
+- `Fixed a bug where ... because the groups were reversed twice in the DOM` → symptom only, no root cause
+- Copying a `changes.md` entry verbatim → every entry must be rewritten and condensed
