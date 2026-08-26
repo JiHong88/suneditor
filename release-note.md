@@ -1,25 +1,26 @@
-## 3.3.0
-
-### Design
-
-* Redesigned the full editor icon set.
-* Increased the corner rounding (`border-radius`) across the editor UI for a rounder look.
+## 3.3.1
 
 ### New Feature
 
-* A `lineBreakClearStyle` option has been added — when `true`, pressing Enter at the end of a line starts a fresh line without carrying the caret's inline style nodes (bold, italic, color, links); the line-level element and its attributes are preserved. Affects the end-of-line case only.
-* `toolbar_sticky` option now accepts a `position: 'sticky' | 'fixed'` field (default `'sticky'`); `'fixed'` forces the JS `position: fixed` sticky engine over native CSS `position: sticky` for environments where CSS sticky misbehaves.
-* `placeholder_line` option now accepts an object for per-type hints, keyed by tag name (`pre`, `blockquote`, ...) or a category sentinel (`@line`, `@normalLine`, `@list`, `@brLine`, `@closureBrLine`, `@block`, `@closureBlock`), resolved most-specific to least. The string form is unchanged.
-* A `menu.subscribeDropdownOff(callback)` method has been added to subscribe to dropdown-off events; it returns an unsubscribe function.
+* A `blockHandle.onPlusClick` option has been added — a hook that runs after the plus button inserts a new line, letting the host decide what opens next.
+* `blockHandle.maxHeight` / `blockHandle.minWidth` and `slashCommand.maxHeight` / `slashCommand.minWidth` options have been added to size the menu.
+* A `table.insert(cols, rows)` method has been added to insert a table without going through the size picker.
+* The block handle is now shown for top-level components (image, table, ...) so they can be reordered like any other block.
 
-### Enhancement
+### Changes
 
-* Added `Esc` key support to close open toolbar dropdown menus, including dropdown-free menus like fontColor.
-* Updated the table cell controller so the unmerge button is hidden instead of disabled when there are no merged cells, matching the merge/split button toggle.
+* The default value of the `slashCommand.limitSize` option has been changed to no limit; set it explicitly to restore a cap.
 
 ### Bugfix
 
-* Fixed an issue where the off-screen focus-temp input (`.__se__focus__temp__`) was a keyboard tab stop; it is now `tabindex="-1"` and no longer reachable by Tab. [#1677](https://github.com/JiHong88/suneditor/issues/1677)
-* Fixed a bug where the finder toolbar button did not toggle the finder panel closed when pressed again.
-* Fixed an issue where pressing Enter on an empty line inside a block (e.g. `<blockquote>`) with content below placed the new line and caret below the lower chunk instead of between the two chunks.
-* Fixed an issue where opening a dropdown-free plugin's sub-panel from the command menu (e.g. fontColor's color-picker hue slider) closed the entire menu; the flyout now closes only when the plugin commits.
+* Fixed a bug where code view failed to close and dropped every image after the first when a single inline wrapper held multiple images.
+* Fixed a bug where the `plugins` option in array form (`plugins: [image, link]`) registered nothing and editor creation failed.
+* Fixed an issue where cleaning HTML left behind empty lines that had no caret position.
+* Fixed an issue where a dropdown-free flyout (table, fontColor, ...) stayed open while the arrow keys kept navigating the menu behind it.
+* Fixed a bug where a menu's sub-panel closed the entire menu on the next keypress when a second menu existed.
+* Fixed a bug where the text fields inside a dropdown-free flyout, such as the color picker's hex box, could not be focused or typed into.
+* Fixed a bug where the table size picker inserted a table with no rows or columns when it was clicked before a size had been hovered.
+* Fixed a bug where the toolbar button group order was scrambled when `textDirection` was set to `rtl`. [#1680](https://github.com/JiHong88/suneditor/issues/1680)
+* Fixed a bug where global `window` listeners survived `destroy()` and kept firing against the destroyed editor.
+* Fixed an issue where picking a dropdown-free plugin from the slash command menu with the keyboard made its picker vanish.
+* Fixed a bug where an exception thrown from a plugin `retainFormat` hook aborted the entire HTML cleaning pass. [#1679](https://github.com/JiHong88/suneditor/issues/1679)
