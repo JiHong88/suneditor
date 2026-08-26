@@ -4,6 +4,8 @@ on:
     push:
         branches:
             - release
+    # 수동 실행 (Actions 장애 등으로 push 트리거가 유실됐을 때 재시도용)
+    workflow_dispatch:
 
 jobs:
     deploy:
