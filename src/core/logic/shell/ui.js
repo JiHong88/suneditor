@@ -73,6 +73,16 @@ class UIManager {
 	#blockHandle = null;
 
 	/**
+	 * @description Currently open `SelectMenu` instances.
+	 * - There is one editor-wide "a select menu is open" flag but many `SelectMenu` instances, so it
+	 * cannot be a plain boolean: the last writer would win. A field plugin that closes its own menu on
+	 * every keystroke (`autocomplete`) used to flip the flag off while another menu (`slashCommand`) was
+	 * still open, which let the wysiwyg keydown handler run against the open menu.
+	 * @type {Set<*>}
+	 */
+	#openSelectMenus = new Set();
+
+	/**
 	 * @constructor
 	 * @param {SunEditor.Kernel} kernel
 	 */
@@ -111,12 +121,6 @@ class UIManager {
 		this.#backWrapper = /** @type {HTMLElement} */ (this.#carrierWrapper.querySelector('.se-back-wrapper'));
 
 		/**
-		 * @description Whether `SelectMenu` is open
-		 * @type {boolean}
-		 */
-		this.selectMenuOn = false;
-
-		/**
 		 * @description Currently open `Controller` info array
 		 * @type {Array<SunEditor.Module.Controller.Info>}
 		 */
@@ -134,6 +138,27 @@ class UIManager {
 		 * @type {?HTMLElement}
 		 */
 		this._figureContainer = null;
+	}
+
+	/**
+	 * @description Whether any `SelectMenu` is currently open.
+	 * - Read-only: a menu announces itself through {@link setSelectMenuOpen}. Derived from the set of
+	 * open instances so an unrelated menu closing cannot clear the flag for a menu that is still open.
+	 * @returns {boolean}
+	 */
+	get selectMenuOn() {
+		return this.#openSelectMenus.size > 0;
+	}
+
+	/**
+	 * @internal
+	 * @description `SelectMenu` open-state notification. Called by `SelectMenu.open()` / `.close()`.
+	 * @param {*} instance The `SelectMenu` instance changing state
+	 * @param {boolean} open `true` on open, `false` on close
+	 */
+	setSelectMenuOpen(instance, open) {
+		if (open) this.#openSelectMenus.add(instance);
+		else this.#openSelectMenus.delete(instance);
 	}
 
 	/**
@@ -290,12 +315,6 @@ class UIManager {
 			}
 
 			this.#activeDirBtn(rtl);
-
-			// reverse toolbar buttons
-			this.#reverseToolbarButtons(this.#context.get('toolbar_buttonTray'));
-			if (this.#context.has('toolbar_sub_buttonTray')) {
-				this.#reverseToolbarButtons(this.#context.get('toolbar_sub_buttonTray'));
-			}
 
 			if (this.#store.mode.isBalloon) this.#$.toolbar._showBalloon();
 			else if (this.#store.mode.isSubBalloon) this.#$.subToolbar._showBalloon();
@@ -614,7 +633,7 @@ class UIManager {
 				rt.get('blockHandle'),
 				rt.get('blockHandlePlus'),
 				rt.get('blockHandleDrag'),
-				blockHandleOpt.menu,
+				blockHandleOpt,
 			);
 		}
 	}
@@ -781,20 +800,6 @@ class UIManager {
 			dom.utils.addClass(commandTargets.get('dir_ltr'), 'active');
 			dom.utils.removeClass(commandTargets.get('dir_rtl'), 'active');
 		}
-	}
-
-	/**
-	 * @description Reverse the order of toolbar button groups (excluding the more-layer).
-	 * @param {HTMLElement} buttonTray - The `.se-btn-tray` element.
-	 */
-	#reverseToolbarButtons(buttonTray) {
-		if (!buttonTray) return;
-		const moreLayer = buttonTray.querySelector('.se-toolbar-more-layer');
-		const children = Array.from(buttonTray.children).filter((c) => c !== moreLayer);
-		for (let i = children.length - 1; i >= 0; i--) {
-			buttonTray.appendChild(children[i]);
-		}
-		if (moreLayer) buttonTray.appendChild(moreLayer);
 	}
 
 	/**

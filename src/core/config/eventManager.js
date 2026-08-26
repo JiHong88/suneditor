@@ -20,6 +20,9 @@ class EventManager {
 	/** @type {Array<*>} */
 	#events = [];
 
+	/** @type {?Array<SunEditor.Event.GlobalInfo>} */
+	#globalEvents = [];
+
 	/**
 	 * @constructor
 	 * @param {import('./contextProvider').default} contextProvider
@@ -165,11 +168,16 @@ class EventManager {
 			this.#frameContext.get('_ww').addEventListener(type, listener, useCapture);
 		}
 		_w.addEventListener(type, listener, useCapture);
-		return {
+
+		const info = {
 			type,
 			listener,
 			useCapture,
 		};
+
+		this.#globalEvents?.push(info);
+
+		return info;
 	}
 
 	/**
@@ -192,6 +200,12 @@ class EventManager {
 			this.#frameContext.get('_ww').removeEventListener(type, listener, useCapture);
 		}
 		_w.removeEventListener(type, listener, useCapture);
+
+		const i =
+			this.#globalEvents?.findIndex(
+				(e) => e.type === type && e.listener === listener && e.useCapture === useCapture,
+			) ?? -1;
+		if (i > -1) this.#globalEvents.splice(i, 1);
 
 		return null;
 	}
@@ -218,6 +232,15 @@ class EventManager {
 		this.#events = null;
 
 		this.#geckoActiveEvent &&= this.removeGlobalEvent(this.#geckoActiveEvent);
+
+		const frameWindow = this.#frameOptions.get('iframe') ? this.#frameContext.get('_ww') : null;
+		for (let i = 0, len = this.#globalEvents.length, e; i < len; i++) {
+			e = this.#globalEvents[i];
+			frameWindow?.removeEventListener(e.type, e.listener, e.useCapture);
+			_w.removeEventListener(e.type, e.listener, e.useCapture);
+		}
+
+		this.#globalEvents = null;
 	}
 }
 

@@ -44,9 +44,11 @@ jest.mock('../../../src/helper', () => ({
 describe('Modules - SelectMenu', () => {
 	let mockInst;
 	let mockEditor;
+	let openSelectMenus;
 
 	beforeEach(() => {
 		jest.clearAllMocks();
+		openSelectMenus = new Set();
 
 		// Use createMockEditor for the $ deps bag pattern
 		const kernel = createMockEditor();
@@ -55,7 +57,18 @@ describe('Modules - SelectMenu', () => {
 		// Override with custom mocks as needed
 		mockEditor.$ = {
 			...kernel.$,
-			ui: { showSelectMenu: jest.fn(), hideSelectMenu: jest.fn(), selectMenuOn: false },
+			ui: {
+				showSelectMenu: jest.fn(),
+				hideSelectMenu: jest.fn(),
+				// mirrors `UIManager`: derived from the open instances, not a last-writer-wins boolean
+				setSelectMenuOpen: jest.fn((instance, open) => {
+					if (open) openSelectMenus.add(instance);
+					else openSelectMenus.delete(instance);
+				}),
+				get selectMenuOn() {
+					return openSelectMenus.size > 0;
+				}
+			},
 			selection: { getRangeElement: jest.fn(), ...kernel.$.selection },
 			offset: {
 				get: jest.fn(() => ({ left: 100, top: 50 })),
@@ -642,20 +655,25 @@ describe('Modules - SelectMenu', () => {
 			expect(selectMenu.isOpen).toBe(true);
 		});
 
-		it('should select item with Space key', () => {
+		it('Space is not an activation key and is left to the document', () => {
 			selectMenu.open();
 			selectMenu.setItem(1);
 
-			const event = new KeyboardEvent('keydown', { code: 'Space', bubbles: true });
-			Object.defineProperty(event, 'preventDefault', { value: jest.fn() });
+			const event = new KeyboardEvent('keydown', { code: 'Space', bubbles: true, cancelable: true });
+			const prevent = jest.fn();
+			Object.defineProperty(event, 'preventDefault', { value: prevent });
 			Object.defineProperty(event, 'stopPropagation', { value: jest.fn() });
 
 			mockEditor.frameContext.get('_ww').dispatchEvent(event);
+
+			// An IME makes `preventDefault()` a no-op, so a swallowed Space still typed a space and
+			// SlashCommand read it as "query ended". The menu never claims the key now.
+			expect(prevent).not.toHaveBeenCalled();
 			expect(selectMenu.isOpen).toBe(true);
 		});
 
-		it('Enter/Space with no item focused (index -1) does NOT close the menu', () => {
-			for (const code of ['Enter', 'Space']) {
+		it('Enter with no item focused (index -1) does NOT close the menu', () => {
+			for (const code of ['Enter']) {
 				selectMenu.open();
 				expect(selectMenu.index).toBe(-1);
 
@@ -679,6 +697,150 @@ describe('Modules - SelectMenu', () => {
 			menu.create(['a', 'b']);
 			menu.open();
 			expect(menu.hasOpenSubmenu()).toBe(false);
+		});
+	});
+
+	describe('Scroll into view (maxHeight list)', () => {
+		const ROW_H = 30;
+		const VIEW_H = 90; // 3 rows visible out of 6
+
+		let selectMenu;
+		let inner;
+		let scrollTop;
+
+		/**
+		 * jsdom has no layout: give the scroll container and every row a fake geometry
+		 * driven by the current `scrollTop`, so the rects move like a real scrolled list.
+		 */
+		function layout() {
+			inner.getBoundingClientRect = () => ({ top: 0, bottom: VIEW_H, left: 0, right: 100, width: 100, height: VIEW_H });
+			selectMenu.menus.forEach((li, i) => {
+				li.getBoundingClientRect = () => ({
+					top: i * ROW_H - scrollTop,
+					bottom: (i + 1) * ROW_H - scrollTop,
+					left: 0,
+					right: 100,
+					width: 100,
+					height: ROW_H
+				});
+			});
+		}
+
+		beforeEach(() => {
+			selectMenu = new SelectMenu(mockEditor.$, { position: 'bottom-left', maxHeight: VIEW_H + 'px' });
+
+			const parent = document.createElement('div');
+			const ref = document.createElement('button');
+			parent.appendChild(ref);
+			document.body.appendChild(parent);
+
+			selectMenu.on(ref, jest.fn());
+			selectMenu.create(['1', '2', '3', '4', '5', '6']);
+
+			inner = selectMenu.form.firstElementChild;
+			scrollTop = 0;
+			Object.defineProperty(inner, 'scrollTop', {
+				configurable: true,
+				get: () => scrollTop,
+				set: (v) => {
+					scrollTop = v;
+				}
+			});
+			Object.defineProperty(inner, 'scrollHeight', { configurable: true, value: ROW_H * 6 });
+			Object.defineProperty(inner, 'clientHeight', { configurable: true, value: VIEW_H });
+			Object.defineProperty(inner, 'clientTop', { configurable: true, value: 0 });
+			layout();
+		});
+
+		afterEach(() => {
+			document.body.innerHTML = '';
+		});
+
+		it('scrolls down when the cursor moves onto a row below the visible area', () => {
+			selectMenu.setItem(2); // last fully visible row
+			expect(scrollTop).toBe(0);
+
+			selectMenu.setItem(3);
+			expect(scrollTop).toBe(ROW_H); // moved by exactly one row
+
+			selectMenu.setItem(5); // last row
+			expect(scrollTop).toBe(ROW_H * 3);
+		});
+
+		it('scrolls up when the cursor moves onto a row above the visible area', () => {
+			selectMenu.setItem(5);
+			expect(scrollTop).toBe(ROW_H * 3);
+
+			selectMenu.setItem(0); // wrap to the top
+			expect(scrollTop).toBe(0);
+		});
+
+		it('does not scroll when the row is already fully visible', () => {
+			selectMenu.setItem(3);
+			const before = scrollTop;
+
+			selectMenu.setItem(2);
+			expect(scrollTop).toBe(before);
+		});
+
+		it('scrolls a viewport-clamped list that has no `maxHeight` param', () => {
+			const clamped = new SelectMenu(mockEditor.$, { position: 'bottom-left' });
+			const ref = document.createElement('button');
+			document.createElement('div').appendChild(ref);
+			document.body.appendChild(ref.parentElement);
+			clamped.on(ref, jest.fn());
+			clamped.create(['1', '2', '3', '4', '5', '6']);
+
+			// what `#clampHeight` leaves behind when the menu doesn't fit the viewport
+			const list = clamped.form.firstElementChild;
+			list.style.maxHeight = VIEW_H + 'px';
+			list.style.overflowY = 'auto';
+
+			let clampedScrollTop = 0;
+			Object.defineProperty(list, 'scrollTop', {
+				configurable: true,
+				get: () => clampedScrollTop,
+				set: (v) => {
+					clampedScrollTop = v;
+				}
+			});
+			Object.defineProperty(list, 'clientHeight', { configurable: true, value: VIEW_H });
+			Object.defineProperty(list, 'clientTop', { configurable: true, value: 0 });
+			list.getBoundingClientRect = () => ({ top: 0, bottom: VIEW_H, left: 0, right: 100, width: 100, height: VIEW_H });
+			clamped.menus.forEach((li, i) => {
+				li.getBoundingClientRect = () => ({
+					top: i * ROW_H - clampedScrollTop,
+					bottom: (i + 1) * ROW_H - clampedScrollTop,
+					left: 0,
+					right: 100,
+					width: 100,
+					height: ROW_H
+				});
+			});
+
+			clamped.setItem(5);
+			expect(clampedScrollTop).toBe(ROW_H * 3);
+		});
+
+		it('does nothing for a menu that neither has `maxHeight` nor was clamped', () => {
+			const plain = new SelectMenu(mockEditor.$, { position: 'bottom-left' });
+			const ref = document.createElement('button');
+			document.createElement('div').appendChild(ref);
+			document.body.appendChild(ref.parentElement);
+			plain.on(ref, jest.fn());
+			plain.create(['1', '2', '3', '4', '5', '6']);
+
+			let plainScrollTop = 0;
+			Object.defineProperty(plain.form.firstElementChild, 'scrollTop', {
+				configurable: true,
+				get: () => plainScrollTop,
+				set: (v) => {
+					plainScrollTop = v;
+				}
+			});
+
+			plain.setItem(5);
+			expect(plainScrollTop).toBe(0);
 		});
 	});
 
@@ -868,7 +1030,7 @@ describe('Modules - SelectMenu', () => {
 				const keydownHandler = kdCall[2];
 				const key = (code) => keydownHandler({ code, preventDefault: jest.fn(), stopPropagation: jest.fn() });
 				key('ArrowDown'); // cursor → row 0
-				key('ArrowRight'); // open submenu of row 0
+				key('Enter'); // open submenu of row 0
 				const parentRow = selectMenu.menus[0];
 				expect(parentRow.classList.contains('se-submenu-open')).toBe(true);
 
@@ -893,6 +1055,153 @@ describe('Modules - SelectMenu', () => {
 				dom.utils.addClass.mockReset();
 				dom.utils.removeClass.mockReset();
 			}
+		});
+
+		it.each(['ArrowLeft', 'ArrowRight'])('%s closes an open submenu and keeps the menu up', (code) => {
+			const { dom } = require('../../../src/helper');
+			dom.utils.hasClass.mockImplementation((el, cls) => !!el?.classList?.contains(cls));
+			dom.utils.addClass.mockImplementation((el, cls) => el?.classList?.add(cls));
+			dom.utils.removeClass.mockImplementation((els, cls) => {
+				const list = !els ? [] : els.nodeType ? [els] : Array.from(els);
+				list.forEach((e) => e.classList?.remove(cls));
+			});
+
+			try {
+				selectMenu.create([{ children: ['ul', 'ol'], childMenus: ['<i>Bulleted</i>', '<i>Numbered</i>'] }, 'plain']);
+				selectMenu.open();
+
+				const kdCall = mockEditor.$.eventManager.addEvent.mock.calls.find((c) => c[1] === 'keydown');
+				const keydownHandler = kdCall[2];
+				const key = (c) => keydownHandler({ code: c, preventDefault: jest.fn(), stopPropagation: jest.fn() });
+
+				key('ArrowDown');
+				key('Enter');
+				const parentRow = selectMenu.menus[0];
+				expect(parentRow.classList.contains('se-submenu-open')).toBe(true);
+
+				// Either direction leaves the submenu, so LTR and RTL need no separate mapping.
+				key(code);
+
+				expect(parentRow.classList.contains('se-submenu-open')).toBe(false);
+				expect(selectMenu.isOpen).toBe(true);
+			} finally {
+				dom.utils.hasClass.mockReset();
+				dom.utils.hasClass.mockReturnValue(false);
+				dom.utils.addClass.mockReset();
+				dom.utils.removeClass.mockReset();
+			}
+		});
+
+		it.each(['ArrowLeft', 'ArrowRight'])('%s opens the submenu on the cursor row', (code) => {
+			const { dom } = require('../../../src/helper');
+			dom.utils.hasClass.mockImplementation((el, cls) => !!el?.classList?.contains(cls));
+			dom.utils.addClass.mockImplementation((el, cls) => el?.classList?.add(cls));
+			dom.utils.removeClass.mockImplementation((els, cls) => {
+				const list = !els ? [] : els.nodeType ? [els] : Array.from(els);
+				list.forEach((e) => e.classList?.remove(cls));
+			});
+
+			try {
+				selectMenu.create([{ children: ['ul', 'ol'], childMenus: ['<i>Bulleted</i>', '<i>Numbered</i>'] }, 'plain']);
+				selectMenu.open();
+
+				const kdCall = mockEditor.$.eventManager.addEvent.mock.calls.find((c) => c[1] === 'keydown');
+				const keydownHandler = kdCall[2];
+				const key = (c) => keydownHandler({ code: c, preventDefault: jest.fn(), stopPropagation: jest.fn() });
+
+				key('ArrowDown'); // cursor → row 0
+				key(code);
+
+				// either direction opens, so LTR and RTL need no separate mapping
+				expect(selectMenu.menus[0].classList.contains('se-submenu-open')).toBe(true);
+				// the cursor did not walk off the trigger row
+				expect(selectMenu.index).toBe(0);
+			} finally {
+				dom.utils.hasClass.mockReset();
+				dom.utils.hasClass.mockReturnValue(false);
+				dom.utils.addClass.mockReset();
+				dom.utils.removeClass.mockReset();
+			}
+		});
+
+		it('a horizontal arrow does not move the cursor in a vertical list', () => {
+			selectMenu.create(['a', 'b', 'c']);
+			selectMenu.open();
+
+			const kdCall = mockEditor.$.eventManager.addEvent.mock.calls.find((c) => c[1] === 'keydown');
+			const key = (c) => kdCall[2]({ code: c, preventDefault: jest.fn(), stopPropagation: jest.fn() });
+
+			key('ArrowDown'); // cursor → row 0
+			key('ArrowRight');
+
+			// moving between rows is up/down's job
+			expect(selectMenu.index).toBe(0);
+		});
+
+		it('a horizontal arrow still moves within a grid menu (splitNum)', () => {
+			const menu = new SelectMenu(mockEditor.$, { position: 'bottom-center', splitNum: 3 });
+			const parent = document.createElement('div');
+			const ref = document.createElement('button');
+			parent.appendChild(ref);
+			document.body.appendChild(parent);
+			menu.on(ref, jest.fn());
+			menu.create(['a', 'b', 'c', 'd', 'e', 'f']);
+			menu.open();
+
+			const kdCall = mockEditor.$.eventManager.addEvent.mock.calls.find((c) => c[1] === 'keydown');
+			const key = (c) => kdCall[2]({ code: c, preventDefault: jest.fn(), stopPropagation: jest.fn() });
+
+			menu.setItem(0);
+			key('ArrowRight');
+
+			// a grid needs this axis to reach every cell
+			expect(menu.index).toBe(1);
+		});
+
+		it('a horizontal arrow selects an owner-managed sub-panel row through the select path', () => {
+			const selectMethod = jest.fn();
+			const subCheckMethod = jest.fn((index) => index === 0); // row 0 owns a flyout
+			const menu = new SelectMenu(mockEditor.$, { position: 'right-middle', subCheckMethod });
+			const parent = document.createElement('div');
+			const ref = document.createElement('button');
+			parent.appendChild(ref);
+			document.body.appendChild(parent);
+			menu.on(ref, selectMethod);
+			menu.create(['flyout-row', 'plain']);
+			menu.open();
+
+			const kdCall = mockEditor.$.eventManager.addEvent.mock.calls.find((c) => c[1] === 'keydown');
+			const key = (c) => kdCall[2]({ code: c, preventDefault: jest.fn(), stopPropagation: jest.fn() });
+
+			key('ArrowDown'); // cursor → row 0
+			key('ArrowRight');
+
+			// dispatched through `#select`, so the owner's pre-dispatch runs; the cursor stayed put
+			expect(selectMethod).toHaveBeenCalledWith('flyout-row');
+			expect(menu.index).toBe(0);
+		});
+
+		it('a horizontal arrow is inert on a row the owner does not claim', () => {
+			const selectMethod = jest.fn();
+			const subCheckMethod = jest.fn(() => false);
+			const menu = new SelectMenu(mockEditor.$, { position: 'right-middle', subCheckMethod });
+			const parent = document.createElement('div');
+			const ref = document.createElement('button');
+			parent.appendChild(ref);
+			document.body.appendChild(parent);
+			menu.on(ref, selectMethod);
+			menu.create(['a', 'b']);
+			menu.open();
+
+			const kdCall = mockEditor.$.eventManager.addEvent.mock.calls.find((c) => c[1] === 'keydown');
+			const key = (c) => kdCall[2]({ code: c, preventDefault: jest.fn(), stopPropagation: jest.fn() });
+
+			key('ArrowDown');
+			key('ArrowRight');
+
+			expect(subCheckMethod).toHaveBeenCalledWith(0);
+			expect(menu.index).toBe(0); // no move
+			expect(selectMethod).not.toHaveBeenCalled(); // and no accidental activation
 		});
 
 		function openMenuWith(subEscMethod, items) {

@@ -111,6 +111,13 @@ export type CommandMenuParams = {
 			icons: any;
 		},
 	) => string;
+	/**
+	 * - Optional owner hook run once,
+	 * - immediately before the user commits inside a dropdown-free flyout (SlashCommand uses it to delete the typed `/query`).
+	 * - A native submenu gets this for free — its commit routes back through `SelectMenu`'s select callback —
+	 * - but a flyout is the plugin's own DOM, so the moment has to be intercepted.
+	 */
+	prepareCommit?: () => void;
 };
 /**
  * @typedef {Object} CommandMenuItem
@@ -148,6 +155,10 @@ export type CommandMenuParams = {
  * @property {Object} selectMenuParams - Base SelectMenu params (`position`, `minWidth`, `keydownTarget`, etc.).
  * @property {function(CommandMenuItem, { icons: Object }): string} [renderCustomItem] - Optional renderer
  *   applied to custom (object) items only. Plugin-string items always render with `buildRowHTML`.
+ * @property {function(): void} [prepareCommit] - Optional owner hook run once,
+ * - immediately before the user commits inside a dropdown-free flyout (SlashCommand uses it to delete the typed `/query`).
+ * - A native submenu gets this for free — its commit routes back through `SelectMenu`'s select callback —
+ * - but a flyout is the plugin's own DOM, so the moment has to be intercepted.
  */
 /**
  * @class

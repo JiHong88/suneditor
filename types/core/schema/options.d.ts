@@ -270,7 +270,23 @@ export namespace DEFAULTS {
  *   menu: [
  *     'p', 'heading', 'blockStyle',
  *     { title: 'Duplicate', icon: 'copy', action: ($, { block }) => block.after(block.cloneNode(true)) },
+ *     // `'table'` as a string opens the size picker; a custom item inserts a default table directly
+ *     { title: 'Table', icon: 'table', action: ($) => $.plugins.table.insert(3, 3) },
  *   ],
+ * }
+ * ```
+ * @property {string} [blockHandle.maxHeight=""] - Max height of the menu list. Any CSS length; the list scrolls past it.
+ * - Unset by default: the menu grows with its items and is only clamped when it would overflow the viewport.
+ * @property {string} [blockHandle.minWidth="200px"] - Min width of the menu.
+ * @property {function(SunEditor.Deps, { block: HTMLElement, openMenu: function(): void }): void} [blockHandle.onPlusClick] - Runs after the plus button inserted a new line.
+ * - Adding the line is fixed behavior; this hook decides what happens next. Nothing does by default.
+ * - `block` is the new line, already focused. `openMenu()` opens the block handle's own `menu`.
+ * ```js
+ * blockHandle: {
+ *   // open the block handle menu
+ *   onPlusClick: ($, { openMenu }) => openMenu(),
+ *   // ...or the slash command menu
+ *   onPlusClick: ($, { block }) => $.plugins.slashCommand.open(block),
  * }
  * ```
  * @property {string} [type=""] - Editor type. Use `"document"` for a document-style layout, with optional sub-types after `:`.
@@ -1056,6 +1072,15 @@ export type EditorBaseOptions = {
 					) => void;
 			  }
 		>;
+		maxHeight?: string;
+		minWidth?: string;
+		onPlusClick?: (
+			arg0: SunEditor.Deps,
+			arg1: {
+				block: HTMLElement;
+				openMenu: () => void;
+			},
+		) => void;
 	};
 	/**
 	 * - Editor type. Use `"document"` for a document-style layout, with optional sub-types after `:`.

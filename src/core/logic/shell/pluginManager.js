@@ -151,9 +151,22 @@ class PluginManager {
 		let retainFilter;
 		if ((retainFilter = this.#options.get('__pluginRetainFilter'))) {
 			this.#retainFormatCheckers.forEach((plugin, query) => {
-				const infoLst = domParser.querySelectorAll(query);
+				let infoLst;
+				try {
+					infoLst = domParser.querySelectorAll(query);
+				} catch (error) {
+					console.warn(`[SUNEDITOR.retainFormat.fail]-[${plugin.key}]`, error.message);
+					return;
+				}
+
 				for (let i = 0, len = infoLst.length; i < len; i++) {
-					if (retainFilter === true || retainFilter[plugin.key] !== false) plugin.method(infoLst[i]);
+					if (retainFilter !== true && retainFilter[plugin.key] === false) continue;
+
+					try {
+						plugin.method(infoLst[i]);
+					} catch (error) {
+						console.warn(`[SUNEDITOR.retainFormat.fail]-[${plugin.key}]`, error.message);
+					}
 				}
 			});
 		}

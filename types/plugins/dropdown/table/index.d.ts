@@ -153,6 +153,17 @@ declare class Table extends PluginDropdownFree {
 	 * @description Closes table-related controllers and table figure
 	 */
 	_closeTableSelectInfo(): void;
+	/**
+	 * @description Insert a table of the given size at the caret and place the caret in its first cell.
+	 * @param {number} [cols=3] - Column count
+	 * @param {number} [rows=3] - Row count
+	 * @returns {boolean} `true` when the table was inserted
+	 * @example
+	 * // insert a 3x3 table without going through the size picker
+	 * editor.plugins.table.insert();
+	 * editor.plugins.table.insert(4, 2);
+	 */
+	insert(cols?: number, rows?: number): boolean;
 	#private;
 }
 import { PluginDropdownFree } from '../../../interfaces';

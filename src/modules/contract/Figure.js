@@ -1,7 +1,7 @@
 import Controller from './Controller';
 import SelectMenu from '../ui/SelectMenu';
 import { _DragHandle } from '../ui/_DragHandle';
-import { dom, numbers, env, converter, keyCodeMap } from '../../helper';
+import { dom, numbers, env, converter, keyCodeMap, unicode } from '../../helper';
 
 const { _w, ON_OVER_COMPONENT } = env;
 const DIRECTION_CURSOR_MAP = {
@@ -975,10 +975,13 @@ class Figure {
 	retainFigureFormat(container, originEl, anchorCover, fileManagerInst) {
 		const isInline = this.#$.component.isInline(container);
 		const originParent = originEl.parentNode;
+		const isBareWrapper =
+			originParent.children?.length === 1 &&
+			!originParent.textContent.replace(unicode.zeroWidthRegExp, '').trim();
 		let existElement =
 			this.#$.format.isBlock(originParent) || dom.check.isWysiwygFrame(originParent) || originParent.nodeType >= 9
 				? originEl
-				: Figure.GetContainer(originEl)?.container || originParent || originEl;
+				: Figure.GetContainer(originEl)?.container || (isBareWrapper ? originParent : originEl);
 
 		if (dom.query.getParentElement(originEl, dom.check.isExcludeFormat)) {
 			existElement = anchorCover && anchorCover !== originEl ? anchorCover : originEl;

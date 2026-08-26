@@ -40,7 +40,7 @@ test('ISSUE 2: ESC on an open slash submenu closes only the submenu', async ({ p
 	await page.waitForTimeout(100);
 	await page.keyboard.type('/align');
 	await page.waitForTimeout(350);
-	await page.keyboard.press('ArrowRight'); // open submenu of the focused row
+	await page.keyboard.press('Enter'); // open submenu of the focused row (arrows only ever close)
 	await page.waitForTimeout(250);
 	const before = await slashMenu(page);
 	expect(before.submenuOpen).toBe(true);

@@ -44,12 +44,16 @@ function Constructor(editorTargets, options) {
 	if (options.plugins) {
 		const excludedPlugins = options.excludedPlugins || [];
 		const originPlugins = options.plugins;
-		const pluginsValues = (Array.isArray(originPlugins) ? originPlugins : Object.keys(originPlugins))
-			.filter((name) => !excludedPlugins.includes(name))
-			.map((name) => originPlugins[name]);
+		const pluginsEntries = Array.isArray(originPlugins)
+			? originPlugins.map((plugin) => [null, plugin])
+			: Object.keys(originPlugins).map((name) => [name, originPlugins[name]]);
 
-		for (let i = 0, len = pluginsValues.length, p; i < len; i++) {
-			p = pluginsValues[i].default || pluginsValues[i];
+		for (let i = 0, len = pluginsEntries.length, name, p; i < len; i++) {
+			name = pluginsEntries[i][0];
+			p = pluginsEntries[i][1];
+			p = p?.default || p;
+			if (!p?.key) continue;
+			if (excludedPlugins.includes(p.key) || (name !== null && excludedPlugins.includes(name))) continue;
 			plugins[p.key] = p;
 		}
 	}
@@ -921,7 +925,7 @@ export function InitOptions(options, editorTargets, plugins) {
 				'toolbar_sub_width',
 				subbar.width ? (numbers.is(subbar.width) ? subbar.width + 'px' : subbar.width) : 'auto',
 			);
-			subButtons = o.get('_rtl') ? subbar.buttonList.reverse() : subbar.buttonList;
+			subButtons = subbar.buttonList;
 			o.set('buttons_sub', new Set(subButtons.toString().split(',')));
 		}
 	}
@@ -1054,7 +1058,7 @@ export function InitOptions(options, editorTargets, plugins) {
 		i: icons,
 		l: /** @type {Object<string, string>} */ (options.lang || _defaultLang),
 		v: (options.value = typeof options.value === 'string' ? options.value : null),
-		buttons: o.get('_rtl') ? buttonList.reverse() : buttonList,
+		buttons: buttonList,
 		subButtons: subButtons,
 		statusbarContainer:
 			typeof options.statusbar_container === 'string'

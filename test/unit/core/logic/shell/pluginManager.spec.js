@@ -689,6 +689,73 @@ describe('PluginManager', () => {
 			expect(retainMethod).toHaveBeenCalledTimes(2);
 		});
 
+		it('should keep processing remaining elements when one retainFormat call throws', () => {
+			const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+			const seen = [];
+			const retainMethod = jest.fn((el) => {
+				seen.push(el.getAttribute('data-i'));
+				if (el.getAttribute('data-i') === '1') throw new Error('boom');
+			});
+			const pluginInstance = {
+				constructor: { options: {}, key: 'retainPlugin' },
+				retainFormat: () => ({ query: 'img.custom', method: retainMethod }),
+			};
+
+			const { kernel, product } = createKernelAndProduct({
+				plugins: { retainPlugin: pluginInstance },
+				pluginCallButtons: {},
+				pluginCallButtons_sub: {},
+				__pluginRetainFilter: true,
+			});
+			const pm = new PluginManager(kernel, product);
+			pm.init({ retainPlugin: {} });
+
+			const container = document.createElement('div');
+			container.innerHTML =
+				'<img class="custom" data-i="0" /><img class="custom" data-i="1" /><img class="custom" data-i="2" />';
+
+			expect(() => pm.applyRetainFormat(container)).not.toThrow();
+			expect(seen).toEqual(['0', '1', '2']);
+			expect(warn).toHaveBeenCalledWith(expect.stringContaining('retainPlugin'), 'boom');
+
+			warn.mockRestore();
+		});
+
+		it('should not abort other retainFormat plugins when one plugin throws', () => {
+			const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+			const badMethod = jest.fn(() => {
+				throw new Error('bad plugin');
+			});
+			const goodMethod = jest.fn();
+
+			const { kernel, product } = createKernelAndProduct({
+				plugins: {
+					badPlugin: {
+						constructor: { options: {}, key: 'badPlugin' },
+						retainFormat: () => ({ query: 'img.custom', method: badMethod }),
+					},
+					goodPlugin: {
+						constructor: { options: {}, key: 'goodPlugin' },
+						retainFormat: () => ({ query: 'span.custom', method: goodMethod }),
+					},
+				},
+				pluginCallButtons: {},
+				pluginCallButtons_sub: {},
+				__pluginRetainFilter: true,
+			});
+			const pm = new PluginManager(kernel, product);
+			pm.init({ badPlugin: {}, goodPlugin: {} });
+
+			const container = document.createElement('div');
+			container.innerHTML = '<img class="custom" /><span class="custom"></span>';
+
+			expect(() => pm.applyRetainFormat(container)).not.toThrow();
+			expect(badMethod).toHaveBeenCalledTimes(1);
+			expect(goodMethod).toHaveBeenCalledTimes(1);
+
+			warn.mockRestore();
+		});
+
 		it('should not register retainFormat when plugin lacks retainFormat', () => {
 			const pluginInstance = {
 				constructor: { options: {}, key: 'noRetain' },

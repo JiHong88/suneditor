@@ -148,12 +148,29 @@ Vue – [suneditor-vue](https://github.com/JiHong88/suneditor-vue)
 SunEditor supports a plugin-based architecture.\
 You can enable only the plugins you need or even create your own custom ones.
 
+Pass the plugins you want as an array of plugin classes:
+
 ```js
+import suneditor from 'suneditor';
+import { font, image, video } from 'suneditor/plugins';
+
 suneditor.create('#editor', {
-	plugins: ['font', 'image', 'video'],
+	plugins: [font, image, video],
 	image: {
 		uploadUrl: 'https://upload.image',
 	},
+});
+```
+
+An object keyed by plugin name works too, and `excludedPlugins` lets you drop
+individual plugins when you enable the whole set:
+
+```js
+import plugins from 'suneditor/plugins';
+
+suneditor.create('#editor', {
+	plugins, // every built-in plugin
+	excludedPlugins: ['image', 'video'],
 });
 ```
 

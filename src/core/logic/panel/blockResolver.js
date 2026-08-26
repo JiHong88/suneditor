@@ -35,6 +35,7 @@ const TABLE_INNER_RE = /^(THEAD|TBODY|TR|TD|TH)$/;
  */
 function classifyType(el) {
 	const tag = el.nodeName;
+	if (isComponentContainer(el)) return 'component';
 	if (tag === 'P' || tag === 'DIV') return 'p';
 	if (HEADING_RE.test(tag)) return 'heading';
 	if (tag === 'LI') return 'list-item';
@@ -72,6 +73,24 @@ function isInsideComponent(node) {
 		el = el.parentNode;
 	}
 	return false;
+}
+
+/**
+ * @description Resolve a node to its outermost component container, but only when that container sits directly on the wysiwyg root.
+ * @param {Node} node
+ * @returns {HTMLElement|null} The top-level component container, or `null` if there is none
+ */
+function resolveTopLevelComponent(node) {
+	let el = node;
+	let outermost = null;
+
+	while (el && !isWysiwygFrame(el)) {
+		if (el.nodeType === 1 && isComponentContainer(/** @type {Element} */ (el)))
+			outermost = /** @type {HTMLElement} */ (el);
+		el = el.parentNode;
+	}
+
+	return outermost && outermost.parentNode && isWysiwygFrame(outermost.parentNode) ? outermost : null;
 }
 
 /**
@@ -193,8 +212,10 @@ export function resolveBlock(node, format, wysiwygFrame, mouseY) {
 	// Already at wysiwyg root
 	if (isWysiwygFrame(node)) return null;
 
-	// Skip components (images, videos, etc.) — they have their own interaction
-	if (isInsideComponent(node)) return null;
+	if (isInsideComponent(node)) {
+		const component = resolveTopLevelComponent(node);
+		return component ? describeBlock(component, format, mouseY) : null;
+	}
 
 	let resolved = null;
 
@@ -248,8 +269,24 @@ export function resolveBlock(node, format, wysiwygFrame, mouseY) {
 
 	if (!resolved) return null;
 
-	// Final component check on resolved element
-	if (isInsideComponent(resolved)) return null;
+	// Final component check on the resolved element (e.g. getLine walked into a component)
+	if (isInsideComponent(resolved)) {
+		const component = resolveTopLevelComponent(resolved);
+		return component ? describeBlock(component, format, mouseY) : null;
+	}
+
+	return describeBlock(resolved, format, mouseY);
+}
+
+/**
+ * @description Build the `BlockInfo` for an already-resolved block element.
+ * @param {HTMLElement} element - Resolved block-level element
+ * @param {FormatAPI} format - Injected format methods
+ * @param {number} [mouseY] - Mouse clientY for nested list resolution
+ * @returns {BlockInfo}
+ */
+function describeBlock(element, format, mouseY) {
+	let resolved = element;
 
 	// For UL/OL, resolve to the closest child LI by mouse Y.
 	// For LI with nested sub-lists, find the deepest child LI.

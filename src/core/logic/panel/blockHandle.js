@@ -37,6 +37,10 @@ class BlockHandle {
 	#plusBtn;
 	#dragBtn;
 	#menuConfig;
+	#menuMaxHeight;
+	#menuMinWidth;
+	/** @type {?function(SunEditor.Deps, { block: HTMLElement, openMenu: function(): void }): void} */
+	#onPlusClickHook;
 
 	/** @type {CommandMenu|null} */
 	#actionMenu = null;
@@ -74,17 +78,21 @@ class BlockHandle {
 	 * @param {HTMLElement} blockHandle - Handle group (.se-block-handle)
 	 * @param {HTMLElement} blockHandlePlus - Plus button
 	 * @param {HTMLElement} blockHandleDrag - Drag button
-	 * @param {Array<string | { title: string, icon?: string, action: function(SunEditor.Deps, { block: HTMLElement }): void }>|null} menuConfig
-	 *   Menu entries. Strings resolve via `ResolveButton` (plugin names, built-in commands). Objects
-	 *   define a custom row whose `action` is invoked with the Deps bag and the current block element.
+	 * @param {Object|Array<*>|null} blockHandleOptions - The `blockHandle` option object (`{ menu, onPlusClick, maxHeight, minWidth }`).
+	 * - An array is accepted as a shorthand for `{ menu: [...] }`.
 	 */
-	constructor($, blockHandleArea, blockHandle, blockHandlePlus, blockHandleDrag, menuConfig) {
+	constructor($, blockHandleArea, blockHandle, blockHandlePlus, blockHandleDrag, blockHandleOptions) {
 		this.#$ = $;
 		this.#area = blockHandleArea;
 		this.#handle = blockHandle;
 		this.#plusBtn = blockHandlePlus;
 		this.#dragBtn = blockHandleDrag;
-		this.#menuConfig = menuConfig || null;
+
+		const opts = Array.isArray(blockHandleOptions) ? { menu: blockHandleOptions } : blockHandleOptions || {};
+		this.#menuConfig = opts.menu || null;
+		this.#menuMaxHeight = typeof opts.maxHeight === 'string' ? opts.maxHeight : '';
+		this.#menuMinWidth = typeof opts.minWidth === 'string' ? opts.minWidth : '200px';
+		this.#onPlusClickHook = typeof opts.onPlusClick === 'function' ? opts.onPlusClick : null;
 
 		this.#$.contextProvider.carrierWrapper.appendChild(this.#handle);
 
@@ -579,6 +587,7 @@ class BlockHandle {
 	/**
 	 * @description Plus button click — insert new line after current block.
 	 * Mirrors Enter-at-end-of-line behavior from keydown.rule.enter.
+	 * Adding the line is the fixed behavior; `onPlusClick` decides what happens next (nothing by default).
 	 * @param {MouseEvent} e
 	 */
 	#onPlusClick(e) {
@@ -588,10 +597,20 @@ class BlockHandle {
 		if (!this.#currentBlock) return;
 
 		const newLine = this.#$.format.addLineAfter(this.#currentBlock);
-		if (newLine) {
-			this.#$.selection.setRange(newLine, 1, newLine, 1);
-			this.#$.history.push(false);
-		}
+		if (!newLine) return;
+
+		this.#$.selection.setRange(newLine, 1, newLine, 1);
+		this.#$.history.push(false);
+
+		if (!this.#onPlusClickHook) return;
+
+		this.#setCurrentBlock(newLine);
+		this.#updatePosition(newLine);
+
+		this.#onPlusClickHook(this.#$, {
+			block: newLine,
+			openMenu: () => this.#toggleActionMenu(),
+		});
 	}
 
 	/**
@@ -777,6 +796,22 @@ class BlockHandle {
 		// Skip if this click was actually a drag
 		if (this.#isDragging) return;
 
+		const componentInfo = this.#$.component.get(this.#currentBlock);
+		if (componentInfo) {
+			this.#actionMenu?.close();
+			this.#clearHoverLines();
+			this.#$.component.select(componentInfo.target, componentInfo.pluginName);
+			return;
+		}
+
+		this.#toggleActionMenu();
+	}
+
+	/**
+	 * @description Open the block action menu (or close it when already open). Shared by the drag button
+	 * and by the `openMenu` helper handed to the `onPlusClick` hook.
+	 */
+	#toggleActionMenu() {
 		if (!this.#menuConfig) return;
 
 		// Lazy build — plugins are not yet instantiated when BlockHandle is constructed
@@ -786,23 +821,24 @@ class BlockHandle {
 
 		if (this.#actionMenu.isOpen) {
 			this.#actionMenu.close();
-		} else {
-			this.#expandRangeToFullLines();
-
-			// Highlight selected range lines
-			const lines = this.#$.format.getLines(null);
-			if (lines.length > 0) {
-				this.#setHoverLines(lines);
-			}
-
-			// Choose open direction based on available space.
-			const btnGlobal = this.#$.offset.getGlobal(this.#dragBtn);
-			const spaceBelow = dom.utils.getClientSize().h - (btnGlobal.top - _w.scrollY + btnGlobal.height);
-			const spaceAbove = btnGlobal.top - _w.scrollY;
-			const horiz = this.#$.options.get('_rtl') ? 'left' : 'right';
-			const dir = `${horiz}-${spaceBelow >= spaceAbove ? 'bottom' : 'top'}`;
-			this.#actionMenu.open(dir);
+			return;
 		}
+
+		this.#expandRangeToFullLines();
+
+		// Highlight selected range lines
+		const lines = this.#$.format.getLines(null);
+		if (lines.length > 0) {
+			this.#setHoverLines(lines);
+		}
+
+		// Choose open direction based on available space.
+		const btnGlobal = this.#$.offset.getGlobal(this.#dragBtn);
+		const spaceBelow = dom.utils.getClientSize().h - (btnGlobal.top - _w.scrollY + btnGlobal.height);
+		const spaceAbove = btnGlobal.top - _w.scrollY;
+		const horiz = this.#$.options.get('_rtl') ? 'left' : 'right';
+		const dir = `${horiz}-${spaceBelow >= spaceAbove ? 'bottom' : 'top'}`;
+		this.#actionMenu.open(dir);
 	}
 
 	/**
@@ -816,7 +852,8 @@ class BlockHandle {
 			selectMenuParams: {
 				position: 'right-top',
 				dir: this.#$.options.get('_rtl') ? 'rtl' : 'ltr',
-				minWidth: '200px',
+				minWidth: this.#menuMinWidth,
+				maxHeight: this.#menuMaxHeight,
 				keydownTarget: _w,
 				closeMethod: () => {
 					dom.utils.removeClass(this.#dragBtn, 'on');

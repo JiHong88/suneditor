@@ -1,5 +1,5 @@
 ---
-name: review
+name: code-review
 description: 코드 리뷰 — 버그, 로직 오류, dead code 검출
 ---
 

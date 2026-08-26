@@ -16,9 +16,10 @@ const MENU_MIN_HEIGHT = 38;
  * @property {number} [splitNum=0] Optional split number for horizontal positioning; defines how many items per row
  * @property {() => void} [openMethod] Optional method to call when the menu is opened
  * @property {() => void} [closeMethod] Optional method to call when the menu is closed
- * @property {() => boolean} [subEscMethod] Optional owner hook invoked on ESC before the menu closes.
- * Return `true` if it dismissed an owner-managed sub-panel (e.g. CommandMenu's flyout), so ESC only
- * closes that sub-panel and keeps the menu open.
+ * @property {() => boolean} [subEscMethod] Optional owner hook that dismisses an owner-managed sub-panel (e.g. CommandMenu's dropdown-free flyout) and puts the cursor back on its row.
+ * Return `true` when a sub-panel was actually dismissed.
+ * @property {(index: number) => boolean} [subCheckMethod] Optional owner hook answering "does the row at `index` own a sub-panel?".
+ * - A query only — it must not open anything.
  * @property {string} [maxHeight] Optional max-height CSS value (e.g. `"200px"`). Enables scrolling when items exceed this height.
  * @property {string} [minWidth] Optional min-width CSS value (e.g. `"130px"`).
  * @property {*} [keydownTarget]  Optional override for the keyboard navigation target. By default `on()` listens
@@ -41,6 +42,7 @@ class SelectMenu {
 	#eventHandlers;
 	#globalEventHandlers;
 
+	#listInner = null;
 	#refer = null;
 	#keydownTarget = null;
 	#keydownTargetOverride = null;
@@ -86,6 +88,7 @@ class SelectMenu {
 		this.openMethod = params.openMethod;
 		this.closeMethod = params.closeMethod;
 		this.subEscMethod = params.subEscMethod || null;
+		this.subCheckMethod = params.subCheckMethod || null;
 		this.maxHeight = params.maxHeight || '';
 		this.minWidth = params.minWidth || '';
 		this.#keydownTargetOverride = params.keydownTarget || null;
@@ -135,7 +138,7 @@ class SelectMenu {
 	 * );
 	 */
 	create(items, menus) {
-		this.form.firstElementChild.innerHTML = '';
+		this.#listInner.innerHTML = '';
 
 		// remove existing submenu elements from form
 		for (const [, data] of this.#submenuData) {
@@ -228,6 +231,8 @@ class SelectMenu {
 			'<div class="se-list-inner"' + (innerStyle ? ' style="' + innerStyle + '"' : '') + '></div>',
 		);
 
+		this.#listInner = /** @type {HTMLElement} */ (this.form.firstElementChild);
+
 		referElement.parentNode.insertBefore(this.form, referElement);
 	}
 
@@ -247,7 +252,7 @@ class SelectMenu {
 	 * selectMenu.open('', '[data-command="' + this.align + '"]');
 	 */
 	open(position, onItemQuerySelector) {
-		this.#$.ui.selectMenuOn = true;
+		this.#$.ui.setSelectMenuOpen(this, true);
 
 		this.openMethod?.();
 
@@ -298,10 +303,11 @@ class SelectMenu {
 	 * @description Select menu close
 	 */
 	close() {
-		this.#$.ui.selectMenuOn = false;
+		this.#$.ui.setSelectMenuOpen(this, false);
 		dom.utils.removeClass(this.#refer, 'on');
 		this.#init();
 		this.form?.removeAttribute('style');
+		if (this.#listInner) this.#resetClamp();
 		this.isOpen = false;
 
 		this.closeMethod?.();
@@ -521,7 +527,7 @@ class SelectMenu {
 	 * @param {string} html - The HTML string representing the menu items.
 	 */
 	#createFormat(html) {
-		this.form.firstElementChild.innerHTML += `<ul class="se-list-basic se-list-checked${this.horizontal ? ' se-list-horizontal' : ''}">${html}</ul>`;
+		this.#listInner.innerHTML += `<ul class="se-list-basic se-list-checked${this.horizontal ? ' se-list-horizontal' : ''}">${html}</ul>`;
 	}
 
 	/**
@@ -552,6 +558,44 @@ class SelectMenu {
 	}
 
 	/**
+	 * @description Restores the list box to its `maxHeight` param, dropping any previous viewport clamp.
+	 * - `#setPosition` may run twice (the `_re` retry), so the clamp must not accumulate.
+	 */
+	#resetClamp() {
+		this.form.style.height = '';
+		this.#listInner.style.maxHeight = this.maxHeight;
+		this.#listInner.style.overflowY = this.maxHeight ? 'auto' : '';
+	}
+
+	/**
+	 * @description Clamps the menu to `h` when it doesn't fit the viewport.
+	 * @param {number} h - Target form height in px.
+	 */
+	#clampHeight(h) {
+		const chrome = this.form.offsetHeight - this.#listInner.offsetHeight; // padding + border
+		this.form.style.height = h + 'px';
+		this.#listInner.style.maxHeight = (h - chrome > 0 ? h - chrome : 0) + 'px';
+		this.#listInner.style.overflowY = 'auto';
+	}
+
+	/**
+	 * @description Scrolls the list so the given item is fully visible.
+	 * @param {Element} item - The item element to reveal.
+	 */
+	#scrollToItem(item) {
+		if (!item) return;
+
+		const list = this.#listInner;
+		if (!list.style.maxHeight) return;
+		const top = list.getBoundingClientRect().top + list.clientTop;
+		const bottom = top + list.clientHeight;
+		const { top: itemTop, bottom: itemBottom } = item.getBoundingClientRect();
+
+		if (itemTop < top) list.scrollTop -= top - itemTop;
+		else if (itemBottom > bottom) list.scrollTop += itemBottom - bottom;
+	}
+
+	/**
 	 * @description Highlights and selects an item by index.
 	 * @param {number} selectIndex - The index of the item to select.
 	 */
@@ -569,6 +613,7 @@ class SelectMenu {
 
 		this.index = selectIndex;
 		this.item = this.items[selectIndex];
+		this.#scrollToItem(this.menus[selectIndex]);
 	}
 
 	/**
@@ -584,7 +629,8 @@ class SelectMenu {
 		const target = this.#refer;
 		form.style.visibility = 'hidden';
 		form.style.display = 'block';
-		dom.utils.removeClass(form, 'se-select-menu-scroll');
+
+		this.#resetClamp();
 		dom.utils.addClass(target, 'on');
 
 		const formW = form.offsetWidth;
@@ -635,7 +681,7 @@ class SelectMenu {
 					h += formT - 4;
 					t -= formT - 4;
 				}
-				form.style.height = h + 'px';
+				this.#clampHeight(h);
 				break;
 			}
 			case 'top':
@@ -645,7 +691,7 @@ class SelectMenu {
 						break;
 					}
 					overH = targetGlobalTop - 4 + sideAddH;
-					if (overH >= MENU_MIN_HEIGHT) form.style.height = overH + 'px';
+					if (overH >= MENU_MIN_HEIGHT) this.#clampHeight(overH);
 				}
 				t = targetOffsetTop - form.offsetHeight + sideAddH;
 				break;
@@ -656,7 +702,7 @@ class SelectMenu {
 						break;
 					}
 					overH = wbottom - 4 + sideAddH;
-					if (overH >= MENU_MIN_HEIGHT) form.style.height = overH + 'px';
+					if (overH >= MENU_MIN_HEIGHT) this.#clampHeight(overH);
 				}
 				t = targetOffsetTop + (side ? 0 : targetHeight);
 				break;
@@ -708,7 +754,7 @@ class SelectMenu {
 		}
 
 		if (onItemQuerySelector) {
-			const item = form.firstElementChild.querySelector(onItemQuerySelector);
+			const item = this.#listInner.querySelector(onItemQuerySelector);
 			if (item) {
 				this._onItem = item;
 				dom.utils.addClass(item, 'se-select-on');
@@ -794,22 +840,18 @@ class SelectMenu {
 					this.#moveSubmenuItem(1);
 					return;
 				case 'ArrowLeft':
+				case 'ArrowRight': {
 					e.preventDefault();
 					e.stopPropagation();
-					// exit submenu back to parent
-					this.#inSubmenu = false;
-					this.#submenuItemIndex = -1;
-					{
-						const subData = this.#submenuData.get(this.#activeSubmenuIndex);
-						if (subData?.element)
-							dom.utils.removeClass(
-								subData.element.querySelectorAll('.se-select-item'),
-								'se-select-cursor',
-							);
-					}
+					// Close the submenu and put the cursor back on its trigger row — the same thing ESC
+					// does. Either direction closes, so the gesture reads the same in LTR and RTL and
+					// there is no writing-direction branch to keep in sync.
+					const parentIndex = this.#activeSubmenuIndex;
+					this.#closeSubmenu();
+					if (parentIndex > -1) this.#selectItem(parentIndex);
 					return;
+				}
 				case 'Enter':
-				case 'Space':
 					if (this.#submenuItemIndex > -1) {
 						e.preventDefault();
 						e.stopPropagation();
@@ -841,24 +883,40 @@ class SelectMenu {
 					moveIndex = 1;
 				}
 				break;
-			case 'ArrowLeft': // left
+			case 'ArrowLeft':
+			case 'ArrowRight':
 				e.preventDefault();
 				e.stopPropagation();
-				moveIndex = -1;
-				break;
-			case 'ArrowRight': // right — enter submenu if available
-				e.preventDefault();
-				e.stopPropagation();
-				if (this.index > -1 && this.#submenuData.has(this.index)) {
-					this.#openSubmenu(this.index);
-					this.#inSubmenu = true;
-					this.#moveSubmenuItem(1);
+
+				if (this.#activeSubmenuIndex > -1) {
+					const parentIndex = this.#activeSubmenuIndex;
+					this.#closeSubmenu();
+					this.#selectItem(parentIndex);
 					return;
 				}
-				moveIndex = 1;
+
+				if (this.subEscMethod?.()) return;
+
+				if (this.index > -1) {
+					if (this.#submenuData.has(this.index)) {
+						this.#openSubmenu(this.index);
+						this.#inSubmenu = true;
+						this.#moveSubmenuItem(1);
+						return;
+					}
+
+					if (this.subCheckMethod?.(this.index)) {
+						this.#select(this.index);
+						return;
+					}
+				}
+
+				if (!this.horizontal) return;
+
+				moveIndex = e.code === 'ArrowLeft' ? -1 : 1;
+
 				break;
 			case 'Enter':
-			case 'Space': // enter, space
 				if (this.index > -1) {
 					e.preventDefault();
 					e.stopPropagation();
@@ -875,6 +933,9 @@ class SelectMenu {
 
 		if (moveIndex) {
 			this.#closeSubmenu();
+			// Moving off a row must take its sub-panel with it, otherwise the flyout stays open while the
+			// cursor is somewhere else entirely.
+			this.subEscMethod?.();
 			this.#moveItem(moveIndex);
 		}
 	}

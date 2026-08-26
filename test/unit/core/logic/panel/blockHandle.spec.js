@@ -123,6 +123,7 @@ function createMockDeps() {
 		ui: { selectMenuOn: false },
 		offset: { getGlobal: jest.fn().mockReturnValue({ top: 100, left: 0, height: 24, width: 24 }) },
 		store: { set: jest.fn() },
+		component: { get: jest.fn().mockReturnValue(null), select: jest.fn() },
 		contextProvider: { carrierWrapper: document.createElement('div') },
 		eventManager: {
 			addEvent: jest.fn((target, type, handler, useCapture) => {
@@ -461,6 +462,94 @@ describe('BlockHandle', () => {
 				.filter((c) => c[1] === 'se-block-hover')
 				.map((c) => c[0]);
 			expect(hoverTargets).toEqual([p3]);
+		});
+	});
+
+	describe('onPlusClick hook', () => {
+		it('inserts the line without a hook configured', () => {
+			const { p2 } = setupThreeBlocks();
+
+			blockHandle = new BlockHandle($, els.area, els.handle, els.plus, els.drag, { menu: ['testCmd'] });
+			blockHandle.positionForTarget(p2);
+			els.plus.click();
+
+			expect($.format.addLineAfter).toHaveBeenCalledWith(p2);
+		});
+
+		it('runs the hook with the new line after inserting it', () => {
+			const { p2 } = setupThreeBlocks();
+			const onPlusClick = jest.fn();
+
+			blockHandle = new BlockHandle($, els.area, els.handle, els.plus, els.drag, {
+				menu: ['testCmd'],
+				onPlusClick,
+			});
+			blockHandle.positionForTarget(p2);
+			els.plus.click();
+
+			expect(onPlusClick).toHaveBeenCalledTimes(1);
+			const [deps, ctx] = onPlusClick.mock.calls[0];
+			expect(deps).toBe($);
+			expect(ctx.block).toBe($.format.addLineAfter.mock.results[0].value);
+			expect(ctx.block).not.toBe(p2);
+			expect(typeof ctx.openMenu).toBe('function');
+		});
+
+		it('opens the action menu through the ctx helper', () => {
+			const { p2 } = setupThreeBlocks();
+			$.selection.getRange.mockReturnValue({ collapsed: true, startContainer: p2, endContainer: p2 });
+
+			blockHandle = new BlockHandle($, els.area, els.handle, els.plus, els.drag, {
+				menu: ['testCmd'],
+				onPlusClick: (_$, { openMenu }) => openMenu(),
+			});
+			blockHandle.positionForTarget(p2);
+			$.selection.setRange.mockClear();
+			els.plus.click();
+
+			// the action menu expands the range to full lines before opening
+			expect($.selection.setRange).toHaveBeenCalled();
+		});
+
+		it('accepts an array as the menu shorthand', () => {
+			const { p2 } = setupThreeBlocks();
+
+			blockHandle = new BlockHandle($, els.area, els.handle, els.plus, els.drag, ['testCmd']);
+			blockHandle.positionForTarget(p2);
+
+			expect(() => els.plus.click()).not.toThrow();
+			expect($.format.addLineAfter).toHaveBeenCalledWith(p2);
+		});
+	});
+
+	describe('handle click on a component', () => {
+		it('opens the component controller instead of the generic action menu', () => {
+			const { p2 } = setupThreeBlocks();
+			const info = { target: p2, pluginName: 'image' };
+			$.component.get.mockReturnValue(info);
+
+			blockHandle = new BlockHandle($, els.area, els.handle, els.plus, els.drag, ['testCmd']);
+			blockHandle.positionForTarget(p2);
+			$.selection.setRange.mockClear();
+			els.drag.click();
+
+			expect($.component.select).toHaveBeenCalledWith(p2, 'image');
+			// the generic menu expands the range to full lines; the component handoff must not
+			expect($.selection.setRange).not.toHaveBeenCalled();
+		});
+
+		it('still opens the action menu for a plain block', () => {
+			const { p2 } = setupThreeBlocks();
+			$.component.get.mockReturnValue(null);
+			$.selection.getRange.mockReturnValue({ collapsed: true, startContainer: p2, endContainer: p2 });
+
+			blockHandle = new BlockHandle($, els.area, els.handle, els.plus, els.drag, ['testCmd']);
+			blockHandle.positionForTarget(p2);
+			$.selection.setRange.mockClear();
+			els.drag.click();
+
+			expect($.component.select).not.toHaveBeenCalled();
+			expect($.selection.setRange).toHaveBeenCalled();
 		});
 	});
 

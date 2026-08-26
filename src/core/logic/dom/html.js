@@ -33,6 +33,7 @@ class HTML {
 	#disallowedTagsRegExp;
 	#disallowedTagNameRegExp;
 	#allowedTagNameRegExp;
+	#emptyLineRegExp;
 
 	/** @type {Object<string, RegExp>} */
 	#attributeWhitelist;
@@ -96,6 +97,12 @@ class HTML {
 		);
 		this.#disallowedTagNameRegExp = new RegExp(`^(${disallowedExtraTags})$`, 'i');
 		this.#allowedTagNameRegExp = new RegExp(`^(${allowedExtraTags})$`, 'i');
+
+		// empty default line probe
+		this.#emptyLineRegExp = new RegExp(
+			`<${options.get('defaultLine')}(?:\\s[^>]*)?></${options.get('defaultLine')}>`,
+			'i',
+		);
 
 		// set disallow text nodes
 		const disallowStyleNodes = Object.keys(options.get('_defaultStyleTagMap'));
@@ -373,6 +380,8 @@ class HTML {
 				return boundedStart && boundedEnd ? m : '';
 			});
 		}
+
+		if (formatFilter && !_freeCodeViewMode) cleanData = this.#dropEmptyLines(cleanData);
 
 		return cleanData;
 	}
@@ -1697,6 +1706,28 @@ class HTML {
 		}
 
 		return '';
+	}
+
+	/**
+	 * @description Drops empty default lines (`<p></p>`) from a cleaned HTML string.
+	 * Wrapping block-level content in a default line is invalid HTML, so the parser tears the line
+	 * apart and leaves caret-less debris behind. An intentionally blank line always carries `<br>`.
+	 * @param {string} html Cleaned HTML string
+	 * @returns {string} The string without empty default lines
+	 */
+	#dropEmptyLines(html) {
+		if (!this.#emptyLineRegExp.test(html)) return html;
+
+		const holder = dom.utils.createElement('DIV', null, html);
+		const lines = holder.querySelectorAll(this.#options.get('defaultLine'));
+		let removed = false;
+		for (let i = lines.length - 1; i >= 0; i--) {
+			if (lines[i].firstChild) continue;
+			dom.utils.removeItem(lines[i]);
+			removed = true;
+		}
+
+		return removed ? holder.innerHTML : html;
 	}
 
 	/**

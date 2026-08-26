@@ -290,7 +290,7 @@ class Format {
 		const lineAttrReset = this.#options.get('lineAttrReset');
 		let newEl;
 
-		if (/^H[1-6]$|^HR$/i.test(tag)) {
+		if (/^H[1-6]$/i.test(tag) || this.#$.component.is(element)) {
 			newEl = dom.utils.createElement(this.#options.get('defaultLine'), null, '<br>');
 		} else if (this.isBrLine(element)) {
 			newEl = dom.utils.createElement(this.#options.get('defaultLine'), null, '<br>');

@@ -31,11 +31,15 @@ export type SelectMenuParams = {
 	 */
 	closeMethod?: () => void;
 	/**
-	 * Optional owner hook invoked on ESC before the menu closes.
-	 * Return `true` if it dismissed an owner-managed sub-panel (e.g. CommandMenu's flyout), so ESC only
-	 * closes that sub-panel and keeps the menu open.
+	 * Optional owner hook that dismisses an owner-managed sub-panel (e.g. CommandMenu's dropdown-free flyout) and puts the cursor back on its row.
+	 * Return `true` when a sub-panel was actually dismissed.
 	 */
 	subEscMethod?: () => boolean;
+	/**
+	 * Optional owner hook answering "does the row at `index` own a sub-panel?".
+	 * - A query only — it must not open anything.
+	 */
+	subCheckMethod?: (index: number) => boolean;
 	/**
 	 * Optional max-height CSS value (e.g. `"200px"`). Enables scrolling when items exceed this height.
 	 */
@@ -66,9 +70,10 @@ export type SelectMenuParams = {
  * @property {number} [splitNum=0] Optional split number for horizontal positioning; defines how many items per row
  * @property {() => void} [openMethod] Optional method to call when the menu is opened
  * @property {() => void} [closeMethod] Optional method to call when the menu is closed
- * @property {() => boolean} [subEscMethod] Optional owner hook invoked on ESC before the menu closes.
- * Return `true` if it dismissed an owner-managed sub-panel (e.g. CommandMenu's flyout), so ESC only
- * closes that sub-panel and keeps the menu open.
+ * @property {() => boolean} [subEscMethod] Optional owner hook that dismisses an owner-managed sub-panel (e.g. CommandMenu's dropdown-free flyout) and puts the cursor back on its row.
+ * Return `true` when a sub-panel was actually dismissed.
+ * @property {(index: number) => boolean} [subCheckMethod] Optional owner hook answering "does the row at `index` own a sub-panel?".
+ * - A query only — it must not open anything.
  * @property {string} [maxHeight] Optional max-height CSS value (e.g. `"200px"`). Enables scrolling when items exceed this height.
  * @property {string} [minWidth] Optional min-width CSS value (e.g. `"130px"`).
  * @property {*} [keydownTarget]  Optional override for the keyboard navigation target. By default `on()` listens
@@ -104,6 +109,7 @@ declare class SelectMenu {
 	openMethod: () => void;
 	closeMethod: () => void;
 	subEscMethod: () => boolean;
+	subCheckMethod: (index: number) => boolean;
 	maxHeight: string;
 	minWidth: string;
 	/**
@@ -193,6 +199,6 @@ declare class SelectMenu {
 	 * @returns {boolean}
 	 */
 	hasOpenSubmenu(): boolean;
-	_onItem: Element;
+	_onItem: any;
 	#private;
 }

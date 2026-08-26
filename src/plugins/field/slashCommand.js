@@ -31,7 +31,10 @@ const { debounce } = converter;
  *   (plugin names, built-in commands like `'bold'`); objects are custom items with their own `action`.
  *   Required.
  * @property {number} [delayTime=120] - Debounce delay (ms) before the input is inspected for the trigger.
- * @property {number} [limitSize=10] - Maximum number of items shown in the dropdown.
+ * @property {number} [limitSize=0] - Maximum number of items kept after filtering. `0` (default) keeps every match
+ *   - the list scrolls within `maxHeight`, so a cap only hides matches the user can no longer reach.
+ * @property {string} [maxHeight='320px'] - Max height of the menu list. Any CSS length; the list scrolls past it.
+ * @property {string} [minWidth='200px'] - Min width of the menu.
  * @property {string} [emptyMessage] - Message shown when no items match the query. If unset, the menu closes on no match.
  * @property {function(SlashCommandItem, { icons: Object }): string} [renderItem] - Custom item HTML renderer.
  *   Applied only to custom item objects; plugin-name entries always render with the canonical BlockHandle row.
@@ -63,6 +66,15 @@ const { debounce } = converter;
  *         keywords: ['blockquote'],
  *         // A container block (BLOCKQUOTE, DIV…): `applyBlock` WRAPS the selected lines → `<blockquote>…</blockquote>`.
  *         action: ($) => $.format.applyBlock(document.createElement('BLOCKQUOTE')),
+ *       },
+ *       {
+ *         key: 'table',
+ *         title: 'Table',
+ *         icon: 'table',
+ *         // A plugin-name entry (`'table'`) opens that plugin's own UI — for table, the size picker,
+ *         // which is driven by the pointer. A custom item skips it and inserts straight away, which
+ *         // keeps the whole gesture on the keyboard: type the trigger, press Enter, done.
+ *         action: ($) => $.plugins.table.insert(3, 3),
  *       },
  *       'bold',
  *       'image',
@@ -111,7 +123,9 @@ class SlashCommand extends PluginField {
 				? pluginOptions.triggerChar
 				: '/';
 		this.#limitSize =
-			typeof pluginOptions.limitSize === 'number' && pluginOptions.limitSize > 0 ? pluginOptions.limitSize : 10;
+			typeof pluginOptions.limitSize === 'number' && pluginOptions.limitSize > 0
+				? pluginOptions.limitSize
+				: Infinity;
 		this.#emptyMessage = typeof pluginOptions.emptyMessage === 'string' ? pluginOptions.emptyMessage : '';
 		const delayTime = typeof pluginOptions.delayTime === 'number' ? pluginOptions.delayTime : 120;
 
@@ -119,11 +133,12 @@ class SlashCommand extends PluginField {
 			items: Array.isArray(pluginOptions.items) ? pluginOptions.items : [],
 			resolveButton: ResolveButton,
 			renderCustomItem: typeof pluginOptions.renderItem === 'function' ? pluginOptions.renderItem : null,
+			prepareCommit: () => this.#removeTrigger(),
 			selectMenuParams: {
 				position: 'bottom-left',
 				dir: 'ltr',
-				minWidth: '200px',
-				maxHeight: '320px',
+				minWidth: typeof pluginOptions.minWidth === 'string' ? pluginOptions.minWidth : '200px',
+				maxHeight: typeof pluginOptions.maxHeight === 'string' ? pluginOptions.maxHeight : '320px',
 				closeMethod: () => this.#onMenuClose(),
 			},
 		});
@@ -220,6 +235,32 @@ class SlashCommand extends PluginField {
 	}
 
 	/**
+	 * @description Open the command menu programmatically, with no trigger character typed and the full tem list shown.
+	 * - Intended for host UI that wants the same menu without the `/` shortcut — e.g. the
+	 * - block handle's plus button:
+	 * ```js
+	 * blockHandle: { onPlusClick: ($, { block }) => $.plugins.slashCommand.open(block) }
+	 * ```
+	 * @param {Node} anchorNode - Node the menu anchors to (typically the line the caret sits on).
+	 * @returns {boolean} `true` if the menu was opened
+	 */
+	open(anchorNode) {
+		if (!anchorNode) return false;
+
+		const filtered = this.#menu.filter('', this.#limitSize);
+		if (filtered.length === 0) return false;
+
+		this.controller.open(anchorNode, null, { isWWTarget: true, initMethod: null, addOffset: null });
+		this.#menu.createRows(filtered);
+		this.#menu.open();
+		this.#menu.setItem(0);
+
+		this.#cacheAnchor(anchorNode, 0, 0);
+
+		return true;
+	}
+
+	/**
 	 * @description Close the menu from the plugin itself (invalid query, or after a selection). Flags
 	 * the close as internal so `#onMenuClose` does not treat it as a user dismiss.
 	 */
@@ -289,17 +330,23 @@ class SlashCommand extends PluginField {
 		if (!anchorNode) return false;
 
 		const triggerChar = this.#triggerChar;
-		const query = anchorNode.textContent.substring(this.#lastTriggerPos + triggerChar.length, this.#anchorOffset);
+		const query = (anchorNode.textContent || '').substring(
+			this.#lastTriggerPos + triggerChar.length,
+			this.#anchorOffset,
+		);
 
-		// Remove the trigger + query, leaving the caret at the trigger position so the action
-		// (insert block, run command, etc.) operates from a clean cursor.
-		this.$.selection.setRange(anchorNode, this.#lastTriggerPos, anchorNode, this.#anchorOffset);
-		const range = this.$.selection.getRange();
-		if (range && !range.collapsed) this.$.html.remove();
+		if (item.kind !== 'dropdownFree') {
+			this.#removeTrigger();
+			this.#closeMenu();
+			this.#menu.dispatch(item, { triggerChar, query, item: item.raw });
+			return;
+		}
 
-		this.#closeMenu();
-
+		// `dispatch` toggles, so picking the row whose flyout is already up (hovered, then picked) closes
+		// it and keeps the menu — as BlockHandle does. Only a flyout that never opened leaves nothing to show.
+		const hadSubPanel = this.#menu.hasOpenSubPanel();
 		this.#menu.dispatch(item, { triggerChar, query, item: item.raw });
+		if (!hadSubPanel && !this.#menu.hasOpenSubPanel()) this.#closeMenu();
 	}
 }
 

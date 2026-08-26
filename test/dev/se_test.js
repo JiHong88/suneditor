@@ -759,7 +759,7 @@ const options1 = {
 	//     <figcaption>Home Edge Logo</figcaption>
 	// </figure>`,
 	// value: `<p><span style="color: #ff5e00;"><del><strong>fdsfdsafa</strong></del></span><br></p>`,
-	plugins: plugins,
+	plugins: [...Object.values(plugins)],
 	allowedClassName: '.+',
 	// toolbar_container: '#root_toolbar_container',
 	attributeWhitelist: { '*': 'class', img: 'scee' },
@@ -1675,9 +1675,14 @@ const options1 = {
 			'table',
 			'fontColor',
 		],
+		onPlusClick: ($, { block, openMenu }) => {
+			// openMenu();
+			$.plugins.slashCommand.open(block);
+		},
 	},
 	slashCommand: {
 		// triggerChar: '/',
+		limitSize: 17,
 		items: [
 			{
 				key: 'h1',
@@ -1698,6 +1703,8 @@ const options1 = {
 				group: 'Media',
 				action: ($) => $.plugins.image?.open(),
 			},
+			{ title: 'Table', icon: 'table', action: ($) => $.plugins.table.insert(3, 3) },
+			'table',
 			'bold',
 			'blockStyle',
 			'blockquote',

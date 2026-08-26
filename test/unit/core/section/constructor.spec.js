@@ -76,6 +76,70 @@ describe('Core Section - Constructor', () => {
         });
     });
 
+    describe('Constructor plugin registration', () => {
+        const makePlugin = (key) => ({ key, prototype: {} });
+        const build = (options) =>
+            Constructor([{ target: document.createElement('textarea'), key: null, options: {} }], {
+                buttonList: [['bold']],
+                ...options
+            });
+
+        it('registers plugins passed as an array of plugin classes', () => {
+            const image = makePlugin('image');
+            const link = makePlugin('link');
+
+            const result = build({ plugins: [image, link] });
+
+            expect(result.plugins.image).toBe(image);
+            expect(result.plugins.link).toBe(link);
+        });
+
+        it('registers plugins passed as an object keyed by name', () => {
+            const image = makePlugin('image');
+            const link = makePlugin('link');
+
+            const result = build({ plugins: { image, link } });
+
+            expect(result.plugins.image).toBe(image);
+            expect(result.plugins.link).toBe(link);
+        });
+
+        it('unwraps a module namespace `default` export', () => {
+            const image = makePlugin('image');
+
+            const result = build({ plugins: [{ default: image }] });
+
+            expect(result.plugins.image).toBe(image);
+        });
+
+        it('honors excludedPlugins for the array form by plugin key', () => {
+            const image = makePlugin('image');
+            const link = makePlugin('link');
+
+            const result = build({ plugins: [image, link], excludedPlugins: ['image'] });
+
+            expect(result.plugins.image).toBeUndefined();
+            expect(result.plugins.link).toBe(link);
+        });
+
+        it('honors excludedPlugins for the object form by map key', () => {
+            const image = makePlugin('image');
+            const link = makePlugin('link');
+
+            const result = build({ plugins: { image, link }, excludedPlugins: ['image'] });
+
+            expect(result.plugins.image).toBeUndefined();
+            expect(result.plugins.link).toBe(link);
+        });
+
+        it('skips null/keyless entries instead of throwing', () => {
+            const link = makePlugin('link');
+
+            expect(() => build({ plugins: { broken: null, link } })).not.toThrow();
+            expect(build({ plugins: { broken: null, link } }).plugins.link).toBe(link);
+        });
+    });
+
     describe('CreateShortcuts', () => {
         it('should handle empty inputs gracefully', () => {
             expect(() => {

@@ -2,6 +2,7 @@ import type {} from '../../../../typedef';
 export const ROW_SELECT_MARGIN: 6;
 export const CELL_SELECT_MARGIN: 6;
 export const CELL_DECIMAL_END: 0;
+export const DEFAULT_SIZE: number[];
 export const RESIZE_CELL_CLASS: '.se-table-resize-line';
 export const RESIZE_CELL_PREV_CLASS: '.se-table-resize-line-prev';
 export const RESIZE_ROW_CLASS: '.se-table-resize-row';
