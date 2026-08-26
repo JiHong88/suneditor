@@ -1680,7 +1680,6 @@ const options1 = {
 			$.plugins.slashCommand.open(block);
 		},
 	},
-	textDirection: 'rtl',
 	slashCommand: {
 		// triggerChar: '/',
 		limitSize: 17,

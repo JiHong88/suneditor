@@ -163,11 +163,12 @@ class CommandMenu {
 		this.selectMenu.on(referElement, /** @type {*} */ (onSelect), attr);
 
 		this.#$.eventManager.addEvent(this.selectMenu.form, 'mousedown', (e) => {
-			if (env.isMobile) {
+			if (env.isMobile || dom.check.isInputElement(dom.query.getEventTarget(e))) {
 				this.#$.store.set('_preventBlur', true);
-			} else {
-				e.preventDefault();
+				return;
 			}
+
+			e.preventDefault();
 		});
 
 		this.#$.eventManager.addEvent(this.selectMenu.form, 'mousemove', this.#onMenuMouseMove.bind(this));
@@ -532,7 +533,7 @@ class CommandMenu {
 		const onCommit = (e) => {
 			if (done) return;
 			const target = /** @type {HTMLElement} */ (dom.query.getEventTarget(e));
-			if (dom.check.isInputElement(target) && e.type === 'mousedown') return;
+			if (dom.check.isInputElement(target)) return;
 			done = true;
 			this.#prepareCommit();
 		};
