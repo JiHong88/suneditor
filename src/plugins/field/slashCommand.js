@@ -67,6 +67,15 @@ const { debounce } = converter;
  *         // A container block (BLOCKQUOTE, DIV…): `applyBlock` WRAPS the selected lines → `<blockquote>…</blockquote>`.
  *         action: ($) => $.format.applyBlock(document.createElement('BLOCKQUOTE')),
  *       },
+ *       {
+ *         key: 'table',
+ *         title: 'Table',
+ *         icon: 'table',
+ *         // A plugin-name entry (`'table'`) opens that plugin's own UI — for table, the size picker,
+ *         // which is driven by the pointer. A custom item skips it and inserts straight away, which
+ *         // keeps the whole gesture on the keyboard: type the trigger, press Enter, done.
+ *         action: ($) => $.plugins.table.insert(3, 3),
+ *       },
  *       'bold',
  *       'image',
  *       'blockStyle',

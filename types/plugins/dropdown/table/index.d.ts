@@ -153,6 +153,23 @@ declare class Table extends PluginDropdownFree {
 	 * @description Closes table-related controllers and table figure
 	 */
 	_closeTableSelectInfo(): void;
+	/**
+	 * @description Insert a table of the given size at the caret and place the caret in its first cell.
+	 * - The size picker routes through here as well, so a picked table and a programmatic one are
+	 * built identically.
+	 * - A size that is missing or not positive falls back to {@link Constants.DEFAULT_SIZE}. The picker
+	 * only learns its size from `mousemove`, so a click that arrives before the pointer ever moved over
+	 * the grid - it opens under a resting cursor when the menu is opened from the keyboard - used to
+	 * build a table with no rows and no columns.
+	 * @param {number} [cols=3] - Column count
+	 * @param {number} [rows=3] - Row count
+	 * @returns {boolean} `true` when the table was inserted
+	 * @example
+	 * // insert a 3x3 table without going through the size picker
+	 * editor.plugins.table.insert();
+	 * editor.plugins.table.insert(4, 2);
+	 */
+	insert(cols?: number, rows?: number): boolean;
 	#private;
 }
 import { PluginDropdownFree } from '../../../interfaces';

@@ -2,6 +2,7 @@
 
 - Added `blockHandle.onPlusClick` — runs after the plus button inserted a new line, so a host can decide what opens next. Inserting the line stays fixed behavior, and nothing opens by default. The context carries the new `block` plus an `openMenu()` helper for the block handle's own menu (`core/logic/panel/blockHandle`)
 - Block handle is now shown for top-level components (image, table, ...) so they can be reordered like any other block; its handle button opens that component's own controller (`core/logic/panel/blockResolver`, `blockHandle`)
+- Added `table.insert(cols, rows)` — inserts a table straight away, skipping the pointer-driven size picker. Lets a slash command or block handle item stay on the keyboard: `action: ($) => $.plugins.table.insert(3, 3)` (`plugins/dropdown/table`)
 - Added `blockHandle.maxHeight` / `blockHandle.minWidth` and `slashCommand.maxHeight` / `slashCommand.minWidth` — the menu size was hardcoded and could not be configured (`core/logic/panel/blockHandle`, `plugins/field/slashCommand`)
 
 ### fix
@@ -12,6 +13,7 @@
 - Fixed a dropdown-free flyout (table, fontColor, ...) staying open while the arrow keys kept walking the parent menu behind it (`modules/ui/SelectMenu`)
 - Fixed a menu's sub-panel (submenu or dropdown-free flyout) tearing the whole menu down on the next keypress when a second `SelectMenu` existed.
 - Fixed the text fields inside a dropdown-free flyout being unusable — the color picker's hex box could not be focused or typed into, and typing in it moved the caret back into the editor (`modules/ui/CommandMenu`)
+- Fixed the table size picker inserting a table with no rows or columns when it was clicked before the pointer had moved over the grid — it opens under a resting cursor when the menu is opened from the keyboard. It now falls back to the default 3x3 (`plugins/dropdown/table`)
 - Fixed `textDirection: 'rtl'` scrambling the toolbar button group order. The groups were reordered in the DOM on top of the CSS mirroring (`.se-btn-tray { direction: rtl }`), so the groups were mirrored twice while the buttons inside each group were mirrored once. Both paths did it - at create time, and again in `ui.setDir` on every runtime direction switch, which also left the order scrambled after switching back to `ltr`. The DOM now keeps the order `buttonList` declares in both directions, and the user's `buttonList` array is no longer reversed in place (`core/section/constructor`, `core/logic/shell/ui`)
 
 ### change

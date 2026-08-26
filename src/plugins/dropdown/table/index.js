@@ -924,9 +924,24 @@ class Table extends PluginDropdownFree {
 	 * @description Executes the selected action when the table picker is clicked.
 	 */
 	#OnClickTablePicker() {
+		this.insert(this.#tableXY[0], this.#tableXY[1]);
+	}
+
+	/**
+	 * @description Insert a table of the given size at the caret and place the caret in its first cell.
+	 * @param {number} [cols=3] - Column count
+	 * @param {number} [rows=3] - Row count
+	 * @returns {boolean} `true` when the table was inserted
+	 * @example
+	 * // insert a 3x3 table without going through the size picker
+	 * editor.plugins.table.insert();
+	 * editor.plugins.table.insert(4, 2);
+	 */
+	insert(cols, rows) {
+		const x = cols > 0 ? cols : Constants.DEFAULT_SIZE[0];
+		const y = rows > 0 ? rows : Constants.DEFAULT_SIZE[1];
+
 		const oTable = dom.utils.createElement('TABLE');
-		const x = this.#tableXY[0];
-		const y = this.#tableXY[1];
 
 		const body = `<tbody>${`<tr>${CreateCellsString('td', x)}</tr>`.repeat(y)}</tbody>`;
 		const colGroup = `<colgroup>${`<col style="width: ${numbers.get(100 / x, Constants.CELL_DECIMAL_END)}%;">`.repeat(x)}</colgroup>`;
@@ -945,12 +960,14 @@ class Table extends PluginDropdownFree {
 		figure.appendChild(oTable);
 		this.#maxWidth = true;
 
-		if (this.$.component.insert(figure, { insertBehavior: 'none' })) {
-			this.#resetTablePicker();
-			this.$.menu.dropdownOff();
-			const target = oTable.querySelector('td div');
-			this.$.selection.setRange(target, 0, target, 0);
-		}
+		if (!this.$.component.insert(figure, { insertBehavior: 'none' })) return false;
+
+		this.#resetTablePicker();
+		this.$.menu.dropdownOff();
+		const target = oTable.querySelector('td div');
+		this.$.selection.setRange(target, 0, target, 0);
+
+		return true;
 	}
 
 	/**

@@ -1086,7 +1086,7 @@
 }
 
 /* block hover highlight (Notion-style) */
-.sun-editor .se-block-hover {
+.sun-editor .se-block-hover:not(.se-component-selected) {
 	background-color: var(--se-block-hover-bg);
 	border-radius: var(--se-border-radius);
 	outline: 2px solid var(--se-block-hover-outline);

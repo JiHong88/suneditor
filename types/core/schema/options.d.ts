@@ -270,6 +270,8 @@ export namespace DEFAULTS {
  *   menu: [
  *     'p', 'heading', 'blockStyle',
  *     { title: 'Duplicate', icon: 'copy', action: ($, { block }) => block.after(block.cloneNode(true)) },
+ *     // `'table'` as a string opens the size picker; a custom item inserts a default table directly
+ *     { title: 'Table', icon: 'table', action: ($) => $.plugins.table.insert(3, 3) },
  *   ],
  * }
  * ```

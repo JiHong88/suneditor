@@ -1703,6 +1703,7 @@ const options1 = {
 				group: 'Media',
 				action: ($) => $.plugins.image?.open(),
 			},
+			{ title: 'Table', icon: 'table', action: ($) => $.plugins.table.insert(3, 3) },
 			'table',
 			'bold',
 			'blockStyle',
