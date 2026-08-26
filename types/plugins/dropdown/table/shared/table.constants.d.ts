@@ -2,7 +2,6 @@ import type {} from '../../../../typedef';
 export const ROW_SELECT_MARGIN: 6;
 export const CELL_SELECT_MARGIN: 6;
 export const CELL_DECIMAL_END: 0;
-/** Size used when a table is inserted without one being chosen: `[columns, rows]` */
 export const DEFAULT_SIZE: number[];
 export const RESIZE_CELL_CLASS: '.se-table-resize-line';
 export const RESIZE_CELL_PREV_CLASS: '.se-table-resize-line-prev';
