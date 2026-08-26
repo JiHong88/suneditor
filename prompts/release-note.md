@@ -24,6 +24,7 @@ Always classify each item into exactly one of the following categories:
 | Design           | Changes the visual design of the editor UI (icons, spacing, theme)       |
 | New Feature      | Introduces a new capability, option, or plugin that did not exist before |
 | Enhancement      | Improves existing behavior, performance, or UX without adding a new API  |
+| Changes          | Alters existing behavior without breaking it - working code keeps working |
 | Bugfix           | Corrects incorrect or unexpected behavior                                |
 | Breaking Changes | Removes, renames, or changes API compatibility from a prior version      |
 | Hotfix           | Critical fix released immediately; always bold the message               |
@@ -107,6 +108,27 @@ Use one of these sentence patterns:
     > `Fixed a bug where the "pt" font size conversion value was incorrect. [#1522]`
     > `Fixed an issue where images in the image gallery were not clickable when their size was smaller than the label. [#1569]`
 
+### Changes Patterns
+
+For behavior that is simply different, not better and not broken. Pick the category by what the
+reader has to *do*, never by whether the change felt like an improvement:
+
+| Category             | Existing code                                | Reader has to                       |
+| -------------------- | -------------------------------------------- | ----------------------------------- |
+| **Enhancement**      | keeps working, same result, only better       | nothing                             |
+| **Changes**          | keeps working, different result               | check whether they relied on the old behavior |
+| **Breaking Changes** | stops working as written                      | migrate                             |
+
+- State the old value or behavior, so the reader can tell at a glance whether it affects them.
+- Say how to get the previous behavior back when an option can restore it.
+    > `The default value of the \`slashCommand.limitSize\` option has been changed to no limit; set it explicitly to restore a cap.`
+    > `The command menu now commits on Enter instead of Space.`
+
+A changed default is **not** automatically breaking - it is breaking only when the old code stops
+doing what its author intended. `limitSize` defaulting to no limit just shows more rows, so it is a
+Change; `strictHTMLValidation` defaulting to `true` can reject content that used to pass, so it is
+a Breaking Change.
+
 ### Breaking Changes Patterns
 
 - Be explicit about what was removed or changed.
@@ -127,6 +149,10 @@ Group items under their category label. Use this exact heading format:
 * ...
 
 ### Enhancement
+
+* ...
+
+### Changes
 
 * ...
 
@@ -161,7 +187,7 @@ Map its section headings onto categories:
 | ------------ | ------------------------------------------------------------------------------ |
 | `feat`       | **New Feature** - or **Design** if it is purely visual                          |
 | `fix`        | **Bugfix**                                                                      |
-| `change`     | **Enhancement** - or **Breaking Changes** if a default/API changed for existing users |
+| `change`     | **Changes** - or **Breaking Changes** if existing code stops working as written |
 | `breaking`   | **Breaking Changes**                                                            |
 
 Issue numbers appear bare (`#1679`). Expand them to
@@ -246,9 +272,9 @@ fixed Enter key bug in certain situations (#1505)
 ### Output
 
 ```
-### Enhancement
+### Changes
 
-* The default value of the `slashCommand.limitSize` option has been changed to no limit.
+* The default value of the `slashCommand.limitSize` option has been changed to no limit; set it explicitly to restore a cap.
 
 ### Bugfix
 
