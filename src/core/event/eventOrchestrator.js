@@ -234,9 +234,14 @@ class EventOrchestrator extends KernelInjector {
 			r.startContainer.nodeType === 3 &&
 			dom.check.isZeroWidth(r.startContainer)
 		) {
-			const br = r.startContainer.nextSibling;
-			if (br && dom.check.isBreak(br)) this.$.selection.setRange(br, 0, br, 0);
-			else this.$.selection.setRange(r.endContainer, r.endOffset, r.endContainer, r.endOffset);
+			const zeroWidth = r.startContainer;
+			const br = zeroWidth.nextSibling;
+			if (br && dom.check.isBreak(br)) {
+				dom.utils.removeItem(zeroWidth);
+				this.$.selection.setRange(br, 0, br, 0);
+			} else {
+				this.$.selection.setRange(r.endContainer, r.endOffset, r.endContainer, r.endOffset);
+			}
 		}
 
 		return this.$.selection.getNode();

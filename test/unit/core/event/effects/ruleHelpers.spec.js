@@ -2,7 +2,7 @@
  * @fileoverview Unit tests for ruleHelpers
  */
 
-import { hardDelete, cleanRemovedTags, isUneditableNode, setDefaultLine } from '../../../../../src/core/event/effects/ruleHelpers';
+import { hardDelete, cleanRemovedTags, isUneditableNode, setDefaultLine, isEdgeBreakCaret, getEmptyLineMergeTarget, getNestedListTarget, getAdjacentLine, getAdjacentElement } from '../../../../../src/core/event/effects/ruleHelpers';
 import { dom } from '../../../../../src/helper';
 
 describe('Rule Helpers', () => {
@@ -342,6 +342,263 @@ describe('Rule Helpers', () => {
 			// Cleanup
 			document.body.removeChild(formatEl);
 			document.body.removeChild(parent);
+		});
+	});
+	describe('isEdgeBreakCaret', () => {
+		/**
+		 * @param {string} html Inner HTML of the line
+		 * @returns {HTMLElement} The line element
+		 */
+		function makeLine(html) {
+			const li = document.createElement('li');
+			li.innerHTML = html;
+			document.body.appendChild(li);
+			return li;
+		}
+
+		/**
+		 * @param {Node} con Range container
+		 * @param {number} off Range offset
+		 * @returns {Range} Collapsed range
+		 */
+		function caret(con, off) {
+			const range = document.createRange();
+			range.setStart(con, off);
+			range.setEnd(con, off);
+			return range;
+		}
+
+		afterEach(() => {
+			document.body.innerHTML = '';
+		});
+
+		it('detects the caret on the <br> of an empty line (both edges)', () => {
+			const li = makeLine('\u200B<br>');
+			const br = li.querySelector('br');
+
+			expect(isEdgeBreakCaret(caret(br, 0), br, 'front')).toBe(true);
+			expect(isEdgeBreakCaret(caret(br, 0), br, 'end')).toBe(true);
+		});
+
+		it('treats a nested list as the line edge', () => {
+			const li = makeLine('\u200B<br><ul><li>x</li></ul>');
+			const br = li.querySelector('br');
+
+			expect(isEdgeBreakCaret(caret(br, 0), br, 'front')).toBe(true);
+			expect(isEdgeBreakCaret(caret(br, 0), br, 'end')).toBe(true);
+		});
+
+		it('rejects a <br> with content on the tested side', () => {
+			const li = makeLine('A<br>B');
+			const br = li.querySelector('br');
+
+			expect(isEdgeBreakCaret(caret(br, 0), br, 'front')).toBe(false);
+			expect(isEdgeBreakCaret(caret(br, 0), br, 'end')).toBe(false);
+		});
+
+		it('rejects a non-break selection node and a non-collapsed range', () => {
+			const li = makeLine('\u200B<br>');
+			const br = li.querySelector('br');
+			const zws = li.firstChild;
+			const range = document.createRange();
+			range.setStart(zws, 0);
+			range.setEnd(zws, 1);
+
+			expect(isEdgeBreakCaret(caret(zws, 0), zws, 'front')).toBe(false);
+			expect(isEdgeBreakCaret(range, br, 'front')).toBe(false);
+		});
+	});
+	describe('getEmptyLineMergeTarget', () => {
+		// `isNormalLine` is true for LI as well as P — an empty list cell must collapse through the same
+		// path as an empty paragraph. Delete used to be dead on an empty cell because the list branch
+		// claimed the key and then did nothing.
+		const format = {
+			isNormalLine: (el) => !!el && /^(P|DIV|H[1-6]|LI)$/.test(el.nodeName),
+			isBrLine: (el) => !!el && el.nodeName === 'PRE',
+		};
+
+		/**
+		 * @param {string} html Wysiwyg content
+		 * @returns {HTMLElement} The container
+		 */
+		function build(html) {
+			const root = document.createElement('div');
+			root.innerHTML = html;
+			document.body.appendChild(root);
+			return root;
+		}
+
+		afterEach(() => {
+			document.body.innerHTML = '';
+		});
+
+		it('returns the neighbouring cell for an empty list cell (both directions)', () => {
+			const root = build('<ul><li><br></li><li><br></li></ul>');
+			const [first, second] = root.querySelectorAll('li');
+
+			expect(getEmptyLineMergeTarget(format, first, 'end')).toBe(second);
+			expect(getEmptyLineMergeTarget(format, second, 'front')).toBe(first);
+		});
+
+		it('returns the neighbouring line for an empty paragraph', () => {
+			const root = build('<p>A</p><p><br></p>');
+			const [first, second] = root.querySelectorAll('p');
+
+			expect(getEmptyLineMergeTarget(format, second, 'front')).toBe(first);
+		});
+
+		it('returns null when the line is not empty, has no neighbour, or is a brLine', () => {
+			const root = build('<p>A</p><p><br></p><pre><br></pre>');
+			const [withText, empty] = root.querySelectorAll('p');
+
+			expect(getEmptyLineMergeTarget(format, withText, 'end')).toBeNull();
+			expect(getEmptyLineMergeTarget(format, empty, 'end')).toBe(root.querySelector('pre'));
+			expect(getEmptyLineMergeTarget(format, root.querySelector('pre'), 'front')).toBeNull();
+			expect(getEmptyLineMergeTarget(format, null, 'front')).toBeNull();
+		});
+
+		it('leaves a cell that owns a nested list to the list rules', () => {
+			const root = build('<ul><li><br><ul><li>x</li></ul></li><li>B</li></ul>');
+			const cell = root.querySelector('li');
+
+			expect(getEmptyLineMergeTarget(format, cell, 'end')).toBeNull();
+		});
+	});
+
+	describe('getNestedListTarget', () => {
+		/**
+		 * @param {string} html Wysiwyg content
+		 * @returns {HTMLElement} The container
+		 */
+		function build(html) {
+			const root = document.createElement('div');
+			root.innerHTML = html;
+			document.body.appendChild(root);
+			return root;
+		}
+
+		afterEach(() => {
+			document.body.innerHTML = '';
+		});
+
+		it('finds a nested list inside the cell', () => {
+			const root = build('<ul><li><br><ul><li>x</li></ul></li></ul>');
+			const cell = root.querySelector('li');
+
+			expect(getNestedListTarget(cell, root.querySelector('ul'))).toBe(cell.querySelector('ul'));
+		});
+
+		it('finds a following cell that carries a nested list', () => {
+			const root = build('<ul><li>A</li><li><ul><li>x</li></ul></li></ul>');
+			const [first, second] = root.querySelectorAll('ul > li');
+
+			expect(getNestedListTarget(first, root.querySelector('ul'))).toBe(second);
+		});
+
+		// Regression: returning a plain sibling here made the list branch claim the key and do nothing,
+		// which blocked the empty-line merge behind it — Delete on an empty cell did nothing at all.
+		it('returns null when the neighbouring cell holds no list', () => {
+			const root = build('<ul><li><br></li><li>B</li></ul>');
+			const cell = root.querySelector('li');
+
+			expect(getNestedListTarget(cell, root.querySelector('ul'))).toBeNull();
+		});
+
+		it('returns null for a lone cell', () => {
+			const root = build('<ul><li><br></li></ul>');
+
+			expect(getNestedListTarget(root.querySelector('li'), root.querySelector('ul'))).toBeNull();
+		});
+	});
+	describe('getAdjacentLine', () => {
+		// Regression: edge decisions used to read `formatEl.nextSibling`, so the last cell of a list looked
+		// like the end of the document and Delete died there; a line before a list found no neighbour either.
+		const format = {
+			isLine: (el) => !!el && /^(P|DIV|H[1-6]|LI|PRE|TD|TH)$/.test(el.nodeName),
+			isBlock: (el) => !!el && /^(UL|OL|BLOCKQUOTE|TABLE|THEAD|TBODY|TR|TD|TH)$/.test(el.nodeName),
+			isClosureBlock: (el) => !!el && /^(TD|TH)$/.test(el.nodeName),
+		};
+
+		/**
+		 * @param {string} html Wysiwyg content
+		 * @returns {HTMLElement} The container
+		 */
+		function build(html) {
+			const root = document.createElement('div');
+			root.innerHTML = html;
+			document.body.appendChild(root);
+			return root;
+		}
+
+		afterEach(() => {
+			document.body.innerHTML = '';
+		});
+
+		it('steps into a list from the line before it', () => {
+			const root = build('<p>A</p><ul><li>B</li><li>C</li></ul>');
+
+			expect(getAdjacentLine(format, root.querySelector('p'), 'end')).toBe(root.querySelector('li'));
+		});
+
+		it('steps out of a list from its last cell', () => {
+			const root = build('<ul><li>A</li></ul><p>B</p>');
+
+			expect(getAdjacentLine(format, root.querySelector('li'), 'end')).toBe(root.querySelector('p'));
+		});
+
+		it('walks backwards symmetrically', () => {
+			const root = build('<ul><li>A</li></ul><p>B</p>');
+
+			expect(getAdjacentLine(format, root.querySelector('p'), 'front')).toBe(root.querySelector('li'));
+		});
+
+		it('returns null at the document edges', () => {
+			const root = build('<ul><li>A</li></ul>');
+			const cell = root.querySelector('li');
+
+			expect(getAdjacentLine(format, cell, 'front')).toBeNull();
+			expect(getAdjacentLine(format, cell, 'end')).toBeNull();
+		});
+
+		it('stops at a closure block instead of escaping the table cell', () => {
+			const root = build('<table><tbody><tr><td><p>x</p></td></tr></tbody></table><p>B</p>');
+
+			expect(getAdjacentLine(format, root.querySelector('td p'), 'end')).toBeNull();
+		});
+
+		// Regression: the step-out loop only climbed through blocks, so a nested list cell's outer
+		// `<li>` parent (a line, not a block) read as the document edge and Delete died there.
+		it('steps out through the outer cell from the last nested cell', () => {
+			const root = build('<ul><li>A<ul><li>B</li></ul></li><li>C</li></ul>');
+			const nested = root.querySelectorAll('li')[1]; // "B"
+
+			expect(getAdjacentLine(format, nested, 'end')).toBe(root.querySelectorAll('li')[2]); // "C"
+		});
+
+		it('returns the outer cell itself as the previous line of a first nested cell', () => {
+			const root = build('<ul><li>A<ul><li>B</li></ul></li></ul>');
+			const nested = root.querySelectorAll('li')[1]; // "B"
+
+			expect(getAdjacentLine(format, nested, 'front')).toBe(root.querySelector('li')); // "A"
+		});
+
+		it('returns null at the document edge behind a nested cell', () => {
+			const root = build('<ul><li>A<ul><li>B</li></ul></li></ul>');
+			const nested = root.querySelectorAll('li')[1]; // "B"
+
+			expect(getAdjacentLine(format, nested, 'end')).toBeNull();
+			expect(getAdjacentElement(format, nested, 'end')).toBeNull();
+		});
+
+		// Regression: a component next door is not the document edge — getAdjacentLine returns null
+		// (no line), but getAdjacentElement must still surface the element so the delete rule falls
+		// through to its component-select branches instead of claiming a dead no-op.
+		it('tells a component neighbour apart from the document edge', () => {
+			const root = build('<p>A</p><figure class="se-component">img</figure>');
+			const line = root.querySelector('p');
+
+			expect(getAdjacentLine(format, line, 'end')).toBeNull();
+			expect(getAdjacentElement(format, line, 'end')).toBe(root.querySelector('figure'));
 		});
 	});
 });

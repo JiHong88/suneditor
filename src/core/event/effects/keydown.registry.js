@@ -1,4 +1,5 @@
 import { dom, unicode } from '../../../helper';
+import { getNestedListTarget } from './ruleHelpers';
 
 /**
  * @typedef {Object} EffectContext_keydown
@@ -79,12 +80,16 @@ export default {
 	/** @action backspaceComponentSelect */
 	'backspace.component.select': ({ ports }, { selectionNode, range, fileComponentInfo }) => {
 		let currentZWS = null;
-		if (dom.check.isBreak(selectionNode)) dom.utils.removeItem(selectionNode);
-		else if (dom.check.isBreak((currentZWS = range.startContainer.childNodes?.[range.startOffset])))
-			dom.utils.removeItem(currentZWS);
 
-		if (ports.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false)
+		if (dom.check.isBreak(selectionNode)) {
+			dom.utils.removeItem(selectionNode);
+		} else if (dom.check.isBreak((currentZWS = range.startContainer.childNodes?.[range.startOffset]))) {
+			dom.utils.removeItem(currentZWS);
+		}
+
+		if (ports.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) {
 			ports.focusManager.blur();
+		}
 	},
 
 	/** @action backspaceComponentRemove */
@@ -103,6 +108,9 @@ export default {
 			rangeEl.parentNode.insertBefore(con, rangeEl.parentNode.firstChild);
 		}
 		const offset = con.nodeType === 3 ? con.textContent.length : 1;
+
+		stripTrailingBreaks(formatEl);
+
 		const children = formatEl.childNodes;
 		let after = con;
 		let child = children[0];
@@ -213,12 +221,9 @@ export default {
 	'delete.list.removeNested': ({ ports, ctx }, { range, formatEl, rangeEl }) => {
 		if (range.startContainer !== range.endContainer) ports.html.remove();
 
-		const next = /** @type {HTMLElement} */ (
-			dom.utils.arrayFind(formatEl.children, dom.check.isList) ||
-				formatEl.nextElementSibling ||
-				rangeEl.parentElement.nextElementSibling
-		);
-		if (next && (dom.check.isList(next) || dom.utils.arrayFind(next.children, dom.check.isList))) {
+		// Same decision the rule gated on — asked once, here and there, so the two can't drift apart.
+		const next = getNestedListTarget(formatEl, rangeEl);
+		if (next) {
 			ctx.e.preventDefault();
 
 			let con, children;

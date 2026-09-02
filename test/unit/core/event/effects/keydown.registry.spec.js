@@ -1243,6 +1243,51 @@ describe('keydown.registry effects', () => {
 			expect(callArgs[1]).toBe(5); // 'first'.length
 		});
 
+		// Regression: an empty cell holds only invisible filler (`<br>` / zero-width text). Carrying it over
+		// parked it behind the caret in the previous cell, where the next Delete ate the filler instead of
+		// pulling the following line up — a keypress with no visible effect.
+		it('drops the filler of an empty cell instead of merging it into prev', () => {
+			const ul = document.createElement('ul');
+			const li1 = document.createElement('li');
+			li1.textContent = 'A';
+			const li2 = document.createElement('li');
+			li2.appendChild(document.createTextNode('\u200B'));
+			li2.appendChild(document.createElement('br'));
+			ul.appendChild(li1);
+			ul.appendChild(li2);
+
+			effects['backspace.list.mergePrev']({ ports: mockPorts }, {
+				prev: li1,
+				formatEl: li2,
+				rangeEl: ul,
+			});
+
+			expect(ul.contains(li2)).toBe(false);
+			expect(li1.innerHTML).toBe('A');
+		});
+
+		it('still moves a cell that holds real content alongside its filler', () => {
+			const ul = document.createElement('ul');
+			const li1 = document.createElement('li');
+			li1.textContent = 'A';
+			const li2 = document.createElement('li');
+			li2.appendChild(document.createElement('br'));
+			const nested = document.createElement('ul');
+			nested.innerHTML = '<li>x</li>';
+			li2.appendChild(nested);
+			ul.appendChild(li1);
+			ul.appendChild(li2);
+
+			effects['backspace.list.mergePrev']({ ports: mockPorts }, {
+				prev: li1,
+				formatEl: li2,
+				rangeEl: ul,
+			});
+
+			expect(ul.contains(li2)).toBe(false);
+			expect(li1.querySelector('ul li').textContent).toBe('x');
+		});
+
 		it('should use rangeEl.previousSibling as con when prev is rangeEl.parentNode', () => {
 			const outerUl = document.createElement('ul');
 			const li = document.createElement('li');

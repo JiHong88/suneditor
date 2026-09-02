@@ -470,4 +470,132 @@ describe('Delete Rule', () => {
 			expect(result).toBe(false);
 		});
 	});
+
+	describe('document-order edge decisions (realistic format classification)', () => {
+		// The default mocks (isLine always true, isEdgeLine always false) hide edge geometry, so these
+		// tests install classifiers matching the real format module.
+		function installRealisticFormat() {
+			const isLine = (el) => !!el && el.nodeType === 1 && /^(P|DIV|H[1-6]|LI|PRE)$/.test(el.nodeName) && !el.classList?.contains('se-component');
+			const isBlock = (el) => !!el && el.nodeType === 1 && /^(UL|OL|BLOCKQUOTE|TABLE|THEAD|TBODY|TR|TD|TH)$/.test(el.nodeName);
+			mockPorts.format.isLine.mockImplementation(isLine);
+			mockPorts.format.isBlock.mockImplementation(isBlock);
+			mockPorts.format.isClosureBlock.mockImplementation((el) => !!el && /^(TD|TH)$/.test(el.nodeName));
+			mockPorts.format.isNormalLine.mockImplementation((el) => isLine(el) && !isBlock(el));
+			mockPorts.format.isBrLine.mockImplementation((el) => !!el && el.nodeName === 'PRE');
+			mockPorts.format.getLine.mockImplementation((node) => {
+				let el = node?.nodeType === 1 ? node : node?.parentElement;
+				while (el && !isLine(el)) el = el.parentElement;
+				return el;
+			});
+			mockPorts.format.getBlock.mockImplementation((node) => {
+				let el = node?.nodeType === 1 ? node : node?.parentElement;
+				while (el && (el === node || !isBlock(el))) el = el.parentElement;
+				return el;
+			});
+		}
+
+		// Regression: `getAdjacentLine` returning null was treated as the document edge, so Delete at the
+		// end of the line before a component prevented and did nothing — component selection never ran.
+		it('falls through to component selection at the end of a line before a component', () => {
+			wysiwygDiv.innerHTML = '';
+			const p = document.createElement('p');
+			const text = document.createTextNode('text');
+			p.appendChild(text);
+			const figure = document.createElement('figure');
+			figure.className = 'se-component';
+			figure.textContent = 'img';
+			wysiwygDiv.appendChild(p);
+			wysiwygDiv.appendChild(figure);
+
+			installRealisticFormat();
+			mockPorts.format.isEdgeLine.mockReturnValue(true);
+			mockPorts.component.is.mockImplementation((el) => el === figure);
+
+			const r = document.createRange();
+			r.setStart(text, text.length);
+			r.setEnd(text, text.length);
+			mockCtx.range = r;
+			mockCtx.formatEl = p;
+			mockCtx.selectionNode = text;
+			mockPorts.selection.getRange.mockReturnValue(r);
+
+			const result = reduceDeleteDown(actions, mockPorts, mockCtx);
+
+			expect(actions).toContainEqual(A.deleteComponentSelectNext(p, figure));
+			expect(result).toBe(true);
+		});
+
+		// Regression: the step-out walk aborted at the outer <li> (a line, not a block), read "document
+		// edge" and killed the key even though a following cell existed.
+		it('merges the following outer cell when deleting at the end of the last nested cell', () => {
+			wysiwygDiv.innerHTML = '<ul><li>A<ul><li>B</li></ul></li><li>C</li></ul>';
+			const cells = wysiwygDiv.querySelectorAll('li');
+			const nested = cells[1]; // "B"
+			const following = cells[2]; // "C"
+			const text = nested.firstChild;
+
+			installRealisticFormat();
+			mockPorts.format.isEdgeLine.mockReturnValue(true);
+
+			const r = document.createRange();
+			r.setStart(text, text.length);
+			r.setEnd(text, text.length);
+			mockCtx.range = r;
+			mockCtx.formatEl = nested;
+			mockCtx.selectionNode = text;
+			mockPorts.selection.getRange.mockReturnValue(r);
+
+			const result = reduceDeleteDown(actions, mockPorts, mockCtx);
+
+			expect(actions).toContainEqual(A.preventStop());
+			expect(actions).toContainEqual(A.mergeLineInto(nested, following));
+			expect(result).toBe(false);
+		});
+
+		it('still prevents at the true document edge behind a nested cell', () => {
+			wysiwygDiv.innerHTML = '<ul><li>A<ul><li>B</li></ul></li></ul>';
+			const nested = wysiwygDiv.querySelectorAll('li')[1]; // "B", nothing after anywhere
+			const text = nested.firstChild;
+
+			installRealisticFormat();
+			mockPorts.format.isEdgeLine.mockReturnValue(true);
+
+			const r = document.createRange();
+			r.setStart(text, text.length);
+			r.setEnd(text, text.length);
+			mockCtx.range = r;
+			mockCtx.formatEl = nested;
+			mockCtx.selectionNode = text;
+			mockPorts.selection.getRange.mockReturnValue(r);
+
+			const result = reduceDeleteDown(actions, mockPorts, mockCtx);
+
+			expect(actions).toContainEqual(A.preventStop());
+			expect(actions).not.toContainEqual(A.mergeLineInto(nested, expect.anything()));
+			expect(result).toBe(false);
+		});
+
+		// Regression: gating the nested-list branch on getNestedListTarget also cut off the
+		// selection-range path, whose effect runs html.remove() — cross-cell selections fell to native.
+		it('keeps handling a cross-cell selection without a nested list', () => {
+			wysiwygDiv.innerHTML = '<ul><li>abc</li><li>def</li></ul>';
+			const ul = wysiwygDiv.querySelector('ul');
+			const [liA, liB] = wysiwygDiv.querySelectorAll('li');
+
+			installRealisticFormat();
+
+			const r = document.createRange();
+			r.setStart(liA.firstChild, 1);
+			r.setEnd(liB.firstChild, 1);
+			mockCtx.range = r;
+			mockCtx.formatEl = liA;
+			mockCtx.selectionNode = liA.firstChild;
+			mockPorts.selection.getRange.mockReturnValue(r);
+
+			const result = reduceDeleteDown(actions, mockPorts, mockCtx);
+
+			expect(actions).toContainEqual(A.deleteListRemoveNested(r, liA, ul));
+			expect(result).toBe(true);
+		});
+	});
 });
