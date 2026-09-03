@@ -6,6 +6,7 @@
 ### fix
 
 - Styles the editor lifts onto a fully-styled list item (`font-family`, `font-size`, `color`, `font-weight`, `font-style`) were stripped on a clean round-trip — `li` now has its own `tagStyles` whitelist entry (`core/schema/options`) #1682
+- Fixed a bug where the structure was broken when pasting into Google Docs. (googleDocs.js added) #1683
 
 - Backspace/Delete not removing an empty list cell when the caret sits on its `<br>` (`core/event/rules/keydown.rule.backspace`, `keydown.rule.delete`) #1681
 - Delete did nothing on an empty list cell — the nested-list branch claimed the key without having anything to lift, blocking the empty-line merge behind it (`core/event/rules/keydown.rule.delete`)

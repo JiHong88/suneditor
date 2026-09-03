@@ -1905,7 +1905,20 @@ class HTML {
 				}
 				checkTags.push(t);
 			} else {
-				p.parentNode.insertBefore(t, p);
+				const ref = p.nextSibling;
+
+				let rest = null;
+				if (t.nextSibling) {
+					rest = p.cloneNode(false);
+					while (t.nextSibling) rest.appendChild(t.nextSibling);
+				}
+
+				p.parentNode.insertBefore(t, ref);
+
+				if (rest) {
+					p.parentNode.insertBefore(rest, ref);
+					checkTags.push(rest);
+				}
 				checkTags.push(p);
 			}
 		}
@@ -1939,6 +1952,29 @@ class HTML {
 				t = t.nextSibling;
 				tp.appendChild(wrongList[i]);
 				p.insertBefore(tp, t);
+			}
+		}
+
+		// wrap top-level `li` elements without a list parent in a `ul`
+		if (formatFilter) {
+			const orphanCells = dom.query.getListChildNodes(
+				documentFragment,
+				(current) => dom.check.isListCell(current) && !dom.check.isList(current.parentNode),
+				null,
+			);
+
+			for (let i = 0, len = orphanCells.length, t, ul, n, next; i < len; i++) {
+				t = orphanCells[i];
+				if (dom.check.isList(t.parentNode)) continue;
+
+				ul = dom.utils.createElement('UL');
+				t.parentNode.insertBefore(ul, t);
+				n = t;
+				while (n && (dom.check.isListCell(n) || (n.nodeType === 3 && !n.textContent.trim()))) {
+					next = n.nextSibling;
+					ul.appendChild(n);
+					n = next;
+				}
 			}
 		}
 

@@ -17,7 +17,7 @@
  * @property {Event} event - event object
  * @property {string} data - drop data
  * @property {boolean} maxCharCount - is max char count
- * @property {string} from - `"SE"`|`"MS"`|`""` - source
+ * @property {string} from - `"SE"`|`"MS"`|`"GOOGLE"`|`""` - source
  */
 
 // --- media

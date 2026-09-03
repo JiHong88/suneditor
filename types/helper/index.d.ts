@@ -178,6 +178,10 @@ export const markdown: {
 export const msOffice: {
 	cleanHTML: typeof import('./msOffice').cleanHTML;
 };
+export const googleDocs: {
+	isGoogleDocs: typeof import('./googleDocs').isGoogleDocs;
+	cleanHTML: typeof import('./googleDocs').cleanHTML;
+};
 declare namespace _default {
 	export { env };
 	export { unicode };
@@ -188,5 +192,6 @@ declare namespace _default {
 	export { clipboard };
 	export { markdown };
 	export { msOffice };
+	export { googleDocs };
 }
 export default _default;

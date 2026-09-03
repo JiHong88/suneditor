@@ -1,5 +1,5 @@
 import KernelInjector from '../kernel/kernelInjector';
-import { dom, unicode, numbers, env, converter, msOffice } from '../../helper';
+import { dom, unicode, numbers, env, converter, msOffice, googleDocs } from '../../helper';
 import { _DragHandle } from '../../modules/ui';
 
 // event handlers
@@ -274,7 +274,7 @@ class EventOrchestrator extends KernelInjector {
 	/**
 	 * @internal
 	 * @description Processes clipboard data for `paste` and `drop` events, handling text and HTML cleanup.
-	 * - Supports specific handling for content from Microsoft Office applications.
+	 * - Supports specific handling for content from Microsoft Office applications and Google Docs.
 	 * @param {"paste"|"drop"} type The type of event
 	 * @param {Event} e The original event object
 	 * @param {DataTransfer} clipboardData The clipboard data object
@@ -297,8 +297,10 @@ class EventOrchestrator extends KernelInjector {
 			/content=["']*Word.Document/i.test(cleanData) ||
 			/content=["']*OneNote.File/i.test(cleanData) ||
 			/content=["']*Excel.Sheet/i.test(cleanData);
+		// Google Docs
+		const GDData = !SEData && !MSData && googleDocs.isGoogleDocs(cleanData);
 		// from
-		const from = SEData ? 'SE' : MSData ? 'MS' : '';
+		const from = SEData ? 'SE' : MSData ? 'MS' : GDData ? 'GOOGLE' : '';
 
 		if (onlyText) {
 			cleanData = converter.htmlToEntity(plainText).replace(/\n/g, '<br>');
@@ -311,6 +313,8 @@ class EventOrchestrator extends KernelInjector {
 				cleanData = cleanData.replace(/\n/g, ' ');
 				plainText = plainText.replace(/\n/g, ' ');
 				cleanData = msOffice.cleanHTML(cleanData);
+			} else if (GDData) {
+				cleanData = googleDocs.cleanHTML(cleanData);
 			}
 		}
 

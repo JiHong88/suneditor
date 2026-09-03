@@ -7,6 +7,7 @@ import KeyCodeMap from './keyCodeMap';
 import Clipboard from './clipboard';
 import Markdown from './markdown';
 import MSOffice from './msOffice';
+import GoogleDocs from './googleDocs';
 
 export const env = Env;
 export const unicode = Unicode;
@@ -17,6 +18,7 @@ export const keyCodeMap = KeyCodeMap;
 export const clipboard = Clipboard;
 export const markdown = Markdown;
 export const msOffice = MSOffice;
+export const googleDocs = GoogleDocs;
 
 export default {
 	env,
@@ -28,4 +30,5 @@ export default {
 	clipboard,
 	markdown,
 	msOffice,
+	googleDocs,
 };
