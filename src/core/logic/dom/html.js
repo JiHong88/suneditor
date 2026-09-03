@@ -9,6 +9,7 @@ const ZWS_RUN_REGEXP = new RegExp(unicode.zeroWidthSpace + '+', 'g');
  * @description All HTML related classes involved in the editing area
  */
 class HTML {
+	/** @type {SunEditor.Deps} */
 	#$;
 	#store;
 
@@ -74,6 +75,18 @@ class HTML {
 				splitTagStyles[n] += tagStyles[k];
 			}
 		}
+
+		// A tag with an explicit entry that is also a line/text-style tag inherits the category
+		// styles ('@line'/'@text'), so category edits stay effective for it. (e.g. "li")
+		const formatLineReg = options.get('formatLine').reg;
+		for (const k in splitTagStyles) {
+			if (k.startsWith('@')) continue;
+			const category = formatLineReg.test(k) ? '@line' : this.#textStyleTags.includes(k) ? '@text' : '';
+			if (category && tagStyles[category]) {
+				splitTagStyles[k] += (splitTagStyles[k] ? '|' : '') + tagStyles[category];
+			}
+		}
+
 		for (const k in splitTagStyles) {
 			splitTagStyles[k] = new RegExp(`\\s*[^-a-zA-Z](${splitTagStyles[k]})\\s*:[^;]+(?!;)*`, 'gi');
 		}
