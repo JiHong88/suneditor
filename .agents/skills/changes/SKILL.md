@@ -4,7 +4,7 @@ description: 수동 코드 수정 후 changes.md에 누락된 변경사항 추�
 ---
 
 The user has manually modified code and needs `changes.md` updated.
-(When Claude modifies code, `changes.md` is updated automatically per CLAUDE.md instructions. This skill is only for user-initiated changes.)
+(When an AI agent (Claude, Codex, ...) modifies code, `changes.md` is updated automatically per its instructions (CLAUDE.md / AGENTS.md). This skill is only for user-initiated changes.)
 
 Follow the rules defined in `prompts/changes-guide.md` exactly.
 
