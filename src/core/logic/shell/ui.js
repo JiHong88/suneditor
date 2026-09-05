@@ -959,7 +959,9 @@ class UIManager {
 		this._updatePlaceholder(fc);
 		// document type page
 		if (fc.has('documentType_use_page')) {
-			fc.get('documentTypePageMirror').innerHTML = fc.get('wysiwyg').innerHTML;
+			fc.get('documentTypePageMirror').replaceChildren(
+				...Array.from(fc.get('wysiwyg').childNodes, (n) => n.cloneNode(true)),
+			);
 			fc.get('documentType').rePage(true);
 		}
 	}

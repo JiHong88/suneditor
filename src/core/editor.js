@@ -232,7 +232,9 @@ class Editor {
 			}
 			if (e.get('documentType').usePage) {
 				e.set('documentType_use_page', true);
-				e.get('documentTypePageMirror').innerHTML = e.get('wysiwyg').innerHTML;
+				e.get('documentTypePageMirror').replaceChildren(
+					...Array.from(e.get('wysiwyg').childNodes, (n) => n.cloneNode(true)),
+				);
 			}
 		}
 	}

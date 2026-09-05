@@ -1674,7 +1674,7 @@ class HTML {
 				) || [];
 			for (let i = ch.length - 1, c; i >= 0; i--) {
 				c = /** @type {HTMLElement} */ (ch[i]);
-				c.outerHTML = c.innerHTML;
+				c.replaceWith(...c.childNodes);
 			}
 
 			if (
@@ -1982,15 +1982,15 @@ class HTML {
 			t = withoutFormatCells[i];
 
 			f = dom.utils.createElement('DIV');
-			f.innerHTML = t.innerHTML;
+			while (t.firstChild) f.appendChild(t.firstChild);
 
-			if (t.textContent.trim().length === 0 && this.#isAllTextStyleNodes(t)) {
+			if (f.textContent.trim().length === 0 && this.#isAllTextStyleNodes(f)) {
 				let leaf = /** @type {Element} */ (f);
 				while (leaf.firstElementChild) leaf = leaf.firstElementChild;
 				leaf.innerHTML = '<br>';
 			}
 
-			t.innerHTML = f.outerHTML;
+			t.appendChild(f);
 		}
 	}
 
