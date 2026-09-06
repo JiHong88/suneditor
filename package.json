@@ -1,6 +1,6 @@
 {
 	"name": "suneditor",
-	"version": "3.3.1",
+	"version": "3.3.2",
 	"description": "Vanilla JavaScript based WYSIWYG web editor",
 	"author": "Yi JiHong",
 	"license": "MIT",
@@ -50,7 +50,8 @@
 		"node": ">=14.0.0"
 	},
 	"overrides": {
-		"uuid": ">=14.0.0"
+		"uuid": ">=14.0.0",
+		"qs": "^6.16.0"
 	},
 	"scripts": {
 		"dev": "webpack-dev-server --config webpack/dev.js",
