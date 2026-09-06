@@ -11,6 +11,13 @@ Tool-specific aliases (`CLAUDE.md`, `GEMINI.md`) redirect here.
 
 ---
 
+## Always-On Rules
+
+**Before any edit, read every rule in [`.agents/rules/`](./.agents/rules/).** They are hard
+guardrails shared by all AI agents — git safety (never stage/commit without user approval),
+generated-file protection, core-change and plugin conventions. Claude auto-loads them via
+`CLAUDE.md`; other agents must read them at session start.
+
 ## Editing Rules
 
 Before modifying any file, read and follow **[prompts/editing-rules.md](./prompts/editing-rules.md)**.

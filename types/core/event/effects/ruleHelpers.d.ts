@@ -51,3 +51,59 @@ export function isRtlBidiMismatch(
 	detectedEdge: 'front' | 'end',
 	doc: Document,
 ): boolean;
+/**
+ * @description Whether the caret sits on a bare `<br>` that stands at the front/end edge of its `line`.
+ * @param {Range} range - The current range
+ * @param {Node} selectionNode - Current selection node
+ * @param {'front'|'end'} edge - Edge to test: `front` for Backspace, `end` for Delete
+ * @returns {boolean} `true` if the caret is on an edge `<br>`
+ */
+export function isEdgeBreakCaret(range: Range, selectionNode: Node, edge: 'front' | 'end'): boolean;
+/**
+ * @description The previous/next element in document order — crossing in and out of blocks (list, quote).
+ * - Out of list-cell ancestors (a nested list), stopping at a closure block (table cell).
+ * @param {EventPorts['format']} format - Format module
+ * @param {?HTMLElement} line - The caret's `line` element
+ * @param {'front'|'end'} edge - `front` for the previous element, `end` for the next one
+ * @returns {?HTMLElement} The adjacent element, or `null` at the document edge
+ */
+export function getAdjacentElement(
+	format: EventPorts['format'],
+	line: HTMLElement | null,
+	edge: 'front' | 'end',
+): HTMLElement | null;
+/**
+ * @description The previous/next `line` in document order — {@link getAdjacentElement} filtered to lines.
+ * - `null` means either the document edge or a non-`line` neighbour (a component); use
+ * {@link getAdjacentElement} when the two must be told apart.
+ * @param {EventPorts['format']} format - Format module
+ * @param {?HTMLElement} line - The caret's `line` element
+ * @param {'front'|'end'} edge - `front` for the previous line, `end` for the next one
+ * @returns {?HTMLElement} The adjacent line, or `null`
+ */
+export function getAdjacentLine(
+	format: EventPorts['format'],
+	line: HTMLElement | null,
+	edge: 'front' | 'end',
+): HTMLElement | null;
+/**
+ * @description The neighbouring `line` an empty line collapses into, or `null` when there is nothing to merge.
+ * - A cell owning a nested list belongs to {@link getNestedListTarget} instead.
+ * @param {EventPorts['format']} format - Format module
+ * @param {?HTMLElement} formatEl - The caret's `line` element
+ * @param {'front'|'end'} edge - `front` for Backspace (previous line), `end` for Delete (next line)
+ * @returns {?HTMLElement} The neighbouring line to merge into, or `null`
+ */
+export function getEmptyLineMergeTarget(
+	format: EventPorts['format'],
+	formatEl: HTMLElement | null,
+	edge: 'front' | 'end',
+): HTMLElement | null;
+/**
+ * @description The nested list a list-cell Backspace/Delete would lift, or `null` when there is none.
+ * - The rules gate their list branch on it so the branch can't claim the key with nothing to do.
+ * @param {HTMLElement} formatEl - The caret's list cell
+ * @param {HTMLElement} rangeEl - The list (`UL`/`OL`) the cell belongs to
+ * @returns {?HTMLElement} The element carrying the nested list, or `null`
+ */
+export function getNestedListTarget(formatEl: HTMLElement, rangeEl: HTMLElement): HTMLElement | null;

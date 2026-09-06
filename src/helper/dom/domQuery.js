@@ -513,7 +513,8 @@ export function getEdgeChildNodes(first, last) {
 
 /**
  * @template {Node} T
- * @description Gets the previous sibling last child. If there is no sibling, then it'll take it from the closest ancestor with child
+ * @description Gets the previous sibling last child. If there is no sibling, then it'll take it from the closest ancestor with child.
+ * - Components (image, table, etc.) are treated as a single tag and not traversed into.
  * @param {Node} node Reference element
  * @param {?Node} [ceiling] Highest boundary allowed
  * @returns {T|null} Not found: `null`
@@ -533,14 +534,17 @@ export function getPreviousDeepestNode(node, ceiling) {
 
 	if (domCheck.isNonEditable(previousNode)) return /** @type {T} */ (/** @type {unknown} */ (previousNode));
 
-	while (previousNode.lastChild) previousNode = previousNode.lastChild;
+	while (!domCheck.isComponentContainer(previousNode) && previousNode.lastChild) {
+		previousNode = previousNode.lastChild;
+	}
 
 	return /** @type {T} */ (/** @type {unknown} */ (previousNode));
 }
 
 /**
  * @template {Node} T
- * @description Gets the next sibling first child. If there is no sibling, then it'll take it from the closest ancestor with child
+ * @description Gets the next sibling first child. If there is no sibling, then it'll take it from the closest ancestor with child.
+ * - Components (image, table, etc.) are treated as a single tag and not traversed into.
  * @param {Node} node Reference element
  * @param {?Node} [ceiling] Highest boundary allowed
  * @returns {T|null} Not found: `null`
@@ -560,7 +564,9 @@ export function getNextDeepestNode(node, ceiling) {
 
 	if (domCheck.isNonEditable(nextNode)) return /** @type {T} */ (/** @type {unknown} */ (nextNode));
 
-	while (nextNode.firstChild) nextNode = nextNode.firstChild;
+	while (!domCheck.isComponentContainer(nextNode) && nextNode.firstChild) {
+		nextNode = nextNode.firstChild;
+	}
 
 	return /** @type {T} */ (/** @type {unknown} */ (nextNode));
 }

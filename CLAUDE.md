@@ -2,11 +2,11 @@
 
 See **[AGENTS.md](./AGENTS.md)** — the primary entry point for AI agents in this repository.
 
-<!-- Always-on rules (eager-loaded). Deep/core docs stay lazy via AGENTS.md → prompts/. -->
-@.claude/rules/generated-files.md
-@.claude/rules/plugin-authoring.md
-@.claude/rules/component-model.md
-@.claude/rules/core-changes.md
-@.claude/rules/options-changes.md
-@.claude/rules/design-principles.md
-@.claude/rules/git-safety.md
+@.agents/rules/generated-files.md
+@.agents/rules/plugin-authoring.md
+@.agents/rules/component-model.md
+@.agents/rules/core-changes.md
+@.agents/rules/keydown-edge-decisions.md
+@.agents/rules/options-changes.md
+@.agents/rules/design-principles.md
+@.agents/rules/git-safety.md

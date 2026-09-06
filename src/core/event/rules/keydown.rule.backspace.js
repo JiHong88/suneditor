@@ -5,6 +5,9 @@ import {
 	isUneditableNode,
 	setDefaultLine,
 	isRtlBidiMismatch,
+	isEdgeBreakCaret,
+	getEmptyLineMergeTarget,
+	getAdjacentLine,
 } from '../effects/ruleHelpers';
 import { A } from '../actions';
 
@@ -79,8 +82,8 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 		!dom.check.isListCell(formatEl) &&
 		format.isEdgeLine(range.startContainer, range.startOffset, 'front')
 	) {
-		const prevLine = findPrevMergeLine(format, formatEl);
-		if (prevLine) {
+		const prevLine = getAdjacentLine(format, formatEl, 'front');
+		if (prevLine && prevLine.parentElement !== formatEl.parentElement && format.isNormalLine(prevLine)) {
 			actions.push(A.preventStop());
 			actions.push(A.mergeLineInto(prevLine, formatEl));
 			actions.push(A.historyPush(true));
@@ -152,6 +155,7 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 					: dom.check.isEdgePoint(range.startContainer, range.startOffset)
 						? dom.query.getPreviousDeepestNode(range.startContainer)
 						: null;
+
 		if (component.is(sel)) {
 			const fileComponentInfo = component.get(sel);
 			if (fileComponentInfo) {
@@ -185,6 +189,7 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 			dom.check.isList(rangeEl) &&
 			(dom.check.isListCell(rangeEl.parentElement) || formatEl.previousElementSibling) &&
 			(selectionNode === formatEl ||
+				isEdgeBreakCaret(range, selectionNode, 'front') ||
 				(selectionNode.nodeType === 3 &&
 					(!selectionNode.previousSibling || dom.check.isList(selectionNode.previousSibling)))) &&
 			(format.getLine(range.startContainer, null) !== format.getLine(range.endContainer, null)
@@ -344,16 +349,9 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 		return false;
 	}
 
-	// empty line: merge into the previous line
-	const emptyLinePrev = formatEl?.previousElementSibling;
-	if (
-		!selectRange &&
-		formatEl &&
-		format.isNormalLine(formatEl) &&
-		!dom.check.isListCell(formatEl) &&
-		dom.check.isEmptyLine(formatEl) &&
-		(format.isNormalLine(emptyLinePrev) || format.isBrLine(emptyLinePrev))
-	) {
+	// empty line: merge into the previous line — plain lines and list cells alike
+	const emptyLinePrev = getEmptyLineMergeTarget(format, formatEl, 'front');
+	if (!selectRange && emptyLinePrev) {
 		actions.push(A.preventStop());
 		actions.push(A.backspaceEmptyLineMergePrev(formatEl, emptyLinePrev));
 		actions.push(A.historyPush(true));
@@ -363,39 +361,4 @@ export function reduceBackspaceDown(actions, ports, ctx) {
 
 	actions.push(A.caretScrollTo(range));
 	return true;
-}
-
-/**
- * @description Mirror of the Delete rule's `findNextMergeLine`: finds the previous line to merge INTO when
- * Backspace is pressed at the start of `formatEl` and the previous line in document order lies across a block
- * boundary. Returns `null` for a plain line→line neighbour (left to native) or when nothing is safely mergeable
- * (list cell, closure, brLine, start of document).
- * @param {EventPorts['format']} format
- * @param {HTMLElement} formatEl
- * @returns {?HTMLElement}
- */
-function findPrevMergeLine(format, formatEl) {
-	let prev = formatEl.previousElementSibling;
-	if (!prev) {
-		// `formatEl` is the first line of its block — look at what precedes the block.
-		const block = formatEl.parentElement;
-		if (!format.isBlock(block) || format.isClosureBlock(block)) return null;
-		prev = block.previousElementSibling;
-		if (!prev) return null;
-	} else if (!format.isBlock(prev)) {
-		return null; // plain line→line — let the browser merge it natively
-	}
-
-	// Descend into blocks to the LAST line; only merge into a simple, non-list, non-closure, non-brLine line.
-	let line = prev;
-	while (line && format.isBlock(line) && !format.isClosureBlock(line)) line = line.lastElementChild;
-	if (
-		!format.isNormalLine(line) ||
-		dom.check.isListCell(line) ||
-		format.isBrLine(line) ||
-		format.isClosureBrLine(line)
-	) {
-		return null;
-	}
-	return /** @type {HTMLElement} */ (line);
 }

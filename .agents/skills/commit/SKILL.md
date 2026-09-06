@@ -51,7 +51,7 @@ description: 커밋 메시지를 자동 생성하고 커밋한다. 커밋 요청
 ## 규칙
 
 - **커밋 메시지에 어떤 서명·트레일러도 붙이지 않는다** — `Co-Authored-By`, `Claude-Session`,
-  `Generated with Claude Code` 등 자동 첨부 문구를 모두 생략한다. 오직 위 포맷의 메시지만 남긴다.
+  `Codex-Session`, `Generated with Claude Code/Codex` 등 자동 첨부 문구를 모두 생략한다. 오직 위 포맷의 메시지만 남긴다.
 - 스코프: 생략 가능
 - 한줄 요약: 50자 이내, 영문으로 작성
 - 변경내역 작성 규칙:

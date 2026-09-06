@@ -1,5 +1,13 @@
 import { dom } from '../../../helper';
-import { hardDelete, isUneditableNode, isRtlBidiMismatch } from '../effects/ruleHelpers';
+import {
+	hardDelete,
+	isUneditableNode,
+	isRtlBidiMismatch,
+	isEdgeBreakCaret,
+	getEmptyLineMergeTarget,
+	getNestedListTarget,
+	getAdjacentElement,
+} from '../effects/ruleHelpers';
 import { A } from '../actions';
 
 /**
@@ -37,31 +45,24 @@ export function reduceDeleteDown(actions, ports, ctx) {
 		return true;
 	}
 
-	if (
-		!selectRange &&
-		!bidiNotEnd &&
-		formatEl &&
-		format.isNormalLine(formatEl) &&
-		!dom.check.isListCell(formatEl) &&
-		format.isEdgeLine(range.endContainer, range.endOffset, 'end')
-	) {
-		const targetLine = findNextMergeLine(format, formatEl);
-		if (targetLine) {
+	if (!selectRange && !bidiNotEnd && formatEl && format.isEdgeLine(range.endContainer, range.endOffset, 'end')) {
+		const adjacent = getAdjacentElement(format, formatEl, 'end');
+		if (!adjacent) {
 			actions.push(A.preventStop());
-			actions.push(A.mergeLineInto(formatEl, targetLine));
+			return false;
+		}
+
+		if (
+			format.isLine(adjacent) &&
+			adjacent.parentElement !== formatEl.parentElement &&
+			format.isNormalLine(formatEl) &&
+			format.isNormalLine(adjacent)
+		) {
+			actions.push(A.preventStop());
+			actions.push(A.mergeLineInto(formatEl, adjacent));
 			actions.push(A.historyPush(true));
 			return false;
 		}
-	}
-
-	if (
-		!selectRange &&
-		!bidiNotEnd &&
-		format.isEdgeLine(range.endContainer, range.endOffset, 'end') &&
-		!formatEl.nextSibling
-	) {
-		actions.push(A.preventStop());
-		return false;
 	}
 
 	// line delete
@@ -158,7 +159,9 @@ export function reduceDeleteDown(actions, ports, ctx) {
 	if (
 		dom.check.isListCell(formatEl) &&
 		dom.check.isList(rangeEl) &&
+		(range.startContainer !== range.endContainer || getNestedListTarget(formatEl, rangeEl)) &&
 		(selectionNode === formatEl ||
+			isEdgeBreakCaret(range, selectionNode, 'end') ||
 			(selectionNode.nodeType === 3 &&
 				(!selectionNode.nextSibling || dom.check.isList(selectionNode.nextSibling)) &&
 				(format.getLine(range.startContainer, null) !== format.getLine(range.endContainer, null)
@@ -215,16 +218,9 @@ export function reduceDeleteDown(actions, ports, ctx) {
 		}
 	}
 
-	// empty line
-	const emptyLineNext = formatEl?.nextElementSibling;
-	if (
-		!selectRange &&
-		formatEl &&
-		format.isNormalLine(formatEl) &&
-		!dom.check.isListCell(formatEl) &&
-		dom.check.isEmptyLine(formatEl) &&
-		(format.isNormalLine(emptyLineNext) || format.isBrLine(emptyLineNext))
-	) {
+	// empty line — plain lines and list cells alike
+	const emptyLineNext = getEmptyLineMergeTarget(format, formatEl, 'end');
+	if (!selectRange && emptyLineNext) {
 		actions.push(A.preventStop());
 		actions.push(A.deleteEmptyLineMergeNext(formatEl, emptyLineNext));
 		actions.push(A.historyPush(true));
@@ -232,38 +228,4 @@ export function reduceDeleteDown(actions, ports, ctx) {
 	}
 
 	return true;
-}
-
-/**
- * @description Finds the line to merge up when Delete is pressed at the end of `formatEl` and the next line in
- * document order lies across a block boundary. Returns `null` for a plain line→line neighbour (left to native)
- * or when there is nothing safely mergeable (list cell, closure, brLine, end of document).
- * @param {EventPorts['format']} format
- * @param {HTMLElement} formatEl
- * @returns {?HTMLElement}
- */
-function findNextMergeLine(format, formatEl) {
-	let next = formatEl.nextElementSibling;
-	if (!next) {
-		// `formatEl` is the last line of its block — look at what follows the block.
-		const block = formatEl.parentElement;
-		if (!format.isBlock(block) || format.isClosureBlock(block)) return null;
-		next = block.nextElementSibling;
-		if (!next) return null;
-	} else if (!format.isBlock(next)) {
-		return null; // plain line→line — let the browser merge it natively
-	}
-
-	// Descend into blocks to the first line; only merge a simple, non-list, non-closure, non-brLine line.
-	let line = next;
-	while (line && format.isBlock(line) && !format.isClosureBlock(line)) line = line.firstElementChild;
-	if (
-		!format.isNormalLine(line) ||
-		dom.check.isListCell(line) ||
-		format.isBrLine(line) ||
-		format.isClosureBrLine(line)
-	) {
-		return null;
-	}
-	return /** @type {HTMLElement} */ (line);
 }

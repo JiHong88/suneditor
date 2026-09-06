@@ -198,7 +198,8 @@ export function getEdgeChildNodes(
 };
 /**
  * @template {Node} T
- * @description Gets the previous sibling last child. If there is no sibling, then it'll take it from the closest ancestor with child
+ * @description Gets the previous sibling last child. If there is no sibling, then it'll take it from the closest ancestor with child.
+ * - Components (image, table, etc.) are treated as a single tag and not traversed into.
  * @param {Node} node Reference element
  * @param {?Node} [ceiling] Highest boundary allowed
  * @returns {T|null} Not found: `null`
@@ -206,7 +207,8 @@ export function getEdgeChildNodes(
 export function getPreviousDeepestNode<T extends Node>(node: Node, ceiling?: Node | null): T | null;
 /**
  * @template {Node} T
- * @description Gets the next sibling first child. If there is no sibling, then it'll take it from the closest ancestor with child
+ * @description Gets the next sibling first child. If there is no sibling, then it'll take it from the closest ancestor with child.
+ * - Components (image, table, etc.) are treated as a single tag and not traversed into.
  * @param {Node} node Reference element
  * @param {?Node} [ceiling] Highest boundary allowed
  * @returns {T|null} Not found: `null`

@@ -188,4 +188,122 @@ function isRtlBidiMismatch(range, formatEl, detectedEdge, doc) {
 	return detectedEdge === 'front' ? caretRect.left <= contentRect.left + 2 : caretRect.left >= contentRect.right - 2;
 }
 
-export { hardDelete, cleanRemovedTags, isUneditableNode, setDefaultLine, isRtlBidiMismatch };
+/**
+ * @description Whether the caret sits on a bare `<br>` that stands at the front/end edge of its `line`.
+ * @param {Range} range - The current range
+ * @param {Node} selectionNode - Current selection node
+ * @param {'front'|'end'} edge - Edge to test: `front` for Backspace, `end` for Delete
+ * @returns {boolean} `true` if the caret is on an edge `<br>`
+ */
+function isEdgeBreakCaret(range, selectionNode, edge) {
+	if (!range.collapsed || !dom.check.isBreak(selectionNode)) return false;
+
+	const key = edge === 'front' ? 'previousSibling' : 'nextSibling';
+	let sibling = selectionNode[key];
+	while (sibling?.nodeType === 3 && dom.check.isZeroWidth(sibling)) {
+		sibling = sibling[key];
+	}
+
+	return !sibling || dom.check.isList(sibling);
+}
+
+/**
+ * @description The previous/next element in document order — crossing in and out of blocks (list, quote).
+ * - Out of list-cell ancestors (a nested list), stopping at a closure block (table cell).
+ * @param {EventPorts['format']} format - Format module
+ * @param {?HTMLElement} line - The caret's `line` element
+ * @param {'front'|'end'} edge - `front` for the previous element, `end` for the next one
+ * @returns {?HTMLElement} The adjacent element, or `null` at the document edge
+ */
+function getAdjacentElement(format, line, edge) {
+	const siblingKey = edge === 'front' ? 'previousElementSibling' : 'nextElementSibling';
+	const childKey = edge === 'front' ? 'lastElementChild' : 'firstElementChild';
+
+	let node = line;
+	let adjacent = null;
+	while (node && !(adjacent = node[siblingKey])) {
+		const parent = node.parentElement;
+		if (!parent || format.isClosureBlock(parent) || dom.check.isWysiwygFrame(parent)) return null;
+
+		if (format.isBlock(parent)) {
+			node = parent;
+		} else if (dom.check.isListCell(parent)) {
+			if (edge === 'front') return /** @type {HTMLElement} */ (parent);
+			node = parent;
+		} else {
+			return null; // the editable root
+		}
+	}
+
+	// step into blocks down to the nearest line
+	while (adjacent && format.isBlock(adjacent) && !format.isClosureBlock(adjacent)) {
+		adjacent = adjacent[childKey];
+	}
+
+	return /** @type {?HTMLElement} */ (adjacent);
+}
+
+/**
+ * @description The previous/next `line` in document order — {@link getAdjacentElement} filtered to lines.
+ * - `null` means either the document edge or a non-`line` neighbour (a component); use
+ * {@link getAdjacentElement} when the two must be told apart.
+ * @param {EventPorts['format']} format - Format module
+ * @param {?HTMLElement} line - The caret's `line` element
+ * @param {'front'|'end'} edge - `front` for the previous line, `end` for the next one
+ * @returns {?HTMLElement} The adjacent line, or `null`
+ */
+function getAdjacentLine(format, line, edge) {
+	const adjacent = getAdjacentElement(format, line, edge);
+	return format.isLine(adjacent) ? /** @type {HTMLElement} */ (adjacent) : null;
+}
+
+/**
+ * @description The neighbouring `line` an empty line collapses into, or `null` when there is nothing to merge.
+ * - A cell owning a nested list belongs to {@link getNestedListTarget} instead.
+ * @param {EventPorts['format']} format - Format module
+ * @param {?HTMLElement} formatEl - The caret's `line` element
+ * @param {'front'|'end'} edge - `front` for Backspace (previous line), `end` for Delete (next line)
+ * @returns {?HTMLElement} The neighbouring line to merge into, or `null`
+ */
+function getEmptyLineMergeTarget(format, formatEl, edge) {
+	if (!formatEl || !format.isNormalLine(formatEl) || !dom.check.isEmptyLine(formatEl)) return null;
+	if (dom.utils.arrayFind(formatEl.children, dom.check.isList)) return null;
+
+	const neighbor = /** @type {HTMLElement} */ (
+		edge === 'front' ? formatEl.previousElementSibling : formatEl.nextElementSibling
+	);
+
+	return format.isNormalLine(neighbor) || format.isBrLine(neighbor) ? neighbor : null;
+}
+
+/**
+ * @description The nested list a list-cell Backspace/Delete would lift, or `null` when there is none.
+ * - The rules gate their list branch on it so the branch can't claim the key with nothing to do.
+ * @param {HTMLElement} formatEl - The caret's list cell
+ * @param {HTMLElement} rangeEl - The list (`UL`/`OL`) the cell belongs to
+ * @returns {?HTMLElement} The element carrying the nested list, or `null`
+ */
+function getNestedListTarget(formatEl, rangeEl) {
+	const next = /** @type {HTMLElement} */ (
+		dom.utils.arrayFind(formatEl.children, dom.check.isList) ||
+			formatEl.nextElementSibling ||
+			rangeEl?.parentElement?.nextElementSibling
+	);
+
+	if (!next) return null;
+
+	return dom.check.isList(next) || dom.utils.arrayFind(next.children, dom.check.isList) ? next : null;
+}
+
+export {
+	hardDelete,
+	cleanRemovedTags,
+	isUneditableNode,
+	setDefaultLine,
+	isRtlBidiMismatch,
+	isEdgeBreakCaret,
+	getAdjacentElement,
+	getAdjacentLine,
+	getEmptyLineMergeTarget,
+	getNestedListTarget,
+};

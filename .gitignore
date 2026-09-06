@@ -18,8 +18,7 @@ node_modules/
 .git/
 /.vs
 .claude/*
-!.claude/skills/
-!.claude/rules/
+!.claude/skills
 !.claude/settings.json
 .work.md
 

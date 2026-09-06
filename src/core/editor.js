@@ -232,7 +232,12 @@ class Editor {
 			}
 			if (e.get('documentType').usePage) {
 				e.set('documentType_use_page', true);
-				e.get('documentTypePageMirror').innerHTML = e.get('wysiwyg').innerHTML;
+				const mirror = e.get('documentTypePageMirror');
+				const frag = mirror.ownerDocument.createDocumentFragment();
+				for (let n = e.get('wysiwyg').firstChild; n; n = n.nextSibling) {
+					frag.appendChild(n.cloneNode(true));
+				}
+				mirror.replaceChildren(frag);
 			}
 		}
 	}

@@ -9,6 +9,7 @@ const ZWS_RUN_REGEXP = new RegExp(unicode.zeroWidthSpace + '+', 'g');
  * @description All HTML related classes involved in the editing area
  */
 class HTML {
+	/** @type {SunEditor.Deps} */
 	#$;
 	#store;
 
@@ -74,6 +75,18 @@ class HTML {
 				splitTagStyles[n] += tagStyles[k];
 			}
 		}
+
+		// A tag with an explicit entry that is also a line/text-style tag inherits the category
+		// styles ('@line'/'@text'), so category edits stay effective for it. (e.g. "li")
+		const formatLineReg = options.get('formatLine').reg;
+		for (const k in splitTagStyles) {
+			if (k.startsWith('@')) continue;
+			const category = formatLineReg.test(k) ? '@line' : this.#textStyleTags.includes(k) ? '@text' : '';
+			if (category && tagStyles[category]) {
+				splitTagStyles[k] += (splitTagStyles[k] ? '|' : '') + tagStyles[category];
+			}
+		}
+
 		for (const k in splitTagStyles) {
 			splitTagStyles[k] = new RegExp(`\\s*[^-a-zA-Z](${splitTagStyles[k]})\\s*:[^;]+(?!;)*`, 'gi');
 		}
@@ -1661,7 +1674,7 @@ class HTML {
 				) || [];
 			for (let i = ch.length - 1, c; i >= 0; i--) {
 				c = /** @type {HTMLElement} */ (ch[i]);
-				c.outerHTML = c.innerHTML;
+				c.replaceWith(...c.childNodes);
 			}
 
 			if (
@@ -1892,7 +1905,20 @@ class HTML {
 				}
 				checkTags.push(t);
 			} else {
-				p.parentNode.insertBefore(t, p);
+				const ref = p.nextSibling;
+
+				let rest = null;
+				if (t.nextSibling) {
+					rest = p.cloneNode(false);
+					while (t.nextSibling) rest.appendChild(t.nextSibling);
+				}
+
+				p.parentNode.insertBefore(t, ref);
+
+				if (rest) {
+					p.parentNode.insertBefore(rest, ref);
+					checkTags.push(rest);
+				}
 				checkTags.push(p);
 			}
 		}
@@ -1929,19 +1955,42 @@ class HTML {
 			}
 		}
 
+		// wrap top-level `li` elements without a list parent in a `ul`
+		if (formatFilter) {
+			const orphanCells = dom.query.getListChildNodes(
+				documentFragment,
+				(current) => dom.check.isListCell(current) && !dom.check.isList(current.parentNode),
+				null,
+			);
+
+			for (let i = 0, len = orphanCells.length, t, ul, n, next; i < len; i++) {
+				t = orphanCells[i];
+				if (dom.check.isList(t.parentNode)) continue;
+
+				ul = dom.utils.createElement('UL');
+				t.parentNode.insertBefore(ul, t);
+				n = t;
+				while (n && (dom.check.isListCell(n) || (n.nodeType === 3 && !n.textContent.trim()))) {
+					next = n.nextSibling;
+					ul.appendChild(n);
+					n = next;
+				}
+			}
+		}
+
 		for (let i = 0, len = withoutFormatCells.length, t, f; i < len; i++) {
 			t = withoutFormatCells[i];
 
 			f = dom.utils.createElement('DIV');
-			f.innerHTML = t.innerHTML;
+			while (t.firstChild) f.appendChild(t.firstChild);
 
-			if (t.textContent.trim().length === 0 && this.#isAllTextStyleNodes(t)) {
+			if (f.textContent.trim().length === 0 && this.#isAllTextStyleNodes(f)) {
 				let leaf = /** @type {Element} */ (f);
 				while (leaf.firstElementChild) leaf = leaf.firstElementChild;
 				leaf.innerHTML = '<br>';
 			}
 
-			t.innerHTML = f.outerHTML;
+			t.appendChild(f);
 		}
 	}
 

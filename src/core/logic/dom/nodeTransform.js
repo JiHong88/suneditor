@@ -106,8 +106,9 @@ class NodeTransform {
 
 			if (temp) {
 				if (dom.check.isListCell(newEl) && dom.check.isList(temp) && temp.firstElementChild) {
-					newEl.innerHTML = temp.firstElementChild.innerHTML;
-					dom.utils.removeItem(temp.firstElementChild);
+					const firstCell = temp.firstElementChild;
+					while (firstCell.firstChild) newEl.appendChild(firstCell.firstChild);
+					dom.utils.removeItem(firstCell);
 					if (temp.children.length > 0) newEl.appendChild(temp);
 				} else {
 					newEl.appendChild(temp);
@@ -300,7 +301,8 @@ class NodeTransform {
 							}
 						}
 					} else {
-						child.innerHTML += next.innerHTML;
+						while (next.firstChild) child.appendChild(next.firstChild);
+						child.normalize();
 					}
 
 					dom.utils.removeItem(next);

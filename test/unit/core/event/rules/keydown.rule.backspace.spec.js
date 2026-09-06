@@ -106,6 +106,44 @@ describe('Backspace Rule', () => {
 		expect(actions).toContainEqual(A.backspaceEmptyLineMergePrev(empty, prev));
 	});
 
+	// Regression: `_normalizeEditRange` rewrites an empty line to `<li>{ZWS}<br></li>` and parks the caret on
+	// the `<br>`, so `selectionNode` is an element. The list-cell branch used to accept only the line itself or
+	// a text node, so Backspace fell through to the browser, which merely ate the ZWS — the empty cell stayed.
+	it('merges an empty list cell into the previous cell when the caret sits on its <br>', () => {
+		const wrap = document.createElement('div');
+		wrap.setAttribute('data-se-wysiwyg', 'true');
+		const ul = document.createElement('ul');
+		const prev = document.createElement('li');
+		prev.appendChild(document.createTextNode('A'));
+		const empty = document.createElement('li');
+		const zws = document.createTextNode('\u200B');
+		const br = document.createElement('br');
+		empty.appendChild(zws);
+		empty.appendChild(br);
+		ul.appendChild(prev);
+		ul.appendChild(empty);
+		wrap.appendChild(ul);
+		document.body.appendChild(wrap);
+
+		const range = document.createRange();
+		range.setStart(br, 0);
+		range.setEnd(br, 0);
+
+		mockPorts.selection.getRange.mockReturnValue(range);
+		mockPorts.format.getLine.mockReturnValue(empty);
+		mockPorts.format.getBlock.mockReturnValue(ul);
+		mockCtx.range = range;
+		mockCtx.formatEl = empty;
+		mockCtx.selectionNode = br;
+		mockCtx.fc = new Map([['wysiwyg', wrap]]);
+
+		const result = reduceBackspaceDown(actions, mockPorts, mockCtx);
+
+		expect(result).toBe(true);
+		expect(actions).toContainEqual(A.prevent());
+		expect(actions).toContainEqual(A.backspaceListMergePrev(prev, empty, ul));
+	});
+
 	it('selects the previous component instead of merging when backspacing on an empty line after a component', () => {
 		const wrap = document.createElement('div');
 		wrap.setAttribute('data-se-wysiwyg', 'true');

@@ -28,6 +28,7 @@ export namespace DEFAULTS {
 		'@text': string;
 		'@line': string;
 		'@component': string;
+		li: string;
 		'table|th|td': string;
 		'table|td': string;
 		tr: string;
@@ -400,7 +401,7 @@ export namespace DEFAULTS {
  * - Value is a pipe-delimited list of allowed style names.
  * - Resolution order when filtering an element: `@component` (for `.se-component` containers) → explicit tag entry → `@line` (for formatLine elements) → `@text` (for textStyleTags).
  * - `@component` guards the inline sizing (`width`/`height`/`min-width`) the editor writes on a media component's container for percentage-based sizes; keep these so a clean() round-trip does not reset the component to full width.
- * - An explicit tag entry **replaces** the category default — include category styles in the value if you want both.
+ * - An explicit tag entry is **merged** with its category default when the tag belongs to one (`@line` for formatLine elements, else `@text` for textStyleTags) — the entry adds styles on top of the category's.
  * - Merged with {@link DEFAULTS.TAG_STYLES}; user-supplied keys win.
  * ```js
  * {
@@ -408,8 +409,8 @@ export namespace DEFAULTS {
  *     '@text': 'color|font-size|background-color',  // default for span, b, i, em, ...
  *     '@line': 'text-align|margin|line-height',     // default for p, h1-h6, div, li, ...
  *     'table|td': 'border|color|background-color',  // per-tag whitelist
- *     div: 'color',                                   // explicit override; ignores `@line` default
- *     hr: 'border-top',
+ *      div: 'color',                                 // merged with the `@line` default (div is a line element)
+ *      hr: 'border-top',
  *   }
  * }
  * ```
@@ -1254,7 +1255,7 @@ export type EditorBaseOptions = {
 	 * - Value is a pipe-delimited list of allowed style names.
 	 * - Resolution order when filtering an element: `@component` (for `.se-component` containers) → explicit tag entry → `@line` (for formatLine elements) → `@text` (for textStyleTags).
 	 * - `@component` guards the inline sizing (`width`/`height`/`min-width`) the editor writes on a media component's container for percentage-based sizes; keep these so a clean() round-trip does not reset the component to full width.
-	 * - An explicit tag entry **replaces** the category default — include category styles in the value if you want both.
+	 * - An explicit tag entry is **merged** with its category default when the tag belongs to one (`@line` for formatLine elements, else `@text` for textStyleTags) — the entry adds styles on top of the category's.
 	 * - Merged with {@link DEFAULTS.TAG_STYLES}; user-supplied keys win.
 	 * ```js
 	 * {
@@ -1262,7 +1263,7 @@ export type EditorBaseOptions = {
 	 * '@text': 'color|font-size|background-color',  // default for span, b, i, em, ...
 	 * '@line': 'text-align|margin|line-height',     // default for p, h1-h6, div, li, ...
 	 * 'table|td': 'border|color|background-color',  // per-tag whitelist
-	 * div: 'color',                                   // explicit override; ignores `@line` default
+	 * div: 'color',                                 // merged with the `@line` default (div is a line element)
 	 * hr: 'border-top',
 	 * }
 	 * }

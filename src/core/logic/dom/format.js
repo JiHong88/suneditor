@@ -74,7 +74,7 @@ class Format {
 			) {
 				newFormat = /** @type {HTMLElement} */ (element.cloneNode(false));
 				dom.utils.copyFormatAttributes(newFormat, node);
-				newFormat.innerHTML = node.innerHTML;
+				while (node.firstChild) newFormat.appendChild(node.firstChild);
 
 				node.parentNode.replaceChild(newFormat, node);
 			}
