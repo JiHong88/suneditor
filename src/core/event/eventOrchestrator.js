@@ -1107,6 +1107,7 @@ class EventOrchestrator extends KernelInjector {
 		}
 
 		this.#scrollContainer();
+		this.#ui.blockHandle?.syncScroll();
 
 		// document type page
 		if (this.$.frameContext.has('documentType_use_page')) {
@@ -1159,6 +1160,7 @@ class EventOrchestrator extends KernelInjector {
 	#OnScroll_Abs() {
 		this.#menu.dropdownOff();
 		this.#scrollContainer();
+		this.#ui.blockHandle?.syncScroll();
 	}
 
 	/**

@@ -653,23 +653,36 @@ describe('BlockHandle', () => {
 		});
 	});
 
-	describe('keydown in wysiwyg clears hover lines', () => {
-		it('removes se-block-hover from current block on keydown', () => {
+	describe('hideOnKeyDown (called from the core keydown pipeline)', () => {
+		it('hides the handle and removes se-block-hover from the current block', () => {
 			const helperMock = require('../../../../../src/helper');
 			const { p1 } = setupThreeBlocks();
-
-			// frameContext.get('eventWysiwyg') returns a (cached) element — capture it so
-			// we can dispatch a keydown that hits the wrapper key handler.
-			const eventWysiwyg = $.frameContext.get('eventWysiwyg');
 
 			blockHandle = new BlockHandle($, els.area, els.handle, els.plus, els.drag, null);
 			blockHandle.positionForTarget(p1);
 			helperMock.dom.utils.removeClass.mockClear();
 
-			eventWysiwyg.dispatchEvent(new KeyboardEvent('keydown', { key: 'a' }));
+			blockHandle.hideOnKeyDown();
 
+			expect(els.handle.style.display).toBe('none');
 			const removeCalls = helperMock.dom.utils.removeClass.mock.calls.filter((c) => c[1] === 'se-block-hover');
 			expect(removeCalls.length).toBeGreaterThan(0);
+		});
+
+		it('keeps the handle hidden when a synthetic mousemove repeats the same position', () => {
+			const { p1 } = setupThreeBlocks();
+
+			blockHandle = new BlockHandle($, els.area, els.handle, els.plus, els.drag, null);
+			blockHandle.positionForTarget(p1, 100);
+			blockHandle.hideOnKeyDown();
+
+			// layout shift under the pointer replays a mousemove at the same Y — must stay hidden
+			blockHandle.positionForTarget(p1, 100);
+			expect(els.handle.style.display).toBe('none');
+
+			// a real move (different Y) releases the lock
+			blockHandle.positionForTarget(p1, 120);
+			expect(els.handle.style.display).toBe('flex');
 		});
 	});
 

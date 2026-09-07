@@ -47,5 +47,10 @@ declare class BlockHandle {
 	 * @description Cleanup — remove listeners, destroy menus, null references.
 	 */
 	destroy(): void;
+	/**
+	 * @internal
+	 * @description Editor keyboard activity (typing, Enter, etc.)
+	 */
+	hideOnKeyDown(): void;
 	#private;
 }

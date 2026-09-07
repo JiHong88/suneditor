@@ -2187,7 +2187,7 @@ const options1 = {
 		pre: '// code', // tag override wins over @brLine
 		h1: 'Heading 1',
 	},
-	height: 'auto',
+	height: '300px',
 	// textDirection: 'rtl',
 	// value: `<a href="https://example.com"><img alt="Logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==" /></a>`,
 };
