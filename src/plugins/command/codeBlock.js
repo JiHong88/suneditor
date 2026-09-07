@@ -1,5 +1,5 @@
 import { PluginCommand, PluginDropdown } from '../../interfaces';
-import { converter, dom } from '../../helper';
+import { converter, dom, env } from '../../helper';
 import { Controller } from '../../modules/contract';
 import { SelectMenu } from '../../modules/ui';
 
@@ -132,6 +132,14 @@ class CodeBlock extends PluginCommand {
 
 		this.#hoverSelectMenu.on(this.#hoverButton, this.#onHoverSelect.bind(this));
 		this.#buildHoverMenu('');
+
+		this.$.eventManager.addEvent(containerEl, 'mousedown', (e) => {
+			if (env.isMobile || this.#hoverSelectMenu.form?.contains(dom.query.getEventTarget(e))) {
+				this.$.store.set('_preventBlur', true);
+			} else {
+				e.preventDefault();
+			}
+		});
 
 		// selectMenu
 		this.$.eventManager.addEvent(this.#hoverButton, 'click', (e) => {
