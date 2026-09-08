@@ -54,6 +54,10 @@ class BlockHandle {
 	#pendingMouseY = undefined;
 	/** @type {number|null} */
 	#hideTimer = null;
+	/** @type {boolean} */
+	#keyboardLock = false;
+	/** @type {number|undefined} */
+	#lastMouseY = undefined;
 	/** @type {HTMLElement[]} */
 	#hoverLines = [];
 
@@ -123,8 +127,6 @@ class BlockHandle {
 			em.addEvent(wrapper, 'dragover', this.#onDragOver.bind(this));
 			em.addEvent(wrapper, 'drop', this.#onDrop.bind(this));
 		}
-
-		em.addEvent(this.#$.frameContext.get('eventWysiwyg'), 'keydown', this.#onWrapperKeyDown.bind(this), true);
 	}
 
 	/**
@@ -161,13 +163,24 @@ class BlockHandle {
 		this.#cancelHide();
 		// Lock handle while action menu is open or dragging
 		if (this.#actionMenu?.isOpen || this.#isDragging) return;
+
+		if (this.#keyboardLock) {
+			if (mouseY === this.#lastMouseY) return;
+			this.#keyboardLock = false;
+		}
+
+		const framePending = this.#pendingTarget !== null;
 		this.#pendingTarget = eventTarget;
+		this.#lastMouseY = mouseY;
 		this.#pendingMouseY = mouseY;
-		if (this.#rafId) return;
+		if (framePending) return;
+
 		this.#rafId = _w.requestAnimationFrame(() => {
 			this.#rafId = null;
-			if (this.#pendingTarget) {
-				this.#doPosition(this.#pendingTarget, this.#pendingMouseY);
+			const target = this.#pendingTarget;
+			this.#pendingTarget = null;
+			if (target) {
+				this.#doPosition(target, this.#pendingMouseY);
 			}
 		});
 	}
@@ -321,6 +334,7 @@ class BlockHandle {
 		if (!this.#$) return;
 		if (this.#isDragging) return;
 
+		this.#keyboardLock = false;
 		this.#cancelHide();
 
 		// Don't reposition while action menu is open
@@ -494,6 +508,24 @@ class BlockHandle {
 
 		const totalOffset = indent + centeringExtra;
 
+		const toolbarEl = this.#$.context?.get('toolbar_main');
+		if (toolbarEl) {
+			const tRect = toolbarEl.getBoundingClientRect();
+			const handleWidth = this.#handle.offsetWidth || 0;
+			const hTop = firstLineCenterVP - handleHeight / 2;
+			const hLeft = isRtl ? areaRect.right - totalOffset - handleWidth : areaRect.left + totalOffset;
+			if (
+				tRect.height > 0 &&
+				hTop < tRect.bottom - 1 &&
+				hTop + handleHeight > tRect.top + 1 &&
+				hLeft < tRect.right &&
+				hLeft + handleWidth > tRect.left
+			) {
+				this.#hideHandle();
+				return;
+			}
+		}
+
 		this.#handle.style.top = top + 'px';
 		if (isRtl) {
 			this.#handle.style.left = '';
@@ -628,10 +660,13 @@ class BlockHandle {
 	}
 
 	/**
+	 * @internal
 	 * @description Editor keyboard activity (typing, Enter, etc.)
 	 */
-	#onWrapperKeyDown() {
-		this.#clearHoverLines();
+	hideOnKeyDown() {
+		if (this.#actionMenu?.isOpen) return;
+		this.#keyboardLock = true;
+		this.hideNow();
 	}
 
 	/**

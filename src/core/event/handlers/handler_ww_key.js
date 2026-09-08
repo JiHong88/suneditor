@@ -22,6 +22,8 @@ const _styleNodes = Object.preventExtensions({ value: [] });
  * @param {KeyboardEvent} e - Event object
  */
 export async function OnKeyDown_wysiwyg(fc, e) {
+	this.$.ui.blockHandle?.hideOnKeyDown();
+
 	if ((this.isComposing = keyCodeMap.isComposing(e))) return true;
 	if (this.$.ui.selectMenuOn || !e.isTrusted) return;
 

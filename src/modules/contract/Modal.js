@@ -249,6 +249,7 @@ class Modal {
 		}
 
 		this.#targetElement = null;
+		this.isUpdate = false;
 	}
 
 	/**
