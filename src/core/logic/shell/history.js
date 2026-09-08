@@ -1,6 +1,35 @@
-import { _w } from '../../../helper/env';
+import { _w, _d } from '../../../helper/env';
 import { getNodeFromPath, getNodePath } from '../../../helper/dom/domQuery';
 import { numbers } from '../../../helper';
+
+const TRANSIENT_UI_CLASSES = [
+	'se-component-selected',
+	'se-figure-over-selected',
+	'se-block-hover',
+	'se-pre-code-focus',
+];
+const TRANSIENT_UI_CLASS_RE = new RegExp(TRANSIENT_UI_CLASSES.join('|'));
+const TRANSIENT_UI_CLASS_SELECTOR = '.' + TRANSIENT_UI_CLASSES.join(', .');
+
+/**
+ * @description Strips transient UI-state classes (selection/hover markers) from a snapshot's HTML.
+ * - only while a marker is actually present in the serialized content.
+ * @param {string} html Serialized wysiwyg content
+ * @returns {string} The cleaned content
+ */
+function cleanSnapshot(html) {
+	if (!TRANSIENT_UI_CLASS_RE.test(html)) return html;
+
+	const t = _d.createElement('template');
+	t.innerHTML = html;
+
+	const marked = t.content.querySelectorAll(TRANSIENT_UI_CLASS_SELECTOR);
+	for (let i = 0; i < marked.length; i++) {
+		marked[i].classList.remove(...TRANSIENT_UI_CLASSES);
+	}
+
+	return t.innerHTML;
+}
 
 /**
  * @description History stack closure
@@ -206,7 +235,7 @@ export default function History(kernel) {
 		$.pluginManager.checkFileInfo(false);
 
 		const fc = frameRoots.get(rootKey);
-		const current = fc.get('wysiwyg').innerHTML;
+		const current = cleanSnapshot(fc.get('wysiwyg').innerHTML);
 		const root = rootStack[rootKey];
 		if (!current || (root.value[root.index] && current === root.value[root.index].content)) return;
 		if (stack.length > stackIndex + 1) refreshRoots(root);
@@ -319,7 +348,7 @@ export default function History(kernel) {
 		 */
 		overwrite(rootKey) {
 			setStack(
-				frameRoots.get(rootKey || store.get('rootKey')).get('wysiwyg').innerHTML,
+				cleanSnapshot(frameRoots.get(rootKey || store.get('rootKey')).get('wysiwyg').innerHTML),
 				null,
 				store.get('rootKey'),
 				0,

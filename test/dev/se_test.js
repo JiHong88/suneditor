@@ -834,7 +834,7 @@ const options1 = {
 	},
 	// autoLinkify: false,
 	// autoStyleify: [],
-	componentInsertBehavior: 'auto', // auto, select, line, none
+	componentInsertBehavior: 'none', // auto, select, line, none
 	// strictMode: false,
 	// freeCodeViewMode: true,
 	value: `
@@ -2651,6 +2651,7 @@ const options_test = {
 	},
 	image: {
 		multiple: true,
+		
 		width: '100%',
 		height: 'auto',
 		sizeOnlyPercentage: false,

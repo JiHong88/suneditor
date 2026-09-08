@@ -136,6 +136,8 @@ class Component {
 
 		if (insertBehavior === undefined) insertBehavior = this.#options.get('componentInsertBehavior');
 
+		if (this.isSelected) this.__deselect();
+
 		const r = this.#$.html.remove();
 		const isInline = this.isInline(element);
 		this.#$.selection.getRangeAndAddLine(this.#$.selection.getRange(), r.container);
@@ -195,7 +197,7 @@ class Component {
 
 		const targetElement = /** @type {HTMLElement} */ (oNode || element);
 
-		if (scrollTo) this.#$.selection.scrollTo(targetElement, { behavior: 'auto' });
+		if (scrollTo) this.#$.selection.scrollTo(targetElement, { behavior: 'auto', noFocus: true });
 		if (insertBehavior !== null) this.applyInsertBehavior(element, oNode, insertBehavior);
 
 		return targetElement;
