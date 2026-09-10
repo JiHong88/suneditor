@@ -54,18 +54,21 @@ describe('Table Menu Render', () => {
     describe('CreateColumnMenu', () => {
         it('should create column menu', () => {
             const result = CreateColumnMenu(mockLang, mockIcons);
-            expect(result.items).toEqual(['insert-left', 'insert-right', 'delete']);
-            expect(result.menus.length).toBe(3);
+            expect(result.items).toEqual(['insert-left', 'insert-right', 'move-left', 'move-right', 'delete']);
+            expect(result.menus.length).toBe(5);
             expect(result.menus[0].title).toBe('Insert Column Before');
+            // items and menu nodes are index-matched — a mismatch dispatches the wrong command
+            expect(result.items.length).toBe(result.menus.length);
         });
     });
 
     describe('CreateRowMenu', () => {
         it('should create row menu', () => {
             const result = CreateRowMenu(mockLang, mockIcons);
-            expect(result.items).toEqual(['insert-above', 'insert-below', 'delete']);
-            expect(result.menus.length).toBe(3);
+            expect(result.items).toEqual(['insert-above', 'insert-below', 'move-up', 'move-down', 'delete']);
+            expect(result.menus.length).toBe(5);
             expect(result.menus[0].title).toBe('Insert Row Above');
+            expect(result.items.length).toBe(result.menus.length);
         });
     });
 

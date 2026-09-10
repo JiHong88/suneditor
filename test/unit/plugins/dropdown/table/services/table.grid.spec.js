@@ -31,6 +31,7 @@ jest.mock('../../../../../../src/modules/ui', () => ({
 		create: jest.fn(),
 		open: jest.fn(),
 		close: jest.fn(),
+		items: [],
 		menus: [{ style: {} }, { style: {} }],
 	})),
 }));

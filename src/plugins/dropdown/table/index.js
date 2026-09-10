@@ -16,6 +16,7 @@ import { CreateHTML, CreateHTML_controller_table, CreateHTML_controller_cell } f
 import TableCellService from './services/table.cell';
 import TableClipboardService from './services/table.clipboard';
 import TableGridService from './services/table.grid';
+import TableReorderService from './services/table.reorder';
 import TableResizeService from './services/table.resize';
 import TableSelectionService from './services/table.selection';
 import TableStyleService from './services/table.style';
@@ -148,6 +149,7 @@ class Table extends PluginDropdownFree {
 		this.cellService = new TableCellService(this, serviceOptions);
 		this.clipboardService = new TableClipboardService(this);
 		this.gridService = new TableGridService(this, serviceOptions);
+		this.reorderService = new TableReorderService(this);
 		this.resizeService = new TableResizeService(this);
 		this.selectionService = new TableSelectionService(this);
 		this.styleService = new TableStyleService(this, { pluginOptions, controller_table });

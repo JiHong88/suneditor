@@ -40,12 +40,21 @@ export function CreateColumnMenu(lang, icons) {
 		<div title="${lang.insertColumnAfter}" aria-label="${lang.insertColumnAfter}">
 			<span class="se-list-icon">${icons.insert_column_right}</span><span class="se-txt">${lang.insertColumnAfter}</span>
 		</div>
+		<div title="${lang.moveColumnLeft}" aria-label="${lang.moveColumnLeft}">
+			<span class="se-list-icon">${icons.menu_arrow_left}</span><span class="se-txt">${lang.moveColumnLeft}</span>
+		</div>
+		<div title="${lang.moveColumnRight}" aria-label="${lang.moveColumnRight}">
+			<span class="se-list-icon">${icons.menu_arrow_right}</span><span class="se-txt">${lang.moveColumnRight}</span>
+		</div>
 		<div title="${lang.deleteColumn}" aria-label="${lang.deleteColumn}">
 			<span class="se-list-icon">${icons.delete_column}</span><span class="se-txt">${lang.deleteColumn}</span>
 		</div>`,
 	);
 
-	return { items: ['insert-left', 'insert-right', 'delete'], menus: menus.querySelectorAll('div') };
+	return {
+		items: ['insert-left', 'insert-right', 'move-left', 'move-right', 'delete'],
+		menus: menus.querySelectorAll('div'),
+	};
 }
 
 /**
@@ -65,12 +74,21 @@ export function CreateRowMenu(lang, icons) {
 		<div title="${lang.insertRowBelow}" aria-label="${lang.insertRowBelow}">
 			<span class="se-list-icon">${icons.insert_row_below}</span><span class="se-txt">${lang.insertRowBelow}</span>
 		</div>
+		<div title="${lang.moveRowUp}" aria-label="${lang.moveRowUp}">
+			<span class="se-list-icon">${icons.menu_arrow_up}</span><span class="se-txt">${lang.moveRowUp}</span>
+		</div>
+		<div title="${lang.moveRowDown}" aria-label="${lang.moveRowDown}">
+			<span class="se-list-icon">${icons.menu_arrow_down}</span><span class="se-txt">${lang.moveRowDown}</span>
+		</div>
 		<div title="${lang.deleteRow}" aria-label="${lang.deleteRow}">
 			<span class="se-list-icon">${icons.delete_row}</span><span class="se-txt">${lang.deleteRow}</span>
 		</div>`,
 	);
 
-	return { items: ['insert-above', 'insert-below', 'delete'], menus: menus.querySelectorAll('div') };
+	return {
+		items: ['insert-above', 'insert-below', 'move-up', 'move-down', 'delete'],
+		menus: menus.querySelectorAll('div'),
+	};
 }
 
 /**

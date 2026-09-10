@@ -3376,6 +3376,11 @@
 	cursor: not-allowed;
 }
 
+.sun-editor .se-select-menu .se-select-item.se-select-disabled {
+	opacity: 0.4;
+	cursor: not-allowed;
+}
+
 .sun-editor .se-modal-form-files .se-select-menu {
 	width: 100%;
 	height: auto;

@@ -1,7 +1,7 @@
 import { dom, numbers } from '../../../../helper';
 import { SelectMenu } from '../../../../modules/ui';
 
-import { CreateCellsHTML, CreateCellsString, InvalidateTableCache } from '../shared/table.utils';
+import { CreateCellsHTML, CreateCellsString, GetLogicalCellIndex, InvalidateTableCache } from '../shared/table.utils';
 import { CreateColumnMenu, CreateRowMenu } from '../render/table.menu';
 
 /**
@@ -57,6 +57,7 @@ export class TableGridService {
 	 * @description Opens the column menu.
 	 */
 	openColumnMenu() {
+		this.#refreshMoveItems(this.selectMenu_column, false);
 		this.selectMenu_column.open();
 	}
 
@@ -69,6 +70,7 @@ export class TableGridService {
 		)
 			? 'none'
 			: '';
+		this.#refreshMoveItems(this.selectMenu_row, true);
 		this.selectMenu_row.open();
 	}
 
@@ -499,9 +501,14 @@ export class TableGridService {
 
 	/**
 	 * @description Handles column operations such as insert and delete.
-	 * @param {"insert-left"|"insert-right"|"delete"} command The column operation to perform.
+	 * @param {"insert-left"|"insert-right"|"delete"|"move-left"|"move-right"} command The column operation to perform.
 	 */
 	#OnColumnEdit(command) {
+		if (command === 'move-left' || command === 'move-right') {
+			this.#moveBand(false, command === 'move-left' ? -1 : 1);
+			return;
+		}
+
 		InvalidateTableCache(this.#main._element);
 
 		switch (command) {
@@ -520,9 +527,14 @@ export class TableGridService {
 
 	/**
 	 * @description Handles row operations such as insert and delete.
-	 * @param {"insert-above"|"insert-below"|"delete"} command The row operation to perform.
+	 * @param {"insert-above"|"insert-below"|"delete"|"move-up"|"move-down"} command The row operation to perform.
 	 */
 	#OnRowEdit(command) {
+		if (command === 'move-up' || command === 'move-down') {
+			this.#moveBand(true, command === 'move-up' ? -1 : 1);
+			return;
+		}
+
 		InvalidateTableCache(this.#main._element);
 
 		switch (command) {
@@ -537,6 +549,52 @@ export class TableGridService {
 		}
 
 		this.#main.historyPush();
+	}
+
+	/**
+	 * @description Greys out the move rows that have nothing left to move over.
+	 * @param {import('../../../../modules/ui/SelectMenu').default} selectMenu Menu to refresh
+	 * @param {boolean} isRow `true` for the row menu
+	 */
+	#refreshMoveItems(selectMenu, isRow) {
+		const table = this.#main._element;
+		const cell = this.#state.tdElement;
+		const row = /** @type {HTMLTableRowElement} */ (cell?.parentElement);
+		// The "move backwards" item, immediately followed by "move forwards" (see table.menu.js).
+		const moveIndex = selectMenu.items.findIndex((k) => k.startsWith?.('move-'));
+		if (!table || !row || moveIndex < 0) return;
+
+		const index = isRow ? row.rowIndex : GetLogicalCellIndex(table, row.rowIndex, cell.cellIndex);
+		const reorder = this.#main.reorderService;
+		const band = reorder.getBand(table, index, isRow);
+		const targets = reorder.getDropTargets(table, band, isRow);
+
+		dom.utils.toggleClass(selectMenu.menus[moveIndex], 'se-select-disabled', !targets.some((t) => t < band.start));
+		dom.utils.toggleClass(
+			selectMenu.menus[moveIndex + 1],
+			'se-select-disabled',
+			!targets.some((t) => t > band.end + 1),
+		);
+	}
+
+	/**
+	 * @description Moves the band holding the current cell one step.
+	 * @param {boolean} isRow `true` to move rows, `false` to move columns
+	 * @param {-1|1} direction `-1` for up/left, `1` for down/right
+	 */
+	#moveBand(isRow, direction) {
+		const table = this.#main._element;
+		const cell = this.#state.tdElement;
+		const row = /** @type {HTMLTableRowElement} */ (cell?.parentElement);
+		if (!table || !row) return;
+
+		const index = isRow ? row.rowIndex : GetLogicalCellIndex(table, row.rowIndex, cell.cellIndex);
+		const reorder = this.#main.reorderService;
+
+		reorder.moveStep(table, reorder.getBand(table, index, isRow), isRow, direction);
+
+		// The menu is still open for the next click, so re-evaluate against the new position.
+		this.#refreshMoveItems(isRow ? this.selectMenu_row : this.selectMenu_column, isRow);
 	}
 }
 
