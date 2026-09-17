@@ -20,6 +20,17 @@ All files under `dist/` are **auto-generated** by webpack build.
 - CSS: edit `src/assets/suneditor.css` or `src/assets/suneditor-contents.css`
 - Run `npm run build:prod` to regenerate `dist/`
 
+### CSS conventions (`suneditor.css`)
+
+- **RTL rules go in the RTL section.** Every `.se-rtl` selector belongs in the dedicated block at
+  the bottom of `suneditor.css` (`/** --- RTL start */` … `/** --- RTL end */`), never next to the
+  base (LTR) rules. Group new rules after the existing rules of the same feature area (e.g. table
+  rules after the other table rules).
+- **Colors come from theme tokens, never hardcoded.** Use `var(--se-*)`; define new tokens in
+  `src/assets/design/color.css` (light defaults) and override them in every theme file under
+  `src/themes/*.css` (dark, midnight, cobalt, cream) — prefer aliasing an existing theme token
+  (e.g. `var(--se-main-color-lighter)`) over inventing per-theme literal values.
+
 ## 3. Language files: edit `en.js` only
 
 All language files under `src/langs/` (except `en.js`) are **auto-generated** by the translation script.

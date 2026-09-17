@@ -11,6 +11,7 @@ Full API: `guide/custom-plugin.md`. Full conventions: `prompts/coding-rules.md`.
 - **iframe-safe**: never `instanceof` (use `dom.check.*` / `this.$.instanceCheck.*`); never bare `window`/`document` (use `_w`/`_d` from `helper/env`, or `frameContext.get('_ww'/'_wd')`).
 - **State containers** are distinct: `store` (runtime state) vs `context` (global UI) vs `frameContext` (per-frame DOM) vs `options`/`frameOptions`. Mutate via `store.set()` so subscribers fire.
 - **i18n**: add new keys to `src/langs/en.js` only; reference as `this.$.lang.<key>`. No hardcoded UI strings.
+- **CSS**: colors via theme tokens only (`var(--se-*)` — new tokens in `design/color.css` + overrides in every `src/themes/*.css`); all `.se-rtl` rules go in the RTL section at the bottom of `suneditor.css`, never beside the base rules. Detail: `prompts/editing-rules.md`.
 
 Reference implementations: `src/plugins/command/blockquote.js` (simple), `src/plugins/dropdown/align.js` (dropdown), `src/plugins/modal/link.js` (modal+controller).
 
