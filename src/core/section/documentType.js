@@ -19,6 +19,7 @@ class DocumentType {
 	#offset;
 	#selection;
 	#toolbar;
+	#options;
 
 	#fc;
 	#ww;
@@ -61,6 +62,7 @@ class DocumentType {
 		this.#offset = $.offset;
 		this.#selection = $.selection;
 		this.#toolbar = $.toolbar;
+		this.#options = $.options;
 
 		// members
 		this.useHeader = $.options.get('_type_options').includes('header');
@@ -244,6 +246,8 @@ class DocumentType {
 
 			this.#pagesLine = this.#page.querySelectorAll('.se-document-page-line');
 			this.#totalPages = this.#pages.length;
+			this.#prevScrollTop = scrollTop;
+
 			this.#updatePageVisibility();
 			this._displayCurrentPage();
 		}, 400);
@@ -391,7 +395,7 @@ class DocumentType {
 		const pages = this.#pages;
 		const delta = scrollTop - prevScrollTop;
 		for (let i = 0, len = pages.length; i < len; i++) {
-			pages[i].style.top = `${numbers.get(pages[i].style.top) - delta}px`;
+			pages[i].style.top = `${numbers.get(pages[i].style.top, -1) - delta}px`;
 		}
 		this.#updatePageVisibility();
 
@@ -438,7 +442,7 @@ class DocumentType {
 
 		const pages = this.#pages;
 		for (let i = 0, len = pages.length; i < len; i++) {
-			if (pages[i].offsetTop >= targetPosition) {
+			if (numbers.get(pages[i].style.top) >= targetPosition) {
 				return (this.#pageNum = i);
 			}
 		}
@@ -536,17 +540,21 @@ class DocumentType {
 			(!isScrollable ? 0 : this._getWWScrollTop());
 		for (let i = 0, len = children.length, c; i < len; i++) {
 			c = children[i];
-			if (c.offsetTop >= pageTop) {
+			if (c.offsetTop + c.offsetHeight > pageTop) {
 				if (!force) this.#selection.setRange(c, 0, c, 0);
-				const scrollTop =
-					i === 0 && isScrollable ? 0 : c.offsetTop - this.#page.offsetTop - c.offsetHeight + globalTop;
+				const scrollTop = i === 0 && isScrollable ? 0 : pageTop - this.#page.offsetTop + globalTop;
 				this._applyPageScroll(scrollTop, () => {
 					if (this.#toolbar.isSticky && !this.#store.mode.isBottom) {
 						this._getDisplayPage().scrollTo({
-							top: scrollTop - this.#context.get('toolbar_main').offsetHeight,
+							top:
+								scrollTop -
+								this.#context.get('toolbar_main').offsetHeight -
+								this.#options.get('_toolbar_sticky'),
 							behavior: 'smooth',
 						});
 					}
+
+					this._displayCurrentPage();
 				});
 
 				this.#pageNum = pageNum;
@@ -563,12 +571,20 @@ class DocumentType {
 		const displayPage = this._getDisplayPage();
 
 		displayPage.scrollTo({ top, behavior: 'smooth' });
+
+		let prevPos = null;
+		let stalledFrames = 0;
 		const checkScrollEnd = () => {
-			if (Math.abs((displayPage.scrollY ?? displayPage.scrollTop) - top) < 1) {
+			const pos = displayPage.scrollY ?? displayPage.scrollTop;
+			if (Math.abs(pos - top) < 1 || (pos === prevPos && ++stalledFrames >= 10)) {
 				callback();
-			} else {
-				_w.requestAnimationFrame(checkScrollEnd);
+				return;
 			}
+			if (pos !== prevPos) {
+				prevPos = pos;
+				stalledFrames = 0;
+			}
+			_w.requestAnimationFrame(checkScrollEnd);
 		};
 
 		_w.requestAnimationFrame(checkScrollEnd);
