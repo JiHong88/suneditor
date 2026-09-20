@@ -530,9 +530,13 @@ class Component {
 		if (info || figure) {
 			info ||= this.get(figure);
 			if (info && !dom.utils.hasClass(info.container, 'se-component-selected')) {
-				this.#$.ui.offCurrentController();
-				_DragHandle.set('__overInfo', ON_OVER_COMPONENT);
-				this.select(info.target, info.pluginName);
+				if (this.isSelected && this.currentInfo?.container === info.container) {
+					dom.utils.addClass(info.container, 'se-component-selected');
+				} else {
+					this.#$.ui.offCurrentController();
+					_DragHandle.set('__overInfo', ON_OVER_COMPONENT);
+					this.select(info.target, info.pluginName);
+				}
 			}
 		} else if (_DragHandle.get('__overInfo') !== null && !dom.utils.hasClass(target, 'se-drag-handle')) {
 			this.__deselect();
@@ -832,7 +836,7 @@ class Component {
 		if (
 			this.currentTarget?.contains(target) ||
 			dom.query.getParentElement(target, '.se-controller') ||
-			dom.utils.hasClass(target, 'se-drag-handle') ||
+			dom.utils.hasClass(target, 'se-drag-handle|se-table-move-handle') ||
 			(this.currentPluginName === this.#$.ui.currentControllerName &&
 				this.#$.ui.opendControllers.some(({ form }) => form.contains(target)))
 		) {

@@ -73,6 +73,7 @@ declare class Table extends PluginDropdownFree {
 	gridService: TableGridService;
 	reorderService: TableReorderService;
 	resizeService: TableResizeService;
+	handleService: TableHandleService;
 	selectionService: TableSelectionService;
 	styleService: TableStyleService;
 	/**
@@ -173,6 +174,7 @@ import { Figure } from '../../../modules/contract';
 import TableCellService from './services/table.cell';
 import TableClipboardService from './services/table.clipboard';
 import TableGridService from './services/table.grid';
+import TableHandleService from './services/table.handle';
 import TableReorderService from './services/table.reorder';
 import TableResizeService from './services/table.resize';
 import TableSelectionService from './services/table.selection';

@@ -51,9 +51,11 @@ export type _Lang = {
 	cut: string;
 	default: string;
 	deleteColumn: string;
+	moveColumn: string;
 	moveColumnLeft: string;
 	moveColumnRight: string;
 	deleteRow: string;
+	moveRow: string;
 	moveRowUp: string;
 	moveRowDown: string;
 	dir_ltr: string;

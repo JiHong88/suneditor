@@ -1673,6 +1673,98 @@
 	z-index: 2;
 }
 
+/* table move - row/column handles */
+.sun-editor .se-table-move-handle {
+	position: absolute;
+	display: none;
+	overflow: hidden;
+	z-index: 3;
+	background-color: transparent;
+	cursor: grab;
+	opacity: 0.3;
+}
+.sun-editor .se-table-move-handle:hover,
+.sun-editor .se-table-move-handle.se-dragging {
+	opacity: 1;
+}
+.sun-editor .se-table-move-handle.se-dragging {
+	cursor: grabbing;
+}
+
+/* grip pill */
+.sun-editor .se-table-move-handle::before {
+	content: '';
+	position: absolute;
+	background-color: var(--se-table-move-grip-color);
+	border-radius: var(--se-border-radius);
+}
+
+/* grip dots */
+.sun-editor .se-table-move-handle::after {
+	content: '';
+	position: absolute;
+	width: 2px;
+	height: 2px;
+	border-radius: 50%;
+	color: var(--se-table-move-grip-dot-color);
+	background-color: currentColor;
+}
+.sun-editor .se-table-move-handle:hover::after,
+.sun-editor .se-table-move-handle.se-dragging::after {
+	color: var(--se-table-move-grip-dot-hover-color);
+}
+
+.sun-editor .se-table-move-handle-row {
+	width: 24px;
+}
+.sun-editor .se-table-move-handle-row::before {
+	right: 4px;
+	width: 12px;
+	top: var(--se-table-grip-start, 0px);
+	height: var(--se-table-grip-size, 0px);
+}
+.sun-editor .se-table-move-handle-row::after {
+	right: 9px;
+	top: calc(var(--se-table-grip-start, 0px) + var(--se-table-grip-size, 0px) / 2 - 1px);
+	box-shadow:
+		0 -5px 0 currentColor,
+		0 5px 0 currentColor;
+}
+
+.sun-editor .se-table-move-handle-column {
+	height: 24px;
+}
+.sun-editor .se-table-move-handle-column::before {
+	bottom: 4px;
+	height: 12px;
+	left: var(--se-table-grip-start, 0px);
+	width: var(--se-table-grip-size, 0px);
+}
+.sun-editor .se-table-move-handle-column::after {
+	bottom: 9px;
+	left: calc(var(--se-table-grip-start, 0px) + var(--se-table-grip-size, 0px) / 2 - 1px);
+	box-shadow:
+		-5px 0 0 currentColor,
+		5px 0 0 currentColor;
+}
+
+/* table move - band overlays */
+.sun-editor .se-table-move-band-source,
+.sun-editor .se-table-move-band-target {
+	position: absolute;
+	display: none;
+	pointer-events: none;
+	z-index: 2;
+}
+.sun-editor .se-table-move-band-source {
+	background-color: var(--se-drag-over-color);
+	opacity: 0.15;
+}
+.sun-editor .se-table-move-band-target {
+	background-color: var(--se-table-move-target-color);
+	opacity: 0.18;
+}
+
 /* dropdown layer --- table selector */
 .sun-editor .se-selector-table {
 	display: none;
@@ -4829,6 +4921,16 @@
 .sun-editor.se-rtl .se-selector-table .se-table-size-highlighted {
 	/* .se-table-size : padding - 5px*/
 	right: 5px;
+}
+
+/* table move handles */
+.sun-editor.se-rtl .se-table-move-handle-row::before {
+	right: auto;
+	left: 4px;
+}
+.sun-editor.se-rtl .se-table-move-handle-row::after {
+	right: auto;
+	left: 9px;
 }
 
 /** --- RTL end -------------------------------------------------------------------------------------------------------------------------------------------------- */

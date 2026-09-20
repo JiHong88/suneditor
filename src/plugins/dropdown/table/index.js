@@ -16,6 +16,7 @@ import { CreateHTML, CreateHTML_controller_table, CreateHTML_controller_cell } f
 import TableCellService from './services/table.cell';
 import TableClipboardService from './services/table.clipboard';
 import TableGridService from './services/table.grid';
+import TableHandleService from './services/table.handle';
 import TableReorderService from './services/table.reorder';
 import TableResizeService from './services/table.resize';
 import TableSelectionService from './services/table.selection';
@@ -151,6 +152,7 @@ class Table extends PluginDropdownFree {
 		this.gridService = new TableGridService(this, serviceOptions);
 		this.reorderService = new TableReorderService(this);
 		this.resizeService = new TableResizeService(this);
+		this.handleService = new TableHandleService(this);
 		this.selectionService = new TableSelectionService(this);
 		this.styleService = new TableStyleService(this, { pluginOptions, controller_table });
 
@@ -429,15 +431,18 @@ class Table extends PluginDropdownFree {
 	 * @type {SunEditor.Hook.Event.OnMouseMove}
 	 */
 	onMouseMove({ event }) {
-		if (this.resizeService.isResizing()) return;
+		if (this.resizeService.isResizing() || this.handleService.isMoving()) return;
 
 		const eventTarget = dom.query.getEventTarget(event);
 		const target = dom.query.getParentElement(eventTarget, IsResizeEls);
 		if (!target || event.buttons === 1) {
 			this.resizeService.offResizeGuide();
+			if (event.buttons === 1) this.handleService.hide();
+			else this.handleService.hideOutside(eventTarget, event);
 			return;
 		}
 
+		this.handleService.refresh(dom.query.getParentElement(eventTarget, dom.check.isTableCell));
 		if (this.resizeService.onResizeGuide(event, target) === false) return;
 
 		if (this._element) this._element.style.cursor = '';
@@ -451,6 +456,7 @@ class Table extends PluginDropdownFree {
 	onMouseDown({ event }) {
 		this.setState('ref', null);
 		this.setState('selectedCell', null);
+		this.handleService.hide();
 
 		const eventTarget = dom.query.getEventTarget(event);
 
@@ -489,8 +495,9 @@ class Table extends PluginDropdownFree {
 	 * @hook Editor.EventManager
 	 * @type {SunEditor.Hook.Event.OnMouseLeave}
 	 */
-	onMouseLeave() {
+	onMouseLeave({ event }) {
 		this.resizeService.offResizeGuide();
+		this.handleService.hideOnLeave(event);
 	}
 
 	/**
@@ -609,6 +616,7 @@ class Table extends PluginDropdownFree {
 	 */
 	onScroll() {
 		this.resizeService.offResizeGuide();
+		this.handleService.hide();
 	}
 
 	/**
@@ -976,6 +984,7 @@ class Table extends PluginDropdownFree {
 	 * @description Initializes services by calling their init methods.
 	 */
 	#initService() {
+		this.handleService.init();
 		this.resizeService.init();
 		this.selectionService.init();
 		this.styleService.init();

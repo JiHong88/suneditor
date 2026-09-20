@@ -7,6 +7,10 @@ export const RESIZE_CELL_CLASS: '.se-table-resize-line';
 export const RESIZE_CELL_PREV_CLASS: '.se-table-resize-line-prev';
 export const RESIZE_ROW_CLASS: '.se-table-resize-row';
 export const RESIZE_ROW_PREV_CLASS: '.se-table-resize-row-prev';
+export const MOVE_HANDLE_ROW_CLASS: '.se-table-move-handle-row';
+export const MOVE_HANDLE_COLUMN_CLASS: '.se-table-move-handle-column';
+export const MOVE_BAND_SOURCE_CLASS: '.se-table-move-band-source';
+export const MOVE_BAND_TARGET_CLASS: '.se-table-move-band-target';
 export const BORDER_LIST: string[];
 export namespace BORDER_FORMATS {
 	let all: string;

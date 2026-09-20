@@ -4,6 +4,7 @@ import Table from '../../../../../src/plugins/dropdown/table/index';
 jest.mock('../../../../../src/plugins/dropdown/table/services/table.cell');
 jest.mock('../../../../../src/plugins/dropdown/table/services/table.clipboard');
 jest.mock('../../../../../src/plugins/dropdown/table/services/table.grid');
+jest.mock('../../../../../src/plugins/dropdown/table/services/table.handle');
 jest.mock('../../../../../src/plugins/dropdown/table/services/table.resize');
 jest.mock('../../../../../src/plugins/dropdown/table/services/table.selection');
 jest.mock('../../../../../src/plugins/dropdown/table/services/table.style');
@@ -304,7 +305,7 @@ describe('Table Plugin Main Class', () => {
          });
          
          it('should handle mouse leave', () => {
-             tablePlugin.onMouseLeave();
+             tablePlugin.onMouseLeave({ event: {} });
              expect(tablePlugin.resizeService.offResizeGuide).toHaveBeenCalled();
          });
     });
@@ -814,7 +815,7 @@ describe('Table Plugin Main Class', () => {
               expect(tablePlugin.state.isShiftPressed).toBe(false);
 
               tablePlugin.resizeService.offResizeGuide = jest.fn();
-              tablePlugin.onMouseLeave();
+              tablePlugin.onMouseLeave({ event: {} });
               expect(tablePlugin.resizeService.offResizeGuide).toHaveBeenCalled();
          });
          
