@@ -170,7 +170,7 @@
 		resize25: 'Redimensionner à 25%',
 		resize50: 'Redimensionner à 50%',
 		resize75: 'Redimensionner à 75%',
-		resize: 'Změnit velikost',
+		resize: 'Redimensionner',
 		revert: 'Revenir en arrière',
 		revisionHistory: 'Historique des révisions',
 		right: 'Droite',
