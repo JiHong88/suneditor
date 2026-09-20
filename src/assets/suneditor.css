@@ -1684,11 +1684,16 @@
 	opacity: 0.3;
 }
 .sun-editor .se-table-move-handle:hover,
-.sun-editor .se-table-move-handle.se-dragging {
+.sun-editor .se-table-move-handle.se-dragging,
+.sun-editor .se-table-move-handle.active {
 	opacity: 1;
 }
 .sun-editor .se-table-move-handle.se-dragging {
 	cursor: grabbing;
+}
+/* table handle -pinned  */
+.sun-editor .se-table-move-handle.active::before {
+	background-color: var(--se-active-dark-color);
 }
 
 /* grip pill */
@@ -1710,7 +1715,8 @@
 	background-color: currentColor;
 }
 .sun-editor .se-table-move-handle:hover::after,
-.sun-editor .se-table-move-handle.se-dragging::after {
+.sun-editor .se-table-move-handle.se-dragging::after,
+.sun-editor .se-table-move-handle.active::after {
 	color: var(--se-table-move-grip-dot-hover-color);
 }
 

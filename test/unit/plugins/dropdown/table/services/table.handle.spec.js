@@ -41,19 +41,25 @@ function stampLayout(table) {
 		bottom: rows.length * ROW_H,
 	});
 
+	// rects are computed from the CURRENT DOM position, so they stay correct after a move
 	for (let r = 0; r < rows.length; r++) {
 		const row = rows[r];
-		const top = r * ROW_H;
 		Object.defineProperty(row, 'offsetHeight', { value: ROW_H, configurable: true });
-		row.getBoundingClientRect = () => ({ top, bottom: top + ROW_H });
+		row.getBoundingClientRect = () => ({ top: row.rowIndex * ROW_H, bottom: (row.rowIndex + 1) * ROW_H });
 
-		let x = 0;
 		for (const cell of row.cells) {
-			const left = x;
 			const width = cell.colSpan * COL_W;
 			Object.defineProperty(cell, 'offsetWidth', { value: width, configurable: true });
-			cell.getBoundingClientRect = () => ({ top, left, right: left + width });
-			x += width;
+			cell.getBoundingClientRect = () => {
+				const parent = cell.parentElement;
+				let left = 0;
+				for (const sibling of parent.cells) {
+					if (sibling === cell) break;
+					left += sibling.colSpan * COL_W;
+				}
+				const top = parent.rowIndex * ROW_H;
+				return { top, left, right: left + width };
+			};
 		}
 	}
 }
@@ -106,7 +112,14 @@ function makeHarness(table, { selected = true, rtl = false, iframe = null } = {}
 		$,
 		historyPush: jest.fn(),
 		_editorEnable: jest.fn(),
+		setState: jest.fn(),
+		controller_table: { isOpen: false },
+		controller_cell: { isOpen: false },
 		resizeService: { offResizeGuide: jest.fn() },
+		selectionService: {
+			selectCells: jest.fn((cells) => ({ fixedCell: cells[0], selectedCell: cells[cells.length - 1] })),
+			deleteStyleSelectedCells: jest.fn(),
+		},
 	};
 	main.reorderService = new TableReorderService(main);
 
@@ -124,6 +137,19 @@ afterEach(() => {
 
 describe('TableHandleService', () => {
 	describe('refresh', () => {
+		it('hides while a controller is open (full selection mode)', () => {
+			const table = makeTable([['a1', 'a2'], ['b1', 'b2']]);
+			stampLayout(table);
+			const { svc, main, rowHandle } = makeHarness(table);
+
+			svc.refresh(table.rows[0].cells[0]);
+			expect(rowHandle.style.display).toBe('block');
+
+			main.controller_cell.isOpen = true;
+			svc.refresh(table.rows[0].cells[0]);
+			expect(rowHandle.style.display).toBe('none');
+		});
+
 		it('stays hidden while the table is not (hover-)selected', () => {
 			const table = makeTable([['a1', 'a2'], ['b1', 'b2']]);
 			stampLayout(table);
@@ -297,6 +323,117 @@ describe('TableHandleService', () => {
 		});
 	});
 
+	describe('pinned handles survive pointer-driven hides', () => {
+		const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+		function pin(svc, table, rowHandle) {
+			svc.refresh(table.rows[0].cells[0]);
+			rowHandle.dispatchEvent(mouse('mousedown', { button: 0, clientX: 0, clientY: 5 }));
+			document.dispatchEvent(mouse('mouseup'));
+			expect(rowHandle.classList.contains('active')).toBe(true);
+		}
+
+		it('ignores hideOnLeave and hideOutside while pinned', () => {
+			const table = makeTable([['a1', 'a2'], ['b1', 'b2']]);
+			stampLayout(table);
+			const { svc, rowHandle } = makeHarness(table);
+			pin(svc, table, rowHandle);
+
+			svc.hideOnLeave({ relatedTarget: document.body, clientX: 500, clientY: 500 });
+			svc.hideOutside(document.body, { clientX: 500, clientY: 500 });
+
+			expect(rowHandle.style.display).toBe('block');
+			expect(rowHandle.classList.contains('active')).toBe(true);
+		});
+
+		it('ignores the grace hide from a reset while pinned', async () => {
+			const table = makeTable([['a1', 'a2'], ['b1', 'b2']]);
+			stampLayout(table);
+			const { svc, rowHandle } = makeHarness(table);
+			pin(svc, table, rowHandle);
+
+			svc.init(); // core hover-deselect reset
+			await wait(320);
+
+			expect(rowHandle.style.display).toBe('block');
+			expect(rowHandle.classList.contains('active')).toBe(true);
+		});
+
+		it('re-applies the pinned band selection after a reset wiped it', async () => {
+			const table = makeTable([['a1', 'a2'], ['b1', 'b2']]);
+			stampLayout(table);
+			const { svc, main, rowHandle } = makeHarness(table);
+			pin(svc, table, rowHandle);
+			main.selectionService.selectCells.mockClear();
+
+			svc.init(); // core deselect strips the selection classes in its own timeout
+			await wait(10);
+
+			const selected = main.selectionService.selectCells.mock.calls.at(-1)[0].map((c) => c.textContent);
+			expect(selected).toEqual(['a1', 'a2']);
+			expect(main.setState).toHaveBeenCalledWith('selectedCells', expect.any(Array));
+		});
+
+		it('releases the pin on Escape, like the other controllers', () => {
+			const table = makeTable([['a1', 'a2'], ['b1', 'b2']]);
+			stampLayout(table);
+			const { svc, main, rowHandle, columnHandle } = makeHarness(table);
+			pin(svc, table, rowHandle);
+			expect(columnHandle.style.display).toBe('none');
+
+			document.dispatchEvent(new KeyboardEvent('keydown', { code: 'Escape' }));
+
+			expect(rowHandle.classList.contains('active')).toBe(false);
+			expect(main.selectionService.deleteStyleSelectedCells).toHaveBeenCalled();
+			expect(main.setState).toHaveBeenCalledWith('selectedCells', null);
+			expect(columnHandle.style.display).toBe('block'); // hover mode restored
+
+			// listener is gone — a second Escape is a no-op
+			main.selectionService.deleteStyleSelectedCells.mockClear();
+			document.dispatchEvent(new KeyboardEvent('keydown', { code: 'Escape' }));
+			expect(main.selectionService.deleteStyleSelectedCells).not.toHaveBeenCalled();
+		});
+
+		it('clears the pinned band selection when an explicit hide() unpins (cell/outside click)', () => {
+			const table = makeTable([['a1', 'a2'], ['b1', 'b2']]);
+			stampLayout(table);
+			const { svc, main, rowHandle } = makeHarness(table);
+			pin(svc, table, rowHandle);
+			main.setState.mockClear();
+
+			svc.hide(); // what a wysiwyg mousedown does
+
+			expect(rowHandle.classList.contains('active')).toBe(false);
+			expect(main.selectionService.deleteStyleSelectedCells).toHaveBeenCalled();
+			expect(main.setState).toHaveBeenCalledWith('selectedCells', null);
+			expect(main.setState).toHaveBeenCalledWith('fixedCell', null);
+		});
+
+		it('does not touch the selection when hide() runs unpinned', () => {
+			const table = makeTable([['a1', 'a2'], ['b1', 'b2']]);
+			stampLayout(table);
+			const { svc, main } = makeHarness(table);
+
+			svc.refresh(table.rows[0].cells[0]); // shown, not pinned
+			svc.hide();
+
+			expect(main.selectionService.deleteStyleSelectedCells).not.toHaveBeenCalled();
+		});
+
+		it('still hides on an explicit hide() and once the table is gone', async () => {
+			const table = makeTable([['a1', 'a2'], ['b1', 'b2']]);
+			stampLayout(table);
+			const { svc, rowHandle, figure } = makeHarness(table);
+			pin(svc, table, rowHandle);
+
+			figure.remove(); // table deleted — the pin no longer holds
+			svc.init();
+			await wait(320);
+			expect(rowHandle.style.display).toBe('none');
+			expect(rowHandle.classList.contains('active')).toBe(false);
+		});
+	});
+
 	describe('hideOnLeave', () => {
 		it('survives the pointer being captured by other floating UI over the strips', () => {
 			const table = makeTable([['a1', 'a2'], ['b1', 'b2']]);
@@ -432,6 +569,84 @@ describe('TableHandleService', () => {
 
 			document.dispatchEvent(mouse('mouseup'));
 			expect(grid(table)).toEqual([['b1', 'b2'], ['a1', 'a2'], ['c1', 'c2']]);
+		});
+
+		it('selects the pressed band on a plain handle click (no drag)', () => {
+			const table = makeTable([['a1', 'a2'], ['b1', 'b2'], ['c1', 'c2']]);
+			stampLayout(table);
+			const { svc, main, rowHandle, columnHandle } = makeHarness(table);
+
+			svc.refresh(table.rows[0].cells[0]);
+			// press on row 1's stretch of the strip and release without moving
+			rowHandle.dispatchEvent(mouse('mousedown', { button: 0, clientX: 0, clientY: 25 }));
+			document.dispatchEvent(mouse('mouseup'));
+
+			expect(grid(table)).toEqual([['a1', 'a2'], ['b1', 'b2'], ['c1', 'c2']]);
+			expect(main.historyPush).not.toHaveBeenCalled();
+			const selected = main.selectionService.selectCells.mock.calls[0][0].map((c) => c.textContent);
+			expect(selected).toEqual(['b1', 'b2']);
+			expect(main.setState).toHaveBeenCalledWith('selectedCells', expect.any(Array));
+
+			// the strips stay visible and the pressed handle turns active (pinned)
+			expect(rowHandle.style.display).toBe('block');
+			expect(rowHandle.classList.contains('active')).toBe(true);
+
+			// pinned: the grip ignores pointer travel along the strip and cell hovers
+			rowHandle.dispatchEvent(mouse('mousemove', { clientX: 0, clientY: 45 }));
+			expect(rowHandle.style.getPropertyValue('--se-table-grip-start')).toBe(`${ROW_H}px`);
+			svc.refresh(table.rows[2].cells[0]);
+			expect(rowHandle.style.getPropertyValue('--se-table-grip-start')).toBe(`${ROW_H}px`);
+			expect(rowHandle.classList.contains('active')).toBe(true);
+
+			// ...and the sibling column strip is hidden while the row is pinned
+			expect(columnHandle.style.display).toBe('none');
+			svc.refresh(table.rows[2].cells[1]); // hovering another column
+			expect(columnHandle.style.display).toBe('none');
+
+			// clicking the pinned band again releases it, clears the selection, restores the sibling
+			rowHandle.dispatchEvent(mouse('mousedown', { button: 0, clientX: 0, clientY: 25 }));
+			document.dispatchEvent(mouse('mouseup'));
+			expect(rowHandle.classList.contains('active')).toBe(false);
+			expect(main.selectionService.deleteStyleSelectedCells).toHaveBeenCalled();
+			expect(main.setState).toHaveBeenCalledWith('selectedCells', null);
+			expect(columnHandle.style.display).toBe('block');
+		});
+
+		it('selects the moved band at its new position after the drop', () => {
+			const table = makeTable([['a1', 'a2'], ['b1', 'b2'], ['c1', 'c2']]);
+			stampLayout(table);
+			const { svc, main, rowHandle } = makeHarness(table);
+
+			svc.refresh(table.rows[0].cells[0]);
+			rowHandle.dispatchEvent(mouse('mousedown', { button: 0, clientX: 0, clientY: 5 }));
+			document.dispatchEvent(mouse('mousemove', { clientX: 0, clientY: 55 }));
+			document.dispatchEvent(mouse('mouseup'));
+
+			// row a moved to the bottom — its cells at the NEW position get selected
+			expect(grid(table)).toEqual([['b1', 'b2'], ['c1', 'c2'], ['a1', 'a2']]);
+			const selected = main.selectionService.selectCells.mock.calls.at(-1)[0].map((c) => c.textContent);
+			expect(selected).toEqual(['a1', 'a2']);
+			expect(main.setState).toHaveBeenCalledWith('selectedCells', expect.any(Array));
+
+			// strips stay up, active on the pressed handle, grip follows the moved band
+			expect(rowHandle.style.display).toBe('block');
+			expect(rowHandle.classList.contains('active')).toBe(true);
+			expect(rowHandle.style.getPropertyValue('--se-table-grip-start')).toBe(`${ROW_H * 2}px`);
+		});
+
+		it('selects the moved column band after the drop', () => {
+			const table = makeTable([['a1', 'a2', 'a3'], ['b1', 'b2', 'b3']]);
+			stampLayout(table);
+			const { svc, main, columnHandle } = makeHarness(table);
+
+			svc.refresh(table.rows[0].cells[2]);
+			columnHandle.dispatchEvent(mouse('mousedown', { button: 0, clientX: 75, clientY: 0 }));
+			document.dispatchEvent(mouse('mousemove', { clientX: 4, clientY: 0 }));
+			document.dispatchEvent(mouse('mouseup'));
+
+			expect(grid(table)).toEqual([['a3', 'a1', 'a2'], ['b3', 'b1', 'b2']]);
+			const selected = main.selectionService.selectCells.mock.calls.at(-1)[0].map((c) => c.textContent);
+			expect(selected).toEqual(['a3', 'b3']);
 		});
 
 		it('cancels on Escape without touching the table or history', () => {

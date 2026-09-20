@@ -37,6 +37,8 @@ export class TableHandleService {
 	#scrollRafId = null;
 	/** Pending grace-hide timer id */
 	#hideTimer = null;
+	/** Global keydown while pinned — Esc releases the pin */
+	#pinKeydownEvent = null;
 
 	/**
 	 * @param {import('../index').default} main Table index
@@ -102,10 +104,15 @@ export class TableHandleService {
 	refresh(cell) {
 		if (this.#moving || !dom.check.isTableCell(cell)) return;
 
+		if (this.#main.controller_table?.isOpen || this.#main.controller_cell?.isOpen) {
+			this.hide();
+			return;
+		}
+
 		const table = /** @type {HTMLTableElement} */ (dom.query.getParentElement(cell, 'TABLE'));
 		const figure = /** @type {HTMLElement} */ (dom.query.getParentElement(table, dom.check.isFigure));
 		if (!table || !figure || !dom.utils.hasClass(figure, 'se-component-selected')) {
-			this.hide();
+			if (!this.#isPinned()) this.hide();
 			return;
 		}
 
@@ -131,13 +138,20 @@ export class TableHandleService {
 		}
 
 		const isRtl = !!this.#$.options.get('_rtl');
+		const pinned = this.#pinHolds(table, rowHandle, columnHandle);
+		const rowActive = dom.utils.hasClass(rowHandle, 'active');
 
 		// row handle - full-height strip on the left edge (right in RTL)
 		rowHandle.style.top = `${visTop}px`;
 		rowHandle.style.height = `${visBottom - visTop}px`;
 		rowHandle.style.left = `${isRtl ? visRight : visLeft - HANDLE_HIT_SIZE}px`;
-		rowHandle.style.display = 'block';
-		this.#rowCtx = { table, band: this.#reorder.getBand(table, row.rowIndex, true), boxStart: visTop };
+		rowHandle.style.display = pinned && !rowActive ? 'none' : 'block';
+
+		this.#rowCtx = {
+			table,
+			band: pinned && this.#rowCtx ? this.#rowCtx.band : this.#reorder.getBand(table, row.rowIndex, true),
+			boxStart: visTop,
+		};
 		this.#setGrip(true, this.#rowCtx);
 
 		// column handle - full-width strip on the top edge, extended over the row handle's corner
@@ -145,16 +159,55 @@ export class TableHandleService {
 		columnHandle.style.left = `${boxLeft}px`;
 		columnHandle.style.width = `${(isRtl ? visRight + HANDLE_HIT_SIZE : visRight) - boxLeft}px`;
 		columnHandle.style.top = `${visTop - HANDLE_HIT_SIZE}px`;
-		columnHandle.style.display = 'block';
+		columnHandle.style.display = pinned && rowActive ? 'none' : 'block';
 		this.#colCtx = {
 			table,
-			band: this.#reorder.getBand(table, GetLogicalCellIndex(table, row.rowIndex, cell.cellIndex), false),
+			band:
+				pinned && this.#colCtx
+					? this.#colCtx.band
+					: this.#reorder.getBand(table, GetLogicalCellIndex(table, row.rowIndex, cell.cellIndex), false),
 			boxStart: boxLeft,
 		};
 		this.#setGrip(false, this.#colCtx);
 
 		this.#lastCell = cell;
 		this.#cancelScheduledHide();
+	}
+
+	/**
+	 * @description Whether the pin holds for `table` — both grips freeze while pinned.
+	 * - A pin left on another table is released (selection included).
+	 * @param {HTMLTableElement} table Current table
+	 * @param {HTMLElement} rowHandle Row handle element
+	 * @param {HTMLElement} columnHandle Column handle element
+	 * @returns {boolean}
+	 */
+	#pinHolds(table, rowHandle, columnHandle) {
+		if (!this.#isPinned()) return false;
+		if ((this.#rowCtx || this.#colCtx)?.table === table) return true;
+
+		dom.utils.removeClass([rowHandle, columnHandle], 'active');
+		this.#removePinKeydown();
+		this.#clearBandSelection();
+		return false;
+	}
+
+	/**
+	 * @description Whether a handle is pinned (`active`) on a still-connected table.
+	 * - Pointer-driven hides are ignored while pinned; explicit hides (click, scroll) are not.
+	 * @returns {boolean}
+	 */
+	#isPinned() {
+		const table = (this.#rowCtx || this.#colCtx)?.table;
+		if (!table || !table.isConnected) return false;
+
+		const rowHandle = this.#element(Constants.MOVE_HANDLE_ROW_CLASS);
+		const columnHandle = this.#element(Constants.MOVE_HANDLE_COLUMN_CLASS);
+
+		return Boolean(
+			(rowHandle && dom.utils.hasClass(rowHandle, 'active')) ||
+				(columnHandle && dom.utils.hasClass(columnHandle, 'active')),
+		);
 	}
 
 	/**
@@ -242,6 +295,8 @@ export class TableHandleService {
 		const ctx = isRow ? this.#rowCtx : this.#colCtx;
 		if (!ctx) return;
 
+		if (this.#isPinned()) return;
+
 		const point = this.#toFrameCoords(event.clientX, event.clientY);
 		const band = this.#bandFromPoint(ctx.table, isRow ? point.y : point.x, isRow);
 		if (!band || (band.start === ctx.band.start && band.end === ctx.band.end)) return;
@@ -274,12 +329,23 @@ export class TableHandleService {
 
 		const rowHandle = this.#element(Constants.MOVE_HANDLE_ROW_CLASS);
 		const columnHandle = this.#element(Constants.MOVE_HANDLE_COLUMN_CLASS);
+		// unpinning always drops the pinned band selection with it
+		const wasPinned =
+			(rowHandle && dom.utils.hasClass(rowHandle, 'active')) ||
+			(columnHandle && dom.utils.hasClass(columnHandle, 'active'));
+
 		if (rowHandle) rowHandle.style.display = 'none';
 		if (columnHandle) columnHandle.style.display = 'none';
+		dom.utils.removeClass([rowHandle, columnHandle], 'active');
 
 		this.#rowCtx = null;
 		this.#colCtx = null;
 		this.#lastCell = null;
+
+		if (wasPinned) {
+			this.#removePinKeydown();
+			this.#clearBandSelection();
+		}
 	}
 
 	/**
@@ -288,6 +354,7 @@ export class TableHandleService {
 	 * @param {MouseEvent} event The mouseleave event
 	 */
 	hideOnLeave(event) {
+		if (this.#isPinned()) return;
 		const related = /** @type {?Element} */ (event?.relatedTarget);
 		if (related && dom.utils.hasClass(related, 'se-table-move-handle')) return;
 		if (event && this.#pointNearTable(event.clientX, event.clientY)) return;
@@ -322,6 +389,7 @@ export class TableHandleService {
 	 * @param {MouseEvent} [event] The mousemove event
 	 */
 	hideOutside(target, event) {
+		if (this.#isPinned()) return;
 		const table = (this.#rowCtx || this.#colCtx)?.table;
 		if (
 			table &&
@@ -341,6 +409,25 @@ export class TableHandleService {
 	init() {
 		this.#finishDrag();
 		this.#scheduleHide();
+		this.#restorePinnedSelection();
+	}
+
+	/**
+	 * @description Re-applies the pinned band's selection after a component deselect wiped it.
+	 * - Deferred: the core's deselect strips the selection classes in its own 0ms timeout,
+	 * so the restore must be queued behind it.
+	 */
+	#restorePinnedSelection() {
+		if (!this.#isPinned()) return;
+
+		_w.setTimeout(() => {
+			if (!this.#isPinned()) return;
+
+			const rowHandle = this.#element(Constants.MOVE_HANDLE_ROW_CLASS);
+			const isRow = !!(rowHandle && dom.utils.hasClass(rowHandle, 'active'));
+			const ctx = isRow ? this.#rowCtx : this.#colCtx;
+			if (ctx) this.#selectBandCells(ctx.table, ctx.band, isRow);
+		}, 0);
 	}
 
 	/**
@@ -350,6 +437,7 @@ export class TableHandleService {
 		this.#cancelScheduledHide();
 		this.#hideTimer = _w.setTimeout(() => {
 			this.#hideTimer = null;
+			if (this.#isPinned()) return;
 			this.hide();
 		}, HIDE_GRACE_MS);
 	}
@@ -397,25 +485,46 @@ export class TableHandleService {
 		const ctx = isRow ? this.#rowCtx : this.#colCtx;
 		if (!ctx) return;
 
-		// snap the band to the pressed point
-		this.#OnHandleMouseMove(isRow, event);
+		const pressed = this.#element(isRow ? Constants.MOVE_HANDLE_ROW_CLASS : Constants.MOVE_HANDLE_COLUMN_CLASS);
+		const sibling = this.#element(isRow ? Constants.MOVE_HANDLE_COLUMN_CLASS : Constants.MOVE_HANDLE_ROW_CLASS);
+
+		// snap the band to the pressed point (hover-follow is off while pinned)
+		const point = this.#toFrameCoords(event.clientX, event.clientY);
+		const band = this.#bandFromPoint(ctx.table, isRow ? point.y : point.x, isRow);
+		// pressing the already-pinned band again releases the pin (on mouseup, unless dragged)
+		const toggleOff =
+			!!pressed &&
+			dom.utils.hasClass(pressed, 'active') &&
+			(!band || (band.start === ctx.band.start && band.end === ctx.band.end));
+		if (band) {
+			ctx.band = band;
+			this.#setGrip(isRow, ctx);
+		}
+
+		this.#selectBandCells(ctx.table, ctx.band, isRow);
+		if (sibling) {
+			dom.utils.removeClass(sibling, 'active');
+			sibling.style.display = 'none';
+		}
+		if (pressed) dom.utils.addClass(pressed, 'active');
+		this.#pinKeydownEvent ??= this.#$.eventManager.addGlobalEvent('keydown', this.#OnPinKeyDown.bind(this), false);
 
 		const drops = this.#collectDrops(ctx.table, ctx.band, isRow);
-		if (drops.length === 0) return;
+		if (drops.length === 0) {
+			if (toggleOff) this.#releaseActive(isRow);
+			return;
+		}
 
 		const range = this.#bandPixelRange(ctx.table, ctx.band, isRow);
 		if (!range) return;
 
 		this.#moving = true;
-		this.#drag = { table: ctx.table, band: ctx.band, isRow, drops, range, chosen: null };
+		this.#drag = { table: ctx.table, band: ctx.band, isRow, drops, range, chosen: null, toggleOff };
 
 		dom.utils.addClass(
 			this.#element(isRow ? Constants.MOVE_HANDLE_ROW_CLASS : Constants.MOVE_HANDLE_COLUMN_CLASS),
 			'se-dragging',
 		);
-
-		const other = this.#element(isRow ? Constants.MOVE_HANDLE_COLUMN_CLASS : Constants.MOVE_HANDLE_ROW_CLASS);
-		if (other) other.style.display = 'none';
 
 		// yellow overlay on the grabbed band
 		const source = this.#element(Constants.MOVE_BAND_SOURCE_CLASS);
@@ -507,17 +616,118 @@ export class TableHandleService {
 	}
 
 	/**
-	 * @description Drops the grabbed band on the chosen boundary.
+	 * @description Drops the grabbed band on the chosen boundary and selects it at its new position.
+	 * - While the pin stays, only the pinned axis' strip remains; releasing it restores both.
 	 */
 	#OnDragEnd() {
 		const drag = this.#drag;
 		this.#finishDrag();
 
-		if (drag && drag.chosen !== null) {
-			this.#reorder.move(drag.table, drag.band, drag.chosen, drag.isRow);
+		if (!drag) return;
+
+		if (drag.chosen === null) {
+			if (drag.toggleOff) this.#releaseActive(drag.isRow);
+			return;
 		}
 
-		this.hide();
+		if (this.#reorder.move(drag.table, drag.band, drag.chosen, drag.isRow)) {
+			const newBand = this.#selectMovedBand(drag.table, drag.band, drag.chosen, drag.isRow);
+			const ctx = drag.isRow ? this.#rowCtx : this.#colCtx;
+			if (ctx) {
+				ctx.band = newBand;
+				this.#setGrip(drag.isRow, ctx);
+			}
+		}
+	}
+
+	/**
+	 * @description Applies the multi-cell selection to the moved band so the result stays visible.
+	 * @param {HTMLTableElement} table Target table
+	 * @param {{start: number, end: number}} band Band BEFORE the move
+	 * @param {number} cut The boundary it was dropped on
+	 * @param {boolean} isRow `true` for a row move
+	 */
+	#selectMovedBand(table, band, cut, isRow) {
+		const size = band.end - band.start + 1;
+		const start = cut < band.start ? cut : cut - size;
+		const newBand = { start, end: start + size - 1 };
+		this.#selectBandCells(table, newBand, isRow);
+		return newBand;
+	}
+
+	/**
+	 * @description Applies the multi-cell selection to a band.
+	 * @param {HTMLTableElement} table Target table
+	 * @param {{start: number, end: number}} band Target band
+	 * @param {boolean} isRow `true` for a row band
+	 */
+	#selectBandCells(table, band, isRow) {
+		const cells = [];
+		const rows = table.rows;
+
+		if (isRow) {
+			for (let r = band.start; r <= band.end; r++) cells.push(...rows[r].cells);
+		} else {
+			for (let r = 0, rLen = rows.length; r < rLen; r++) {
+				const rowCells = rows[r].cells;
+				for (let c = 0, cLen = rowCells.length; c < cLen; c++) {
+					const from = GetLogicalCellIndex(table, r, c);
+					if (from <= band.end && from + rowCells[c].colSpan - 1 >= band.start) cells.push(rowCells[c]);
+				}
+			}
+		}
+
+		if (cells.length === 0) return;
+
+		const { fixedCell, selectedCell } = this.#main.selectionService.selectCells(cells);
+		this.#main.setState('selectedCells', cells);
+		this.#main.setState('fixedCell', fixedCell);
+		this.#main.setState('selectedCell', selectedCell);
+		this.#main.setState('selectedTable', table);
+	}
+
+	/**
+	 * @description Releases the pinned state — active class off, band selection cleared.
+	 * @param {boolean} isRow `true` for the row handle
+	 */
+	#releaseActive(isRow) {
+		this.#removePinKeydown();
+
+		const handle = this.#element(isRow ? Constants.MOVE_HANDLE_ROW_CLASS : Constants.MOVE_HANDLE_COLUMN_CLASS);
+		if (handle) dom.utils.removeClass(handle, 'active');
+
+		const sibling = this.#element(isRow ? Constants.MOVE_HANDLE_COLUMN_CLASS : Constants.MOVE_HANDLE_ROW_CLASS);
+		if (sibling && this.#rowCtx && this.#colCtx) sibling.style.display = 'block';
+
+		this.#clearBandSelection();
+	}
+
+	/**
+	 * @description Releases the pin on Escape, like the other controllers.
+	 * @param {KeyboardEvent} event The keydown event
+	 */
+	#OnPinKeyDown(event) {
+		if (this.#moving || !keyCodeMap.isEsc(event.code)) return;
+
+		const rowHandle = this.#element(Constants.MOVE_HANDLE_ROW_CLASS);
+		this.#releaseActive(!!(rowHandle && dom.utils.hasClass(rowHandle, 'active')));
+	}
+
+	/**
+	 * @description Removes the pin's global keydown listener.
+	 */
+	#removePinKeydown() {
+		this.#pinKeydownEvent &&= this.#$.eventManager.removeGlobalEvent(this.#pinKeydownEvent);
+	}
+
+	/**
+	 * @description Clears the band selection — styles and the selection state.
+	 */
+	#clearBandSelection() {
+		this.#main.selectionService.deleteStyleSelectedCells();
+		this.#main.setState('selectedCells', null);
+		this.#main.setState('fixedCell', null);
+		this.#main.setState('selectedCell', null);
 	}
 
 	/**
