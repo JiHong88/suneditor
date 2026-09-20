@@ -836,6 +836,7 @@ class Component {
 		if (
 			this.currentTarget?.contains(target) ||
 			dom.query.getParentElement(target, '.se-controller') ||
+			dom.query.getParentElement(target, '.se-select-menu') ||
 			dom.utils.hasClass(target, 'se-drag-handle|se-table-move-handle') ||
 			(this.currentPluginName === this.#$.ui.currentControllerName &&
 				this.#$.ui.opendControllers.some(({ form }) => form.contains(target)))

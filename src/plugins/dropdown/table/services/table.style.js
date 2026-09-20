@@ -206,15 +206,16 @@ export class TableStyleService {
 
 	/**
 	 * @description Opens the cell properties dialog.
-	 * @param {HTMLElement} target - The target element (usually the table cell).
+	 * @param {HTMLElement} target - The target element (a controller button, or the handle anchor).
+	 * @param {{selfTarget?: boolean}} [options] - Position options.
 	 */
-	openCellProps(target) {
+	openCellProps(target, { selfTarget = false } = {}) {
 		if (this.controller_props.currentTarget === target && this.controller_props.form?.style.display === 'block') {
 			this.controller_props.close();
 		} else {
 			this.controller_props_title.textContent = this.#$.lang.cellProperties;
 			this.#setCtrlProps('cell');
-			this.controller_props.open(target, this.#main.controller_cell.form, {
+			this.controller_props.open(target, selfTarget ? null : this.#main.controller_cell.form, {
 				isWWTarget: false,
 				initMethod: null,
 				addOffset: null,

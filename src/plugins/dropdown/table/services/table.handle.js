@@ -1,4 +1,4 @@
-import { dom, env, keyCodeMap } from '../../../../helper';
+import { dom, env, keyCodeMap, numbers } from '../../../../helper';
 import * as Constants from '../shared/table.constants';
 import { GetLogicalCellIndex } from '../shared/table.utils';
 
@@ -22,7 +22,7 @@ export class TableHandleService {
 	#main;
 	#$;
 
-	#globalEvents = { move: null, stop: null, keydown: null };
+	#globalEvents = { move: null, stop: null, keydown: null, pinUp: null };
 	#moving = false;
 
 	/** Band under the cursor per axis: `{ table, band, boxStart }` */
@@ -104,14 +104,19 @@ export class TableHandleService {
 	refresh(cell) {
 		if (this.#moving || !dom.check.isTableCell(cell)) return;
 
-		if (this.#main.controller_table?.isOpen || this.#main.controller_cell?.isOpen) {
+		if (
+			this.#isControllerVisible(this.#main.controller_table) ||
+			this.#isControllerVisible(this.#main.controller_cell)
+		) {
 			this.hide();
 			return;
 		}
 
 		const table = /** @type {HTMLTableElement} */ (dom.query.getParentElement(cell, 'TABLE'));
 		const figure = /** @type {HTMLElement} */ (dom.query.getParentElement(table, dom.check.isFigure));
-		if (!table || !figure || !dom.utils.hasClass(figure, 'se-component-selected')) {
+
+		const pinnedHere = this.#isPinned() && (this.#rowCtx || this.#colCtx)?.table === table;
+		if (!table || !figure || (!dom.utils.hasClass(figure, 'se-component-selected') && !pinnedHere)) {
 			if (!this.#isPinned()) this.hide();
 			return;
 		}
@@ -188,6 +193,7 @@ export class TableHandleService {
 
 		dom.utils.removeClass([rowHandle, columnHandle], 'active');
 		this.#removePinKeydown();
+		this.#main.gridService.closeMenus();
 		this.#clearBandSelection();
 		return false;
 	}
@@ -236,8 +242,11 @@ export class TableHandleService {
 	#bandLocalSpan(table, band, isRow) {
 		if (isRow) {
 			const rows = table.rows;
+			const startRow = rows[band.start];
 			const endRow = rows[band.end];
-			const start = this.#$.offset.getLocal(rows[band.start]).top;
+			if (!startRow || !endRow) return null;
+
+			const start = this.#$.offset.getLocal(startRow).top;
 			return { start, size: this.#$.offset.getLocal(endRow).top + endRow.offsetHeight - start };
 		}
 
@@ -344,6 +353,7 @@ export class TableHandleService {
 
 		if (wasPinned) {
 			this.#removePinKeydown();
+			this.#main.gridService.closeMenus();
 			this.#clearBandSelection();
 		}
 	}
@@ -400,6 +410,86 @@ export class TableHandleService {
 			return;
 		if (event && this.#pointNearTable(event.clientX, event.clientY, OVERSHOOT_MARGIN)) return;
 		this.hide();
+	}
+
+	/**
+	 * @description Whether a controller is open AND actually showing.
+	 * @param {?import('../../../../modules/contract/Controller').default} controller Controller
+	 * @returns {boolean}
+	 */
+	#isControllerVisible(controller) {
+		return !!controller?.isOpen && controller.form?.style.display !== 'none';
+	}
+
+	/**
+	 * @description The pinned axis: `true` = row, `false` = column, `null` = not pinned.
+	 * @returns {?boolean}
+	 */
+	#pinnedAxis() {
+		const rowHandle = this.#element(Constants.MOVE_HANDLE_ROW_CLASS);
+		if (rowHandle && dom.utils.hasClass(rowHandle, 'active')) return true;
+
+		const columnHandle = this.#element(Constants.MOVE_HANDLE_COLUMN_CLASS);
+		if (columnHandle && dom.utils.hasClass(columnHandle, 'active')) return false;
+
+		return null;
+	}
+
+	/**
+	 * @description Moves the pin onto the band a handle-menu insert just created.
+	 * - An insert-before lands at the old band's start (the old band shifts away);
+	 * an insert-after lands right past its end.
+	 * @param {boolean} isBefore `true` for insert above/left
+	 */
+	repinAfterInsert(isBefore) {
+		const isRow = this.#pinnedAxis();
+		if (isRow === null) return;
+
+		const ctx = isRow ? this.#rowCtx : this.#colCtx;
+		if (!ctx || !ctx.table.isConnected) return;
+
+		const band = this.#reorder.getBand(ctx.table, isBefore ? ctx.band.start : ctx.band.end + 1, isRow);
+		ctx.band = band;
+
+		const cells = this.#selectBandCells(ctx.table, band, isRow);
+		if (cells) this.refresh(cells[0]);
+	}
+
+	/**
+	 * @description Re-aims the pin after a handle-menu action changed the table structure.
+	 * - The selected cells' element references survive moves/inserts, so the band is
+	 * re-derived from them; a deleted band (references disconnected) releases the pin.
+	 */
+	repinFromSelection() {
+		const isRow = this.#pinnedAxis();
+		if (isRow === null) return;
+
+		const cell = this.#main.state.selectedCells?.[0];
+		if (!cell || !cell.isConnected) {
+			this.#removePinKeydown();
+			dom.utils.removeClass(
+				[this.#element(Constants.MOVE_HANDLE_ROW_CLASS), this.#element(Constants.MOVE_HANDLE_COLUMN_CLASS)],
+				'active',
+			);
+			this.#clearBandSelection();
+			this.hide();
+			return;
+		}
+
+		const table = /** @type {HTMLTableElement} */ (dom.query.getParentElement(cell, 'TABLE'));
+		const row = /** @type {HTMLTableRowElement} */ (cell.parentElement);
+		const band = isRow
+			? this.#reorder.getBand(table, row.rowIndex, true)
+			: this.#reorder.getBand(table, GetLogicalCellIndex(table, row.rowIndex, cell.cellIndex), false);
+
+		const ctx = isRow ? this.#rowCtx : this.#colCtx;
+		if (ctx) {
+			ctx.table = table;
+			ctx.band = band;
+		}
+
+		// reposition strips and grip for the (possibly resized) table
+		this.refresh(cell);
 	}
 
 	/**
@@ -511,7 +601,17 @@ export class TableHandleService {
 
 		const drops = this.#collectDrops(ctx.table, ctx.band, isRow);
 		if (drops.length === 0) {
-			if (toggleOff) this.#releaseActive(isRow);
+			// not draggable — one-shot for this press; also removed by #releaseActive (Esc while held)
+			this.#removePinUp();
+			this.#globalEvents.pinUp = this.#$.eventManager.addGlobalEvent(
+				'mouseup',
+				() => {
+					this.#removePinUp();
+					if (toggleOff) this.#releaseActive(isRow);
+					else this.#openPinMenu(isRow);
+				},
+				false,
+			);
 			return;
 		}
 
@@ -627,6 +727,7 @@ export class TableHandleService {
 
 		if (drag.chosen === null) {
 			if (drag.toggleOff) this.#releaseActive(drag.isRow);
+			else this.#openPinMenu(drag.isRow);
 			return;
 		}
 
@@ -677,13 +778,15 @@ export class TableHandleService {
 			}
 		}
 
-		if (cells.length === 0) return;
+		if (cells.length === 0) return null;
 
 		const { fixedCell, selectedCell } = this.#main.selectionService.selectCells(cells);
 		this.#main.setState('selectedCells', cells);
 		this.#main.setState('fixedCell', fixedCell);
 		this.#main.setState('selectedCell', selectedCell);
 		this.#main.setState('selectedTable', table);
+		this.#main.setCellInfo(cells[0], true);
+		return cells;
 	}
 
 	/**
@@ -692,6 +795,8 @@ export class TableHandleService {
 	 */
 	#releaseActive(isRow) {
 		this.#removePinKeydown();
+		this.#removePinUp();
+		this.#main.gridService.closeMenus();
 
 		const handle = this.#element(isRow ? Constants.MOVE_HANDLE_ROW_CLASS : Constants.MOVE_HANDLE_COLUMN_CLASS);
 		if (handle) dom.utils.removeClass(handle, 'active');
@@ -700,6 +805,27 @@ export class TableHandleService {
 		if (sibling && this.#rowCtx && this.#colCtx) sibling.style.display = 'block';
 
 		this.#clearBandSelection();
+	}
+
+	/**
+	 * @description Opens the row/column menu anchored on the pinned grip.
+	 * - Safe against the pin click itself: SelectMenu closes on outside MOUSEDOWN, and this
+	 * runs at mouseup.
+	 * @param {boolean} isRow `true` for the row handle
+	 */
+	#openPinMenu(isRow) {
+		const ctx = isRow ? this.#rowCtx : this.#colCtx;
+		const handle = this.#element(isRow ? Constants.MOVE_HANDLE_ROW_CLASS : Constants.MOVE_HANDLE_COLUMN_CLASS);
+		if (!ctx || !handle) return;
+
+		const handleRect = handle.getBoundingClientRect();
+		const gripStart = numbers.get(handle.style.getPropertyValue('--se-table-grip-start'), -1) || 0;
+		const gripSize = numbers.get(handle.style.getPropertyValue('--se-table-grip-size'), -1) || 0;
+		const rect = isRow
+			? { left: handleRect.left, top: handleRect.top + gripStart, width: handleRect.width, height: gripSize }
+			: { left: handleRect.left + gripStart, top: handleRect.top, width: gripSize, height: handleRect.height };
+
+		this.#main.gridService[isRow ? 'openRowMenuForHandle' : 'openColumnMenuForHandle'](rect);
 	}
 
 	/**
@@ -718,6 +844,13 @@ export class TableHandleService {
 	 */
 	#removePinKeydown() {
 		this.#pinKeydownEvent &&= this.#$.eventManager.removeGlobalEvent(this.#pinKeydownEvent);
+	}
+
+	/**
+	 * @description Removes the pending pin mouseup listener.
+	 */
+	#removePinUp() {
+		this.#globalEvents.pinUp &&= this.#$.eventManager.removeGlobalEvent(this.#globalEvents.pinUp);
 	}
 
 	/**

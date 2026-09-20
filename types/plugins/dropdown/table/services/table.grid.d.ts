@@ -28,14 +28,30 @@ export class TableGridService {
 	);
 	selectMenu_column: SelectMenu;
 	selectMenu_row: SelectMenu;
+	selectMenu_column_handle: SelectMenu;
+	selectMenu_row_handle: SelectMenu;
 	/**
-	 * @description Opens the column menu.
+	 * @description Opens the column menu from the cell controller button.
 	 */
 	openColumnMenu(): void;
 	/**
-	 * @description Opens the row menu.
+	 * @description Opens the row menu from the cell controller button.
 	 */
 	openRowMenu(): void;
+	/**
+	 * @description Opens the column menu on a move handle's grip, with the cell-context items.
+	 * @param {{left: number, top: number, width: number, height: number}} rect Grip rect (viewport coords)
+	 */
+	openColumnMenuForHandle(rect: { left: number; top: number; width: number; height: number }): void;
+	/**
+	 * @description Opens the row menu on a move handle's grip, with the cell-context items.
+	 * @param {{left: number, top: number, width: number, height: number}} rect Grip rect (viewport coords)
+	 */
+	openRowMenuForHandle(rect: { left: number; top: number; width: number; height: number }): void;
+	/**
+	 * @description Closes the handle menus (e.g. when a handle pin is released).
+	 */
+	closeMenus(): void;
 	/**
 	 * @description Edits the table by adding, removing, or modifying rows and cells, based on the provided options. Supports both single and multi-cell/row editing.
 	 * @param {"row"|"cell"} type The type of element to edit (`row` or `cell`).

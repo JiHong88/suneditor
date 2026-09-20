@@ -38,6 +38,19 @@ export class TableHandleService {
 	 */
 	hideOutside(target: Node | null, event?: MouseEvent): void;
 	/**
+	 * @description Moves the pin onto the band a handle-menu insert just created.
+	 * - An insert-before lands at the old band's start (the old band shifts away);
+	 * an insert-after lands right past its end.
+	 * @param {boolean} isBefore `true` for insert above/left
+	 */
+	repinAfterInsert(isBefore: boolean): void;
+	/**
+	 * @description Re-aims the pin after a handle-menu action changed the table structure.
+	 * - The selected cells' element references survive moves/inserts, so the band is
+	 * re-derived from them; a deleted band (references disconnected) releases the pin.
+	 */
+	repinFromSelection(): void;
+	/**
 	 * @description Service reset — aborts any drag and hides the handles after the grace delay.
 	 * - Delayed because a reset can come from an overshoot deselect; returning onto a strip cancels it.
 	 */

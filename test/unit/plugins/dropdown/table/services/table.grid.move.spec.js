@@ -22,6 +22,8 @@ jest.mock('../../../../../../src/modules/ui', () => ({
 				return li;
 			});
 		},
+		setRefer: jest.fn(),
+		isOpen: false,
 		open: jest.fn(),
 		close: jest.fn(),
 	})),
@@ -49,8 +51,9 @@ function setup(rowCount = 3, colCount = 3) {
 	const main = {
 		_element: table,
 		state: { tdElement: null },
-		$: { lang: {}, icons: {} },
+		$: { lang: {}, icons: {}, contextProvider: { carrierWrapper: document.createElement('div') } },
 		historyPush: jest.fn(),
+		handleService: { repinFromSelection: jest.fn() },
 	};
 	main.reorderService = new TableReorderService(main);
 
@@ -71,10 +74,30 @@ function setup(rowCount = 3, colCount = 3) {
 }
 
 const disabled = (menu, i) => menu.menus[i].classList.contains('se-select-disabled');
-const MOVE_BACK = 2; // move-up / move-left
+const MOVE_BACK = 2; // move-up / move-left (controller menus carry no cell-context items)
 const MOVE_FWD = 3; // move-down / move-right
 
 describe('TableGridService - move menu state', () => {
+	it('dismisses the handle menus and re-aims the pin when a handle-menu action runs', () => {
+		const { grid, main, focus } = setup();
+		focus(1, 1);
+
+		grid.selectMenu_row_handle.isOpen = true;
+		grid.selectMenu_row.selectMethod('move-up'); // shared handler
+
+		expect(grid.selectMenu_row_handle.close).toHaveBeenCalled();
+		expect(main.handleService.repinFromSelection).toHaveBeenCalled();
+	});
+
+	it('leaves the handles alone for controller-menu actions', () => {
+		const { grid, main, focus } = setup();
+		focus(1, 1);
+
+		grid.selectMenu_row.selectMethod('move-up'); // no handle menu open
+
+		expect(main.handleService.repinFromSelection).not.toHaveBeenCalled();
+	});
+
 	afterEach(() => {
 		document.body.innerHTML = '';
 		jest.clearAllMocks();

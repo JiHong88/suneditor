@@ -1754,6 +1754,14 @@
 		5px 0 0 currentColor;
 }
 
+/* table move - invisible anchor the pin menu opens from */
+.sun-editor .se-table-move-menu-anchor {
+	position: absolute;
+	left: -10000px;
+	pointer-events: none;
+	background: transparent;
+}
+
 /* table move - band overlays */
 .sun-editor .se-table-move-band-source,
 .sun-editor .se-table-move-band-target {

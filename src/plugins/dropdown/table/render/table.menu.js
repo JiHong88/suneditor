@@ -1,6 +1,28 @@
 import { dom } from '../../../../helper';
 import { _DragHandle } from '../../../../modules/ui';
-import { BORDER_LIST, BORDER_FORMATS } from '../shared/table.constants';
+import { BORDER_LIST, BORDER_FORMATS, CELL_CONTEXT_KEYS } from '../shared/table.constants';
+
+/**
+ * @description Creates the cell-context menu rows (shown only when opened from a move handle).
+ * @param {Object} lang - Language object.
+ * @param {Object} icons - Icons object.
+ * @returns {string} HTML string
+ */
+function CreateCellContextHTML(lang, icons) {
+	return /*html*/ `
+		<div title="${lang.cellProperties}" aria-label="${lang.cellProperties}">
+			<span class="se-list-icon">${icons.cell_properties}</span><span class="se-txt">${lang.cellProperties}</span>
+		</div>
+		<div title="${lang.mergeCells}" aria-label="${lang.mergeCells}">
+			<span class="se-list-icon">${icons.merge_cell}</span><span class="se-txt">${lang.mergeCells}</span>
+		</div>
+		<div title="${lang.verticalSplit}" aria-label="${lang.verticalSplit}">
+			<span class="se-list-icon">${icons.split_cell}</span><span class="se-txt">${lang.verticalSplit}</span>
+		</div>
+		<div title="${lang.horizontalSplit}" aria-label="${lang.horizontalSplit}">
+			<span class="se-list-icon">${icons.split_cell}</span><span class="se-txt">${lang.horizontalSplit}</span>
+		</div>`;
+}
 
 /**
  * @description Creates the split menu items.
@@ -27,13 +49,15 @@ export function CreateSplitMenu(lang) {
  * @description Creates the column menu items.
  * @param {Object} lang - Language object.
  * @param {Object} icons - Icons object.
+ * @param {boolean} [withCellContext] - Include the cell-context items (handle menu only).
  * @returns {{items: string[], menus: NodeListOf<Element>}}
  */
-export function CreateColumnMenu(lang, icons) {
+export function CreateColumnMenu(lang, icons, withCellContext) {
 	const menus = dom.utils.createElement(
 		'DIV',
 		null,
-		/*html*/ `
+		(withCellContext ? CreateCellContextHTML(lang, icons) : '') +
+			/*html*/ `
 		<div title="${lang.insertColumnBefore}" aria-label="${lang.insertColumnBefore}">
 			<span class="se-list-icon">${icons.insert_column_left}</span><span class="se-txt">${lang.insertColumnBefore}</span>
 		</div>
@@ -52,7 +76,14 @@ export function CreateColumnMenu(lang, icons) {
 	);
 
 	return {
-		items: ['insert-left', 'insert-right', 'move-left', 'move-right', 'delete'],
+		items: [
+			...(withCellContext ? CELL_CONTEXT_KEYS : []),
+			'insert-left',
+			'insert-right',
+			'move-left',
+			'move-right',
+			'delete',
+		],
 		menus: menus.querySelectorAll('div'),
 	};
 }
@@ -61,13 +92,15 @@ export function CreateColumnMenu(lang, icons) {
  * @description Creates the row menu items.
  * @param {Object} lang - Language object.
  * @param {Object} icons - Icons object.
+ * @param {boolean} [withCellContext] - Include the cell-context items (handle menu only).
  * @returns {{items: string[], menus: NodeListOf<Element>}}
  */
-export function CreateRowMenu(lang, icons) {
+export function CreateRowMenu(lang, icons, withCellContext) {
 	const menus = dom.utils.createElement(
 		'DIV',
 		null,
-		/*html*/ `
+		(withCellContext ? CreateCellContextHTML(lang, icons) : '') +
+			/*html*/ `
 		<div title="${lang.insertRowAbove}" aria-label="${lang.insertRowAbove}">
 			<span class="se-list-icon">${icons.insert_row_above}</span><span class="se-txt">${lang.insertRowAbove}</span>
 		</div>
@@ -86,7 +119,14 @@ export function CreateRowMenu(lang, icons) {
 	);
 
 	return {
-		items: ['insert-above', 'insert-below', 'move-up', 'move-down', 'delete'],
+		items: [
+			...(withCellContext ? CELL_CONTEXT_KEYS : []),
+			'insert-above',
+			'insert-below',
+			'move-up',
+			'move-down',
+			'delete',
+		],
 		menus: menus.querySelectorAll('div'),
 	};
 }

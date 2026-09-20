@@ -70,9 +70,17 @@ export class TableStyleService {
 	openTableProps(target: HTMLElement): void;
 	/**
 	 * @description Opens the cell properties dialog.
-	 * @param {HTMLElement} target - The target element (usually the table cell).
+	 * @param {HTMLElement} target - The target element (a controller button, or the handle anchor).
+	 * @param {{selfTarget?: boolean}} [options] - Position options.
 	 */
-	openCellProps(target: HTMLElement): void;
+	openCellProps(
+		target: HTMLElement,
+		{
+			selfTarget,
+		}?: {
+			selfTarget?: boolean;
+		},
+	): void;
 	/**
 	 * @description Opens the border format menu.
 	 */

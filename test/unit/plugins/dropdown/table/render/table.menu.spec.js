@@ -23,6 +23,8 @@ describe('Table Menu Render', () => {
 
     beforeEach(() => {
         mockLang = {
+            cellProperties: 'Cell properties',
+            mergeCells: 'Merge cells',
             verticalSplit: 'Vertical Split',
             horizontalSplit: 'Horizontal Split',
             insertColumnBefore: 'Insert Column Before',
@@ -33,6 +35,9 @@ describe('Table Menu Render', () => {
             deleteRow: 'Delete Row'
         };
         mockIcons = {
+            cell_properties: 'icon_props',
+            merge_cell: 'icon_merge',
+            split_cell: 'icon_split',
             insert_column_left: 'icon_left',
             insert_column_right: 'icon_right',
             delete_column: 'icon_delete_col',
@@ -52,7 +57,7 @@ describe('Table Menu Render', () => {
     });
 
     describe('CreateColumnMenu', () => {
-        it('should create column menu', () => {
+        it('should create column menu without cell-context items by default', () => {
             const result = CreateColumnMenu(mockLang, mockIcons);
             expect(result.items).toEqual(['insert-left', 'insert-right', 'move-left', 'move-right', 'delete']);
             expect(result.menus.length).toBe(5);
@@ -60,14 +65,32 @@ describe('Table Menu Render', () => {
             // items and menu nodes are index-matched — a mismatch dispatches the wrong command
             expect(result.items.length).toBe(result.menus.length);
         });
+
+        it('should prepend cell-context items when withCellContext is true (handle menu)', () => {
+            const result = CreateColumnMenu(mockLang, mockIcons, true);
+            expect(result.items).toEqual(['cell-properties', 'merge', 'split-vertical', 'split-horizontal', 'insert-left', 'insert-right', 'move-left', 'move-right', 'delete']);
+            expect(result.menus.length).toBe(9);
+            expect(result.menus[0].title).toBe('Cell properties');
+            expect(result.menus[4].title).toBe('Insert Column Before');
+            expect(result.items.length).toBe(result.menus.length);
+        });
     });
 
     describe('CreateRowMenu', () => {
-        it('should create row menu', () => {
+        it('should create row menu without cell-context items by default', () => {
             const result = CreateRowMenu(mockLang, mockIcons);
             expect(result.items).toEqual(['insert-above', 'insert-below', 'move-up', 'move-down', 'delete']);
             expect(result.menus.length).toBe(5);
             expect(result.menus[0].title).toBe('Insert Row Above');
+            expect(result.items.length).toBe(result.menus.length);
+        });
+
+        it('should prepend cell-context items when withCellContext is true (handle menu)', () => {
+            const result = CreateRowMenu(mockLang, mockIcons, true);
+            expect(result.items).toEqual(['cell-properties', 'merge', 'split-vertical', 'split-horizontal', 'insert-above', 'insert-below', 'move-up', 'move-down', 'delete']);
+            expect(result.menus.length).toBe(9);
+            expect(result.menus[0].title).toBe('Cell properties');
+            expect(result.menus[4].title).toBe('Insert Row Above');
             expect(result.items.length).toBe(result.menus.length);
         });
     });

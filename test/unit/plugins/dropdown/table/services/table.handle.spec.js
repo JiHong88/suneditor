@@ -113,8 +113,14 @@ function makeHarness(table, { selected = true, rtl = false, iframe = null } = {}
 		historyPush: jest.fn(),
 		_editorEnable: jest.fn(),
 		setState: jest.fn(),
+		setCellInfo: jest.fn(),
 		controller_table: { isOpen: false },
 		controller_cell: { isOpen: false },
+		gridService: {
+			closeMenus: jest.fn(),
+			openRowMenuForHandle: jest.fn(),
+			openColumnMenuForHandle: jest.fn(),
+		},
 		resizeService: { offResizeGuide: jest.fn() },
 		selectionService: {
 			selectCells: jest.fn((cells) => ({ fixedCell: cells[0], selectedCell: cells[cells.length - 1] })),
@@ -146,8 +152,14 @@ describe('TableHandleService', () => {
 			expect(rowHandle.style.display).toBe('block');
 
 			main.controller_cell.isOpen = true;
+			main.controller_cell.form = { style: { display: 'block' } };
 			svc.refresh(table.rows[0].cells[0]);
 			expect(rowHandle.style.display).toBe('none');
+
+			// hide()n (not closed) controllers — e.g. after a resize — must NOT block the handles
+			main.controller_cell.form.style.display = 'none';
+			svc.refresh(table.rows[0].cells[0]);
+			expect(rowHandle.style.display).toBe('block');
 		});
 
 		it('stays hidden while the table is not (hover-)selected', () => {
@@ -374,6 +386,27 @@ describe('TableHandleService', () => {
 			expect(main.setState).toHaveBeenCalledWith('selectedCells', expect.any(Array));
 		});
 
+		it('opens the axis menu on the grip when a click pins, and closes it on release', () => {
+			const table = makeTable([['a1', 'a2'], ['b1', 'b2']]);
+			stampLayout(table);
+			const { svc, main, rowHandle } = makeHarness(table);
+			pin(svc, table, rowHandle); // click-pin
+
+			expect(main.gridService.openRowMenuForHandle).toHaveBeenCalledTimes(1);
+			const rect = main.gridService.openRowMenuForHandle.mock.calls[0][0];
+			expect(rect).toEqual({
+				left: expect.any(Number),
+				top: expect.any(Number),
+				width: expect.any(Number),
+				height: expect.any(Number),
+			});
+
+			// releasing by re-click closes the menus
+			rowHandle.dispatchEvent(mouse('mousedown', { button: 0, clientX: 0, clientY: 5 }));
+			document.dispatchEvent(mouse('mouseup'));
+			expect(main.gridService.closeMenus).toHaveBeenCalled();
+		});
+
 		it('releases the pin on Escape, like the other controllers', () => {
 			const table = makeTable([['a1', 'a2'], ['b1', 'b2']]);
 			stampLayout(table);
@@ -392,6 +425,88 @@ describe('TableHandleService', () => {
 			main.selectionService.deleteStyleSelectedCells.mockClear();
 			document.dispatchEvent(new KeyboardEvent('keydown', { code: 'Escape' }));
 			expect(main.selectionService.deleteStyleSelectedCells).not.toHaveBeenCalled();
+		});
+
+		it('Escape while the press is held cancels the pending pin-menu open', () => {
+			const table = makeTable([['a1', 'a2']]); // single row — the row band is not draggable
+			stampLayout(table);
+			const { svc, main, rowHandle } = makeHarness(table);
+			svc.refresh(table.rows[0].cells[0]);
+
+			rowHandle.dispatchEvent(mouse('mousedown', { button: 0, clientX: 0, clientY: 5 }));
+			expect(rowHandle.classList.contains('active')).toBe(true);
+
+			document.dispatchEvent(new KeyboardEvent('keydown', { code: 'Escape' })); // releases the pin mid-press
+			document.dispatchEvent(mouse('mouseup'));
+
+			expect(main.gridService.openRowMenuForHandle).not.toHaveBeenCalled();
+			expect(rowHandle.classList.contains('active')).toBe(false);
+
+			// the cancelled one-shot must not break the next press — a plain click-pin still opens the menu
+			rowHandle.dispatchEvent(mouse('mousedown', { button: 0, clientX: 0, clientY: 5 }));
+			document.dispatchEvent(mouse('mouseup'));
+			expect(main.gridService.openRowMenuForHandle).toHaveBeenCalledTimes(1);
+		});
+
+		it('repinFromSelection follows the band after a structural change', () => {
+			const table = makeTable([['a1', 'a2'], ['b1', 'b2'], ['c1', 'c2']]);
+			stampLayout(table);
+			const { svc, main, figure, rowHandle } = makeHarness(table);
+			pin(svc, table, rowHandle); // pins row 0
+
+			// reaching the menu deselected the component (bare-background hover-deselect)
+			figure.classList.remove('se-component-selected');
+
+			// a menu action moved the band: rows reordered, selection refs traveled with it
+			main.reorderService.move(table, { start: 0, end: 0 }, 3, true); // a → bottom
+			main.state = { selectedCells: Array.from(table.rows[2].cells) };
+
+			svc.repinFromSelection();
+
+			// still pinned and visible, grip re-aimed at the band's new position
+			expect(rowHandle.classList.contains('active')).toBe(true);
+			expect(rowHandle.style.display).toBe('block');
+			expect(rowHandle.style.getPropertyValue('--se-table-grip-start')).toBe(`${ROW_H * 2}px`);
+		});
+
+		it('repinAfterInsert moves the pin onto the inserted row', () => {
+			const table = makeTable([['a1', 'a2'], ['b1', 'b2']]);
+			stampLayout(table);
+			const { svc, main, rowHandle } = makeHarness(table);
+			pin(svc, table, rowHandle); // pins row 0 (band {0,0})
+
+			// menu inserted a row ABOVE the band
+			const newRow = table.insertRow(0);
+			newRow.insertCell().textContent = 'n1';
+			newRow.insertCell().textContent = 'n2';
+			InvalidateTableCache(table);
+			stampLayout(table);
+
+			svc.repinAfterInsert(true);
+
+			// selection and grip land on the NEW row at index 0
+			const selected = main.selectionService.selectCells.mock.calls.at(-1)[0].map((c) => c.textContent);
+			expect(selected).toEqual(['n1', 'n2']);
+			expect(rowHandle.classList.contains('active')).toBe(true);
+			expect(rowHandle.style.getPropertyValue('--se-table-grip-start')).toBe('0px');
+		});
+
+		it('repinFromSelection releases everything when the band was deleted', () => {
+			const table = makeTable([['a1', 'a2'], ['b1', 'b2']]);
+			stampLayout(table);
+			const { svc, main, rowHandle } = makeHarness(table);
+			pin(svc, table, rowHandle);
+
+			const removed = table.rows[0];
+			removed.remove(); // menu action deleted the pinned row
+			main.state = { selectedCells: Array.from(removed.cells) };
+
+			svc.repinFromSelection();
+
+			expect(rowHandle.classList.contains('active')).toBe(false);
+			expect(rowHandle.style.display).toBe('none');
+			expect(main.selectionService.deleteStyleSelectedCells).toHaveBeenCalled();
+			expect(main.setState).toHaveBeenCalledWith('selectedCells', null);
 		});
 
 		it('clears the pinned band selection when an explicit hide() unpins (cell/outside click)', () => {
