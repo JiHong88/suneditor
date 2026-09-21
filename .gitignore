@@ -37,4 +37,3 @@ playwright/.cache/
 # npx repomix
 repomix-output.xml
 .gstack/
-.codex/
