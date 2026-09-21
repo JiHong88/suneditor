@@ -204,6 +204,7 @@ class FileUpload extends PluginCommand {
 				nonBorder: true,
 				figureTarget: true,
 				infoOnly: false,
+				nonDragHandle: false,
 			});
 		} else {
 			asBtn.innerHTML = this.$.icons.expansion + dom.utils.createTooltipInner(this.$.lang.asBlock);

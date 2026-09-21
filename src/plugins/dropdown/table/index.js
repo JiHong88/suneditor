@@ -870,6 +870,7 @@ class Table extends PluginDropdownFree {
 			nonBorder: true,
 			figureTarget: true,
 			infoOnly: false,
+			nonDragHandle: _DragHandle.get('__overInfo') === ON_OVER_COMPONENT,
 		});
 	}
 

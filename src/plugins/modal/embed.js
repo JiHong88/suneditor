@@ -572,6 +572,7 @@ class Embed extends PluginModal {
 			nonBorder: false,
 			figureTarget: false,
 			infoOnly,
+			nonDragHandle: false,
 		});
 
 		this.#element = target;
@@ -714,6 +715,7 @@ class Embed extends PluginModal {
 			nonBorder: false,
 			figureTarget: false,
 			infoOnly: true,
+			nonDragHandle: false,
 		});
 
 		width ||= this.#defaultSizeX;
@@ -807,6 +809,7 @@ class Embed extends PluginModal {
 			nonBorder: false,
 			figureTarget: false,
 			infoOnly: true,
+			nonDragHandle: false,
 		});
 		const size = (oFrame.getAttribute('data-se-size') || ',').split(',');
 
