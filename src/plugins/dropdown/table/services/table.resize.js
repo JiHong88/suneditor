@@ -34,6 +34,21 @@ export class TableResizeService {
 			resizeStop: null,
 			resizeKeyDown: null,
 		};
+
+		this.#$.contextProvider.applyToRoots((e) => {
+			e.get('wrapper').appendChild(
+				dom.utils.createElement('DIV', { class: Constants.RESIZE_CELL_CLASS.replace(/^\./, '') }),
+			);
+			e.get('wrapper').appendChild(
+				dom.utils.createElement('DIV', { class: Constants.RESIZE_CELL_PREV_CLASS.replace(/^\./, '') }),
+			);
+			e.get('wrapper').appendChild(
+				dom.utils.createElement('DIV', { class: Constants.RESIZE_ROW_CLASS.replace(/^\./, '') }),
+			);
+			e.get('wrapper').appendChild(
+				dom.utils.createElement('DIV', { class: Constants.RESIZE_ROW_PREV_CLASS.replace(/^\./, '') }),
+			);
+		});
 	}
 
 	get #selectionService() {

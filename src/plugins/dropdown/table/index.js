@@ -96,21 +96,6 @@ class Table extends PluginDropdownFree {
 		const controller_table = CreateHTML_controller_table(this.$);
 		const controller_cell = CreateHTML_controller_cell(this.$, this.cellControllerTop);
 
-		this.$.contextProvider.applyToRoots((e) => {
-			e.get('wrapper').appendChild(
-				dom.utils.createElement('DIV', { class: Constants.RESIZE_CELL_CLASS.replace(/^\./, '') }),
-			);
-			e.get('wrapper').appendChild(
-				dom.utils.createElement('DIV', { class: Constants.RESIZE_CELL_PREV_CLASS.replace(/^\./, '') }),
-			);
-			e.get('wrapper').appendChild(
-				dom.utils.createElement('DIV', { class: Constants.RESIZE_ROW_CLASS.replace(/^\./, '') }),
-			);
-			e.get('wrapper').appendChild(
-				dom.utils.createElement('DIV', { class: Constants.RESIZE_ROW_PREV_CLASS.replace(/^\./, '') }),
-			);
-		});
-
 		// members - Controller
 		if (this.cellControllerTop) {
 			this.controller_cell = new Controller(this, this.$, controller_cell.html, { position: 'top' });

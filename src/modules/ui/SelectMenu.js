@@ -158,7 +158,7 @@ class SelectMenu {
 			const menuContent =
 				typeof menus[i] === 'string' ? menus[i] : /** @type {HTMLElement} */ (menus[i]).outerHTML;
 			const itemObj = /** @type {{children?: Array, childMenus?: Array}} */ (
-				item && typeof item === 'object' ? item : {}
+				item && typeof item === 'object' && !this.#$.instanceCheck.isNode(item) ? item : {}
 			);
 			const hasChildren = itemObj.children?.length > 0;
 
@@ -574,7 +574,7 @@ class SelectMenu {
 	#clampHeight(h) {
 		const chrome = this.form.offsetHeight - this.#listInner.offsetHeight; // padding + border
 		this.form.style.height = h + 'px';
-		this.#listInner.style.maxHeight = (h - chrome > 0 ? h - chrome : 0) + 'px';
+		this.#listInner.style.maxHeight = (h - chrome > 0 ? h - chrome : 0) + 2 + 'px';
 		this.#listInner.style.overflowY = 'auto';
 	}
 
