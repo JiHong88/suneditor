@@ -1,3 +1,8 @@
+/**
+ * ⚠ Before modifying: read `.agents/rules/keydown-edge-decisions.md` — the shared decision
+ * model for Backspace/Delete edge branches. This file mirrors `keydown.rule.backspace.js`
+ * (front/end); keep the branches in sync with the model and with the mirror rule.
+ */
 import { dom } from '../../../helper';
 import {
 	hardDelete,

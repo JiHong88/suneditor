@@ -6,7 +6,7 @@ implementing structural changes; surface the trade-off to the user instead of si
 
 - **Cost vs value.** Weigh the structural cost (new plugin, new abstraction, migration,
   broadened API surface) against the concrete value. Don't promote a lightweight construct to a
-  heavy one for a single action — e.g. don't turn a launcher-based component ([[component-model]])
+  heavy one for a single action — e.g. don't turn a launcher-based component ([component-model](./component-model.md))
   into a full plugin just to add one delete button when keyboard delete already works.
 - **Consistency with siblings first.** New UI/behavior should match the closest existing peer.
   If `hr` (a line-break component) shows no controller, `pageBreak` shouldn't grow one in
@@ -19,4 +19,4 @@ implementing structural changes; surface the trade-off to the user instead of si
   layer earns its keep when it carries several actions or real per-instance state — not one.
 - **Don't dump the user into a 700+ line doc.** When pointing at `GUIDE.md` /
   `ARCHITECTURE.md` / `custom-plugin.md`, link the specific section for the edit context — see
-  the deep-link table in [[core-changes]].
+  the deep-link table in [core-changes](./core-changes.md).

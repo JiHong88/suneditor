@@ -26,7 +26,7 @@ while still calling `preventDefault`/`stopPropagation`, so nothing happens and n
 ## Selection UI by component class
 
 - `se-component-line-break` (hr, pageBreak): gets **line-breaker drag handles only**, never an
-  auto controller. Keep siblings consistent — see [[design-principles]] (hr ↔ pageBreak).
+  auto controller. Keep siblings consistent — see [design-principles](./design-principles.md) (hr ↔ pageBreak).
 - Figure/file components: controller + handle, owned and opened by the plugin's `componentSelect`.
 - Inline components: zero-width-space anchoring, no line breaker.
 
@@ -35,5 +35,5 @@ while still calling `preventDefault`/`stopPropagation`, so nothing happens and n
 Only a full plugin instance can show a controller (`this.controller.open(...)` from
 `componentSelect`). There is **no framework path** that opens a controller for a launcher.
 Adding a controller to a launcher-based component means promoting it to a full plugin — a
-structural change; weigh it via [[design-principles]] before doing it.
+structural change; weigh it via [design-principles](./design-principles.md) before doing it.
 Reference: `guide/custom-plugin.md#example-3-custom-embed-modal-with-controller-typescript`.

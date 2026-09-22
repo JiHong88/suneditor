@@ -1,81 +1,96 @@
-name: Test & Coverage
+name: CI
 
 on:
     push:
         branches: [master]
-        paths-ignore:
-            - '**/*.md'
-            - '**/*.css'
-            - 'docs/**'
-            - '.github/**'
-            - 'guide/**'
-            - 'scripts/**'
-            - 'webpack/**'
-            - 'src/assets/**'
-            - 'src/themes/**'
-            - 'test/dev/**'
-            - '.barrelsby.json'
-            - '.dependency-cruiser.js'
-            - '.editorconfig'
-            - '.gitattributes'
-            - '.gitignore'
-            - '.prettierrc'
-            - 'codecov.yml'
-            - 'eslint.config.mjs'
-            - 'playwright.config.js'
-            - 'LICENSE.txt'
     pull_request:
         branches: [master]
-        paths-ignore:
-            - '**/*.md'
-            - '**/*.css'
-            - 'docs/**'
-            - '.github/**'
-            - 'guide/**'
-            - 'scripts/**'
-            - 'webpack/**'
-            - 'src/assets/**'
-            - 'src/themes/**'
-            - 'test/dev/**'
-            - '.barrelsby.json'
-            - '.dependency-cruiser.js'
-            - '.editorconfig'
-            - '.gitattributes'
-            - '.gitignore'
-            - '.prettierrc'
-            - 'codecov.yml'
-            - 'eslint.config.mjs'
-            - 'playwright.config.js'
-            - 'LICENSE.txt'
+    workflow_dispatch:
+
+permissions:
+    contents: read
 
 jobs:
     test:
         runs-on: ubuntu-latest
-        timeout-minutes: 10
+        timeout-minutes: 30
         steps:
             - name: Checkout code
               uses: actions/checkout@v4
               with:
                   persist-credentials: false
+                  # Local PR merge-base and multi-commit push comparisons, without an API file limit.
+                  fetch-depth: 0
 
             - name: Setup Node.js
               uses: actions/setup-node@v4
               with:
                   node-version: '22'
-                  cache: 'npm'
+
+            - name: Test CI routing and Codex edit hooks
+              run: node --test scripts/ci/select-checks.test.cjs scripts/hooks/codex-post-tool-use.test.cjs
+
+            - name: Select checks from changed paths
+              id: scope
+              run: node scripts/ci/select-checks.cjs
+
+            - name: Check harness
+              run: npm run check:harness
+
+            - name: Cache npm downloads
+              if: steps.scope.outputs.install == 'true'
+              uses: actions/cache@v4
+              with:
+                  path: ~/.npm
+                  key: ${{ runner.os }}-node22-npm-${{ hashFiles('package-lock.json') }}
+                  restore-keys: ${{ runner.os }}-node22-npm-
 
             - name: Install dependencies
+              id: install
+              if: steps.scope.outputs.install == 'true'
               run: npm ci
 
-            - name: Lint & Check architecture
+            # Independent checks still run after another check fails; the job keeps its failed status.
+            - name: Lint, types and architecture
+              if: ${{ !cancelled() && steps.install.outcome == 'success' && steps.scope.outputs.checks == 'true' }}
               run: npm run lint
 
+            - name: Test architecture guardrails
+              if: ${{ !cancelled() && steps.install.outcome == 'success' && steps.scope.outputs.checks == 'true' }}
+              run: npm run test:arch
+
+            - name: Check public exports
+              if: ${{ !cancelled() && steps.install.outcome == 'success' && steps.scope.outputs.checks == 'true' }}
+              run: npm run check:exports
+
             - name: Run tests with coverage
-              run: npm run test:coverage
+              id: coverage
+              if: ${{ !cancelled() && steps.install.outcome == 'success' && steps.scope.outputs.coverage == 'true' }}
+              run: npm run test:coverage -- --runInBand
 
             - name: Upload coverage to Codecov
-              if: always()
+              if: ${{ !cancelled() && (steps.coverage.outcome == 'success' || steps.coverage.outcome == 'failure') && hashFiles('coverage/lcov.info') != '' }}
               uses: codecov/codecov-action@v5
               with:
                   token: ${{ secrets.CODECOV_TOKEN }}
                   fail_ci_if_error: false
+
+            - name: Install browsers
+              id: browsers
+              if: ${{ !cancelled() && steps.install.outcome == 'success' && steps.scope.outputs.browser == 'true' }}
+              run: npx --no-install playwright install --with-deps chromium firefox
+
+            - name: Browser contracts (DIV/iframe and LTR/RTL)
+              id: browser
+              if: ${{ !cancelled() && steps.browsers.outcome == 'success' }}
+              run: npm run test:browser
+
+            - name: Upload browser evidence
+              if: ${{ !cancelled() && (steps.browser.outcome == 'success' || steps.browser.outcome == 'failure') }}
+              uses: actions/upload-artifact@v4
+              with:
+                  name: browser-contracts
+                  path: |
+                      playwright-report/
+                      test-results/
+                  retention-days: 7

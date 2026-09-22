@@ -1,209 +1,136 @@
-/**
- * @fileoverview Memory leak tests for editor destroy() function
- * Verifies that destroy() properly breaks circular references and releases memory
- */
+/** Behavioral teardown checks; these do not claim to measure garbage collection. */
+import Editor from '../../src/core/editor';
+import { PluginCommand } from '../../src/interfaces';
 
-import { createTestEditor, destroyTestEditor, waitForEditorReady } from '../__mocks__/editorIntegration';
+describe('Editor resource lifecycle', () => {
+	const editors = [];
 
-describe('Editor destroy() memory management', () => {
-	let container;
-	let editor;
-
-	beforeEach(async () => {
-		container = document.createElement('div');
-		container.id = 'memory-test-container';
-		document.body.appendChild(container);
-
-		editor = createTestEditor({
-			element: container,
-			buttonList: [['undo', 'redo', 'bold', 'italic']],
-			width: '100%',
-			height: 'auto',
+	async function create(options = {}) {
+		const target = document.createElement('textarea');
+		document.body.appendChild(target);
+		let ready;
+		const loaded = new Promise((resolve) => {
+			ready = resolve;
 		});
-		await waitForEditorReady(editor);
-	});
+		const editor = new Editor([{ key: null, target }], {
+			buttonList: [['undo', 'redo', 'bold']],
+			height: '200px',
+			value: '<p>initial</p>',
+			...options,
+			events: { ...options.events, onload: ready },
+		});
+		const entry = {
+			editor,
+			target,
+			destroyed: false,
+			destroy() {
+				if (!this.destroyed) {
+					editor.destroy();
+					this.destroyed = true;
+				}
+			},
+		};
+		editors.push(entry);
+		await loaded;
+		return entry;
+	}
 
 	afterEach(() => {
-		if (container && container.parentNode) {
-			container.parentNode.removeChild(container);
+		for (const entry of editors.splice(0)) {
+			entry.destroy();
+			entry.target.remove();
 		}
+		jest.useRealTimers();
+		jest.restoreAllMocks();
 	});
 
-	describe('Circular reference breaking', () => {
-
-		it('should nullify editor reference in plugins after destroy', () => {
-			// If there are plugins, verify they are cleaned up
-			const plugins = editor.$.plugins;
-			const pluginKeys = Object.keys(plugins || {});
-
-			editor.destroy();
-
-			// After destroy, plugins should have editor = null
-			for (const key of pluginKeys) {
-				if (plugins[key]) {
-					expect(plugins[key].editor).toBeNull();
-				}
+	it('runs a registered plugin cleanup and clears populated registries and DOM', async () => {
+		const dispose = jest.fn();
+		class Probe extends PluginCommand {
+			static key = 'probe';
+			action() {}
+			_destroy() {
+				dispose();
 			}
-		});
+		}
+		const entry = await create({ plugins: [Probe], buttonList: [['probe', 'bold']] });
+		const $ = entry.editor.$;
+		const plugin = $.plugins.probe;
+		const targets = $.commandDispatcher.targets;
+		const context = $.context;
+		const options = $.options;
+		const roots = $.frameRoots;
+		const topArea = $.frameContext.get('topArea');
+		expect(plugin).toBeInstanceOf(Probe);
+		expect(targets.size).toBeGreaterThan(0);
+		expect(context.size).toBeGreaterThan(0);
+		expect(options.size()).toBeGreaterThan(0);
+		expect(roots.size).toBe(1);
+		expect(topArea.isConnected).toBe(true);
 
-		it('should clear Map objects after destroy', () => {
-			// Get references to Map objects before destroy (refactored locations)
-			const allCommandButtons = editor.$.commandDispatcher.allCommandButtons;
-			const subAllCommandButtons = editor.$.commandDispatcher.subAllCommandButtons;
-			const shortcutsKeyMap = editor.$.shortcuts.keyMap;
-			const commandTargets = editor.$.commandDispatcher.targets;
-
-			// Verify Maps have some state before destroy (may be empty in test env)
-			expect(allCommandButtons).toBeInstanceOf(Map);
-			expect(subAllCommandButtons).toBeInstanceOf(Map);
-			expect(shortcutsKeyMap).toBeInstanceOf(Map);
-			expect(commandTargets).toBeInstanceOf(Map);
-
-			editor.destroy();
-
-			// Verify Maps are cleared after destroy
-			expect(allCommandButtons.size).toBe(0);
-			expect(subAllCommandButtons.size).toBe(0);
-			expect(shortcutsKeyMap.size).toBe(0);
-			expect(commandTargets.size).toBe(0);
-		});
-
-		it('should nullify events object after destroy', () => {
-			// Verify events exist before destroy (if present)
-			if (editor.events !== undefined) {
-				expect(editor.events).toBeTruthy();
-			}
-
-			editor.destroy();
-
-			// Verify events are nullified after destroy
-			expect(editor.events).toBeNull();
-		});
-
-		it('should nullify plugins object after destroy', () => {
-			editor.destroy();
-
-			// Plugins may be an empty object or null after destroy
-			expect(!editor.$.plugins || Object.keys(editor.$.plugins).length === 0).toBe(true);
-		});
-
+		entry.destroy();
+		expect(dispose).toHaveBeenCalledTimes(1);
+		expect(targets.size).toBe(0);
+		expect(context.size).toBe(0);
+		expect(options.size()).toBe(0);
+		expect(roots.size).toBe(0);
+		expect(topArea.isConnected).toBe(false);
+		expect(entry.editor.events).toBeNull();
 	});
 
-	describe('WeakRef GC eligibility', () => {
+	it('cancels a pending history save before it can notify or access destroyed state', async () => {
+		const change = jest.fn();
+		const entry = await create({ events: { onChange: change }, historyStackDelayTime: 250 });
+		jest.useFakeTimers();
+		const $ = entry.editor.$;
+		change.mockClear();
+		$.frameContext.get('wysiwyg').firstChild.textContent = 'pending edit';
+		$.history.push(true);
+		// Complete the current edit's frame sync, leaving the delayed snapshot outstanding.
+		jest.advanceTimersByTime(0);
+		expect(change).not.toHaveBeenCalled();
+		expect(jest.getTimerCount()).toBeGreaterThan(0);
+		entry.destroy();
+		expect(jest.getTimerCount()).toBe(0);
+		expect(() => jest.advanceTimersByTime(1000)).not.toThrow();
+		expect(change).not.toHaveBeenCalled();
 	});
 
-	describe('DOM cleanup', () => {
-		it('should remove DOM elements after destroy', () => {
-			// Get references to DOM elements before destroy
-			const topArea = editor.$.frameContext.get('topArea');
-			const hasTopAreaBefore = topArea && topArea.parentNode;
+	it('detaches listeners on retained DOM and leaves the other editor functional', async () => {
+		const first = await create();
+		const second = await create();
+		const node = first.editor.$.frameContext.get('wysiwyg');
+		const firstCallback = jest.fn();
+		const secondCallback = jest.fn();
+		first.editor.$.eventManager.addEvent(node, 'probe', firstCallback);
+		first.editor.$.eventManager.addGlobalEvent('probe', firstCallback);
+		second.editor.$.eventManager.addGlobalEvent('probe', secondCallback);
+		node.dispatchEvent(new Event('probe'));
+		window.dispatchEvent(new Event('probe'));
+		expect(firstCallback).toHaveBeenCalledTimes(2);
+		expect(secondCallback).toHaveBeenCalledTimes(1);
 
-			editor.destroy();
-
-			// After destroy, topArea should be removed from DOM
-			if (hasTopAreaBefore) {
-				expect(topArea.parentNode).toBeNull();
-			}
-		});
-
-		it('should clear context Maps after destroy', () => {
-			const context = editor.$.context;
-			const options = editor.$.options;
-			const frameRoots = editor.$.frameRoots;
-
-			// Verify Maps exist before destroy
-			expect(context).toBeTruthy();
-			expect(options).toBeTruthy();
-			expect(frameRoots).toBeTruthy();
-
-			// Check if they are real Maps with size property
-			const contextIsMap = context instanceof Map || typeof context.size === 'number';
-			const optionsIsMap = options instanceof Map || typeof options.size === 'number';
-			const frameRootsIsMap = frameRoots instanceof Map || typeof frameRoots.size === 'number';
-
-			editor.destroy();
-
-			// Verify Maps are cleared after destroy
-			if (contextIsMap) {
-				expect(context.size).toBe(0);
-			}
-			if (optionsIsMap) {
-				expect(options.size).toBe(0);
-			}
-			if (frameRootsIsMap) {
-				expect(frameRoots.size).toBe(0);
-			}
-		});
+		first.destroy();
+		node.dispatchEvent(new Event('probe'));
+		window.dispatchEvent(new Event('probe'));
+		expect(firstCallback).toHaveBeenCalledTimes(2);
+		expect(secondCallback).toHaveBeenCalledTimes(2);
+		second.editor.$.html.set('<p>still editable</p>');
+		expect(second.editor.$.frameContext.get('wysiwyg').textContent).toBe('still editable');
 	});
 
-	describe('History cleanup', () => {
-	});
-
-	describe('Event listener cleanup', () => {
-	});
-
-	describe('Multiple editor instances', () => {
-		it('should not affect other editor instances when one is destroyed', async () => {
-			// Create a second editor
-			const container2 = document.createElement('div');
-			container2.id = 'memory-test-container-2';
-			document.body.appendChild(container2);
-
-			const editor2 = createTestEditor({
-				element: container2,
-				buttonList: [['bold']],
-			});
-			await waitForEditorReady(editor2);
-
-			// Destroy first editor
-			editor.destroy();
-
-			// Second editor should still work
-			expect(editor2.$.eventManager).toBeTruthy();
-			expect(editor2.$.selection).toBeTruthy();
-			expect(editor2.$.format).toBeTruthy();
-
-			// Cleanup second editor
-			destroyTestEditor(editor2);
-			if (container2.parentNode) {
-				container2.parentNode.removeChild(container2);
-			}
-		});
-	});
-
-	describe('Repeated create/destroy cycles', () => {
-		it('should handle multiple create/destroy cycles without memory accumulation', async () => {
-			// First destroy the initial editor
-			editor.destroy();
-
-			// Track DOM elements count
-			const initialDomCount = document.body.querySelectorAll('*').length;
-
-			// Create and destroy editors multiple times
-			for (let i = 0; i < 3; i++) {
-				const tempContainer = document.createElement('div');
-				tempContainer.id = `cycle-test-${i}`;
-				document.body.appendChild(tempContainer);
-
-				const tempEditor = createTestEditor({
-					element: tempContainer,
-					buttonList: [['bold']],
-				});
-				await waitForEditorReady(tempEditor);
-
-				// Verify editor works
-				expect(tempEditor.$.selection).toBeTruthy();
-
-				// Destroy
-				destroyTestEditor(tempEditor);
-				if (tempContainer.parentNode) {
-					tempContainer.parentNode.removeChild(tempContainer);
-				}
-			}
-
-			// DOM element count should be similar to initial (allowing some variance for test artifacts)
-			const finalDomCount = document.body.querySelectorAll('*').length;
-			expect(finalDomCount).toBeLessThanOrEqual(initialDomCount + 10);
-		});
+	it('repeated create/destroy cycles remove all registered callbacks and editor DOM', async () => {
+		const callback = jest.fn();
+		const originalCount = document.querySelectorAll('.sun-editor').length;
+		for (let i = 0; i < 5; i++) {
+			const entry = await create();
+			entry.editor.$.eventManager.addGlobalEvent('probe', callback);
+			window.dispatchEvent(new Event('probe'));
+			expect(callback).toHaveBeenCalledTimes(i + 1);
+			entry.destroy();
+			window.dispatchEvent(new Event('probe'));
+			expect(callback).toHaveBeenCalledTimes(i + 1);
+			expect(document.querySelectorAll('.sun-editor').length).toBe(originalCount);
+		}
 	});
 });

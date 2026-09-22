@@ -54,3 +54,16 @@ Run `npm run check:exports` to validate.
 | Added/removed plugins or toolbar buttons | `npm run check:inject` → `npm run ts-build` |
 | Default options (`src/core/schema/options.js`) | `npm run ts-build` |
 | Exports in `src/suneditor.js` | Update `cdn-builder.js` + `format-index.cjs` → `npm run check:exports` |
+
+
+## 7. Verification scope and generated side effects
+
+Use [.agents/skills/post-edit/SKILL.md](../.agents/skills/post-edit/SKILL.md) for source edits.
+`ts-build` generates types but masks the compiler exit status with `tsc || true`; always run
+`npm run lint:type` separately before claiming type safety. `check:inject` writes generated
+source sections; `check:langs` translates files using Google credentials and is not a read-only
+check. Do not run the translation command for unrelated changes or without its configured
+service. Report an unavailable translation step explicitly.
+
+For documentation/harness-only changes, check links, command names, examples and
+`git diff --check`; do not regenerate source/types or run the source autofixer.

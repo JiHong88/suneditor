@@ -7,7 +7,7 @@ Read this before writing or modifying any `.js` file under `src/`.
 - **What this is not**: file-level edit restrictions (see [`editing-rules.md`](./editing-rules.md)), architecture overview (see [`ARCHITECTURE.md`](../ARCHITECTURE.md)), or commit conventions (see [`guide/commit-types.md`](../guide/commit-types.md)).
 
 For each rule: ✅ canonical pattern, ❌ anti-pattern, 💡 why.
-Most violations are caught by `dependency-cruiser` or break at runtime in iframe mode — but not all. Treat this as a checklist, not a suggestion.
+ESLint checks syntax/style; dependency-cruiser checks only its configured import rules. Event lifetime, history ownership, L3 cross-service access and performance still require source review. Treat this as a checklist, not a claim of automatic enforcement.
 
 ---
 
@@ -38,11 +38,11 @@ All DOM listeners must go through `this.$.eventManager`. Raw `addEventListener` 
 // Element-bound listener — auto-tracked, auto-removed on destroy/setOptions
 const info = this.$.eventManager.addEvent(element, 'click', this.onClick.bind(this));
 
-// Window/document-level listener — must be tracked manually
-this.__esc = this.$.eventManager.addGlobalEvent('keydown', this.onEsc);
+// Temporary global listener — retain the handle in a declared private field
+this.#esc ??= this.$.eventManager.addGlobalEvent('keydown', this.#onEsc); // handler bound once during setup
 
-// Cleanup (only required for addGlobalEvent — addEvent is automatic)
-this.__esc &&= this.$.eventManager.removeGlobalEvent(this.__esc);
+// On close/cancel, remove temporary listeners rather than waiting for editor teardown
+this.#esc &&= this.$.eventManager.removeGlobalEvent(this.#esc);
 ```
 
 ### ❌ DON'T
@@ -53,14 +53,14 @@ window.addEventListener('keydown', handler); // wrong window in iframe mode
 document.addEventListener('selectionchange', handler); // bypasses iframe-aware routing
 ```
 
-💡 `eventManager.addEvent` records every listener in an internal array and removes them all in `_init()` on destroy/setOptions (`src/core/config/eventManager.js:187-196`). `addGlobalEvent` is iframe-aware: when `iframe` option is on, it registers on the iframe's window too (`eventManager.js:138-148`).
+💡 `src/core/config/eventManager.js` tracks both registration kinds for `_init()` teardown. Temporary UI still owns early cleanup. `removeEvent` detaches but retains tracking records until teardown; avoid repeated registration of rebuilt DOM. `addGlobalEvent` targets the host window and current iframe, not all roots. See [resource lifetime](./performance-guide.md#event-and-resource-costs).
 
 ### Public event hooks (`triggerEvent`)
 
 `triggerEvent` calls the user-registered `events.onXxx` handler. It is **async** — always `await`.
 
 ```javascript
-const result = await this.$.eventManager.triggerEvent('onChange', { frameContext, data });
+const result = await this.$.eventManager.triggerEvent('onPaste', { frameContext, event, data });
 if (result === false) return; // user canceled
 ```
 
@@ -70,7 +70,7 @@ if (result === false) return; // user canceled
 
 ## 2. DOM mutation — go through `$.html` / `$.format` / `$.inline`
 
-Direct DOM mutation inside the wysiwyg root skips sanitization, history, and char-count. Use the L3 logic layer instead.
+Use the existing semantic editing API for content changes. Detached toolbar/dialog DOM may be constructed directly with helpers. Low-level core DOM routines necessarily mutate nodes; specialized plugin edits (for example align styles) may also use helpers when no semantic wrapper fits, but their caller must own validation, selection/cache updates and history. Do not duplicate structural editing in a feature or assume every L3 method sanitizes and saves.
 
 ### ✅ DO
 
@@ -81,17 +81,23 @@ this.$.html.insertNode(node, { afterNode, skipCharCount: false }); // insert raw
 
 this.$.format.setLine(pElement); // wrap selection as line
 this.$.format.applyBlock(blockquoteEl.cloneNode(false)); // apply block format
-this.$.inline.apply(spanFormat, styleArray, true); // apply inline style
+this.$.inline.apply(spanFormat, { stylesToModify: styleArray, strictRemove: true });
 ```
 
-Wrappers that already push history (do NOT call `history.push` again after these):
+History ownership (verify the implementation and flags for the path being changed):
 
-| Wrapper                                                              | Auto-pushes      |
-| -------------------------------------------------------------------- | ---------------- |
-| `$.html.set` / `$.html.insert` / `$.html.insertNode`                 | ✅ `push(false)` |
-| `$.format.setLine` / `$.format.applyBlock`                           | ✅               |
-| `$.inline.apply`                                                     | ✅               |
-| `$.component.insert` / `$.component.select` / `$.component.deselect` | ✅               |
+| API | History behavior |
+| --- | --- |
+| `$.html.set` / `$.html.insert` | Push on their normal content-edit paths |
+| `$.html.insertNode` | Low-level insertion; no final history push of its own |
+| `$.format.setLine` / `$.format.applyBlock` / `$.inline.apply` | Own their normal edit push; early returns may do nothing |
+| `$.component.insert` | Pushes unless `skipHistory: true` |
+| `$.component.select` / `$.component.deselect` | Selection/UI operations; no content history push of their own |
+
+Do not add another push after a wrapper that owns the edit. For a lower-level composition,
+trace nested calls and assign the final push to one owner. `insertNode` is not an HTML
+sanitizer; keep external input on the cleaning path. Skip flags require a caller that already
+performed the corresponding validation/batching, not a performance shortcut.
 
 ### ❌ DON'T
 
@@ -101,7 +107,7 @@ container.appendChild(node); // bypasses format normalization
 document.execCommand('bold', false); // deprecated, inconsistent across browsers
 ```
 
-💡 `$.html.set` also handles `rootKey` for multi-root frames (`src/core/logic/dom/html.js:1322-1344`). Skipping it desyncs the history stack for that frame.
+💡 `$.html.set` also handles `rootKey` for multi-root frames (`src/core/logic/dom/html.js`, `set`). Skipping it desyncs the history stack for that frame.
 
 ---
 
@@ -195,6 +201,50 @@ document.createElement('div');               // use _d
 
 💡 The `dom.check.*` helpers use `nodeType` and `Object.prototype.toString.call(x)` internally — both cross-realm safe.
 
+### Coordinates and iframe boundaries
+
+Any offset, hit-test, drag/resize, caret popup or overlay calculation involving a WYSIWYG
+target must support iframe mode. State the coordinate space at the boundary: frame viewport,
+host viewport, host document or the positioned container. A raw `getBoundingClientRect()` or
+pointer `clientX/clientY` belongs to its originating viewport; it cannot be combined directly
+with host-window coordinates when the event/target is inside an iframe.
+
+- Reuse `$.offset.getLocal`, `getGlobal`, `getWWScroll`, `setAbsPosition` or `setRangePosition`
+  according to the destination, and `$.selection.getRects` for selection geometry. Inspect
+  the method and a matching caller: these APIs are not interchangeable coordinate formats.
+- `offset.getGlobal` includes the active iframe translation and host scroll in `top/left`;
+  `fixedTop/fixedLeft` are host-viewport coordinates. Do not add those offsets again.
+  `selection.getRects` also applies iframe translation on its relevant paths; preserve its
+  returned rect/scroll contract rather than treating it as a raw iframe rect.
+- `_w`/`_d` from `helper/env` refer to the host. Use the originating frame's `_ww`/`_wd` or
+  the target's owning document/window when frame-local selection, style or viewport data is
+  needed. Replacing bare `window` with `_w` alone does not make a calculation iframe-safe.
+- Shared offset/selection services use the active frame. Verify target ownership, especially
+  after deferred work or a root switch. Keep geometry reads together and invalidate caches
+  on relevant scroll, resize, content, direction and frame changes.
+
+### RTL and horizontal behavior
+
+Treat direction as an implementation requirement whenever a change affects horizontal
+positioning, alignment, ordering, indentation, drag/resize handles or directional controls.
+
+- Use the existing editor UI direction, `$.options.get('_rtl')`, and the `setDir` lifecycle.
+  Do not infer direction from the language name or retain a constructor-only direction value
+  when `resetOptions({ textDirection: ... })` can change it at runtime. If the operation is
+  about content with its own direction, inspect that content's direction separately.
+- Distinguish physical `left/right` from logical `start/end`. Reuse the sibling's logical CSS
+  or RTL rules and shared positioning code. Do not blindly swap physical coordinates, arrow
+  keys, explicit left/right alignment commands or DOM order under RTL.
+- Mirror once: `offset.setAbsPosition` already handles RTL horizontal placement, and existing
+  CSS may already mirror a toolbar. Reversing its DOM order as well can cancel the intended
+  result. Preserve `buttonList` order and follow the existing family behavior.
+- Geometry/direction changes require browser coverage of **DIV + LTR, DIV + RTL, iframe + LTR,
+  iframe + RTL**, with relevant host/editor scroll and viewport edges. Check LTR → RTL → LTR
+  switching for cached placement, arrows and styles; include root switching when frame-scoped.
+
+References: `src/core/logic/dom/offset.js`, `selection.js`, `src/core/logic/shell/ui.js`
+(`setDir`), `src/modules/contract/Controller.js`, and `test/e2e/toolbar.rtl.order.spec.js`.
+
 ---
 
 ## 6. History & onChange
@@ -203,14 +253,14 @@ document.createElement('div');               // use _d
 
 | Call                                  | Behavior                                                              |
 | ------------------------------------- | --------------------------------------------------------------------- |
-| `this.$.history.push(false)`          | Debounced save (~400ms), batches rapid edits                          |
-| `this.$.history.push(true)`           | Immediate save (use after discrete actions: mouse up, dialog confirm) |
+| `this.$.history.push(false)` | Immediate snapshot attempt; use for discrete edits |
+| `this.$.history.push(true)` | Debounced by `historyStackDelayTime` (default 400ms), batches typing |
 | `this.$.history.push(false, rootKey)` | Multi-root: push to a specific frame                                  |
 
 Rules:
 
 - **Any UI handler that mutates persisted wysiwyg DOM must end its chain with `history.push`.** It's what fires `onChange`.
-- If you called a wrapper from §2 that already pushes, **do not push again** — duplicate stack entries break undo.
+- If a wrapper from §2 owns the push, **do not push again**. Identical snapshots are deduplicated, but redundant pushes still schedule frame sync and check content/file state; intermediate snapshots can split undo.
 - **Read-only operations must not push.** Selection probes, hover effects, controller positioning — no push.
 - **Never call `history.push` from inside an `onChange` handler.** It re-fires `onChange` → infinite loop.
 
@@ -243,14 +293,14 @@ node.nodeType === 1;                        // use dom.check.isElement
 
 ## 8. Imports & layer boundaries
 
-Enforced by `.dependency-cruiser.js`:
+Import conventions are enforced by `.dependency-cruiser.js`; exact existing ownership exceptions and review limits are in [Layer Dependency Rules](../ARCHITECTURE.md#layer-dependency-rules):
 
 | Rule                                                                                  |
 | ------------------------------------------------------------------------------------- |
 | `helper/*` cannot import from `core/*`, `modules/*`, or `plugins/*`                   |
 | `modules/*` cannot import from `core/*` or `plugins/*` — receives `$` via constructor |
-| L3 modules cannot import other L3 modules directly — cross-reference via `$`          |
-| Plugins cannot import other plugins (same plugin's submodules are fine)               |
+| L3 services cross-reference via `$`; only documented owned-helper/constant edges are exempt |
+| Plugins cannot import other plugins or their public barrel (same plugin submodules are fine), or import `core/logic` directly |
 
 ### ✅ DO
 
@@ -286,8 +336,8 @@ import { PluginCommand } from '../../interfaces';
 import { dom } from '../../helper';
 
 class MyPlugin extends PluginCommand {
-	static key = 'myPlugin'; // required, lowercase
-	static type = 'command'; // required: 'command' | 'dropdown' | 'modal' | 'browser' | 'popup' | 'field' | 'input' | 'dropdown-free'
+	static key = 'myPlugin'; // required, exact case-sensitive registration key
+	// static type is inherited from PluginCommand; do not redeclare it.
 	static className = 'se-btn-my'; // optional toolbar button class
 
 	constructor(kernel, pluginOptions) {
@@ -349,12 +399,11 @@ this.controller = new Controller(this, this.$, controllerElement, {
 	isWWTarget: true,
 });
 
-this.figure = new Figure(this, this.$, imgElement, {
-	controls: [['mirror_h', 'mirror_v'], ['caption'], ['remove']],
-});
+// Figure takes controls, not a DOM element, as its third argument.
+this.figure = new Figure(this, this.$, figureControls, { sizeUnit: 'px' });
 ```
 
-First arg is the **host plugin instance** (`this`), second is `$`. Order matters — swapping breaks lifecycle hooks.
+First arg is the **host plugin instance** (`this`), second is `$`. Remaining arguments are module-specific: inspect the constructor rather than assuming every module takes an element. Order matters — swapping breaks lifecycle hooks.
 
 💡 Modules receive `$` directly (not `kernel`) because `kernel` instantiates modules indirectly through plugins; passing `kernel` would create a circular dep.
 
@@ -390,7 +439,7 @@ The first form returns a Promise that may resolve to `false` (user canceled), `t
 
 ## 13. Private fields & JSDoc types
 
-- Every instance field is `#privateField`. No `this._foo`. No public state on `this` unless it's part of the documented plugin API (e.g., `this.title`, `this.icon`, `this.modal`, `this.controller`).
+- New implementation-private state uses `#privateField`. Keep documented/inherited plugin and module fields public (e.g., `title`, `icon`, `modal`, `controller`). Existing public/underscored members may have callers: inspect them before renaming; do not mechanically privatize legacy APIs.
 - JSDoc types:
     - `@param {SunEditor.Kernel}` — **only** for constructor params taking the Kernel instance.
     - `@param {SunEditor.Deps}` — everything else: `this.$`, event-callback `$`, module `$`.
@@ -404,8 +453,21 @@ See [`ARCHITECTURE.md` §5](../ARCHITECTURE.md#5-type-system) for the full type 
 
 - Recoverable failures: log with `console.warn` (prefix: `[SunEditor.<area>.<reason>]`) and return.
 - Unrecoverable invariants: `throw new Error('[SUNEDITOR.<area>.<fn>.fail] <reason>')` — see `format.setLine` for the format.
-- User event handlers are wrapped in `try/catch` by `eventManager.triggerEvent` and log via `console.error`. Don't swallow exceptions inside plugins; let the wrapper handle it.
+- Public user callbacks are caught by `eventManager.triggerEvent`; plugin hooks and async command calls do not all pass through that wrapper. Inspect the actual caller, propagate or handle failures there, and release resources on error. Do not assume the public-event wrapper catches plugin exceptions.
 - No custom logger exists. Don't introduce one.
+
+---
+
+## 15. Code style and feature cost
+
+Use `eslint.config.mjs` as the formatting authority: tabs (width 4), single quotes,
+semicolons, trailing commas and 120-column formatting. Match adjacent naming, imports,
+JSDoc (`@type` for existing hook contracts) and control-flow style. Avoid unrelated
+formatting or renaming. Do not add blanket lint disables or `any` casts to hide a mismatch.
+
+Before implementing a new feature, read the [Performance and Feature Guide](./performance-guide.md).
+Find a sibling and shared owner before creating a new API. Keep the inactive path cheap,
+preserve synchronous editing decisions and validate costs proportional to the changed path.
 
 ---
 
@@ -414,14 +476,16 @@ See [`ARCHITECTURE.md` §5](../ARCHITECTURE.md#5-type-system) for the full type 
 Before saving:
 
 - [ ] All DOM listeners go through `this.$.eventManager.addEvent` / `addGlobalEvent`.
-- [ ] All wysiwyg mutations go through `$.html` / `$.format` / `$.inline` (no `innerHTML`, no `appendChild` into wysiwyg).
+- [ ] Semantic editing APIs reused; any necessary low-level mutation has validation, selection/cache and history ownership (§2).
 - [ ] State changes go through `store.set` (no direct field writes).
 - [ ] Right state container: `store` vs `context` vs `frameContext` vs `options` vs `frameOptions`.
 - [ ] No `instanceof` — use `dom.check.*` or `this.$.instanceCheck.*`.
 - [ ] No `window.` / `document.` — use `_w` / `_d` from `helper/env`, or `frameContext.get('_ww'/'_wd')`.
+- [ ] Geometry uses the correct frame/coordinate space; horizontal behavior supports RTL without double mirroring (§5).
 - [ ] `history.push` called exactly once per logical edit (and never after a wrapper that auto-pushes).
 - [ ] `await` on `triggerEvent` and `_callPluginEventAsync`.
 - [ ] No L3↔L3 imports; no helper→core imports; no plugin→plugin imports.
-- [ ] Plugin has `static key`, `static type`, and `super(kernel)` in constructor.
+- [ ] Plugin has a case-sensitive `static key`, inherits the correct base type, and calls `super(kernel)`.
 - [ ] New lang keys added to `src/langs/en.js` only.
-- [ ] Instance fields are `#private`.
+- [ ] New private implementation state uses `#private`; existing API contracts preserved.
+- [ ] Hot-path costs, resource cleanup and async root/request ownership checked ([performance guide](./performance-guide.md)).

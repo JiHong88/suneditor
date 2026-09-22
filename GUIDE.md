@@ -2,7 +2,7 @@
 
 > **Purpose:**
 > Technical reference for developers and AI agents.
-> Defines architecture, conventions, and development workflow.
+> Navigation and developer reference. Authoritative contracts live in the linked architecture, coding, editing and testing guides.
 
 ---
 
@@ -15,7 +15,7 @@
     - [Plugin System](#plugin-system-srcplugins)
     - [Modules](#modules-srcmodules)
 - [Essential Commands](#essential-commands)
-    - [Claude Code Skills](#claude-code-skills-claudeskills)
+    - [Project Agent Skills](#project-agent-skills-agentsskills)
 - [Naming Conventions](#naming-conventions)
 - [Common Pitfalls](#common-pitfalls)
 - [Plugin Registration Flow](#plugin-registration-flow)
@@ -27,6 +27,7 @@
 - [Build System](#build-system)
 - [Changes Log](#changes-log)
 - [Supplementary Guides](#supplementary-guides)
+    - [Performance and Feature Guide](./prompts/performance-guide.md) - Reuse map, event/resource costs and targeted validation
     - [Coding Rules](./prompts/coding-rules.md) - Enforceable conventions for `src/*.js`
     - [Editing Rules](./prompts/editing-rules.md) - File-level edit restrictions
     - [Custom Plugin Guide](./guide/custom-plugin.md) - Creating custom plugins
@@ -104,7 +105,8 @@ suneditor/
 ├── test/
 │   ├── unit/
 │   ├── integration/
-│   └── e2e/
+│   ├── e2e/                # Native editing regressions
+│   └── browser/            # CI geometry contracts and performance budgets
 ├── types/                   # Generated TypeScript definitions
 ├── webpack/                 # Build configuration
 └── dist/                    # Built bundles (not tracked in git)
@@ -119,7 +121,7 @@ suneditor/
 
 **Development Environment:**
 
-- **Node.js**: **v22** recommended, minimum v14+
+- **Node.js**: **v22** for repository tooling and CI (the package engines field is not a toolchain guarantee)
 - **Build tools**: Webpack 5, Babel, ESLint, Prettier
 
 **Type System:**
@@ -131,7 +133,7 @@ suneditor/
 **Testing Stack:**
 
 - **Unit/Integration**: Jest with jsdom
-- **E2E**: Playwright (Chromium)
+- **Browser**: Playwright (Chromium and Firefox)
 - **Coverage**: Jest coverage reports
 
 ---
@@ -149,22 +151,7 @@ suneditor/
 | **L3** | `logic/`  | Business logic, DOM operations, UI                        | Selection, Format, Component, Toolbar, History                  |
 | **L4** | `event/`  | Internal DOM event processing                             | EventOrchestrator, handlers, reducers, rules, executor, effects |
 
-**Initialization Order:**
-
-```
-1. suneditor.create() → Validates target, merges options
-2. new Editor() → Creates editor instance
-3. Constructor() → Builds DOM (toolbar, statusbar, wysiwyg frames)
-4. new CoreKernel() → Kernel (runtime container)
-   a. L1: Store (state management)
-   b. Deps Phase 1: Config deps added to $ (L2)
-   c. L3: Logic instances created (dom, shell, panel)
-   d. Deps Phase 2: Logic deps added to $ (Deps bag complete)
-   e. L3 Init Pass: _init() called on L3 instances that need post-Phase 2 setup
-   f. L4: EventOrchestrator
-5. editor.#Create() → Plugin registration, event setup
-6. editor.#editorInit() → Frame init, triggers onload event
-```
+Initialization and dependency availability are defined in [the two-phase injection strategy](./ARCHITECTURE.md#the-2-phase-injection-strategy). Wait for `onload` before using initialized editor UI.
 
 ---
 
@@ -195,110 +182,18 @@ KernelInjector → Base → PluginCommand/PluginModal/PluginDropdown/...
 | **`PluginInput`**        | `input`         | (none)              | fontSize, pageNavigator                               |
 | **`PluginPopup`**        | `popup`         | `show()`            | anchor                                                |
 
-**Plugin Access Pattern:**
-
-All plugins access dependencies through `this.$`:
-
-```javascript
-import { PluginModal } from '../../interfaces';
-
-class MyPlugin extends PluginModal {
-	static key = 'myPlugin';
-	static className = 'se-btn-my-plugin';
-
-	/**
-	 * @constructor
-	 * @param {SunEditor.Kernel} kernel - The Kernel instance
-	 */
-	constructor(kernel, pluginOptions) {
-		super(kernel); // KernelInjector → this.$ = kernel.$ (Deps bag)
-		this.title = this.$.lang.myPlugin; // access via Deps
-		this.icon = 'myPlugin';
-	}
-
-	open(target) {
-		const range = this.$.selection.get();
-		const wysiwyg = this.$.frameContext.get('wysiwyg');
-		const height = this.$.frameOptions.get('height');
-		this.$.html.insert('<p>content</p>');
-		this.$.history.push(false);
-	}
-}
-```
-
-**Multi-Interface Pattern (TypeScript):**
-
-A single plugin can implement multiple interfaces — combining a base plugin type with module contracts and component hooks. In TypeScript, use `implements` to compose these:
-
-```typescript
-import { interfaces } from 'suneditor';
-import type { SunEditor } from 'suneditor/types';
-
-class MyPlugin extends interfaces.PluginModal
-	implements interfaces.ModuleModal, interfaces.EditorComponent
-{
-	static key = 'myPlugin';
-
-	_element: HTMLElement | null = null;
-
-	constructor(kernel: SunEditor.Kernel) {
-		super(kernel);
-	}
-
-	// PluginModal base
-	open(target?: HTMLElement) { ... }
-
-	// ModuleModal interface
-	async modalAction() { return true; }
-	modalOff(isUpdate: boolean) { ... }
-
-	// EditorComponent interface
-	static component(node: Node) {
-		return /^IMG$/i.test(node?.nodeName) ? node : null;
-	}
-	componentSelect(target: HTMLElement) { ... }
-}
-```
-
-**Available Contracts and Base Types (`interfaces.*`):**
-
-| Type                    | Purpose               | Key Methods                                |
-| ----------------------- | --------------------- | ------------------------------------------ |
-| **`ModuleModal`**       | Modal dialog behavior | `modalAction()`, `modalOn()`, `modalOff()` |
-| **`ModuleController`**  | Floating controller   | `controllerAction()`, `controllerOn()`     |
-| **`ModuleColorPicker`** | Color picker behavior | `colorPickerAction()`                      |
-| **`ModuleHueSlider`**   | Hue slider behavior   | `hueSliderAction()`                        |
-| **`ModuleBrowser`**     | Gallery browser       | `browserInit()`                            |
-| **`EditorComponent`**   | Component lifecycle   | `componentSelect()`, `componentDestroy()`  |
-| **`PluginDropdown`**    | Plugin base class     | `on()`, `action()`                         |
-
-Contracts can be combined with a base plugin class via `implements`.
-
-**Available via `this.$` (Deps bag):**
-
-- **Config**: `options`, `frameOptions`, `context`, `frameContext`, `frameRoots`, `lang`, `icons`
-- **DOM Logic**: `selection`, `html`, `format`, `inline`, `listFormat`, `nodeTransform`, `char`, `offset`
-- **Shell Logic**: `component`, `focusManager`, `pluginManager`, `plugins`, `ui`, `commandDispatcher`, `history`, `shortcuts`
-- **Panel Logic**: `toolbar`, `subToolbar` (second `Toolbar` instance, only with `_subMode`), `menu`, `viewer`
-- **Services**: `eventManager`, `contextProvider`, `optionProvider`, `instanceCheck`, `store`
-- **Environment**: `facade` (editor instance)
-
----
+Plugins receive `this.$` through `super(kernel)`; it is the Deps bag, not the Kernel.
+Use the [plugin shape](./prompts/coding-rules.md#9-plugin-shape) for source conventions and
+[Custom Plugin Guide](./guide/custom-plugin.md) for JavaScript/TypeScript examples, module
+contracts and multi-interface composition. The [Deps reference](./ARCHITECTURE.md#the--deps-object)
+lists available services.
 
 #### Plugin Hooks & Methods Reference
 
-> **Full reference:** [Custom Plugin Guide](./guide/custom-plugin.md) — Complete hook tables, parameter types, code examples, and multi-interface patterns.
-
-Plugin hooks are organized into four categories:
-
-| Category            | Interfaces                                                                                 | Key Methods                                                                                            |
-| ------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
-| **Common Hooks**    | (all plugins)                                                                              | `active()`, `init()`, `retainFormat()`, `shortcut()`, `setDir()`                                       |
-| **Event Hooks**     | (all plugins)                                                                              | `onKeyDown`, `onInput`, `onClick`, `onPaste`, `onFocus`, `onBlur`, +8 more                             |
-| **Module Hooks**    | `ModuleModal`, `ModuleController`, `ModuleColorPicker`, `ModuleHueSlider`, `ModuleBrowser` | `modalAction()`, `controllerAction()`, `colorPickerAction()`, etc.                                     |
-| **Component Hooks** | `EditorComponent`                                                                          | `componentSelect()`, `componentDeselect()`, `componentEdit()`, `componentDestroy()`, `componentCopy()` |
-
-**Event hook execution order** is controlled by `eventIndex` in `static options` (lower = earlier).
+The [Custom Plugin Guide](./guide/custom-plugin.md) owns hook tables, signatures and examples.
+Hook order and cancellation belong to the [event system](./ARCHITECTURE.md#9-event-system).
+Keep repeated `active()` hooks synchronous and local to the supplied node; see the
+[performance guide](./prompts/performance-guide.md#event-and-resource-costs).
 
 ---
 
@@ -328,7 +223,7 @@ Plugin hooks are organized into four categories:
 
 ### Helper Utilities (`src/helper/`)
 
-**Architecture Pattern**: Pure functions, no classes or state
+**Architecture Pattern**: Standalone utilities with no editor-layer imports; prefer pure functions. DOM helpers mutate nodes, and utilities such as `debounce` hold per-call closure state.
 
 - Export: `export function funcName()` + `export default { funcName }`
 - Can be imported as `import { dom } from '../helper'` → `dom.check.isElement()`
@@ -361,26 +256,10 @@ Options use Map-based storage. Some are marked `'fixed'` (immutable) or resettab
 
 ### Context System
 
-**1. Global Context (`$.context`)**
-
-- Shared UI elements (toolbar, statusbar, modal overlay)
-- Access: `$.context.get('toolbar')`
-
-**2. Frame Context (`$.frameContext`)**
-
-- Per-frame state and DOM references (wysiwyg, code, readonly state, etc.)
-- Convenience pointer to `frameRoots.get(store.get('rootKey'))`
-- Access: `$.frameContext.get('wysiwyg')`
-
-**3. Frame Roots Storage (`$.frameRoots`)**
-
-- `Map<rootKey, FrameContext>` — actual data storage for all frames
-- `null` key for single-root, custom string for multi-root
-
-**4. Frame Options (`$.frameOptions`)**
-
-- Convenience pointer to `frameContext.get('options')`
-- Access: `$.frameOptions.get('height')`
+Global `context` holds shared UI references; `frameContext` and `frameOptions` are moving views
+of the active root. Per-root ownership and storage are defined in
+[Multi-Root Architecture](./ARCHITECTURE.md#7-multi-root-architecture). Async work must retain
+its originating frame, rather than trusting the active view after an `await`.
 
 ---
 
@@ -402,15 +281,9 @@ npm run build:prod      # Build for production (minified)
 
 ### Testing
 
-```bash
-npm test                # Run Jest unit tests (silent mode)
-npm run test:watch      # Run Jest in watch mode
-npm run test:coverage   # Run tests with coverage report
-npm run test:e2e        # Run Playwright E2E tests (webServer starts/reuses localhost:8088)
-npm run test:e2e:ui     # Run E2E tests with Playwright UI
-npm run test:e2e:headed # Run E2E tests in headed mode
-npm run test:all        # Run all tests (Jest + Playwright)
-```
+Commands, browser installation, CI coverage and benchmark budgets are maintained in
+[Testing and Validation](./guide/testing.md). For changed code, follow the
+[post-edit pipeline](./.agents/skills/post-edit/SKILL.md).
 
 ### Linting
 
@@ -431,14 +304,16 @@ npm run check:langs     # Sync language files (requires Google API credentials)
 npm run check:inject    # Inject plugin JSDoc types into options.js
 ```
 
-### Claude Code Skills (`.claude/skills/`)
+### Project Agent Skills (`.agents/skills/`)
 
-Project-specific slash commands for [Claude Code](https://claude.ai/claude-code). Type `/` to see the list.
+Shared across agents; `.claude/skills` is a symlink. Read the relevant `SKILL.md` if the host has no skill invocation tool.
+
+Invoke these project skills using the current host’s supported skill mechanism.
 
 | Command         | Description                                                                              |
 | --------------- | ---------------------------------------------------------------------------------------- |
-| `/post-edit`    | Post-edit pipeline: `lint:fix-js` → `ts-build` → `check:arch` → `check:exports` → `test` |
-| `/review`       | Code review for bugs, logic errors, and dead code (report only, no fixes)                |
+| `/post-edit`    | Scope-specific validation; authoritative order in the [skill](./.agents/skills/post-edit/SKILL.md) |
+| `/code-review` | Review behavior, resource/performance regressions and project contracts (report only)                |
 | `/changes`      | Analyze git diff and update `changes.md` (for manual edits only)                         |
 | `/release-note` | Convert `changes.md` to release note format                                              |
 
@@ -449,7 +324,7 @@ Project-specific slash commands for [Claude Code](https://claude.ai/claude-code)
 **File Naming:**
 
 - **JavaScript files**: camelCase (e.g., `selection.js`, `eventManager.js`)
-- **Class files**: Match class name (e.g., `Modal.js` for `Modal` class)
+- **Class files**: Preserve the directory convention and exact case (`modules/contract/Modal.js`, but `core/logic/dom/selection.js`)
 - **Plugin files**: Match plugin key (e.g., `blockquote.js` for key `'blockquote'`)
 
 **Code Naming:**
@@ -461,7 +336,7 @@ Project-specific slash commands for [Claude Code](https://claude.ai/claude-code)
 
 **Plugin Naming:**
 
-- **Plugin keys**: lowercase string (e.g., `'image'`, `'video'`, `'blockStyle'`)
+- **Plugin keys**: case-sensitive registration strings (e.g., `'image'`, `'video'`, `'blockStyle'`); preserve spelling in `buttonList` and options
 - **Plugin types**: lowercase string (e.g., `'command'`, `'modal'`, `'dropdown'`)
 - **Plugin class names**: PascalCase (e.g., `Blockquote`, `Link`, `Image`)
 
@@ -474,145 +349,42 @@ Project-specific slash commands for [Claude Code](https://claude.ai/claude-code)
 
 ## Common Pitfalls
 
-**DON'T:**
-
-- Use `innerHTML` directly on wysiwyg frame → Use `this.$.html.set(content)`
-- Access `frameRoots` directly → Use `this.$.frameContext`
-- Register events without EventManager → Use `this.$.eventManager.addEvent(element, 'click', handler)`
-- Use `document.execCommand` → Use `this.$.html`, `this.$.format`, or `this.$.inline` methods
-- Create plugin without extending base class → Always extend from `src/interfaces/plugins.js`
-- Access kernel internals directly → Use `this.$` (the Deps bag, not the kernel itself)
-
-**DO:**
-
-- Use `this.$.selection` for all selection management
-- Use `this.$.html` for content manipulation
-- Use `this.$.format` for block-level formatting
-- Register all events via `this.$.eventManager` for automatic cleanup
-- Use `this.$.frameContext` and `this.$.frameOptions` instead of direct `frameRoots` access
-- Check element types with `dom.check` methods (iframe-safe)
-- Follow the Redux pattern for event handling (Handler → Reducer → Actions → Effects)
-- Use specific JSDoc types (`SunEditor.Kernel` for constructors, `SunEditor.Deps` for deps)
-- **Any UI handler that mutates persisted wysiwyg DOM must end its chain with `this.$.history.push(false)`** — this is what triggers the public `onChange` event. If you call a wrapper that already pushes (e.g., `this.$.inline.apply`, `this.$.format.setLine`), don't push again. When in doubt, check the wrapper's implementation.
+Use the [coding checklist](./prompts/coding-rules.md#quick-checklist) for events, shared DOM
+methods, state, history and iframe/RTL behavior. API names are not proof of ownership: trace
+the actual caller before adding a history push, listener or async cleanup path.
 
 ---
 
 ## Plugin Registration Flow
 
-```
-options.plugins: [ImagePlugin, VideoPlugin, ...]  // or { image: ImagePlugin, video: VideoPlugin, ... }
-         ↓
-Constructor.js: stores as class references in product.plugins
-         ↓
-CoreKernel → PluginManager: loops through plugins
-         ↓
-new Plugin(kernel, options) → super(kernel) → KernelInjector → this.$ = kernel.$ (Deps bag)
-         ↓
-Plugin events registered (_onPluginEvents Map)
-```
-
-**Runtime Activation:**
-
-| Plugin Type | Flow                                                                       |
-| ----------- | -------------------------------------------------------------------------- |
-| Command     | `button.click` → `commandDispatcher.run()` → `plugin.action()`             |
-| Modal       | `button.click` → `commandDispatcher.run()` → `plugin.open()` → Modal shows |
-| Dropdown    | `button.click` → `menu.dropdownOn()` → `plugin.on()`                       |
-
-**Key Rule:** Always pass **class references**, not instances:
-
-```javascript
-// Correct
-plugins: [MyPlugin];
-
-// Wrong - Kernel cannot manage lifecycle
-plugins: [new MyPlugin()];
-```
+Pass plugin **classes** in `options.plugins`; `PluginManager` constructs them with the Kernel
+and owns their lifecycle. Source contracts are in [Plugin shape](./prompts/coding-rules.md#9-plugin-shape);
+runtime activation is in [Toolbar button → plugin activation](./ARCHITECTURE.md#toolbar-button--plugin-activation).
 
 ---
 
 ## Example Implementations
 
-**Simple Command Plugin:**
+Trace the closest existing implementation and its callers before extending a feature:
 
-- `src/plugins/command/blockquote.js` - Minimal command plugin
+| Responsibility | Starting point |
+| --- | --- |
+| Command / dropdown | `src/plugins/command/blockquote.js`, `src/plugins/dropdown/align.js` |
+| Modal and component | `src/plugins/modal/link.js`, `src/plugins/modal/image/index.js` |
+| Selection and formatting | `src/core/logic/dom/selection.js`, `src/core/logic/dom/format.js` |
+| Shared UI contract | `src/modules/contract/Modal.js`, `src/modules/contract/Controller.js` |
+| Keyboard editing | `src/core/event/handlers/handler_ww_key.js`, `reducers/keydown.reducer.js`, `rules/keydown.rule.enter.js` |
 
-**Modal Plugin with Form:**
-
-- `src/plugins/modal/link.js` - Link dialog with form validation
-- `src/plugins/modal/image/index.js` - Image upload with Figure module
-
-**Dropdown Plugin:**
-
-- `src/plugins/dropdown/align.js` - Simple dropdown menu
-
-**Component Plugin:**
-
-- `src/plugins/modal/image/index.js` - Full component lifecycle
-- `src/plugins/modal/video/index.js` - Component with multiple content types
-
-**Core Logic Class:**
-
-- `src/core/logic/dom/selection.js` - Selection and range manipulation
-- `src/core/logic/dom/format.js` - Block-level formatting operations
-- `src/core/logic/shell/component.js` - Component lifecycle management
-
-**Module:**
-
-- `src/modules/contract/Modal.js` - Dialog window system
-- `src/modules/contract/Controller.js` - Floating toolbar controller
-
-**Event Handling:**
-
-- `src/core/event/handlers/handler_ww_key.js` - Wysiwyg keyboard handlers
-- `src/core/event/reducers/keydown.reducer.js` - Keydown event analysis
-- `src/core/event/rules/keydown.rule.enter.js` - Enter key rule logic
-- `src/core/event/actions/index.js` - Action type definitions and creators
-- `src/core/event/executor.js` - Action dispatcher
-- `src/core/event/effects/keydown.registry.js` - Keydown effect handlers
-- `src/core/event/effects/common.registry.js` - Common effect handlers
-
-**Example Event Flow (Enter Key):**
-
-```
-1. User presses Enter
-   ↓
-2. handler_ww_key.js captures keydown event
-   ↓
-3. keydown.reducer.js analyzes the event with current editor state
-   ↓
-4. Reducer delegates to keydown.rule.enter.js for Enter-specific logic
-   ↓
-5. Returns action list: [{t: 'enter.line.addDefault', p: {...}}, {t: 'history.push', p: {...}}]
-   ↓
-6. executor.js dispatches actions through effect registries (common + keydown)
-   ↓
-7. Effects execute:
-   - 'enter.line.addDefault' → calls format.addLine()
-   - 'history.push' → calls history.push()
-   ↓
-8. DOM updated, selection adjusted, onChange event triggered
-```
+The [reuse map](./prompts/performance-guide.md#reuse-map) lists shared owners by behavior.
+The [event pipeline](./ARCHITECTURE.md#event-pipeline-internal) explains handlers, decisions and effects.
 
 ---
 
 ## Testing Strategy
 
-### Unit Tests (`test/unit/`)
-
-- Jest with jsdom environment
-- Test individual functions and components in isolation
-- Module path alias: `@/` maps to `src/`
-- Coverage thresholds: 70% statements, 60% branches, 80% functions, 70% lines
-
-### Integration Tests (`test/integration/`)
-
-- Jest-based integration tests for cross-component functionality
-
-### E2E Tests (`test/e2e/`)
-
-- Playwright tests running against local dev server
-- Run on Chromium by default
+[Testing and Validation](./guide/testing.md) is the command and coverage reference.
+Use behavioral assertions for jsdom, real browsers for native editing/geometry, and explicit
+work budgets for repeated paths. Passing coverage alone does not establish those contracts.
 
 ---
 
@@ -698,39 +470,18 @@ The `dist/` folder is NOT tracked in git and is built via CI/CD.
 
 ## Changes Log
 
-When making code changes (bug fixes, new features, improvements, security patches, etc.), **always update `changes.md`** in the project root.
-This file is used to generate the demo site's changelog. Keep entries concise and user-facing.
-
-**Format:**
-
-```markdown
-## [Category] - YYYY-MM-DD
-
-- **tag:** Short description of the change
-```
-
-**Categories:** `Fix`, `Feature`, `Improvement`, `Security`, `Breaking`\
-**Tags (examples):** `html`, `toolbar`, `plugin:image`, `selection`, `clipboard`, `core`, `api`, etc.
-
-**Example:**
-
-```markdown
-## Security - 2026-03-29
-
-- **html:** Block obfuscated `javascript:` protocol in href/src attributes (entity/URL-encoded whitespace bypass)
-```
-
-**Rules:**
-
-- Append new entries at the **top** of the file (newest first)
-- One bullet per logical change
-- Do not include internal refactors that have no user-visible effect
-- If `changes.md` does not exist yet, create it
+For user-facing changes, update `changes.md` using
+[prompts/changes-guide.md](./prompts/changes-guide.md), the sole formatting authority.
+Use `### feat`, `### fix`, `### change`, `### breaking` groups and concise bullets with
+source/plugin references. Do not use dated category headings. Skip documentation/harness,
+tests and internal-only changes. Clear the log only after release completion or an explicit
+request, not while drafting release notes.
 
 ---
 
 ## Supplementary Guides
 
+- [Performance and Feature Guide](./prompts/performance-guide.md) - Reuse map, event/resource costs and targeted validation
 - [Coding Rules](./prompts/coding-rules.md) - Enforceable conventions for `src/*.js` (events, DOM, state, history, plugin shape)
 - [Editing Rules](./prompts/editing-rules.md) - File-level edit restrictions (generated files, lang files, sync rules)
 - [Custom Plugin Guide](./guide/custom-plugin.md) - Creating custom plugins

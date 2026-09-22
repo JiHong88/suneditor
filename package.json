@@ -56,6 +56,7 @@
 	"scripts": {
 		"dev": "webpack-dev-server --config webpack/dev.js",
 		"start": "npm run dev",
+		"dev:browser-tests": "webpack-dev-server --config webpack/browser-tests.js",
 		"build:dev": "cross-env NODE_ENV=development webpack --config webpack/builder.js && cross-env NODE_ENV=development webpack --config webpack/builder-contents.js && rm -f dist/_suneditor-contents.js",
 		"build:prod": "cross-env NODE_ENV=production webpack --config webpack/builder.js && cross-env NODE_ENV=production webpack --config webpack/builder-contents.js && rm -f dist/_suneditor-contents.js",
 		"lint:type": "npx tsc --noEmit",
@@ -68,9 +69,10 @@
 		"test:watch": "jest --watch",
 		"test:coverage": "jest --coverage",
 		"test:e2e": "playwright test",
+		"test:browser": "playwright test --config playwright.contracts.config.js",
 		"test:e2e:ui": "playwright test --ui",
 		"test:e2e:headed": "playwright test --headed",
-		"test:all": "jest --silent && playwright test",
+		"test:all": "jest --silent && npm run test:arch && npm run test:browser && playwright test",
 		"check": "npm run check:arch && npm run check:exports && npm run check:inject && npm run check:langs",
 		"check:arch": "dependency-cruiser --config .dependency-cruiser.js src",
 		"check:exports": "node scripts/check/check-exports-sync.cjs",
@@ -78,7 +80,10 @@
 		"check:langs": "cross-env GOOGLE_APPLICATION_CREDENTIALS=./.env/google-api-service-account.json node scripts/check/langs-sync.cjs --auto-translate && npx eslint \"src/langs/*.js\" --fix && npx eslint \"types/langs/_Lang.d.ts\" --fix",
 		"release:archive": "bash scripts/release-archive.sh",
 		"repomix": "npx repomix",
-		"update-browserslist": "npx browserslist@latest --update-db"
+		"update-browserslist": "npx browserslist@latest --update-db",
+		"test:arch": "node --test scripts/check/architecture.test.cjs",
+		"test:perf": "playwright test --config playwright.contracts.config.js --grep @performance --workers=1",
+		"check:harness": "node scripts/check/check-harness.cjs"
 	},
 	"bugs": {
 		"url": "https://github.com/JiHong88/SunEditor/issues"
