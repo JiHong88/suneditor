@@ -810,6 +810,17 @@
 	border-top-color: var(--se-controller-background-color);
 }
 
+/* arrow hidden (invisible but still occupies space - 6px) */
+.sun-editor .se-arrow-visible-hidden {
+	visibility: hidden;
+}
+.sun-editor .se-arrow-visible-hidden.se-arrow,
+.sun-editor .se-arrow-visible-hidden.se-arrow::after {
+	height: 6px;
+	border: 0;
+	margin: 0;
+}
+
 /** --- container */
 .sun-editor .se-container {
 	position: relative;
@@ -4261,10 +4272,6 @@
 	background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEzLjQ2LDEyTDE5LDE3LjU0VjE5SDE3LjU0TDEyLDEzLjQ2TDYuNDYsMTlINVYxNy41NEwxMC41NCwxMkw1LDYuNDZWNUg2LjQ2TDEyLDEwLjU0TDE3LjU0LDVIMTlWNi40NkwxMy40NiwxMloiIC8+PC9zdmc+')
 		no-repeat center center;
 	background-size: cover;
-}
-
-.sun-editor .se-visible-hidden {
-	visibility: hidden;
 }
 
 /** --- selected class */

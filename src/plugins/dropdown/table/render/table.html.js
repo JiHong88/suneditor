@@ -26,7 +26,7 @@ export function CreateHTML() {
  */
 export function CreateHTML_controller_table({ lang, icons }) {
 	const html = /*html*/ `
-	<div class="se-arrow se-arrow-down se-visible-hidden"></div>
+	<div class="se-arrow se-arrow-down se-arrow-visible-hidden"></div>
 	<div class="se-btn-group">
 		<button type="button" data-command="openTableProperties" class="se-btn se-tooltip">
 			${icons.table_properties}
@@ -83,9 +83,9 @@ export function CreateHTML_controller_table({ lang, icons }) {
 export function CreateHTML_controller_cell({ lang, icons }, cellControllerPosition) {
 	const arrowClass =
 		cellControllerPosition === 'table'
-			? 'se-arrow-down se-visible-hidden'
+			? 'se-arrow-down se-arrow-visible-hidden'
 			: cellControllerPosition === 'dot'
-				? 'se-arrow-up se-visible-hidden'
+				? 'se-arrow-up se-arrow-visible-hidden'
 				: 'se-arrow-up';
 
 	const html = /*html*/ `

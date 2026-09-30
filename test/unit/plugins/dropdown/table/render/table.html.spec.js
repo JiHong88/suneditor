@@ -107,20 +107,20 @@ describe('Table HTML Render', () => {
         it('should create cell controller with hidden arrow down (table position)', () => {
              const result = CreateHTML_controller_cell({ lang: mockLang, icons: mockIcons }, 'table');
              expect(result.html.querySelector('.se-arrow-down')).not.toBeNull();
-             expect(result.html.querySelector('.se-visible-hidden')).not.toBeNull();
+             expect(result.html.querySelector('.se-arrow-visible-hidden')).not.toBeNull();
         });
 
         it('should create cell controller with arrow up (cell position)', () => {
              const result = CreateHTML_controller_cell({ lang: mockLang, icons: mockIcons }, 'cell');
              expect(result.html.querySelector('.se-arrow-up')).not.toBeNull();
              expect(result.html.querySelector('.se-arrow-down')).toBeNull();
-             expect(result.html.querySelector('.se-visible-hidden')).toBeNull();
+             expect(result.html.querySelector('.se-arrow-visible-hidden')).toBeNull();
         });
 
         it('should create cell controller with hidden arrow (dot position)', () => {
              const result = CreateHTML_controller_cell({ lang: mockLang, icons: mockIcons }, 'dot');
              expect(result.html.querySelector('.se-arrow-up')).not.toBeNull();
-             expect(result.html.querySelector('.se-visible-hidden')).not.toBeNull();
+             expect(result.html.querySelector('.se-arrow-visible-hidden')).not.toBeNull();
         });
     });
 
