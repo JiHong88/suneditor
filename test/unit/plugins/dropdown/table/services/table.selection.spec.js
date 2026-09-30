@@ -355,7 +355,24 @@ describe('TableSelectionService', () => {
             }
         });
 
-        it('recallStyleSelectedCells restores the edge classes after they were stripped', () => {
+        it('recallStyleSelectedCells restores the edge classes after a keepEdges strip (historyPush pair)', () => {
+            const table = buildTable([[{}, {}], [{}, {}]]);
+            mainState.selectedTable = table;
+            const r = table.rows;
+            selectionService.setMultiCells(r[0].cells[0], r[1].cells[1]);
+            mainState.fixedCell = r[0].cells[0];
+            mainState.selectedCells = Array.from(table.querySelectorAll('.se-selected-table-cell'));
+
+            selectionService.deleteStyleSelectedCells(true);
+            expect(selectionService.getEdgeCells('r')).toEqual([r[0].cells[1], r[1].cells[1]]);
+            selectionService.recallStyleSelectedCells();
+
+            expect(edgesOf(r[0].cells[0])).toBe('tl');
+            expect(edgesOf(r[1].cells[1])).toBe('br');
+            expect(r[0].cells[1].classList.contains('se-selected-table-cell')).toBe(true);
+        });
+
+        it('a plain deleteStyleSelectedCells discards the region: no edge cells, nothing to recall', () => {
             const table = buildTable([[{}, {}], [{}, {}]]);
             mainState.selectedTable = table;
             const r = table.rows;
@@ -364,10 +381,12 @@ describe('TableSelectionService', () => {
             mainState.selectedCells = Array.from(table.querySelectorAll('.se-selected-table-cell'));
 
             selectionService.deleteStyleSelectedCells();
-            selectionService.recallStyleSelectedCells();
+            expect(selectionService.getEdgeCells('r')).toEqual([]);
+            expect(selectionService.getEdgeCells('l')).toEqual([]);
 
-            expect(edgesOf(r[0].cells[0])).toBe('tl');
-            expect(edgesOf(r[1].cells[1])).toBe('br');
+            selectionService.recallStyleSelectedCells();
+            expect(edgesOf(r[0].cells[0])).toBe('');
+            expect(edgesOf(r[1].cells[1])).toBe('');
             expect(r[0].cells[1].classList.contains('se-selected-table-cell')).toBe(true);
         });
 

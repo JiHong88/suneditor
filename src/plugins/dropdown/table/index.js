@@ -812,7 +812,7 @@ class Table extends PluginDropdownFree {
 	 * @description Adds a new entry to the history stack.
 	 */
 	historyPush() {
-		this.selectionService.deleteStyleSelectedCells();
+		this.selectionService.deleteStyleSelectedCells(true);
 		this.$.history.push(false);
 		this.selectionService.recallStyleSelectedCells();
 		this.dotService.reposition();

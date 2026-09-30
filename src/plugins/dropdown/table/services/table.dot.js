@@ -97,6 +97,7 @@ export class TableDotService {
 		if (!box) {
 			dot.style.display = 'none';
 			this.#tableDotOn = !!table?.isConnected;
+			if (this.#tableDotOn) this.#$.ui.onControllerTriggerContext();
 			return;
 		}
 

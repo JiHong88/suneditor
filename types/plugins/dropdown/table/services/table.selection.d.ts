@@ -45,9 +45,10 @@ export class TableSelectionService {
 	 */
 	startCellSelection(tdElement: HTMLTableCellElement, shift: boolean): void;
 	/**
-	 * @description Deletes styles from selected table cells.
+	 * @description Deletes styles from selected table cells and discards the remembered multi-cell region.
+	 * @param {boolean} [keepEdges=false] `true`: only strip the classes, keep the region memory.
 	 */
-	deleteStyleSelectedCells(): void;
+	deleteStyleSelectedCells(keepEdges?: boolean): void;
 	/**
 	 * @description Restores styles for selected table cells (the region's edge classes included).
 	 */

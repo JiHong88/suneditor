@@ -105,7 +105,6 @@ export class TableSelectionService {
 		const table = this.#state.selectedTable;
 		const rows = table.rows;
 		this.deleteStyleSelectedCells();
-		this.#resetEdges();
 
 		dom.utils.addClass(startCell, SELECTED_CELL_CLASS);
 
@@ -244,7 +243,6 @@ export class TableSelectionService {
 		this.#main.setState('selectedTable', dom.query.getParentElement(tdElement, 'TABLE'));
 
 		this.deleteStyleSelectedCells();
-		this.#resetEdges();
 		dom.utils.addClass(tdElement, 'se-selected-cell-focus');
 	}
 
@@ -288,9 +286,11 @@ export class TableSelectionService {
 	}
 
 	/**
-	 * @description Deletes styles from selected table cells.
+	 * @description Deletes styles from selected table cells and discards the remembered multi-cell region.
+	 * @param {boolean} [keepEdges=false] `true`: only strip the classes, keep the region memory.
 	 */
-	deleteStyleSelectedCells() {
+	deleteStyleSelectedCells(keepEdges = false) {
+		if (!keepEdges) this.#resetEdges();
 		dom.utils.removeClass([this.#state.fixedCell, this.#state.selectedCell], 'se-selected-cell-focus');
 		const table = this.#state.fixedCell?.closest('table');
 		if (table) {
