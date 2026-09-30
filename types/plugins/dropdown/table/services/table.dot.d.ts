@@ -17,8 +17,7 @@ export class TableDotService {
 	 */
 	showTableDot(_recheck?: boolean): void;
 	/**
-	 * @description Shows the cell dot on the current cell's right edge (left in RTL), vertically centered.
-	 * - Hidden when the anchor point is scrolled out of the figure's visible area.
+	 * @description Shows the cell dot on the selection's right edge (left in RTL), vertically centered.
 	 */
 	showCellDot(): void;
 	/**

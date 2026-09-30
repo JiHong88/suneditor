@@ -101,6 +101,7 @@ export class TableDotService {
 		}
 
 		this.#tableDotOn = true;
+		this.#$.ui.onControllerTriggerContext();
 		const isRtl = !!this.#$.options.get('_rtl');
 		const corner = isRtl ? box.right : box.left;
 		const x = this.#breakerOnCorner(corner, box.top)
@@ -136,8 +137,7 @@ export class TableDotService {
 	}
 
 	/**
-	 * @description Shows the cell dot on the current cell's right edge (left in RTL), vertically centered.
-	 * - Hidden when the anchor point is scrolled out of the figure's visible area.
+	 * @description Shows the cell dot on the selection's right edge (left in RTL), vertically centered.
 	 */
 	showCellDot() {
 		if (!this.#cellEnabled) return;
@@ -145,7 +145,8 @@ export class TableDotService {
 		const dot = this.#element(Constants.DOT_CELL_CLASS);
 		if (!dot) return;
 
-		const cell = this.#main.state.tdElement;
+		const isRtl = !!this.#$.options.get('_rtl');
+		const cell = this.#cellDotAnchor(isRtl);
 		if (!cell || !cell.isConnected) {
 			dot.style.display = 'none';
 			this.#cellDotOn = false;
@@ -153,9 +154,10 @@ export class TableDotService {
 		}
 
 		this.#cellDotOn = true;
+		this.#$.ui.onControllerTriggerContext();
 		const box = this.#visibleBox(dom.query.getParentElement(cell, 'TABLE'));
 		const cellOffset = box && this.#$.offset.getLocal(cell);
-		const x = cellOffset && (this.#$.options.get('_rtl') ? cellOffset.left : cellOffset.left + cell.offsetWidth);
+		const x = cellOffset && (isRtl ? cellOffset.left : cellOffset.left + cell.offsetWidth);
 		const y = cellOffset && cellOffset.top + cell.offsetHeight / 2;
 		if (!box || x < box.left - 1 || x > box.right + 1 || y < box.top - 1 || y > box.bottom + 1) {
 			dot.style.display = 'none';
@@ -163,6 +165,17 @@ export class TableDotService {
 		}
 
 		this.#place(dot, x, y);
+	}
+
+	/**
+	 * @description The cell the cell dot anchors to: the middle cell of the region's (right|left) edge.
+	 * @param {boolean} isRtl RTL mode
+	 * @returns {?HTMLTableCellElement}
+	 */
+	#cellDotAnchor(isRtl) {
+		const edge = this.#main.selectionService.getEdgeCells(isRtl ? 'l' : 'r');
+		if (edge.length > 0) return edge[(edge.length - 1) >> 1];
+		return this.#main.state.tdElement;
 	}
 
 	/**
@@ -183,6 +196,7 @@ export class TableDotService {
 
 		this.#cellDotOn = false;
 		this.#tableDotOn = false;
+		this.#$.ui.offControllerTriggerContext();
 
 		const cellDot = this.#element(Constants.DOT_CELL_CLASS);
 		if (cellDot) cellDot.style.display = 'none';

@@ -75,6 +75,8 @@ jest.mock('../../../../../src/plugins/dropdown/table/shared/table.constants', ()
     RESIZE_ROW_PREV_CLASS: 'resize-row-prev',
     DOT_CELL_CLASS: '.se-table-dot-cell',
     DOT_TABLE_CLASS: '.se-table-dot-table',
+    SELECTED_CELL_CLASS: 'se-selected-table-cell',
+    SELECTED_EDGE_CLASSES: 'se-selected-cell-focus-t|se-selected-cell-focus-b|se-selected-cell-focus-l|se-selected-cell-focus-r',
     CELL_DECIMAL_END: 4
 }));
 

@@ -6,6 +6,7 @@
 - Added a `nonDragHandle` option to `Figure.open()` — a plugin can suppress the component drag handle for that open (the table uses it on hover, where the handle would overlap the column move handle) (`modules/contract/Figure`)
 - Added a `dot` value to the table plugin's `cellControllerPosition` option — selecting a cell shows a small dot on the cell's right edge (left in RTL) instead of the cell controller; clicking the dot opens the controller anchored to it, clicking it again hides the controller (`plugins/dropdown/table`)
 - Added a `tableControllerPosition` option to the table plugin (`'dot'` default, `'table'`) — with `dot`, selecting the table shows a dot on its top-left corner (top-right in RTL) instead of the table controller, and clicking the dot opens/hides the controller (`plugins/dropdown/table`)
+- Added `ui.onControllerTriggerContext()` / `ui.offControllerTriggerContext()` — a plugin showing a controller trigger (`.se-controller-trigger`, e.g. the table dot launchers) marks it visible so the selected component survives wysiwyg scrolls the same way an open controller does; cleared on component deselect (`core/ui`)
 - Added `SunEditor.Module.<Name>.Instance` types for every public module class (`Controller`, `Figure`, `SelectMenu`, `Modal`, `Browser`, `ColorPicker`, `HueSlider`, `CommandMenu`, `ModalAnchorEditor`, `ApiManager`, `FileManager`) — annotate a module instance passed between functions without a relative `import('…').default` path (`typedef`)
 
 ### change
@@ -14,6 +15,7 @@
 
 ### fix
 
+- Fixed the table's selection outline (and the selected-cell styles) blinking off while drag-selecting cells or resizing.
 - SelectMenu no longer mistakes a DOM-node item for a submenu config — a node item with child elements (e.g. a heading in the anchor bookmark list) was rendered as a broken submenu instead of a plain row (`modules/ui/SelectMenu`)
 - Fixed document-type page indicator drifting out of sync with the scroll position — page offsets accumulated an error on scroll and the current-page detection used stale positions (`core/section/documentType`)
 - Fixed the French translation of `resize` (was Czech text) (`langs/fr`, #1692)

@@ -12,6 +12,11 @@ export const RESIZE_ROW_PREV_CLASS = '.se-table-resize-row-prev';
 /** Cell-context menu keys shown only when the row/column menu opens from a move handle */
 export const CELL_CONTEXT_KEYS = ['cell-properties', 'merge', 'split-vertical', 'split-horizontal'];
 
+/** Multi-cell selection: the selected cells. */
+export const SELECTED_CELL_CLASS = 'se-selected-table-cell';
+/** Multi-cell selection: the outer edges of the selected region (`t`op, `b`ottom, `l`eft, `r`ight), pipe-joined. */
+export const SELECTED_EDGE_CLASSES = ['t', 'b', 'l', 'r'].map((d) => `se-selected-cell-focus-${d}`).join('|');
+
 export const DOT_CELL_CLASS = '.se-table-dot-cell';
 export const DOT_TABLE_CLASS = '.se-table-dot-table';
 

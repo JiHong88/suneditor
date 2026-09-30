@@ -3084,9 +3084,9 @@
 	outline: 2px solid transparent;
 }
 
-.sun-editor-editable[contenteditable='true'] .se-component:not(:has(figure)).se-component-selected,
-.sun-editor-editable[contenteditable='true'] figure.se-component-selected,
-.sun-editor-editable[contenteditable='true'] .se-component.se-component-selected > figure {
+.sun-editor-editable:is([contenteditable='true'], .se-disabled) .se-component:not(:has(figure)).se-component-selected,
+.sun-editor-editable:is([contenteditable='true'], .se-disabled) figure.se-component-selected,
+.sun-editor-editable:is([contenteditable='true'], .se-disabled) .se-component.se-component-selected > figure {
 	outline: 2px solid var(--se-active-dark-color);
 	transition:
 		outline-color 0.2s ease-in-out,
@@ -4289,10 +4289,47 @@
 	right: -1px;
 	top: -1px;
 }
-.sun-editor-editable[contenteditable='true'] table td.se-selected-cell-focus,
-.sun-editor-editable[contenteditable='true'] table th.se-selected-cell-focus {
+/* table - selection style */
+.sun-editor-editable:is([contenteditable='true'], .se-disabled) table td.se-selected-cell-focus,
+.sun-editor-editable:is([contenteditable='true'], .se-disabled) table th.se-selected-cell-focus {
 	outline: 2px dashed var(--se-active-dark3-color);
+	outline-offset: -2px;
 	z-index: 1;
+}
+/* table - multi-cell selection style */
+.sun-editor-editable:is([contenteditable='true'], .se-disabled) table td.se-selected-cell-focus-t::before,
+.sun-editor-editable:is([contenteditable='true'], .se-disabled) table td.se-selected-cell-focus-b::before,
+.sun-editor-editable:is([contenteditable='true'], .se-disabled) table td.se-selected-cell-focus-l::before,
+.sun-editor-editable:is([contenteditable='true'], .se-disabled) table td.se-selected-cell-focus-r::before,
+.sun-editor-editable:is([contenteditable='true'], .se-disabled) table th.se-selected-cell-focus-t::before,
+.sun-editor-editable:is([contenteditable='true'], .se-disabled) table th.se-selected-cell-focus-b::before,
+.sun-editor-editable:is([contenteditable='true'], .se-disabled) table th.se-selected-cell-focus-l::before,
+.sun-editor-editable:is([contenteditable='true'], .se-disabled) table th.se-selected-cell-focus-r::before {
+	content: '';
+	position: absolute;
+	top: -1px;
+	right: -1px;
+	bottom: -1px;
+	left: -1px;
+	border: 0 dashed var(--se-active-dark3-color);
+	pointer-events: none;
+	z-index: 1;
+}
+.sun-editor-editable:is([contenteditable='true'], .se-disabled) table td.se-selected-cell-focus-t::before,
+.sun-editor-editable:is([contenteditable='true'], .se-disabled) table th.se-selected-cell-focus-t::before {
+	border-top-width: 2px;
+}
+.sun-editor-editable:is([contenteditable='true'], .se-disabled) table td.se-selected-cell-focus-b::before,
+.sun-editor-editable:is([contenteditable='true'], .se-disabled) table th.se-selected-cell-focus-b::before {
+	border-bottom-width: 2px;
+}
+.sun-editor-editable:is([contenteditable='true'], .se-disabled) table td.se-selected-cell-focus-l::before,
+.sun-editor-editable:is([contenteditable='true'], .se-disabled) table th.se-selected-cell-focus-l::before {
+	border-left-width: 2px;
+}
+.sun-editor-editable:is([contenteditable='true'], .se-disabled) table td.se-selected-cell-focus-r::before,
+.sun-editor-editable:is([contenteditable='true'], .se-disabled) table th.se-selected-cell-focus-r::before {
+	border-right-width: 2px;
 }
 
 /** --- pre code lang --- */

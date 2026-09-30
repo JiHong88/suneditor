@@ -1369,6 +1369,26 @@ describe('UIManager (real instance)', () => {
 		});
 	});
 
+	describe('onControllerTriggerContext / offControllerTriggerContext', () => {
+		it('should initialize controllerTriggerContext as null', () => {
+			expect(ui.controllerTriggerContext).toBe(null);
+		});
+
+		it('should set controllerTriggerContext to current topArea and reset it', () => {
+			ui.onControllerTriggerContext();
+			expect(ui.controllerTriggerContext).toBe(ctx.frameContext.get('topArea'));
+			ui.offControllerTriggerContext();
+			expect(ui.controllerTriggerContext).toBe(null);
+		});
+
+		it('is independent of the controller context', () => {
+			ui.onControllerTriggerContext();
+			ui.offControllerContext();
+			expect(ui.controllerTriggerContext).toBe(ctx.frameContext.get('topArea'));
+			ui.offControllerTriggerContext();
+		});
+	});
+
 	// -------------------------------------------------------------------
 	// enableBackWrapper / disableBackWrapper
 	// -------------------------------------------------------------------
@@ -1594,6 +1614,24 @@ describe('UIManager (real instance)', () => {
 			ctx.$.component.__deselect.mockClear();
 			ui._syncScrollPosition({ scrollTop: 0, scrollLeft: 0 });
 			expect(ctx.$.component.__deselect).not.toHaveBeenCalled();
+		});
+
+		it('keeps the selection when only a controller trigger is visible (no controller open)', () => {
+			ui.controllerTargetContext = null;
+			ui.onControllerTriggerContext();
+			ctx.$.component.__deselect.mockClear();
+			ui._syncScrollPosition({ scrollTop: 0, scrollLeft: 0 });
+			expect(ctx.$.component.__deselect).not.toHaveBeenCalled();
+			ui.offControllerTriggerContext();
+		});
+
+		it('deselects when a trigger from another root is visible and no controller is open', () => {
+			ui.controllerTargetContext = null;
+			ui.controllerTriggerContext = document.createElement('div');
+			ctx.$.component.__deselect.mockClear();
+			ui._syncScrollPosition({ scrollTop: 0, scrollLeft: 0 });
+			expect(ctx.$.component.__deselect).toHaveBeenCalled();
+			ui.controllerTriggerContext = null;
 		});
 
 		it('should handle scrollY/scrollX properties', () => {

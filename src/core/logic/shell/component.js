@@ -551,6 +551,7 @@ class Component {
 	 */
 	__deselect() {
 		this.#store.set('_preventBlur', false);
+		this.#$.ui.offControllerTriggerContext();
 		_DragHandle.set('__overInfo', null);
 		this.__removeDragEvent();
 
@@ -1045,7 +1046,10 @@ function SetClipboardComponent(e, container, clipboardData) {
 function RemoveSelectedClass(container) {
 	dom.utils.removeClass(container, 'se-component-selected');
 	dom.utils.removeClass(container.querySelectorAll('.se-figure-selected'), 'se-figure-selected');
-	dom.utils.removeClass(container.querySelectorAll('.se-selected-table-cell'), 'se-selected-table-cell');
+	dom.utils.removeClass(
+		container.querySelectorAll('.se-selected-table-cell'),
+		'se-selected-table-cell|se-selected-cell-focus-t|se-selected-cell-focus-b|se-selected-cell-focus-l|se-selected-cell-focus-r',
+	);
 	dom.utils.removeClass(container.querySelector('.se-selected-cell-focus'), 'se-selected-cell-focus');
 }
 

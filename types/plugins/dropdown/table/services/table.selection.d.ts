@@ -30,6 +30,13 @@ export class TableSelectionService {
 	 */
 	initCellSelection(tdElement: HTMLTableCellElement): void;
 	/**
+	 * @description The cells on one outer edge of the current multi-cell region (document order).
+	 * - Empty for a single-cell selection.
+	 * @param {"t"|"b"|"l"|"r"} side Region edge
+	 * @returns {HTMLTableCellElement[]}
+	 */
+	getEdgeCells(side: 't' | 'b' | 'l' | 'r'): HTMLTableCellElement[];
+	/**
 	 * @description Starts cell selection with global event listeners for drag/shift selection.
 	 * **WARNING**: Registers global events (mousemove/mousedown, mouseup, touchmove).
 	 * These events are auto-removed on mouseup/touchmove, or call `#removeGlobalEvents()` manually.
@@ -42,7 +49,7 @@ export class TableSelectionService {
 	 */
 	deleteStyleSelectedCells(): void;
 	/**
-	 * @description Restores styles for selected table cells.
+	 * @description Restores styles for selected table cells (the region's edge classes included).
 	 */
 	recallStyleSelectedCells(): void;
 	/**

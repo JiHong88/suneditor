@@ -275,7 +275,10 @@ class Table extends PluginDropdownFree {
 	componentCopy({ event, cloneContainer }) {
 		/** @type {NodeListOf<HTMLTableCellElement>} */
 		const selectedCells = cloneContainer.querySelectorAll('.se-selected-table-cell');
-		dom.utils.removeClass(selectedCells, 'se-selected-table-cell|se-selected-cell-focus');
+		dom.utils.removeClass(
+			selectedCells,
+			`se-selected-table-cell|se-selected-cell-focus|${Constants.SELECTED_EDGE_CLASSES}`,
+		);
 
 		if (selectedCells.length > 0) {
 			this.clipboardService.copySelectedTableCells(event, cloneContainer, selectedCells);

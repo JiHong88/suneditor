@@ -26,6 +26,11 @@ declare class UIManager {
 	 */
 	controllerTargetContext: HTMLElement | null;
 	/**
+	 * @description Frame div of a visible controller trigger (`.se-controller-trigger` , e.g. the table dot launchers).
+	 * @type {?HTMLElement}
+	 */
+	controllerTriggerContext: HTMLElement | null;
+	/**
 	 * @internal
 	 * @description Current Figure container.
 	 * @type {?HTMLElement}
@@ -135,6 +140,15 @@ declare class UIManager {
 	 * @description Reset the controller target context.
 	 */
 	offControllerContext(): void;
+	/**
+	 * @description Marks a controller trigger (`.se-controller-trigger`) as visible in the current top area.
+	 * - Call when the trigger is shown; pair with `offControllerTriggerContext` when it is hidden.
+	 */
+	onControllerTriggerContext(): void;
+	/**
+	 * @description Reset the controller trigger context.
+	 */
+	offControllerTriggerContext(): void;
 	/**
 	 * @description Activate the transparent background `div` so that other elements are not affected during resizing.
 	 * @param {string} cursor cursor css property

@@ -265,6 +265,157 @@ describe('TableSelectionService', () => {
     });
 
 
+    describe('region edge classes (se-selected-cell-focus-t/b/l/r)', () => {
+        const EDGES = 'se-selected-cell-focus-t|se-selected-cell-focus-b|se-selected-cell-focus-l|se-selected-cell-focus-r';
+
+        function buildTable(rowsSpec) {
+            const table = document.createElement('table');
+            for (const cells of rowsSpec) {
+                const tr = document.createElement('tr');
+                for (const spec of cells) {
+                    const td = document.createElement('td');
+                    if (spec && spec.colSpan) td.colSpan = spec.colSpan;
+                    if (spec && spec.rowSpan) td.rowSpan = spec.rowSpan;
+                    tr.appendChild(td);
+                }
+                table.appendChild(tr);
+            }
+            document.body.appendChild(table);
+            return table;
+        }
+
+        beforeEach(() => {
+            const { dom, numbers } = require('../../../../../../src/helper');
+            numbers.getOverlapRangeAtIndex.mockImplementation((s1, e1, s2, e2) => {
+                if (s1 === null || e1 === null || s2 === null || e2 === null) return false;
+                return Math.max(s1, s2) <= Math.min(e1, e2);
+            });
+            // real class ops so the DOM can be inspected
+            dom.utils.addClass.mockImplementation((el, cls) => {
+                const els = el && el.length !== undefined && !el.nodeType ? Array.from(el) : [el];
+                els.forEach((e) => e && cls.split('|').forEach((c) => c && e.classList.add(c)));
+            });
+            dom.utils.removeClass.mockImplementation((el, cls) => {
+                const els = el && el.length !== undefined && !el.nodeType ? Array.from(el) : [el];
+                els.forEach((e) => e && cls.split('|').forEach((c) => c && e.classList.remove(c)));
+            });
+        });
+
+        afterEach(() => {
+            document.body.innerHTML = '';
+        });
+
+        const edgesOf = (cell) =>
+            ['t', 'b', 'l', 'r'].filter((d) => cell.classList.contains(`se-selected-cell-focus-${d}`)).join('');
+
+        it('marks only the outer edges of a 3x3 region', () => {
+            const table = buildTable([[{}, {}, {}], [{}, {}, {}], [{}, {}, {}]]);
+            mainState.selectedTable = table;
+            const r = table.rows;
+
+            selectionService.setMultiCells(r[0].cells[0], r[2].cells[2]);
+
+            expect(edgesOf(r[0].cells[0])).toBe('tl');
+            expect(edgesOf(r[0].cells[1])).toBe('t');
+            expect(edgesOf(r[0].cells[2])).toBe('tr');
+            expect(edgesOf(r[1].cells[0])).toBe('l');
+            expect(edgesOf(r[1].cells[1])).toBe('');
+            expect(edgesOf(r[1].cells[2])).toBe('r');
+            expect(edgesOf(r[2].cells[0])).toBe('bl');
+            expect(edgesOf(r[2].cells[1])).toBe('b');
+            expect(edgesOf(r[2].cells[2])).toBe('br');
+            expect(r[1].cells[1].classList.contains('se-selected-table-cell')).toBe(true);
+        });
+
+        it('a merged cell spanning the whole region height carries both its top and bottom edge', () => {
+            // col0 is one cell rowSpan=2; region = both rows of col0..col1
+            const table = buildTable([[{ rowSpan: 2 }, {}], [{}]]);
+            mainState.selectedTable = table;
+            const r = table.rows;
+
+            selectionService.setMultiCells(r[0].cells[0], r[1].cells[0]);
+
+            expect(edgesOf(r[0].cells[0])).toBe('tbl');
+            expect(edgesOf(r[0].cells[1])).toBe('tr');
+            expect(edgesOf(r[1].cells[0])).toBe('br');
+        });
+
+        it('deleteStyleSelectedCells strips the edge classes with the selection class', () => {
+            const table = buildTable([[{}, {}], [{}, {}]]);
+            mainState.selectedTable = table;
+            const r = table.rows;
+            selectionService.setMultiCells(r[0].cells[0], r[1].cells[1]);
+            mainState.fixedCell = r[0].cells[0];
+
+            selectionService.deleteStyleSelectedCells();
+
+            for (const row of r) for (const cell of row.cells) {
+                expect(cell.classList.contains('se-selected-table-cell')).toBe(false);
+                expect(edgesOf(cell)).toBe('');
+            }
+        });
+
+        it('recallStyleSelectedCells restores the edge classes after they were stripped', () => {
+            const table = buildTable([[{}, {}], [{}, {}]]);
+            mainState.selectedTable = table;
+            const r = table.rows;
+            selectionService.setMultiCells(r[0].cells[0], r[1].cells[1]);
+            mainState.fixedCell = r[0].cells[0];
+            mainState.selectedCells = Array.from(table.querySelectorAll('.se-selected-table-cell'));
+
+            selectionService.deleteStyleSelectedCells();
+            selectionService.recallStyleSelectedCells();
+
+            expect(edgesOf(r[0].cells[0])).toBe('tl');
+            expect(edgesOf(r[1].cells[1])).toBe('br');
+            expect(r[0].cells[1].classList.contains('se-selected-table-cell')).toBe(true);
+        });
+
+        it('a single-cell (re)selection does not resurrect stale edge classes on recall', () => {
+            const table = buildTable([[{}, {}], [{}, {}]]);
+            mainState.selectedTable = table;
+            const r = table.rows;
+            selectionService.setMultiCells(r[0].cells[0], r[1].cells[1]);
+            mainState.fixedCell = r[0].cells[0];
+
+            // plain click on the first cell again
+            mainState.selectedCells = [];
+            selectionService.initCellSelection(r[0].cells[0]);
+            mainState.selectedCells = [r[0].cells[0]];
+            selectionService.deleteStyleSelectedCells();
+            selectionService.recallStyleSelectedCells();
+
+            expect(edgesOf(r[0].cells[0])).toBe('');
+            expect(r[0].cells[0].classList.contains('se-selected-table-cell')).toBe(true);
+        });
+
+        it('getEdgeCells returns each edge in document order, empty for a single-cell selection', () => {
+            const table = buildTable([[{}, {}, {}], [{}, {}, {}], [{}, {}, {}]]);
+            mainState.selectedTable = table;
+            const r = table.rows;
+
+            selectionService.setMultiCells(r[0].cells[0], r[2].cells[2]);
+            expect(selectionService.getEdgeCells('r')).toEqual([r[0].cells[2], r[1].cells[2], r[2].cells[2]]);
+            expect(selectionService.getEdgeCells('l')).toEqual([r[0].cells[0], r[1].cells[0], r[2].cells[0]]);
+            expect(selectionService.getEdgeCells('t')).toEqual([r[0].cells[0], r[0].cells[1], r[0].cells[2]]);
+            expect(selectionService.getEdgeCells('b')).toEqual([r[2].cells[0], r[2].cells[1], r[2].cells[2]]);
+
+            // plain single-cell selection clears the lists
+            selectionService.setMultiCells(r[1].cells[1], r[1].cells[1]);
+            expect(selectionService.getEdgeCells('r')).toEqual([]);
+            expect(selectionService.getEdgeCells('l')).toEqual([]);
+
+            selectionService.setMultiCells(r[0].cells[0], r[2].cells[2]);
+            selectionService.initCellSelection(r[0].cells[0]);
+            expect(selectionService.getEdgeCells('r')).toEqual([]);
+        });
+
+        it('exposes the edge class list for the copy paths', () => {
+            const Constants = require('../../../../../../src/plugins/dropdown/table/shared/table.constants');
+            expect(Constants.SELECTED_EDGE_CLASSES).toBe(EDGES);
+        });
+    });
+
     describe('deleteStyleSelectedCells', () => {
         it('should remove styles from selected cells', () => {
             const { dom } = require('../../../../../../src/helper');

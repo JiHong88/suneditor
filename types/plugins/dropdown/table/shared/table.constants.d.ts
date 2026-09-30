@@ -9,6 +9,10 @@ export const RESIZE_ROW_CLASS: '.se-table-resize-row';
 export const RESIZE_ROW_PREV_CLASS: '.se-table-resize-row-prev';
 /** Cell-context menu keys shown only when the row/column menu opens from a move handle */
 export const CELL_CONTEXT_KEYS: string[];
+/** Multi-cell selection: the selected cells. */
+export const SELECTED_CELL_CLASS: 'se-selected-table-cell';
+/** Multi-cell selection: the outer edges of the selected region (`t`op, `b`ottom, `l`eft, `r`ight), pipe-joined. */
+export const SELECTED_EDGE_CLASSES: string;
 export const DOT_CELL_CLASS: '.se-table-dot-cell';
 export const DOT_TABLE_CLASS: '.se-table-dot-table';
 export const MOVE_HANDLE_ROW_CLASS: '.se-table-move-handle-row';
