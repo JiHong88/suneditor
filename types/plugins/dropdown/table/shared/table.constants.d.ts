@@ -9,6 +9,8 @@ export const RESIZE_ROW_CLASS: '.se-table-resize-row';
 export const RESIZE_ROW_PREV_CLASS: '.se-table-resize-row-prev';
 /** Cell-context menu keys shown only when the row/column menu opens from a move handle */
 export const CELL_CONTEXT_KEYS: string[];
+export const DOT_CELL_CLASS: '.se-table-dot-cell';
+export const DOT_TABLE_CLASS: '.se-table-dot-table';
 export const MOVE_HANDLE_ROW_CLASS: '.se-table-move-handle-row';
 export const MOVE_HANDLE_COLUMN_CLASS: '.se-table-move-handle-column';
 export const MOVE_BAND_SOURCE_CLASS: '.se-table-move-band-source';

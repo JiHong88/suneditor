@@ -527,7 +527,7 @@ declare class Figure {
 	 * @param {Node} container - The container element of the figure component.
 	 * @param {Node} originEl - The original element of the figure component.
 	 * @param {Node} anchorCover - The anchor cover element of the figure component.
-	 * @param {import('../manager/FileManager').default} [fileManagerInst=null] - FileManager module instance, if used.
+	 * @param {SunEditor.Module.FileManager.Instance} [fileManagerInst=null] - FileManager module instance, if used.
 	 * @example
 	 * // Insert a new image figure, replacing the original element in the DOM
 	 * const figureInfo = Figure.CreateContainer(imgElement, 'se-image-container');
@@ -540,7 +540,7 @@ declare class Figure {
 		container: Node,
 		originEl: Node,
 		anchorCover: Node,
-		fileManagerInst?: import('../manager/FileManager').default,
+		fileManagerInst?: SunEditor.Module.FileManager.Instance,
 	): void;
 	/**
 	 * @description Initialize the transform style (rotation) of the element.

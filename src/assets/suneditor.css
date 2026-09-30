@@ -1771,12 +1771,41 @@
 	z-index: 2;
 }
 .sun-editor .se-table-move-band-source {
-	background-color: var(--se-drag-over-color);
-	opacity: 0.15;
+	background-color: var(--se-table-move-source-color);
+	opacity: 0.2;
 }
 .sun-editor .se-table-move-band-target {
 	background-color: var(--se-table-move-target-color);
-	opacity: 0.18;
+	opacity: 0.25;
+}
+
+/* table controller dot launchers */
+.sun-editor .se-table-dot {
+	position: absolute;
+	display: none;
+	z-index: 4;
+	width: 14px;
+	height: 14px;
+	padding: 0;
+	margin: 0;
+	border: 2px solid var(--se-main-background-color);
+	border-radius: 50%;
+	background-color: var(--se-active-dark-color);
+	box-shadow: var(--se-shadow-layer);
+	cursor: pointer;
+	outline: none;
+	transition:
+		background-color 0.15s ease,
+		transform 0.15s ease;
+}
+.sun-editor .se-table-dot:hover,
+.sun-editor .se-table-dot:focus {
+	background-color: var(--se-active-dark3-color);
+	transform: scale(1.25);
+}
+.sun-editor .se-table-dot-table {
+	width: 16px;
+	height: 16px;
 }
 
 /* dropdown layer --- table selector */

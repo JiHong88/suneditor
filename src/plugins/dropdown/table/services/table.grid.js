@@ -127,7 +127,7 @@ export class TableGridService {
 	}
 
 	/**
-	 * @param {import('../../../../modules/ui/SelectMenu').default} selectMenu Menu instance to open
+	 * @param {SunEditor.Module.SelectMenu.Instance} selectMenu Menu instance to open
 	 * @param {boolean} fromHandle Opened from a move handle
 	 */
 	#openColumnMenuCommon(selectMenu, fromHandle) {
@@ -137,7 +137,7 @@ export class TableGridService {
 	}
 
 	/**
-	 * @param {import('../../../../modules/ui/SelectMenu').default} selectMenu Menu instance to open
+	 * @param {SunEditor.Module.SelectMenu.Instance} selectMenu Menu instance to open
 	 * @param {boolean} fromHandle Opened from a move handle
 	 */
 	#openRowMenuCommon(selectMenu, fromHandle) {
@@ -152,7 +152,7 @@ export class TableGridService {
 	 * @description Shows/hides the cell-context items by the current selection (handle menus only —
 	 * the controller menus are created without these items).
 	 * - Merge needs a multi-cell selection; split needs a single cell.
-	 * @param {import('../../../../modules/ui/SelectMenu').default} selectMenu Menu to update
+	 * @param {SunEditor.Module.SelectMenu.Instance} selectMenu Menu to update
 	 */
 	#setContextItems(selectMenu) {
 		const count = this.#state.selectedCells?.length || 0;
@@ -162,7 +162,7 @@ export class TableGridService {
 
 	/**
 	 * @description Shows/hides menu items by their item keys.
-	 * @param {import('../../../../modules/ui/SelectMenu').default} selectMenu Target menu
+	 * @param {SunEditor.Module.SelectMenu.Instance} selectMenu Target menu
 	 * @param {string[]} keys Item keys
 	 * @param {boolean} visible `true` to show
 	 */
@@ -720,7 +720,7 @@ export class TableGridService {
 
 	/**
 	 * @description Greys out the move rows that have nothing left to move over.
-	 * @param {import('../../../../modules/ui/SelectMenu').default} selectMenu Menu to refresh
+	 * @param {SunEditor.Module.SelectMenu.Instance} selectMenu Menu to refresh
 	 * @param {boolean} isRow `true` for the row menu
 	 */
 	#refreshMoveItems(selectMenu, isRow) {

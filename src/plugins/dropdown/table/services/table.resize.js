@@ -20,6 +20,9 @@ export class TableResizeService {
 	#resizeLine = null;
 	#resizeLinePrev = null;
 
+	/** @type {WeakMap<HTMLElement, {[selector: string]: HTMLElement}>} */
+	#els = new WeakMap();
+
 	/**
 	 * @param {import('../index').default} main Table index
 	 */
@@ -36,18 +39,19 @@ export class TableResizeService {
 		};
 
 		this.#$.contextProvider.applyToRoots((e) => {
-			e.get('wrapper').appendChild(
-				dom.utils.createElement('DIV', { class: Constants.RESIZE_CELL_CLASS.replace(/^\./, '') }),
-			);
-			e.get('wrapper').appendChild(
-				dom.utils.createElement('DIV', { class: Constants.RESIZE_CELL_PREV_CLASS.replace(/^\./, '') }),
-			);
-			e.get('wrapper').appendChild(
-				dom.utils.createElement('DIV', { class: Constants.RESIZE_ROW_CLASS.replace(/^\./, '') }),
-			);
-			e.get('wrapper').appendChild(
-				dom.utils.createElement('DIV', { class: Constants.RESIZE_ROW_PREV_CLASS.replace(/^\./, '') }),
-			);
+			const wrapper = e.get('wrapper');
+			const els = /** @type {{[selector: string]: HTMLElement}} */ ({});
+			this.#els.set(wrapper, els);
+
+			for (const selector of [
+				Constants.RESIZE_CELL_CLASS,
+				Constants.RESIZE_CELL_PREV_CLASS,
+				Constants.RESIZE_ROW_CLASS,
+				Constants.RESIZE_ROW_PREV_CLASS,
+			]) {
+				els[selector] = dom.utils.createElement('DIV', { class: selector.replace(/^\./, '') });
+				wrapper.appendChild(els[selector]);
+			}
 		});
 	}
 
@@ -75,7 +79,7 @@ export class TableResizeService {
 			if (this.#main._element) this.#main._element.style.cursor = '';
 			this.#removeGlobalEvents();
 			if (this.#resizeLine?.style.display === 'block') this.#resizeLine.style.display = 'none';
-			this.#resizeLine = this.#$.frameContext.get('wrapper').querySelector(Constants.RESIZE_CELL_CLASS);
+			this.#resizeLine = this.#element(Constants.RESIZE_CELL_CLASS);
 			this.#setResizeLinePosition(
 				dom.query.getParentElement(target, dom.check.isTable),
 				target,
@@ -92,7 +96,7 @@ export class TableResizeService {
 			this.#main._element = dom.query.getParentElement(target, dom.check.isTable);
 			this.#main._element.style.cursor = 'ns-resize';
 			if (this.#resizeLine?.style.display === 'block') this.#resizeLine.style.display = 'none';
-			this.#resizeLine = this.#$.frameContext.get('wrapper').querySelector(Constants.RESIZE_ROW_CLASS);
+			this.#resizeLine = this.#element(Constants.RESIZE_ROW_CLASS);
 			this.#setResizeRowPosition(dom.query.getParentElement(target, dom.check.isTable), target, this.#resizeLine);
 			this.#resizeLine.style.display = 'block';
 			return false;
@@ -123,10 +127,8 @@ export class TableResizeService {
 
 				// ready
 				this.#$.ui.enableBackWrapper('ew-resize');
-				this.#resizeLine ||= this.#$.frameContext.get('wrapper').querySelector(Constants.RESIZE_CELL_CLASS);
-				this.#resizeLinePrev = this.#$.frameContext
-					.get('wrapper')
-					.querySelector(Constants.RESIZE_CELL_PREV_CLASS);
+				this.#resizeLine = this.#element(Constants.RESIZE_CELL_CLASS);
+				this.#resizeLinePrev = this.#element(Constants.RESIZE_CELL_PREV_CLASS);
 
 				// select figure
 				if (colIndex < 0 || colIndex === this.#state.logical_cellCnt - 1) {
@@ -154,6 +156,7 @@ export class TableResizeService {
 				this.#main.setState('selectedCell', null);
 				this.#main.controller_table.hide();
 				this.#main.controller_cell.hide();
+				this.#main.dotService.hide();
 			}
 
 			return false;
@@ -177,10 +180,8 @@ export class TableResizeService {
 
 				// ready
 				this.#$.ui.enableBackWrapper('ns-resize');
-				this.#resizeLine ||= this.#$.frameContext.get('wrapper').querySelector(Constants.RESIZE_ROW_CLASS);
-				this.#resizeLinePrev = this.#$.frameContext
-					.get('wrapper')
-					.querySelector(Constants.RESIZE_ROW_PREV_CLASS);
+				this.#resizeLine = this.#element(Constants.RESIZE_ROW_CLASS);
+				this.#resizeLinePrev = this.#element(Constants.RESIZE_ROW_PREV_CLASS);
 
 				this._startRowResizing(
 					row,
@@ -197,6 +198,7 @@ export class TableResizeService {
 				this.#main.setState('selectedCell', null);
 				this.#main.controller_table.hide();
 				this.#main.controller_cell.hide();
+				this.#main.dotService.hide();
 			}
 
 			return false;
@@ -509,6 +511,15 @@ export class TableResizeService {
 		if (this.#main._element) {
 			this.#main._element.style.cursor = '';
 		}
+	}
+
+	/**
+	 * @description The current root's resize guide element.
+	 * @param {string} selector Class selector from `table.constants`
+	 * @returns {?HTMLElement}
+	 */
+	#element(selector) {
+		return this.#els.get(this.#$.frameContext.get('wrapper'))?.[selector] || null;
 	}
 
 	/**

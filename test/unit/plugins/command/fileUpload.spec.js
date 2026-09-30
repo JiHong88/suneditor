@@ -335,6 +335,7 @@ describe('Plugins - Command - FileUpload', () => {
                 nonResizing: true,
                 nonSizeInfo: true,
                 nonBorder: true,
+                nonDragHandle: false,
                 figureTarget: true,
                 infoOnly: false
             });

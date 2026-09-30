@@ -40,6 +40,9 @@ export class TableHandleService {
 	/** Global keydown while pinned — Esc releases the pin */
 	#pinKeydownEvent = null;
 
+	/** @type {WeakMap<HTMLElement, {[selector: string]: HTMLElement}>} */
+	#els = new WeakMap();
+
 	/**
 	 * @param {import('../index').default} main Table index
 	 */
@@ -52,25 +55,31 @@ export class TableHandleService {
 
 		this.#$.contextProvider.applyToRoots((e) => {
 			const wrapper = e.get('wrapper');
-			const rowHandle = dom.utils.createElement('DIV', {
+			const els = /** @type {{[selector: string]: HTMLElement}} */ ({});
+			this.#els.set(wrapper, els);
+
+			const rowHandle = (els[Constants.MOVE_HANDLE_ROW_CLASS] = dom.utils.createElement('DIV', {
 				class: `se-table-move-handle ${rowClass}`,
 				title: this.#$.lang.moveRow,
 				'aria-label': this.#$.lang.moveRow,
-			});
-			const columnHandle = dom.utils.createElement('DIV', {
+			}));
+			const columnHandle = (els[Constants.MOVE_HANDLE_COLUMN_CLASS] = dom.utils.createElement('DIV', {
 				class: `se-table-move-handle ${columnClass}`,
 				title: this.#$.lang.moveColumn,
 				'aria-label': this.#$.lang.moveColumn,
+			}));
+
+			els[Constants.MOVE_BAND_SOURCE_CLASS] = dom.utils.createElement('DIV', {
+				class: Constants.MOVE_BAND_SOURCE_CLASS.replace(/^\./, ''),
+			});
+			els[Constants.MOVE_BAND_TARGET_CLASS] = dom.utils.createElement('DIV', {
+				class: Constants.MOVE_BAND_TARGET_CLASS.replace(/^\./, ''),
 			});
 
 			wrapper.appendChild(rowHandle);
 			wrapper.appendChild(columnHandle);
-			wrapper.appendChild(
-				dom.utils.createElement('DIV', { class: Constants.MOVE_BAND_SOURCE_CLASS.replace(/^\./, '') }),
-			);
-			wrapper.appendChild(
-				dom.utils.createElement('DIV', { class: Constants.MOVE_BAND_TARGET_CLASS.replace(/^\./, '') }),
-			);
+			wrapper.appendChild(els[Constants.MOVE_BAND_SOURCE_CLASS]);
+			wrapper.appendChild(els[Constants.MOVE_BAND_TARGET_CLASS]);
 
 			this.#$.eventManager.addEvent(rowHandle, 'mousedown', this.#OnHandleMouseDown.bind(this, true));
 			this.#$.eventManager.addEvent(columnHandle, 'mousedown', this.#OnHandleMouseDown.bind(this, false));
@@ -414,7 +423,7 @@ export class TableHandleService {
 
 	/**
 	 * @description Whether a controller is open AND actually showing.
-	 * @param {?import('../../../../modules/contract/Controller').default} controller Controller
+	 * @param {?SunEditor.Module.Controller.Instance} controller Controller
 	 * @returns {boolean}
 	 */
 	#isControllerVisible(controller) {
@@ -571,6 +580,7 @@ export class TableHandleService {
 		event.stopPropagation();
 
 		this.#cancelScheduledHide();
+		this.#main.dotService.hide();
 
 		const ctx = isRow ? this.#rowCtx : this.#colCtx;
 		if (!ctx) return;
@@ -983,7 +993,7 @@ export class TableHandleService {
 	 * @returns {?HTMLElement}
 	 */
 	#element(selector) {
-		return this.#$.frameContext.get('wrapper')?.querySelector(selector);
+		return this.#els.get(this.#$.frameContext.get('wrapper'))?.[selector] || null;
 	}
 }
 

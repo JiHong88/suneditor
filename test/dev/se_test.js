@@ -1097,7 +1097,8 @@ const options1 = {
 	},
 	table: {
 		scrollType: 'x',
-		// cellControllerPosition: 'cell',
+		cellControllerPosition: 'dot',
+		tableControllerPosition: 'dot',
 	},
 	fontColor: {
 		// disableHEXInput: true,

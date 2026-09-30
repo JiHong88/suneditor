@@ -85,6 +85,7 @@ describe('TableCellService', () => {
             setState: jest.fn((key, val) => { mainState[key] = val; }),
             _closeTableSelectInfo: jest.fn(),
             _setController: jest.fn(),
+            _resetCellControllerPosition: jest.fn(),
             historyPush: jest.fn(),
             controller_cell: {
                 resetPosition: jest.fn()

@@ -544,7 +544,7 @@ class Controller {
 	 */
 	#checkForm(target) {
 		if (dom.check.isWysiwygFrame(target) || target.contains(this.form)) return false;
-		if (dom.utils.hasClass(target, 'se-drag-handle')) return true;
+		if (dom.utils.hasClass(target, 'se-drag-handle|se-controller-trigger')) return true;
 
 		let isParentForm = false;
 		if (this.isInsideForm && this.parentsForm?.length > 0) {

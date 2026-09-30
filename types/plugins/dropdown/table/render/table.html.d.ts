@@ -12,12 +12,12 @@ export function CreateHTML(): HTMLDivElement;
 export function CreateHTML_controller_table({ lang, icons }: SunEditor.Deps): HTMLDivElement;
 /**
  * @param {SunEditor.Deps} $ - Kernel dependencies
- * @param {boolean} cellControllerTop - Whether to position cell controller on top
+ * @param {"cell"|"table"|"dot"} cellControllerPosition - Cell controller position mode
  * @returns {{ html: HTMLElement, splitButton: HTMLButtonElement, columnButton: HTMLButtonElement, rowButton: HTMLButtonElement, mergeButton: HTMLButtonElement, unmergeButton: HTMLButtonElement }}
  */
 export function CreateHTML_controller_cell(
 	{ lang, icons }: SunEditor.Deps,
-	cellControllerTop: boolean,
+	cellControllerPosition: 'cell' | 'table' | 'dot',
 ): {
 	html: HTMLElement;
 	splitButton: HTMLButtonElement;

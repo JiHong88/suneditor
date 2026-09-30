@@ -116,6 +116,7 @@ function makeHarness(table, { selected = true, rtl = false, iframe = null } = {}
 		setCellInfo: jest.fn(),
 		controller_table: { isOpen: false },
 		controller_cell: { isOpen: false },
+		dotService: { hide: jest.fn(), reposition: jest.fn() },
 		gridService: {
 			closeMenus: jest.fn(),
 			openRowMenuForHandle: jest.fn(),

@@ -172,7 +172,8 @@
 
 	/* table move handle */
 	--se-table-move-grip-color: var(--se-main-color-lighter);
-	--se-table-move-target-color: var(--se-success-dark2-color);
+	--se-table-move-source-color: #ffd60a;
+	--se-table-move-target-color: #00e676;
 
 	/* select menu interactive states */
 	--se-select-menu-hover-bg: rgba(255, 255, 255, 0.08);

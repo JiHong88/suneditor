@@ -88,12 +88,17 @@ export function CreateSliderCtx(): {
 declare class HueSlider {
 	/**
 	 * @constructor
-	 * @param {import('./ColorPicker').default} inst The instance object that called the constructor.
+	 * @param {SunEditor.Module.ColorPicker.Instance} inst The instance object that called the constructor.
 	 * @param {SunEditor.Deps} $ Kernel dependencies
 	 * @param {HueSliderParams} [params={}] Hue slider options
 	 * @param {string} [className=""] The class name of the hue slider.
 	 */
-	constructor(inst: import('./ColorPicker').default, $: SunEditor.Deps, params?: HueSliderParams, className?: string);
+	constructor(
+		inst: SunEditor.Module.ColorPicker.Instance,
+		$: SunEditor.Deps,
+		params?: HueSliderParams,
+		className?: string,
+	);
 	inst: import('./ColorPicker').default;
 	ctx: {
 		wheelX: number;
