@@ -12,11 +12,13 @@ export function CreateSplitMenu(lang: any): {
  * @description Creates the column menu items.
  * @param {Object} lang - Language object.
  * @param {Object} icons - Icons object.
+ * @param {boolean} [withCellContext] - Include the cell-context items (handle menu only).
  * @returns {{items: string[], menus: NodeListOf<Element>}}
  */
 export function CreateColumnMenu(
 	lang: any,
 	icons: any,
+	withCellContext?: boolean,
 ): {
 	items: string[];
 	menus: NodeListOf<Element>;
@@ -25,11 +27,13 @@ export function CreateColumnMenu(
  * @description Creates the row menu items.
  * @param {Object} lang - Language object.
  * @param {Object} icons - Icons object.
+ * @param {boolean} [withCellContext] - Include the cell-context items (handle menu only).
  * @returns {{items: string[], menus: NodeListOf<Element>}}
  */
 export function CreateRowMenu(
 	lang: any,
 	icons: any,
+	withCellContext?: boolean,
 ): {
 	items: string[];
 	menus: NodeListOf<Element>;

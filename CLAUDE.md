@@ -4,6 +4,8 @@ See **[AGENTS.md](./AGENTS.md)** — the primary entry point for AI agents in th
 
 @.agents/rules/generated-files.md
 @.agents/rules/plugin-authoring.md
+@.agents/rules/component-model.md
+@.agents/rules/overlay-placement.md
 @.agents/rules/core-changes.md
 @.agents/rules/design-principles.md
 @.agents/rules/performance.md

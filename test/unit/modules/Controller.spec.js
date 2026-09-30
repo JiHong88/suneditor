@@ -2037,7 +2037,7 @@ describe('Modules - Controller', () => {
 		});
 
 		it('should return true for drag handle class', () => {
-			mockDom.utils.hasClass.mockImplementation((target, cls) => cls === 'se-drag-handle');
+			mockDom.utils.hasClass.mockImplementation((target, cls) => cls.split('|').includes('se-drag-handle'));
 			mockKeyCodeMap.isNonResponseKey.mockReturnValue(true);
 			mockKeyCodeMap.isEsc.mockReturnValue(false);
 			const handlers = getGlobalEventHandlers($);

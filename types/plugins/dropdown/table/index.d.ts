@@ -10,9 +10,18 @@ export type TablePluginOptions = {
 	 */
 	captionPosition?: 'top' | 'bottom';
 	/**
-	 * - Cell controller position (`cell`, `table`)
+	 * - Cell controller position (`cell`, `table`, `dot`)
+	 * - `dot`: Selecting a cell shows a dot on the cell's right edge (left in RTL) instead of the controller; clicking the dot opens the cell controller, clicking it again hides it.
+	 * - `cell`: The controller opens on selection, below the selected cell.
+	 * - `table`: The controller opens on selection, stacked on the table figure with the table controller.
 	 */
-	cellControllerPosition?: 'cell' | 'table';
+	cellControllerPosition?: 'cell' | 'table' | 'dot';
+	/**
+	 * - Table controller position (`table`, `dot`)
+	 * - `dot`: Selecting the table shows a dot on the table's top-left corner (top-right in RTL) instead of the controller; clicking the dot opens the table controller, clicking it again hides it.
+	 * - `table`: The controller opens on selection, on top of the table figure.
+	 */
+	tableControllerPosition?: 'table' | 'dot';
 	/**
 	 * - HEX color list for the cell background color picker.
 	 * ```js
@@ -26,7 +35,13 @@ export type TableState = import('./shared/table.constants').TableState;
  * @typedef {Object} TablePluginOptions
  * @property {"x"|"y"|"xy"} [scrollType='x'] - Scroll type (`x`, `y`, `xy`)
  * @property {"top"|"bottom"} [captionPosition='bottom'] - Caption position (`top`, `bottom`)
- * @property {"cell"|"table"} [cellControllerPosition='cell'] - Cell controller position (`cell`, `table`)
+ * @property {"cell"|"table"|"dot"} [cellControllerPosition='dot'] - Cell controller position (`cell`, `table`, `dot`)
+ * - `dot`: Selecting a cell shows a dot on the cell's right edge (left in RTL) instead of the controller; clicking the dot opens the cell controller, clicking it again hides it.
+ * - `cell`: The controller opens on selection, below the selected cell.
+ * - `table`: The controller opens on selection, stacked on the table figure with the table controller.
+ * @property {"table"|"dot"} [tableControllerPosition='dot'] - Table controller position (`table`, `dot`)
+ * - `dot`: Selecting the table shows a dot on the table's top-left corner (top-right in RTL) instead of the controller; clicking the dot opens the table controller, clicking it again hides it.
+ * - `table`: The controller opens on selection, on top of the table figure.
  * @property {Array<string>} [colorList] - HEX color list for the cell background color picker.
  * ```js
  * { colorList: ['#bbf7d0', '#fde68a', '#fecaca', '#e9d5ff'] }
@@ -58,6 +73,10 @@ declare class Table extends PluginDropdownFree {
 	figureScrollList: string[];
 	figureScroll: string;
 	captionPosition: string;
+	/** @type {"cell"|"table"|"dot"} */
+	cellControllerPosition: 'cell' | 'table' | 'dot';
+	/** @type {"table"|"dot"} */
+	tableControllerPosition: 'table' | 'dot';
 	cellControllerTop: boolean;
 	controller_cell: Controller;
 	controller_table: Controller;
@@ -70,8 +89,11 @@ declare class Table extends PluginDropdownFree {
 	state: Constants.TableState;
 	cellService: TableCellService;
 	clipboardService: TableClipboardService;
+	dotService: TableDotService;
 	gridService: TableGridService;
+	reorderService: TableReorderService;
 	resizeService: TableResizeService;
+	handleService: TableHandleService;
 	selectionService: TableSelectionService;
 	styleService: TableStyleService;
 	/**
@@ -141,6 +163,13 @@ declare class Table extends PluginDropdownFree {
 	 */
 	_setCellControllerPosition(tdElement: HTMLTableCellElement, reset: boolean): void;
 	/**
+	 * @internal
+	 * @description Resets the cell controller's position - in `dot` mode, re-anchors the dot
+	 * (and the controller on it, when open) instead.
+	 * @param {HTMLTableCellElement} tdElement - The target table cell.
+	 */
+	_resetCellControllerPosition(tdElement: HTMLTableCellElement): void;
+	/**
 	 * @description Enables or disables editor mode.
 	 * @param {boolean} enabled Whether to enable or disable the editor.
 	 */
@@ -171,7 +200,10 @@ import { Controller } from '../../../modules/contract';
 import { Figure } from '../../../modules/contract';
 import TableCellService from './services/table.cell';
 import TableClipboardService from './services/table.clipboard';
+import TableDotService from './services/table.dot';
 import TableGridService from './services/table.grid';
+import TableHandleService from './services/table.handle';
+import TableReorderService from './services/table.reorder';
 import TableResizeService from './services/table.resize';
 import TableSelectionService from './services/table.selection';
 import TableStyleService from './services/table.style';

@@ -78,10 +78,19 @@ declare global {
 		type ComponentInsertType = 'auto' | 'select' | 'line' | 'none';
 		type NodeCollection = Array<Node> | HTMLCollection | NodeList;
 		export namespace Module {
+			namespace Browser {
+				type Instance = import('./modules/contract/Browser').default;
+				type File = import('./modules/contract/Browser').BrowserFile;
+			}
+			namespace ColorPicker {
+				type Instance = import('./modules/contract/ColorPicker').default;
+			}
 			namespace Controller {
+				type Instance = import('./modules/contract/Controller').default;
 				type Info = import('./modules/contract/Controller').ControllerInfo;
 			}
 			namespace Figure {
+				type Instance = import('./modules/contract/Figure').default;
 				type Info = import('./modules/contract/Figure').FigureInfo;
 				type TargetInfo = import('./modules/contract/Figure').FigureTargetInfo;
 				type ControlButton = import('./modules/contract/Figure').FigureControlButton;
@@ -89,11 +98,27 @@ declare global {
 				type ControlCustomAction = import('./modules/contract/Figure').ControlCustomAction;
 				type Controls = import('./modules/contract/Figure').FigureControls;
 			}
-			namespace Browser {
-				type File = import('./modules/contract/Browser').BrowserFile;
-			}
 			namespace HueSlider {
+				type Instance = import('./modules/contract/HueSlider').default;
 				type Color = import('./modules/contract/HueSlider').HueSliderColor;
+			}
+			namespace Modal {
+				type Instance = import('./modules/contract/Modal').default;
+			}
+			namespace CommandMenu {
+				type Instance = import('./modules/ui/CommandMenu').default;
+			}
+			namespace ModalAnchorEditor {
+				type Instance = import('./modules/ui/ModalAnchorEditor').default;
+			}
+			namespace SelectMenu {
+				type Instance = import('./modules/ui/SelectMenu').default;
+			}
+			namespace ApiManager {
+				type Instance = import('./modules/manager/ApiManager').default;
+			}
+			namespace FileManager {
+				type Instance = import('./modules/manager/FileManager').default;
 			}
 		}
 		export namespace Hook {

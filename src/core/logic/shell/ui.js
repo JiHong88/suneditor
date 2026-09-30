@@ -133,6 +133,12 @@ class UIManager {
 		this.controllerTargetContext = null;
 
 		/**
+		 * @description Frame div of a visible controller trigger (`.se-controller-trigger` , e.g. the table dot launchers).
+		 * @type {?HTMLElement}
+		 */
+		this.controllerTriggerContext = null;
+
+		/**
 		 * @internal
 		 * @description Current Figure container.
 		 * @type {?HTMLElement}
@@ -550,6 +556,21 @@ class UIManager {
 	}
 
 	/**
+	 * @description Marks a controller trigger (`.se-controller-trigger`) as visible in the current top area.
+	 * - Call when the trigger is shown; pair with `offControllerTriggerContext` when it is hidden.
+	 */
+	onControllerTriggerContext() {
+		this.controllerTriggerContext = this.#frameContext.get('topArea');
+	}
+
+	/**
+	 * @description Reset the controller trigger context.
+	 */
+	offControllerTriggerContext() {
+		this.controllerTriggerContext = null;
+	}
+
+	/**
 	 * @description Activate the transparent background `div` so that other elements are not affected during resizing.
 	 * @param {string} cursor cursor css property
 	 */
@@ -686,7 +707,8 @@ class UIManager {
 		// block handle scroll sync
 		this.#blockHandle?.syncScroll();
 
-		if (this.controllerTargetContext !== this.#frameContext.get('topArea')) {
+		const topArea = this.#frameContext.get('topArea');
+		if (this.controllerTargetContext !== topArea && this.controllerTriggerContext !== topArea) {
 			this.offCurrentController();
 		}
 

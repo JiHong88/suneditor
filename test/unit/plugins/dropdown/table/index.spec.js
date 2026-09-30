@@ -4,6 +4,7 @@ import Table from '../../../../../src/plugins/dropdown/table/index';
 jest.mock('../../../../../src/plugins/dropdown/table/services/table.cell');
 jest.mock('../../../../../src/plugins/dropdown/table/services/table.clipboard');
 jest.mock('../../../../../src/plugins/dropdown/table/services/table.grid');
+jest.mock('../../../../../src/plugins/dropdown/table/services/table.handle');
 jest.mock('../../../../../src/plugins/dropdown/table/services/table.resize');
 jest.mock('../../../../../src/plugins/dropdown/table/services/table.selection');
 jest.mock('../../../../../src/plugins/dropdown/table/services/table.style');
@@ -72,6 +73,10 @@ jest.mock('../../../../../src/plugins/dropdown/table/shared/table.constants', ()
     RESIZE_CELL_PREV_CLASS: 'resize-cell-prev',
     RESIZE_ROW_CLASS: 'resize-row',
     RESIZE_ROW_PREV_CLASS: 'resize-row-prev',
+    DOT_CELL_CLASS: '.se-table-dot-cell',
+    DOT_TABLE_CLASS: '.se-table-dot-table',
+    SELECTED_CELL_CLASS: 'se-selected-table-cell',
+    SELECTED_EDGE_CLASSES: 'se-selected-cell-focus-t|se-selected-cell-focus-b|se-selected-cell-focus-l|se-selected-cell-focus-r',
     CELL_DECIMAL_END: 4
 }));
 
@@ -191,8 +196,9 @@ describe('Table Plugin Main Class', () => {
         const { dom } = require('../../../../../src/helper');
         dom.utils.createElement.mockImplementation((tag) => document.createElement(tag || 'div'));
         
-        // Instantiate plugin
-        tablePlugin = new Table(editor, {});
+        // Instantiate plugin - the classic controller positions (the suite asserts controller open/hide
+        // behaviors; the 3.4+ default is 'dot', covered by its own tests)
+        tablePlugin = new Table(editor, { cellControllerPosition: 'table', tableControllerPosition: 'table' });
         
         // Ensure fresh state for each test to avoid singleton state sharing issue with mocked INITIAL_STATE
         tablePlugin.state = JSON.parse(JSON.stringify({ 
@@ -304,7 +310,7 @@ describe('Table Plugin Main Class', () => {
          });
          
          it('should handle mouse leave', () => {
-             tablePlugin.onMouseLeave();
+             tablePlugin.onMouseLeave({ event: {} });
              expect(tablePlugin.resizeService.offResizeGuide).toHaveBeenCalled();
          });
     });
@@ -814,7 +820,7 @@ describe('Table Plugin Main Class', () => {
               expect(tablePlugin.state.isShiftPressed).toBe(false);
 
               tablePlugin.resizeService.offResizeGuide = jest.fn();
-              tablePlugin.onMouseLeave();
+              tablePlugin.onMouseLeave({ event: {} });
               expect(tablePlugin.resizeService.offResizeGuide).toHaveBeenCalled();
          });
          
@@ -963,8 +969,24 @@ describe('Table Plugin Main Class', () => {
               };
               
               const instance = new TableClass(mockEditor, { cellControllerPosition: 'table' });
-              
+
               expect(instance.cellControllerTop).toBe(true);
+         });
+
+         it('should default both controller positions to dot', () => {
+              const TableClass = tablePlugin.constructor;
+              const mockEditor = {
+                  ...editor,
+                  contextProvider: { applyToRoots: jest.fn() },
+                  get: jest.fn(),
+              };
+              mockEditor.$ = mockEditor;
+
+              const instance = new TableClass(mockEditor, {});
+
+              expect(instance.cellControllerPosition).toBe('dot');
+              expect(instance.tableControllerPosition).toBe('dot');
+              expect(instance.cellControllerTop).toBe(false);
          });
 
          it('should handle componentDestroy logic', () => {
@@ -1000,7 +1022,8 @@ describe('Table Plugin Main Class', () => {
                  get: jest.fn(),
              };
              mockEditor.$ = mockEditor;
-             new TableClass(mockEditor, {});
+             // handle/resize services are auto-mocked - the dot service is the per-root wiring that still runs
+             new TableClass(mockEditor, { cellControllerPosition: 'dot', tableControllerPosition: 'dot' });
              expect(mockEditor.contextProvider.applyToRoots).toHaveBeenCalled();
          });
 

@@ -171,6 +171,11 @@
 	--se-block-hover-outline: rgba(255, 255, 255, 0.04);
 	--se-block-drag-indicator-color: var(--se-active-dark3-color);
 
+	/* table move handle */
+	--se-table-move-grip-color: var(--se-main-color-lighter);
+	--se-table-move-source-color: #ffd60a;
+	--se-table-move-target-color: #00e676;
+
 	/* select menu interactive states */
 	--se-select-menu-hover-bg: rgba(255, 255, 255, 0.08);
 	--se-select-menu-active-bg: rgba(255, 255, 255, 0.14);

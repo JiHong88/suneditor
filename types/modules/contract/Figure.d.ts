@@ -412,6 +412,10 @@ declare class Figure {
 	 * @param {boolean} [params.nonBorder=false] Do not display the selected style line
 	 * @param {boolean} [params.figureTarget=false] If `true`, the target is a figure element
 	 * @param {boolean} [params.infoOnly=false] If `true`, returns only the figure target info without opening the controller
+	 * @param {boolean} [params.nonDragHandle=false] Do not attach the component drag handle.
+	 * - Even when `false`, the handle is skipped in these cases: an inline cover (`CreateInlineContainer`),
+	 * - a hover-open over the component (`ON_OVER_COMPONENT`) unless the container is an input component (e.g. table),
+	 * - and `infoOnly: true` (returns before this step).
 	 * @returns {FigureTargetInfo|undefined} figure target info
 	 * @example
 	 * // Open controller with full UI (resize handles, size info, border)
@@ -435,12 +439,14 @@ declare class Figure {
 			nonBorder,
 			figureTarget,
 			infoOnly,
+			nonDragHandle,
 		}: {
 			nonResizing?: boolean;
 			nonSizeInfo?: boolean;
 			nonBorder?: boolean;
 			figureTarget?: boolean;
 			infoOnly?: boolean;
+			nonDragHandle?: boolean;
 		},
 	): FigureTargetInfo | undefined;
 	/**
@@ -521,7 +527,7 @@ declare class Figure {
 	 * @param {Node} container - The container element of the figure component.
 	 * @param {Node} originEl - The original element of the figure component.
 	 * @param {Node} anchorCover - The anchor cover element of the figure component.
-	 * @param {import('../manager/FileManager').default} [fileManagerInst=null] - FileManager module instance, if used.
+	 * @param {SunEditor.Module.FileManager.Instance} [fileManagerInst=null] - FileManager module instance, if used.
 	 * @example
 	 * // Insert a new image figure, replacing the original element in the DOM
 	 * const figureInfo = Figure.CreateContainer(imgElement, 'se-image-container');
@@ -534,7 +540,7 @@ declare class Figure {
 		container: Node,
 		originEl: Node,
 		anchorCover: Node,
-		fileManagerInst?: import('../manager/FileManager').default,
+		fileManagerInst?: SunEditor.Module.FileManager.Instance,
 	): void;
 	/**
 	 * @description Initialize the transform style (rotation) of the element.

@@ -1,5 +1,12 @@
 import { dom, numbers, env } from '../../../../helper';
-import { refCache } from '../shared/table.utils';
+import { CalculateCellRef, refCache } from '../shared/table.utils';
+import { SELECTED_CELL_CLASS, SELECTED_EDGE_CLASSES } from '../shared/table.constants';
+
+const [EDGE_T, EDGE_B, EDGE_L, EDGE_R] = SELECTED_EDGE_CLASSES.split('|');
+
+function EmptyEdgeCells() {
+	return { t: [], b: [], l: [], r: [] };
+}
 
 /**
  * @param {HTMLTableCellElement} startCell
@@ -27,6 +34,19 @@ export class TableSelectionService {
 	#globalEvents;
 
 	#fixedCellName = null;
+
+	/**
+	 * Outer-edge classes of the current multi-cell region, per selected cell
+	 * - re-applied by`recallStyleSelectedCells` (the classes are stripped around `history.push`).
+	 * @type {WeakMap<Element, string>}
+	 */
+	#edgeClasses = new WeakMap();
+
+	/**
+	 * Cells on each outer edge of the current multi-cell region, in document order.
+	 * @type {{t: HTMLTableCellElement[], b: HTMLTableCellElement[], l: HTMLTableCellElement[], r: HTMLTableCellElement[]}}
+	 */
+	#edgeCells = EmptyEdgeCells();
 
 	/**
 	 * @param {import('../index').default} main Table index
@@ -86,7 +106,7 @@ export class TableSelectionService {
 		const rows = table.rows;
 		this.deleteStyleSelectedCells();
 
-		dom.utils.addClass(startCell, 'se-selected-table-cell');
+		dom.utils.addClass(startCell, SELECTED_CELL_CLASS);
 
 		if (startCell === endCell && !this.#state.isShiftPressed) {
 			return;
@@ -107,7 +127,7 @@ export class TableSelectionService {
 		}
 
 		// calculate ref
-		const ref = this.#calculateRef(rows, startCell, endCell);
+		const ref = CalculateCellRef(rows, startCell, endCell);
 		this.#main.setState('ref', ref);
 
 		// cache ref
@@ -122,111 +142,8 @@ export class TableSelectionService {
 	}
 
 	/**
-	 * @param {HTMLCollectionOf<HTMLTableRowElement>} rows
-	 * @param {Node} startCell
-	 * @param {Node} endCell
-	 * @returns {{_i: number, cs: number|null, ce: number|null, rs: number|null, re: number|null}}
-	 */
-	#calculateRef(rows, startCell, endCell) {
-		let findSelectedCell = true;
-		let spanIndex = [];
-		let rowSpanArr = [];
-		const ref = { _i: 0, cs: null, ce: null, rs: null, re: null };
-
-		for (let i = 0, len = rows.length, cells, colSpan; i < len; i++) {
-			cells = rows[i].cells;
-			colSpan = 0;
-
-			for (let c = 0, cLen = cells.length, cell, logcalIndex, cs, rs; c < cLen; c++) {
-				cell = cells[c];
-				cs = cell.colSpan - 1;
-				rs = cell.rowSpan - 1;
-				logcalIndex = c + colSpan;
-
-				if (spanIndex.length > 0) {
-					for (let r = 0, arr; r < spanIndex.length; r++) {
-						arr = spanIndex[r];
-						if (arr.row > i) continue;
-						if (logcalIndex >= arr.index) {
-							colSpan += arr.cs;
-							logcalIndex += arr.cs;
-							arr.rs -= 1;
-							arr.row = i + 1;
-							if (arr.rs < 1) {
-								spanIndex.splice(r, 1);
-								r--;
-							}
-						} else if (c === cLen - 1) {
-							arr.rs -= 1;
-							arr.row = i + 1;
-							if (arr.rs < 1) {
-								spanIndex.splice(r, 1);
-								r--;
-							}
-						}
-					}
-				}
-
-				if (findSelectedCell) {
-					if (cell === startCell || cell === endCell) {
-						ref.cs = ref.cs !== null && ref.cs < logcalIndex ? ref.cs : logcalIndex;
-						ref.ce = ref.ce !== null && ref.ce > logcalIndex + cs ? ref.ce : logcalIndex + cs;
-						ref.rs = ref.rs !== null && ref.rs < i ? ref.rs : i;
-						ref.re = ref.re !== null && ref.re > i + rs ? ref.re : i + rs;
-						ref._i += 1;
-					}
-
-					if (ref._i === 2) {
-						findSelectedCell = false;
-						spanIndex = [];
-						rowSpanArr = [];
-						i = -1;
-						break;
-					}
-				} else {
-					const newCs = ref.cs < logcalIndex ? ref.cs : logcalIndex;
-					const newCe = ref.ce > logcalIndex + cs ? ref.ce : logcalIndex + cs;
-					const newRs = ref.rs < i ? ref.rs : i;
-					const newRe = ref.re > i + rs ? ref.re : i + rs;
-
-					if (
-						numbers.getOverlapRangeAtIndex(ref.cs, ref.ce, logcalIndex, logcalIndex + cs) &&
-						numbers.getOverlapRangeAtIndex(ref.rs, ref.re, i, i + rs)
-					) {
-						if (ref.cs !== newCs || ref.ce !== newCe || ref.rs !== newRs || ref.re !== newRe) {
-							ref.cs = newCs;
-							ref.ce = newCe;
-							ref.rs = newRs;
-							ref.re = newRe;
-							i = -1;
-
-							spanIndex = [];
-							rowSpanArr = [];
-							break;
-						}
-					}
-				}
-
-				if (rs > 0) {
-					rowSpanArr.push({
-						index: logcalIndex,
-						cs: cs + 1,
-						rs: rs,
-						row: -1,
-					});
-				}
-
-				colSpan += cell.colSpan - 1;
-			}
-
-			spanIndex = spanIndex.concat(rowSpanArr).sort((a, b) => a.index - b.index);
-			rowSpanArr = [];
-		}
-
-		return ref;
-	}
-
-	/**
+	 * @description Marks the cells inside `ref` as selected.
+	 * - A cell touching the region's outer edge also gets the edge class for that side (`se-selected-cell-focus-t/b/l/r`).
 	 * @param {HTMLCollectionOf<HTMLTableRowElement>} rows
 	 * @param {{cs: number|null, ce: number|null, rs: number|null, re: number|null}} ref
 	 */
@@ -272,7 +189,29 @@ export class TableSelectionService {
 					numbers.getOverlapRangeAtIndex(ref.cs, ref.ce, logcalIndex, logcalIndex + cs) &&
 					numbers.getOverlapRangeAtIndex(ref.rs, ref.re, i, i + rs)
 				) {
-					dom.utils.addClass(cell, 'se-selected-table-cell');
+					dom.utils.addClass(cell, SELECTED_CELL_CLASS);
+
+					let edges = '';
+					if (i <= ref.rs) {
+						edges += EDGE_T;
+						this.#edgeCells.t.push(cell);
+					}
+					if (i + rs >= ref.re) {
+						edges += '|' + EDGE_B;
+						this.#edgeCells.b.push(cell);
+					}
+					if (logcalIndex <= ref.cs) {
+						edges += '|' + EDGE_L;
+						this.#edgeCells.l.push(cell);
+					}
+					if (logcalIndex + cs >= ref.ce) {
+						edges += '|' + EDGE_R;
+						this.#edgeCells.r.push(cell);
+					}
+					if (edges) {
+						dom.utils.addClass(cell, edges);
+						this.#edgeClasses.set(cell, edges);
+					}
 				}
 
 				if (rs > 0) {
@@ -308,6 +247,21 @@ export class TableSelectionService {
 	}
 
 	/**
+	 * @description The cells on one outer edge of the current multi-cell region (document order).
+	 * - Empty for a single-cell selection.
+	 * @param {"t"|"b"|"l"|"r"} side Region edge
+	 * @returns {HTMLTableCellElement[]}
+	 */
+	getEdgeCells(side) {
+		return this.#edgeCells[side] || [];
+	}
+
+	#resetEdges() {
+		this.#edgeClasses = new WeakMap();
+		this.#edgeCells = EmptyEdgeCells();
+	}
+
+	/**
 	 * @description Starts cell selection with global event listeners for drag/shift selection.
 	 * **WARNING**: Registers global events (mousemove/mousedown, mouseup, touchmove).
 	 * These events are auto-removed on mouseup/touchmove, or call `#removeGlobalEvents()` manually.
@@ -332,27 +286,32 @@ export class TableSelectionService {
 	}
 
 	/**
-	 * @description Deletes styles from selected table cells.
+	 * @description Deletes styles from selected table cells and discards the remembered multi-cell region.
+	 * @param {boolean} [keepEdges=false] `true`: only strip the classes, keep the region memory.
 	 */
-	deleteStyleSelectedCells() {
+	deleteStyleSelectedCells(keepEdges = false) {
+		if (!keepEdges) this.#resetEdges();
 		dom.utils.removeClass([this.#state.fixedCell, this.#state.selectedCell], 'se-selected-cell-focus');
 		const table = this.#state.fixedCell?.closest('table');
 		if (table) {
-			const selectedCells = table.querySelectorAll('.se-selected-table-cell');
+			const selectedCells = table.querySelectorAll('.' + SELECTED_CELL_CLASS);
 			for (let i = 0, len = selectedCells.length; i < len; i++) {
-				dom.utils.removeClass(selectedCells[i], 'se-selected-table-cell');
+				dom.utils.removeClass(selectedCells[i], SELECTED_CELL_CLASS + '|' + SELECTED_EDGE_CLASSES);
 			}
 		}
 	}
 
 	/**
-	 * @description Restores styles for selected table cells.
+	 * @description Restores styles for selected table cells (the region's edge classes included).
 	 */
 	recallStyleSelectedCells() {
 		if (this.#state.selectedCells) {
 			const selectedCells = this.#state.selectedCells;
-			for (let i = 0, len = selectedCells.length; i < len; i++) {
-				dom.utils.addClass(selectedCells[i], 'se-selected-table-cell');
+			for (let i = 0, len = selectedCells.length, cell; i < len; i++) {
+				cell = selectedCells[i];
+				dom.utils.addClass(cell, SELECTED_CELL_CLASS);
+				const edges = this.#edgeClasses.get(cell);
+				if (edges) dom.utils.addClass(cell, edges);
 			}
 		}
 	}
@@ -423,7 +382,7 @@ export class TableSelectionService {
 		this.#cellService.setMergeSplitButton();
 		this.#main.setState(
 			'selectedCells',
-			Array.from(this.#state.selectedTable.querySelectorAll('.se-selected-table-cell')),
+			Array.from(this.#state.selectedTable.querySelectorAll('.' + SELECTED_CELL_CLASS)),
 		);
 
 		if (this.#state.isShiftPressed) return;
@@ -431,7 +390,7 @@ export class TableSelectionService {
 		if (fixedCell && this.#state.selectedCell) {
 			this.focusCellEdge(fixedCell);
 			if (fixedCell === this.#state.selectedCell) {
-				dom.utils.removeClass(fixedCell, 'se-selected-table-cell');
+				dom.utils.removeClass(fixedCell, SELECTED_CELL_CLASS + '|' + SELECTED_EDGE_CLASSES);
 			}
 		}
 

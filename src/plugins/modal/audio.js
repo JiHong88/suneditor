@@ -267,6 +267,7 @@ class Audio_ extends PluginModal {
 			nonBorder: true,
 			figureTarget: true,
 			infoOnly: false,
+			nonDragHandle: false,
 		});
 		this.#ready(target);
 	}

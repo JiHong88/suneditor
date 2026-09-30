@@ -26,7 +26,7 @@ export function CreateHTML() {
  */
 export function CreateHTML_controller_table({ lang, icons }) {
 	const html = /*html*/ `
-	<div class="se-arrow se-arrow-down se-visible-hidden"></div>
+	<div class="se-arrow se-arrow-down se-arrow-visible-hidden"></div>
 	<div class="se-btn-group">
 		<button type="button" data-command="openTableProperties" class="se-btn se-tooltip">
 			${icons.table_properties}
@@ -77,12 +77,19 @@ export function CreateHTML_controller_table({ lang, icons }) {
 
 /**
  * @param {SunEditor.Deps} $ - Kernel dependencies
- * @param {boolean} cellControllerTop - Whether to position cell controller on top
+ * @param {"cell"|"table"|"dot"} cellControllerPosition - Cell controller position mode
  * @returns {{ html: HTMLElement, splitButton: HTMLButtonElement, columnButton: HTMLButtonElement, rowButton: HTMLButtonElement, mergeButton: HTMLButtonElement, unmergeButton: HTMLButtonElement }}
  */
-export function CreateHTML_controller_cell({ lang, icons }, cellControllerTop) {
+export function CreateHTML_controller_cell({ lang, icons }, cellControllerPosition) {
+	const arrowClass =
+		cellControllerPosition === 'table'
+			? 'se-arrow-down se-arrow-visible-hidden'
+			: cellControllerPosition === 'dot'
+				? 'se-arrow-up se-arrow-visible-hidden'
+				: 'se-arrow-up';
+
 	const html = /*html*/ `
-	<div class="se-arrow se-arrow-${cellControllerTop ? 'down se-visible-hidden' : 'up'}"></div>
+	<div class="se-arrow ${arrowClass}"></div>
     <div class="se-btn-group">
 		<button type="button" data-command="openCellProperties" class="se-btn se-tooltip">
 			${icons.cell_properties}

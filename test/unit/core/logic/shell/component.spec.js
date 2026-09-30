@@ -285,6 +285,15 @@ describe('Component', () => {
 	});
 
 	describe('__deselect method', () => {
+		it('clears the controller trigger context', () => {
+			const { _DragHandle } = require('../../../../../src/modules/ui');
+			_DragHandle.get.mockReturnValue(null);
+
+			component.__deselect();
+
+			expect(mockEditor.$.ui.offControllerTriggerContext).toHaveBeenCalled();
+		});
+
 		it('should reset isSelected to false', () => {
 			const { _DragHandle } = require('../../../../../src/modules/ui');
 			_DragHandle.get.mockReturnValue(null);

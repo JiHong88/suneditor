@@ -920,6 +920,8 @@ export function createMockEditor(customOptions = {}) {
 		setControllerOnDisabledButtons: jest.fn().mockReturnValue(true),
 		onControllerContext: jest.fn(),
 		offControllerContext: jest.fn(),
+		onControllerTriggerContext: jest.fn(),
+		offControllerTriggerContext: jest.fn(),
 		enableBackWrapper: jest.fn(),
 		disableBackWrapper: jest.fn(),
 		offCurrentController: jest.fn(),

@@ -530,9 +530,13 @@ class Component {
 		if (info || figure) {
 			info ||= this.get(figure);
 			if (info && !dom.utils.hasClass(info.container, 'se-component-selected')) {
-				this.#$.ui.offCurrentController();
-				_DragHandle.set('__overInfo', ON_OVER_COMPONENT);
-				this.select(info.target, info.pluginName);
+				if (this.isSelected && this.currentInfo?.container === info.container) {
+					dom.utils.addClass(info.container, 'se-component-selected');
+				} else {
+					this.#$.ui.offCurrentController();
+					_DragHandle.set('__overInfo', ON_OVER_COMPONENT);
+					this.select(info.target, info.pluginName);
+				}
 			}
 		} else if (_DragHandle.get('__overInfo') !== null && !dom.utils.hasClass(target, 'se-drag-handle')) {
 			this.__deselect();
@@ -547,6 +551,7 @@ class Component {
 	 */
 	__deselect() {
 		this.#store.set('_preventBlur', false);
+		this.#$.ui.offControllerTriggerContext();
 		_DragHandle.set('__overInfo', null);
 		this.__removeDragEvent();
 
@@ -832,7 +837,8 @@ class Component {
 		if (
 			this.currentTarget?.contains(target) ||
 			dom.query.getParentElement(target, '.se-controller') ||
-			dom.utils.hasClass(target, 'se-drag-handle') ||
+			dom.query.getParentElement(target, '.se-select-menu') ||
+			dom.utils.hasClass(target, 'se-drag-handle|se-table-move-handle|se-controller-trigger') ||
 			(this.currentPluginName === this.#$.ui.currentControllerName &&
 				this.#$.ui.opendControllers.some(({ form }) => form.contains(target)))
 		) {
@@ -1040,7 +1046,10 @@ function SetClipboardComponent(e, container, clipboardData) {
 function RemoveSelectedClass(container) {
 	dom.utils.removeClass(container, 'se-component-selected');
 	dom.utils.removeClass(container.querySelectorAll('.se-figure-selected'), 'se-figure-selected');
-	dom.utils.removeClass(container.querySelectorAll('.se-selected-table-cell'), 'se-selected-table-cell');
+	dom.utils.removeClass(
+		container.querySelectorAll('.se-selected-table-cell'),
+		'se-selected-table-cell|se-selected-cell-focus-t|se-selected-cell-focus-b|se-selected-cell-focus-l|se-selected-cell-focus-r',
+	);
 	dom.utils.removeClass(container.querySelector('.se-selected-cell-focus'), 'se-selected-cell-focus');
 }
 

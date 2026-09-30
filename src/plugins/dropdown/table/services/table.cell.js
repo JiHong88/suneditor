@@ -242,7 +242,7 @@ export class TableCellService {
 		this.#main.setState('selectedCell', lastCell);
 
 		this.setUnMergeButton();
-		this.#main.controller_cell.resetPosition(lastCell);
+		this.#main._resetCellControllerPosition(lastCell);
 
 		// history push
 		this.#main.historyPush();
