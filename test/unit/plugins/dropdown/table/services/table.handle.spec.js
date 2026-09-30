@@ -104,7 +104,12 @@ function makeHarness(table, { selected = true, rtl = false, iframe = null } = {}
 				return { top: rect.top, left: rect.left };
 			},
 		},
-		ui: { enableBackWrapper: jest.fn(), disableBackWrapper: jest.fn() },
+		ui: {
+			enableBackWrapper: jest.fn(),
+			disableBackWrapper: jest.fn(),
+			onControllerTriggerContext: jest.fn(),
+			offControllerTriggerContext: jest.fn(),
+		},
 		options: { get: (key) => (key === '_rtl' ? rtl : false) },
 	};
 
@@ -116,7 +121,7 @@ function makeHarness(table, { selected = true, rtl = false, iframe = null } = {}
 		setCellInfo: jest.fn(),
 		controller_table: { isOpen: false },
 		controller_cell: { isOpen: false },
-		dotService: { hide: jest.fn(), reposition: jest.fn() },
+		dotService: { hide: jest.fn(), reposition: jest.fn(), showTableDot: jest.fn() },
 		gridService: {
 			closeMenus: jest.fn(),
 			openRowMenuForHandle: jest.fn(),
@@ -726,6 +731,41 @@ describe('TableHandleService', () => {
 			expect(main.selectionService.deleteStyleSelectedCells).toHaveBeenCalled();
 			expect(main.setState).toHaveBeenCalledWith('selectedCells', null);
 			expect(columnHandle.style.display).toBe('block');
+		});
+
+		it('sets selectedTable before selectCells so a restore after a state reset cannot read a null table', () => {
+			const table = makeTable([['a1', 'a2'], ['b1', 'b2']]);
+			stampLayout(table);
+			const { svc, main, rowHandle } = makeHarness(table);
+			svc.refresh(table.rows[0].cells[0]);
+
+			rowHandle.dispatchEvent(mouse('mousedown', { button: 0, clientX: 0, clientY: 5 }));
+			document.dispatchEvent(mouse('mouseup'));
+
+			const setTable = main.setState.mock.calls.findIndex(([k, v]) => k === 'selectedTable' && v === table);
+			expect(setTable).toBeGreaterThanOrEqual(0);
+			const setTableOrder = main.setState.mock.invocationCallOrder[setTable];
+			const selectOrder = main.selectionService.selectCells.mock.invocationCallOrder[0];
+			expect(setTableOrder).toBeLessThan(selectOrder);
+		});
+
+		it('a pin arms the controller trigger context; releasing it disarms and re-shows the table dot', () => {
+			const table = makeTable([['a1', 'a2'], ['b1', 'b2']]);
+			stampLayout(table);
+			const { svc, main, rowHandle } = makeHarness(table);
+			svc.refresh(table.rows[0].cells[0]);
+
+			rowHandle.dispatchEvent(mouse('mousedown', { button: 0, clientX: 0, clientY: 5 }));
+			document.dispatchEvent(mouse('mouseup'));
+			expect(rowHandle.classList.contains('active')).toBe(true);
+			expect(main.$.ui.onControllerTriggerContext).toHaveBeenCalled();
+			expect(main.$.ui.offControllerTriggerContext).not.toHaveBeenCalled();
+
+			// Escape releases the pin
+			document.dispatchEvent(new KeyboardEvent('keydown', { code: 'Escape' }));
+			expect(rowHandle.classList.contains('active')).toBe(false);
+			expect(main.$.ui.offControllerTriggerContext).toHaveBeenCalled();
+			expect(main.dotService.showTableDot).toHaveBeenCalled();
 		});
 
 		it('selects the moved band at its new position after the drop', () => {

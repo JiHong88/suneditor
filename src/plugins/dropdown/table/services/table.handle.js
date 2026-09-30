@@ -482,6 +482,7 @@ export class TableHandleService {
 			);
 			this.#clearBandSelection();
 			this.hide();
+			this.#main.dotService.showTableDot();
 			return;
 		}
 
@@ -607,6 +608,7 @@ export class TableHandleService {
 			sibling.style.display = 'none';
 		}
 		if (pressed) dom.utils.addClass(pressed, 'active');
+		this.#$.ui.onControllerTriggerContext();
 		this.#pinKeydownEvent ??= this.#$.eventManager.addGlobalEvent('keydown', this.#OnPinKeyDown.bind(this), false);
 
 		const drops = this.#collectDrops(ctx.table, ctx.band, isRow);
@@ -790,11 +792,11 @@ export class TableHandleService {
 
 		if (cells.length === 0) return null;
 
+		this.#main.setState('selectedTable', table);
 		const { fixedCell, selectedCell } = this.#main.selectionService.selectCells(cells);
 		this.#main.setState('selectedCells', cells);
 		this.#main.setState('fixedCell', fixedCell);
 		this.#main.setState('selectedCell', selectedCell);
-		this.#main.setState('selectedTable', table);
 		this.#main.setCellInfo(cells[0], true);
 		return cells;
 	}
@@ -815,6 +817,7 @@ export class TableHandleService {
 		if (sibling && this.#rowCtx && this.#colCtx) sibling.style.display = 'block';
 
 		this.#clearBandSelection();
+		this.#main.dotService.showTableDot();
 	}
 
 	/**
@@ -867,6 +870,7 @@ export class TableHandleService {
 	 * @description Clears the band selection — styles and the selection state.
 	 */
 	#clearBandSelection() {
+		this.#$.ui.offControllerTriggerContext();
 		this.#main.selectionService.deleteStyleSelectedCells();
 		this.#main.setState('selectedCells', null);
 		this.#main.setState('fixedCell', null);
