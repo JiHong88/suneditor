@@ -1,4 +1,5 @@
 import { dom, env, keyCodeMap } from '../../helper';
+import { isPopoverOpen } from '../../helper/dom/popover';
 import { _DragHandle } from '../ui/_DragHandle';
 
 const { _w, isMobile, ON_OVER_COMPONENT } = env;
@@ -595,7 +596,8 @@ class Controller {
 
 		// The z-index above governs only the no-popover fallback. In the popover top layer, stacking follows
 		// show order — so to lift the hovered controller (and its tooltips) above an overlapping sibling, re-show it.
-		if (this.sibling && _topHoverController !== this && this.form.matches?.(':popover-open')) {
+		// `matches(':popover-open')` throws a SyntaxError where that pseudo-class is not implemented.
+		if (this.sibling && _topHoverController !== this && isPopoverOpen(this.form)) {
 			_topHoverController = this;
 			this.form.hidePopover();
 			this.form.showPopover();

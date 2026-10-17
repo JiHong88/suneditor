@@ -138,6 +138,14 @@ describe('TableResizeService', () => {
 
              expect(dom.query.getParentElement).toHaveBeenCalled();
         });
+
+        it('should not throw when the current root has no resize line', () => {
+            const { CheckCellEdge } = require('../../../../../../src/plugins/dropdown/table/shared/table.utils');
+            CheckCellEdge.mockReturnValue({ is: true, isLeft: false });
+            main.frameContext.get.mockReturnValue(null);
+
+            expect(() => resizeService.onResizeGuide({}, document.createElement('td'))).not.toThrow();
+        });
     });
 
     describe('readyResizeFromEdge', () => {

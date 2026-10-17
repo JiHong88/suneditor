@@ -1,4 +1,5 @@
 import { dom, env, keyCodeMap } from '../../helper';
+import { hidePopoverIfOpen, showPopoverUnlessOpen } from '../../helper/dom/popover';
 
 const { _w } = env;
 const MENU_MIN_HEIGHT = 38;
@@ -363,7 +364,7 @@ class SelectMenu {
 			sub.style.visibility = 'hidden';
 
 			if (supportsPopover) {
-				if (!sub.matches(':popover-open')) sub.showPopover();
+				showPopoverUnlessOpen(sub);
 			} else {
 				sub.style.display = 'block';
 			}
@@ -474,7 +475,7 @@ class SelectMenu {
 			const data = this.#submenuData.get(this.#activeSubmenuIndex);
 			if (data?.element) {
 				if (typeof data.element.hidePopover === 'function') {
-					if (data.element.matches(':popover-open')) data.element.hidePopover();
+					hidePopoverIfOpen(data.element);
 				} else {
 					data.element.style.display = '';
 				}

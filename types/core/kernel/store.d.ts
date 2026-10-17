@@ -160,6 +160,12 @@ declare class Store {
 	 */
 	get<K extends keyof StoreState>(key: K): StoreState[K];
 	/**
+	 * @description Whether this store still accepts reads and writes.
+	 * `false` after {@link Store#_destroy}.
+	 * @returns {boolean}
+	 */
+	isActive(): boolean;
+	/**
 	 * @description Set state value and notify subscribers
 	 * @template {keyof StoreState} K
 	 * @param {K} key
