@@ -155,7 +155,8 @@
 		"types",
 		"dist",
 		"README.md",
-		"LICENSE.txt"
+		"LICENSE.txt",
+		"release-note.md"
 	],
 	"keywords": [
 		"suneditor",

@@ -776,6 +776,9 @@ const options1 = {
 	toolbar_sticky: 0,
 	lineAttrReset: 'id',
 	wordCounter: true,
+	toolbar: {
+		mode: 'bottom',
+	},
 	wordCounter_label: 'Words :',
 	charCounter: true,
 	charCounter_label: 'Characters :',
@@ -1652,7 +1655,7 @@ const options1 = {
 	toolbar_sticky: { top: 50, position: 'fixed' },
 	iframe_attributes: { frameborder: '1' },
 	lineBreakClearStyle: true,
-	mode: 'classic',
+	mode: 'classic:bottom',
 	// textDirection: 'rtl',
 	// iframe: true,
 	height: '500px',
@@ -2655,7 +2658,7 @@ const options_test = {
 	},
 	image: {
 		multiple: true,
-		
+
 		width: '100%',
 		height: 'auto',
 		sizeOnlyPercentage: false,

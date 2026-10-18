@@ -19,7 +19,7 @@ export const MOVE_HANDLE_ROW_CLASS: '.se-table-move-handle-row';
 export const MOVE_HANDLE_COLUMN_CLASS: '.se-table-move-handle-column';
 export const MOVE_BAND_SOURCE_CLASS: '.se-table-move-band-source';
 export const MOVE_BAND_TARGET_CLASS: '.se-table-move-band-target';
-export const MOVE_MENU_ANCHOR_CLASS: '.se-table-move-menu-anchor';
+export const MOVE_GRIP_CLASS: '.se-table-move-grip';
 export const BORDER_LIST: string[];
 export namespace BORDER_FORMATS {
 	let all: string;
@@ -40,6 +40,7 @@ export namespace BORDER_NS {
 	let r: string;
 	let b: string;
 }
+export const DEFAULT_BORDER_WIDTH: '2';
 export const DEFAULT_BORDER_UNIT: 'px';
 export const DEFAULT_COLOR_LIST: string[];
 /**

@@ -387,6 +387,14 @@ export class TableSelectionService {
 
 		if (this.#state.isShiftPressed) return;
 
+		this.showSelection();
+	}
+
+	/**
+	 * @description Shows a finished cell selection.
+	 */
+	showSelection() {
+		const fixedCell = this.#state.fixedCell;
 		if (fixedCell && this.#state.selectedCell) {
 			this.focusCellEdge(fixedCell);
 			if (fixedCell === this.#state.selectedCell) {

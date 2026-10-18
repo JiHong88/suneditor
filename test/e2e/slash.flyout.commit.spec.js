@@ -29,9 +29,31 @@ const state = (page) =>
 		};
 	});
 
-async function openSlashMenu(page, query) {
+/**
+ * Replaces the dev page editor with one whose slash list is fixed — the playground's own items
+ * (a custom "Table" row before the plugin's) change what `/table` lands on.
+ * `autocomplete` stays loaded: its menu closing on every keystroke is part of the regression.
+ */
+async function makeEditor(page) {
 	await page.goto('/');
-	await page.waitForFunction(() => window.editor_root !== undefined, { timeout: 15000 });
+	await page.waitForFunction(() => window.editor_root !== undefined && window.suneditor, { timeout: 15000 });
+	await page.evaluate(() => {
+		const { slashCommand, table, align, blockquote, autocomplete } = window.editor_root.$.plugins;
+		window.editor_root.destroy();
+		document.body.innerHTML = '<div id="slash_editor"></div>';
+		window.editor_root = window.suneditor.create('#slash_editor', {
+			plugins: [slashCommand, table, align, blockquote, autocomplete].map((p) => p.constructor),
+			buttonList: [['table', 'align', 'blockquote']],
+			slashCommand: { items: ['table', 'align', 'blockquote'] },
+			autocomplete: { triggers: { '@': { data: [{ key: 'john' }, { key: 'jane' }] } } },
+			height: '400px',
+		});
+	});
+	await page.waitForTimeout(300);
+}
+
+async function openSlashMenu(page, query) {
+	await makeEditor(page);
 	await page.evaluate(() => window.editor_root.$.html.set('<p><br></p>'));
 	await page.waitForTimeout(200);
 	await page.locator('.se-wrapper-wysiwyg').click();

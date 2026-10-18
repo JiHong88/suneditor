@@ -21,8 +21,12 @@ let _topHoverController = null;
  * @property {HTMLElement} [form=null] - The controller element
  * @property {HTMLElement|Range} [target=null] - The controller target element
  * @property {boolean} [notInCarrier=false] - If the controller is not in the `carrierWrapper`, set it to `true`.
+ * @property {boolean} [inWrapper=false] - An in-editor `wrapper` controller (`container: 'wrapper'`), not a floating one.
+ * - Floating-controller bookkeeping skips it: `z-index` stacking, the close-time state reset, "click inside another controller" checks and modal hiding.
  * @property {boolean} [isRangeTarget=false] - If the target is a `Range`, set it to `true`.
  * @property {boolean} [fixed=false] - If the controller is fixed and should not be closed, set it to `true`.
+ * @property {boolean} [passive=false] - Opened without touching the editor state (hover UI, in-editor controllers).
+ * @property {?HTMLElement} [topArea=null] - The root (`frameContext.get('topArea')`) it was opened in.
  */
 
 /**
@@ -41,6 +45,23 @@ let _topHoverController = null;
  * - You must specify this option, if use `sibling`
  * @property {boolean} [isInsideForm=false] If the controller is inside a form, set it to `true`.
  * @property {boolean} [isOutsideForm=false] If the controller is outside a form, set it to `true`.
+ * @property {"carrier"|"wrapper"} [container="carrier"] Where the controller lives.
+ * - `carrier`: a floating controller in the `carrierWrapper` (popover top layer), placed against its target by `position`.
+ * - `wrapper`: an in-editor controller inside the current root's `.se-wrapper` (moved there on `open`), placed by `place`.
+ * 			  - It keeps the controller contract — `open`/`close`/`hide`/`show`/`resetPosition`, `parents`
+ * 			  - Its owner drives its lifecycle: no auto-close listeners, no deselect on close, no editor-state changes.
+ * 			  - Scrolls inside the content (e.g. a scrolled table figure) are the owner's: call `resetPosition()`.
+ * @property {boolean} [selection=false] If `true`, this controller is the selected component's UI (e.g. an image toolbar).
+ * - The component keeps its selection and its key/click handling while it is open.
+ * - Closing a base one (no `parents`) deselects the component; closing a child keeps it.
+ * - Inherited from `parents`. Leave it `false` for standalone controllers (e.g. link preview).
+ * @property {"level"|"all"} [escape="level"] What Esc does when this controller handles it:
+ * - `level`: closes this level only (and consumes the Esc) — a child popup closes, its parent stays.
+ * 			- A base selection UI controller leaves the Esc to the component, which ends the selection.
+ * - `all`: closes every open controller at once and ends the selection (`ui.closeAllControllers`).
+ * @property {(form: HTMLElement, target: Node) => ?{left: number, top: number}} [place] `container: 'wrapper'` only:
+ * - the form's wrapper-local position (`$.offset.getLocal` space), or `null` to hide it. It may also size the form;
+ * - the controller writes the position, the display and the scroll baseline.
  */
 
 /**
@@ -61,6 +82,11 @@ class Controller {
 	#bindShadowRootEvent = null;
 	#bindClose_key = null;
 	#bindClose_mouse = null;
+
+	/** @type {?(form: HTMLElement, target: Node) => ?{left: number, top: number}} `wrapper` placement */
+	#place = null;
+	/** Declared a selection UI controller */
+	#selection = false;
 
 	/**
 	 * @type {Array<Controller>}
@@ -101,6 +127,11 @@ class Controller {
 		this.siblingMain = !!params.siblingMain;
 		this.isInsideForm = !!params.isInsideForm;
 		this.isOutsideForm = !!params.isOutsideForm;
+		/** @type {"carrier"|"wrapper"} */
+		this.container = params.container === 'wrapper' ? 'wrapper' : 'carrier';
+		/** @type {"level"|"all"} */
+		this.escape = params.escape === 'all' ? 'all' : 'level';
+		this.#selection = !!params.selection;
 		this.toTop = false;
 		/** @type {{left?: number, top?: number, addOfffset?: {left?: number, top?: number}}} */
 		this.__offset = {};
@@ -121,6 +152,15 @@ class Controller {
 			this.parentsForm.push(parent.form);
 		}
 
+		if (this.container === 'wrapper') {
+			this.#place = typeof params.place === 'function' ? params.place : null;
+			if (!this.#place) {
+				console.warn('[SUNEDITOR.Controller.constructor.warn] A `wrapper` controller requires `place`.');
+			}
+			this.#$.eventManager.addEvent(element, 'click', this.#Action.bind(this));
+			return;
+		}
+
 		// add element
 		this.form.setAttribute('popover', 'manual');
 		this.#$.contextProvider.carrierWrapper.appendChild(element);
@@ -138,7 +178,7 @@ class Controller {
 	 * @param {Object} [params={}] params
 	 * @param {boolean} [params.isWWTarget] If the controller is in the WYSIWYG area, set it to `true`.
 	 * @param {boolean} [params.passive] If `true`, opens the controller visually without affecting editor state
-	 * - (`_preventBlur`, `controlActive`, `onControllerContext`, `opendControllers`).
+	 * - (`_preventBlur`, `controlActive`, `currentControllerName`, balloon toolbar hiding); it is still registered in `opendControllers`.
 	 * - Used for lightweight, non-intrusive display such as hover-triggered UI (e.g., codeLang selector on `<pre>` hover).
 	 * - Automatically set to `true` when opened during component hover selection (`ON_OVER_COMPONENT`).
 	 * @param {() => void} [params.initMethod] Method to be called when the controller is closed.
@@ -155,6 +195,11 @@ class Controller {
 	 * this.controller.open(this.$.selection.getRange());
 	 */
 	open(target, positionTarget, { isWWTarget, passive, initMethod, disabled, addOffset } = {}) {
+		if (this.container === 'wrapper') {
+			this.#openInWrapper(/** @type {Node} */ (target), positionTarget);
+			return;
+		}
+
 		if (_DragHandle.get('__overInfo') === ON_OVER_COMPONENT) {
 			passive = true;
 		}
@@ -191,7 +236,7 @@ class Controller {
 		if (!passive) {
 			const parents = this.isOutsideForm ? this.parentsForm : [];
 			this.#$.ui.opendControllers?.forEach((e) => {
-				if (!parents.includes(e.form)) e.form.style.zIndex = INDEX_1;
+				if (!e.inWrapper && !parents.includes(e.form)) e.form.style.zIndex = INDEX_1;
 			});
 
 			if (this.parentsHide) {
@@ -238,7 +283,7 @@ class Controller {
 		this.__offset = {};
 		this.#addOffset = ADD_OFFSET_VALUE;
 
-		this.#removeGlobalEvent();
+		if (this.container !== 'wrapper') this.#removeGlobalEvent();
 
 		this.#initMethod?.();
 		this.#controllerOff();
@@ -252,9 +297,22 @@ class Controller {
 
 		this.host.controllerClose?.();
 
-		if (this.parentsForm.length > 0) return;
+		if (this.container === 'wrapper' || this.parentsForm.length > 0) return;
 
 		this.#$.component.deselect();
+	}
+
+	/**
+	 * @description Whether this controller is the selected component's UI — set by `selection` or inherited from `parents`.
+	 * @returns {boolean}
+	 */
+	get isSelectionUI() {
+		if (this.#selection) return true;
+		return this.parents.some((parent) => {
+			if (!dom.check.isElement(parent)) return /** @type {Controller} */ (parent).isSelectionUI;
+			const owner = this.#$.ui.getControllerAt(/** @type {Node} */ (parent))?.inst;
+			return owner !== this && !!owner?.isSelectionUI;
+		});
 	}
 
 	/**
@@ -364,6 +422,95 @@ class Controller {
 	}
 
 	/**
+	 * @description Opens a `wrapper` controller — moves its form into the current root's wrapper,
+	 * - registers it as an in-editor controller and places it.
+	 * - Registered `fixed`: the core's deselect sweep (`_offControllers`) leaves it to its owner.
+	 * @param {Node} target Target node
+	 * @param {Node} [positionTarget] Position target node (`place`'s second argument)
+	 */
+	#openInWrapper(target, positionTarget) {
+		if (!target) {
+			console.warn('[SUNEDITOR.Controller.open.fail] The target element is required.');
+			return;
+		}
+
+		this.currentTarget = /** @type {HTMLElement} */ (target);
+		this.currentPositionTarget = positionTarget || target;
+
+		const wrapper = this.#$.frameContext.get('wrapper');
+		if (this.form.parentNode !== wrapper) wrapper.appendChild(this.form);
+
+		const cont = this.#$.ui.opendControllers;
+		if (!cont.some((v) => v.form === this.form)) {
+			cont.push({
+				position: 'none',
+				inst: this,
+				form: this.form,
+				target: /** @type {HTMLElement} */ (target),
+				notInCarrier: true,
+				inWrapper: true,
+				fixed: true,
+				passive: true,
+				topArea: this.#$.frameContext.get('topArea'),
+			});
+		}
+
+		this.isOpen = true;
+		this.#placeInWrapper(false);
+	}
+
+	/**
+	 * @description Places a `wrapper` controller through its `place` callback.
+	 * - `null` hides it (its children with it, and the controllers anchored on it).
+	 * - Records the scroll baseline the core moves it from on the wysiwyg's inner scroll (`ui._syncScrollPosition`).
+	 * @param {boolean} reanchor Re-anchor the controllers positioned on this one even when it stayed visible
+	 * (`resetPosition`/`show`); an `open` re-place only does it when coming back from hidden.
+	 * @returns {boolean} Whether it is shown
+	 */
+	#placeInWrapper(reanchor) {
+		const pos = this.#place?.(this.form, /** @type {Node} */ (this.currentPositionTarget));
+		if (!pos) {
+			if (this.form.style.display !== 'none') this.hide();
+			this.#syncAnchored(false);
+			return false;
+		}
+
+		const wasHidden = this.form.style.display !== 'block';
+		this.form.style.left = `${pos.left}px`;
+		this.form.style.top = `${pos.top}px`;
+		this.form.style.display = 'block';
+
+		const ww = this.#$.frameContext.get('eventWysiwyg');
+		this.__offset = {
+			left: pos.left + (ww.scrollLeft || ww.scrollX || 0),
+			top: pos.top + (ww.scrollTop || ww.scrollY || 0),
+		};
+
+		if (wasHidden) this.#childrenSync('show');
+		if (wasHidden || reanchor) this.#syncAnchored(true);
+		return true;
+	}
+
+	/**
+	 * @description Keeps the floating controllers positioned on an element inside this `wrapper` controller (its
+	 * child popups, or e.g. a properties panel opened on it) with it: re-anchored when it moved, hidden while it —
+	 * or the anchor element inside it — is not rendered.
+	 * @param {boolean} visible Whether this controller is shown
+	 */
+	#syncAnchored(visible) {
+		for (const { inst, inWrapper } of this.#$.ui.opendControllers) {
+			const anchor = inst?.currentPositionTarget;
+			if (inWrapper || inst === this || !anchor?.nodeType || !this.form.contains(anchor)) continue;
+
+			if (!visible || anchor.getClientRects().length === 0) {
+				if (inst.form.style.display !== 'none') inst.hide();
+			} else if (!inst.form.hasAttribute('data-se-hidden-by-parent')) {
+				inst.resetPosition();
+			}
+		}
+	}
+
+	/**
 	 * @description Show controller at editor area (controller elements, function, `controller target element(@Required)`, `controller name(@Required)`, etc..)
 	 * @param {HTMLFormElement} form Controller element
 	 * @param {Node|Range} target Controller target element
@@ -379,6 +526,8 @@ class Controller {
 			target: /** @type {HTMLElement} */ (target),
 			isRangeTarget,
 			notInCarrier: !this.#$.contextProvider.carrierWrapper.contains(form),
+			passive: !!passive,
+			topArea: this.#$.frameContext.get('topArea'),
 		};
 
 		if (
@@ -396,7 +545,6 @@ class Controller {
 		}
 
 		if (!passive) {
-			this.#$.ui.onControllerContext();
 			this.#$.store.set('controlActive', true);
 			this.#$.store.set('_preventBlur', true);
 		}
@@ -419,18 +567,25 @@ class Controller {
 	 * @description Hide controller at editor area (link button, image resize button..)
 	 */
 	#controllerOff() {
+		if (this.container === 'wrapper') {
+			this.form.style.display = 'none';
+			this.#$.ui.opendControllers = this.#$.ui.opendControllers.filter((v) => v.form !== this.form);
+			return;
+		}
+
 		if (_topHoverController === this) _topHoverController = null;
 		this.form.hidePopover?.();
 		this.form.style.display = 'none';
 		this.#$.ui.opendControllers = this.#$.ui.opendControllers.filter((v) => v.form !== this.form);
-		if (this.#$.ui.currentControllerName !== this.kind && this.#$.ui.opendControllers.length > 0) return;
+		if (this.#$.ui.currentControllerName !== this.kind && this.#$.ui.hasFloatingController()) return;
 
 		this.#$.ui.setControllerOnDisabledButtons(false);
-		this.#$.ui.offControllerContext();
 
-		this.#$.frameContext.get('lineBreaker_t').style.display = this.#$.frameContext.get(
-			'lineBreaker_b',
-		).style.display = 'none';
+		if (!this.isSelectionUI || !this.#$.component.isSelected) {
+			this.#$.frameContext.get('lineBreaker_t').style.display = this.#$.frameContext.get(
+				'lineBreaker_b',
+			).style.display = 'none';
+		}
 		this.#$.store.set('_lastSelectionNode', null);
 		this.#$.ui.currentControllerName = '';
 		this.#$.store.set('_preventBlur', false);
@@ -449,6 +604,11 @@ class Controller {
 	 * @returns {boolean} - view : `true` || hide : `false`
 	 */
 	#setControllerPosition(controller, refer, skipAutoReposition) {
+		if (this.container === 'wrapper') {
+			if (refer) this.currentPositionTarget = refer;
+			return this.#placeInWrapper(true);
+		}
+
 		if (!refer) return false;
 
 		controller.style.visibility = 'hidden';
@@ -516,7 +676,7 @@ class Controller {
 	 * - When the ESC key is pressed, the controller is closed.
 	 */
 	#removeGlobalEvent() {
-		this.#$.component.__removeGlobalEvent();
+		if (!this.isSelectionUI) this.#$.component.__removeGlobalEvent();
 		this.#bindClose_key &&= this.#$.eventManager.removeGlobalEvent(this.#bindClose_key);
 		this.#bindClose_mouse &&= this.#$.eventManager.removeGlobalEvent(this.#bindClose_mouse);
 	}
@@ -544,7 +704,7 @@ class Controller {
 	 */
 	#checkForm(target) {
 		if (dom.check.isWysiwygFrame(target) || target.contains(this.form)) return false;
-		if (dom.utils.hasClass(target, 'se-drag-handle|se-controller-trigger')) return true;
+		if (dom.utils.hasClass(target, 'se-drag-handle')) return true;
 
 		let isParentForm = false;
 		if (this.isInsideForm && this.parentsForm?.length > 0) {
@@ -559,7 +719,8 @@ class Controller {
 		const _element = this.host._element;
 		return (
 			!isParentForm &&
-			(!!dom.query.getParentElement(target, '.se-controller') ||
+			(this.#$.ui.isInsideController(target) ||
+				!!dom.query.getParentElement(target, '.se-controller') ||
 				(this.#$.component.isInline(_element) ? target === _element : target?.contains(_element)))
 		);
 	}
@@ -628,6 +789,22 @@ class Controller {
 		} else {
 			if (this.#__childrenControllers__.some(({ isOpen }) => isOpen)) return;
 			if (this.#escGuard?.()) return;
+
+			if (this.escape === 'all') {
+				e.preventDefault();
+				e.stopPropagation();
+				this.#PostCloseEvent(eventTarget);
+				this.#$.ui.closeAllControllers();
+				return;
+			}
+
+			if (this.isSelectionUI && this.parentsForm.length === 0) {
+				this.#PostCloseEvent(eventTarget);
+				return;
+			}
+
+			e.preventDefault();
+			e.stopPropagation();
 		}
 
 		this.#PostCloseEvent(eventTarget);

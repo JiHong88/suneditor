@@ -50,6 +50,12 @@ declare class Component {
 	 */
 	_init(): void;
 	/**
+	 * @description Whether the current selection is only a hover selection (made on mouse-over, cleared on mouse-out)
+	 * — not yet upgraded by a click or an opened controller.
+	 * @returns {boolean}
+	 */
+	get isHoverSelected(): boolean;
+	/**
 	 * @description Inserts an element and returns it. (Used for elements: table, hr, image, video)
 	 * - If `element` is `HR`, inserts and returns the new line.
 	 * @param {Node} element Element to be inserted

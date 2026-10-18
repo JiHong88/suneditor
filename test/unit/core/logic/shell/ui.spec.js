@@ -277,6 +277,10 @@ function createUIKernel(overrides = {}) {
 	// --- Component ---
 	const component = {
 		__deselect: jest.fn(),
+		deselect: jest.fn(),
+		isSelected: false,
+		isHoverSelected: false,
+		currentTarget: null,
 	};
 
 	// --- Format ---
@@ -570,24 +574,6 @@ describe('UIManager', () => {
 		});
 	});
 
-	describe('onControllerContext method', () => {
-		it('should attach controller context handler', () => {
-			const handler = jest.fn();
-			expect(() => {
-				mockEditor.$.ui.onControllerContext(handler);
-			}).not.toThrow();
-		});
-	});
-
-	describe('offControllerContext method', () => {
-		it('should detach controller context handler', () => {
-			const handler = jest.fn();
-			expect(() => {
-				mockEditor.$.ui.offControllerContext(handler);
-			}).not.toThrow();
-		});
-	});
-
 	describe('enableBackWrapper method', () => {
 		it('should enable back wrapper', () => {
 			expect(() => {
@@ -815,10 +801,6 @@ describe('UIManager (real instance)', () => {
 
 		it('should initialize opendControllers as empty array', () => {
 			expect(ui.opendControllers).toEqual([]);
-		});
-
-		it('should initialize controllerTargetContext as null', () => {
-			expect(ui.controllerTargetContext).toBe(null);
 		});
 
 		it('should initialize _figureContainer as null', () => {
@@ -1352,40 +1334,80 @@ describe('UIManager (real instance)', () => {
 	});
 
 	// -------------------------------------------------------------------
-	// onControllerContext / offControllerContext
+	// controller registry queries / close-all / suspend
 	// -------------------------------------------------------------------
-	describe('onControllerContext', () => {
-		it('should set controllerTargetContext to current topArea', () => {
-			ui.onControllerContext();
-			expect(ui.controllerTargetContext).toBe(ctx.frameContext.get('topArea'));
-		});
-	});
+	describe('controller registry', () => {
+		const entry = (props = {}) => ({ form: document.createElement('div'), inst: {}, ...props });
 
-	describe('offControllerContext', () => {
-		it('should set controllerTargetContext to null', () => {
-			ui.onControllerContext();
-			ui.offControllerContext();
-			expect(ui.controllerTargetContext).toBe(null);
-		});
-	});
-
-	describe('onControllerTriggerContext / offControllerTriggerContext', () => {
-		it('should initialize controllerTriggerContext as null', () => {
-			expect(ui.controllerTriggerContext).toBe(null);
+		afterEach(() => {
+			ui.opendControllers = [];
 		});
 
-		it('should set controllerTriggerContext to current topArea and reset it', () => {
-			ui.onControllerTriggerContext();
-			expect(ui.controllerTriggerContext).toBe(ctx.frameContext.get('topArea'));
-			ui.offControllerTriggerContext();
-			expect(ui.controllerTriggerContext).toBe(null);
+		it('isInsideController / getControllerAt answer from the open forms (floating or in-editor)', () => {
+			const floating = entry();
+			const inEditor = entry({ notInCarrier: true, inWrapper: true });
+			const inner = document.createElement('span');
+			inEditor.form.appendChild(inner);
+			ui.opendControllers = [floating, inEditor];
+
+			expect(ui.isInsideController(inner)).toBe(true);
+			expect(ui.getControllerAt(inner)).toBe(inEditor);
+			expect(ui.isInsideController(document.createElement('p'))).toBe(false);
+			expect(ui.getControllerAt(null)).toBe(null);
 		});
 
-		it('is independent of the controller context', () => {
-			ui.onControllerTriggerContext();
-			ui.offControllerContext();
-			expect(ui.controllerTriggerContext).toBe(ctx.frameContext.get('topArea'));
-			ui.offControllerTriggerContext();
+		it('hasFloatingController counts carrier controllers only', () => {
+			ui.opendControllers = [entry({ notInCarrier: true, inWrapper: true }), entry({ notInCarrier: true })];
+			expect(ui.hasFloatingController()).toBe(false);
+			ui.opendControllers.push(entry());
+			expect(ui.hasFloatingController()).toBe(true);
+		});
+
+		it('closeAllControllers closes the open ones, last opened first, then ends the selection', () => {
+			const order = [];
+			const make = (name) => ({ isOpen: true, close: jest.fn(() => order.push(name)) });
+			const first = make('first');
+			const second = make('second');
+			const closed = { isOpen: false, close: jest.fn() };
+			ui.opendControllers = [entry({ inst: first }), entry({ inst: closed }), entry({ inst: second })];
+			ctx.$.component.isSelected = true;
+			ctx.$.component.deselect.mockClear();
+
+			ui.closeAllControllers();
+
+			expect(order).toEqual(['second', 'first']);
+			expect(closed.close).not.toHaveBeenCalled();
+			expect(ctx.$.component.deselect).toHaveBeenCalled();
+			ctx.$.component.isSelected = false;
+		});
+
+		it('_suspendControllers hides and pins the floating ones only', () => {
+			const floating = entry();
+			const inEditor = entry({ inWrapper: true, fixed: true });
+			ui.opendControllers = [floating, inEditor];
+
+			ui._suspendControllers(true);
+			expect(floating).toEqual(expect.objectContaining({ fixed: true }));
+			expect(floating.form.style.display).toBe('none');
+			expect(inEditor.form.style.display).toBe('');
+
+			ui._suspendControllers(false);
+			expect(floating.fixed).toBe(false);
+			expect(floating.form.style.display).toBe('block');
+			expect(inEditor.fixed).toBe(true);
+		});
+
+		it('_addInEditorEntry replaces an earlier entry of the same form; _removeControllerEntry drops it', () => {
+			const form = document.createElement('div');
+			ui._addInEditorEntry({ form, inst: {} });
+			ui._addInEditorEntry({ form, inst: {} });
+			expect(ui.opendControllers).toHaveLength(1);
+			expect(ui.opendControllers[0]).toEqual(
+				expect.objectContaining({ notInCarrier: true, topArea: ctx.frameContext.get('topArea') }),
+			);
+
+			ui._removeControllerEntry(form);
+			expect(ui.opendControllers).toEqual([]);
 		});
 	});
 
@@ -1513,40 +1535,77 @@ describe('UIManager (real instance)', () => {
 	// _offControllers
 	// -------------------------------------------------------------------
 	describe('_offControllers', () => {
-		it('should close all non-fixed controllers', () => {
-			const closeFn = jest.fn();
+		it('should close all non-fixed controllers through their own close(), children first', () => {
+			const order = [];
 			const form1 = document.createElement('div');
 			form1.style.display = 'block';
 			const form2 = document.createElement('div');
 			form2.style.display = 'block';
+			const inst1 = { isOpen: true, close: jest.fn(() => order.push(1)) };
+			const inst2 = { isOpen: true, close: jest.fn(() => order.push(2)) };
 
 			ui.opendControllers = [
-				{ fixed: false, inst: { controllerClose: closeFn }, form: form1 },
-				{ fixed: false, inst: { controllerClose: closeFn }, form: form2 },
+				{ fixed: false, inst: inst1, form: form1 },
+				{ fixed: false, inst: inst2, form: form2 },
 			];
 
 			ui._offControllers();
 
-			expect(closeFn).toHaveBeenCalledTimes(2);
+			expect(inst1.close).toHaveBeenCalledWith(true);
+			expect(inst2.close).toHaveBeenCalledWith(true);
+			expect(order).toEqual([2, 1]);
 			expect(form1.style.display).toBe('none');
 			expect(form2.style.display).toBe('none');
 			expect(ui.opendControllers).toEqual([]);
 			expect(ui.currentControllerName).toBe('');
 		});
 
+		it('should leave the registry before closing — a re-entrant call closes nothing twice', () => {
+			const inst = {
+				isOpen: true,
+				close: jest.fn(() => {
+					inst.isOpen = false;
+					ui._offControllers();
+				}),
+			};
+			ui.opendControllers = [{ fixed: false, inst, form: document.createElement('div') }];
+
+			ui._offControllers();
+
+			expect(inst.close).toHaveBeenCalledTimes(1);
+			expect(ui.opendControllers).toEqual([]);
+		});
+
+		it('should skip closed instances and non-controller entries', () => {
+			const closed = { isOpen: false, close: jest.fn() };
+			const figure = { close: jest.fn() };
+			const form = document.createElement('div');
+			form.style.display = 'block';
+			ui.opendControllers = [
+				{ fixed: false, inst: closed, form: document.createElement('div') },
+				{ fixed: false, inst: figure, form },
+			];
+
+			ui._offControllers();
+
+			expect(closed.close).not.toHaveBeenCalled();
+			expect(figure.close).not.toHaveBeenCalled();
+			expect(form.style.display).toBe('none');
+		});
+
 		it('should keep fixed controllers', () => {
-			const fixedController = { fixed: true, inst: { controllerClose: jest.fn() }, form: document.createElement('div') };
-			const normalController = { fixed: false, inst: { controllerClose: jest.fn() }, form: document.createElement('div') };
+			const fixedController = { fixed: true, inst: { isOpen: true, close: jest.fn() }, form: document.createElement('div') };
+			const normalController = { fixed: false, inst: { isOpen: true, close: jest.fn() }, form: document.createElement('div') };
 
 			ui.opendControllers = [fixedController, normalController];
 			ui._offControllers();
 
 			expect(ui.opendControllers).toEqual([fixedController]);
-			expect(fixedController.inst.controllerClose).not.toHaveBeenCalled();
-			expect(normalController.inst.controllerClose).toHaveBeenCalled();
+			expect(fixedController.inst.close).not.toHaveBeenCalled();
+			expect(normalController.inst.close).toHaveBeenCalled();
 		});
 
-		it('should handle controllers without controllerClose method', () => {
+		it('should handle entries without close method', () => {
 			ui.opendControllers = [
 				{ fixed: false, inst: {}, form: document.createElement('div') },
 			];
@@ -1603,35 +1662,55 @@ describe('UIManager (real instance)', () => {
 			ctx.store.mode.isSubBalloon = false;
 		});
 
-		it('should close controller when controllerTargetContext does not match current topArea', () => {
-			ui.controllerTargetContext = document.createElement('div'); // different from topArea
-			ui._syncScrollPosition({ scrollTop: 0, scrollLeft: 0 });
-			expect(ctx.$.component.__deselect).toHaveBeenCalled();
-		});
+		describe('what a scroll keeps', () => {
+			const scroll = () => ui._syncScrollPosition({ scrollTop: 0, scrollLeft: 0 });
+			beforeEach(() => {
+				ctx.$.component.__deselect.mockClear();
+				ui.opendControllers = [];
+				Object.assign(ctx.$.component, { isSelected: false, isHoverSelected: false, currentTarget: null });
+			});
+			afterEach(() => {
+				ui.opendControllers = [];
+				Object.assign(ctx.$.component, { isSelected: false, isHoverSelected: false, currentTarget: null });
+			});
 
-		it('should not close controller when controllerTargetContext matches current topArea', () => {
-			ui.controllerTargetContext = ctx.frameContext.get('topArea');
-			ctx.$.component.__deselect.mockClear();
-			ui._syncScrollPosition({ scrollTop: 0, scrollLeft: 0 });
-			expect(ctx.$.component.__deselect).not.toHaveBeenCalled();
-		});
+			it('drops what was neither selected nor opened in this root', () => {
+				scroll();
+				expect(ctx.$.component.__deselect).toHaveBeenCalled();
+			});
 
-		it('keeps the selection when only a controller trigger is visible (no controller open)', () => {
-			ui.controllerTargetContext = null;
-			ui.onControllerTriggerContext();
-			ctx.$.component.__deselect.mockClear();
-			ui._syncScrollPosition({ scrollTop: 0, scrollLeft: 0 });
-			expect(ctx.$.component.__deselect).not.toHaveBeenCalled();
-			ui.offControllerTriggerContext();
-		});
+			it('keeps a component really selected in this root (no controller needed — e.g. the table dots)', () => {
+				const target = document.createElement('table');
+				ctx.frameContext.get('wysiwyg').appendChild(target);
+				Object.assign(ctx.$.component, { isSelected: true, currentTarget: target });
+				scroll();
+				expect(ctx.$.component.__deselect).not.toHaveBeenCalled();
+				target.remove();
+			});
 
-		it('deselects when a trigger from another root is visible and no controller is open', () => {
-			ui.controllerTargetContext = null;
-			ui.controllerTriggerContext = document.createElement('div');
-			ctx.$.component.__deselect.mockClear();
-			ui._syncScrollPosition({ scrollTop: 0, scrollLeft: 0 });
-			expect(ctx.$.component.__deselect).toHaveBeenCalled();
-			ui.controllerTriggerContext = null;
+			it('drops a hover selection', () => {
+				const target = document.createElement('table');
+				ctx.frameContext.get('wysiwyg').appendChild(target);
+				Object.assign(ctx.$.component, { isSelected: true, isHoverSelected: true, currentTarget: target });
+				scroll();
+				expect(ctx.$.component.__deselect).toHaveBeenCalled();
+				target.remove();
+			});
+
+			it('keeps a controller opened non-passively in this root, not one of another root or a passive one', () => {
+				const topArea = ctx.frameContext.get('topArea');
+				ui.opendControllers = [{ form: document.createElement('div'), passive: false, topArea }];
+				scroll();
+				expect(ctx.$.component.__deselect).not.toHaveBeenCalled();
+
+				ui.opendControllers = [{ form: document.createElement('div'), passive: false, topArea: document.createElement('div') }];
+				scroll();
+				expect(ctx.$.component.__deselect).toHaveBeenCalledTimes(1);
+
+				ui.opendControllers = [{ form: document.createElement('div'), passive: true, topArea }];
+				scroll();
+				expect(ctx.$.component.__deselect).toHaveBeenCalledTimes(2);
+			});
 		});
 
 		it('should handle scrollY/scrollX properties', () => {
@@ -2378,7 +2457,6 @@ describe('UIManager (real instance)', () => {
 			lb_t.style.left = '50px';
 			lb_t.setAttribute('data-offset', '0,0');
 
-			ui.controllerTargetContext = ctx.frameContext.get('topArea');
 			ui._syncScrollPosition({ scrollTop: 20, scrollLeft: 10 });
 
 			expect(lb_t.style.top).toBe('80px');
@@ -2392,7 +2470,6 @@ describe('UIManager (real instance)', () => {
 			lb_b.style.top = '200px';
 			lb_b.setAttribute('data-offset', '0,left,0');
 
-			ui.controllerTargetContext = ctx.frameContext.get('topArea');
 			ui._syncScrollPosition({ scrollTop: 30, scrollLeft: 15 });
 
 			expect(lb_b.style.top).toBe('170px');
@@ -2404,7 +2481,6 @@ describe('UIManager (real instance)', () => {
 			lb_t.style.display = 'none';
 			lb_t.style.top = '100px';
 
-			ui.controllerTargetContext = ctx.frameContext.get('topArea');
 			ui._syncScrollPosition({ scrollTop: 20, scrollLeft: 10 });
 
 			// Should remain unchanged
@@ -2418,7 +2494,6 @@ describe('UIManager (real instance)', () => {
 			lb_t.style.left = '25px';
 			// No data-offset attribute set, defaults to ','
 
-			ui.controllerTargetContext = ctx.frameContext.get('topArea');
 			ui._syncScrollPosition({ scrollTop: 10, scrollLeft: 5 });
 
 			expect(lb_t.getAttribute('data-offset')).toBe('10,5');
@@ -2433,7 +2508,6 @@ describe('UIManager (real instance)', () => {
 				{ notInCarrier: true, form, inst: { __offset: { top: 200, left: 100 } } },
 			];
 
-			ui.controllerTargetContext = ctx.frameContext.get('topArea');
 			ui._syncScrollPosition({ scrollTop: 30, scrollLeft: 20 });
 
 			expect(form.style.top).toBe('170px');
@@ -2449,7 +2523,6 @@ describe('UIManager (real instance)', () => {
 				{ notInCarrier: false, form, inst: { __offset: { top: 200, left: 100 } } },
 			];
 
-			ui.controllerTargetContext = ctx.frameContext.get('topArea');
 			ui._syncScrollPosition({ scrollTop: 30, scrollLeft: 20 });
 
 			// inCarrier controllers should not have their position updated by resetLineBreaker

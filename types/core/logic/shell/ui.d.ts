@@ -16,20 +16,12 @@ declare class UIManager {
 	toastContainer: Element;
 	toastMessage: HTMLSpanElement;
 	/**
-	 * @description Currently open `Controller` info array
+	 * @description Currently open `Controller` info array — the one registry of open controllers.
+	 * - Read it through the query methods (`isInsideController`, `getControllerAt`, `hasFloatingController`);
+	 * - entries are added and removed by `Controller` (and `_addInEditorEntry`/`_removeControllerEntry`).
 	 * @type {Array<SunEditor.Module.Controller.Info>}
 	 */
 	opendControllers: Array<SunEditor.Module.Controller.Info>;
-	/**
-	 * @description Controller target's frame div (`editor.frameContext.get('topArea')`)
-	 * @type {?HTMLElement}
-	 */
-	controllerTargetContext: HTMLElement | null;
-	/**
-	 * @description Frame div of a visible controller trigger (`.se-controller-trigger` , e.g. the table dot launchers).
-	 * @type {?HTMLElement}
-	 */
-	controllerTriggerContext: HTMLElement | null;
 	/**
 	 * @internal
 	 * @description Current Figure container.
@@ -133,22 +125,48 @@ declare class UIManager {
 	 */
 	setControllerOnDisabledButtons(active: boolean): boolean;
 	/**
-	 * @description Set the controller target context to the current top area.
+	 * @description Whether `target` lies inside an open controller — floating or in-editor.
+	 * @param {?Node} target The node to test
+	 * @returns {boolean}
 	 */
-	onControllerContext(): void;
+	isInsideController(target: Node | null): boolean;
 	/**
-	 * @description Reset the controller target context.
+	 * @description The open controller whose form contains `target`.
+	 * @param {?Node} target The node to test
+	 * @returns {?SunEditor.Module.Controller.Info}
 	 */
-	offControllerContext(): void;
+	getControllerAt(target: Node | null): SunEditor.Module.Controller.Info | null;
 	/**
-	 * @description Marks a controller trigger (`.se-controller-trigger`) as visible in the current top area.
-	 * - Call when the trigger is shown; pair with `offControllerTriggerContext` when it is hidden.
+	 * @description Whether a floating controller (one in the `carrierWrapper`) is open.
+	 * - In-editor entries (`wrapper` controllers, the figure resize frame) don't count.
+	 * @returns {boolean}
 	 */
-	onControllerTriggerContext(): void;
+	hasFloatingController(): boolean;
 	/**
-	 * @description Reset the controller trigger context.
+	 * @description Closes every open controller at once — child popups before their parents — and ends the
+	 * component selection. The one-step alternative to the level-by-level Esc (see `Controller`'s `escape` option).
 	 */
-	offControllerTriggerContext(): void;
+	closeAllControllers(): void;
+	/**
+	 * @internal
+	 * @description Suspends (hides, and protects from closing) or resumes the open floating controllers.
+	 * — while a modal is open. In-editor controllers stay under the modal and keep their own lifecycle.
+	 * @param {boolean} suspend `true` to suspend, `false` to resume
+	 */
+	_suspendControllers(suspend: boolean): void;
+	/**
+	 * @internal
+	 * @description Registers an in-editor element that is not a `Controller` (the figure resize frame).
+	 * - the core then  moves it with the wysiwyg's inner scroll and hides it with the other controllers. Replaces an earlier entry of the same form.
+	 * @param {SunEditor.Module.Controller.Info} info Entry (`notInCarrier: true`, with `inst.__offset` as scroll baseline)
+	 */
+	_addInEditorEntry(info: SunEditor.Module.Controller.Info): void;
+	/**
+	 * @internal
+	 * @description Removes the registry entry of `form`.
+	 * @param {HTMLElement} form The registered form
+	 */
+	_removeControllerEntry(form: HTMLElement): void;
 	/**
 	 * @description Activate the transparent background `div` so that other elements are not affected during resizing.
 	 * @param {string} cursor cursor css property
@@ -191,9 +209,8 @@ declare class UIManager {
 	reset(rt: any): void;
 	/**
 	 * @internal
-	 * @description Closes all open controllers except those marked as `fixed`.
-	 * Iterates through `opendControllers`, calls `controllerClose` on each non-fixed controller,
-	 * hides their forms, and resets the controller state.
+	 * @description Closes all open controllers except those marked as `fixed` — child popups before their parents —
+	 * through their own `close()`, hides the other entries' forms, and resets the controller state.
 	 * @see offCurrentController - Public method for closing a single controller via component deselect
 	 */
 	_offControllers(): void;

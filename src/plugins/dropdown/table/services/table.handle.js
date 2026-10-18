@@ -1,4 +1,5 @@
 import { dom, env, keyCodeMap, numbers } from '../../../../helper';
+import { Controller } from '../../../../modules/contract';
 import * as Constants from '../shared/table.constants';
 import { GetLogicalCellIndex } from '../shared/table.utils';
 
@@ -35,13 +36,27 @@ export class TableHandleService {
 	/** Last hovered cell — anchor for repositioning after a figure scroll */
 	#lastCell = null;
 	#scrollRafId = null;
+	/** `refresh`'s visible box of the table, shared by both strips' `place` within that call */
+	#refreshBox = null;
 	/** Pending grace-hide timer id */
 	#hideTimer = null;
 	/** Global keydown while pinned — Esc releases the pin */
 	#pinKeydownEvent = null;
 
-	/** @type {WeakMap<HTMLElement, {[selector: string]: HTMLElement}>} */
+	/** @type {WeakMap<HTMLElement, {[selector: string]: HTMLElement}>} Per-root drag overlays (band source/target) */
 	#els = new WeakMap();
+
+	/**
+	 * @description The row strip
+	 * @type {SunEditor.Module.Controller.Instance}
+	 */
+	rowStrip;
+
+	/**
+	 * @description The column strip
+	 * @type {SunEditor.Module.Controller.Instance}
+	 */
+	columnStrip;
 
 	/**
 	 * @param {import('../index').default} main Table index
@@ -50,24 +65,13 @@ export class TableHandleService {
 		this.#main = main;
 		this.#$ = main.$;
 
-		const rowClass = Constants.MOVE_HANDLE_ROW_CLASS.replace(/^\./, '');
-		const columnClass = Constants.MOVE_HANDLE_COLUMN_CLASS.replace(/^\./, '');
+		this.rowStrip = this.#createStrip(true);
+		this.columnStrip = this.#createStrip(false);
 
 		this.#$.contextProvider.applyToRoots((e) => {
 			const wrapper = e.get('wrapper');
 			const els = /** @type {{[selector: string]: HTMLElement}} */ ({});
 			this.#els.set(wrapper, els);
-
-			const rowHandle = (els[Constants.MOVE_HANDLE_ROW_CLASS] = dom.utils.createElement('DIV', {
-				class: `se-table-move-handle ${rowClass}`,
-				title: this.#$.lang.moveRow,
-				'aria-label': this.#$.lang.moveRow,
-			}));
-			const columnHandle = (els[Constants.MOVE_HANDLE_COLUMN_CLASS] = dom.utils.createElement('DIV', {
-				class: `se-table-move-handle ${columnClass}`,
-				title: this.#$.lang.moveColumn,
-				'aria-label': this.#$.lang.moveColumn,
-			}));
 
 			els[Constants.MOVE_BAND_SOURCE_CLASS] = dom.utils.createElement('DIV', {
 				class: Constants.MOVE_BAND_SOURCE_CLASS.replace(/^\./, ''),
@@ -75,22 +79,109 @@ export class TableHandleService {
 			els[Constants.MOVE_BAND_TARGET_CLASS] = dom.utils.createElement('DIV', {
 				class: Constants.MOVE_BAND_TARGET_CLASS.replace(/^\./, ''),
 			});
-
-			wrapper.appendChild(rowHandle);
-			wrapper.appendChild(columnHandle);
 			wrapper.appendChild(els[Constants.MOVE_BAND_SOURCE_CLASS]);
 			wrapper.appendChild(els[Constants.MOVE_BAND_TARGET_CLASS]);
 
-			this.#$.eventManager.addEvent(rowHandle, 'mousedown', this.#OnHandleMouseDown.bind(this, true));
-			this.#$.eventManager.addEvent(columnHandle, 'mousedown', this.#OnHandleMouseDown.bind(this, false));
-			this.#$.eventManager.addEvent(rowHandle, 'mousemove', this.#OnHandleMouseMove.bind(this, true));
-			this.#$.eventManager.addEvent(columnHandle, 'mousemove', this.#OnHandleMouseMove.bind(this, false));
-
-			this.#$.eventManager.addEvent(e.get('wysiwyg'), 'scroll', this.#OnFigureScroll.bind(this), {
+			// scrolls inside the content (e.g. a scrolled figure) — the wysiwyg's own scroll is the core's
+			const wysiwyg = e.get('wysiwyg');
+			this.#$.eventManager.addEvent(wysiwyg, 'scroll', (event) => this.#OnFigureScroll(event, wysiwyg), {
 				passive: true,
 				capture: true,
 			});
 		});
+	}
+
+	/**
+	 * @description Creates a strip (with its grip band box) and its in-editor controller.
+	 * - Hosted by the current root's wrapper until an `open` moves it to the active root.
+	 * @param {boolean} isRow `true` for the row strip
+	 * @returns {SunEditor.Module.Controller.Instance}
+	 */
+	#createStrip(isRow) {
+		const selector = isRow ? Constants.MOVE_HANDLE_ROW_CLASS : Constants.MOVE_HANDLE_COLUMN_CLASS;
+		const label = isRow ? this.#$.lang.moveRow : this.#$.lang.moveColumn;
+		const strip = dom.utils.createElement('DIV', {
+			class: `se-table-move-handle ${selector.replace(/^\./, '')}`,
+			title: label,
+			'aria-label': label,
+		});
+		// the grip's band box — a real element so the handle menu (a Controller) can anchor to it
+		strip.appendChild(dom.utils.createElement('DIV', { class: Constants.MOVE_GRIP_CLASS.replace(/^\./, '') }));
+		this.#$.frameContext.get('wrapper').appendChild(strip);
+
+		this.#$.eventManager.addEvent(strip, 'mousedown', this.#OnHandleMouseDown.bind(this, isRow));
+		this.#$.eventManager.addEvent(strip, 'mousemove', this.#OnHandleMouseMove.bind(this, isRow));
+
+		return new Controller(this, this.#$, strip, {
+			container: 'wrapper',
+			selection: true,
+			place: () => this.#placeStrip(isRow),
+		});
+	}
+
+	/**
+	 * @description `place` of a strip — Sizes the strip and moves the grip onto the context's band.
+	 * @param {boolean} isRow `true` for the row strip
+	 * @returns {?{left: number, top: number}} Wrapper-local position, `null` while the table is out of its figure's view
+	 */
+	#placeStrip(isRow) {
+		const ctx = isRow ? this.#rowCtx : this.#colCtx;
+		const table = ctx?.table;
+		const box = this.#refreshBox?.table === table ? this.#refreshBox.box : this.#visibleBox(table);
+		if (!box) return null;
+
+		const { top: visTop, bottom: visBottom, left: visLeft, right: visRight } = box;
+		const isRtl = !!this.#$.options.get('_rtl');
+		const strip = (isRow ? this.rowStrip : this.columnStrip).form;
+
+		if (isRow) {
+			strip.style.height = `${visBottom - visTop}px`;
+			ctx.boxStart = visTop;
+			this.#setGrip(true, ctx);
+			return { left: isRtl ? visRight : visLeft - HANDLE_HIT_SIZE, top: visTop };
+		}
+
+		const boxLeft = isRtl ? visLeft : visLeft - HANDLE_HIT_SIZE;
+		strip.style.width = `${(isRtl ? visRight + HANDLE_HIT_SIZE : visRight) - boxLeft}px`;
+		ctx.boxStart = boxLeft;
+		this.#setGrip(false, ctx);
+		return { left: boxLeft, top: visTop - HANDLE_HIT_SIZE };
+	}
+
+	/**
+	 * @description The table's visible box inside its figure (wrapper-local).
+	 * @param {?HTMLTableElement} table Target table
+	 * @returns {?{top: number, bottom: number, left: number, right: number}} `null` while out of the figure's view
+	 */
+	#visibleBox(table) {
+		const figure = /** @type {HTMLElement} */ (dom.query.getParentElement(table, dom.check.isFigure));
+		if (!table?.isConnected || !figure) return null;
+
+		const tableOffset = this.#$.offset.getLocal(table);
+		const figureOffset = this.#$.offset.getLocal(figure);
+		// clientWidth/Height 0 (jsdom, unrendered) means "no viewport", not "empty"
+		const viewRight = figure.clientWidth ? figureOffset.left + figure.clientWidth : Infinity;
+		const viewBottom = figure.clientHeight ? figureOffset.top + figure.clientHeight : Infinity;
+
+		const top = Math.max(tableOffset.top, figureOffset.top);
+		const bottom = Math.min(tableOffset.top + table.offsetHeight, viewBottom);
+		const left = Math.max(tableOffset.left, figureOffset.left);
+		const right = Math.min(tableOffset.left + table.offsetWidth, viewRight);
+		if (bottom - top <= 0 || right - left <= 0) return null;
+
+		return { top, bottom, left, right };
+	}
+
+	/**
+	 * @description Shows (opens on the cell) or hides (closes) a strip.
+	 * @param {boolean} isRow `true` for the row strip
+	 * @param {HTMLTableCellElement} cell The hovered cell
+	 * @param {boolean} visible Whether to show it
+	 */
+	#toggleStrip(isRow, cell, visible) {
+		const strip = isRow ? this.rowStrip : this.columnStrip;
+		if (visible) strip.open(cell);
+		else strip.close();
 	}
 
 	get #reorder() {
@@ -130,59 +221,34 @@ export class TableHandleService {
 			return;
 		}
 
-		const rowHandle = this.#element(Constants.MOVE_HANDLE_ROW_CLASS);
-		const columnHandle = this.#element(Constants.MOVE_HANDLE_COLUMN_CLASS);
-		if (!rowHandle || !columnHandle) return;
+		const rowHandle = this.rowStrip.form;
+		const columnHandle = this.columnStrip.form;
 
 		const row = /** @type {HTMLTableRowElement} */ (cell.parentElement);
-		const tableOffset = this.#$.offset.getLocal(table);
-		const figureOffset = this.#$.offset.getLocal(figure);
-		// clientWidth/Height 0 (jsdom, unrendered) means "no viewport", not "empty"
-		const viewRight = figure.clientWidth ? figureOffset.left + figure.clientWidth : Infinity;
-		const viewBottom = figure.clientHeight ? figureOffset.top + figure.clientHeight : Infinity;
-
-		// the table's visible box inside the figure
-		const visTop = Math.max(tableOffset.top, figureOffset.top);
-		const visBottom = Math.min(tableOffset.top + table.offsetHeight, viewBottom);
-		const visLeft = Math.max(tableOffset.left, figureOffset.left);
-		const visRight = Math.min(tableOffset.left + table.offsetWidth, viewRight);
-		if (visBottom - visTop <= 0 || visRight - visLeft <= 0) {
-			this.hide();
-			return;
-		}
-
-		const isRtl = !!this.#$.options.get('_rtl');
 		const pinned = this.#pinHolds(table, rowHandle, columnHandle);
 		const rowActive = dom.utils.hasClass(rowHandle, 'active');
-
-		// row handle - full-height strip on the left edge (right in RTL)
-		rowHandle.style.top = `${visTop}px`;
-		rowHandle.style.height = `${visBottom - visTop}px`;
-		rowHandle.style.left = `${isRtl ? visRight : visLeft - HANDLE_HIT_SIZE}px`;
-		rowHandle.style.display = pinned && !rowActive ? 'none' : 'block';
 
 		this.#rowCtx = {
 			table,
 			band: pinned && this.#rowCtx ? this.#rowCtx.band : this.#reorder.getBand(table, row.rowIndex, true),
-			boxStart: visTop,
+			boxStart: this.#rowCtx?.boxStart ?? 0,
 		};
-		this.#setGrip(true, this.#rowCtx);
-
-		// column handle - full-width strip on the top edge, extended over the row handle's corner
-		const boxLeft = isRtl ? visLeft : visLeft - HANDLE_HIT_SIZE;
-		columnHandle.style.left = `${boxLeft}px`;
-		columnHandle.style.width = `${(isRtl ? visRight + HANDLE_HIT_SIZE : visRight) - boxLeft}px`;
-		columnHandle.style.top = `${visTop - HANDLE_HIT_SIZE}px`;
-		columnHandle.style.display = pinned && rowActive ? 'none' : 'block';
 		this.#colCtx = {
 			table,
 			band:
 				pinned && this.#colCtx
 					? this.#colCtx.band
 					: this.#reorder.getBand(table, GetLogicalCellIndex(table, row.rowIndex, cell.cellIndex), false),
-			boxStart: boxLeft,
+			boxStart: this.#colCtx?.boxStart ?? 0,
 		};
-		this.#setGrip(false, this.#colCtx);
+
+		this.#refreshBox = { table, box: this.#visibleBox(table) };
+		try {
+			this.#toggleStrip(true, cell, !(pinned && !rowActive));
+			this.#toggleStrip(false, cell, !(pinned && rowActive));
+		} finally {
+			this.#refreshBox = null;
+		}
 
 		this.#lastCell = cell;
 		this.#cancelScheduledHide();
@@ -209,36 +275,51 @@ export class TableHandleService {
 
 	/**
 	 * @description Whether a handle is pinned (`active`) on a still-connected table.
-	 * - Pointer-driven hides are ignored while pinned; explicit hides (click, scroll) are not.
+	 * @returns {boolean}
+	 */
+	isPinned() {
+		return this.#isPinned();
+	}
+
+	/**
+	 * @description Whether a handle is pinned (`active`) on a still-connected table.
+	 * - Pointer-driven hides are ignored while pinned; explicit hides (click) are not.
+	 * - A scroll repositions the pinned strips (and the menu on the grip) instead of hiding them.
 	 * @returns {boolean}
 	 */
 	#isPinned() {
 		const table = (this.#rowCtx || this.#colCtx)?.table;
 		if (!table || !table.isConnected) return false;
 
-		const rowHandle = this.#element(Constants.MOVE_HANDLE_ROW_CLASS);
-		const columnHandle = this.#element(Constants.MOVE_HANDLE_COLUMN_CLASS);
-
-		return Boolean(
-			(rowHandle && dom.utils.hasClass(rowHandle, 'active')) ||
-				(columnHandle && dom.utils.hasClass(columnHandle, 'active')),
-		);
+		return this.#pinnedAxis() !== null;
 	}
 
 	/**
 	 * @description Positions the grip pill over the context's band (clipped by the strip).
+	 * - The grip's band box is hidden while it lies entirely outside the strip.
 	 * @param {boolean} isRow `true` for the row handle
 	 * @param {{table: HTMLTableElement, band: {start: number, end: number}, boxStart: number}} ctx Handle context
 	 */
 	#setGrip(isRow, ctx) {
-		const handle = this.#element(isRow ? Constants.MOVE_HANDLE_ROW_CLASS : Constants.MOVE_HANDLE_COLUMN_CLASS);
-		if (!handle) return;
-
+		const handle = this.#strip(isRow).form;
 		const span = this.#bandLocalSpan(ctx.table, ctx.band, isRow);
 		if (!span) return;
 
-		handle.style.setProperty('--se-table-grip-start', `${span.start - ctx.boxStart}px`);
+		const start = span.start - ctx.boxStart;
+		handle.style.setProperty('--se-table-grip-start', `${start}px`);
 		handle.style.setProperty('--se-table-grip-size', `${span.size}px`);
+
+		const stripSize = numbers.get(isRow ? handle.style.height : handle.style.width, 0);
+		this.#grip(isRow).style.display = start + span.size > 0 && start < stripSize ? '' : 'none';
+	}
+
+	/**
+	 * @description The grip band box of a handle.
+	 * @param {boolean} isRow `true` for the row handle
+	 * @returns {HTMLElement}
+	 */
+	#grip(isRow) {
+		return this.#strip(isRow).form.querySelector(Constants.MOVE_GRIP_CLASS);
 	}
 
 	/**
@@ -345,16 +426,12 @@ export class TableHandleService {
 		if (this.#moving) return;
 		this.#cancelScheduledHide();
 
-		const rowHandle = this.#element(Constants.MOVE_HANDLE_ROW_CLASS);
-		const columnHandle = this.#element(Constants.MOVE_HANDLE_COLUMN_CLASS);
 		// unpinning always drops the pinned band selection with it
-		const wasPinned =
-			(rowHandle && dom.utils.hasClass(rowHandle, 'active')) ||
-			(columnHandle && dom.utils.hasClass(columnHandle, 'active'));
+		const wasPinned = this.#pinnedAxis() !== null;
 
-		if (rowHandle) rowHandle.style.display = 'none';
-		if (columnHandle) columnHandle.style.display = 'none';
-		dom.utils.removeClass([rowHandle, columnHandle], 'active');
+		this.rowStrip.close();
+		this.columnStrip.close();
+		dom.utils.removeClass([this.rowStrip.form, this.columnStrip.form], 'active');
 
 		this.#rowCtx = null;
 		this.#colCtx = null;
@@ -435,12 +512,8 @@ export class TableHandleService {
 	 * @returns {?boolean}
 	 */
 	#pinnedAxis() {
-		const rowHandle = this.#element(Constants.MOVE_HANDLE_ROW_CLASS);
-		if (rowHandle && dom.utils.hasClass(rowHandle, 'active')) return true;
-
-		const columnHandle = this.#element(Constants.MOVE_HANDLE_COLUMN_CLASS);
-		if (columnHandle && dom.utils.hasClass(columnHandle, 'active')) return false;
-
+		if (dom.utils.hasClass(this.rowStrip.form, 'active')) return true;
+		if (dom.utils.hasClass(this.columnStrip.form, 'active')) return false;
 		return null;
 	}
 
@@ -476,10 +549,7 @@ export class TableHandleService {
 		const cell = this.#main.state.selectedCells?.[0];
 		if (!cell || !cell.isConnected) {
 			this.#removePinKeydown();
-			dom.utils.removeClass(
-				[this.#element(Constants.MOVE_HANDLE_ROW_CLASS), this.#element(Constants.MOVE_HANDLE_COLUMN_CLASS)],
-				'active',
-			);
+			dom.utils.removeClass([this.rowStrip.form, this.columnStrip.form], 'active');
 			this.#clearBandSelection();
 			this.hide();
 			this.#main.dotService.showTableDot();
@@ -523,8 +593,7 @@ export class TableHandleService {
 		_w.setTimeout(() => {
 			if (!this.#isPinned()) return;
 
-			const rowHandle = this.#element(Constants.MOVE_HANDLE_ROW_CLASS);
-			const isRow = !!(rowHandle && dom.utils.hasClass(rowHandle, 'active'));
+			const isRow = this.#pinnedAxis() === true;
 			const ctx = isRow ? this.#rowCtx : this.#colCtx;
 			if (ctx) this.#selectBandCells(ctx.table, ctx.band, isRow);
 		}, 0);
@@ -552,10 +621,13 @@ export class TableHandleService {
 	}
 
 	/**
-	 * @description Repositions visible handles after a figure scroll (one update per frame).
+	 * @description Re-places the strips after a scroll inside the content (one update per frame)
+	 * @param {Event} event The scroll event
+	 * @param {HTMLElement} wysiwyg The wysiwyg of the root the listener belongs to
 	 */
-	#OnFigureScroll() {
+	#OnFigureScroll(event, wysiwyg) {
 		if (this.#moving || this.#scrollRafId !== null) return;
+		if (dom.query.getEventTarget(event) === wysiwyg || wysiwyg !== this.#$.frameContext.get('wysiwyg')) return;
 
 		this.#scrollRafId = _w.requestAnimationFrame(() => {
 			this.#scrollRafId = null;
@@ -565,7 +637,8 @@ export class TableHandleService {
 				this.hide();
 				return;
 			}
-			this.refresh(cell);
+			if (this.rowStrip.isOpen) this.rowStrip.resetPosition();
+			if (this.columnStrip.isOpen) this.columnStrip.resetPosition();
 		});
 	}
 
@@ -586,15 +659,14 @@ export class TableHandleService {
 		const ctx = isRow ? this.#rowCtx : this.#colCtx;
 		if (!ctx) return;
 
-		const pressed = this.#element(isRow ? Constants.MOVE_HANDLE_ROW_CLASS : Constants.MOVE_HANDLE_COLUMN_CLASS);
-		const sibling = this.#element(isRow ? Constants.MOVE_HANDLE_COLUMN_CLASS : Constants.MOVE_HANDLE_ROW_CLASS);
+		const pressed = this.#strip(isRow).form;
+		const sibling = this.#strip(!isRow).form;
 
 		// snap the band to the pressed point (hover-follow is off while pinned)
 		const point = this.#toFrameCoords(event.clientX, event.clientY);
 		const band = this.#bandFromPoint(ctx.table, isRow ? point.y : point.x, isRow);
 		// pressing the already-pinned band again releases the pin (on mouseup, unless dragged)
 		const toggleOff =
-			!!pressed &&
 			dom.utils.hasClass(pressed, 'active') &&
 			(!band || (band.start === ctx.band.start && band.end === ctx.band.end));
 		if (band) {
@@ -603,12 +675,9 @@ export class TableHandleService {
 		}
 
 		this.#selectBandCells(ctx.table, ctx.band, isRow);
-		if (sibling) {
-			dom.utils.removeClass(sibling, 'active');
-			sibling.style.display = 'none';
-		}
-		if (pressed) dom.utils.addClass(pressed, 'active');
-		this.#$.ui.onControllerTriggerContext();
+		dom.utils.removeClass(sibling, 'active');
+		this.#strip(!isRow).close();
+		dom.utils.addClass(pressed, 'active');
 		this.#pinKeydownEvent ??= this.#$.eventManager.addGlobalEvent('keydown', this.#OnPinKeyDown.bind(this), false);
 
 		const drops = this.#collectDrops(ctx.table, ctx.band, isRow);
@@ -633,10 +702,7 @@ export class TableHandleService {
 		this.#moving = true;
 		this.#drag = { table: ctx.table, band: ctx.band, isRow, drops, range, chosen: null, toggleOff };
 
-		dom.utils.addClass(
-			this.#element(isRow ? Constants.MOVE_HANDLE_ROW_CLASS : Constants.MOVE_HANDLE_COLUMN_CLASS),
-			'se-dragging',
-		);
+		dom.utils.addClass(this.#strip(isRow).form, 'se-dragging');
 
 		// yellow overlay on the grabbed band
 		const source = this.#element(Constants.MOVE_BAND_SOURCE_CLASS);
@@ -657,6 +723,7 @@ export class TableHandleService {
 		}
 
 		this.#main.resizeService.offResizeGuide();
+		this.#$.store.set('_preventBlur', true);
 		this.#main._editorEnable(false);
 		this.#$.ui.enableBackWrapper('grabbing');
 
@@ -729,7 +796,6 @@ export class TableHandleService {
 
 	/**
 	 * @description Drops the grabbed band on the chosen boundary and selects it at its new position.
-	 * - While the pin stays, only the pinned axis' strip remains; releasing it restores both.
 	 */
 	#OnDragEnd() {
 		const drag = this.#drag;
@@ -744,12 +810,15 @@ export class TableHandleService {
 		}
 
 		if (this.#reorder.move(drag.table, drag.band, drag.chosen, drag.isRow)) {
+			this.#releaseActive(drag.isRow, true);
 			const newBand = this.#selectMovedBand(drag.table, drag.band, drag.chosen, drag.isRow);
 			const ctx = drag.isRow ? this.#rowCtx : this.#colCtx;
 			if (ctx) {
 				ctx.band = newBand;
 				this.#setGrip(drag.isRow, ctx);
 			}
+			this.#main.cellService.setMergeSplitButton();
+			this.#main.selectionService.showSelection();
 		}
 	}
 
@@ -804,17 +873,17 @@ export class TableHandleService {
 	/**
 	 * @description Releases the pinned state — active class off, band selection cleared.
 	 * @param {boolean} isRow `true` for the row handle
+	 * @param {boolean} [keepSelection=false] Keep the band selection (the caller shows it as a cell selection)
 	 */
-	#releaseActive(isRow) {
+	#releaseActive(isRow, keepSelection = false) {
 		this.#removePinKeydown();
 		this.#removePinUp();
 		this.#main.gridService.closeMenus();
 
-		const handle = this.#element(isRow ? Constants.MOVE_HANDLE_ROW_CLASS : Constants.MOVE_HANDLE_COLUMN_CLASS);
-		if (handle) dom.utils.removeClass(handle, 'active');
+		dom.utils.removeClass(this.#strip(isRow).form, 'active');
 
-		const sibling = this.#element(isRow ? Constants.MOVE_HANDLE_COLUMN_CLASS : Constants.MOVE_HANDLE_ROW_CLASS);
-		if (sibling && this.#rowCtx && this.#colCtx) sibling.style.display = 'block';
+		if (this.#lastCell && this.#rowCtx && this.#colCtx) this.#toggleStrip(!isRow, this.#lastCell, true);
+		if (keepSelection) return;
 
 		this.#clearBandSelection();
 		this.#main.dotService.showTableDot();
@@ -828,17 +897,9 @@ export class TableHandleService {
 	 */
 	#openPinMenu(isRow) {
 		const ctx = isRow ? this.#rowCtx : this.#colCtx;
-		const handle = this.#element(isRow ? Constants.MOVE_HANDLE_ROW_CLASS : Constants.MOVE_HANDLE_COLUMN_CLASS);
-		if (!ctx || !handle) return;
+		if (!ctx) return;
 
-		const handleRect = handle.getBoundingClientRect();
-		const gripStart = numbers.get(handle.style.getPropertyValue('--se-table-grip-start'), -1) || 0;
-		const gripSize = numbers.get(handle.style.getPropertyValue('--se-table-grip-size'), -1) || 0;
-		const rect = isRow
-			? { left: handleRect.left, top: handleRect.top + gripStart, width: handleRect.width, height: gripSize }
-			: { left: handleRect.left + gripStart, top: handleRect.top, width: gripSize, height: handleRect.height };
-
-		this.#main.gridService[isRow ? 'openRowMenuForHandle' : 'openColumnMenuForHandle'](rect);
+		this.#main.gridService[isRow ? 'openRowMenuForHandle' : 'openColumnMenuForHandle'](this.#grip(isRow));
 	}
 
 	/**
@@ -848,8 +909,7 @@ export class TableHandleService {
 	#OnPinKeyDown(event) {
 		if (this.#moving || !keyCodeMap.isEsc(event.code)) return;
 
-		const rowHandle = this.#element(Constants.MOVE_HANDLE_ROW_CLASS);
-		this.#releaseActive(!!(rowHandle && dom.utils.hasClass(rowHandle, 'active')));
+		this.#releaseActive(this.#pinnedAxis() === true);
 	}
 
 	/**
@@ -870,7 +930,6 @@ export class TableHandleService {
 	 * @description Clears the band selection — styles and the selection state.
 	 */
 	#clearBandSelection() {
-		this.#$.ui.offControllerTriggerContext();
 		this.#main.selectionService.deleteStyleSelectedCells();
 		this.#main.setState('selectedCells', null);
 		this.#main.setState('fixedCell', null);
@@ -909,10 +968,7 @@ export class TableHandleService {
 		if (source) source.style.display = 'none';
 		const target = this.#element(Constants.MOVE_BAND_TARGET_CLASS);
 		if (target) target.style.display = 'none';
-		dom.utils.removeClass(
-			[this.#element(Constants.MOVE_HANDLE_ROW_CLASS), this.#element(Constants.MOVE_HANDLE_COLUMN_CLASS)],
-			'se-dragging',
-		);
+		dom.utils.removeClass([this.rowStrip.form, this.columnStrip.form], 'se-dragging');
 	}
 
 	/**
@@ -992,8 +1048,17 @@ export class TableHandleService {
 	}
 
 	/**
-	 * @description The current root's handle/overlay element.
-	 * @param {string} selector Class selector from `table.constants`
+	 * @description A move-handle strip (one per editor).
+	 * @param {boolean} isRow `true` for the row strip
+	 * @returns {SunEditor.Module.Controller.Instance}
+	 */
+	#strip(isRow) {
+		return isRow ? this.rowStrip : this.columnStrip;
+	}
+
+	/**
+	 * @description The current root's band overlay element.
+	 * @param {string} selector `MOVE_BAND_SOURCE_CLASS` / `MOVE_BAND_TARGET_CLASS` from `table.constants`
 	 * @returns {?HTMLElement}
 	 */
 	#element(selector) {

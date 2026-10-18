@@ -7,6 +7,10 @@ import TableReorderService from '../../../../../../src/plugins/dropdown/table/se
 
 const captured = { column: null, row: null };
 
+jest.mock('../../../../../../src/modules/contract', () => ({
+	Controller: jest.fn().mockImplementation((host, $, form) => ({ open: jest.fn(), close: jest.fn(), isOpen: false, form })),
+}));
+
 jest.mock('../../../../../../src/modules/ui', () => ({
 	SelectMenu: jest.fn().mockImplementation(() => ({
 		on(_ref, selectMethod) {
@@ -53,7 +57,8 @@ function setup(rowCount = 3, colCount = 3) {
 		state: { tdElement: null },
 		$: { lang: {}, icons: {}, contextProvider: { carrierWrapper: document.createElement('div') } },
 		historyPush: jest.fn(),
-		handleService: { repinFromSelection: jest.fn() },
+		handleService: { repinFromSelection: jest.fn(), rowStrip: { strip: 'row' }, columnStrip: { strip: 'column' } },
+		styleService: { openCellProps: jest.fn() },
 	};
 	main.reorderService = new TableReorderService(main);
 
@@ -76,6 +81,66 @@ function setup(rowCount = 3, colCount = 3) {
 const disabled = (menu, i) => menu.menus[i].classList.contains('se-select-disabled');
 const MOVE_BACK = 2; // move-up / move-left (controller menus carry no cell-context items)
 const MOVE_FWD = 3; // move-down / move-right
+
+describe('TableGridService - handle menu host', () => {
+	const { Controller } = require('../../../../../../src/modules/contract');
+	/** The row/column menu hosts of the last `setup()` (created row first). */
+	const hosts = () => ({ row: Controller.mock.results.at(-2).value, column: Controller.mock.results.at(-1).value });
+
+	/** A grip band box with a fixed width. */
+	const makeGrip = (width) => {
+		const grip = document.createElement('div');
+		Object.defineProperty(grip, 'offsetWidth', { value: width });
+		return grip;
+	};
+
+	it("hosts each handle menu in a controller that is its strip's child popup (closing never deselects)", () => {
+		const { main } = setup();
+		const [rowCall, columnCall] = Controller.mock.calls.slice(-2);
+		expect(rowCall[3].parents).toEqual([main.handleService.rowStrip]);
+		expect(columnCall[3].parents).toEqual([main.handleService.columnStrip]);
+		expect(rowCall[3].position).toBe('bottom');
+	});
+
+	it('opens the host on the grip, centered, before the menu', () => {
+		const { grid, focus } = setup();
+		focus(1, 1);
+		const { row } = hosts();
+		const grip = makeGrip(24);
+
+		grid.openRowMenuForHandle(grip);
+
+		expect(row.open).toHaveBeenCalledWith(grip, null, expect.objectContaining({ addOffset: { left: 12 } }));
+		expect(grid.selectMenu_row_handle.open).toHaveBeenCalled();
+		expect(row.open.mock.invocationCallOrder[0]).toBeLessThan(
+			grid.selectMenu_row_handle.open.mock.invocationCallOrder[0],
+		);
+	});
+
+	it('closeMenus closes the open menu and both hosts', () => {
+		const { grid } = setup();
+		const { row, column } = hosts();
+		grid.selectMenu_column_handle.isOpen = true;
+
+		grid.closeMenus();
+
+		expect(grid.selectMenu_column_handle.close).toHaveBeenCalled();
+		expect(row.close).toHaveBeenCalled();
+		expect(column.close).toHaveBeenCalled();
+	});
+
+	it('opens cell properties on the grip the menu was opened from', () => {
+		const { grid, main, focus } = setup();
+		focus(1, 1);
+		const grip = makeGrip(30);
+		grid.openColumnMenuForHandle(grip);
+
+		grid.selectMenu_column_handle.isOpen = true;
+		grid.selectMenu_column_handle.selectMethod('cell-properties');
+
+		expect(main.styleService.openCellProps).toHaveBeenCalledWith(grip, { selfTarget: true });
+	});
+});
 
 describe('TableGridService - move menu state', () => {
 	it('dismisses the handle menus and re-aims the pin when a handle-menu action runs', () => {

@@ -10,6 +10,16 @@ export class TableHandleService {
 	 */
 	constructor(main: import('../index').default);
 	/**
+	 * @description The row strip
+	 * @type {SunEditor.Module.Controller.Instance}
+	 */
+	rowStrip: SunEditor.Module.Controller.Instance;
+	/**
+	 * @description The column strip
+	 * @type {SunEditor.Module.Controller.Instance}
+	 */
+	columnStrip: SunEditor.Module.Controller.Instance;
+	/**
 	 * @description Whether a handle drag is in progress.
 	 * @returns {boolean}
 	 */
@@ -20,6 +30,11 @@ export class TableHandleService {
 	 * @param {?HTMLTableCellElement} cell The hovered table cell (non-cells are ignored).
 	 */
 	refresh(cell: HTMLTableCellElement | null): void;
+	/**
+	 * @description Whether a handle is pinned (`active`) on a still-connected table.
+	 * @returns {boolean}
+	 */
+	isPinned(): boolean;
 	/**
 	 * @description Hides both handles. No-op while a drag is in progress.
 	 */
