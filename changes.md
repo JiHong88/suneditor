@@ -30,3 +30,4 @@
 - SelectMenu no longer mistakes a DOM-node item for a submenu config — a node item with child elements (e.g. a heading in the anchor bookmark list) was rendered as a broken submenu instead of a plain row (`modules/ui/SelectMenu`)
 - Fixed document-type page indicator drifting out of sync with the scroll position — page offsets accumulated an error on scroll and the current-page detection used stale positions (`core/section/documentType`)
 - Fixed the French translation of `resize` (was Czech text) (`langs/fr`, #1692)
+- Fixed the HTML sanitizer keeping `javascript:` and other non-whitelisted URLs in the `poster` attribute of `<video>` — URL protocol checks only covered `href` and `src`. They now also cover `poster`, `xlink:href`, `background`, `cite`, `action` and `formaction` (`core/logic/dom/html`)
