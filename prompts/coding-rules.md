@@ -222,6 +222,10 @@ with host-window coordinates when the event/target is inside an iframe.
 - Shared offset/selection services use the active frame. Verify target ownership, especially
   after deferred work or a root switch. Keep geometry reads together and invalidate caches
   on relevant scroll, resize, content, direction and frame changes.
+- Measure an element only while it and its container are displayed: a hidden menu/tray reads
+  `0` height, and a direction or flip decision made from it is silently wrong (bottom-toolbar
+  dropdowns opened downward over their button). Show it first (`visibility: hidden` if needed),
+  then measure and place.
 
 ### RTL and horizontal behavior
 
