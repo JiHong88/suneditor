@@ -1203,7 +1203,6 @@
 
 /* button group */
 .sun-editor .se-btn-module-border {
-	border: 1px solid var(--se-main-divider-color);
 	border: none;
 	border-radius: var(--se-border-radius);
 	margin-left: 1px;
