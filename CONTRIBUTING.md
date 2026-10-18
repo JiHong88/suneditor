@@ -33,6 +33,28 @@ Node.js **v22 recommended**, minimum **v14+** is required to build and test.
 
 ---
 
+## 🌱 Finding Something to Work On
+
+| Label              | Meaning                                                             |
+| ------------------ | ------------------------------------------------------------------- |
+| `good first issue` | Small, well-scoped task with the files and tests already identified |
+| `help wanted`      | Accepted work the maintainer would welcome a PR for                 |
+| `docs`             | README, guides, JSDoc                                               |
+| `tests`            | Missing or flaky test coverage                                      |
+| `plugin`           | A plugin's behavior or a new plugin                                 |
+| `framework`        | React / Vue / Angular / Svelte / SSR integration                    |
+| `translation`      | `src/langs/` locale updates                                         |
+
+A `good first issue` should be finishable without knowing the whole codebase. When filing or labeling one, include:
+
+- **Related files** — where the change goes
+- **Expected result** — what should happen after the fix
+- **Test location** — the existing spec to extend (e.g. `test/integration/...`)
+- **Implementation hint** — the function or pattern to start from
+- **Done when** — the concrete acceptance check
+
+---
+
 ## 🤝 How to Contribute
 
 We welcome code contributions, bug reports, documentation improvements, or plugin ideas!
@@ -66,6 +88,18 @@ SunEditor supports a modular plugin architecture where features can be enabled/d
     - Implement required methods (`action()`, `open()`, etc.)
     - Add static properties (`key`, `type`, `className`)
     - Export and register in options
+
+### Publishing a Community Plugin
+
+Plugins don't need to live in this repository. To publish your own:
+
+- Name the package **`suneditor-plugin-<name>`** (e.g. `suneditor-plugin-mermaid`, `suneditor-plugin-ai-command`),
+  or **`@<your-scope>/suneditor-plugin-<name>`** under your own npm scope
+- The **`@suneditor/*`** scope is reserved for official packages published by the
+  [suneditor](https://github.com/suneditor) organization (framework adapters, official plugins)
+- Add the `suneditor` and `suneditor-plugin` keywords to its `package.json`
+- Declare `suneditor` as a `peerDependency` (e.g. `"suneditor": "^3.0.0"`) and import base classes from `suneditor/interfaces`
+- Share it in [Discussions → Show and tell](https://github.com/JiHong88/SunEditor/discussions/categories/show-and-tell)
 
 ---
 

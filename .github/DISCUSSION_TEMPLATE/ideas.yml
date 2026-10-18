@@ -1,0 +1,13 @@
+body:
+    - type: textarea
+      id: idea
+      attributes:
+          label: Idea
+          description: What would you like SunEditor to do, and why?
+      validations:
+          required: true
+    - type: textarea
+      id: use-case
+      attributes:
+          label: Use case
+          description: Where would you use it (CMS, admin, email, ...)? Could it be a plugin?

@@ -1,0 +1,76 @@
+name: Bug report
+description: Something in SunEditor does not work as expected
+labels: ['bug']
+body:
+    - type: markdown
+      attributes:
+          value: |
+              Thanks for reporting! A **minimal reproduction** is the fastest way to a fix.
+              Configure the editor at the [Playground](https://suneditor.com/playground) and paste the URL — it preserves your settings.
+              Questions and usage help belong in [Discussions → Q&A](https://github.com/JiHong88/SunEditor/discussions/categories/q-a).
+              **Security issues:** do not file them here — see the [Security Policy](https://github.com/JiHong88/SunEditor/security/policy).
+    - type: input
+      id: version
+      attributes:
+          label: SunEditor version
+          placeholder: e.g. 3.3.3
+      validations:
+          required: true
+    - type: dropdown
+      id: framework
+      attributes:
+          label: Framework
+          options:
+              - Vanilla JS / CDN
+              - React
+              - Vue
+              - Angular
+              - Svelte
+              - Next.js / Nuxt (SSR)
+              - Other
+      validations:
+          required: true
+    - type: input
+      id: browser
+      attributes:
+          label: Browser and version
+          placeholder: e.g. Chrome 130, Safari 18.1 (iOS)
+      validations:
+          required: true
+    - type: input
+      id: os
+      attributes:
+          label: OS / device
+          placeholder: e.g. macOS 15, Windows 11, iPhone 15 (iOS 18)
+      validations:
+          required: true
+    - type: input
+      id: playground
+      attributes:
+          label: Playground URL or online reproduction
+          description: Playground URL, CodeSandbox, StackBlitz or a minimal HTML file.
+          placeholder: https://suneditor.com/playground?...
+    - type: textarea
+      id: reproduction
+      attributes:
+          label: Steps to reproduce
+          description: Include the editor options and the HTML content if they matter.
+          placeholder: |
+              1. Set the content to `<p>...</p>`
+              2. Place the cursor ...
+              3. Press ...
+      validations:
+          required: true
+    - type: textarea
+      id: expected
+      attributes:
+          label: Expected behavior
+      validations:
+          required: true
+    - type: textarea
+      id: actual
+      attributes:
+          label: Actual behavior
+          description: Screenshots, recordings and console errors help.
+      validations:
+          required: true
