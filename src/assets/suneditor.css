@@ -1203,7 +1203,6 @@
 
 /* button group */
 .sun-editor .se-btn-module-border {
-	border: 1px solid var(--se-main-divider-color);
 	border: none;
 	border-radius: var(--se-border-radius);
 	margin-left: 1px;
@@ -1765,12 +1764,22 @@
 		5px 0 0 currentColor;
 }
 
-/* table move - invisible anchor the pin menu opens from */
-.sun-editor .se-table-move-menu-anchor {
+/* table move - the grip's band box */
+.sun-editor .se-table-move-grip {
 	position: absolute;
-	left: -10000px;
 	pointer-events: none;
-	background: transparent;
+}
+.sun-editor .se-table-move-handle-row .se-table-move-grip {
+	left: 0;
+	right: 0;
+	top: var(--se-table-grip-start, 0px);
+	height: var(--se-table-grip-size, 0px);
+}
+.sun-editor .se-table-move-handle-column .se-table-move-grip {
+	top: 0;
+	bottom: 0;
+	left: var(--se-table-grip-start, 0px);
+	width: var(--se-table-grip-size, 0px);
 }
 
 /* table move - band overlays */
@@ -1782,12 +1791,13 @@
 	z-index: 2;
 }
 .sun-editor .se-table-move-band-source {
-	background-color: var(--se-table-move-source-color);
-	opacity: 0.2;
+	background-color: color-mix(in srgb, var(--se-table-move-source-color) 14%, transparent);
+	outline: 1px dashed var(--se-table-move-source-color);
+	outline-offset: -1px;
 }
 .sun-editor .se-table-move-band-target {
-	background-color: var(--se-table-move-target-color);
-	opacity: 0.25;
+	background-color: color-mix(in srgb, var(--se-table-move-target-color) 12%, transparent);
+	box-shadow: inset 0 0 0 2px var(--se-table-move-target-color);
 }
 
 /* table controller dot launchers */

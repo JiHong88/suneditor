@@ -59,6 +59,10 @@ export class TableSelectionService {
 	 */
 	focusCellEdge(cell: HTMLElement): void;
 	/**
+	 * @description Shows a finished cell selection.
+	 */
+	showSelection(): void;
+	/**
 	 * @description Initialize the selection service (remove global events).
 	 */
 	init(): void;

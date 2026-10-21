@@ -372,9 +372,10 @@ function Constructor(editorTargets, options) {
 	} else {
 		const rootContainer = frameRoots.get(rootId).get('container');
 		if (o.get('_toolbar_bottom')) {
-			const statusbar = rootContainer.querySelector('.se-statusbar');
+			const statusbar = rootContainer.querySelector('.se-status-bar');
 			rootContainer.insertBefore(toolbar, statusbar);
 			if (subbar) rootContainer.insertBefore(subbar, toolbar);
+			rootContainer.insertBefore(rootContainer.querySelector('.se-toolbar-sticky-dummy'), toolbar.nextSibling);
 		} else {
 			rootContainer.insertBefore(toolbar, rootContainer.firstElementChild);
 			if (subbar) rootContainer.insertBefore(subbar, rootContainer.firstElementChild);

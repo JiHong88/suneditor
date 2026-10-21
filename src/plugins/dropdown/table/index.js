@@ -110,18 +110,37 @@ class Table extends PluginDropdownFree {
 		const controller_table = CreateHTML_controller_table(this.$);
 		const controller_cell = CreateHTML_controller_cell(this.$, this.cellControllerPosition);
 
+		this.dotService = new TableDotService(this);
+		const tableParents = this.dotService.tableDot ? [this.dotService.tableDot] : [];
+		const cellParents = this.dotService.cellDot ? [this.dotService.cellDot] : [];
+
 		// members - Controller
 		if (this.cellControllerTop) {
-			this.controller_cell = new Controller(this, this.$, controller_cell.html, { position: 'top' });
-			this.controller_table = new Controller(this, this.$, controller_table, { position: 'top' });
+			this.controller_cell = new Controller(this, this.$, controller_cell.html, {
+				position: 'top',
+				selection: true,
+			});
+			this.controller_table = new Controller(this, this.$, controller_table, {
+				position: 'top',
+				parents: tableParents,
+				selection: true,
+			});
 			if (this.tableControllerPosition === 'table') {
 				this.controller_cell.sibling = this.controller_table.form;
 				this.controller_table.sibling = this.controller_cell.form;
 				this.controller_table.siblingMain = true;
 			}
 		} else {
-			this.controller_table = new Controller(this, this.$, controller_table, { position: 'top' });
-			this.controller_cell = new Controller(this, this.$, controller_cell.html, { position: 'bottom' });
+			this.controller_table = new Controller(this, this.$, controller_table, {
+				position: 'top',
+				parents: tableParents,
+				selection: true,
+			});
+			this.controller_cell = new Controller(this, this.$, controller_cell.html, {
+				position: 'bottom',
+				parents: cellParents,
+				selection: true,
+			});
 		}
 
 		this.figure = new Figure(this, this.$, null, {});
@@ -150,11 +169,10 @@ class Table extends PluginDropdownFree {
 
 		this.cellService = new TableCellService(this, serviceOptions);
 		this.clipboardService = new TableClipboardService(this);
-		this.dotService = new TableDotService(this);
+		this.handleService = new TableHandleService(this);
 		this.gridService = new TableGridService(this, serviceOptions);
 		this.reorderService = new TableReorderService(this);
 		this.resizeService = new TableResizeService(this);
-		this.handleService = new TableHandleService(this);
 		this.selectionService = new TableSelectionService(this);
 		this.styleService = new TableStyleService(this, { pluginOptions, controller_table });
 
@@ -470,7 +488,9 @@ class Table extends PluginDropdownFree {
 		this.setState('ref', null);
 		this.setState('selectedCell', null);
 		this.handleService.hide();
-		this.dotService.hide();
+
+		this.dotService.closeControllers();
+		this.dotService.closeCellDot();
 
 		const eventTarget = dom.query.getEventTarget(event);
 
@@ -633,7 +653,7 @@ class Table extends PluginDropdownFree {
 	 */
 	onScroll() {
 		this.resizeService.offResizeGuide();
-		this.handleService.hide();
+		if (!this.handleService.isPinned()) this.handleService.hide();
 	}
 
 	/**
@@ -887,6 +907,7 @@ class Table extends PluginDropdownFree {
 		this.controller_table.close(true);
 		this.controller_cell.close(true);
 		this.dotService.hide();
+		this.$.component.deselect();
 	}
 
 	/**

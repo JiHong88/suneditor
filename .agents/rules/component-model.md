@@ -30,6 +30,30 @@ while still calling `preventDefault`/`stopPropagation`, so nothing happens and n
 - Figure/file components: controller + handle, owned and opened by the plugin's `componentSelect`.
 - Inline components: zero-width-space anchoring, no line breaker.
 
+## Controller standard — selection UI vs standalone
+
+Every `Controller` is one of two kinds; the component owns the selection either way.
+
+- **Selection UI** (`selection: true`, inherited by `parents` children) — what a component opens from
+  `componentSelect` (figure/table/math/audio/file toolbars, table dots and strips). It never takes the
+  component's global listeners; the component skips keys/copy/clicks whose target is inside an open
+  controller (`ui.isInsideController`). Closing a floating base one deselects; closing a child (or an
+  in-editor `container: 'wrapper'` one, owner-driven) keeps the selection.
+- **Standalone** (default) — no component behind it (link preview, autocomplete, slash menu). It strips the
+  component's listeners while open.
+- **Esc = one level per press.** An open child closes and consumes Esc; a base selection controller lets
+  Esc reach the component, which deselects (one Esc for an image, as before). An open `SelectMenu` is a
+  level too. `escape: 'all'` / `ui.closeAllControllers()` close everything and deselect.
+- **"Esc handled" = `e.defaultPrevented`.** The layer that closes on Esc calls `preventDefault()` (a child
+  controller also stops propagation; a SelectMenu keeps it for the owner's own keydown hooks). Every
+  outer bubble-phase Esc handler (component deselect, Modal close) returns on `e.defaultPrevented`. A new
+  Esc-closing layer needs both sides — the capture-phase controller listener can't be relied on to stop it.
+- **Ask the registry through `ui`** (`isInsideController`, `getControllerAt`, `hasFloatingController`).
+  No whitelists of controller classes, no counting open entries — both broke on every new controller kind.
+- **Scroll keeps a selection session**: a click selection in the root, or a non-passive controller opened in
+  it, survives a wysiwyg scroll; hover selections and other roots' controllers drop
+  (`component.isHoverSelected`). `ui.on/offControllerContext` is deprecated — don't call it.
+
 ## Controllers are plugin-owned
 
 Only a full plugin instance can show a controller (`this.controller.open(...)` from

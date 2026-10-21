@@ -1,0 +1,28 @@
+body:
+    - type: markdown
+      attributes:
+          value: |
+              Share a project, integration or plugin built with SunEditor.
+              Community plugins: publish them as `suneditor-plugin-<name>` (or `@<your-scope>/suneditor-plugin-<name>`) with the `suneditor` and `suneditor-plugin` npm keywords. `@suneditor/*` is reserved for official packages.
+    - type: dropdown
+      id: kind
+      attributes:
+          label: What are you sharing?
+          options:
+              - Project / production use
+              - Plugin
+              - Framework integration
+              - Other
+      validations:
+          required: true
+    - type: input
+      id: link
+      attributes:
+          label: Link
+          description: npm package, repository or live site
+    - type: textarea
+      id: description
+      attributes:
+          label: Description
+      validations:
+          required: true

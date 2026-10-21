@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+    - name: Question / usage help
+      url: https://github.com/JiHong88/SunEditor/discussions/categories/q-a
+      about: Ask how to configure or integrate SunEditor in Discussions Q&A.
+    - name: Report a security vulnerability
+      url: https://github.com/JiHong88/SunEditor/security/advisories/new
+      about: Report vulnerabilities privately. Do not open a public issue.
+    - name: Playground
+      url: https://suneditor.com/playground
+      about: Try options and build a reproduction URL.

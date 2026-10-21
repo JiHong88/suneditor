@@ -86,6 +86,7 @@ function makeHarness(table, { selected = true, rtl = false, iframe = null } = {}
 		lang: { moveRow: 'Move row', moveColumn: 'Move column' },
 		contextProvider: { applyToRoots: (fn) => fn({ get: () => wrapper }) },
 		frameContext: { get: (key) => (key === 'wysiwygFrame' ? frameEl : wrapper) },
+		store: { get: jest.fn(), set: jest.fn() },
 		eventManager: {
 			addEvent: (el, type, fn, opts) => el.addEventListener(type, fn, opts),
 			addGlobalEvent: (type, fn) => {
@@ -107,8 +108,7 @@ function makeHarness(table, { selected = true, rtl = false, iframe = null } = {}
 		ui: {
 			enableBackWrapper: jest.fn(),
 			disableBackWrapper: jest.fn(),
-			onControllerTriggerContext: jest.fn(),
-			offControllerTriggerContext: jest.fn(),
+			opendControllers: [],
 		},
 		options: { get: (key) => (key === '_rtl' ? rtl : false) },
 	};
@@ -128,9 +128,11 @@ function makeHarness(table, { selected = true, rtl = false, iframe = null } = {}
 			openColumnMenuForHandle: jest.fn(),
 		},
 		resizeService: { offResizeGuide: jest.fn() },
+		cellService: { setMergeSplitButton: jest.fn() },
 		selectionService: {
 			selectCells: jest.fn((cells) => ({ fixedCell: cells[0], selectedCell: cells[cells.length - 1] })),
 			deleteStyleSelectedCells: jest.fn(),
+			showSelection: jest.fn(),
 		},
 	};
 	main.reorderService = new TableReorderService(main);
@@ -311,6 +313,92 @@ describe('TableHandleService', () => {
 		});
 	});
 
+	describe('grip band box and controllers anchored to it', () => {
+		const raf = () => new Promise((resolve) => requestAnimationFrame(resolve));
+		const fakeController = (target) => {
+			const form = document.createElement('div');
+			form.style.display = 'block';
+			return { currentPositionTarget: target, form, resetPosition: jest.fn(), hide: jest.fn() };
+		};
+
+		it('each handle carries a grip box; it is hidden while the band lies outside the strip', () => {
+			const table = makeTable([['a1', 'a2'], ['b1', 'b2'], ['c1', 'c2']]);
+			stampLayout(table);
+			const { svc, rowHandle, columnHandle } = makeHarness(table);
+			const rowGrip = rowHandle.querySelector('.se-table-move-grip');
+			expect(rowGrip).not.toBeNull();
+			expect(columnHandle.querySelector('.se-table-move-grip')).not.toBeNull();
+
+			svc.refresh(table.rows[1].cells[0]);
+			expect(rowGrip.style.display).toBe('');
+
+			// the hovered row sits below the strip's visible box
+			table.rows[1].getBoundingClientRect = () => ({ top: ROW_H * 10, bottom: ROW_H * 11 });
+			svc.refresh(table.rows[1].cells[0]);
+			expect(rowGrip.style.display).toBe('none');
+		});
+
+		it('re-anchors controllers on the grip after a scroll, hides them while it is clipped', async () => {
+			const table = makeTable([['a1', 'a2'], ['b1', 'b2'], ['c1', 'c2']]);
+			stampLayout(table);
+			const { svc, main, figure, rowHandle } = makeHarness(table);
+			svc.refresh(table.rows[1].cells[0]);
+
+			const rowGrip = rowHandle.querySelector('.se-table-move-grip');
+			// jsdom has no layout: report the grip rendered unless it is display:none
+			rowGrip.getClientRects = () => (rowGrip.style.display === 'none' ? [] : [{}]);
+			const onGrip = fakeController(rowGrip);
+			const elsewhere = fakeController(document.createElement('div'));
+			main.$.ui.opendControllers.push({ inst: onGrip }, { inst: elsewhere });
+
+			figure.dispatchEvent(new Event('scroll'));
+			await raf();
+			expect(onGrip.resetPosition).toHaveBeenCalledTimes(1);
+			expect(onGrip.hide).not.toHaveBeenCalled();
+			expect(elsewhere.resetPosition).not.toHaveBeenCalled();
+
+			// scrolled far enough that the band leaves the strip
+			table.rows[1].getBoundingClientRect = () => ({ top: ROW_H * 10, bottom: ROW_H * 11 });
+			figure.dispatchEvent(new Event('scroll'));
+			await raf();
+			expect(onGrip.hide).toHaveBeenCalledTimes(1);
+			expect(onGrip.resetPosition).toHaveBeenCalledTimes(1);
+		});
+
+		it("follows only scrolls inside the content — the wysiwyg's own scroll is the core's", async () => {
+			const table = makeTable([['a1', 'a2'], ['b1', 'b2'], ['c1', 'c2']]);
+			stampLayout(table);
+			const { svc, wrapper, figure, rowHandle } = makeHarness(table);
+			svc.refresh(table.rows[1].cells[0]);
+			expect(rowHandle.style.getPropertyValue('--se-table-grip-start')).toBe(`${ROW_H}px`);
+
+			table.rows[1].getBoundingClientRect = () => ({ top: ROW_H - 5, bottom: ROW_H * 2 - 5 });
+
+			// the wysiwyg (here: the harness wrapper) scrolling itself — moved by the core, not re-placed here
+			wrapper.dispatchEvent(new Event('scroll'));
+			await raf();
+			expect(rowHandle.style.getPropertyValue('--se-table-grip-start')).toBe(`${ROW_H}px`);
+
+			// a scroll inside the content (the figure) — re-placed, coalesced into one frame
+			figure.dispatchEvent(new Event('scroll'));
+			figure.dispatchEvent(new Event('scroll'));
+			await raf();
+			expect(rowHandle.style.getPropertyValue('--se-table-grip-start')).toBe(`${ROW_H - 5}px`);
+		});
+
+		it('reports the pin so the plugin keeps it through wysiwyg scrolls', () => {
+			const table = makeTable([['a1', 'a2'], ['b1', 'b2']]);
+			stampLayout(table);
+			const { svc, rowHandle } = makeHarness(table);
+			svc.refresh(table.rows[0].cells[0]);
+			expect(svc.isPinned()).toBe(false);
+
+			rowHandle.dispatchEvent(mouse('mousedown', { button: 0, clientX: 0, clientY: 5 }));
+			document.dispatchEvent(mouse('mouseup'));
+			expect(svc.isPinned()).toBe(true);
+		});
+	});
+
 	describe('grace hide on reset', () => {
 		const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -399,13 +487,8 @@ describe('TableHandleService', () => {
 			pin(svc, table, rowHandle); // click-pin
 
 			expect(main.gridService.openRowMenuForHandle).toHaveBeenCalledTimes(1);
-			const rect = main.gridService.openRowMenuForHandle.mock.calls[0][0];
-			expect(rect).toEqual({
-				left: expect.any(Number),
-				top: expect.any(Number),
-				width: expect.any(Number),
-				height: expect.any(Number),
-			});
+			const grip = main.gridService.openRowMenuForHandle.mock.calls[0][0];
+			expect(grip).toBe(rowHandle.querySelector('.se-table-move-grip'));
 
 			// releasing by re-click closes the menus
 			rowHandle.dispatchEvent(mouse('mousedown', { button: 0, clientX: 0, clientY: 5 }));
@@ -749,7 +832,7 @@ describe('TableHandleService', () => {
 			expect(setTableOrder).toBeLessThan(selectOrder);
 		});
 
-		it('a pin arms the controller trigger context; releasing it disarms and re-shows the table dot', () => {
+		it('releasing a pin re-shows the table dot', () => {
 			const table = makeTable([['a1', 'a2'], ['b1', 'b2']]);
 			stampLayout(table);
 			const { svc, main, rowHandle } = makeHarness(table);
@@ -758,20 +841,17 @@ describe('TableHandleService', () => {
 			rowHandle.dispatchEvent(mouse('mousedown', { button: 0, clientX: 0, clientY: 5 }));
 			document.dispatchEvent(mouse('mouseup'));
 			expect(rowHandle.classList.contains('active')).toBe(true);
-			expect(main.$.ui.onControllerTriggerContext).toHaveBeenCalled();
-			expect(main.$.ui.offControllerTriggerContext).not.toHaveBeenCalled();
 
 			// Escape releases the pin
 			document.dispatchEvent(new KeyboardEvent('keydown', { code: 'Escape' }));
 			expect(rowHandle.classList.contains('active')).toBe(false);
-			expect(main.$.ui.offControllerTriggerContext).toHaveBeenCalled();
 			expect(main.dotService.showTableDot).toHaveBeenCalled();
 		});
 
 		it('selects the moved band at its new position after the drop', () => {
 			const table = makeTable([['a1', 'a2'], ['b1', 'b2'], ['c1', 'c2']]);
 			stampLayout(table);
-			const { svc, main, rowHandle } = makeHarness(table);
+			const { svc, main, rowHandle, columnHandle } = makeHarness(table);
 
 			svc.refresh(table.rows[0].cells[0]);
 			rowHandle.dispatchEvent(mouse('mousedown', { button: 0, clientX: 0, clientY: 5 }));
@@ -784,10 +864,36 @@ describe('TableHandleService', () => {
 			expect(selected).toEqual(['a1', 'a2']);
 			expect(main.setState).toHaveBeenCalledWith('selectedCells', expect.any(Array));
 
-			// strips stay up, active on the pressed handle, grip follows the moved band
+			// the move releases the pin: both strips back, no active grip, grip on the moved band
 			expect(rowHandle.style.display).toBe('block');
-			expect(rowHandle.classList.contains('active')).toBe(true);
+			expect(columnHandle.style.display).toBe('block');
+			expect(rowHandle.classList.contains('active')).toBe(false);
+			expect(svc.isPinned()).toBe(false);
 			expect(rowHandle.style.getPropertyValue('--se-table-grip-start')).toBe(`${ROW_H * 2}px`);
+
+			// the moved band stays selected and is shown like a cell range selection (cell dot included)
+			expect(main.selectionService.deleteStyleSelectedCells).not.toHaveBeenCalled();
+			expect(main.cellService.setMergeSplitButton).toHaveBeenCalled();
+			expect(main.selectionService.showSelection).toHaveBeenCalledTimes(1);
+			expect(main.selectionService.showSelection.mock.invocationCallOrder[0]).toBeGreaterThan(
+				main.selectionService.selectCells.mock.invocationCallOrder.at(-1),
+			);
+			expect(main.gridService.openRowMenuForHandle).not.toHaveBeenCalled();
+		});
+
+		it('follows the hover again after a move — the pin does not hold', () => {
+			const table = makeTable([['a1', 'a2'], ['b1', 'b2'], ['c1', 'c2']]);
+			stampLayout(table);
+			const { svc, rowHandle } = makeHarness(table);
+
+			svc.refresh(table.rows[0].cells[0]);
+			rowHandle.dispatchEvent(mouse('mousedown', { button: 0, clientX: 0, clientY: 5 }));
+			document.dispatchEvent(mouse('mousemove', { clientX: 0, clientY: 55 }));
+			document.dispatchEvent(mouse('mouseup'));
+
+			// hovering the first row moves the grip there (a pin would keep it on the moved band)
+			svc.refresh(table.rows[0].cells[0]);
+			expect(rowHandle.style.getPropertyValue('--se-table-grip-start')).toBe('0px');
 		});
 
 		it('selects the moved column band after the drop', () => {

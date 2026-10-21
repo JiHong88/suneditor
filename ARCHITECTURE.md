@@ -560,7 +560,7 @@ DOM Event → Handler → Reducer → Rules → Action[] → Executor → Effect
 
 ### 3-Stage Event Processing
 
-The diagram below describes hook/effect dispatch, not the complete timing of every DOM handler. Public and plugin hooks may cancel subsequent processing with `false`. In the keydown handler, guards, normalization, shortcuts and action reduction occur before these hooks; the executor follows them. The Enter `beforeinput` route has its own synchronous cancellation path and does not pass through the generic hooks. Read the actual handler before moving any work across an `await`.
+The diagram below describes hook/effect dispatch, not the complete timing of every DOM handler. Public and plugin hooks may cancel subsequent processing with `false`. In the keydown handler, guards, normalization, shortcuts and action reduction occur before these hooks, and the reduced `prevent`/`stop` actions are applied at once (`applyEventControl`) — a `preventDefault()` issued after an `await` can land after the browser's default action. The executor follows the hooks; a hook that cancels skips it, and a key already prevented stays prevented. The Enter `beforeinput` route has its own synchronous cancellation path and does not pass through the generic hooks. Read the actual handler before moving any work across an `await`.
 
 ```
 DOM Event (keydown, input, click, paste, ...)
@@ -593,6 +593,8 @@ DOM Event (keydown, input, click, paste, ...)
 
 ```javascript
 // Guards, normalization, shortcuts and reduceKeydown already ran.
+applyEventControl(actions, event); // prevent/stop now, before the first await
+
 // Stage 1: User event
 if ((await this.$.eventManager.triggerEvent('onKeyDown', { frameContext, event })) === false) return;
 

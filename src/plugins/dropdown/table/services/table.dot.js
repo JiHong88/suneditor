@@ -1,4 +1,5 @@
 import { dom, env } from '../../../../helper';
+import { Controller } from '../../../../modules/contract';
 import * as Constants from '../shared/table.constants';
 
 const { _w } = env;
@@ -20,15 +21,19 @@ export class TableDotService {
 	#main;
 	#$;
 
-	#cellEnabled = false;
-	#tableEnabled = false;
 	#scrollRafId = null;
 
-	#cellDotOn = false;
-	#tableDotOn = false;
+	/**
+	 * @description The cell dot (`null` unless `cellControllerPosition: 'dot'`)
+	 * @type {?SunEditor.Module.Controller.Instance}
+	 */
+	cellDot = null;
 
-	/** @type {WeakMap<HTMLElement, {[selector: string]: HTMLElement}>} */
-	#dots = new WeakMap();
+	/**
+	 * @description The table dot (`null` unless `tableControllerPosition: 'dot'`)
+	 * @type {?SunEditor.Module.Controller.Instance}
+	 */
+	tableDot = null;
 
 	/**
 	 * @param {import('../index').default} main Table index
@@ -36,43 +41,30 @@ export class TableDotService {
 	constructor(main) {
 		this.#main = main;
 		this.#$ = main.$;
-		this.#cellEnabled = main.cellControllerPosition === 'dot';
-		this.#tableEnabled = main.tableControllerPosition === 'dot';
-		if (!this.#cellEnabled && !this.#tableEnabled) return;
 
-		const cellClass = Constants.DOT_CELL_CLASS.replace(/^\./, '');
-		const tableClass = Constants.DOT_TABLE_CLASS.replace(/^\./, '');
+		if (main.cellControllerPosition === 'dot') {
+			this.cellDot = this.#createDot(
+				Constants.DOT_CELL_CLASS,
+				this.#$.lang.cellMenu,
+				this.#OnCellDotClick.bind(this),
+				this.#placeCellDot.bind(this),
+			);
+		}
+
+		if (main.tableControllerPosition === 'dot') {
+			this.tableDot = this.#createDot(
+				Constants.DOT_TABLE_CLASS,
+				this.#$.lang.tableMenu,
+				this.#OnTableDotClick.bind(this),
+				this.#placeTableDot.bind(this),
+			);
+		}
+
+		if (!this.cellDot && !this.tableDot) return;
 
 		this.#$.contextProvider.applyToRoots((e) => {
-			const wrapper = e.get('wrapper');
-			const dots = /** @type {{[selector: string]: HTMLElement}} */ ({});
-			this.#dots.set(wrapper, dots);
-
-			if (this.#cellEnabled) {
-				const cellDot = (dots[Constants.DOT_CELL_CLASS] = dom.utils.createElement('BUTTON', {
-					type: 'button',
-					class: `se-table-dot se-controller-trigger ${cellClass}`,
-					title: this.#$.lang.cellMenu,
-					'aria-label': this.#$.lang.cellMenu,
-				}));
-				wrapper.appendChild(cellDot);
-				this.#$.eventManager.addEvent(cellDot, 'mousedown', OnDotMouseDown);
-				this.#$.eventManager.addEvent(cellDot, 'click', this.#OnCellDotClick.bind(this));
-			}
-
-			if (this.#tableEnabled) {
-				const tableDot = (dots[Constants.DOT_TABLE_CLASS] = dom.utils.createElement('BUTTON', {
-					type: 'button',
-					class: `se-table-dot se-controller-trigger ${tableClass}`,
-					title: this.#$.lang.tableMenu,
-					'aria-label': this.#$.lang.tableMenu,
-				}));
-				wrapper.appendChild(tableDot);
-				this.#$.eventManager.addEvent(tableDot, 'mousedown', OnDotMouseDown);
-				this.#$.eventManager.addEvent(tableDot, 'click', this.#OnTableDotClick.bind(this));
-			}
-
-			this.#$.eventManager.addEvent(e.get('wysiwyg'), 'scroll', this.#OnScroll.bind(this), {
+			const wysiwyg = e.get('wysiwyg');
+			this.#$.eventManager.addEvent(wysiwyg, 'scroll', (event) => this.#OnScroll(event, wysiwyg), {
 				passive: true,
 				capture: true,
 			});
@@ -80,29 +72,138 @@ export class TableDotService {
 	}
 
 	/**
+	 * @description Creates a dot button and its in-editor controller.
+	 * @param {string} selector Dot class selector from `table.constants`
+	 * @param {string} label Button title
+	 * @param {(e: MouseEvent) => void} onClick Click handler
+	 * @param {() => ?{left: number, top: number}} place Placement
+	 * @returns {SunEditor.Module.Controller.Instance}
+	 */
+	#createDot(selector, label, onClick, place) {
+		const button = dom.utils.createElement('BUTTON', {
+			type: 'button',
+			class: `se-table-dot ${selector.replace(/^\./, '')}`,
+			title: label,
+			'aria-label': label,
+		});
+		this.#$.eventManager.addEvent(button, 'mousedown', OnDotMouseDown);
+		this.#$.eventManager.addEvent(button, 'click', onClick);
+
+		return new Controller(this, this.#$, button, { container: 'wrapper', selection: true, place });
+	}
+
+	/**
 	 * @description Shows the table dot on the table's top-left corner (top-right in RTL).
-	 * - Steps inward along the top edge while the top line breaker holds the corner.
-	 * - Hidden when the corner is scrolled out of the figure's visible area.
-	 * @param {boolean} [_recheck=true] Internal - re-run once on the next tick (the core
+	 * - Hidden while the corner is scrolled out of the figure's visible area.
+	 * @param {boolean} [_recheck=true] Internal - re-place once on the next tick (the core
 	 * positions the line breaker after `componentSelect`, so the first pass may be stale).
 	 */
 	showTableDot(_recheck = true) {
-		if (!this.#tableEnabled) return;
-
-		const dot = this.#element(Constants.DOT_TABLE_CLASS);
-		if (!dot) return;
+		if (!this.tableDot) return;
 
 		const table = this.#main.state.selectedTable || this.#main._element;
-		const box = this.#visibleBox(table);
-		if (!box) {
-			dot.style.display = 'none';
-			this.#tableDotOn = !!table?.isConnected;
-			if (this.#tableDotOn) this.#$.ui.onControllerTriggerContext();
+		if (!table?.isConnected) {
+			this.tableDot.close();
 			return;
 		}
 
-		this.#tableDotOn = true;
-		this.#$.ui.onControllerTriggerContext();
+		this.tableDot.open(table);
+
+		if (_recheck) {
+			_w.setTimeout(() => {
+				if (this.tableDot.isOpen) this.tableDot.resetPosition();
+			}, 0);
+		}
+	}
+
+	/**
+	 * @description Shows the cell dot on the selection's right edge (left in RTL), vertically centered.
+	 * - Hidden while the anchor point is scrolled out of the figure's visible area.
+	 */
+	showCellDot() {
+		if (!this.cellDot) return;
+
+		const cell = this.#cellDotAnchor(!!this.#$.options.get('_rtl'));
+		if (!cell?.isConnected) {
+			this.cellDot.close();
+			return;
+		}
+
+		this.cellDot.open(cell);
+	}
+
+	/**
+	 * @description Re-places the open dots (clamp-hidden ones re-appear when back in view) and,
+	 * - through the controller, the popups opened on them.
+	 */
+	reposition() {
+		if (this.cellDot?.isOpen) this.cellDot.resetPosition();
+		if (this.tableDot?.isOpen) this.tableDot.resetPosition();
+	}
+
+	/**
+	 * @description Closes the open controllers launched from the dots (a click elsewhere dismisses them).
+	 * - Force close: a click inside the table sets the controller's own prevent-close guard.
+	 */
+	closeControllers() {
+		if (this.cellDot && this.#main.controller_cell.isOpen) this.#main.controller_cell.close(true);
+		if (this.tableDot && this.#main.controller_table.isOpen) this.#main.controller_table.close(true);
+	}
+
+	/**
+	 * @description Closes the cell dot only — a click inside the table moves the cell UI while the table dot stays,
+	 * - like the table controller in the `'table'` mode. The new cell's dot is shown on the selection's mouseup.
+	 */
+	closeCellDot() {
+		this.cellDot?.close();
+	}
+
+	/**
+	 * @description Closes both dots (and the popups opened on them).
+	 */
+	hide() {
+		if (!this.cellDot && !this.tableDot) return;
+
+		this.cellDot?.close();
+		this.tableDot?.close();
+	}
+
+	/**
+	 * @description Service reset — closes the dots.
+	 */
+	init() {
+		this.hide();
+	}
+
+	/**
+	 * @description `place` of the cell dot — centered on the anchor cell's right edge (left in RTL).
+	 * @returns {?{left: number, top: number}} Wrapper-local position, `null` while out of the figure's visible area
+	 */
+	#placeCellDot() {
+		const isRtl = !!this.#$.options.get('_rtl');
+		const cell = this.#cellDotAnchor(isRtl);
+		if (!cell?.isConnected) return null;
+
+		const box = this.#visibleBox(dom.query.getParentElement(cell, 'TABLE'));
+		if (!box) return null;
+
+		const cellOffset = this.#$.offset.getLocal(cell);
+		const x = isRtl ? cellOffset.left : cellOffset.left + cell.offsetWidth;
+		const y = cellOffset.top + cell.offsetHeight / 2;
+		if (x < box.left - 1 || x > box.right + 1 || y < box.top - 1 || y > box.bottom + 1) return null;
+
+		return { left: x - DOT_SIZE / 2, top: y - DOT_SIZE / 2 };
+	}
+
+	/**
+	 * @description `place` of the table dot — centered on the table's top-left corner (top-right in RTL).
+	 * - Steps inward along the top edge while the top line breaker holds the corner.
+	 * @returns {?{left: number, top: number}} Wrapper-local position, `null` while out of the figure's visible area
+	 */
+	#placeTableDot() {
+		const box = this.#visibleBox(this.#main.state.selectedTable || this.#main._element);
+		if (!box) return null;
+
 		const isRtl = !!this.#$.options.get('_rtl');
 		const corner = isRtl ? box.right : box.left;
 		const x = this.#breakerOnCorner(corner, box.top)
@@ -110,13 +211,8 @@ export class TableDotService {
 				? corner - TABLE_DOT_INSET
 				: corner + TABLE_DOT_INSET
 			: corner;
-		this.#place(dot, x, box.top, TABLE_DOT_SIZE);
 
-		if (_recheck) {
-			_w.setTimeout(() => {
-				if (dot.style.display === 'block') this.showTableDot(false);
-			}, 0);
-		}
+		return { left: x - TABLE_DOT_SIZE / 2, top: box.top - TABLE_DOT_SIZE / 2 };
 	}
 
 	/**
@@ -138,37 +234,6 @@ export class TableDotService {
 	}
 
 	/**
-	 * @description Shows the cell dot on the selection's right edge (left in RTL), vertically centered.
-	 */
-	showCellDot() {
-		if (!this.#cellEnabled) return;
-
-		const dot = this.#element(Constants.DOT_CELL_CLASS);
-		if (!dot) return;
-
-		const isRtl = !!this.#$.options.get('_rtl');
-		const cell = this.#cellDotAnchor(isRtl);
-		if (!cell || !cell.isConnected) {
-			dot.style.display = 'none';
-			this.#cellDotOn = false;
-			return;
-		}
-
-		this.#cellDotOn = true;
-		this.#$.ui.onControllerTriggerContext();
-		const box = this.#visibleBox(dom.query.getParentElement(cell, 'TABLE'));
-		const cellOffset = box && this.#$.offset.getLocal(cell);
-		const x = cellOffset && (isRtl ? cellOffset.left : cellOffset.left + cell.offsetWidth);
-		const y = cellOffset && cellOffset.top + cell.offsetHeight / 2;
-		if (!box || x < box.left - 1 || x > box.right + 1 || y < box.top - 1 || y > box.bottom + 1) {
-			dot.style.display = 'none';
-			return;
-		}
-
-		this.#place(dot, x, y);
-	}
-
-	/**
 	 * @description The cell the cell dot anchors to: the middle cell of the region's (right|left) edge.
 	 * @param {boolean} isRtl RTL mode
 	 * @returns {?HTMLTableCellElement}
@@ -177,53 +242,6 @@ export class TableDotService {
 		const edge = this.#main.selectionService.getEdgeCells(isRtl ? 'l' : 'r');
 		if (edge.length > 0) return edge[(edge.length - 1) >> 1];
 		return this.#main.state.tdElement;
-	}
-
-	/**
-	 * @description Repositions the logically shown dots (clamp-hidden ones re-appear when back in view).
-	 */
-	reposition() {
-		if (!this.#cellEnabled && !this.#tableEnabled) return;
-
-		if (this.#cellDotOn) this.showCellDot();
-		if (this.#tableDotOn) this.showTableDot();
-	}
-
-	/**
-	 * @description Hides both dots.
-	 */
-	hide() {
-		if (!this.#cellEnabled && !this.#tableEnabled) return;
-
-		this.#cellDotOn = false;
-		this.#tableDotOn = false;
-		this.#$.ui.offControllerTriggerContext();
-
-		const cellDot = this.#element(Constants.DOT_CELL_CLASS);
-		if (cellDot) cellDot.style.display = 'none';
-
-		const tableDot = this.#element(Constants.DOT_TABLE_CLASS);
-		if (tableDot) tableDot.style.display = 'none';
-	}
-
-	/**
-	 * @description Service reset — hides the dots.
-	 */
-	init() {
-		this.hide();
-	}
-
-	/**
-	 * @description Centers a dot on a wrapper-local point and shows it.
-	 * @param {HTMLElement} dot Dot element
-	 * @param {number} x Wrapper-local x of the anchor point
-	 * @param {number} y Wrapper-local y of the anchor point
-	 * @param {number} [size=DOT_SIZE] Dot diameter
-	 */
-	#place(dot, x, y, size = DOT_SIZE) {
-		dot.style.left = `${x - size / 2}px`;
-		dot.style.top = `${y - size / 2}px`;
-		dot.style.display = 'block';
 	}
 
 	/**
@@ -253,7 +271,7 @@ export class TableDotService {
 	}
 
 	/**
-	 * @description Opens the cell controller anchored to the cell dot, or hides it when already showing.
+	 * @description Opens the cell controller anchored to the cell dot, or closes it when already showing.
 	 * @param {MouseEvent} event The click event
 	 */
 	#OnCellDotClick(event) {
@@ -266,12 +284,12 @@ export class TableDotService {
 
 		const controller = main.controller_cell;
 		if (controller.isOpen && controller.form.style.display === 'block') {
-			controller.hide();
+			controller.close(true);
 			return;
 		}
 
 		main.cellService.setUnMergeButton();
-		controller.open(cell, this.#element(Constants.DOT_CELL_CLASS), {
+		controller.open(cell, this.cellDot.form, {
 			isWWTarget: false,
 			initMethod: null,
 			addOffset: null,
@@ -280,7 +298,7 @@ export class TableDotService {
 	}
 
 	/**
-	 * @description Opens the table controller anchored to the table dot, or hides it when already showing.
+	 * @description Opens the table controller anchored to the table dot, or closes it when already showing.
 	 * @param {MouseEvent} event The click event
 	 */
 	#OnTableDotClick(event) {
@@ -293,11 +311,11 @@ export class TableDotService {
 
 		const controller = main.controller_table;
 		if (controller.isOpen && controller.form.style.display === 'block') {
-			controller.hide();
+			controller.close(true);
 			return;
 		}
 
-		controller.open(figureEl, this.#element(Constants.DOT_TABLE_CLASS), {
+		controller.open(figureEl, this.tableDot.form, {
 			isWWTarget: false,
 			initMethod: null,
 			addOffset: null,
@@ -306,54 +324,23 @@ export class TableDotService {
 	}
 
 	/**
-	 * @description Repositions the dots and their open controllers after a wysiwyg/figure scroll
-	 * (one update per frame). The outer-document scroll is handled by the core.
+	 * @description Re-places the dots after a scroll inside the content (one update per frame).
+	 * @param {Event} event The scroll event
+	 * @param {HTMLElement} wysiwyg The wysiwyg of the root the listener belongs to
 	 */
-	#OnScroll() {
+	#OnScroll(event, wysiwyg) {
 		if (this.#scrollRafId !== null) return;
+		if (dom.query.getEventTarget(event) === wysiwyg || wysiwyg !== this.#$.frameContext.get('wysiwyg')) return;
 
 		this.#scrollRafId = _w.requestAnimationFrame(() => {
 			this.#scrollRafId = null;
 			this.reposition();
-			if (this.#cellEnabled) this.#followDot(this.#main.controller_cell, Constants.DOT_CELL_CLASS);
-			if (this.#tableEnabled) this.#followDot(this.#main.controller_table, Constants.DOT_TABLE_CLASS);
 		});
-	}
-
-	/**
-	 * @description Re-anchors an open controller onto its (just repositioned) dot.
-	 * - Hidden along with a clamp-hidden dot; re-shown when the dot scrolls back into view.
-	 * @param {SunEditor.Module.Controller.Instance} controller Target controller
-	 * @param {string} selector Dot class selector from `table.constants`
-	 */
-	#followDot(controller, selector) {
-		if (!controller.isOpen) return;
-
-		const dot = this.#element(selector);
-		if (!dot || controller.currentPositionTarget !== dot) return;
-
-		if (dot.style.display !== 'block') {
-			if (controller.form.style.display === 'block') controller.hide();
-			return;
-		}
-
-		controller.resetPosition();
-	}
-
-	/**
-	 * @description The current root's dot element.
-	 * @param {string} selector Class selector from `table.constants`
-	 * @returns {?HTMLElement}
-	 */
-	#element(selector) {
-		return this.#dots.get(this.#$.frameContext.get('wrapper'))?.[selector] || null;
 	}
 }
 
 /**
  * @description Keeps the editor selection and open UI alive under the pressed dot.
- * - `se-controller-trigger` is additionally whitelisted in the component/controller
- * global close listeners (capture phase, where this `stopPropagation` cannot reach).
  * @param {MouseEvent} event The mousedown event
  */
 function OnDotMouseDown(event) {

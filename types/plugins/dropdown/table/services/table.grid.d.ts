@@ -40,14 +40,14 @@ export class TableGridService {
 	openRowMenu(): void;
 	/**
 	 * @description Opens the column menu on a move handle's grip, with the cell-context items.
-	 * @param {{left: number, top: number, width: number, height: number}} rect Grip rect (viewport coords)
+	 * @param {HTMLElement} grip The grip's band box (`.se-table-move-grip`)
 	 */
-	openColumnMenuForHandle(rect: { left: number; top: number; width: number; height: number }): void;
+	openColumnMenuForHandle(grip: HTMLElement): void;
 	/**
 	 * @description Opens the row menu on a move handle's grip, with the cell-context items.
-	 * @param {{left: number, top: number, width: number, height: number}} rect Grip rect (viewport coords)
+	 * @param {HTMLElement} grip The grip's band box (`.se-table-move-grip`)
 	 */
-	openRowMenuForHandle(rect: { left: number; top: number; width: number; height: number }): void;
+	openRowMenuForHandle(grip: HTMLElement): void;
 	/**
 	 * @description Closes the handle menus (e.g. when a handle pin is released).
 	 */

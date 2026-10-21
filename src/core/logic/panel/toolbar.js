@@ -297,17 +297,17 @@ class Toolbar {
 
 		if (this.isBottomMode) {
 			const viewportBottom = currentScrollY + _w.innerHeight;
-			const editorBottom = editorOffset.top + editorHeight;
-			const y = viewportBottom - stickyTop - (this.isInlineMode ? toolbar.offsetHeight : 0);
+			const editorBottom =
+				editorOffset.top + (this.isInlineMode ? this.#frameContext.get('topArea').offsetHeight : editorHeight);
+			const y = viewportBottom - stickyTop - toolbar.offsetHeight;
 
-			const offSticky = !this.#options.get('toolbar_container')
-				? y - editorOffset.top - minHeight
-				: viewportBottom - stickyTop - editorOffset.top - minHeight - toolbar.offsetHeight;
+			const offSticky = y - editorOffset.top - minHeight;
 			if (y > editorBottom) {
 				this.#offSticky();
 			} else if (offSticky < 0) {
+				// keep `minHeight` of content above the toolbar — `offSticky` already excludes `stickyTop`
 				if (!this.isSticky) this.#onSticky(inlineOffset);
-				toolbar.style.bottom = inlineOffset + offSticky + this.#getViewportTop() + 'px';
+				toolbar.style.bottom = stickyTop + offSticky + this.#getViewportTop() + 'px';
 				toolbar.style.top = 'auto';
 			} else {
 				this.#onSticky(inlineOffset);

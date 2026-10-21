@@ -81,7 +81,11 @@ describe('Controller - Nested State Management (Essential Tests)', () => {
 				onControllerContext: jest.fn(),
 				offControllerContext: jest.fn(),
 				opendControllers: [],
-				currentControllerName: ''
+				currentControllerName: '',
+				isInsideController: jest.fn().mockReturnValue(false),
+				getControllerAt: jest.fn().mockReturnValue(null),
+				hasFloatingController: jest.fn().mockReturnValue(false),
+				closeAllControllers: jest.fn()
 			},
 			selection: {
 				getRangeElement: jest.fn(),

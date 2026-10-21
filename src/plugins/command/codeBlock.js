@@ -166,7 +166,7 @@ class CodeBlock extends PluginCommand {
 		const eventTarget = dom.query.getEventTarget(event);
 		const pre = eventTarget.closest('pre');
 
-		if (pre && !this.#isHoverOpen() && this.$.ui.opendControllers.length === 0) {
+		if (pre && !this.#isHoverOpen() && !this.$.component.isSelected && !this.$.ui.hasFloatingController()) {
 			this.#showHover(pre);
 		}
 	}

@@ -1,5 +1,5 @@
 import { dom, keyCodeMap } from '../../../helper';
-import { actionExecutor } from '../executor';
+import { actionExecutor, applyEventControl } from '../executor';
 import { makePorts } from '../ports';
 import { reduceEnterDown } from '../rules/keydown.rule.enter';
 import { useEnterFromBeforeInput } from '../reducers/keydown.reducer';
@@ -108,11 +108,7 @@ async function dispatchEnter(fc, e) {
 	const actions = [];
 	reduceEnterDown(actions, ports, ctx);
 
-	// `beforeinput.preventDefault()` MUST run synchronously (before the first `await` below), or the browser
-	// commits its native insertParagraph/insertLineBreak on top of ours (duplicate line / cloned container).
-	if (actions.some((a) => a.t === 'event.prevent' || a.t === 'event.prevent.stop')) {
-		e.preventDefault();
-	}
+	applyEventControl(actions, e);
 
 	await actionExecutor(actions, { ports, ctx });
 }

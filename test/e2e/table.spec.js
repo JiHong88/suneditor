@@ -139,7 +139,7 @@ test.describe('Table Plugin E2E Tests', () => {
 
 	test('should have table plugin methods accessible', async ({ page }) => {
 		const hasTablePlugin = await page.evaluate(() => {
-			return window.editor_root && window.editor_root.plugins && window.editor_root.plugins.table !== undefined;
+			return !!window.editor_root?.$.plugins.table;
 		});
 
 		expect(hasTablePlugin).toBe(true);

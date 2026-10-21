@@ -161,7 +161,7 @@ class Figure {
 
 		const controllerEl = CreateHTML_controller(this, $, controls || []);
 		this.controller = controllerEl
-			? new Controller(this, $, controllerEl, { position: 'bottom', disabled: true }, this.kind)
+			? new Controller(this, $, controllerEl, { position: 'bottom', disabled: true, selection: true }, this.kind)
 			: null;
 
 		if (controllerEl) {
@@ -519,7 +519,6 @@ class Figure {
 
 		const _figure = this.#$.frameContext.get('_figure');
 		this.#$.ui.setFigureContainer(_figure.main);
-		this.#$.ui.opendControllers = this.#$.ui.opendControllers.filter((c) => c.form !== _figure.main);
 
 		_figure.main.style.top = top + 'px';
 		_figure.main.style.left = left + 'px';
@@ -532,12 +531,11 @@ class Figure {
 
 		this.__offset = { left: left + scrollX, top: top + scrollY };
 
-		this.#$.ui.opendControllers.push({
+		this.#$.ui._addInEditorEntry({
 			position: 'none',
 			form: _figure.main,
 			target: sizeTarget,
 			inst: this,
-			notInCarrier: true,
 		});
 
 		// percentage active
@@ -1714,7 +1712,7 @@ class Figure {
 		const _figure = this.#$.frameContext.get('_figure');
 		_figure.main.style.display = 'none';
 		this.#$.ui.setFigureContainer(null);
-		this.#$.ui.opendControllers = this.#$.ui.opendControllers.filter((c) => c.form !== _figure.main);
+		this.#$.ui._removeControllerEntry(_figure.main);
 	}
 
 	#OnClick_alignButton() {

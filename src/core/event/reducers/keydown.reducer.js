@@ -60,9 +60,9 @@ export function useEnterFromBeforeInput(store, e) {
  * @description Keydown event reducer
  * @param {EventPorts} ports - Ports for interacting with editor
  * @param {KeydownReducerCtx} ctx - Context object
- * @returns {Promise<EventActions>} Action list
+ * @returns {EventActions} Action list
  */
-export async function reduceKeydown(ports, ctx) {
+export function reduceKeydown(ports, ctx) {
 	const actions = [];
 
 	switch (ctx.keyCode) {

@@ -14,8 +14,12 @@ Validate the intended changes without rewriting unrelated work. Read `git status
   then `git diff --check`. Skip source lint, generation and runtime tests.
 - Source JS: run the sequence below. Fix formatting only in the changed source files;
   do not start with the repository-wide `lint:fix-js` autofixer on unrelated user work.
+  A file-level `prettier --write`/`eslint --fix` also rewrites unformatted lines you didn't touch
+  (many test files are) — check `git diff` after it and keep only your own hunks.
 - CSS/layout: lint applicable files, build with `npm run build:prod`, and run relevant browser
-  cases. Source-only Jest cannot establish layout correctness.
+  cases. Source-only Jest cannot establish layout correctness. Computed style returns the specified
+  value, not what painted (e.g. a border lost to border-collapse still reads `2px`) — assert visibility
+  from screenshot pixels and add a control case that must fail (`test/e2e/table.propsBorder.spec.js`).
 - Test/tooling-only: run the changed tool or relevant test suite and applicable static checks.
   For dependency rules, run both `npm run check:arch` and `npm run test:arch`.
   Commands and CI scope: [Testing and Validation](../../../guide/testing.md).
@@ -32,8 +36,9 @@ Run sequentially; stop dependent steps on failure, diagnose and rerun only affec
 5. `npm run check:exports` — export sync.
 6. `npm test -- --runInBand` — Jest unit AND integration suites.
 7. Targeted browser tests for native input, selection, IME, iframe, layout or focus changes:
-   `npm run test:e2e -- <relevant-spec> --project=chromium`. Use the configured Firefox project
-   for relevant `*.firefox.spec.js` cases. For geometry/direction, run `npm run test:browser -- geometry.spec.js`
+   `npm run test:e2e -- <relevant-spec> --project=chromium` (add `--reporter=line` and a bound such as
+   `--global-timeout`; piping a run through `grep | head` hides progress, so a hang looks like silence).
+   Use the configured Firefox project for relevant `*.firefox.spec.js` cases. For geometry/direction, run `npm run test:browser -- geometry.spec.js`
    (DIV/iframe × LTR/RTL in Chromium and Firefox). State any untested browser/device behavior.
 8. For new features/hot paths/resources, use `prompts/performance-guide.md` to check the
    relevant costs and lifecycle; run `npm run test:perf` for selection/offset paths. Extend the

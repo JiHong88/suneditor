@@ -74,6 +74,7 @@ describe('Modules - Modal', () => {
 				hideLoading: jest.fn(),
 				enableBackWrapper: jest.fn(),
 				disableBackWrapper: jest.fn(),
+				_suspendControllers: jest.fn(),
 				opendControllers: [],
 				currentControllerName: '',
 				opendModal: null
@@ -595,30 +596,12 @@ describe('Modules - Modal', () => {
 			modal = new Modal(mockInst, mockEditor.$, mockElement);
 		});
 
-		it('should fix controllers when opening modal', () => {
-			const mockController = {
-				fixed: false,
-				form: { style: { display: 'block' } }
-			};
-			mockEditor.$.ui.opendControllers = [mockController];
-
+		it('suspends the floating controllers while open and resumes them on close (ui owns the list)', () => {
 			modal.open();
-
-			expect(mockController.fixed).toBe(true);
-			expect(mockController.form.style.display).toBe('none');
-		});
-
-		it('should unfix controllers when closing modal', () => {
-			const mockController = {
-				fixed: true,
-				form: { style: { display: 'none' } }
-			};
-			mockEditor.$.ui.opendControllers = [mockController];
+			expect(mockEditor.$.ui._suspendControllers).toHaveBeenLastCalledWith(true);
 
 			modal.close();
-
-			expect(mockController.fixed).toBe(false);
-			expect(mockController.form.style.display).toBe('block');
+			expect(mockEditor.$.ui._suspendControllers).toHaveBeenLastCalledWith(false);
 		});
 
 		it('should handle empty controller list', () => {

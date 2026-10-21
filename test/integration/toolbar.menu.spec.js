@@ -188,6 +188,29 @@ describe('Toolbar and Menu Integration Tests', () => {
 			}
 		});
 
+		it('should show the menu tray before measuring the dropdown position', () => {
+			const buttonTray = editor.$.context.get('toolbar_buttonTray');
+			const fontBtn = buttonTray.querySelector('[data-command="font"]');
+			const menuTray = editor.$.context.get('menuTray');
+			let trayOpen = false;
+			menuTray.showPopover = jest.fn(() => (trayOpen = true));
+			menuTray.hidePopover = jest.fn(() => (trayOpen = false));
+			const openAtMeasure = [];
+			const spy = jest
+				.spyOn(editor.$.offset, 'setRelPosition')
+				.mockImplementation(() => openAtMeasure.push(trayOpen));
+
+			try {
+				editor.$.menu.dropdownOn(fontBtn);
+				expect(openAtMeasure).toEqual([true]);
+			} finally {
+				spy.mockRestore();
+				editor.$.menu.dropdownOff();
+				delete menuTray.showPopover;
+				delete menuTray.hidePopover;
+			}
+		});
+
 		it('should display dropdown menu element', () => {
 			const buttonTray = editor.$.context.get('toolbar_buttonTray');
 			const fontBtn = buttonTray.querySelector('[data-command="font"]');
@@ -419,6 +442,7 @@ describe('Toolbar Bottom Mode (classic:bottom)', () => {
 			plugins: { font, fontSize },
 			buttonList: [['bold', 'italic', 'font', 'fontSize']],
 			mode: 'classic:bottom',
+			statusbar: true,
 		});
 		await waitForEditorReady(editor);
 	});
@@ -465,10 +489,17 @@ describe('Toolbar Bottom Mode (classic:bottom)', () => {
 			const rootFc = editor.$.frameRoots.values().next().value;
 			const container = rootFc.get('container');
 			const toolbar = editor.$.context.get('toolbar_main');
-			const statusbar = container.querySelector('.se-statusbar');
-			if (statusbar) {
-				expect(toolbar.compareDocumentPosition(statusbar) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-			}
+			const statusbar = container.querySelector('.se-status-bar');
+			expect(statusbar).toBeTruthy();
+			expect(toolbar.compareDocumentPosition(statusbar) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+		});
+
+		it('sticky dummy should hold the toolbar slot below the wrapper', () => {
+			// a dummy above the wrapper pushes the content (and the window scroll) down when the toolbar sticks
+			const rootFc = editor.$.frameRoots.values().next().value;
+			const toolbar = editor.$.context.get('toolbar_main');
+			const dummy = rootFc.get('_stickyDummy');
+			expect(toolbar.nextElementSibling).toBe(dummy);
 		});
 	});
 

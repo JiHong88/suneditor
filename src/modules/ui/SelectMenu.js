@@ -1039,8 +1039,9 @@ class SelectMenu {
 	#CloseListener_key(e) {
 		if (!keyCodeMap.isEsc(e.code)) return;
 
+		e.preventDefault();
+
 		if (this.#activeSubmenuIndex > -1) {
-			e.preventDefault();
 			e.stopPropagation();
 
 			const parentIndex = this.#activeSubmenuIndex;
@@ -1051,7 +1052,6 @@ class SelectMenu {
 		}
 
 		if (this.subEscMethod?.()) {
-			e.preventDefault();
 			e.stopPropagation();
 			return;
 		}
@@ -1065,12 +1065,9 @@ class SelectMenu {
 	#CloseListener_mousedown(e) {
 		const eventTarget = dom.query.getEventTarget(e);
 		if (this.form.contains(eventTarget)) return;
-		if (
-			this.#$.ui.opendControllers?.some(
-				({ form }) => form?.contains?.(eventTarget) && !form.contains(this.#refer),
-			)
-		)
-			return;
+
+		const owner = this.#$.ui.getControllerAt(eventTarget);
+		if (owner && !owner.inWrapper && !owner.form.contains(this.#refer)) return;
 		if (!this.#refer.contains(eventTarget)) {
 			this.close();
 		} else if (!dom.check.isInputElement(eventTarget)) {

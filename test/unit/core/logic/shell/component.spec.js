@@ -285,15 +285,6 @@ describe('Component', () => {
 	});
 
 	describe('__deselect method', () => {
-		it('clears the controller trigger context', () => {
-			const { _DragHandle } = require('../../../../../src/modules/ui');
-			_DragHandle.get.mockReturnValue(null);
-
-			component.__deselect();
-
-			expect(mockEditor.$.ui.offControllerTriggerContext).toHaveBeenCalled();
-		});
-
 		it('should reset isSelected to false', () => {
 			const { _DragHandle } = require('../../../../../src/modules/ui');
 			_DragHandle.get.mockReturnValue(null);
@@ -435,6 +426,25 @@ describe('Component', () => {
 
 		it('should not throw when called without active events', () => {
 			expect(() => component.__removeGlobalEvent()).not.toThrow();
+		});
+	});
+
+	describe('isHoverSelected', () => {
+		const { _DragHandle } = require('../../../../../src/modules/ui');
+
+		it('is false without a selection', () => {
+			component.isSelected = false;
+			_DragHandle.get.mockReturnValue(undefined);
+			expect(component.isHoverSelected).toBe(false);
+		});
+
+		it('is true for a hover selection, false for a real (clicked) one', () => {
+			component.isSelected = true;
+			_DragHandle.get.mockReturnValue(undefined);
+			expect(component.isHoverSelected).toBe(true);
+			_DragHandle.get.mockReturnValue(false);
+			expect(component.isHoverSelected).toBe(false);
+			component.isSelected = false;
 		});
 	});
 

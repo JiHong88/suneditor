@@ -440,7 +440,7 @@ export class TableStyleService {
 			const isTable = this.#main.controller_table.form.contains(this.controller_props.currentTarget);
 			const targets = isTable ? [this.#main._element] : this.#state.selectedCells;
 			const tr = /** @type {HTMLTableCellElement} */ (targets[0]);
-			const trStyles = _w.getComputedStyle(tr);
+			const defaultBorder = this.#getDefaultBorder();
 			const {
 				border_format,
 				border_color,
@@ -459,8 +459,8 @@ export class TableStyleService {
 
 			const cellAlignment = cell_alignment.getAttribute('se-cell-align') || '';
 			const cellAlignmentVertical = cell_alignment_vertical.getAttribute('se-cell-align') || '';
-			const borderColor = isNoneFormat ? '' : border_color.value.trim() || trStyles.borderColor;
-			let borderWidth = isNoneFormat ? '' : border_width.value.trim() || trStyles.borderWidth;
+			const borderColor = isNoneFormat ? '' : border_color.value.trim() || defaultBorder.c;
+			let borderWidth = isNoneFormat ? '' : border_width.value.trim() || defaultBorder.w;
 			borderWidth = borderWidth + (numbers.is(borderWidth) ? Constants.DEFAULT_BORDER_UNIT : '');
 			const backColor = back_color.value.trim();
 			const fontColor = font_color.value.trim();
@@ -714,7 +714,10 @@ export class TableStyleService {
 		dom.utils.removeClass(border_format, 'active');
 
 		// border - styles
+		const defaultBorder = this.#getDefaultBorder();
 		b_style ||= Constants.BORDER_LIST[0];
+		b_color ||= defaultBorder.c;
+		b_width ||= defaultBorder.w;
 		border_style.textContent = b_style;
 		border_color.style.borderColor = border_color.value = b_color;
 		border_width.value = b_width;
@@ -747,6 +750,17 @@ export class TableStyleService {
 			(dom.utils.hasClass(font_strike, 'on') ? 'line-through ' : '') +
 			(dom.utils.hasClass(font_underline, 'on') ? 'underline' : '')
 		).trim();
+	}
+
+	/**
+	 * @description The border prefilled in the props when the target has none of its own.
+	 * @returns {{w: string, c: string}}
+	 */
+	#getDefaultBorder() {
+		return {
+			w: Constants.DEFAULT_BORDER_WIDTH,
+			c: converter.rgb2hex(_w.getComputedStyle(this.#$.frameContext.get('wysiwyg')).color),
+		};
 	}
 
 	/**

@@ -4,6 +4,7 @@
 
 import { createTestEditor, waitForEditorReady, destroyTestEditor } from '../__mocks__/editorIntegration';
 import { image } from '../../src/plugins';
+import Controller from '../../src/modules/contract/Controller';
 
 describe('Component Lifecycle', () => {
 	let editor;
@@ -119,6 +120,29 @@ describe('Component Lifecycle', () => {
 			expect(editor.$.component.currentTarget).toBeNull();
 			expect(editor.$.component.currentPlugin).toBeNull();
 			expect(editor.$.component.currentPluginName).toBe('');
+		});
+
+		it('should close an open selection UI controller through its own close()', async () => {
+			const host = { controllerClose: jest.fn() };
+			const form = document.createElement('div');
+			form.innerHTML = '<div class="se-arrow"></div>';
+			const controller = new Controller(host, editor.$, form, { selection: true }, 'testSelectionUI');
+			const target = document.createElement('div');
+			editor.$.frameContext.get('wysiwyg').appendChild(target);
+
+			controller.open(target);
+			await Promise.resolve();
+			expect(controller.isOpen).toBe(true);
+
+			editor.$.component.isSelected = true;
+			editor.$.component.deselect();
+
+			expect(controller.isOpen).toBe(false);
+			expect(host.controllerClose).toHaveBeenCalledTimes(1);
+			expect(editor.$.ui.opendControllers.some((c) => c.inst === controller)).toBe(false);
+
+			// let the deferred `controlActive` resets run before the editor is destroyed
+			await new Promise((r) => setTimeout(r, 0));
 		});
 	});
 
