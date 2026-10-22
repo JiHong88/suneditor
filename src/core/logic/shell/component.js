@@ -441,6 +441,8 @@ class Component {
 	 * @description Deselects the selected component.
 	 */
 	deselect() {
+		if (this.#store.isActive?.() === false) return;
+
 		// Defer controlActive reset — synchronous blur handlers during deselect still need to see it as active
 		_w.setTimeout(() => {
 			this.#store.set('controlActive', false);
@@ -536,6 +538,8 @@ class Component {
 	 * @param {Element} target The element to hover-select
 	 */
 	hoverSelect(target) {
+		if (this.#store.isActive?.() === false) return;
+
 		const figure = dom.query.getParentElement(target, dom.check.isFigure);
 		let info = this.get(target);
 		if (info || figure) {
@@ -562,6 +566,8 @@ class Component {
 	 * - This method resets the selection state and hides UI elements related to the component selection.
 	 */
 	__deselect() {
+		if (this.#store.isActive?.() === false) return;
+
 		this.#store.set('_preventBlur', false);
 		_DragHandle.set('__overInfo', null);
 		this.__removeDragEvent();
@@ -901,7 +907,7 @@ class Component {
 	 * @param {KeyboardEvent} e - Event object
 	 */
 	async #OnKeyDown_component(e) {
-		if (this.#$.ui.selectMenuOn) return;
+		if (this.#store.isActive?.() === false || this.#$.ui.selectMenuOn) return;
 
 		const keyCode = e.code;
 		if (!keyCodeMap.isEsc(keyCode) && this.#$.ui.isInsideController(dom.query.getEventTarget(e))) return;
@@ -928,6 +934,7 @@ class Component {
 
 			if (
 				typeof this.currentPlugin?.componentDestroy === 'function' &&
+				this.info?.container &&
 				(!this.info.isInputType || !this.#store.get('hasFocus'))
 			) {
 				const focusNode = this.info.container.previousSibling;
@@ -947,7 +954,8 @@ class Component {
 		if (keyCodeMap.isEnter(keyCode)) {
 			e.preventDefault();
 			const compContext = this.currentInfo || this.get(this.currentTarget);
-			const container = compContext.container || compContext.target;
+			const container = compContext?.container || compContext?.target;
+			if (!container?.parentNode) return;
 			const sibling = container.previousElementSibling || container.nextElementSibling;
 			let newEl = null;
 			if (dom.check.isListCell(container.parentNode)) {
@@ -972,7 +980,9 @@ class Component {
 		// up down, left right
 		DIR_KEYCODE.lastIndex = 0;
 		if (DIR_KEYCODE.test(keyCode)) {
-			const { container } = this.get(this.currentTarget);
+			const comp = this.get(this.currentTarget);
+			if (!comp) return;
+			const { container } = comp;
 			const isInline = this.isInline(container || this.currentTarget);
 
 			let el = null;

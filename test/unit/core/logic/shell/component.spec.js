@@ -338,6 +338,15 @@ describe('Component', () => {
 
 			expect(mockEditor.store.set).toHaveBeenCalledWith('_preventBlur', false);
 		});
+
+		it('should not touch the store after the editor is destroyed', () => {
+			mockEditor.store.isActive.mockReturnValue(false);
+			mockEditor.store.set.mockClear();
+
+			expect(() => component.deselect()).not.toThrow();
+			expect(() => component.__deselect()).not.toThrow();
+			expect(mockEditor.store.set).not.toHaveBeenCalled();
+		});
 	});
 
 	describe('insert method', () => {

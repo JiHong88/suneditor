@@ -6,6 +6,13 @@ import { CheckCellEdge, CheckRowEdge } from '../shared/table.utils';
 
 const { _w } = env;
 
+const RESIZE_LINE_SELECTORS = [
+	Constants.RESIZE_CELL_CLASS,
+	Constants.RESIZE_CELL_PREV_CLASS,
+	Constants.RESIZE_ROW_CLASS,
+	Constants.RESIZE_ROW_PREV_CLASS,
+];
+
 /**
  * @description Manages table and cell resizing with drag-based dimension adjustments and visual guide lines.
  */
@@ -39,19 +46,7 @@ export class TableResizeService {
 		};
 
 		this.#$.contextProvider.applyToRoots((e) => {
-			const wrapper = e.get('wrapper');
-			const els = /** @type {{[selector: string]: HTMLElement}} */ ({});
-			this.#els.set(wrapper, els);
-
-			for (const selector of [
-				Constants.RESIZE_CELL_CLASS,
-				Constants.RESIZE_CELL_PREV_CLASS,
-				Constants.RESIZE_ROW_CLASS,
-				Constants.RESIZE_ROW_PREV_CLASS,
-			]) {
-				els[selector] = dom.utils.createElement('DIV', { class: selector.replace(/^\./, '') });
-				wrapper.appendChild(els[selector]);
-			}
+			this.#ensureLines(e.get('wrapper'));
 		});
 	}
 
@@ -80,6 +75,8 @@ export class TableResizeService {
 			this.#removeGlobalEvents();
 			if (this.#resizeLine?.style.display === 'block') this.#resizeLine.style.display = 'none';
 			this.#resizeLine = this.#element(Constants.RESIZE_CELL_CLASS);
+			if (!this.#resizeLine) return;
+
 			this.#setResizeLinePosition(
 				dom.query.getParentElement(target, dom.check.isTable),
 				target,
@@ -97,6 +94,8 @@ export class TableResizeService {
 			this.#main._element.style.cursor = 'ns-resize';
 			if (this.#resizeLine?.style.display === 'block') this.#resizeLine.style.display = 'none';
 			this.#resizeLine = this.#element(Constants.RESIZE_ROW_CLASS);
+			if (!this.#resizeLine) return;
+
 			this.#setResizeRowPosition(dom.query.getParentElement(target, dom.check.isTable), target, this.#resizeLine);
 			this.#resizeLine.style.display = 'block';
 			return false;
@@ -237,8 +236,10 @@ export class TableResizeService {
 		dom.utils.removeClass(figureElement, 'se-component-selected');
 
 		this.#resizePercentCol(this.#main._element);
-		this.#setResizeLinePosition(figureElement, this.#state.tdElement, this.#resizeLinePrev, isLeftEdge);
-		this.#resizeLinePrev.style.display = 'block';
+		if (this.#resizeLinePrev) {
+			this.#setResizeLinePosition(figureElement, this.#state.tdElement, this.#resizeLinePrev, isLeftEdge);
+			this.#resizeLinePrev.style.display = 'block';
+		}
 		const prevValue = col.style.width;
 		const nextCol = /** @type {HTMLElement} */ (col.nextElementSibling);
 		const nextColPrevValue = nextCol.style.width;
@@ -328,8 +329,10 @@ export class TableResizeService {
 		const figureElement = this.#state.figureElement;
 		dom.utils.removeClass(figureElement, 'se-component-selected');
 
-		this.#setResizeRowPosition(figureElement, row, this.#resizeLinePrev);
-		this.#resizeLinePrev.style.display = 'block';
+		if (this.#resizeLinePrev) {
+			this.#setResizeRowPosition(figureElement, row, this.#resizeLinePrev);
+			this.#resizeLinePrev.style.display = 'block';
+		}
 		const prevValue = row.style.height;
 
 		if (_DragHandle.get('__dragHandler')) _DragHandle.get('__dragHandler').style.display = 'none';
@@ -371,8 +374,10 @@ export class TableResizeService {
 		const figure = this.#state.figureElement;
 		dom.utils.removeClass(figure, 'se-component-selected');
 
-		this.#setResizeLinePosition(figure, figure, this.#resizeLinePrev, isLeftEdge);
-		this.#resizeLinePrev.style.display = 'block';
+		if (this.#resizeLinePrev) {
+			this.#setResizeLinePosition(figure, figure, this.#resizeLinePrev, isLeftEdge);
+			this.#resizeLinePrev.style.display = 'block';
+		}
 		const realWidth = converter.getWidthInPercentage(figure);
 
 		if (_DragHandle.get('__dragHandler')) _DragHandle.get('__dragHandler').style.display = 'none';
@@ -426,6 +431,8 @@ export class TableResizeService {
 	 * @param {boolean} isLeftEdge Whether the resizing is on the left edge.
 	 */
 	#setResizeLinePosition(figure, target, resizeLine, isLeftEdge) {
+		if (!resizeLine || !figure || !target) return;
+
 		const tdOffset = this.#$.offset.getLocal(target);
 		const tableOffset = this.#$.offset.getLocal(figure);
 		resizeLine.style.left = `${tdOffset.left + (isLeftEdge ? 0 : target.offsetWidth)}px`;
@@ -440,6 +447,8 @@ export class TableResizeService {
 	 * @param {HTMLElement} resizeLine The resize line element.
 	 */
 	#setResizeRowPosition(figure, target, resizeLine) {
+		if (!resizeLine || !figure || !target) return;
+
 		const rowOffset = this.#$.offset.getLocal(target);
 		const tableOffset = this.#$.offset.getLocal(figure);
 		resizeLine.style.top = `${rowOffset.top + target.offsetHeight}px`;
@@ -514,12 +523,33 @@ export class TableResizeService {
 	}
 
 	/**
+	 * @description Guide lines for one editor root. Created on demand when the current
+	 * wrapper was not present at construction (a later root, or a wrapper that was replaced).
+	 * @param {?HTMLElement} wrapper
+	 * @returns {?{[selector: string]: HTMLElement}}
+	 */
+	#ensureLines(wrapper) {
+		if (!wrapper) return null;
+
+		const existing = this.#els.get(wrapper);
+		if (existing) return existing;
+
+		const els = /** @type {{[selector: string]: HTMLElement}} */ ({});
+		this.#els.set(wrapper, els);
+		for (const selector of RESIZE_LINE_SELECTORS) {
+			els[selector] = dom.utils.createElement('DIV', { class: selector.replace(/^\./, '') });
+			wrapper.appendChild(els[selector]);
+		}
+		return els;
+	}
+
+	/**
 	 * @description The current root's resize guide element.
 	 * @param {string} selector Class selector from `table.constants`
 	 * @returns {?HTMLElement}
 	 */
 	#element(selector) {
-		return this.#els.get(this.#$.frameContext.get('wrapper'))?.[selector] || null;
+		return this.#ensureLines(this.#$.frameContext.get('wrapper'))?.[selector] || null;
 	}
 
 	/**
