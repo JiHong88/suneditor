@@ -78,6 +78,7 @@ declare class Table extends PluginDropdownFree {
 	/** @type {"table"|"dot"} */
 	tableControllerPosition: 'table' | 'dot';
 	cellControllerTop: boolean;
+	dotService: TableDotService;
 	controller_cell: Controller;
 	controller_table: Controller;
 	figure: Figure;
@@ -89,11 +90,10 @@ declare class Table extends PluginDropdownFree {
 	state: Constants.TableState;
 	cellService: TableCellService;
 	clipboardService: TableClipboardService;
-	dotService: TableDotService;
+	handleService: TableHandleService;
 	gridService: TableGridService;
 	reorderService: TableReorderService;
 	resizeService: TableResizeService;
-	handleService: TableHandleService;
 	selectionService: TableSelectionService;
 	styleService: TableStyleService;
 	/**

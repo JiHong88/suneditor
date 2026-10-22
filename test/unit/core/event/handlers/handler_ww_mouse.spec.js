@@ -287,6 +287,17 @@ describe('handler_ww_mouse', () => {
 			expect(result).toBe(false);
 		});
 
+		it('should not hover-select after the editor is destroyed', () => {
+			mockThis.$.store.isActive = jest.fn(() => false);
+			const event = { target: document.createElement('p') };
+
+			OnMouseMove_wysiwyg.call(mockThis, mockFc, event);
+			jest.runAllTimers();
+
+			expect(mockThis.$.component.hoverSelect).not.toHaveBeenCalled();
+			expect(mockThis._callPluginEvent).not.toHaveBeenCalled();
+		});
+
 		it('should trigger plugin onMouseMove event', () => {
 			const event = { target: document.createElement('p') };
 

@@ -1,0 +1,37 @@
+labels: ['question']
+body:
+    - type: markdown
+      attributes:
+          value: |
+              Include enough detail for someone to reproduce your setup. A Playground URL answers most questions fastest.
+    - type: input
+      id: version
+      attributes:
+          label: SunEditor version
+          placeholder: e.g. 3.3.3
+      validations:
+          required: true
+    - type: input
+      id: framework
+      attributes:
+          label: Framework
+          placeholder: e.g. Vanilla JS, React 19, Vue 3, Next.js 15
+      validations:
+          required: true
+    - type: input
+      id: environment
+      attributes:
+          label: Browser / OS
+          placeholder: e.g. Chrome 130 / macOS 15
+    - type: input
+      id: playground
+      attributes:
+          label: Playground URL or reproduction
+          placeholder: https://suneditor.com/playground?...
+    - type: textarea
+      id: question
+      attributes:
+          label: Question
+          description: What are you trying to do, what did you try, and what happened instead?
+      validations:
+          required: true

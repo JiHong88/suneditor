@@ -109,7 +109,11 @@ class Math_ extends PluginModal {
 
 		// modules
 		this.modal = new Modal(this, this.$, modalEl);
-		this.controller = new Controller(this, this.$, controllerEl, { position: 'bottom', disabled: true });
+		this.controller = new Controller(this, this.$, controllerEl, {
+			position: 'bottom',
+			disabled: true,
+			selection: true,
+		});
 
 		// members
 		/** @type {HTMLTextAreaElement} */

@@ -2470,7 +2470,7 @@ const _RE_SPAN = /^span$/i;
 
 // _isSafeAttribute
 const _SAFE_URL_PROTOCOL = /^(?:https?|ftps?|mailto|tel|blob|sms|geo|webcal|callto):|^[#/]|^data:image\//i;
-const _URL_ATTR_PATTERN = /^(?:href|src)\s*=/i;
+const _URL_ATTR_PATTERN = /^(?:href|src|poster|xlink:href|background|cite|action|formaction)\s*=/i;
 const _RE_ATTR_VALUE = /=\s*(?:"([^"]*)"|'([^']*)'|(\S+))/;
 const _RE_COLON = /:/i;
 
@@ -2520,7 +2520,7 @@ function _isSafeURL(url) {
 
 /**
  * @description Checks whether an HTML attribute string is safe from XSS injection.
- * - Non-URL attributes (anything other than `href` or `src`) are always safe.
+ * - Non-URL attributes (anything other than `href`, `src`, `poster`, `xlink:href`, `background`, `cite`, `action`, `formaction`) are always safe.
  * - For URL attributes, extracts the URL value and delegates to {@link _isSafeURL}
  *   to verify the protocol against the allowed whitelist.
  * @param {string} attr A single attribute string (e.g. `href="https://example.com"`, `class="foo"`)

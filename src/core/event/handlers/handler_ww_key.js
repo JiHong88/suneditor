@@ -1,5 +1,5 @@
 import { dom, env, unicode, keyCodeMap } from '../../../helper';
-import { actionExecutor } from '../executor';
+import { actionExecutor, applyEventControl } from '../executor';
 import { makePorts } from '../ports';
 import { reduceKeydown, useEnterFromBeforeInput } from '../reducers/keydown.reducer';
 
@@ -112,8 +112,9 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 	};
 	const ports = makePorts(this, { _styleNodes });
 
-	// action execute
-	const actions = await reduceKeydown(ports, ctx);
+	const actions = reduceKeydown(ports, ctx);
+
+	applyEventControl(actions, e);
 
 	if ((await this.$.eventManager.triggerEvent('onKeyDown', { frameContext: fc, event: e })) === false) return;
 

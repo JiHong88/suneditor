@@ -668,6 +668,7 @@ export function createMockEditor(customOptions = {}) {
 	const store = {
 		get: jest.fn((key) => storeState[key]),
 		set: jest.fn((key, value) => { storeState[key] = value; }),
+		isActive: jest.fn(() => true),
 		subscribe: jest.fn().mockReturnValue(jest.fn()),
 		mode: {
 			isClassic: true,
@@ -867,6 +868,7 @@ export function createMockEditor(customOptions = {}) {
 		isInline: jest.fn().mockReturnValue(false),
 		__deselect: jest.fn(),
 		__removeGlobalEvent: jest.fn(),
+		isHoverSelected: false,
 		__selectionSelected: false
 	};
 
@@ -920,8 +922,13 @@ export function createMockEditor(customOptions = {}) {
 		setControllerOnDisabledButtons: jest.fn().mockReturnValue(true),
 		onControllerContext: jest.fn(),
 		offControllerContext: jest.fn(),
-		onControllerTriggerContext: jest.fn(),
-		offControllerTriggerContext: jest.fn(),
+		isInsideController: jest.fn().mockReturnValue(false),
+		getControllerAt: jest.fn().mockReturnValue(null),
+		hasFloatingController: jest.fn().mockReturnValue(false),
+		closeAllControllers: jest.fn(),
+		_suspendControllers: jest.fn(),
+		_addInEditorEntry: jest.fn(),
+		_removeControllerEntry: jest.fn(),
 		enableBackWrapper: jest.fn(),
 		disableBackWrapper: jest.fn(),
 		offCurrentController: jest.fn(),

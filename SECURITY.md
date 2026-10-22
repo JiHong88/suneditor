@@ -11,7 +11,10 @@
 
 If you discover a security vulnerability, please do **not** disclose it publicly through GitHub Issues, Discussions, or pull requests.
 
-Instead, please report it by email:
+Instead, report it privately through one of these channels:
+
+- **GitHub private vulnerability reporting (preferred):** [Report a vulnerability](https://github.com/JiHong88/SunEditor/security/advisories/new)
+- **Email:** see below
 
 Security contact: **0125ses@hanmail.net**
 
@@ -53,3 +56,21 @@ Do **not** include technical details, reproduction steps, proof-of-concept code,
 If the report is declined, we will explain the reason when possible.
 
 Please avoid sharing vulnerability details publicly until we have had a reasonable amount of time to investigate and address the issue.
+
+## Security Advisory Handling
+
+1. **Triage** — the report is reproduced and its severity assessed (CVSS where applicable).
+2. **Fix** — the fix is developed privately, together with a regression case in the XSS corpus
+   (`test/unit/core/logic/dom/html.xssCorpus.spec.js`) or a dedicated test.
+3. **Release** — the fix ships as a patch release (see below).
+4. **Disclosure** — a [GitHub Security Advisory](https://github.com/JiHong88/SunEditor/security/advisories) is published
+   for confirmed vulnerabilities, with a CVE requested through GitHub when appropriate, and the release note lists the fix
+   under **Security**.
+
+## Patch Release Policy
+
+- Security fixes are released as a **patch version** of the latest 3.x minor line, without waiting for the next
+  scheduled release.
+- Security patches do not contain breaking changes. If a fix requires a behavior change (e.g. stricter sanitizing),
+  the release note explains how to restore the previous behavior where it is safe to do so.
+- Users should stay on the latest 3.x patch version to receive security fixes.

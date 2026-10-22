@@ -1112,6 +1112,15 @@ describe('PluginManager', () => {
 			expect(pm.findComponentInfo(document.createElement('div'))).toBeNull();
 		});
 
+		it('should return null after destroy instead of iterating a released list', () => {
+			const { kernel, product } = createKernelAndProduct();
+			const pm = new PluginManager(kernel, product);
+			pm._destroy();
+
+			expect(() => pm.findComponentInfo(document.createElement('div'))).not.toThrow();
+			expect(pm.findComponentInfo(document.createElement('div'))).toBeNull();
+		});
+
 		it('should return first truthy result from checkers', () => {
 			const componentFn1 = jest.fn(() => null);
 			const componentFn2 = jest.fn((node) => node);
@@ -1281,6 +1290,16 @@ describe('PluginManager', () => {
 	// emitEvent
 	// ---------------------------------------------------------------
 	describe('emitEvent', () => {
+		it('should ignore plugin events after destroy', async () => {
+			const { kernel, product } = createKernelAndProduct();
+			const pm = new PluginManager(kernel, product);
+			pm._destroy();
+
+			expect(() => pm.emitEvent('onFocus', {})).not.toThrow();
+			expect(pm.emitEvent('onFocus', {})).toBeUndefined();
+			await expect(pm.emitEventAsync('onFocus', {})).resolves.toBeUndefined();
+		});
+
 		it('should return false when a handler returns false', () => {
 			const pluginInstance = {
 				constructor: { options: {} },

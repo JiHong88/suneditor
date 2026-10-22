@@ -145,7 +145,7 @@ test('clicking a handle opens the row menu on the grip', async ({ page }) => {
 	const state = await page.evaluate(() => {
 		const menu = window.editor_root.$.plugins.table.gridService.selectMenu_row_handle;
 		const rect = menu.form.getBoundingClientRect();
-		const anchor = document.querySelector('.se-table-move-menu-anchor').getBoundingClientRect();
+		const anchor = document.querySelector('.se-table-move-handle-row .se-table-move-grip').getBoundingClientRect();
 		return {
 			isOpen: menu.isOpen,
 			visible: getComputedStyle(menu.form).display === 'block' && rect.width > 0,
@@ -172,7 +172,7 @@ test('clicking a handle opens the row menu on the grip', async ({ page }) => {
 		const table = window.editor_root.$.plugins.table;
 		const form = table.styleService.controller_props.form;
 		const rect = form.getBoundingClientRect();
-		const anchorRect = document.querySelector('.se-table-move-menu-anchor').getBoundingClientRect();
+		const anchorRect = document.querySelector('.se-table-move-handle-row .se-table-move-grip').getBoundingClientRect();
 		return {
 			visible: form.style.display === 'block' && rect.width > 0,
 			nearHandle: Math.abs(rect.top - anchorRect.bottom) < 60 && Math.abs(rect.left - anchorRect.left) < 300,
@@ -272,4 +272,267 @@ test('handles survive crossing onto the row strip in an x-scrolled figure', asyn
 
 	expect(after.selected).toBe(true);
 	expect(after.rowHandle).toBe('block');
+});
+
+test('the pinned handle menu follows an inner wysiwyg scroll and hides while its grip is off-screen', async ({ page }) => {
+	await page.goto('/');
+	await page.waitForFunction(() => window.editor_root !== undefined, { timeout: 15000 });
+
+	// a table between long filler, inside a fixed-height (inner-scrolling) wysiwyg
+	const scrollable = await page.evaluate(() => {
+		const row = (p) => `<tr>${Array.from({ length: 4 }, (_, i) => `<td><div>${p}${i}</div></td>`).join('')}</tr>`;
+		const filler = Array.from({ length: 30 }, (_, i) => `<p>line ${i}</p>`).join('');
+		window.editor_root.$.html.set(`${filler}<table><tbody>${row('a')}${row('b')}${row('c')}</tbody></table>${filler}`);
+		const ww = document.querySelector('.se-wrapper-wysiwyg');
+		ww.style.height = '320px';
+		ww.style.overflowY = 'auto';
+		ww.scrollIntoView({ block: 'center' });
+		const figure = ww.querySelector('figure');
+		ww.scrollTop += figure.getBoundingClientRect().top - ww.getBoundingClientRect().top - 100;
+		return ww.scrollHeight > ww.clientHeight;
+	});
+	expect(scrollable).toBe(true);
+	await page.waitForTimeout(200);
+
+	const g = await page.evaluate(() => {
+		const r = document.querySelector('.se-wrapper-wysiwyg table').rows[1].cells[0].getBoundingClientRect();
+		return { x: Math.round((r.left + r.right) / 2), y: Math.round((r.top + r.bottom) / 2) };
+	});
+	await page.mouse.move(g.x + 20, g.y + 5);
+	await page.mouse.move(g.x, g.y, { steps: 4 });
+	await page.waitForTimeout(300);
+	const hLeft = await page.evaluate(
+		() => document.querySelector('.se-table-move-handle-row').getBoundingClientRect().left,
+	);
+	await page.mouse.click(Math.round(hLeft + 10), g.y);
+	await page.waitForTimeout(300);
+
+	const read = () =>
+		page.evaluate(() => {
+			const menu = window.editor_root.$.plugins.table.gridService.selectMenu_row_handle;
+			const m = menu.form.getBoundingClientRect();
+			const grip = document.querySelector('.se-table-move-handle-row .se-table-move-grip').getBoundingClientRect();
+			return {
+				isOpen: menu.isOpen,
+				shown: m.width > 0 && m.height > 0,
+				menuTop: m.top,
+				gripBottom: grip.bottom,
+				pinned: document.querySelector('.se-table-move-handle-row').classList.contains('active'),
+			};
+		});
+
+	const before = await read();
+	expect(before.isOpen).toBe(true);
+	expect(before.shown).toBe(true);
+	expect(Math.abs(before.menuTop - before.gripBottom)).toBeLessThan(6);
+
+	// scroll the wysiwyg a little — the pin and the menu stay, and the menu keeps to the grip
+	await page.evaluate(() => (document.querySelector('.se-wrapper-wysiwyg').scrollTop += 40));
+	await page.waitForTimeout(250);
+	const moved = await read();
+	expect(moved.pinned).toBe(true);
+	expect(moved.isOpen).toBe(true);
+	expect(moved.shown).toBe(true);
+	expect(before.gripBottom - moved.gripBottom).toBeGreaterThan(30); // the grip really moved
+	expect(Math.abs(moved.menuTop - moved.gripBottom)).toBeLessThan(6);
+
+	// scroll the band out of the editor's view — the menu hides but stays open
+	const shownTop = await page.evaluate(() => {
+		const ww = document.querySelector('.se-wrapper-wysiwyg');
+		const top = ww.scrollTop;
+		ww.scrollTop += 1200;
+		return top;
+	});
+	await page.waitForTimeout(250);
+	const away = await read();
+	expect(away.isOpen).toBe(true);
+	expect(away.shown).toBe(false);
+
+	// and comes back on the grip when scrolled back — to the recorded spot: `+= 1200` clamps at the
+	// bottom, so `-= 1200` would land lower, with the grip at the view's edge
+	await page.evaluate((top) => (document.querySelector('.se-wrapper-wysiwyg').scrollTop = top), shownTop);
+	await page.waitForTimeout(250);
+	const back = await read();
+	expect(back.isOpen).toBe(true);
+	expect(back.shown).toBe(true);
+	expect(Math.abs(back.menuTop - back.gripBottom)).toBeLessThan(6);
+});
+
+for (const iframe of [false, true]) {
+	test(`a pinned strip and its menu move with the wysiwyg scroll in the same tick (${iframe ? 'iframe' : 'div'})`, async ({ page }) => {
+		await page.goto('/');
+		await page.waitForFunction(() => window.editor_root !== undefined, { timeout: 15000 });
+		await page.evaluate((iframe) => {
+			const Table = window.editor_root.$.plugins.table.constructor;
+			const el = document.createElement('div');
+			document.body.prepend(el);
+			window.__pinEditor = window.suneditor.create(el, { plugins: [Table], buttonList: [['table']], iframe, height: '320px' });
+		}, iframe);
+		await page.waitForTimeout(600);
+		await page.evaluate(() => {
+			const row = (p) => `<tr>${Array.from({ length: 4 }, (_, i) => `<td><div>${p}${i}</div></td>`).join('')}</tr>`;
+			const filler = Array.from({ length: 30 }, (_, i) => `<p>line ${i}</p>`).join('');
+			window.__pinEditor.$.html.set(`${filler}<table><tbody>${row('a')}${row('b')}${row('c')}</tbody></table>${filler}`);
+			window.__pinEditor.$.frameContext.get('topArea').scrollIntoView({ block: 'start' });
+		});
+		await page.waitForTimeout(200);
+		await page.evaluate(() => {
+			const fc = window.__pinEditor.$.frameContext;
+			const frame = fc.get('wysiwygFrame');
+			const top = fc.get('wysiwyg').querySelector('table').getBoundingClientRect().top;
+			if (/^iframe$/i.test(frame.nodeName)) frame.contentWindow.scrollBy(0, Math.round(top - 100));
+			else fc.get('wysiwyg').scrollTop += Math.round(top - 100);
+		});
+		await page.waitForTimeout(200);
+
+		const cell = await page.evaluate(() => {
+			const fc = window.__pinEditor.$.frameContext;
+			const frame = fc.get('wysiwygFrame');
+			const off = /^iframe$/i.test(frame.nodeName) ? frame.getBoundingClientRect() : { left: 0, top: 0 };
+			const b = fc.get('wysiwyg').querySelector('table').rows[1].cells[1].getBoundingClientRect();
+			return { x: Math.round(off.left + (b.left + b.right) / 2), y: Math.round(off.top + (b.top + b.bottom) / 2) };
+		});
+		await page.mouse.click(cell.x, cell.y); // click-select: the strips show
+		await page.mouse.move(cell.x + 5, cell.y, { steps: 3 });
+		await page.waitForTimeout(300);
+		const h = await page.evaluate(() => {
+			const r = window.__pinEditor.$.frameContext.get('wrapper').querySelector('.se-table-move-handle-row').getBoundingClientRect();
+			return { x: Math.round((r.left + r.right) / 2), shown: r.width > 0 };
+		});
+		expect(h.shown).toBe(true);
+		await page.mouse.click(h.x, cell.y); // pin + menu
+		await page.waitForTimeout(300);
+
+		const r = await page.evaluate(
+			() =>
+				new Promise((resolve) => {
+					const $ = window.__pinEditor.$;
+					const fc = $.frameContext;
+					const frame = fc.get('wysiwygFrame');
+					const isIframe = /^iframe$/i.test(frame.nodeName);
+					const strip = fc.get('wrapper').querySelector('.se-table-move-handle-row');
+					const grip = strip.querySelector('.se-table-move-grip');
+					const menu = $.plugins.table.gridService.selectMenu_row_handle.form;
+					const row = fc.get('wysiwyg').querySelector('table').rows[1];
+					const read = () => ({
+						strip: grip.getBoundingClientRect().top - row.getBoundingClientRect().top,
+						menu: menu.getBoundingClientRect().top - grip.getBoundingClientRect().bottom,
+					});
+					const before = read();
+					const scroller = isIframe ? frame.contentWindow : fc.get('wysiwyg');
+					scroller.addEventListener('scroll', () => resolve({ before, during: read(), open: menu.getBoundingClientRect().width > 0 }), { once: true });
+					if (isIframe) frame.contentWindow.scrollBy(0, 40);
+					else scroller.scrollTop += 40;
+				}),
+		);
+
+		expect(r.open).toBe(true);
+		expect(Math.abs(r.during.strip - r.before.strip)).toBeLessThan(1);
+		expect(Math.abs(r.during.menu - r.before.menu)).toBeLessThan(1);
+	});
+}
+
+test('a table hover-selected and then used through the pin menu deselects on a click elsewhere', async ({ page }) => {
+	await page.goto('/');
+	await page.waitForFunction(() => window.editor_root !== undefined, { timeout: 15000 });
+	await page.evaluate(() => {
+		const Table = window.editor_root.$.plugins.table.constructor;
+		const el = document.createElement('div');
+		document.body.prepend(el);
+		window.__hoverEditor = window.suneditor.create(el, { plugins: [Table], buttonList: [['table']], height: '420px' });
+	});
+	await page.waitForTimeout(600);
+	await page.evaluate(() => {
+		const row = (p) => `<tr>${Array.from({ length: 4 }, (_, i) => `<td><div>${p}${i}</div></td>`).join('')}</tr>`;
+		window.__hoverEditor.$.html.set(`<p>before text</p><table><tbody>${row('a')}${row('b')}</tbody></table><p>after text here</p><p>more</p>`);
+		window.__hoverEditor.$.frameContext.get('topArea').scrollIntoView({ block: 'start' });
+	});
+	await page.waitForTimeout(300);
+
+	const selected = () =>
+		page.evaluate(() => !!window.__hoverEditor.$.frameContext.get('wysiwyg').querySelector('figure.se-component-selected'));
+	const c = await page.evaluate(() => {
+		const r = window.__hoverEditor.$.frameContext.get('wysiwyg').querySelector('table').rows[1].cells[1].getBoundingClientRect();
+		return { x: Math.round((r.left + r.right) / 2), y: Math.round((r.top + r.bottom) / 2) };
+	});
+
+	// hover only (no click), then pin through the row handle and dismiss the menu
+	await page.mouse.move(c.x + 20, c.y + 5);
+	await page.mouse.move(c.x, c.y, { steps: 5 });
+	await page.waitForTimeout(300);
+	const h = await page.evaluate(() => {
+		const r = window.__hoverEditor.$.frameContext.get('wrapper').querySelector('.se-table-move-handle-row').getBoundingClientRect();
+		return { x: Math.round((r.left + r.right) / 2) };
+	});
+	await page.mouse.click(h.x, c.y);
+	await page.waitForTimeout(300);
+	expect(await page.evaluate(() => window.__hoverEditor.$.plugins.table.gridService.selectMenu_row_handle.isOpen)).toBe(true);
+	await page.keyboard.press('Escape');
+	await page.waitForTimeout(300);
+
+	const p = await page.evaluate(() => {
+		const r = window.__hoverEditor.$.frameContext.get('wysiwyg').querySelector('p:last-child').getBoundingClientRect();
+		return { x: Math.round(r.left + 20), y: Math.round((r.top + r.bottom) / 2) };
+	});
+	await page.mouse.click(p.x, p.y);
+	await page.waitForTimeout(400);
+	expect(await selected()).toBe(false);
+});
+
+test('a drag move leaves a plain cell range selection — no pin, cell dot shown, handles follow the hover', async ({ page }) => {
+	await setup(page);
+
+	const g = await page.evaluate(() => {
+		const figure = document.querySelector('.se-wrapper-wysiwyg figure');
+		figure.scrollIntoView({ block: 'center' });
+		const rows = figure.querySelector('table').rows;
+		const mid = (r) => ({ x: Math.round((r.left + r.right) / 2), y: Math.round((r.top + r.bottom) / 2) });
+		return { r0: mid(rows[0].cells[0].getBoundingClientRect()), r2: mid(rows[2].cells[0].getBoundingClientRect()) };
+	});
+
+	// hover row 0, then drag its handle onto row 2
+	await page.mouse.move(g.r0.x + 20, g.r0.y + 5);
+	await page.mouse.move(g.r0.x, g.r0.y, { steps: 4 });
+	await page.waitForTimeout(300);
+	const hx = await page.evaluate(() =>
+		Math.round(document.querySelector('.se-table-move-handle-row').getBoundingClientRect().left + 10),
+	);
+	await page.mouse.move(hx, g.r0.y);
+	await page.mouse.down();
+	await page.mouse.move(hx, g.r2.y, { steps: 6 });
+	await page.mouse.up();
+	await page.waitForTimeout(300);
+
+	const after = await page.evaluate(() => {
+		const table = document.querySelector('.se-wrapper-wysiwyg table');
+		const plugin = window.editor_root.$.plugins.table;
+		const cellDot = plugin.dotService.cellDot;
+		return {
+			lastRowText: table.rows[2].cells[0].textContent,
+			active: !!document.querySelector('.se-table-move-handle-row.active, .se-table-move-handle-column.active'),
+			pinned: plugin.handleService.isPinned(),
+			selectedInMovedRow: table.rows[2].querySelectorAll('.se-selected-table-cell').length,
+			cellDotShown: !!cellDot && cellDot.isOpen && cellDot.form.style.display === 'block',
+			menuOpen: plugin.gridService.selectMenu_row_handle.isOpen,
+			gripStart: parseFloat(
+				document.querySelector('.se-table-move-handle-row').style.getPropertyValue('--se-table-grip-start'),
+			),
+		};
+	});
+
+	expect(after.lastRowText).toBe('a0'); // row a moved to the bottom
+	expect(after.active).toBe(false);
+	expect(after.pinned).toBe(false);
+	expect(after.selectedInMovedRow).toBeGreaterThan(0); // the moved band stays selected
+	expect(after.cellDotShown).toBe(true); // like a cell range selection
+	expect(after.menuOpen).toBe(false);
+
+	// the handles follow the hover again: hovering row 0 moves the grip up from the moved (last) row
+	await page.mouse.move(g.r0.x + 20, g.r0.y + 5, { steps: 4 });
+	await page.mouse.move(g.r0.x, g.r0.y, { steps: 4 });
+	await page.waitForTimeout(200);
+	const gripStart = await page.evaluate(() =>
+		parseFloat(document.querySelector('.se-table-move-handle-row').style.getPropertyValue('--se-table-grip-start')),
+	);
+	expect(gripStart).toBeLessThan(after.gripStart);
 });

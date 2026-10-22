@@ -19,16 +19,17 @@ that match the SunEditor release note style.
 
 Always classify each item into exactly one of the following categories:
 
-| Category         | When to use                                                              |
-| ---------------- | ------------------------------------------------------------------------ |
-| Design           | Changes the visual design of the editor UI (icons, spacing, theme)       |
-| New Feature      | Introduces a new capability, option, or plugin that did not exist before |
-| Enhancement      | Improves existing behavior, performance, or UX without adding a new API  |
+| Category         | When to use                                                               |
+| ---------------- | ------------------------------------------------------------------------- |
+| Design           | Changes the visual design of the editor UI (icons, spacing, theme)        |
+| New Feature      | Introduces a new capability, option, or plugin that did not exist before  |
+| Enhancement      | Improves existing behavior, performance, or UX without adding a new API   |
 | Changes          | Alters existing behavior without breaking it - working code keeps working |
-| Bugfix           | Corrects incorrect or unexpected behavior                                |
-| Breaking Changes | Removes, renames, or changes API compatibility from a prior version      |
-| Hotfix           | Critical fix released immediately; always bold the message               |
-| Translation      | Adds or updates i18n locale files                                        |
+| Bugfix           | Corrects incorrect or unexpected behavior                                 |
+| Security         | Fixes a vulnerability or hardens sanitizing (XSS, injection, bypass)      |
+| Breaking Changes | Removes, renames, or changes API compatibility from a prior version       |
+| Hotfix           | Critical fix released immediately; always bold the message                |
+| Translation      | Adds or updates i18n locale files                                         |
 
 ---
 
@@ -45,13 +46,13 @@ Keep only what a developer integrating the library needs to decide "does this af
 
 Drop everything else:
 
-| Drop                                                | Example of what to cut                                     |
-| --------------------------------------------------- | ---------------------------------------------------------- |
-| Source file / module / directory references          | `` (`core/section/constructor`, `core/logic/shell/ui`) ``   |
-| Root cause and implementation detail                 | "the groups were reversed in the DOM on top of the CSS ..." |
-| Internal identifiers users never call                | `#reverseToolbarButtons`, `#setPosition`, `InitOptions`     |
-| Internal CSS selectors and DOM structure             | `` `.se-btn-tray { direction: rtl }` ``                     |
-| Which code paths were involved, how it was fixed     | "both paths did it - at create time, and again in ..."      |
+| Drop                                             | Example of what to cut                                      |
+| ------------------------------------------------ | ----------------------------------------------------------- |
+| Source file / module / directory references      | ``(`core/section/constructor`, `core/logic/shell/ui`)``     |
+| Root cause and implementation detail             | "the groups were reversed in the DOM on top of the CSS ..." |
+| Internal identifiers users never call            | `#reverseToolbarButtons`, `#setPosition`, `InitOptions`     |
+| Internal CSS selectors and DOM structure         | `` `.se-btn-tray { direction: rtl }` ``                     |
+| Which code paths were involved, how it was fixed | "both paths did it - at create time, and again in ..."      |
 
 **One sentence per item.** Split into two bullets only when one change has two genuinely
 independent user-visible effects. If an item still needs a second sentence, it is carrying
@@ -111,23 +112,31 @@ Use one of these sentence patterns:
 ### Changes Patterns
 
 For behavior that is simply different, not better and not broken. Pick the category by what the
-reader has to *do*, never by whether the change felt like an improvement:
+reader has to _do_, never by whether the change felt like an improvement:
 
-| Category             | Existing code                                | Reader has to                       |
-| -------------------- | -------------------------------------------- | ----------------------------------- |
-| **Enhancement**      | keeps working, same result, only better       | nothing                             |
-| **Changes**          | keeps working, different result               | check whether they relied on the old behavior |
-| **Breaking Changes** | stops working as written                      | migrate                             |
+| Category             | Existing code                           | Reader has to                                 |
+| -------------------- | --------------------------------------- | --------------------------------------------- |
+| **Enhancement**      | keeps working, same result, only better | nothing                                       |
+| **Changes**          | keeps working, different result         | check whether they relied on the old behavior |
+| **Breaking Changes** | stops working as written                | migrate                                       |
 
 - State the old value or behavior, so the reader can tell at a glance whether it affects them.
 - Say how to get the previous behavior back when an option can restore it.
     > `The default value of the \`slashCommand.limitSize\` option has been changed to no limit; set it explicitly to restore a cap.`
-    > `The command menu now commits on Enter instead of Space.`
+`The command menu now commits on Enter instead of Space.`
 
 A changed default is **not** automatically breaking - it is breaking only when the old code stops
 doing what its author intended. `limitSize` defaulting to no limit just shows more rows, so it is a
 Change; `strictHTMLValidation` defaulting to `true` can reject content that used to pass, so it is
 a Breaking Change.
+
+### Security Patterns
+
+- Start with "Fixed a vulnerability where..." or "Hardened ..." and name the affected surface, not the payload.
+- Never include a proof-of-concept payload, bypass string or exploit steps.
+- Link the published GitHub Security Advisory when one exists.
+    > `Fixed a vulnerability where a \`javascript:\` URL in a \`<video>\` \`poster\` attribute was not removed by the HTML sanitizer.`
+`Hardened URL sanitizing for \`poster\`, \`cite\` and \`formaction\` attributes. ([GHSA-xxxx-xxxx-xxxx](https://github.com/JiHong88/SunEditor/security/advisories/GHSA-xxxx-xxxx-xxxx))`
 
 ### Breaking Changes Patterns
 
@@ -160,6 +169,10 @@ Group items under their category label. Use this exact heading format:
 
 * ...
 
+### Security
+
+* ...
+
 ### Breaking Changes
 
 * ...
@@ -177,16 +190,16 @@ Group items under their category label. Use this exact heading format:
 
 `changes.md` is an internal engineering log, not a draft release note. Per
 `prompts/changes-guide.md` every entry ends with the **source file or plugin it touched**, in
-parentheses - `` (`core/logic/shell/ui`) ``. That reference exists for the demo/maintenance
+parentheses - ``(`core/logic/shell/ui`)``. That reference exists for the demo/maintenance
 workflow and **must not reach the release note**. Entries also tend to explain the root cause,
 because they are written right after the fix. Condense as described above.
 
 Map its section headings onto categories:
 
-| `changes.md` | Release note                                                                  |
-| ------------ | ------------------------------------------------------------------------------ |
+| `changes.md` | Release note                                                                    |
+| ------------ | ------------------------------------------------------------------------------- |
 | `feat`       | **New Feature** - or **Design** if it is purely visual                          |
-| `fix`        | **Bugfix**                                                                      |
+| `fix`        | **Bugfix** - or **Security** if it closes a vulnerability or hardens sanitizing |
 | `change`     | **Changes** - or **Breaking Changes** if existing code stops working as written |
 | `breaking`   | **Breaking Changes**                                                            |
 

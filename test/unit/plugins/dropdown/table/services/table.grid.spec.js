@@ -38,6 +38,10 @@ jest.mock('../../../../../../src/modules/ui', () => ({
 	})),
 }));
 
+jest.mock('../../../../../../src/modules/contract', () => ({
+	Controller: jest.fn().mockImplementation((host, $, form) => ({ open: jest.fn(), close: jest.fn(), isOpen: false, form })),
+}));
+
 jest.mock('../../../../../../src/plugins/dropdown/table/shared/table.utils', () => ({
 	CreateCellsHTML: jest.fn().mockReturnValue({ nodeName: 'TD' }),
 	CreateCellsString: jest.fn().mockReturnValue('<td></td>'),
@@ -93,6 +97,7 @@ describe('TableGridService', () => {
 			_setCellControllerPosition: jest.fn(),
 			_closeController: jest.fn(),
 			historyPush: jest.fn(),
+			handleService: { rowStrip: {}, columnStrip: {} },
 		};
 
 		// Make main act as its own kernel for dependency injection

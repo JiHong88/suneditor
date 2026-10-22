@@ -46,7 +46,7 @@ class Anchor extends PluginPopup {
 			this,
 			this.$,
 			controllerSelectEl,
-			{ position: 'bottom', disabled: true },
+			{ position: 'bottom', disabled: true, selection: true },
 			Anchor.key,
 		);
 

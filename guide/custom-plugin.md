@@ -832,6 +832,10 @@ Any plugin can implement event hooks. Method names use the lowercase `on` prefix
 - `true` — Stops remaining plugins, **allows** default editor behavior
 - `void` / `undefined` — Continues to next plugin
 
+For `onKeyDown`, the editor has already blocked the browser's default action for a key it takes over
+(Enter, Backspace/Delete merges, Tab, ...) before the hooks run — so `false` there means the key does nothing
+unless your hook performs the edit itself.
+
 | Hook                 | Interruptible | Params Type                | Description             |
 | -------------------- | ------------- | -------------------------- | ----------------------- |
 | `onKeyDown`          | Yes           | `HookParams.KeyEvent`      | Key down in editor      |
@@ -916,6 +920,25 @@ For plugins using the `Controller` module (floating toolbar).
 | `controllerAction(target)`   | **Yes**  | Controller button clicked | `void` — `target`: the clicked button element |
 | `controllerOn(form, target)` | No       | After controller opens    | `void`                                        |
 | `controllerClose()`          | No       | Before controller closes  | `void`                                        |
+
+**Selection UI vs standalone.** Every controller is one of two kinds — declare which:
+
+- **Selection UI** (`selection: true`) — the controller a component opens for itself in `componentSelect`
+  (image, table, embed toolbars). The component keeps the selection and its own keyboard/copy/outside-click
+  handling while it is open; keys typed into the controller's inputs stay with the inputs. Children
+  (`parents: [...]`) inherit the flag. Closing a base selection controller ends the selection.
+- **Standalone** (default) — a controller with no selected component behind it (link preview, autocomplete).
+  It owns the outside-click/key handling while open.
+
+**Esc** closes one level per press (`escape: 'level'`, default): an open child closes by itself and the
+selection stays; a base selection controller leaves Esc to its component, which deselects. Pass
+`escape: 'all'` to close every open controller and end the selection on one Esc — the same as calling
+`this.$.ui.closeAllControllers()`. An open select menu (`SelectMenu`) is a level of its own: Esc closes
+only the menu. A layer that handles Esc calls `preventDefault()`, so a plugin with its own global Esc
+handler should return when `e.defaultPrevented` is already set.
+
+Never inspect `ui.opendControllers` or `.se-controller` classes to ask "is this inside a controller?" —
+use `this.$.ui.isInsideController(node)`, `getControllerAt(node)` or `hasFloatingController()`.
 
 #### ModuleColorPicker
 
@@ -1044,7 +1067,7 @@ class CustomEmbed extends interfaces.PluginModal
     const controllerEl = /* build controller HTML */;
 
     this.modal = new Modal(this, this.$, modalEl);
-    this.controller = new Controller(this, this.$, controllerEl);
+    this.controller = new Controller(this, this.$, controllerEl, { selection: true }); // the component's selection UI
   }
 
   // Static: detect embed components
@@ -1132,7 +1155,7 @@ class CustomEmbed extends PluginModal {
 		super(kernel);
 		this._element = null;
 		this.modal = new Modal(this, this.$, modalEl);
-		this.controller = new Controller(this, this.$, controllerEl);
+		this.controller = new Controller(this, this.$, controllerEl, { selection: true }); // the component's selection UI
 	}
 
 	/**
@@ -1486,7 +1509,7 @@ class Embed
 		);
 
 		this.modal = new Modal(this, this.$, modalEl);
-		this.controller = new Controller(this, this.$, controllerEl);
+		this.controller = new Controller(this, this.$, controllerEl, { selection: true }); // the component's selection UI
 		this.urlInput = modalEl.querySelector('input')!;
 	}
 

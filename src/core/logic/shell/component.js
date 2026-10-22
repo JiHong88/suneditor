@@ -118,6 +118,17 @@ class Component {
 	}
 
 	/**
+	 * @description Whether the current selection is only a hover selection (made on mouse-over, cleared on mouse-out)
+	 * — not yet upgraded by a click or an opened controller.
+	 * @returns {boolean}
+	 */
+	get isHoverSelected() {
+		if (!this.isSelected) return false;
+		const overInfo = _DragHandle.get('__overInfo');
+		return overInfo === ON_OVER_COMPONENT || overInfo === undefined;
+	}
+
+	/**
 	 * @description Inserts an element and returns it. (Used for elements: table, hr, image, video)
 	 * - If `element` is `HR`, inserts and returns the new line.
 	 * @param {Node} element Element to be inserted
@@ -430,6 +441,8 @@ class Component {
 	 * @description Deselects the selected component.
 	 */
 	deselect() {
+		if (this.#store.isActive?.() === false) return;
+
 		// Defer controlActive reset — synchronous blur handlers during deselect still need to see it as active
 		_w.setTimeout(() => {
 			this.#store.set('controlActive', false);
@@ -525,6 +538,8 @@ class Component {
 	 * @param {Element} target The element to hover-select
 	 */
 	hoverSelect(target) {
+		if (this.#store.isActive?.() === false) return;
+
 		const figure = dom.query.getParentElement(target, dom.check.isFigure);
 		let info = this.get(target);
 		if (info || figure) {
@@ -536,6 +551,7 @@ class Component {
 					this.#$.ui.offCurrentController();
 					_DragHandle.set('__overInfo', ON_OVER_COMPONENT);
 					this.select(info.target, info.pluginName);
+					if (_DragHandle.get('__overInfo') === ON_OVER_COMPONENT) _DragHandle.set('__overInfo', undefined);
 				}
 			}
 		} else if (_DragHandle.get('__overInfo') !== null && !dom.utils.hasClass(target, 'se-drag-handle')) {
@@ -550,8 +566,9 @@ class Component {
 	 * - This method resets the selection state and hides UI elements related to the component selection.
 	 */
 	__deselect() {
+		if (this.#store.isActive?.() === false) return;
+
 		this.#store.set('_preventBlur', false);
-		this.#$.ui.offControllerTriggerContext();
 		_DragHandle.set('__overInfo', null);
 		this.__removeDragEvent();
 
@@ -836,11 +853,10 @@ class Component {
 		const target = dom.query.getEventTarget(e);
 		if (
 			this.currentTarget?.contains(target) ||
+			dom.utils.hasClass(target, 'se-drag-handle') ||
+			this.#$.ui.isInsideController(target) ||
 			dom.query.getParentElement(target, '.se-controller') ||
-			dom.query.getParentElement(target, '.se-select-menu') ||
-			dom.utils.hasClass(target, 'se-drag-handle|se-table-move-handle|se-controller-trigger') ||
-			(this.currentPluginName === this.#$.ui.currentControllerName &&
-				this.#$.ui.opendControllers.some(({ form }) => form.contains(target)))
+			dom.query.getParentElement(target, '.se-select-menu')
 		) {
 			return;
 		}
@@ -853,6 +869,7 @@ class Component {
 	#OnCopy_component(e) {
 		const target = dom.query.getEventTarget(e);
 		if (dom.check.isInputElement(target) && dom.query.getParentElement(target, '.se-modal')) return;
+		if (this.#$.ui.isInsideController(target)) return;
 
 		const info = this.info;
 		if (!info) return;
@@ -873,6 +890,8 @@ class Component {
 	 * @param {ClipboardEvent} e - Event object
 	 */
 	#OnCut_component(e) {
+		if (this.#$.ui.isInsideController(dom.query.getEventTarget(e))) return;
+
 		const info = this.info;
 		if (!info) return;
 
@@ -888,9 +907,11 @@ class Component {
 	 * @param {KeyboardEvent} e - Event object
 	 */
 	async #OnKeyDown_component(e) {
-		if (this.#$.ui.selectMenuOn) return;
+		if (this.#store.isActive?.() === false || this.#$.ui.selectMenuOn) return;
 
 		const keyCode = e.code;
+		if (!keyCodeMap.isEsc(keyCode) && this.#$.ui.isInsideController(dom.query.getEventTarget(e))) return;
+
 		const ctrl = keyCodeMap.isCtrl(e);
 
 		// redo, undo
@@ -913,6 +934,7 @@ class Component {
 
 			if (
 				typeof this.currentPlugin?.componentDestroy === 'function' &&
+				this.info?.container &&
 				(!this.info.isInputType || !this.#store.get('hasFocus'))
 			) {
 				const focusNode = this.info.container.previousSibling;
@@ -932,7 +954,8 @@ class Component {
 		if (keyCodeMap.isEnter(keyCode)) {
 			e.preventDefault();
 			const compContext = this.currentInfo || this.get(this.currentTarget);
-			const container = compContext.container || compContext.target;
+			const container = compContext?.container || compContext?.target;
+			if (!container?.parentNode) return;
 			const sibling = container.previousElementSibling || container.nextElementSibling;
 			let newEl = null;
 			if (dom.check.isListCell(container.parentNode)) {
@@ -957,7 +980,9 @@ class Component {
 		// up down, left right
 		DIR_KEYCODE.lastIndex = 0;
 		if (DIR_KEYCODE.test(keyCode)) {
-			const { container } = this.get(this.currentTarget);
+			const comp = this.get(this.currentTarget);
+			if (!comp) return;
+			const { container } = comp;
 			const isInline = this.isInline(container || this.currentTarget);
 
 			let el = null;
@@ -1021,6 +1046,7 @@ class Component {
 
 		// ESC
 		if (keyCodeMap.isEsc(keyCode)) {
+			if (e.defaultPrevented) return;
 			this.deselect();
 			return;
 		}

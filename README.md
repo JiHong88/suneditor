@@ -4,38 +4,53 @@
   </a>
 </p>
 
-<p align="center"><em>A lightweight and powerful WYSIWYG editor built with vanilla JavaScript</em></p>
+<p align="center"><strong>A modular WYSIWYG HTML editor with zero runtime dependencies.</strong><br /><em>Everything included. Enable only what you need.</em></p>
 
 <p align="center">
 	<a href="https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt" title="MIT License"><img src="https://img.shields.io/github/license/jihong88/suneditor.svg?style=flat-square" alt="GitHub License"></a>
 	<a href="https://www.npmjs.com/package/suneditor" title="npm release"><img src="https://img.shields.io/npm/v/suneditor.svg?style=flat-square" alt="npm"></a>
-	<a href="https://www.npmjs.com/package/suneditor" title="npm month downloads"><img src="https://img.shields.io/npm/dm/suneditor.svg?logo=npm&style=flat-square" alt="npm weekly downloads"></a>
+	<a href="https://www.npmjs.com/package/suneditor" title="npm month downloads"><img src="https://img.shields.io/npm/dm/suneditor.svg?logo=npm&style=flat-square" alt="npm monthly downloads"></a>
 	<a href="https://www.jsdelivr.com/package/npm/suneditor" title="jsDelivr CDN month downloads"><img src="https://img.shields.io/jsdelivr/npm/hm/suneditor?label=CDN&style=flat-square" alt="jsDelivr CDN" /></a>
 	<a href="https://codecov.io/gh/jihong88/suneditor" title="Test coverage"><img src="https://codecov.io/gh/jihong88/suneditor/branch/develop/graph/badge.svg" alt="Test coverage" /></a>
 </p>
 
+<p align="center">
+	<a href="https://suneditor.com/playground"><strong>Live Playground</strong></a> ·
+	<a href="https://suneditor.com"><strong>Documentation</strong></a> ·
+	<a href="#-install--quick-start"><strong>Get Started</strong></a> ·
+	<a href="#-framework-integration"><strong>Frameworks</strong></a>
+</p>
+
 #
 
-SunEditor supports all modern browsers without dependencies or polyfills.
+- **Tables, images, video, audio and files** — resize, align, captions, galleries and uploads built in
+- **Markdown, math and code blocks** — GFM Markdown view, LaTeX math, code blocks with a language selector
+- **Slash commands and block handles** — `/` command menu, drag handles to move blocks
+- **Mentions, find & replace, templates, PDF export, drawing** — and more, as opt-in plugins
+- **TypeScript** — bundled type definitions for options, plugins and the public API
+- **Works with any framework** — React, Vue, Angular, Svelte or plain HTML
+- **MIT License** — free for commercial use, no account or cloud service required
+- **Zero runtime dependencies** — no polyfills, no peer dependencies
 
-## 🌟 Why SunEditor?
+## 🤔 Need an editor, not an editor framework?
 
-SunEditor is a lightweight, fast, and extensible WYSIWYG editor written in pure JavaScript.  
-It's easy to integrate, highly customizable, and built for modern web applications.
+Headless editor frameworks (Tiptap, Lexical, ProseMirror) give you an engine and leave the toolbar, dialogs,
+tables and media handling for you to build. That is the right choice when the editor **is** your product.
 
-### ⚡ Key Features
+SunEditor is for the other case: you need a complete HTML editor in a CMS, admin panel, back office,
+board, product description or email form — and you need it today.
 
-- **No dependencies** — Optimized for speed and simplicity
-- **Modular architecture** — Enable only the plugins you need
-- **Responsive UI** — Works smoothly on all modern devices
-- **Framework-friendly** — Easy to use with React, Vue, Svelte, etc.
-- **Feature-rich plugin ecosystem**, including:
-    - @Mentions with autocomplete
-    - Advanced table editing & custom layouts
-    - Math (LaTeX), drawing, and code block support (with language selector)
-    - Markdown view mode (GFM) — edit content as Markdown
-    - Built-in media galleries (image, video, audio, file)
-    - PDF export, templates, and embedded content (audio/video/iframe)
+|                              | SunEditor                      | Headless editor framework              |
+| ---------------------------- | ------------------------------ | -------------------------------------- |
+| Toolbar, dialogs, menus      | Built in                       | You build them                         |
+| Tables, images, media, files | Built in                       | Extensions + your own UI               |
+| Output                       | HTML                           | Document model (HTML via a serializer) |
+| First working editor         | One `create()` call            | Engine setup + your own UI             |
+| Best for                     | CMS, admin, back office, forms | Notion-like or highly custom editors   |
+
+**When SunEditor is not the best fit:** Notion-like block products, deeply custom node UIs, or collaboration-first
+editors are better served by Tiptap or Lexical. Enterprise document workflows that need comments, track changes and
+vendor support are better served by CKEditor.
 
 ### 📝 Content Editing Approach
 
@@ -45,7 +60,11 @@ SunEditor is optimized for **structured content** (articles, documentation, emai
 
 🌤 **[Try all plugins in Playground](https://suneditor.com/playground)**
 
-⭐ **Contributions welcome!** Please refer to [Contribution Guidelines](/CONTRIBUTING.md) and check out our [open tasks](https://github.com/jihong88/suneditor/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22). ⭐
+⭐ If SunEditor saves you time, a [GitHub star](https://github.com/JiHong88/SunEditor) helps other developers find it.
+
+🤝 **Contributions welcome!** See the [Contribution Guidelines](/CONTRIBUTING.md) and the
+[`good first issue`](https://github.com/jihong88/suneditor/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22) /
+[`help wanted`](https://github.com/jihong88/suneditor/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22) issues.
 
 ---
 
@@ -176,6 +195,16 @@ suneditor.create('#editor', {
 
 📘 [Learn how to build your own plugin →](https://suneditor.com/plugin-guide)
 
+### Community plugins
+
+| Package   | Naming                                                               | Published by                                                    |
+| --------- | -------------------------------------------------------------------- | --------------------------------------------------------------- |
+| Official  | `@suneditor/<name>` (e.g. `@suneditor/plugin-mermaid`)               | The [suneditor](https://github.com/suneditor) organization only |
+| Community | `suneditor-plugin-<name>` or `@<your-scope>/suneditor-plugin-<name>` | Anyone                                                          |
+
+Add the `suneditor` and `suneditor-plugin` keywords so others can find your plugin, and share it in
+[Discussions → Show and tell](https://github.com/JiHong88/SunEditor/discussions/categories/show-and-tell).
+
 🤖 Want to build plugins? Get real-time help from [SunEditor Devs AI](https://chatgpt.com/g/g-JViNPCrkD-suneditor-devs).\
 See [Contribution Guide](./CONTRIBUTING.md#-ai-plugin-helper) for tips and examples.
 
@@ -198,6 +227,13 @@ See [Contribution Guide](./CONTRIBUTING.md#-ai-plugin-helper) for tips and examp
 ### Sponsors
 
 [![Sponsors on Open Collective](https://opencollective.com/suneditor/sponsors.svg?width=890&avatarHeight=64&button=false)](https://opencollective.com/suneditor)
+
+---
+
+## 🔒 Security
+
+SunEditor sanitizes HTML on input, paste and Code View, and an XSS regression corpus runs with the unit test suite in CI.
+Please report vulnerabilities privately — see the [Security Policy](./SECURITY.md).
 
 ---
 

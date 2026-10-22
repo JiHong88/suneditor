@@ -30,6 +30,14 @@ describe('Core Logic - Selection', () => {
 		jest.clearAllMocks();
 	});
 
+	describe('init', () => {
+		it('should not throw when the frame document is already gone', () => {
+			kernel.$.frameContext.set('_wd', undefined);
+			expect(() => selection.init()).not.toThrow();
+			expect(selection.init()).toBeNull();
+		});
+	});
+
 	describe('get', () => {
 		it('should return selection object', () => {
 			const sel = selection.get();

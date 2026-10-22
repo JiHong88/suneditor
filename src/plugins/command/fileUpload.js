@@ -130,7 +130,7 @@ class FileUpload extends PluginCommand {
 				this,
 				this.$,
 				controllerEl,
-				{ position: 'bottom', disabled: true },
+				{ position: 'bottom', disabled: true, selection: true },
 				FileUpload.key,
 			);
 			this.editInput = controllerEl.querySelector('input');

@@ -10,6 +10,7 @@ import {
 	OnClick_wysiwyg,
 	OnMouseMove_wysiwyg,
 	OnMouseLeave_wysiwyg,
+	cancelWysiwygMouseMoveFrames,
 } from '../event/handlers/handler_ww_mouse';
 import { OnBeforeInput_wysiwyg, OnInput_wysiwyg } from '../event/handlers/handler_ww_input';
 import { OnKeyDown_wysiwyg, OnKeyUp_wysiwyg } from '../event/handlers/handler_ww_key';
@@ -680,6 +681,8 @@ class EventOrchestrator extends KernelInjector {
 			this._toolbarObserver = null;
 		}
 
+		cancelWysiwygMouseMoveFrames(this);
+
 		// clear timers
 		if (this.#balloonDelay) {
 			_w.clearTimeout(this.#balloonDelay);
@@ -801,6 +804,8 @@ class EventOrchestrator extends KernelInjector {
 	 * @param {FocusEvent} event - Focus event object
 	 */
 	__postFocusEvent(frameContext, event) {
+		if (this.#store.isActive?.() === false) return;
+
 		if (this.#store.mode.isInline || this.#store.mode.isBalloonAlways) this.#toolbar.show();
 		if (this.#store.mode.isSubBalloonAlways) this.$.subToolbar.show();
 
@@ -826,6 +831,7 @@ class EventOrchestrator extends KernelInjector {
 		if (this.#store.mode.isInline) {
 			// Defer hide — prevents race with deferred focus show (setTimeout in #OnFocus_wysiwyg)
 			_w.setTimeout(() => {
+				if (this.#store.isActive?.() === false) return;
 				if (!this.#store.get('hasFocus')) {
 					this._hideToolbar();
 				}
@@ -966,6 +972,7 @@ class EventOrchestrator extends KernelInjector {
 
 		// Defer focus event emission — allow blur handler on the previous frame to complete first
 		_w.setTimeout(() => {
+			if (this.#store.isActive?.() === false) return;
 			this.__postFocusEvent(frameContext, e);
 		}, 0);
 	}

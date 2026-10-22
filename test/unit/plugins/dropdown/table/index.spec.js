@@ -862,6 +862,44 @@ describe('Table Plugin Main Class', () => {
              tablePlugin.onScroll();
              expect(tablePlugin.resizeService.offResizeGuide).toHaveBeenCalled();
         });
+
+        it('hides unpinned hover strips on scroll; a pinned handle stays (the core moves in-editor controllers)', () => {
+             tablePlugin.handleService.isPinned = jest.fn(() => false);
+             tablePlugin.handleService.hide = jest.fn();
+             tablePlugin.onScroll();
+             expect(tablePlugin.handleService.hide).toHaveBeenCalledTimes(1);
+
+             tablePlugin.handleService.isPinned = jest.fn(() => true);
+             tablePlugin.onScroll();
+             expect(tablePlugin.handleService.hide).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe('Dot launchers - popup close', () => {
+        it('a wysiwyg mousedown closes the dot-launched controllers first', () => {
+             tablePlugin.dotService.closeControllers = jest.fn();
+             const { dom } = require('../../../../../src/helper');
+             dom.query.getParentElement.mockReturnValue(null);
+             tablePlugin.onMouseDown({ event: { target: document.createElement('div') } });
+             expect(tablePlugin.dotService.closeControllers).toHaveBeenCalledTimes(1);
+        });
+
+        it('_closeController ends the table selection in every position mode', () => {
+             tablePlugin.$.component = { ...tablePlugin.$.component, deselect: jest.fn() };
+             tablePlugin.controller_table = { close: jest.fn() };
+             tablePlugin.controller_cell = { close: jest.fn() };
+             tablePlugin.dotService.hide = jest.fn();
+
+             tablePlugin.tableControllerPosition = 'dot';
+             tablePlugin.cellControllerPosition = 'dot';
+             tablePlugin._closeController();
+             tablePlugin.cellControllerPosition = 'cell';
+             tablePlugin._closeController();
+
+             expect(tablePlugin.controller_table.close).toHaveBeenCalledWith(true);
+             expect(tablePlugin.dotService.hide).toHaveBeenCalledTimes(2);
+             expect(tablePlugin.$.component.deselect).toHaveBeenCalledTimes(2);
+        });
     });
 
     describe('Detailed Branch Coverage', () => {
