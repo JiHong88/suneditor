@@ -20,6 +20,8 @@
 
 ### fix
 
+
+- Fixed the French table menu swapping “insert row above” and “insert row below” (`langs/fr`)
 - Fixed crashes when a controller, component, or selection callback runs after the editor is destroyed — store writes (`controlActive`, `_preventBlur`), component deselect, and `selection.init` no longer touch released state (`core/kernel/store`, `core/logic/shell/component`, `core/logic/dom/selection`)
 - Fixed a crash when a coalesced wysiwyg mousemove frame runs after the editor is destroyed — component lookup no longer iterates a released checker list, and the pending frame is cancelled (`core/logic/shell/pluginManager`, `core/event/handlers/handler_ww_mouse`)
 - Fixed a crash when a deferred focus event runs after the editor is destroyed — plugin event dispatch no longer reads a cleared handler list (`core/logic/shell/pluginManager`, `core/event/eventOrchestrator`)
