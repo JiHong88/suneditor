@@ -1,5 +1,10 @@
 import type {} from '../../../typedef';
 /**
+ * @description Cancel coalesced wysiwyg mousemove frames for one editor.
+ * @param {object} editor Event orchestrator that scheduled the frames.
+ */
+export function cancelWysiwygMouseMoveFrames(editor: object): void;
+/**
  * @typedef {import('../eventOrchestrator').default} EventManagerThis_handler_ww_mouse
  */
 /**
