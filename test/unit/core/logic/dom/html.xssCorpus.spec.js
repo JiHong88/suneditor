@@ -79,6 +79,56 @@ const CORPUS = [
 	['unclosed attribute', '<p title="x><img src=x onerror=alert(1)>">y</p>'],
 	['nested malformed', '<p><b><i><a href="javascript:alert(1)"><img src=x onerror=alert(1)></b></p>'],
 	['select breakout', '<select><option><img src="x" onerror="alert(1)"></option></select>'],
+
+	// --- security advisories: namespaced-lookalike tag names skip attribute cleaning
+	// (EXTRA_TAG_MAP `[a-z]+:[a-z]+` vs `_RE_XML_NS_TAG` `[a-z0-9]+:[a-z0-9]+` vs the whitelist `\b` lookahead)
+	['GHSA-6pm3-2q9w-2926 ns tag digit name', '<a:1 onclick="alert(document.cookie)">click me</a:1>'],
+	['GHSA-m989-x9mj-698j ns tag digit prefix', '<p>x</p><a1:b2 onclick="alert(1)">Click</a1:b2><p>y</p>'],
+	['GHSA-m989-x9mj-698j ns tag digit prefix 2', '<x1:y onclick="alert(1)">Link</x1:y>'],
+	['GHSA-m989-x9mj-698j ns tag digit prefix 3', '<a1:b onmouseover="alert(1)">Hover me</a1:b>'],
+	['GHSA-692m-4688-45wp ns tag alnum', '<p><a:1b src="/x" onclick="alert(1)">click</a:1b></p>'],
+	['GHSA-692m-4688-45wp ns tag text-style branch', '<p><b:1c src="/x" onmouseover="alert(1)">hover</b:1c></p>'],
+	['GHSA-692m-4688-45wp ns tag dash suffix', '<p><a:1-d src="/x" onclick="alert(1)">click</a:1-d></p>'],
+	['ns tag variant: dash prefix', '<p><a-b:c onclick="alert(1)">x</a-b:c></p>'],
+	['ns tag variant: dot name', '<p><a:b.c onclick="alert(1)">x</a:b.c></p>'],
+	['ns tag variant: underscore', '<p><x_y:z onclick="alert(1)">x</x_y:z></p>'],
+
+	// --- security advisories: iframe placeholder rebuild copies `srcdoc` (and any other key) verbatim
+	[
+		'GHSA-q867-q2hw-f8gp placeholder srcdoc svg',
+		'<span data-se-iframe-holder="1" data-se-iframe-holder-attrs="{&quot;srcdoc&quot;:&quot;<svg/onload=window.__PWNED=document.domain&gt;&quot;}">x</span>',
+	],
+	[
+		'GHSA-q867-q2hw-f8gp placeholder srcdoc svg (jsdom-stable)',
+		'<span data-se-iframe-holder="1" data-se-iframe-holder-attrs="{&quot;srcdoc&quot;:&quot;<svg/onload=alert(document.domain)&quot;}">x</span>',
+	],
+	[
+		'GHSA-8rr9-72mx-m49h placeholder srcdoc json-escaped script',
+		'<div data-se-iframe-holder="1" data-se-iframe-holder-attrs="{&quot;srcdoc&quot;:&quot;\\u003cscript\\u003ealert(document.cookie)\\u003c/script\\u003e&quot;}">[iframe: ]</div>',
+	],
+	[
+		'GHSA-3qm5-8p2w-5q9j placeholder srcdoc entity script',
+		'<div data-se-iframe-holder="1" data-se-iframe-holder-attrs="{&quot;srcdoc&quot;:&quot;&lt;script&gt;alert(document.domain)&lt;/script&gt;&quot;}">placeholder</div>',
+	],
+	[
+		'GHSA-692m-4688-45wp placeholder srcdoc single-quoted json',
+		`<p>x</p><div data-se-iframe-holder="1" data-se-iframe-holder-attrs='{"srcdoc":"&lt;script&gt;alert(document.domain)&lt;/script&gt;"}'>y</div>`,
+	],
+	[
+		'GHSA-692m-4688-45wp placeholder malformed json (crash)',
+		`<div data-se-iframe-holder="1" data-se-iframe-holder-attrs='{"srcdoc":"<img src=x onerror=alert(1)>"}'>y</div>`,
+	],
+	[
+		'placeholder variant: attrs not an object',
+		'<div data-se-iframe-holder="1" data-se-iframe-holder-attrs="null">y</div>',
+	],
+
+	// --- security advisories: `_normalizeURL` drops named entities instead of decoding them
+	['GHSA-v4jx-8pj6-w4w8 &colon; entity', '<a href="javascript&colon;alert(document.domain)">Click me</a>'],
+	['GHSA-v4jx-8pj6-w4w8 &colon; entity in src', '<img src="javascript&colon;alert(1)">'],
+	['entity variant: numeric without semicolon', '<a href="javascript&#58alert(1)">x</a>'],
+	['entity variant: hex without semicolon', '<a href="javascript&#x3a//%0aalert(1)">x</a>'],
+	['entity variant: &Tab; split', '<a href="java&Tab;script:alert(1)">x</a>'],
 ];
 
 const URL_ATTRS = new Set(['href', 'src', 'action', 'formaction', 'xlink:href', 'data', 'poster', 'background', 'codebase', 'cite', 'longdesc', 'srcset', 'values', 'to', 'from']);
@@ -140,6 +190,15 @@ const EDITOR_CASES = [
 			buttonList: [['blockquote', 'list', 'table', 'link', 'image', 'video', 'audio', 'embed', 'math', 'anchor', 'codeBlock']],
 		},
 	],
+	// no DOMParser round-trip before the attribute filter: entities reach `_normalizeURL` undecoded
+	['autoStyleify off', { buttonList: [['bold', 'italic']], autoStyleify: [] }],
+	// the security checks must not depend on which attribute/style filters are on
+	['styleFilter off', { buttonList: [['bold', 'italic']], strictMode: { styleFilter: false } }],
+	['attrFilter off', { buttonList: [['bold', 'italic']], strictMode: { attrFilter: false } }],
+	[
+		'attrFilter + styleFilter off, autoStyleify off',
+		{ buttonList: [['bold', 'italic']], strictMode: { attrFilter: false, styleFilter: false }, autoStyleify: [] },
+	],
 ];
 
 describe.each(EDITOR_CASES)('XSS corpus (%s)', (_name, options) => {
@@ -164,5 +223,29 @@ describe.each(EDITOR_CASES)('XSS corpus (%s)', (_name, options) => {
 	it.each(CORPUS)('html.set/get: %s', (_label, payload) => {
 		editor.$.html.set(payload);
 		expect(findViolations(editor.$.html.get())).toEqual([]);
+	});
+});
+
+// With `tagFilter` off no tag is removed, but the attribute filter still runs and must strip
+// event handlers from namespaced-lookalike tags too (GHSA-m989-x9mj-698j: `<a1:b2>` is only
+// removed by the element whitelist, not by the namespace handling).
+describe('XSS corpus (tagFilter off): namespaced tag event handlers', () => {
+	const NS_TAG_CASES = CORPUS.filter(([label]) => label.includes('ns tag'));
+	let editor;
+
+	beforeAll(async () => {
+		jest.spyOn(console, 'warn').mockImplementation(() => {});
+		jest.spyOn(console, 'error').mockImplementation(() => {});
+		editor = createTestEditor({ defaultLine: 'p', buttonList: [['bold', 'italic']], strictMode: { tagFilter: false } });
+		await waitForEditorReady(editor);
+	});
+
+	afterAll(() => {
+		destroyTestEditor(editor);
+		jest.restoreAllMocks();
+	});
+
+	it.each(NS_TAG_CASES)('html.clean: %s', (_label, payload) => {
+		expect(findViolations(editor.$.html.clean(payload)).filter((v) => /\[on/.test(v))).toEqual([]);
 	});
 });

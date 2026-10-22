@@ -390,8 +390,11 @@ class FileUpload extends PluginCommand {
 				'data-se-non-focus': 'true',
 				'data-se-non-link': 'true',
 			},
-			name,
+			null,
 		);
+
+		// `name` comes from the server response or a browser item — set as text, never as HTML
+		a.textContent = name;
 
 		this.fileManager.setFileData(a, file);
 

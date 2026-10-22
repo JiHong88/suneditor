@@ -518,6 +518,10 @@ describe('Embed Plugin', () => {
 		describe('submitSRC', () => {
 			it('should process iframe embed code', async () => {
 				const iframeCode = '<iframe src="https://www.facebook.com/plugins/post.php?href=test"></iframe>';
+				// raw embed HTML is sanitized through html.clean inside its figure container
+				embed.$.html.clean = jest
+					.fn()
+					.mockReturnValue(`<div class="se-component se-embed-container"><figure>${iframeCode}</figure></div>`);
 				// Mock triggerEvent to call the handler (simulating event listener that approves)
 				embed.$.eventManager.triggerEvent = jest.fn().mockImplementation(async (eventName, data) => {
 					if (eventName === 'onEmbedInputBefore' && data.handler) {
@@ -1414,6 +1418,10 @@ describe('Embed Plugin', () => {
 		it('should handle !isUpdate without process (blockquote/children path, lines 583-596)', async () => {
 			const blockquoteCode = '<blockquote class="twitter-tweet"><a href="https://twitter.com/user/status/123">test</a></blockquote>';
 			embed.modal.isUpdate = false;
+			// raw embed HTML is sanitized through html.clean inside its figure container
+			embed.$.html.clean = jest
+				.fn()
+				.mockReturnValue(`<div class="se-component se-embed-container"><figure>${blockquoteCode}</figure></div>`);
 			embed.$.eventManager.triggerEvent = jest.fn().mockResolvedValue(true);
 
 			const result = await embed.submitSRC(blockquoteCode);

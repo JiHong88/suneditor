@@ -1,6 +1,6 @@
 import SelectMenu from './SelectMenu';
 import FileManager from '../manager/FileManager';
-import { dom, numbers, env, unicode } from '../../helper';
+import { dom, numbers, env, unicode, converter } from '../../helper';
 const { _w, NO_EVENT } = env;
 
 /**
@@ -353,8 +353,8 @@ class ModalAnchorEditor {
 			list.push(v);
 			menus.push(
 				dom.check.isAnchor(v)
-					? `<div><span class="se-text-prefix-icon">${this.#$.icons.bookmark_anchor}</span>${v.id}</div>`
-					: `<div style="${v.style.cssText}">${v.textContent}</div>`,
+					? `<div><span class="se-text-prefix-icon">${this.#$.icons.bookmark_anchor}</span>${converter.htmlToEntity(v.id)}</div>`
+					: `<div style="${converter.htmlToEntity(v.style.cssText)}">${converter.htmlToEntity(v.textContent)}</div>`,
 			);
 		}
 

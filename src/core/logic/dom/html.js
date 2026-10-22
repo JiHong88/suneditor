@@ -308,9 +308,7 @@ class HTML {
 			html = domParser.body.innerHTML;
 		}
 
-		if (attrFilter || styleFilter) {
-			html = html.replace(/(<[a-zA-Z0-9-]+)[^>]*(?=>)/g, this.#CleanElements.bind(this, attrFilter, styleFilter));
-		}
+		html = html.replace(/(<[a-zA-Z0-9-]+)[^>]*(?=>)/g, this.#CleanElements.bind(this, attrFilter, styleFilter));
 
 		// get dom tree
 		const domParser = _d.createRange().createContextualFragment(html);
@@ -334,18 +332,9 @@ class HTML {
 		// iframe placeholder parsing
 		const iframePlaceholders = domParser.querySelectorAll('[data-se-iframe-holder]');
 		for (let i = 0, len = iframePlaceholders.length; i < len; i++) {
-			/** @type {HTMLIFrameElement} */
-			const iframe = dom.utils.createElement('iframe');
-
-			const attrs = JSON.parse(iframePlaceholders[i].getAttribute('data-se-iframe-holder-attrs'));
-			for (const [key, value] of Object.entries(attrs)) {
-				// Block event handler attributes and validate src protocol
-				if (/^on/i.test(key)) continue;
-				if (key === 'src' && !_isSafeURL(String(value))) continue;
-				iframe.setAttribute(key, value);
-			}
-
-			iframePlaceholders[i].replaceWith(iframe);
+			const iframe = this.#rebuildIframePlaceholder(iframePlaceholders[i], attrFilter, styleFilter);
+			if (iframe) iframePlaceholders[i].replaceWith(iframe);
+			else dom.utils.removeItem(iframePlaceholders[i]);
 		}
 
 		this.#$.pluginManager.applyRetainFormat(domParser);
@@ -2289,10 +2278,11 @@ class HTML {
 	 * @returns {string}
 	 */
 	#CleanElements(attrFilter, styleFilter, m, t) {
-		if (_RE_XML_NS_TAG.test(m)) return m;
+		const nsTag = m.match(_RE_XML_NS_TAG);
+		if (nsTag) t = nsTag[0];
 
 		let v = null;
-		const tagName = t.match(_RE_TAG_NAME)[0].toLowerCase();
+		const tagName = (nsTag ? t.substring(1) : t.match(_RE_TAG_NAME)[0]).toLowerCase();
 
 		if (attrFilter) {
 			// blacklist
@@ -2305,18 +2295,25 @@ class HTML {
 			const wAttr = this.#attributeWhitelist[tagName];
 			if (wAttr) v = m.match(wAttr);
 			else v = m.match(this.#attributeWhitelistRegExp);
+
+			if (tagName === 'a') {
+				const sv = m.match(/(?:(?:id|name)\s*=\s*(?:"|')[^"']*(?:"|'))/g);
+				if (sv) {
+					v ||= [];
+					v.push(sv[0]);
+				}
+			}
+		} else {
+			v = m.match(_RE_ANY_ATTR)?.filter((a) => !_RE_STYLE_NAME.test(a)) || null;
 		}
 
-		if (!styleFilter) return m;
-
-		// attribute
-		if (tagName === 'a') {
-			const sv = m.match(/(?:(?:id|name)\s*=\s*(?:"|')[^"']*(?:"|'))/g);
+		if (!styleFilter) {
+			const sv = !v?.some((a) => _RE_STYLE_NAME.test(a)) && m.match(_RE_STYLE_ATTR_RAW);
 			if (sv) {
 				v ||= [];
 				v.push(sv[0]);
 			}
-		} else if (!v || !_RE_STYLE_EQ.test(v.toString())) {
+		} else if (tagName !== 'a' && !v?.some((a) => _RE_STYLE_NAME.test(a))) {
 			if (_RE_SE_COMPONENT.test(m)) {
 				v = this.#cleanStyle(m, v, '@component');
 			} else if (this.#cleanStyleTagKeyRegExp.test(tagName)) {
@@ -2329,7 +2326,7 @@ class HTML {
 		}
 
 		// figure
-		if (dom.check.isMedia(tagName) || dom.check.isFigure(tagName)) {
+		if (styleFilter && (dom.check.isMedia(tagName) || dom.check.isFigure(tagName))) {
 			const sv = m.match(_RE_STYLE_ATTR);
 			v ||= [];
 			if (sv) v.push(sv[0]);
@@ -2337,12 +2334,41 @@ class HTML {
 
 		if (v) {
 			for (let i = 0, len = v.length, a; i < len; i++) {
-				a = _isSafeAttribute(v[i].trim()) ? v[i] : '';
+				a = _isSafeAttribute(v[i].trim(), attrFilter) ? v[i] : '';
 				t += (_RE_LEADING_SPACE.test(a) ? '' : ' ') + a;
 			}
 		}
 
 		return t;
+	}
+
+	/**
+	 * @description Rebuilds an `<iframe>` from a clipboard placeholder (`data-se-iframe-holder-attrs`, see `helper/clipboard`).
+	 * - event handlers, `srcdoc` and unsafe `src` are always dropped.
+	 * @param {Element} placeholder Placeholder element
+	 * @param {boolean} attrFilter `strictMode.attrFilter`
+	 * @param {boolean} styleFilter `strictMode.styleFilter`
+	 * @returns {?Element} The rebuilt iframe, or `null` when the placeholder is malformed
+	 */
+	#rebuildIframePlaceholder(placeholder, attrFilter, styleFilter) {
+		let attrs = null;
+		try {
+			attrs = JSON.parse(placeholder.getAttribute('data-se-iframe-holder-attrs'));
+		} catch {
+			// malformed placeholder
+		}
+		if (!attrs || typeof attrs !== 'object' || Array.isArray(attrs)) return null;
+
+		let tag = '<iframe';
+		for (const [key, value] of Object.entries(attrs)) {
+			if (!_RE_ATTR_NAME.test(key) || _RE_PLACEHOLDER_BLOCKED_ATTR.test(key)) continue;
+			if (key === 'src' && !_isSafeURL(String(value))) continue;
+			tag += ` ${key}="${String(value).replace(/&/g, '&amp;').replace(/"/g, '&quot;')}"`;
+		}
+
+		tag = this.#CleanElements(attrFilter, styleFilter, tag, '<iframe');
+
+		return _d.createRange().createContextualFragment(tag + '></iframe>').firstElementChild;
 	}
 
 	/**
@@ -2442,11 +2468,17 @@ class HTML {
 
 /** Module-level regex constants */
 // #CleanElements
-const _RE_XML_NS_TAG = /^<[a-z0-9]+:[a-z0-9]+/i;
+const _RE_XML_NS_TAG = /^<[^\s/>:]+:[^\s/>]*/;
 const _RE_TAG_NAME = /(?!<)[a-zA-Z0-9-]+/;
 const _RE_ON_HANDLER = /\s(?:on[a-z]+)\s*=\s*(?:(["'])[^"']*\1|\S+)/gi;
-const _RE_STYLE_EQ = /style=/i;
+
+// #rebuildIframePlaceholder
+const _RE_ATTR_NAME = /^[a-z_][a-z0-9_.:-]*$/i;
+const _RE_PLACEHOLDER_BLOCKED_ATTR = /^(?:on|srcdoc$)/i;
 const _RE_STYLE_ATTR = /style\s*=\s*(?:"|')[^"']*(?:"|')/;
+const _RE_STYLE_NAME = /^\s*style\s*=/i;
+const _RE_STYLE_ATTR_RAW = /\sstyle\s*=\s*(?:"[^"]*"|'[^']*')/i;
+const _RE_ANY_ATTR = /\s[^\s"'>/=]+\s*=\s*(?:"[^"]*"|'[^']*')/g;
 const _RE_SE_COMPONENT = /class\s*=\s*("|')(?:[^"']*\s)?se-component(?=[\s"'])/i;
 const _RE_LEADING_SPACE = /^\s/;
 
@@ -2470,29 +2502,40 @@ const _RE_SPAN = /^span$/i;
 
 // _isSafeAttribute
 const _SAFE_URL_PROTOCOL = /^(?:https?|ftps?|mailto|tel|blob|sms|geo|webcal|callto):|^[#/]|^data:image\//i;
-const _URL_ATTR_PATTERN = /^(?:href|src|poster|xlink:href|background|cite|action|formaction)\s*=/i;
+const _UNSAFE_URL_PROTOCOL = /^(?:javascript|vbscript):|^data:(?!image\/)/i;
+const _RE_SCRIPT_ATTR = /^(?:on|srcdoc\s*=)/i;
+const _URL_ATTR_PATTERN =
+	/^(?:href|src|poster|xlink:href|background|cite|action|formaction|data|codebase|longdesc|srcset|imagesrcset|values|to|from)\s*=/i;
+
+// candidate / keyframe lists — every entry is checked (`srcset`: `url 1x, url 2x`; SVG `values`: `a;b`)
+const _URL_LIST_ATTR_PATTERN = /^(?:srcset|imagesrcset|values)\s*=/i;
+const _RE_URL_LIST_SEPARATOR = /[,;]/;
 const _RE_ATTR_VALUE = /=\s*(?:"([^"]*)"|'([^']*)'|(\S+))/;
 const _RE_COLON = /:/i;
+
+// _normalizeURL — entity decoder, created once on first use
+/** @type {?HTMLTextAreaElement} */
+let _entityDecoder = null;
+const _RE_AMP_REF = /&(?:amp|AMP);/g;
+const _RE_NON_AMP_REF = /&(?!(?:amp|AMP);)/;
 
 /**
  * @description Normalize a URL by decoding all HTML entities, URL-encoded characters,
  * and stripping whitespace/control characters. Used to detect obfuscated dangerous protocols.
- * e.g. `java&#x09;script:`, `java%09script:`, `&#106;avascript:`
+ * e.g. `java&#x09;script:`, `java%09script:`, `&#106;avascript:`, `javascript&colon;`, `javascript&#58alert`
  * @param {string} url Raw URL string
  * @returns {string} Normalized URL
  */
 function _normalizeURL(url) {
-	// Decode HTML entities (&#x09; &#9; etc.) — repeat to handle nested encoding (e.g. &#38;#x6a; → &#x6a; → j)
-	let prev,
-		limit = 5;
-	do {
-		prev = url;
-		url = url.replace(/&(#x([0-9a-f]+)|#([0-9]+)|([a-z]+));/gi, (_, __, hex, dec) => {
-			if (hex) return String.fromCharCode(parseInt(hex, 16));
-			if (dec) return String.fromCharCode(parseInt(dec, 10));
-			return '';
-		});
-	} while (url !== prev && --limit);
+	// <textarea> content is RCDATA: `innerHTML` decodes refs exactly like the browser (`&colon;`, `&#58`)
+	// without creating elements — a hand-written decoder drifted and let `javascript:` through.
+	if (_RE_NON_AMP_REF.test(url)) {
+		_entityDecoder ||= _d.createElement('textarea');
+		_entityDecoder.innerHTML = url;
+		url = _entityDecoder.value;
+	} else if (url.includes('&')) {
+		url = url.replace(_RE_AMP_REF, '&');
+	}
 
 	// Decode URL-encoded characters (%09, %0a, etc.)
 	try {
@@ -2509,31 +2552,41 @@ function _normalizeURL(url) {
 }
 
 /**
- * @description Check if a URL is safe (matches the allowed protocol whitelist).
+ * @description Check if a URL is safe.
+ * - `strict` (attribute filter on): the protocol must be in the allowed whitelist.
+ * - otherwise only script-capable protocols are rejected, so custom app schemes (`zoommtg:`, `slack:`) are kept.
  * @param {string} url Raw URL string
+ * @param {boolean} [strict=true] Use the protocol whitelist
  * @returns {boolean}
  */
-function _isSafeURL(url) {
+function _isSafeURL(url, strict = true) {
 	const normalized = _normalizeURL(url);
+	if (!strict) return !_UNSAFE_URL_PROTOCOL.test(normalized);
 	return _SAFE_URL_PROTOCOL.test(normalized) || !_RE_COLON.test(normalized);
 }
 
 /**
  * @description Checks whether an HTML attribute string is safe from XSS injection.
- * - Non-URL attributes (anything other than `href`, `src`, `poster`, `xlink:href`, `background`, `cite`, `action`, `formaction`) are always safe.
+ * - Event handlers (`on*`) and `srcdoc` are never safe.
+ * - Other non-URL attributes (anything not in `_URL_ATTR_PATTERN`: `href`, `src`, `srcset`, `action`, SVG `values`, ...) are safe.
  * - For URL attributes, extracts the URL value and delegates to {@link _isSafeURL}
- *   to verify the protocol against the allowed whitelist.
+ *   to verify the protocol (whitelist when `strict`, script-capable protocols otherwise).
  * @param {string} attr A single attribute string (e.g. `href="https://example.com"`, `class="foo"`)
- * @returns {boolean} `true` if the attribute is safe, `false` if it contains a dangerous URL protocol.
+ * @param {boolean} [strict=true] Use the protocol whitelist (`strictMode.attrFilter`)
+ * @returns {boolean} `true` if the attribute is safe, `false` if it can run script.
  */
-function _isSafeAttribute(attr) {
+function _isSafeAttribute(attr, strict = true) {
+	if (_RE_SCRIPT_ATTR.test(attr)) return false;
 	if (!_URL_ATTR_PATTERN.test(attr)) return true;
 
 	const urlMatch = attr.match(_RE_ATTR_VALUE);
 	if (!urlMatch) return true;
 
 	const url = urlMatch[1] ?? urlMatch[2] ?? urlMatch[3] ?? '';
-	return _isSafeURL(url);
+	if (_URL_LIST_ATTR_PATTERN.test(attr)) {
+		return url.split(_RE_URL_LIST_SEPARATOR).every((u) => _isSafeURL(u.trim(), strict));
+	}
+	return _isSafeURL(url, strict);
 }
 
 /**

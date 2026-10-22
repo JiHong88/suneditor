@@ -308,4 +308,153 @@ describe('HTML Security - XSS Prevention', () => {
 			expect(result).not.toContain('data-secret');
 		});
 	});
+
+	describe('iframe clipboard placeholder rebuild', () => {
+		/** @param {Object<string, string>} attrs */
+		const placeholder = (attrs) =>
+			`<div data-se-iframe-holder="1" data-se-iframe-holder-attrs="${JSON.stringify(attrs).replace(/&/g, '&amp;').replace(/"/g, '&quot;')}">[iframe]</div>`;
+
+		const rebuild = (attrs) => {
+			const div = document.createElement('div');
+			div.innerHTML = editor.$.html.clean(placeholder(attrs));
+			return div.querySelector('iframe');
+		};
+
+		it('should rebuild a copied editor iframe with its whitelisted and data-se attributes', () => {
+			const iframe = rebuild({
+				src: 'https://www.youtube.com/embed/abc?a=1&b=2',
+				width: '640',
+				height: '360',
+				frameborder: '0',
+				allowfullscreen: '',
+				'data-se-size': '640px,360px',
+				style: 'width: 640px; height: 360px;',
+			});
+			expect(iframe).not.toBeNull();
+			expect(iframe.getAttribute('src')).toBe('https://www.youtube.com/embed/abc?a=1&b=2');
+			expect(iframe.getAttribute('width')).toBe('640');
+			expect(iframe.getAttribute('data-se-size')).toBe('640px,360px');
+			expect(iframe.hasAttribute('allowfullscreen')).toBe(true);
+		});
+
+		it('should drop srcdoc, event handlers and non-whitelisted attributes', () => {
+			const iframe = rebuild({
+				src: 'https://www.youtube.com/embed/abc',
+				srcdoc: '<script>alert(1)</script>',
+				onload: 'alert(1)',
+				name: 'x',
+			});
+			expect(iframe).not.toBeNull();
+			expect(iframe.hasAttribute('srcdoc')).toBe(false);
+			expect(iframe.hasAttribute('onload')).toBe(false);
+			expect(iframe.hasAttribute('name')).toBe(false);
+			expect(iframe.getAttribute('src')).toBe('https://www.youtube.com/embed/abc');
+		});
+
+		it('should drop an attribute whose name breaks out of the tag', () => {
+			for (const key of ['a" onload="alert(1)', 'a"/onload="alert(1)', 'a=1 x']) {
+				const div = document.createElement('div');
+				div.innerHTML = editor.$.html.clean(
+					placeholder({ src: 'https://www.youtube.com/embed/abc', [key]: '1' }),
+				);
+				const iframe = div.querySelector('iframe');
+				expect(iframe?.hasAttribute('onload') || false).toBe(false);
+				if (iframe) expect(Array.from(iframe.attributes).map((a) => a.name)).toEqual(['src']);
+			}
+		});
+
+		it('should drop an unsafe src', () => {
+			const iframe = rebuild({ src: 'javascript:alert(1)' });
+			expect(iframe).not.toBeNull();
+			expect(iframe.hasAttribute('src')).toBe(false);
+		});
+
+		it('should remove a malformed placeholder instead of throwing', () => {
+			for (const raw of ['null', '[]', '"x"', '{bad json', '']) {
+				const html = `<p>a</p><div data-se-iframe-holder="1" data-se-iframe-holder-attrs="${raw}">[iframe]</div>`;
+				let out;
+				expect(() => (out = editor.$.html.clean(html))).not.toThrow();
+				expect(out).not.toContain('data-se-iframe-holder');
+				expect(out).not.toContain('<iframe');
+			}
+		});
+	});
+});
+
+// `attrFilter` / `styleFilter` decide which attributes are kept; event handlers, `srcdoc` and unsafe URLs are
+// removed whichever of them is on (`styleFilter: false` used to skip the whitelist and the URL check).
+describe.each([
+	['attrFilter + styleFilter', {}],
+	['styleFilter off', { styleFilter: false }],
+	['attrFilter off', { attrFilter: false }],
+	['attrFilter + styleFilter off', { attrFilter: false, styleFilter: false }],
+])('HTML Security - strictMode %s', (_name, strictMode) => {
+	let editor;
+
+	beforeAll(async () => {
+		jest.spyOn(console, 'warn').mockImplementation(() => {});
+		jest.spyOn(console, 'error').mockImplementation(() => {});
+		editor = createTestEditor({ buttonList: [['bold', 'italic']], defaultLine: 'p', strictMode });
+		await waitForEditorReady(editor);
+	});
+
+	afterAll(() => {
+		destroyTestEditor(editor);
+		jest.restoreAllMocks();
+	});
+
+	/** @param {string} html */
+	const clean = (html) => {
+		const div = document.createElement('div');
+		div.innerHTML = editor.$.html.clean(html);
+		return div;
+	};
+
+	it('should remove javascript: URLs', () => {
+		const div = clean(
+			'<p><a href="javascript:alert(1)">a</a><a href="java&Tab;script:alert(1)">b</a><a href="javascript&colon;alert(1)">c</a></p>',
+		);
+		for (const a of div.querySelectorAll('a')) expect(a.hasAttribute('href')).toBe(false);
+	});
+
+	it('should remove iframe srcdoc and an unsafe iframe src', () => {
+		const iframe = clean('<iframe src="javascript:alert(1)" srcdoc="x"></iframe>').querySelector('iframe');
+		expect(iframe?.hasAttribute('srcdoc') || false).toBe(false);
+		expect(iframe?.hasAttribute('src') || false).toBe(false);
+	});
+
+	it('should remove event handlers', () => {
+		const div = clean('<p onclick="alert(1)">x<span onmouseover="alert(1)">y</span></p>');
+		for (const el of div.querySelectorAll('*')) {
+			expect(Array.from(el.attributes).some((a) => /^on/i.test(a.name))).toBe(false);
+		}
+	});
+
+	it('should keep safe URLs', () => {
+		const a = clean('<p><a href="https://example.com" target="_blank">x</a></p>').querySelector('a');
+		expect(a.getAttribute('href')).toBe('https://example.com');
+		expect(a.getAttribute('target')).toBe('_blank');
+	});
+
+	it('should remove data: URLs other than images', () => {
+		const div = clean('<p><a href="data:text/html,x">a</a><img src="data:image/png;base64,AAAA"></p>');
+		expect(div.querySelector('a').hasAttribute('href')).toBe(false);
+		expect(div.querySelector('img').getAttribute('src')).toBe('data:image/png;base64,AAAA');
+	});
+
+	it('should keep custom app schemes only when attrFilter is off (protocol blacklist instead of whitelist)', () => {
+		const a = clean('<p><a href="zoommtg://zoom.us/join?confno=1">x</a></p>').querySelector('a');
+		expect(a.getAttribute('href') === 'zoommtg://zoom.us/join?confno=1').toBe(strictMode.attrFilter === false);
+	});
+
+	it('should apply the attribute whitelist only when attrFilter is on', () => {
+		const p = clean('<p data-x="1" title="t">x</p>').querySelector('p');
+		expect(p.getAttribute('title')).toBe('t');
+		expect(p.hasAttribute('data-x')).toBe(strictMode.attrFilter === false);
+	});
+
+	it('should keep the inline style as is only when styleFilter is off', () => {
+		const p = clean('<p style="position: fixed;">x</p>').querySelector('p');
+		expect(p.getAttribute('style') === 'position: fixed;').toBe(strictMode.styleFilter === false);
+	});
 });

@@ -58,6 +58,7 @@ jest.mock('../../../src/helper', () => ({
         }
     },
     keyCodeMap: { isEsc: jest.fn().mockReturnValue(false) },
+    converter: { htmlToEntity: jest.requireActual('../../../src/helper/converter').htmlToEntity },
     env: {
         _w: { scrollY: 0 },
         getXMLHttpRequest: () => ({

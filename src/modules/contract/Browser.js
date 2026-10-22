@@ -1,4 +1,4 @@
-import { dom, keyCodeMap } from '../../helper';
+import { dom, converter, keyCodeMap } from '../../helper';
 import { _w } from '../../helper/env';
 import ApiManager from '../manager/ApiManager';
 
@@ -376,7 +376,8 @@ class Browser {
 					tag = tags[t];
 					if (tag && !_tags.includes(tag)) {
 						_tags.push(tag);
-						tagsHTML += `<a title="${tag}" aria-label="${tag}">${tag}</a>`;
+						const tagText = converter.htmlToEntity(tag);
+						tagsHTML += `<a title="${tagText}" aria-label="${tagText}">${tagText}</a>`;
 					}
 				}
 			}
@@ -511,7 +512,7 @@ class Browser {
 				const folderLabel = dom.utils.createElement(
 					'div',
 					item.key ? { 'data-command': item.key, 'aria-label': item.name } : null,
-					`<span class="se-menu-icon">${item.key ? this.icon_folder : this.icon_folder_item}</span><span>${item.name}</span>`,
+					`<span class="se-menu-icon">${item.key ? this.icon_folder : this.icon_folder_item}</span><span>${converter.htmlToEntity(item.name ?? '')}</span>`,
 				);
 				const folderDiv = dom.utils.createElement('div', { class: 'se-menu-folder' }, folderLabel);
 
@@ -529,7 +530,7 @@ class Browser {
 				const folderLabel = dom.utils.createElement(
 					'div',
 					{ 'data-command': item.key, 'aria-label': item.name, class: 'se-menu-folder-item' },
-					`<span class="se-menu-icon">${this.icon_item}</span><span>${item.name}</span>`,
+					`<span class="se-menu-icon">${this.icon_item}</span><span>${converter.htmlToEntity(item.name ?? '')}</span>`,
 				);
 				if (parentElement === this.sideInner) {
 					const folderDiv = dom.utils.createElement('div', { class: 'se-menu-folder' }, folderLabel);
@@ -705,12 +706,9 @@ class Browser {
 			const text = el.textContent;
 			const idx = text.toLowerCase().indexOf(keyword);
 			if (idx > -1) {
-				el.innerHTML =
-					text.substring(0, idx) +
-					'<mark>' +
-					text.substring(idx, idx + keyword.length) +
-					'</mark>' +
-					text.substring(idx + keyword.length);
+				const mark = dom.utils.createElement('mark');
+				mark.textContent = text.substring(idx, idx + keyword.length);
+				el.replaceChildren(text.substring(0, idx), mark, text.substring(idx + keyword.length));
 			}
 		}
 	}
@@ -810,17 +808,21 @@ function CreateHTMLInfos($, useSearch) {
  * @param {BrowserFile} item Item of the response data's array
  */
 function DrawItems(item) {
+	const esc = converter.htmlToEntity;
 	const srcName = item.src.split('/').pop();
 	const thumbnail = item.thumbnail || '';
 	const src = thumbnail || item.src;
-	const customProps = this.props?.map((v) => `data-${v}="${item[v]}"`).join(' ') || '';
-	const attrs = `data-type="${item.type}" data-command="${item.src}" data-name="${item.name || srcName}" data-thumbnail="${thumbnail}" data-extension="${item.src.split('.').pop()}" ${customProps}`;
-	const props = `class="${thumbnail || 'se-browser-empty-image'}" src="${src}" alt="${item.alt || srcName}" ${attrs}`;
+	const name = esc(item.name || srcName);
+	const customProps =
+		this.props?.map((v) => `data-${esc(String(v))}="${esc(String(item[v] ?? ''))}"`).join(' ') || '';
+	const attrs = `data-type="${esc(item.type || '')}" data-command="${esc(item.src)}" data-name="${name}" data-thumbnail="${esc(thumbnail)}" data-extension="${esc(item.src.split('.').pop())}" ${customProps}`;
+	const className = esc(thumbnail) || 'se-browser-empty-image';
+	const props = `class="${className}" src="${esc(src)}" alt="${esc(item.alt || srcName)}" ${attrs}`;
 	return /*html*/ `
 		<div class="se-file-item-img">
-			${this.thumbnail && !thumbnail && item.type !== 'image' ? `<div class="se-browser-empty-thumbnail" ${props}>${this.thumbnail(item)}</div>` : `<img class="${thumbnail || 'se-browser-empty-image'}" ${props}>`}
+			${this.thumbnail && !thumbnail && item.type !== 'image' ? `<div class="se-browser-empty-thumbnail" ${props}>${this.thumbnail(item)}</div>` : `<img class="${className}" ${props}>`}
 			<div class="se-file-name-image se-file-name-back"></div>
-			<div class="se-file-name-image">${item.name || srcName}</div>
+			<div class="se-file-name-image">${name}</div>
 		</div>`;
 }
 

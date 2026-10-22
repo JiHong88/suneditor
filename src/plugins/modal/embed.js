@@ -686,22 +686,25 @@ class Embed extends PluginModal {
 				cover = figure.cover;
 				container = figure.container;
 			} else {
-				oFrame = children[0];
-				const figure = Figure.CreateContainer(oFrame, 'se-embed-container');
-				cover = figure.cover;
-				container = figure.container;
-
-				const childNodes = Array.from(children);
+				const embedTarget = children[0];
 				const scriptWhitelist = this.pluginOptions.scriptSrcWhitelist;
-				for (const chd of childNodes) {
-					if (/^script$/i.test(chd.nodeName)) {
-						const scriptSrc = /** @type {Element} */ (chd).getAttribute('src') || '';
-						if (!Embed.#isAllowedScriptSrc(scriptSrc, scriptWhitelist)) continue;
-						scriptTag = dom.utils.createElement('script', { src: scriptSrc, async: 'true' }, null);
-						continue;
-					}
-					cover.appendChild(chd);
+				for (const chd of Array.from(children)) {
+					if (!/^script$/i.test(chd.nodeName)) continue;
+					const scriptSrc = /** @type {Element} */ (chd).getAttribute('src') || '';
+					if (!Embed.#isAllowedScriptSrc(scriptSrc, scriptWhitelist)) continue;
+					scriptTag = dom.utils.createElement('script', { src: scriptSrc, async: 'true' }, null);
 				}
+
+				if (!/^(?:iframe|blockquote)$/i.test(embedTarget?.nodeName)) return;
+
+				const raw = Figure.CreateContainer(embedTarget, 'se-embed-container');
+				container = /** @type {HTMLElement} */ (
+					new DOMParser().parseFromString(this.$.html.clean(raw.container.outerHTML), 'text/html').body
+						.firstElementChild
+				);
+				cover = container?.querySelector('figure');
+				oFrame = cover?.firstElementChild;
+				if (!/^(?:iframe|blockquote)$/i.test(oFrame?.nodeName)) return;
 			}
 		}
 
