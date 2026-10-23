@@ -24,6 +24,13 @@ references: [Performance and Feature Guide](../../prompts/performance-guide.md).
   handlers once; opening a menu must not accumulate listeners or subscriptions. Remove
   temporary events on close/cancel, cancel scheduled work, disconnect observers and dispose
   subscriptions on teardown. EventManager tracking alone does not make repeated registration free.
+- **Destroy is a lifetime boundary, not a safe-call mode.** Calls after destroy and destruction
+  reentered from arbitrary synchronous hooks are unsupported unless explicitly documented.
+  Cancel owned deferred work at teardown. Safe completion of every in-flight async operation
+  across destroy is not a general guarantee; define cancellation/discard behavior per feature.
+  Do not scatter lifetime/null guards after every `await` or make Store access
+  silently succeed to conceal missing cleanup. Follow the
+  [lifecycle contract](../../prompts/performance-guide.md#lifecycle-and-destroy).
 - **Preserve editing timing.** Do not debounce caret edits, IME decisions or browser default
   cancellation. Use `converter.debounce` (including `.cancel()`) for deferrable work; use
   animation frames only for visual work that can be coalesced and canceled. Never defer a
@@ -31,8 +38,8 @@ references: [Performance and Feature Guide](../../prompts/performance-guide.md).
 - **One logical edit has one history owner** (ownership/flag tables: coding-rules §2).
   Redundant pushes still perform work even if identical snapshots are discarded. Do not bypass
   sanitization, char limits, read-only guards or undo to improve a timing number.
-- **Async work belongs to its originating frame and request.** After an await/timer, reject
-  stale results from a closed/replaced UI, changed query, destroyed editor or removed root.
+- **Async work belongs to its originating frame and request.** While the editor is alive, reject
+  stale results from a closed/replaced UI, changed query or removed root.
   Do not blindly use the now-current `$.frameContext` or a stale cached range.
 - **Verify cost where it is introduced.** For hot-path/new-feature changes, compare relevant
   work counts or browser timings on a small and large document, with the feature enabled and

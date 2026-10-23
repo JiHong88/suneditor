@@ -24,6 +24,7 @@ Steps:
 
 Review guidelines — avoid false positives:
 - **Null/guard checks**: If a null check already exists upstream in the call chain (caller side), do NOT flag the callee for lacking its own null guard. Only flag if there is a realistic unguarded path.
+- **Lifetime checks**: Follow [the lifecycle contract](../../../prompts/performance-guide.md#lifecycle-and-destroy): report missing cleanup for owned work, not missing guards on arbitrary calls after destroy or hypothetical synchronous hook reentrancy. Safe completion of all in-flight async operations across destroy is not a general guarantee. Require a feature-specific cancellation/discard contract and a concrete supported path before recommending a lifetime guard.
 - **Intentional patterns**: If code looks intentional and consistent with surrounding patterns, do NOT report it as a bug. If unsure, note it as a confirmation question (e.g. "의도된 동작인지 확인: ...") rather than a bug.
 - **Severity filtering**: Report concrete incorrect behavior, demonstrable resource/performance regressions, or a specific project contract violation on the changed path. Include the triggering scenario and source evidence; label unmeasured cost concerns as such. Do not report style preferences, hypothetical future risks, or "would be nice" improvements.
 - **staged/unstaged diff**: Do not flag git staging state differences as findings.
