@@ -36,6 +36,9 @@ class HTML {
 	#allowedTagNameRegExp;
 	#emptyLineRegExp;
 
+	/** @type {Set<string>} */
+	#allowedURLProtocols;
+
 	/** @type {Object<string, RegExp>} */
 	#attributeWhitelist;
 	/** @type {Object<string, RegExp>} */
@@ -62,6 +65,7 @@ class HTML {
 		}.bind(options.get('allowedClassName'));
 
 		this.#textStyleTags = options.get('_textStyleTags');
+		this.#allowedURLProtocols = new Set(options.get('allowedURLProtocols') || []);
 
 		// clean styles
 		const tagStyles = options.get('tagStyles');
@@ -2347,7 +2351,7 @@ class HTML {
 
 		if (v) {
 			for (let i = 0, len = v.length, a; i < len; i++) {
-				a = _isSafeAttribute(v[i].trim(), attrFilter) ? v[i] : '';
+				a = _isSafeAttribute(v[i].trim(), attrFilter, this.#allowedURLProtocols) ? v[i] : '';
 				t += (_RE_LEADING_SPACE.test(a) ? '' : ' ') + a;
 			}
 		}
@@ -2375,7 +2379,7 @@ class HTML {
 		let tag = '<iframe';
 		for (const [key, value] of Object.entries(attrs)) {
 			if (!_RE_ATTR_NAME.test(key) || _RE_PLACEHOLDER_BLOCKED_ATTR.test(key)) continue;
-			if (key === 'src' && !_isSafeURL(String(value))) continue;
+			if (key === 'src' && !_isSafeURL(String(value), attrFilter, this.#allowedURLProtocols)) continue;
 			tag += ` ${key}="${String(value).replace(/&/g, '&amp;').replace(/"/g, '&quot;')}"`;
 		}
 
@@ -2570,12 +2574,14 @@ function _normalizeURL(url) {
  * - otherwise only script-capable protocols are rejected, so custom app schemes (`zoommtg:`, `slack:`) are kept.
  * @param {string} url Raw URL string
  * @param {boolean} [strict=true] Use the protocol whitelist
+ * @param {Set<string>} [allowedProtocols] Additional allowed schemes
  * @returns {boolean}
  */
-function _isSafeURL(url, strict = true) {
+function _isSafeURL(url, strict = true, allowedProtocols) {
 	const normalized = _normalizeURL(url);
-	if (!strict) return !_UNSAFE_URL_PROTOCOL.test(normalized);
-	return _SAFE_URL_PROTOCOL.test(normalized) || !_RE_COLON.test(normalized);
+	if (_UNSAFE_URL_PROTOCOL.test(normalized)) return false;
+	if (!strict || _SAFE_URL_PROTOCOL.test(normalized) || !_RE_COLON.test(normalized)) return true;
+	return !!allowedProtocols?.size && allowedProtocols.has(normalized.slice(0, normalized.indexOf(':')).toLowerCase());
 }
 
 /**
@@ -2586,9 +2592,10 @@ function _isSafeURL(url, strict = true) {
  *   to verify the protocol (whitelist when `strict`, script-capable protocols otherwise).
  * @param {string} attr A single attribute string (e.g. `href="https://example.com"`, `class="foo"`)
  * @param {boolean} [strict=true] Use the protocol whitelist (`strictMode.attrFilter`)
+ * @param {Set<string>} [allowedProtocols] Additional allowed schemes
  * @returns {boolean} `true` if the attribute is safe, `false` if it can run script.
  */
-function _isSafeAttribute(attr, strict = true) {
+function _isSafeAttribute(attr, strict = true, allowedProtocols) {
 	if (_RE_SCRIPT_ATTR.test(attr)) return false;
 	if (!_URL_ATTR_PATTERN.test(attr)) return true;
 
@@ -2597,9 +2604,9 @@ function _isSafeAttribute(attr, strict = true) {
 
 	const url = urlMatch[1] ?? urlMatch[2] ?? urlMatch[3] ?? '';
 	if (_URL_LIST_ATTR_PATTERN.test(attr)) {
-		return url.split(_RE_URL_LIST_SEPARATOR).every((u) => _isSafeURL(u.trim(), strict));
+		return url.split(_RE_URL_LIST_SEPARATOR).every((u) => _isSafeURL(u.trim(), strict, allowedProtocols));
 	}
-	return _isSafeURL(url, strict);
+	return _isSafeURL(url, strict, allowedProtocols);
 }
 
 /**

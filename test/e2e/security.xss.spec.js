@@ -9,6 +9,9 @@
 const { test, expect } = require('@playwright/test');
 
 const SANITIZER_CASES = [
+	['script tag', '<p>safe</p><script>window.__xss++</script>'],
+	['reassembled script tag', '<p>safe</p><scr<script></script>ipt>window.__xss++</script>'],
+	['extra tags', '<p>safe</p><style>p{color:red}</style><meta name=probe content=x><link rel=stylesheet href=/missing.css>'],
 	[
 		'GHSA-q867-q2hw-f8gp placeholder srcdoc svg',
 		'<span data-se-iframe-holder="1" data-se-iframe-holder-attrs="{&quot;srcdoc&quot;:&quot;<svg/onload=parent.__xss++&gt;&quot;}">x</span>',
@@ -85,6 +88,7 @@ async function trigger(page) {
 
 		const left = [];
 		for (const el of ww.querySelectorAll('*')) {
+			if (/^(script|style|meta|link)$/.test(el.localName)) left.push(el.localName);
 			if (el.localName === 'iframe' && el.hasAttribute('srcdoc')) left.push('iframe[srcdoc]');
 			for (const { name, value } of Array.from(el.attributes)) {
 				if (/^on/i.test(name)) left.push(`${el.localName}[${name}]`);
@@ -106,10 +110,21 @@ test('harness control: unsanitized payloads are detected', async ({ page }) => {
 	expect(result.left).toEqual(['a:1b[onclick]', 'iframe[srcdoc]']);
 });
 
+test('harness control: inert script tags are detected without execution', async ({ page }) => {
+	await make(page, {});
+	await page.evaluate(() => {
+		window.__sEditor.$.frameContext.get('wysiwyg').innerHTML = '<script>window.__xss++</script>';
+	});
+	expect(await trigger(page)).toEqual({ xss: 0, left: ['script'] });
+});
+
 test.describe('Security advisories: sanitizer PoCs (html.set)', () => {
 	for (const [label, payload] of SANITIZER_CASES) {
 		for (const [mode, options] of [
 			['default', {}],
+			['additional protocols', { allowedURLProtocols: ['zoommtg', 'javascript', 'vbscript', 'data'] }],
+			['tagFilter off', { strictMode: { tagFilter: false } }],
+			['tagFilter + formatFilter off', { strictMode: { tagFilter: false, formatFilter: false } }],
 			['autoStyleify off', { autoStyleify: [] }],
 			['styleFilter off', { strictMode: { styleFilter: false } }],
 			['attrFilter + styleFilter off', { strictMode: { attrFilter: false, styleFilter: false } }],
@@ -137,4 +152,16 @@ test.describe('Security advisories: Embed raw HTML PoCs (submitSRC)', () => {
 			expect(await trigger(page)).toEqual({ xss: 0, left: [] });
 		});
 	}
+});
+
+
+test('additional URL protocols preserve app links without admitting unsafe URLs', async ({ page }) => {
+	await make(page, { allowedURLProtocols: ['zoommtg', 'slack', 'javascript', 'data'] });
+	const links = await page.evaluate(() => {
+		const ed = window.__sEditor;
+		ed.$.html.set('<p><a href="zoommtg:open">Zoom</a><a href="slack:channel">Slack</a><a href="javascript:window.__xss++">unsafe</a><a href="data:text/html,test">data</a></p>');
+		return Array.from(ed.$.frameContext.get('wysiwyg').querySelectorAll('a'), (a) => a.getAttribute('href'));
+	});
+	expect(links).toEqual(['zoommtg:open', 'slack:channel', null, null]);
+	// Avoid activating app links; the shared corpus checks execution of unsafe links.
 });

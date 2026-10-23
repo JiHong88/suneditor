@@ -59,7 +59,8 @@ without installing packages. Changing the workflow also
 requires validating step conditions and the single-install invariant. Configuring a workflow
 is not evidence that a hosted CI run has passed.
 
-The existing `playwright.config.js` uses port 8088 and limits Firefox to `*.firefox.spec.js`.
+The existing `playwright.config.js` uses port 8088 and runs Firefox for `*.firefox.spec.js`
+and the shared `security.xss.spec.js` corpus.
 The separate [contract configuration](../playwright.contracts.config.js) serves
 `test/browser/fixture.js` on port 8089, includes the real editor CSS, and runs every contract
 on both browsers. It starts its own server in CI and can reuse a local one.
