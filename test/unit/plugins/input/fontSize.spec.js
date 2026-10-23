@@ -171,6 +171,9 @@ describe('FontSize Plugin', () => {
 		it('should return undefined when element is line format', () => {
 			const mockElement = document.createElement('p');
 			const mockTarget = document.createElement('div');
+			const label = document.createElement('span');
+			label.className = '__se__font_size';
+			document.createElement('div').append(mockTarget, label);
 
 			kernel.$.format.isLine = jest.fn().mockReturnValue(true);
 
@@ -188,6 +191,35 @@ describe('FontSize Plugin', () => {
 
 			const result = fontSize.active(mockElement, mockTarget);
 			expect(result).toBe(false);
+		});
+
+		it('should update a sibling size label when the target itself has no label (disableInput)', () => {
+			const { dom } = require('../../../../src/helper');
+			const label = { textContent: 'Size' };
+			const mockTarget = { parentElement: { querySelector: jest.fn().mockReturnValue(label) } };
+
+			dom.utils.hasClass = jest.fn().mockReturnValue(false);
+			kernel.$.format.isLine = jest.fn().mockReturnValue(false);
+			dom.utils.getStyle = jest.fn().mockReturnValue('20px');
+
+			const result = fontSize.active(document.createElement('span'), mockTarget);
+			expect(result).toBe(true);
+			expect(label.textContent).toBe('20px');
+		});
+
+		it('should show the default size for plain text (no element)', () => {
+			const label = { textContent: '20px' };
+			const mockTarget = { parentElement: { querySelector: jest.fn().mockReturnValue(label) } };
+
+			const originalGet = kernel.$.frameContext.get;
+			kernel.$.frameContext.get = jest.fn((key) =>
+				key === 'wwComputedStyle' ? { fontSize: '13px' } : originalGet?.(key),
+			);
+
+			fontSize.active(null, mockTarget);
+			expect(label.textContent).toBe('13px');
+
+			kernel.$.frameContext.get = originalGet;
 		});
 	});
 
