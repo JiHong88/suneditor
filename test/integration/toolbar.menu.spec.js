@@ -637,3 +637,51 @@ describe('Toolbar Bottom Mode (inline:bottom)', () => {
 		expect(toolbar.classList.contains('se-toolbar-inline')).toBe(true);
 	});
 });
+
+describe('FontSize toolbar label', () => {
+	const layouts = {
+		'input box': {},
+		'disableInput (replaced button)': { disableInput: true },
+		'disableInput with inc/dec controls': { disableInput: true, showIncDecControls: true },
+	};
+
+	describe.each(Object.keys(layouts))('%s', (layout) => {
+		let editor;
+
+		beforeEach(async () => {
+			editor = createTestEditor({
+				plugins: { fontSize },
+				defaultLine: 'div',
+				editorStyle: 'font-size: 13px;',
+				buttonList: [['fontSize']],
+				fontSize: { sizeUnit: 'px', ...layouts[layout] },
+			});
+			await waitForEditorReady(editor);
+		});
+
+		afterEach(() => {
+			destroyTestEditor(editor);
+		});
+
+		const getLabel = () => {
+			const label = editor.$.context.get('toolbar_buttonTray').querySelector('.__se__font_size');
+			return label.value ?? label.textContent;
+		};
+
+		const selectText = (node) => {
+			editor.$.selection.setRange(node, 0, node, 2);
+			editor.$.eventManager.applyTagEffect(node);
+		};
+
+		it('should show the inline size and fall back to the default size for plain text', () => {
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
+			wysiwyg.innerHTML = '<div>plain <span style="font-size: 20px;">styled</span></div>';
+
+			selectText(wysiwyg.querySelector('span').firstChild);
+			expect(getLabel()).toBe('20px');
+
+			selectText(wysiwyg.querySelector('div').firstChild);
+			expect(getLabel()).toBe('13px');
+		});
+	});
+});
