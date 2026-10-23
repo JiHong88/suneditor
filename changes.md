@@ -20,7 +20,7 @@
 
 ### fix
 
-
+- Fixed event-handler attributes (`onclick`, `onmouseover`, ...) and blacklisted attributes surviving on XML-namespaced tags (`<a:b>`, `<o:p>`, ...) when `strictMode.tagFilter` is off — the attribute filter skipped those tags entirely. With the default `strictMode` they were already removed whole; hardens against the GHSA-6rf4-v2fh-m6p4 payloads (`core/logic/dom/html`)
 - Fixed the French table menu swapping “insert row above” and “insert row below” (`langs/fr`)
 - Fixed crashes when a controller, component, or selection callback runs after the editor is destroyed — store writes (`controlActive`, `_preventBlur`), component deselect, and `selection.init` no longer touch released state (`core/kernel/store`, `core/logic/shell/component`, `core/logic/dom/selection`)
 - Fixed a crash when a coalesced wysiwyg mousemove frame runs after the editor is destroyed — component lookup no longer iterates a released checker list, and the pending frame is cancelled (`core/logic/shell/pluginManager`, `core/event/handlers/handler_ww_mouse`)

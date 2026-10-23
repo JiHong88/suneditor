@@ -539,6 +539,58 @@ describe('Embed Plugin', () => {
 				expect(result).toBe(true);
 			});
 
+			describe('raw embed HTML with a trailing <script> (GHSA-w93q-cq9w-58p7)', () => {
+				const { dom } = require('../../../../src/helper');
+				const approveHandler = () =>
+					jest.fn().mockImplementation(async (eventName, data) => {
+						if (eventName === 'onEmbedInputBefore' && data.handler) data.handler(null);
+						return undefined;
+					});
+				const scriptCreations = () => dom.utils.createElement.mock.calls.filter(([tag]) => tag === 'script');
+
+				it('does not recreate an external script by default', async () => {
+					const payload =
+						'<iframe src="https://www.facebook.com/plugins/post.php?href=test"></iframe><script src="http://127.0.0.1:8000/poc.js"></script>';
+					embed.$.eventManager.triggerEvent = approveHandler();
+
+					const result = await embed.submitSRC(payload);
+
+					expect(result).toBe(true);
+					expect(scriptCreations()).toHaveLength(0);
+					const cover = mockFigure.CreateContainer.mock.results[0].value.cover;
+					expect(cover.appendChild.mock.calls.some(([node]) => /^script$/i.test(node?.nodeName))).toBe(false);
+				});
+
+				it('never recreates an inline script, even with a whitelist', async () => {
+					const scriptedEmbed = new Embed(kernel, { scriptSrcWhitelist: ['http://127.0.0.1:8000/'] });
+					scriptedEmbed.$.eventManager.triggerEvent = approveHandler();
+
+					const result = await scriptedEmbed.submitSRC(
+						'<iframe src="https://www.facebook.com/plugins/post.php?href=test"></iframe><script>alert(1)</script>',
+					);
+
+					expect(result).toBe(true);
+					expect(scriptCreations()).toHaveLength(0);
+				});
+
+				it('recreates a script only when its src matches scriptSrcWhitelist', async () => {
+					const scriptedEmbed = new Embed(kernel, { scriptSrcWhitelist: [/^https:\/\/platform\.twitter\.com\//] });
+					scriptedEmbed.$.eventManager.triggerEvent = approveHandler();
+
+					await scriptedEmbed.submitSRC(
+						'<blockquote class="twitter-tweet">content</blockquote><script src="https://platform.twitter.com/widgets.js"></script>',
+					);
+					expect(scriptCreations()).toHaveLength(1);
+					expect(scriptCreations()[0][1].src).toBe('https://platform.twitter.com/widgets.js');
+
+					dom.utils.createElement.mockClear();
+					await scriptedEmbed.submitSRC(
+						'<blockquote class="twitter-tweet">content</blockquote><script src="http://127.0.0.1:8000/poc.js"></script>',
+					);
+					expect(scriptCreations()).toHaveLength(0);
+				});
+			});
+
 			it('should process URL', async () => {
 				const url = 'https://www.facebook.com/user/posts/123';
 				const result = await embed.submitSRC(url);

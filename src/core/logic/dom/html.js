@@ -2289,7 +2289,10 @@ class HTML {
 	 * @returns {string}
 	 */
 	#CleanElements(attrFilter, styleFilter, m, t) {
-		if (_RE_XML_NS_TAG.test(m)) return m;
+		// Namespaced tags (<o:p>, <a:b>, ...) keep their attributes, but never event handlers or blacklisted attributes.
+		if (_RE_XML_NS_TAG.test(m)) {
+			return attrFilter ? m.replace(_RE_ON_HANDLER, '').replace(this.#attributeBlacklistRegExp, '') : m;
+		}
 
 		let v = null;
 		const tagName = t.match(_RE_TAG_NAME)[0].toLowerCase();
