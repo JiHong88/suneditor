@@ -355,11 +355,8 @@ describe('Store', () => {
 			const listener = jest.fn();
 			store.subscribe('controlActive', listener);
 
-			expect(store.isActive()).toBe(true);
-
 			store._destroy();
 
-			expect(store.isActive()).toBe(false);
 			expect(() => store.set('controlActive', true)).not.toThrow();
 			expect(() => store.set('_preventBlur', false)).not.toThrow();
 			expect(store.get('controlActive')).toBeUndefined();

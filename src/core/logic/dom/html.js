@@ -103,7 +103,7 @@ class HTML {
 
 		// extra tags
 		const allowedExtraTags = options.get('_allowedExtraTag');
-		const disallowedExtraTags = options.get('_disallowedExtraTag');
+		const disallowedExtraTags = options.get('_disallowedExtraTag') || '(?!)';
 		this.#disallowedTagsRegExp = new RegExp(
 			`<(${disallowedExtraTags})[^>]*>([\\s\\S]*?)<\\/\\1>|<(${disallowedExtraTags})[^>]*\\/?>`,
 			'gi',
@@ -293,9 +293,9 @@ class HTML {
 		let cleanData = '';
 
 		html = this.compress(html);
+		html = this.#removeDisallowedExtraTags(html);
 
 		if (tagFilter) {
-			html = html.replace(this.#disallowedTagsRegExp, '');
 			html = this.#deleteDisallowedTags(html, this.#elementWhitelistRegExp, this.#elementBlacklistRegExp).replace(
 				/<br\/?>$/i,
 				'',
@@ -1481,8 +1481,7 @@ class HTML {
 
 		for (let i = 0; i < rootKey.length; i++) {
 			this.#$.facade.changeFrameContext(rootKey[i]);
-			if (ctx.head)
-				this.#frameContext.get('_wd').head.innerHTML = ctx.head.replace(this.#disallowedTagsRegExp, '');
+			if (ctx.head) this.#frameContext.get('_wd').head.innerHTML = this.#removeDisallowedExtraTags(ctx.head);
 			if (ctx.body)
 				this.#frameContext.get('_wd').body.innerHTML = this.clean(ctx.body, {
 					forceFormat: true,
@@ -2204,6 +2203,20 @@ class HTML {
 		}
 
 		return html.replace(whitelistRegExp, '').replace(blacklistRegExp, '');
+	}
+
+	/**
+	 * @description Removes the tags disallowed by `allowedExtraTags` (script, style, meta, link...).
+	 * - Repeats until stable so a removal cannot join the remains into a new tag (`<scr<script></script>ipt>`).
+	 * @param {string} html HTML string
+	 * @returns {string}
+	 */
+	#removeDisallowedExtraTags(html) {
+		for (let prev = null; prev !== html; ) {
+			prev = html;
+			html = html.replace(this.#disallowedTagsRegExp, '');
+		}
+		return html;
 	}
 
 	/**

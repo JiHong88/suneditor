@@ -51,6 +51,7 @@ export const domCheck: {
 	isExcludeFormat: typeof import('./domCheck').isExcludeFormat;
 	isUneditable: typeof import('./domCheck').isUneditable;
 	isImportantDisabled: typeof import('./domCheck').isImportantDisabled;
+	isPopoverOpen: typeof import('./domCheck').isPopoverOpen;
 };
 export const domUtils: {
 	clone: typeof import('./domUtils').clone;

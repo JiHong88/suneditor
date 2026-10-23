@@ -1,9 +1,9 @@
 import type {} from '../../../typedef';
 /**
- * @description Cancel coalesced wysiwyg mousemove frames for one editor.
- * @param {object} editor Event orchestrator that scheduled the frames.
+ * @description Cancel the pending coalesced wysiwyg mousemove frame of each root.
+ * @param {Map<string, SunEditor.FrameContext>} frameRoots The editor's frame roots
  */
-export function cancelWysiwygMouseMoveFrames(editor: object): void;
+export function cancelWysiwygMouseMoveFrames(frameRoots: Map<string, SunEditor.FrameContext>): void;
 /**
  * @typedef {import('../eventOrchestrator').default} EventManagerThis_handler_ww_mouse
  */

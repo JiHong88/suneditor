@@ -338,7 +338,7 @@ class Embed extends PluginModal {
 		return {
 			query: 'iframe',
 			/** @param {HTMLIFrameElement} element */
-			method: async (element) => {
+			method: (element) => {
 				if (!Embed.#checkContentType(element.src)) return;
 
 				const figureInfo = Figure.GetContainer(element);
@@ -581,7 +581,7 @@ class Embed extends PluginModal {
 		this._caption = figureInfo.caption;
 		this.#align = figureInfo.align;
 
-		if (!this.#cover?.getAttribute?.('data-se-origin')) {
+		if (this.#cover && !this.#cover.getAttribute('data-se-origin')) {
 			const src = target?.getAttribute?.('src') || target?.querySelector?.('a')?.href;
 			if (src && Embed.#checkContentType(src)) {
 				this.#cover.setAttribute('data-se-origin', src);

@@ -458,3 +458,91 @@ describe.each([
 		expect(p.getAttribute('style') === 'position: fixed;').toBe(strictMode.styleFilter === false);
 	});
 });
+
+// `allowedExtraTags` (script, style, meta, link...) is applied whichever `tagFilter`/`formatFilter` setting is used.
+describe.each([
+	['default', {}],
+	['tagFilter off', { tagFilter: false }],
+	['tagFilter + formatFilter off', { tagFilter: false, formatFilter: false }],
+])('HTML Security - disallowed extra tags, strictMode %s', (_name, strictMode) => {
+	let editor;
+
+	beforeAll(async () => {
+		jest.spyOn(console, 'warn').mockImplementation(() => {});
+		jest.spyOn(console, 'error').mockImplementation(() => {});
+		editor = createTestEditor({ buttonList: [['bold', 'italic']], defaultLine: 'p', strictMode });
+		await waitForEditorReady(editor);
+	});
+
+	afterAll(() => {
+		destroyTestEditor(editor);
+		jest.restoreAllMocks();
+	});
+
+	it('should remove script tags', () => {
+		const cleaned = editor.$.html.clean(
+			'<p>a<script>alert(1)</script></p><script src="//x"></script><script>b</script>',
+		);
+		expect(cleaned).not.toMatch(/<script/i);
+		expect(cleaned).toContain('a');
+	});
+
+	it('should remove a script tag rebuilt from the remains of a removed one', () => {
+		const cleaned = editor.$.html.clean('<p>a</p><scr<script></script>ipt>alert(1)</script>');
+		expect(cleaned).not.toMatch(/<script/i);
+	});
+
+	it('should remove style, meta and link tags', () => {
+		const cleaned = editor.$.html.clean(
+			'<p>a</p><style>@import "x";</style><meta http-equiv="refresh" content="0;url=x"><link rel="stylesheet" href="x">',
+		);
+		expect(cleaned).not.toMatch(/<(style|meta|link)/i);
+	});
+});
+
+describe('HTML Security - every extra tag allowed', () => {
+	let editor;
+
+	beforeAll(async () => {
+		jest.spyOn(console, 'warn').mockImplementation(() => {});
+		editor = createTestEditor({
+			buttonList: [['bold']],
+			defaultLine: 'p',
+			allowedExtraTags: { script: true, style: true, meta: true, link: true, '[a-z]+:[a-z]+': true },
+		});
+		await waitForEditorReady(editor);
+	});
+
+	afterAll(() => {
+		destroyTestEditor(editor);
+		jest.restoreAllMocks();
+	});
+
+	it('should not strip ordinary tags when no extra tag is disallowed', () => {
+		expect(editor.$.html.clean('<p>a<strong>b</strong></p>')).toBe('<p>a<strong>b</strong></p>');
+	});
+});
+
+describe('HTML Security - setFullPage head', () => {
+	let editor;
+
+	beforeAll(async () => {
+		jest.spyOn(console, 'warn').mockImplementation(() => {});
+		editor = createTestEditor({ buttonList: [['bold']], defaultLine: 'p', iframe: true, iframe_cssFileName: [] });
+		await waitForEditorReady(editor);
+	});
+
+	afterAll(() => {
+		destroyTestEditor(editor);
+		jest.restoreAllMocks();
+	});
+
+	it('should remove a disallowed tag rebuilt from the remains of a removed one', () => {
+		editor.$.html.setFullPage({
+			head: '<title>t</title><sty<style></style>le>body{display:none}</style><li<link>nk rel="stylesheet" href="//x">',
+		});
+		const head = editor.$.frameContext.get('_wd').head.innerHTML;
+		expect(head).not.toMatch(/<(style|link)/i);
+		expect(head).toContain('<title>t</title>');
+	});
+});

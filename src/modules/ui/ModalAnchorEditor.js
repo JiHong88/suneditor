@@ -344,7 +344,7 @@ class ModalAnchorEditor {
 		);
 		if (headers.length === 0) return;
 
-		const valueRegExp = new RegExp(`^${urlValue.replace(/^#/, '')}`, 'i');
+		const valueRegExp = new RegExp(`^${unicode.escapeStringRegexp(urlValue.replace(/^#/, ''))}`, 'i');
 		const list = [];
 		const menus = [];
 		for (let i = 0, len = headers.length, v; i < len; i++) {

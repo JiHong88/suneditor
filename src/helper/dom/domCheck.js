@@ -318,6 +318,20 @@ export function isImportantDisabled(node) {
 	return /** @type {HTMLElement} */ (node)?.hasAttribute('data-important-disabled');
 }
 
+/**
+ * @description Checks if the element is currently shown as a popover.
+ * - Returns `false` where the `:popover-open` selector is not implemented (`matches` throws a `SyntaxError` there).
+ * @param {?Element} element The element to check
+ * @returns {boolean}
+ */
+export function isPopoverOpen(element) {
+	try {
+		return !!element?.matches(':popover-open');
+	} catch {
+		return false;
+	}
+}
+
 const check = {
 	isZeroWidth,
 	isEdgePoint,
@@ -346,6 +360,7 @@ const check = {
 	isExcludeFormat,
 	isUneditable,
 	isImportantDisabled,
+	isPopoverOpen,
 };
 
 export default check;

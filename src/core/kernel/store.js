@@ -118,15 +118,6 @@ class Store {
 	}
 
 	/**
-	 * @description Whether this store still accepts reads and writes.
-	 * `false` after {@link Store#_destroy}.
-	 * @returns {boolean}
-	 */
-	isActive() {
-		return this.#state !== null;
-	}
-
-	/**
 	 * @description Set state value and notify subscribers
 	 * @template {keyof StoreState} K
 	 * @param {K} key

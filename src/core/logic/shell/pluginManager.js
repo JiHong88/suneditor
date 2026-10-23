@@ -168,7 +168,7 @@ class PluginManager {
 					try {
 						plugin.method(infoLst[i]);
 					} catch (error) {
-						console.warn(`[SUNEDITOR.retainFormat.fail]-[${plugin.key}]`, error.message);
+						console.warn(`[SUNEDITOR.retainFormat.fail]-[${plugin.key}]`, error?.message ?? error);
 					}
 				}
 			});

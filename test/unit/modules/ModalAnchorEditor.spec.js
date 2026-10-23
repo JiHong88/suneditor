@@ -772,6 +772,26 @@ describe('ModalAnchorEditor', () => {
 			expect(bookmarkMenu.create).toHaveBeenCalled();
 		});
 
+		it('should match RegExp special characters in the value literally', () => {
+			const $ = createDeps();
+			const wysiwyg = document.createElement('div');
+			for (const text of ['(a) intro', 'abc']) {
+				const h2 = document.createElement('h2');
+				h2.textContent = text;
+				wysiwyg.appendChild(h2);
+			}
+			$.frameContext.set('wysiwyg', wysiwyg);
+
+			const ae = new ModalAnchorEditor($, createModalForm(), { relList: [], defaultRel: {} });
+			const { calls } = getEventHandlers($);
+			const focusHandler = calls[3][2];
+
+			ae.urlInput.value = '#(';
+			expect(() => focusHandler()).not.toThrow();
+			const bookmarkMenu = SelectMenu.mock.results[0].value;
+			expect(bookmarkMenu.create.mock.calls.at(-1)[0]).toHaveLength(1);
+		});
+
 		it('should not create bookmark list when value is not a bookmark', () => {
 			const $ = createDeps();
 			const ae = new ModalAnchorEditor($, createModalForm(), { relList: [], defaultRel: {} });

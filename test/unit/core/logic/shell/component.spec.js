@@ -339,14 +339,6 @@ describe('Component', () => {
 			expect(mockEditor.store.set).toHaveBeenCalledWith('_preventBlur', false);
 		});
 
-		it('should not touch the store after the editor is destroyed', () => {
-			mockEditor.store.isActive.mockReturnValue(false);
-			mockEditor.store.set.mockClear();
-
-			expect(() => component.deselect()).not.toThrow();
-			expect(() => component.__deselect()).not.toThrow();
-			expect(mockEditor.store.set).not.toHaveBeenCalled();
-		});
 	});
 
 	describe('insert method', () => {
@@ -404,6 +396,47 @@ describe('Component', () => {
 			component._init();
 			expect(mockEditor.$.contextProvider.applyToRoots).toHaveBeenCalled();
 		});
+	});
+
+	describe('deferred selection lifecycle', () => {
+		let target;
+		let info;
+
+		beforeEach(() => {
+			jest.useFakeTimers();
+			const { _DragHandle } = require('../../../../../src/modules/ui');
+			_DragHandle.get.mockReturnValue(null);
+			const line = document.createElement('p');
+			line.innerHTML = 'before<span class="se-component se-inline-component">item</span>';
+			target = line.lastChild;
+			info = { target, container: target, pluginName: 'test', isFile: false };
+			jest.spyOn(component, 'get').mockReturnValue(info);
+			mockEditor.$.plugins.test = { componentSelect: () => true };
+			mockEditor.store.set('hasFocus', true);
+		});
+
+		afterEach(() => {
+			component._destroy();
+			jest.clearAllTimers();
+			jest.useRealTimers();
+			jest.restoreAllMocks();
+		});
+
+		it.each(['__deselect', '_destroy'])('cancels pending listener setup on %s', (method) => {
+			component.select(target, 'test', { isInput: true });
+			component[method]();
+			jest.runAllTimers();
+			expect(mockEditor.$.eventManager.addGlobalEvent).not.toHaveBeenCalled();
+			expect(target.classList.contains('se-component-selected')).toBe(false);
+		});
+
+		it('keeps only one pending listener setup across repeated selections', () => {
+			for (let i = 0; i < 20; i++) component.select(target, 'test', { isInput: true });
+			jest.runAllTimers();
+			expect(mockEditor.$.eventManager.addGlobalEvent).toHaveBeenCalledTimes(4);
+			expect(target.classList.contains('se-component-selected')).toBe(true);
+		});
+
 	});
 
 	describe('_destroy method', () => {

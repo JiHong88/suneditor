@@ -30,6 +30,8 @@ class Component {
 	#bindClose_keydown = null;
 	/** @type {?SunEditor.Event.GlobalInfo} */
 	#bindClose_mousedown = null;
+	/** @type {?number} Pending selection listener setup. */
+	#selectionTimer = null;
 
 	/**
 	 * @constructor
@@ -382,7 +384,9 @@ class Component {
 
 		const __overInfo = _DragHandle.get('__overInfo');
 		// Defer drag handle setup — let the current click/mousedown event complete before attaching global listeners
-		_w.setTimeout(() => {
+		if (this.#selectionTimer !== null) _w.clearTimeout(this.#selectionTimer);
+		this.#selectionTimer = _w.setTimeout(() => {
+			this.#selectionTimer = null;
 			_DragHandle.set('__overInfo', __overInfo === ON_OVER_COMPONENT ? undefined : false);
 			if (__overInfo !== ON_OVER_COMPONENT) this.#addGlobalEvent();
 			if (!info.isFile) this.#addNotFileGlobalEvent();
@@ -441,8 +445,6 @@ class Component {
 	 * @description Deselects the selected component.
 	 */
 	deselect() {
-		if (this.#store.isActive?.() === false) return;
-
 		// Defer controlActive reset — synchronous blur handlers during deselect still need to see it as active
 		_w.setTimeout(() => {
 			this.#store.set('controlActive', false);
@@ -538,8 +540,6 @@ class Component {
 	 * @param {Element} target The element to hover-select
 	 */
 	hoverSelect(target) {
-		if (this.#store.isActive?.() === false) return;
-
 		const figure = dom.query.getParentElement(target, dom.check.isFigure);
 		let info = this.get(target);
 		if (info || figure) {
@@ -566,7 +566,8 @@ class Component {
 	 * - This method resets the selection state and hides UI elements related to the component selection.
 	 */
 	__deselect() {
-		if (this.#store.isActive?.() === false) return;
+		if (this.#selectionTimer !== null) _w.clearTimeout(this.#selectionTimer);
+		this.#selectionTimer = null;
 
 		this.#store.set('_preventBlur', false);
 		_DragHandle.set('__overInfo', null);
@@ -907,7 +908,7 @@ class Component {
 	 * @param {KeyboardEvent} e - Event object
 	 */
 	async #OnKeyDown_component(e) {
-		if (this.#store.isActive?.() === false || this.#$.ui.selectMenuOn) return;
+		if (this.#$.ui.selectMenuOn) return;
 
 		const keyCode = e.code;
 		if (!keyCodeMap.isEsc(keyCode) && this.#$.ui.isInsideController(dom.query.getEventTarget(e))) return;
@@ -1057,6 +1058,8 @@ class Component {
 	 * @description Destroy the Component instance and release memory
 	 */
 	_destroy() {
+		if (this.#selectionTimer !== null) _w.clearTimeout(this.#selectionTimer);
+		this.#selectionTimer = null;
 		this.__removeGlobalEvent();
 		this.__removeDragEvent();
 	}
