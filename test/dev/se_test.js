@@ -1117,9 +1117,9 @@ const options1 = {
 	},
 	fontSize: {
 		// showIncDecControls: true
-		// disableInput: true,
+		disableInput: true,
 		// sizeUnit: 'text',
-		// showDefaultSizeLabel:true
+		showDefaultSizeLabel:true
 	},
 
 	autocomplete: {

@@ -721,6 +721,30 @@ describe('PluginManager', () => {
 			warn.mockRestore();
 		});
 
+		it.each([new Error('failure'), null, 'failure'])('handles a thrown retainFormat error (%s) and continues other elements', (reason) => {
+			const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+			try {
+				const method = jest.fn().mockImplementationOnce(() => { throw reason; }).mockReturnValue(undefined);
+				const plugin = {
+					constructor: { options: {}, key: 'retainPlugin' },
+					retainFormat: () => ({ query: 'img', method }),
+				};
+				const { kernel, product } = createKernelAndProduct({
+					plugins: { retainPlugin: plugin },
+					__pluginRetainFilter: true,
+				});
+				const pm = new PluginManager(kernel, product);
+				pm.init({ retainPlugin: {} });
+				const container = document.createElement('div');
+				container.innerHTML = '<img><img>';
+				pm.applyRetainFormat(container);
+				expect(method).toHaveBeenCalledTimes(2);
+				expect(warn).toHaveBeenCalledWith(expect.stringContaining('retainPlugin'), reason?.message ?? reason);
+			} finally {
+				warn.mockRestore();
+			}
+		});
+
 		it('should not abort other retainFormat plugins when one plugin throws', () => {
 			const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
 			const badMethod = jest.fn(() => {

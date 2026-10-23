@@ -87,7 +87,8 @@ class DocumentType {
 			let headerHTML = '';
 			for (let i = 0, len = headers.length, h; i < len; i++) {
 				h = headers[i];
-				headerHTML += `<div class="se-doc-item se-doc-h${numbers.get(h.nodeName)}" title="${h.textContent}">${h.textContent}</div>`;
+				const text = converter.htmlToEntity(h.textContent);
+				headerHTML += `<div class="se-doc-item se-doc-h${numbers.get(h.nodeName)}" title="${text}">${text}</div>`;
 			}
 			inner.innerHTML = headerHTML;
 			this.#innerHeaders = inner.querySelectorAll('div');

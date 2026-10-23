@@ -464,6 +464,23 @@ SUNEDITOR.create('#editor', {
 | **`attrFilter`**         | Filters attributes                              | Allows any attributes (XSS risk) |
 | **`styleFilter`**        | Filters inline styles                           | Allows any inline styles         |
 
+Custom app links can be enabled without disabling attribute filtering:
+
+```javascript
+SUNEDITOR.create('#editor', {
+	allowedURLProtocols: ['zoommtg', 'slack', 'vscode'],
+});
+```
+
+`allowedURLProtocols` extends the built-in URL protocol allow list and defaults to `[]`.
+The built-in protocols are `http`, `https`, `ftp`, `ftps`, `mailto`, `tel`, `blob`, `sms`,
+`geo`, `webcal` and `callto`; relative URLs, fragment links (`#...`) and image data URLs
+(`data:image/...`) are also allowed by default.
+Entries are case-insensitive scheme names without a colon; invalid entries and `javascript`,
+`vbscript`, or `data` are ignored, and non-image data URLs remain blocked.
+The option applies to URL attributes, including clipboard iframe placeholders, and is fixed
+at creation like the other sanitizer allow lists (`resetOptions` cannot change it).
+
 ---
 
 ## 7. Multi-Root Architecture

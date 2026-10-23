@@ -46,7 +46,14 @@ export class TableResizeService {
 		};
 
 		this.#$.contextProvider.applyToRoots((e) => {
-			this.#ensureLines(e.get('wrapper'));
+			const wrapper = e.get('wrapper');
+			const els = /** @type {{[selector: string]: HTMLElement}} */ ({});
+			this.#els.set(wrapper, els);
+
+			for (const selector of RESIZE_LINE_SELECTORS) {
+				els[selector] = dom.utils.createElement('DIV', { class: selector.replace(/^\./, '') });
+				wrapper.appendChild(els[selector]);
+			}
 		});
 	}
 
@@ -523,33 +530,12 @@ export class TableResizeService {
 	}
 
 	/**
-	 * @description Guide lines for one editor root. Created on demand when the current
-	 * wrapper was not present at construction (a later root, or a wrapper that was replaced).
-	 * @param {?HTMLElement} wrapper
-	 * @returns {?{[selector: string]: HTMLElement}}
-	 */
-	#ensureLines(wrapper) {
-		if (!wrapper) return null;
-
-		const existing = this.#els.get(wrapper);
-		if (existing) return existing;
-
-		const els = /** @type {{[selector: string]: HTMLElement}} */ ({});
-		this.#els.set(wrapper, els);
-		for (const selector of RESIZE_LINE_SELECTORS) {
-			els[selector] = dom.utils.createElement('DIV', { class: selector.replace(/^\./, '') });
-			wrapper.appendChild(els[selector]);
-		}
-		return els;
-	}
-
-	/**
 	 * @description The current root's resize guide element.
 	 * @param {string} selector Class selector from `table.constants`
 	 * @returns {?HTMLElement}
 	 */
 	#element(selector) {
-		return this.#ensureLines(this.#$.frameContext.get('wrapper'))?.[selector] || null;
+		return this.#els.get(this.#$.frameContext.get('wrapper'))?.[selector] || null;
 	}
 
 	/**

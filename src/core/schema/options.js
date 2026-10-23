@@ -435,6 +435,17 @@ export const DEFAULTS = {
  * ```
  * ///
  *
+ * @property {Array<string>} [allowedURLProtocols=[]] - Additional URL schemes allowed by the HTML sanitizer, without a trailing colon (case-insensitive).
+ * - Extends the built-in protocol allow list without disabling attribute filtering.
+ * - Built-in protocols: `http`, `https`, `ftp`, `ftps`, `mailto`, `tel`, `blob`, `sms`, `geo`, `webcal`, `callto`.
+ * - Relative URLs, fragment links (`#...`) and image data URLs (`data:image/...`) are also allowed by default.
+ * - `javascript`, `vbscript` and `data` entries are ignored; only image data URLs remain allowed.
+ * - Fixed at editor creation; cannot be changed with `resetOptions`.
+ * ```js
+ * { allowedURLProtocols: ['zoommtg', 'slack', 'vscode'] }
+ * ```
+ * ///
+ *
  * #### 3) Text & Inline Style Control
  * @property {string} [textStyleTags=__textStyleTags] - Additional text style tags.
  * - The default follows {@link PrivateBaseOptions.__textStyleTags}
@@ -799,6 +810,7 @@ export const OPTION_FIXED_FLAG = {
 	lang: 'fixed',
 	fontSizeUnits: 'fixed',
 	allowedClassName: 'fixed',
+	allowedURLProtocols: 'fixed',
 	closeModalOutsideClick: 'fixed',
 	copyFormatKeepOn: true,
 	syncTabIndent: true,

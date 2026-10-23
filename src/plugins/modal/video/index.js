@@ -306,7 +306,7 @@ class Video extends PluginModal {
 		return {
 			query: 'iframe, video',
 			/** @param {HTMLIFrameElement|HTMLVideoElement} element */
-			method: async (element) => {
+			method: (element) => {
 				if (/^(iframe)$/i.test(element?.nodeName)) {
 					if (!Video.#checkContentType(element.src)) return;
 				}

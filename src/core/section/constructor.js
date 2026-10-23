@@ -765,6 +765,17 @@ export function InitOptions(options, editorTargets, plugins) {
 		o.get('defaultLine'),
 	);
 	o.set('elementBlacklist', elb + (elb ? '|' : '') + o.get('_disallowedExtraTag'));
+	o.set(
+		'allowedURLProtocols',
+		Array.isArray(options.allowedURLProtocols)
+			? options.allowedURLProtocols
+					.map((protocol) => protocol.trim().toLowerCase())
+					.filter(
+						(protocol) =>
+							/^[a-z][a-z0-9+.-]*$/.test(protocol) && !/^(javascript|vbscript|data)$/.test(protocol),
+					)
+			: [],
+	);
 	// attribute
 	o.set(
 		'attributeWhitelist',

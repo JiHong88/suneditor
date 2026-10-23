@@ -457,7 +457,7 @@ describe('Embed Plugin', () => {
 				const mockCover = {
 					nodeType: 1,
 					setAttribute: jest.fn(),
-					getAttribute: jest.fn().mockReturnValue('https://example.com/video'),
+					getAttribute: jest.fn().mockReturnValue(encodeURIComponent('https://example.com/video?value=%25')),
 					appendChild: jest.fn(),
 				};
 				embed.figure.open = jest.fn().mockReturnValue({
@@ -471,7 +471,7 @@ describe('Embed Plugin', () => {
 				embed.modal.isUpdate = true;
 				embed.modalOn(true);
 
-				expect(embed.embedInput.value).toBe('https://example.com/video');
+				expect(embed.embedInput.value).toBe('https://example.com/video?value=%25');
 			});
 		});
 
@@ -518,6 +518,10 @@ describe('Embed Plugin', () => {
 		describe('submitSRC', () => {
 			it('should process iframe embed code', async () => {
 				const iframeCode = '<iframe src="https://www.facebook.com/plugins/post.php?href=test"></iframe>';
+				// raw embed HTML is sanitized through html.clean inside its figure container
+				embed.$.html.clean = jest
+					.fn()
+					.mockReturnValue(`<div class="se-component se-embed-container"><figure>${iframeCode}</figure></div>`);
 				// Mock triggerEvent to call the handler (simulating event listener that approves)
 				embed.$.eventManager.triggerEvent = jest.fn().mockImplementation(async (eventName, data) => {
 					if (eventName === 'onEmbedInputBefore' && data.handler) {
@@ -1129,7 +1133,7 @@ describe('Embed Plugin', () => {
 			};
 
 			embed.componentSelect(mockElement);
-			expect(mockCover.setAttribute).toHaveBeenCalledWith('data-se-origin', 'https://www.facebook.com/user/posts/123');
+			expect(mockCover.setAttribute).toHaveBeenCalledWith('data-se-origin', encodeURIComponent('https://www.facebook.com/user/posts/123'));
 		});
 
 		it('should handle resizing disabled path (line 497)', () => {
@@ -1466,6 +1470,10 @@ describe('Embed Plugin', () => {
 		it('should handle !isUpdate without process (blockquote/children path, lines 583-596)', async () => {
 			const blockquoteCode = '<blockquote class="twitter-tweet"><a href="https://twitter.com/user/status/123">test</a></blockquote>';
 			embed.modal.isUpdate = false;
+			// raw embed HTML is sanitized through html.clean inside its figure container
+			embed.$.html.clean = jest
+				.fn()
+				.mockReturnValue(`<div class="se-component se-embed-container"><figure>${blockquoteCode}</figure></div>`);
 			embed.$.eventManager.triggerEvent = jest.fn().mockResolvedValue(true);
 
 			const result = await embed.submitSRC(blockquoteCode);

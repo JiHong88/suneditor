@@ -8,19 +8,20 @@ const { _w } = env;
  * @type {WeakMap<*, {rafId: ?number, event: ?MouseEvent}>}
  */
 const __wwMousemoveRaf = new WeakMap();
-/** @type {WeakMap<object, Set<number>>} Pending mousemove frames, keyed by the editor that scheduled them. */
-const __editorMousemoveRafIds = new WeakMap();
 
 /**
- * @description Cancel coalesced wysiwyg mousemove frames for one editor.
- * @param {object} editor Event orchestrator that scheduled the frames.
+ * @description Cancel the pending coalesced wysiwyg mousemove frame of each root.
+ * @param {Map<string, SunEditor.FrameContext>} frameRoots The editor's frame roots
  */
-export function cancelWysiwygMouseMoveFrames(editor) {
-	const ids = __editorMousemoveRafIds.get(editor);
-	if (!ids) return;
+export function cancelWysiwygMouseMoveFrames(frameRoots) {
+	for (const fc of frameRoots.values()) {
+		const s = __wwMousemoveRaf.get(fc);
+		if (!s || s.rafId === null) continue;
 
-	for (const id of ids) _w.cancelAnimationFrame(id);
-	ids.clear();
+		_w.cancelAnimationFrame(s.rafId);
+		s.rafId = null;
+		s.event = null;
+	}
 }
 
 /**
@@ -184,12 +185,9 @@ export function OnMouseMove_wysiwyg(fc, e) {
 
 	s.rafId = _w.requestAnimationFrame(() => {
 		const ev = s.event;
-		const rafId = s.rafId;
 		s.rafId = null;
 		s.event = null;
-		__editorMousemoveRafIds.get(this)?.delete(rafId);
-		// The frame can fire after the editor is destroyed.
-		if (!ev || this.$.store.isActive?.() === false) return;
+		if (!ev) return;
 
 		const eventTarget = dom.query.getEventTarget(ev);
 
@@ -203,13 +201,6 @@ export function OnMouseMove_wysiwyg(fc, e) {
 
 		this._callPluginEvent('onMouseMove', { frameContext: fc, event: ev });
 	});
-
-	let ids = __editorMousemoveRafIds.get(this);
-	if (!ids) {
-		ids = new Set();
-		__editorMousemoveRafIds.set(this, ids);
-	}
-	ids.add(s.rafId);
 }
 
 /**

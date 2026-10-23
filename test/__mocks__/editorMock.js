@@ -668,7 +668,6 @@ export function createMockEditor(customOptions = {}) {
 	const store = {
 		get: jest.fn((key) => storeState[key]),
 		set: jest.fn((key, value) => { storeState[key] = value; }),
-		isActive: jest.fn(() => true),
 		subscribe: jest.fn().mockReturnValue(jest.fn()),
 		mode: {
 			isClassic: true,

@@ -89,11 +89,33 @@ does not change. In particular:
 ## Async ownership
 
 Capture the concrete event frame/root and request identity before scheduling. The shared
-`$.frameContext` is a moving view, not an immutable snapshot. When a request finishes, verify
+`$.frameContext` is a moving view, not an immutable snapshot. While the editor is alive, verify
 the originating root still exists, the editor/UI still owns the request and the relevant
 query/target has not changed. Use existing request cancellation where available, plus stale
 result checks when cancellation cannot guarantee ordering. A canceled public hook must not
 continue into a mutation. Do not insert into whichever frame happens to be active now.
+
+## Lifecycle and destroy
+
+- Calling editor APIs after `destroy()` is unsupported. Do not make ordinary synchronous
+  methods safe to call on a destroyed instance by adding lifetime or null guards.
+- The owner must cancel its timers, animation frames and cancellable requests, remove its
+  listeners and disconnect its observers during teardown. A callback guard is not a substitute
+  for cleanup. Keep cancellation local to the existing owner; do not introduce a global task
+  framework just to remove a few checks.
+- Safe completion of every in-flight async operation across destroy is not a general guarantee.
+  Do not add a lifetime check after every `await`. Features that need cancellation/discard
+  behavior (for example uploads) must define that contract at the operation's owner, including
+  result application and error cleanup, and test it. For such a contract, check uncancelable
+  results at the relevant boundary rather than repeating guards through synchronous callees.
+- Destruction from an arbitrary synchronous user/plugin hook is not generally supported
+  reentrancy. Do not invent guards after every hook based only on that possibility. If a
+  specific hook explicitly supports it, document and test that boundary.
+- Do not hide missing cleanup with no-op Store reads/writes or optional access to released
+  dependencies. Test scheduling before destroy followed by actual teardown and queue flushing;
+  assert no late effects/listener registration and that other editors remain functional.
+  Tests that only flip a lifetime flag or call APIs after destroy do not establish a supported
+  lifecycle path. Apply this contract to the changed path; audit legacy exceptions before removal.
 
 ## Validation proportional to the change
 
