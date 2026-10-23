@@ -165,3 +165,34 @@ test('additional URL protocols preserve app links without admitting unsafe URLs'
 	expect(links).toEqual(['zoommtg:open', 'slack:channel', null, null]);
 	// Avoid activating app links; the shared corpus checks execution of unsafe links.
 });
+
+test('raw embed origin survives serialization and restores the original modal input', async ({ page }) => {
+	await make(page, {});
+	const result = await page.evaluate(async () => {
+		const ed = window.__sEditor;
+		const embed = ed.$.plugins.embed;
+		const original = '<iframe src="https://platform.twitter.com/embed/Tweet.html?value=%25" title="한글 😀 100%"></iframe>';
+		ed.$.html.set('<p>before</p>');
+		const ww = ed.$.frameContext.get('wysiwyg');
+		const text = ww.querySelector('p').firstChild;
+		ed.$.selection.setRange(text, 6, text, 6);
+		await embed.submitSRC(original);
+		for (let i = 0; i < 3; i++) ed.$.html.set(ed.$.html.get());
+		const iframe = ww.querySelector('iframe');
+		embed.componentSelect(iframe);
+		embed.modalOn(true);
+		return {
+			count: ww.querySelectorAll('iframe').length,
+			src: iframe.getAttribute('src'),
+			encoded: iframe.closest('figure').getAttribute('data-se-origin') === encodeURIComponent(original),
+			restored: embed.embedInput.value === original && embed.previewSrc.textContent === original,
+		};
+	});
+	expect(result).toEqual({
+		count: 1,
+		src: 'https://platform.twitter.com/embed/Tweet.html?value=%25',
+		encoded: true,
+		restored: true,
+	});
+	expect(await trigger(page)).toEqual({ xss: 0, left: [] });
+});

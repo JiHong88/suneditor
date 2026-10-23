@@ -457,7 +457,7 @@ describe('Embed Plugin', () => {
 				const mockCover = {
 					nodeType: 1,
 					setAttribute: jest.fn(),
-					getAttribute: jest.fn().mockReturnValue('https://example.com/video'),
+					getAttribute: jest.fn().mockReturnValue(encodeURIComponent('https://example.com/video?value=%25')),
 					appendChild: jest.fn(),
 				};
 				embed.figure.open = jest.fn().mockReturnValue({
@@ -471,7 +471,7 @@ describe('Embed Plugin', () => {
 				embed.modal.isUpdate = true;
 				embed.modalOn(true);
 
-				expect(embed.embedInput.value).toBe('https://example.com/video');
+				expect(embed.embedInput.value).toBe('https://example.com/video?value=%25');
 			});
 		});
 
@@ -1081,7 +1081,7 @@ describe('Embed Plugin', () => {
 			};
 
 			embed.componentSelect(mockElement);
-			expect(mockCover.setAttribute).toHaveBeenCalledWith('data-se-origin', 'https://www.facebook.com/user/posts/123');
+			expect(mockCover.setAttribute).toHaveBeenCalledWith('data-se-origin', encodeURIComponent('https://www.facebook.com/user/posts/123'));
 		});
 
 		it('should handle resizing disabled path (line 497)', () => {

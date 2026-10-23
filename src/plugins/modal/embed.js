@@ -368,7 +368,7 @@ class Embed extends PluginModal {
 			this.#linkValue =
 				this.previewSrc.textContent =
 				this.embedInput.value =
-					this.#cover.getAttribute('data-se-origin') || '';
+					decodeURIComponent(this.#cover.getAttribute('data-se-origin') || '');
 		}
 	}
 
@@ -584,7 +584,7 @@ class Embed extends PluginModal {
 		if (this.#cover && !this.#cover.getAttribute('data-se-origin')) {
 			const src = target?.getAttribute?.('src') || target?.querySelector?.('a')?.href;
 			if (src && Embed.#checkContentType(src)) {
-				this.#cover.setAttribute('data-se-origin', src);
+				this.#cover.setAttribute('data-se-origin', encodeURIComponent(src));
 			}
 		}
 
@@ -736,8 +736,8 @@ class Embed extends PluginModal {
 		// align
 		this.figure.setAlign(oFrame, align);
 
-		// origin src
-		cover.setAttribute('data-se-origin', originSrc);
+		// Keep raw markup out of serialized attribute values during HTML cleaning.
+		cover.setAttribute('data-se-origin', encodeURIComponent(originSrc));
 
 		if (!isUpdate) {
 			this.$.component.insert(container, {
