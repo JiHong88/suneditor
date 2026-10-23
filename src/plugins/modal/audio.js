@@ -110,7 +110,11 @@ class Audio_ extends PluginModal {
 
 		// modules
 		this.modal = new Modal(this, this.$, modalEl);
-		this.controller = new Controller(this, this.$, controllerEl, { position: 'bottom', disabled: true });
+		this.controller = new Controller(this, this.$, controllerEl, {
+			position: 'bottom',
+			disabled: true,
+			selection: true,
+		});
 		this.fileManager = new FileManager(this, this.$, {
 			query: 'audio',
 			loadEventName: 'onAudioLoad',
@@ -267,6 +271,7 @@ class Audio_ extends PluginModal {
 			nonBorder: true,
 			figureTarget: true,
 			infoOnly: false,
+			nonDragHandle: false,
 		});
 		this.#ready(target);
 	}

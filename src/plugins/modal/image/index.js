@@ -541,6 +541,7 @@ class Image_ extends PluginModal {
 			nonBorder: false,
 			figureTarget: false,
 			infoOnly: true,
+			nonDragHandle: false,
 		});
 
 		// set size
@@ -585,6 +586,7 @@ class Image_ extends PluginModal {
 			nonBorder: false,
 			figureTarget: false,
 			infoOnly: true,
+			nonDragHandle: true,
 		});
 
 		// set size
@@ -613,6 +615,7 @@ class Image_ extends PluginModal {
 			nonBorder: false,
 			figureTarget: false,
 			infoOnly,
+			nonDragHandle: false,
 		});
 		this.anchor.set(dom.check.isAnchor(target.parentNode) ? target.parentNode : null);
 
@@ -822,6 +825,7 @@ class Image_ extends PluginModal {
 				nonBorder: false,
 				figureTarget: false,
 				infoOnly: true,
+				nonDragHandle: false,
 			});
 		}
 

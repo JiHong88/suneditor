@@ -188,6 +188,29 @@ describe('Toolbar and Menu Integration Tests', () => {
 			}
 		});
 
+		it('should show the menu tray before measuring the dropdown position', () => {
+			const buttonTray = editor.$.context.get('toolbar_buttonTray');
+			const fontBtn = buttonTray.querySelector('[data-command="font"]');
+			const menuTray = editor.$.context.get('menuTray');
+			let trayOpen = false;
+			menuTray.showPopover = jest.fn(() => (trayOpen = true));
+			menuTray.hidePopover = jest.fn(() => (trayOpen = false));
+			const openAtMeasure = [];
+			const spy = jest
+				.spyOn(editor.$.offset, 'setRelPosition')
+				.mockImplementation(() => openAtMeasure.push(trayOpen));
+
+			try {
+				editor.$.menu.dropdownOn(fontBtn);
+				expect(openAtMeasure).toEqual([true]);
+			} finally {
+				spy.mockRestore();
+				editor.$.menu.dropdownOff();
+				delete menuTray.showPopover;
+				delete menuTray.hidePopover;
+			}
+		});
+
 		it('should display dropdown menu element', () => {
 			const buttonTray = editor.$.context.get('toolbar_buttonTray');
 			const fontBtn = buttonTray.querySelector('[data-command="font"]');
@@ -419,6 +442,7 @@ describe('Toolbar Bottom Mode (classic:bottom)', () => {
 			plugins: { font, fontSize },
 			buttonList: [['bold', 'italic', 'font', 'fontSize']],
 			mode: 'classic:bottom',
+			statusbar: true,
 		});
 		await waitForEditorReady(editor);
 	});
@@ -465,10 +489,17 @@ describe('Toolbar Bottom Mode (classic:bottom)', () => {
 			const rootFc = editor.$.frameRoots.values().next().value;
 			const container = rootFc.get('container');
 			const toolbar = editor.$.context.get('toolbar_main');
-			const statusbar = container.querySelector('.se-statusbar');
-			if (statusbar) {
-				expect(toolbar.compareDocumentPosition(statusbar) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-			}
+			const statusbar = container.querySelector('.se-status-bar');
+			expect(statusbar).toBeTruthy();
+			expect(toolbar.compareDocumentPosition(statusbar) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+		});
+
+		it('sticky dummy should hold the toolbar slot below the wrapper', () => {
+			// a dummy above the wrapper pushes the content (and the window scroll) down when the toolbar sticks
+			const rootFc = editor.$.frameRoots.values().next().value;
+			const toolbar = editor.$.context.get('toolbar_main');
+			const dummy = rootFc.get('_stickyDummy');
+			expect(toolbar.nextElementSibling).toBe(dummy);
 		});
 	});
 
@@ -604,5 +635,53 @@ describe('Toolbar Bottom Mode (inline:bottom)', () => {
 	it('toolbar should also have se-toolbar-inline class', () => {
 		const toolbar = editor.$.context.get('toolbar_main');
 		expect(toolbar.classList.contains('se-toolbar-inline')).toBe(true);
+	});
+});
+
+describe('FontSize toolbar label', () => {
+	const layouts = {
+		'input box': {},
+		'disableInput (replaced button)': { disableInput: true },
+		'disableInput with inc/dec controls': { disableInput: true, showIncDecControls: true },
+	};
+
+	describe.each(Object.keys(layouts))('%s', (layout) => {
+		let editor;
+
+		beforeEach(async () => {
+			editor = createTestEditor({
+				plugins: { fontSize },
+				defaultLine: 'div',
+				editorStyle: 'font-size: 13px;',
+				buttonList: [['fontSize']],
+				fontSize: { sizeUnit: 'px', ...layouts[layout] },
+			});
+			await waitForEditorReady(editor);
+		});
+
+		afterEach(() => {
+			destroyTestEditor(editor);
+		});
+
+		const getLabel = () => {
+			const label = editor.$.context.get('toolbar_buttonTray').querySelector('.__se__font_size');
+			return label.value ?? label.textContent;
+		};
+
+		const selectText = (node) => {
+			editor.$.selection.setRange(node, 0, node, 2);
+			editor.$.eventManager.applyTagEffect(node);
+		};
+
+		it('should show the inline size and fall back to the default size for plain text', () => {
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
+			wysiwyg.innerHTML = '<div>plain <span style="font-size: 20px;">styled</span></div>';
+
+			selectText(wysiwyg.querySelector('span').firstChild);
+			expect(getLabel()).toBe('20px');
+
+			selectText(wysiwyg.querySelector('div').firstChild);
+			expect(getLabel()).toBe('13px');
+		});
 	});
 });

@@ -222,6 +222,36 @@ describe('BlockHandle', () => {
 			expect(els.handle.style.display).toBe('none');
 		});
 
+		it('yields to a selected input component — its in-place move handles own that space', () => {
+			const { dom } = require('../../../../../src/helper');
+			dom.utils.hasClass.mockImplementation((el, cls) => !!el?.classList?.contains(cls));
+
+			const figure = document.createElement('figure');
+			figure.className = 'se-input-component se-component-selected';
+			document.body.appendChild(figure);
+			const mockRect = { top: 100, left: 0, bottom: 200, right: 400, width: 400, height: 100 };
+			figure.getBoundingClientRect = jest.fn().mockReturnValue(mockRect);
+			els.area.getBoundingClientRect = jest.fn().mockReturnValue({ top: 50, left: 0 });
+
+			resolveBlock.mockReturnValue({
+				element: figure, type: 'component', depth: 0, parent: null,
+				siblings: { prev: null, next: null }, rect: mockRect
+			});
+
+			blockHandle = new BlockHandle($, els.area, els.handle, els.plus, els.drag, null);
+			els.handle.style.display = 'flex';
+			blockHandle.positionForTarget(figure);
+
+			expect(els.handle.style.display).toBe('none');
+
+			// unselected input component — handle shows normally
+			figure.className = 'se-input-component';
+			blockHandle.positionForTarget(figure);
+			expect(els.handle.style.display).toBe('flex');
+
+			dom.utils.hasClass.mockReturnValue(false);
+		});
+
 		it('skips repositioning for same block', () => {
 			const p = document.createElement('p');
 			document.body.appendChild(p);

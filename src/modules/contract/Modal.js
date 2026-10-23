@@ -257,11 +257,7 @@ class Modal {
 	 * @param {boolean} fixed - Whether to fix or unfix the controller.
 	 */
 	#fixCurrentController(fixed) {
-		const cont = this.#$.ui.opendControllers;
-		for (let i = 0; i < cont.length; i++) {
-			cont[i].fixed = fixed;
-			cont[i].form.style.display = fixed ? 'none' : 'block';
-		}
+		this.#$.ui._suspendControllers(fixed);
 	}
 
 	/**
@@ -350,7 +346,7 @@ class Modal {
 	 * @param {KeyboardEvent} e - Event object
 	 */
 	#CloseListener(e) {
-		if (!keyCodeMap.isEsc(e.code)) return;
+		if (!keyCodeMap.isEsc(e.code) || e.defaultPrevented) return;
 		this.close();
 	}
 

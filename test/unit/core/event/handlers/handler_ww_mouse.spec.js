@@ -2,7 +2,7 @@
  * @fileoverview Unit tests for handler_ww_mouse.js
  */
 
-import { OnMouseDown_wysiwyg, OnMouseUp_wysiwyg, OnClick_wysiwyg, OnMouseMove_wysiwyg, OnMouseLeave_wysiwyg } from '../../../../../src/core/event/handlers/handler_ww_mouse';
+import { OnMouseDown_wysiwyg, OnMouseUp_wysiwyg, OnClick_wysiwyg, OnMouseMove_wysiwyg, OnMouseLeave_wysiwyg, cancelWysiwygMouseMoveFrames } from '../../../../../src/core/event/handlers/handler_ww_mouse';
 
 describe('handler_ww_mouse', () => {
 	let mockThis;
@@ -286,6 +286,22 @@ describe('handler_ww_mouse', () => {
 
 			expect(result).toBe(false);
 		});
+
+		it('should not run a frame cancelled on destroy', () => {
+			const event = { target: document.createElement('p') };
+
+			OnMouseMove_wysiwyg.call(mockThis, mockFc, event);
+			cancelWysiwygMouseMoveFrames(new Map([['root', mockFc]]));
+			jest.runAllTimers();
+
+			expect(mockThis._callPluginEvent).not.toHaveBeenCalled();
+
+			// the next move schedules a new frame
+			OnMouseMove_wysiwyg.call(mockThis, mockFc, event);
+			jest.runAllTimers();
+			expect(mockThis._callPluginEvent).toHaveBeenCalled();
+		});
+
 
 		it('should trigger plugin onMouseMove event', () => {
 			const event = { target: document.createElement('p') };

@@ -32,9 +32,9 @@ export function useEnterFromBeforeInput(store: SunEditor.Store, e?: KeyboardEven
  * @description Keydown event reducer
  * @param {EventPorts} ports - Ports for interacting with editor
  * @param {KeydownReducerCtx} ctx - Context object
- * @returns {Promise<EventActions>} Action list
+ * @returns {EventActions} Action list
  */
-export function reduceKeydown(ports: EventPorts, ctx: KeydownReducerCtx): Promise<EventActions>;
+export function reduceKeydown(ports: EventPorts, ctx: KeydownReducerCtx): EventActions;
 /**
  * @description Master switch for processing Enter from the `beforeinput` event (post-IME-commit) instead
  * of `keydown`, to avoid trapping iOS/mobile IME marked-text when `keydown` mutates the DOM (see

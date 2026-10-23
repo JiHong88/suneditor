@@ -10,6 +10,21 @@ const { _w } = env;
 const __wwMousemoveRaf = new WeakMap();
 
 /**
+ * @description Cancel the pending coalesced wysiwyg mousemove frame of each root.
+ * @param {Map<string, SunEditor.FrameContext>} frameRoots The editor's frame roots
+ */
+export function cancelWysiwygMouseMoveFrames(frameRoots) {
+	for (const fc of frameRoots.values()) {
+		const s = __wwMousemoveRaf.get(fc);
+		if (!s || s.rafId === null) continue;
+
+		_w.cancelAnimationFrame(s.rafId);
+		s.rafId = null;
+		s.event = null;
+	}
+}
+
+/**
  * @typedef {import('../eventOrchestrator').default} EventManagerThis_handler_ww_mouse
  */
 

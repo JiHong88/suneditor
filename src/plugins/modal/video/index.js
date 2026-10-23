@@ -306,7 +306,7 @@ class Video extends PluginModal {
 		return {
 			query: 'iframe, video',
 			/** @param {HTMLIFrameElement|HTMLVideoElement} element */
-			method: async (element) => {
+			method: (element) => {
 				if (/^(iframe)$/i.test(element?.nodeName)) {
 					if (!Video.#checkContentType(element.src)) return;
 				}
@@ -570,6 +570,7 @@ class Video extends PluginModal {
 			nonBorder: false,
 			figureTarget: false,
 			infoOnly: true,
+			nonDragHandle: false,
 		});
 
 		// set size
@@ -773,6 +774,7 @@ class Video extends PluginModal {
 			nonBorder: false,
 			figureTarget: false,
 			infoOnly,
+			nonDragHandle: false,
 		});
 
 		this.#element = target;
@@ -851,6 +853,7 @@ class Video extends PluginModal {
 			nonBorder: false,
 			figureTarget: false,
 			infoOnly: true,
+			nonDragHandle: false,
 		});
 		const size = (cloneFrame.getAttribute('data-se-size') || ',').split(',');
 

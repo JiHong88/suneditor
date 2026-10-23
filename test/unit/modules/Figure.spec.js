@@ -196,6 +196,8 @@ describe('Modules - Figure', () => {
                 disableBackWrapper: jest.fn(),
                 enableBackWrapper: jest.fn(),
                 setFigureContainer: jest.fn(),
+                _addInEditorEntry: jest.fn(),
+                _removeControllerEntry: jest.fn(),
                 opendControllers: [],
             },
             selection: {

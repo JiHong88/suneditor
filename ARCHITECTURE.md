@@ -11,6 +11,7 @@ SunEditor is architected to be a WYSIWYG editor with constraints:
 
 - **Zero Dependencies**: No frameworks (React/Vue/Angular) or libraries (jQuery/Lodash) in the core.
 - **Vanilla JavaScript**: Written in modern ES2022+, utilizing native browser APIs.
+- **Performance by construction**: Reuse shared editing services, keep inactive plugins cheap, bound work on repeated events and tie resources to their owner. See [Performance and Feature Guide](./prompts/performance-guide.md).
 - **State-aware editing**: Uses internal state management in addition to native `contentEditable` behavior.
 
 ## 2. High-Level Architecture
@@ -165,6 +166,7 @@ $ = {
 
 ```javascript
 import { PluginCommand } from '../../interfaces';
+import { dom } from '../../helper';
 
 class Blockquote extends PluginCommand {
 	static key = 'blockquote';
@@ -175,8 +177,7 @@ class Blockquote extends PluginCommand {
 	}
 
 	action() {
-		const node = this.$.selection.getNode();
-		this.$.format.applyBlock(this.quoteTag.cloneNode(false));
+		this.$.format.applyBlock(dom.utils.createElement('BLOCKQUOTE'));
 	}
 }
 ```
@@ -188,6 +189,9 @@ class Component {
 	#kernel;
 	#$;
 	#store;
+	#options;
+	#frameContext;
+	#eventManager;
 
 	constructor(kernel) {
 		this.#kernel = kernel; // Kernel (runtime container)
@@ -226,7 +230,7 @@ class Modal {
 
 ### Layer Dependency Rules
 
-Dependency boundaries are enforced at build time via **dependency-cruiser** (`.dependency-cruiser.js`).
+Runtime import boundaries below are checked by **dependency-cruiser** (`.dependency-cruiser.js`). `npm run test:arch` verifies accepted and rejected fixture graphs with the real checker. Runtime property access and every L1–L4 lifecycle invariant are still review responsibilities.
 
 ```
 Allowed dependency direction:
@@ -248,8 +252,17 @@ Allowed dependency direction:
 | :------------------- | :-------------------------------------------------------------------------------------- |
 | **Helper isolation** | `helper/*` cannot import from any other layer                                           |
 | **Module isolation** | `modules/*` cannot import `core/*` or `plugins/*` — receives Deps (`$`) via constructor |
-| **Plugin isolation** | Plugins cannot import other plugins (same plugin submodules OK)                         |
+| **Plugin isolation** | No cross-plugin imports or public-barrel bypass (same plugin submodules OK); no direct `core/logic` imports |
+| **L3 isolation** | No direct imports between services, except the exact existing ownership edges below |
 | **No circular deps** | No module can import from a module that imports it                                      |
+
+Existing exact exceptions: `commandDispatcher → _commandExecutor` (owned executor),
+`ui → blockHandle` (owned UI), `blockHandle → blockResolver` (owned helper), and
+`ui → commandDispatcher` (`COMMAND_BUTTONS` constant). An exception permits only that
+file pair; it does not allow the owner to import arbitrary services. The checker operates
+on file edges, so reviewers must ensure the last edge still imports only the constant.
+Do not broaden exceptions to silence a new dependency violation; use `$` for service access.
+Type-only documentation imports are outside this runtime graph (`tsPreCompilationDeps: false`).
 
 **Circular dependency resolution:** L3 modules that need each other (e.g., `format` ↔ `selection`) don't import directly. Both receive the full Deps bag (`$`) after Phase 2, resolving circular references at runtime.
 
@@ -451,6 +464,23 @@ SUNEDITOR.create('#editor', {
 | **`attrFilter`**         | Filters attributes                              | Allows any attributes (XSS risk) |
 | **`styleFilter`**        | Filters inline styles                           | Allows any inline styles         |
 
+Custom app links can be enabled without disabling attribute filtering:
+
+```javascript
+SUNEDITOR.create('#editor', {
+	allowedURLProtocols: ['zoommtg', 'slack', 'vscode'],
+});
+```
+
+`allowedURLProtocols` extends the built-in URL protocol allow list and defaults to `[]`.
+The built-in protocols are `http`, `https`, `ftp`, `ftps`, `mailto`, `tel`, `blob`, `sms`,
+`geo`, `webcal` and `callto`; relative URLs, fragment links (`#...`) and image data URLs
+(`data:image/...`) are also allowed by default.
+Entries are case-insensitive scheme names without a colon; invalid entries and `javascript`,
+`vbscript`, or `data` are ignored, and non-image data URLs remain blocked.
+The option applies to URL attributes, including clipboard iframe placeholders, and is fixed
+at creation like the other sanitizer allow lists (`resetOptions` cannot change it).
+
 ---
 
 ## 7. Multi-Root Architecture
@@ -494,8 +524,7 @@ class MyPlugin extends PluginCommand {
 
 	action() {
 		// Access core logic directly
-		const selection = this.$.selection.get();
-		this.$.history.push();
+		this.$.html.insert('<p>Example</p>'); // insertion owns history
 	}
 }
 ```
@@ -548,7 +577,7 @@ DOM Event → Handler → Reducer → Rules → Action[] → Executor → Effect
 
 ### 3-Stage Event Processing
 
-Wysiwyg DOM events pass through three stages in order. Each stage can cancel further processing by returning `false`.
+The diagram below describes hook/effect dispatch, not the complete timing of every DOM handler. Public and plugin hooks may cancel subsequent processing with `false`. In the keydown handler, guards, normalization, shortcuts and action reduction occur before these hooks, and the reduced `prevent`/`stop` actions are applied at once (`applyEventControl`) — a `preventDefault()` issued after an `await` can land after the browser's default action. The executor follows the hooks; a hook that cancels skips it, and a key already prevented stays prevented. The Enter `beforeinput` route has its own synchronous cancellation path and does not pass through the generic hooks. Read the actual handler before moving any work across an `await`.
 
 ```
 DOM Event (keydown, input, click, paste, ...)
@@ -580,13 +609,16 @@ DOM Event (keydown, input, click, paste, ...)
 **Example — `onKeyDown` in `handler_ww_key.js`:**
 
 ```javascript
+// Guards, normalization, shortcuts and reduceKeydown already ran.
+applyEventControl(actions, event); // prevent/stop now, before the first await
+
 // Stage 1: User event
 if ((await this.$.eventManager.triggerEvent('onKeyDown', { frameContext, event })) === false) return;
 
 // Stage 2: Plugin event
 if ((await this._callPluginEventAsync('onKeyDown', { frameContext, event, range, line })) === false) return;
 
-// Stage 3: Core processing (reducer → actions → effects)
+// Stage 3: Execute the previously reduced actions
 ```
 
 ### Toolbar Button → Plugin Activation

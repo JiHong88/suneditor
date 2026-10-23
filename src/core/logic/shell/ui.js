@@ -121,16 +121,12 @@ class UIManager {
 		this.#backWrapper = /** @type {HTMLElement} */ (this.#carrierWrapper.querySelector('.se-back-wrapper'));
 
 		/**
-		 * @description Currently open `Controller` info array
+		 * @description Currently open `Controller` info array — the one registry of open controllers.
+		 * - Read it through the query methods (`isInsideController`, `getControllerAt`, `hasFloatingController`);
+		 * - entries are added and removed by `Controller` (and `_addInEditorEntry`/`_removeControllerEntry`).
 		 * @type {Array<SunEditor.Module.Controller.Info>}
 		 */
 		this.opendControllers = [];
-
-		/**
-		 * @description Controller target's frame div (`editor.frameContext.get('topArea')`)
-		 * @type {?HTMLElement}
-		 */
-		this.controllerTargetContext = null;
 
 		/**
 		 * @internal
@@ -536,17 +532,77 @@ class UIManager {
 	}
 
 	/**
-	 * @description Set the controller target context to the current top area.
+	 * @description Whether `target` lies inside an open controller — floating or in-editor.
+	 * @param {?Node} target The node to test
+	 * @returns {boolean}
 	 */
-	onControllerContext() {
-		this.controllerTargetContext = this.#frameContext.get('topArea');
+	isInsideController(target) {
+		return target && this.opendControllers.some(({ form }) => form?.contains(target));
 	}
 
 	/**
-	 * @description Reset the controller target context.
+	 * @description The open controller whose form contains `target`.
+	 * @param {?Node} target The node to test
+	 * @returns {?SunEditor.Module.Controller.Info}
 	 */
-	offControllerContext() {
-		this.controllerTargetContext = null;
+	getControllerAt(target) {
+		if (!target) return null;
+		return this.opendControllers.find(({ form }) => form?.contains(target)) || null;
+	}
+
+	/**
+	 * @description Whether a floating controller (one in the `carrierWrapper`) is open.
+	 * - In-editor entries (`wrapper` controllers, the figure resize frame) don't count.
+	 * @returns {boolean}
+	 */
+	hasFloatingController() {
+		return this.opendControllers.some((c) => !c.notInCarrier);
+	}
+
+	/**
+	 * @description Closes every open controller at once — child popups before their parents — and ends the
+	 * component selection. The one-step alternative to the level-by-level Esc (see `Controller`'s `escape` option).
+	 */
+	closeAllControllers() {
+		const open = [...this.opendControllers].reverse();
+		for (const { inst } of open) {
+			if (inst?.isOpen) inst.close?.(true);
+		}
+		if (this.#$.component.isSelected) this.#$.component.deselect();
+	}
+
+	/**
+	 * @internal
+	 * @description Suspends (hides, and protects from closing) or resumes the open floating controllers.
+	 * — while a modal is open. In-editor controllers stay under the modal and keep their own lifecycle.
+	 * @param {boolean} suspend `true` to suspend, `false` to resume
+	 */
+	_suspendControllers(suspend) {
+		for (const c of this.opendControllers) {
+			if (c.inWrapper) continue;
+			c.fixed = suspend;
+			c.form.style.display = suspend ? 'none' : 'block';
+		}
+	}
+
+	/**
+	 * @internal
+	 * @description Registers an in-editor element that is not a `Controller` (the figure resize frame).
+	 * - the core then  moves it with the wysiwyg's inner scroll and hides it with the other controllers. Replaces an earlier entry of the same form.
+	 * @param {SunEditor.Module.Controller.Info} info Entry (`notInCarrier: true`, with `inst.__offset` as scroll baseline)
+	 */
+	_addInEditorEntry(info) {
+		this._removeControllerEntry(info.form);
+		this.opendControllers.push({ ...info, notInCarrier: true, topArea: this.#frameContext.get('topArea') });
+	}
+
+	/**
+	 * @internal
+	 * @description Removes the registry entry of `form`.
+	 * @param {HTMLElement} form The registered form
+	 */
+	_removeControllerEntry(form) {
+		this.opendControllers = this.opendControllers.filter((c) => c.form !== form);
 	}
 
 	/**
@@ -640,24 +696,20 @@ class UIManager {
 
 	/**
 	 * @internal
-	 * @description Closes all open controllers except those marked as `fixed`.
-	 * Iterates through `opendControllers`, calls `controllerClose` on each non-fixed controller,
-	 * hides their forms, and resets the controller state.
+	 * @description Closes all open controllers except those marked as `fixed` — child popups before their parents —
+	 * through their own `close()`, hides the other entries' forms, and resets the controller state.
 	 * @see offCurrentController - Public method for closing a single controller via component deselect
 	 */
 	_offControllers() {
-		const cont = this.opendControllers;
-		const fixedCont = [];
-		for (let i = 0, c; i < cont.length; i++) {
-			c = cont[i];
-			if (c.fixed) {
-				fixedCont.push(c);
-				continue;
-			}
-			c.inst.controllerClose?.();
+		const closing = this.opendControllers.filter((c) => !c.fixed);
+		this.opendControllers = this.opendControllers.filter((c) => c.fixed);
+
+		for (let i = closing.length - 1, c; i >= 0; i--) {
+			c = closing[i];
+			if (c.inst?.isOpen) c.inst.close?.(true);
 			if (c.form) c.form.style.display = 'none';
 		}
-		this.opendControllers = fixedCont;
+
 		this.currentControllerName = '';
 		this.#store.set('_preventBlur', false);
 	}
@@ -686,11 +738,29 @@ class UIManager {
 		// block handle scroll sync
 		this.#blockHandle?.syncScroll();
 
-		if (this.controllerTargetContext !== this.#frameContext.get('topArea')) {
-			this.offCurrentController();
-		}
+		if (!this.#keepsOnScroll()) this.offCurrentController();
 
 		this.#resetLineBreaker(x, y);
+	}
+
+	/**
+	 * @description Whether a wysiwyg scroll keeps the current selection UI:
+	 * - a component really selected (not just hover-selected) in the current root,
+	 * - or a controller opened (non-passively) in it. Anything else is dropped.
+	 * @returns {boolean}
+	 */
+	#keepsOnScroll() {
+		const component = this.#$.component;
+		if (
+			component.isSelected &&
+			!component.isHoverSelected &&
+			this.#frameContext.get('wysiwyg')?.contains(component.currentTarget)
+		) {
+			return true;
+		}
+
+		const topArea = this.#frameContext.get('topArea');
+		return this.opendControllers.some((c) => !c.passive && c.topArea === topArea);
 	}
 
 	/**

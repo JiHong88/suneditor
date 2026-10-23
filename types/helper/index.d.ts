@@ -110,6 +110,7 @@ export const dom: {
 		isExcludeFormat: typeof import('./dom/domCheck').isExcludeFormat;
 		isUneditable: typeof import('./dom/domCheck').isUneditable;
 		isImportantDisabled: typeof import('./dom/domCheck').isImportantDisabled;
+		isPopoverOpen: typeof import('./dom/domCheck').isPopoverOpen;
 	};
 	utils: {
 		clone: typeof import('./dom/domUtils').clone;

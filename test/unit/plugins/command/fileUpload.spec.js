@@ -335,6 +335,7 @@ describe('Plugins - Command - FileUpload', () => {
                 nonResizing: true,
                 nonSizeInfo: true,
                 nonBorder: true,
+                nonDragHandle: false,
                 figureTarget: true,
                 infoOnly: false
             });
@@ -1058,7 +1059,9 @@ describe('Plugins - Command - FileUpload', () => {
                 download: 'test.pdf',
                 'data-se-file-download': '',
                 contenteditable: 'false'
-            }), 'test.pdf');
+            }), null);
+            // the name is set as text, never parsed as HTML
+            expect(mockAnchor.textContent).toBe('test.pdf');
             expect(mockFileManager.setFileData).toHaveBeenCalledWith(mockAnchor, mockFile);
             expect(kernel.component.insert).toHaveBeenCalledWith(mockAnchor, {
                 scrollTo: true,
@@ -1192,7 +1195,8 @@ describe('Plugins - Command - FileUpload', () => {
             expect(dom.utils.createElement).toHaveBeenCalledWith('A', expect.objectContaining({
                 title: '/path/to/test.pdf',
                 download: '/path/to/test.pdf'
-            }), '/path/to/test.pdf');
+            }), null);
+            expect(mockAnchor.textContent).toBe('/path/to/test.pdf');
         });
     });
 

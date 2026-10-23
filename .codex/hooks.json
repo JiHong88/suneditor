@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "^apply_patch$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)/scripts/hooks/codex-post-tool-use.cjs\"",
+            "timeout": 30,
+            "statusMessage": "ESLint and editor rule checklists"
+          }
+        ]
+      }
+    ]
+  }
+}

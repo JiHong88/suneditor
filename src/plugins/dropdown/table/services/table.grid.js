@@ -1,7 +1,8 @@
 import { dom, numbers } from '../../../../helper';
+import { Controller } from '../../../../modules/contract';
 import { SelectMenu } from '../../../../modules/ui';
 
-import { CreateCellsHTML, CreateCellsString, InvalidateTableCache } from '../shared/table.utils';
+import { CreateCellsHTML, CreateCellsString, GetLogicalCellIndex, InvalidateTableCache } from '../shared/table.utils';
 import { CreateColumnMenu, CreateRowMenu } from '../render/table.menu';
 
 /**
@@ -11,6 +12,17 @@ export class TableGridService {
 	#main;
 	#$;
 	#state;
+
+	/**
+	 * Hosts of the handle menus
+	 * @type {SunEditor.Module.Controller.Instance}
+	 */
+	#rowMenuHost;
+	/** @type {SunEditor.Module.Controller.Instance} */
+	#columnMenuHost;
+
+	/** The grip the handle menu was opened on (also the cell-properties anchor) */
+	#handleGrip = null;
 
 	/**
 	 * @param {import('../index').default} main Table index
@@ -47,6 +59,28 @@ export class TableGridService {
 		});
 		this.selectMenu_row.on(rowButton, this.#OnRowEdit.bind(this));
 		this.selectMenu_row.create(rownMenu.items, rownMenu.menus);
+
+		// members - handle menus, each hosted in a Controller anchored to its strip's grip
+		this.#rowMenuHost = this.#createHandleMenuHost(main.handleService.rowStrip);
+		this.#columnMenuHost = this.#createHandleMenuHost(main.handleService.columnStrip);
+
+		const columnHandleMenu = CreateColumnMenu(this.#$.lang, this.#$.icons, true);
+		this.selectMenu_column_handle = new SelectMenu(this.#$, {
+			checkList: false,
+			position: 'bottom-center',
+			closeMethod: () => this.#columnMenuHost.close(),
+		});
+		this.selectMenu_column_handle.on(this.#columnMenuHost.form.firstElementChild, this.#OnColumnEdit.bind(this));
+		this.selectMenu_column_handle.create(columnHandleMenu.items, columnHandleMenu.menus);
+
+		const rowHandleMenu = CreateRowMenu(this.#$.lang, this.#$.icons, true);
+		this.selectMenu_row_handle = new SelectMenu(this.#$, {
+			checkList: false,
+			position: 'bottom-center',
+			closeMethod: () => this.#rowMenuHost.close(),
+		});
+		this.selectMenu_row_handle.on(this.#rowMenuHost.form.firstElementChild, this.#OnRowEdit.bind(this));
+		this.selectMenu_row_handle.create(rowHandleMenu.items, rowHandleMenu.menus);
 	}
 
 	get #selectionService() {
@@ -54,22 +88,130 @@ export class TableGridService {
 	}
 
 	/**
-	 * @description Opens the column menu.
+	 * @description Opens the column menu from the cell controller button.
 	 */
 	openColumnMenu() {
-		this.selectMenu_column.open();
+		this.#openColumnMenuCommon(this.selectMenu_column, false);
 	}
 
 	/**
-	 * @description Opens the row menu.
+	 * @description Opens the row menu from the cell controller button.
 	 */
 	openRowMenu() {
-		this.selectMenu_row.menus[0].style.display = this.selectMenu_row.menus[1].style.display = /^TH$/i.test(
-			this.#state.tdElement?.nodeName,
-		)
-			? 'none'
-			: '';
-		this.selectMenu_row.open();
+		this.#openRowMenuCommon(this.selectMenu_row, false);
+	}
+
+	/**
+	 * @description Opens the column menu on a move handle's grip, with the cell-context items.
+	 * @param {HTMLElement} grip The grip's band box (`.se-table-move-grip`)
+	 */
+	openColumnMenuForHandle(grip) {
+		this.#openHandleMenuHost(this.#columnMenuHost, grip);
+		this.#openColumnMenuCommon(this.selectMenu_column_handle, true);
+	}
+
+	/**
+	 * @description Opens the row menu on a move handle's grip, with the cell-context items.
+	 * @param {HTMLElement} grip The grip's band box (`.se-table-move-grip`)
+	 */
+	openRowMenuForHandle(grip) {
+		this.#openHandleMenuHost(this.#rowMenuHost, grip);
+		this.#openRowMenuCommon(this.selectMenu_row_handle, true);
+	}
+
+	/**
+	 * @description Closes the handle menus (e.g. when a handle pin is released).
+	 */
+	closeMenus() {
+		this.#closeHandleSelectMenus();
+		this.#rowMenuHost.close();
+		this.#columnMenuHost.close();
+	}
+
+	/**
+	 * @description Creates a handle menu host
+	 * — an empty controller holding the SelectMenu, the strip's child popup
+	 * @param {SunEditor.Module.Controller.Instance} strip The strip controller
+	 * @returns {SunEditor.Module.Controller.Instance}
+	 */
+	#createHandleMenuHost(strip) {
+		const form = dom.utils.createElement('DIV', { class: 'se-controller se-empty-controller' });
+		form.appendChild(dom.utils.createElement('DIV'));
+		return new Controller(this, this.#$, form, {
+			position: 'bottom',
+			parents: [strip],
+			initMethod: () => this.#closeHandleSelectMenus(),
+		});
+	}
+
+	/**
+	 * @description Opens a menu host on the grip.
+	 * @param {SunEditor.Module.Controller.Instance} host The menu host
+	 * @param {HTMLElement} grip The grip's band box
+	 */
+	#openHandleMenuHost(host, grip) {
+		this.#handleGrip = grip;
+		host.open(grip, null, {
+			isWWTarget: false,
+			initMethod: null,
+			addOffset: { left: grip.offsetWidth / 2 },
+		});
+	}
+
+	/**
+	 * @description Closes whichever handle SelectMenu is open (their `closeMethod` closes the host).
+	 */
+	#closeHandleSelectMenus() {
+		if (this.selectMenu_column_handle.isOpen) this.selectMenu_column_handle.close();
+		if (this.selectMenu_row_handle.isOpen) this.selectMenu_row_handle.close();
+	}
+
+	/**
+	 * @param {SunEditor.Module.SelectMenu.Instance} selectMenu Menu instance to open
+	 * @param {boolean} fromHandle Opened from a move handle
+	 */
+	#openColumnMenuCommon(selectMenu, fromHandle) {
+		if (fromHandle) this.#setContextItems(selectMenu);
+		this.#refreshMoveItems(selectMenu, false);
+		selectMenu.open();
+	}
+
+	/**
+	 * @param {SunEditor.Module.SelectMenu.Instance} selectMenu Menu instance to open
+	 * @param {boolean} fromHandle Opened from a move handle
+	 */
+	#openRowMenuCommon(selectMenu, fromHandle) {
+		const isHeader = /^TH$/i.test(this.#state.tdElement?.nodeName);
+		this.#setItemsVisible(selectMenu, ['insert-above', 'insert-below'], !isHeader);
+		if (fromHandle) this.#setContextItems(selectMenu);
+		this.#refreshMoveItems(selectMenu, true);
+		selectMenu.open();
+	}
+
+	/**
+	 * @description Shows/hides the cell-context items by the current selection (handle menus only —
+	 * the controller menus are created without these items).
+	 * - Merge needs a multi-cell selection; split needs a single cell.
+	 * @param {SunEditor.Module.SelectMenu.Instance} selectMenu Menu to update
+	 */
+	#setContextItems(selectMenu) {
+		const count = this.#state.selectedCells?.length || 0;
+		this.#setItemsVisible(selectMenu, ['merge'], count > 1);
+		this.#setItemsVisible(selectMenu, ['split-vertical', 'split-horizontal'], count === 1);
+	}
+
+	/**
+	 * @description Shows/hides menu items by their item keys.
+	 * @param {SunEditor.Module.SelectMenu.Instance} selectMenu Target menu
+	 * @param {string[]} keys Item keys
+	 * @param {boolean} visible `true` to show
+	 */
+	#setItemsVisible(selectMenu, keys, visible) {
+		for (const key of keys) {
+			const idx = selectMenu.items.indexOf(key);
+			const menu = idx > -1 ? selectMenu.menus[idx] : null;
+			if (menu) menu.style.display = visible ? '' : 'none';
+		}
 	}
 
 	/**
@@ -498,10 +640,65 @@ export class TableGridService {
 	}
 
 	/**
+	 * @description Closes the handle menus (they cover the table, so any action dismisses them).
+	 * - Controller-menu actions keep their stay-open-for-stepping behavior.
+	 * @returns {boolean} `true` when the action came from a handle menu
+	 */
+	#closeHandleMenus() {
+		const fromHandle = this.selectMenu_column_handle.isOpen || this.selectMenu_row_handle.isOpen;
+		this.closeMenus();
+		return fromHandle;
+	}
+
+	/**
+	 * @description Handles the shared cell-context commands (properties, merge, split).
+	 * @param {string} command The selected menu command
+	 * @returns {boolean} `true` when the command was a cell-context one
+	 */
+	#OnCellContextEdit(command) {
+		switch (command) {
+			case 'cell-properties':
+				this.#main.styleService.openCellProps(this.#handleGrip, { selfTarget: true });
+				return true;
+			case 'merge':
+				this.#main.cellService.mergeCells(this.#state.selectedCells);
+				return true;
+			case 'split-vertical':
+			case 'split-horizontal':
+				this.#main.cellService._OnSplitCells(command === 'split-vertical' ? 'vertical' : 'horizontal');
+				return true;
+			default:
+				return false;
+		}
+	}
+
+	/**
 	 * @description Handles column operations such as insert and delete.
-	 * @param {"insert-left"|"insert-right"|"delete"} command The column operation to perform.
+	 * @param {"insert-left"|"insert-right"|"delete"|"move-left"|"move-right"} command The column operation to perform.
 	 */
 	#OnColumnEdit(command) {
+		const fromHandle = this.#closeHandleMenus();
+		this.#runColumnCommand(command);
+		if (!fromHandle) return;
+
+		if (command === 'insert-left' || command === 'insert-right') {
+			this.#main.handleService.repinAfterInsert(command === 'insert-left');
+		} else {
+			this.#main.handleService.repinFromSelection();
+		}
+	}
+
+	/**
+	 * @param {string} command The selected menu command
+	 */
+	#runColumnCommand(command) {
+		if (this.#OnCellContextEdit(command)) return;
+
+		if (command === 'move-left' || command === 'move-right') {
+			this.#moveBand(false, command === 'move-left' ? -1 : 1);
+			return;
+		}
+
 		InvalidateTableCache(this.#main._element);
 
 		switch (command) {
@@ -520,9 +717,31 @@ export class TableGridService {
 
 	/**
 	 * @description Handles row operations such as insert and delete.
-	 * @param {"insert-above"|"insert-below"|"delete"} command The row operation to perform.
+	 * @param {"insert-above"|"insert-below"|"delete"|"move-up"|"move-down"} command The row operation to perform.
 	 */
 	#OnRowEdit(command) {
+		const fromHandle = this.#closeHandleMenus();
+		this.#runRowCommand(command);
+		if (!fromHandle) return;
+
+		if (command === 'insert-above' || command === 'insert-below') {
+			this.#main.handleService.repinAfterInsert(command === 'insert-above');
+		} else {
+			this.#main.handleService.repinFromSelection();
+		}
+	}
+
+	/**
+	 * @param {string} command The selected menu command
+	 */
+	#runRowCommand(command) {
+		if (this.#OnCellContextEdit(command)) return;
+
+		if (command === 'move-up' || command === 'move-down') {
+			this.#moveBand(true, command === 'move-up' ? -1 : 1);
+			return;
+		}
+
 		InvalidateTableCache(this.#main._element);
 
 		switch (command) {
@@ -537,6 +756,53 @@ export class TableGridService {
 		}
 
 		this.#main.historyPush();
+	}
+
+	/**
+	 * @description Greys out the move rows that have nothing left to move over.
+	 * @param {SunEditor.Module.SelectMenu.Instance} selectMenu Menu to refresh
+	 * @param {boolean} isRow `true` for the row menu
+	 */
+	#refreshMoveItems(selectMenu, isRow) {
+		const table = this.#main._element;
+		const cell = this.#state.tdElement;
+		const row = /** @type {HTMLTableRowElement} */ (cell?.parentElement);
+		// The "move backwards" item, immediately followed by "move forwards" (see table.menu.js).
+		const moveIndex = selectMenu.items.findIndex((k) => k.startsWith?.('move-'));
+		if (!table || !row || moveIndex < 0) return;
+
+		const index = isRow ? row.rowIndex : GetLogicalCellIndex(table, row.rowIndex, cell.cellIndex);
+		const reorder = this.#main.reorderService;
+		const band = reorder.getBand(table, index, isRow);
+		const targets = reorder.getDropTargets(table, band, isRow);
+
+		dom.utils.toggleClass(selectMenu.menus[moveIndex], 'se-select-disabled', !targets.some((t) => t < band.start));
+		dom.utils.toggleClass(
+			selectMenu.menus[moveIndex + 1],
+			'se-select-disabled',
+			!targets.some((t) => t > band.end + 1),
+		);
+	}
+
+	/**
+	 * @description Moves the band holding the current cell one step.
+	 * @param {boolean} isRow `true` to move rows, `false` to move columns
+	 * @param {-1|1} direction `-1` for up/left, `1` for down/right
+	 */
+	#moveBand(isRow, direction) {
+		const table = this.#main._element;
+		const cell = this.#state.tdElement;
+		const row = /** @type {HTMLTableRowElement} */ (cell?.parentElement);
+		if (!table || !row) return;
+
+		const index = isRow ? row.rowIndex : GetLogicalCellIndex(table, row.rowIndex, cell.cellIndex);
+		const reorder = this.#main.reorderService;
+
+		reorder.moveStep(table, reorder.getBand(table, index, isRow), isRow, direction);
+
+		// The menu is still open for the next click, so re-evaluate against the new position.
+		this.#refreshMoveItems(isRow ? this.selectMenu_row : this.selectMenu_column, isRow);
+		this.#refreshMoveItems(isRow ? this.selectMenu_row_handle : this.selectMenu_column_handle, isRow);
 	}
 }
 

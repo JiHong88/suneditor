@@ -555,4 +555,21 @@ describe('dom.check helper', () => {
 			expect(dom.check.isImportantDisabled(div)).toBe(false);
 		});
 	});
+
+	describe('isPopoverOpen', () => {
+		it('should read the :popover-open state', () => {
+			const div = document.createElement('div');
+			div.matches = jest.fn((selector) => selector === ':popover-open');
+			expect(dom.check.isPopoverOpen(div)).toBe(true);
+			expect(dom.check.isPopoverOpen(null)).toBe(false);
+		});
+
+		it('should return false where :popover-open is not a valid selector', () => {
+			const div = document.createElement('div');
+			div.matches = jest.fn(() => {
+				throw new DOMException("':popover-open' is not a valid selector.", 'SyntaxError');
+			});
+			expect(dom.check.isPopoverOpen(div)).toBe(false);
+		});
+	});
 });

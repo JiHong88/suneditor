@@ -28,11 +28,18 @@ jest.mock('../../../../../../src/helper', () => ({
 jest.mock('../../../../../../src/modules/ui', () => ({
 	SelectMenu: jest.fn().mockImplementation(() => ({
 		on: jest.fn(),
+		setRefer: jest.fn(),
 		create: jest.fn(),
 		open: jest.fn(),
 		close: jest.fn(),
+		isOpen: false,
+		items: [],
 		menus: [{ style: {} }, { style: {} }],
 	})),
+}));
+
+jest.mock('../../../../../../src/modules/contract', () => ({
+	Controller: jest.fn().mockImplementation((host, $, form) => ({ open: jest.fn(), close: jest.fn(), isOpen: false, form })),
 }));
 
 jest.mock('../../../../../../src/plugins/dropdown/table/shared/table.utils', () => ({
@@ -85,10 +92,12 @@ describe('TableGridService', () => {
 			},
 			setCellInfo: jest.fn(),
 			resetInfo: jest.fn(),
+			contextProvider: { carrierWrapper: document.createElement('div') },
 			_closeTableSelectInfo: jest.fn(),
 			_setCellControllerPosition: jest.fn(),
 			_closeController: jest.fn(),
 			historyPush: jest.fn(),
+			handleService: { rowStrip: {}, columnStrip: {} },
 		};
 
 		// Make main act as its own kernel for dependency injection
@@ -480,7 +489,8 @@ describe('TableGridService', () => {
 			});
 
 			it('should open row menu', () => {
-				// Mock selectMenu_row.menus style
+				// items/menus are index-matched — the insert items are toggled by key
+				gridService.selectMenu_row.items = ['insert-above', 'insert-below'];
 				gridService.selectMenu_row.menus = [{ style: {} }, { style: {} }];
 				mainState.tdElement = { nodeName: 'TD' };
 
@@ -491,6 +501,7 @@ describe('TableGridService', () => {
 			});
 
 			it('should hide insert options in row menu if TH', () => {
+				gridService.selectMenu_row.items = ['insert-above', 'insert-below'];
 				gridService.selectMenu_row.menus = [{ style: {} }, { style: {} }];
 				mainState.tdElement = { nodeName: 'TH' };
 

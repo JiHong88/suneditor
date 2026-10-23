@@ -158,7 +158,7 @@ class SelectMenu {
 			const menuContent =
 				typeof menus[i] === 'string' ? menus[i] : /** @type {HTMLElement} */ (menus[i]).outerHTML;
 			const itemObj = /** @type {{children?: Array, childMenus?: Array}} */ (
-				item && typeof item === 'object' ? item : {}
+				item && typeof item === 'object' && !this.#$.instanceCheck.isNode(item) ? item : {}
 			);
 			const hasChildren = itemObj.children?.length > 0;
 
@@ -363,7 +363,7 @@ class SelectMenu {
 			sub.style.visibility = 'hidden';
 
 			if (supportsPopover) {
-				if (!sub.matches(':popover-open')) sub.showPopover();
+				sub.showPopover();
 			} else {
 				sub.style.display = 'block';
 			}
@@ -474,7 +474,7 @@ class SelectMenu {
 			const data = this.#submenuData.get(this.#activeSubmenuIndex);
 			if (data?.element) {
 				if (typeof data.element.hidePopover === 'function') {
-					if (data.element.matches(':popover-open')) data.element.hidePopover();
+					data.element.hidePopover();
 				} else {
 					data.element.style.display = '';
 				}
@@ -574,7 +574,7 @@ class SelectMenu {
 	#clampHeight(h) {
 		const chrome = this.form.offsetHeight - this.#listInner.offsetHeight; // padding + border
 		this.form.style.height = h + 'px';
-		this.#listInner.style.maxHeight = (h - chrome > 0 ? h - chrome : 0) + 'px';
+		this.#listInner.style.maxHeight = (h - chrome > 0 ? h - chrome : 0) + 2 + 'px';
 		this.#listInner.style.overflowY = 'auto';
 	}
 
@@ -1038,8 +1038,9 @@ class SelectMenu {
 	#CloseListener_key(e) {
 		if (!keyCodeMap.isEsc(e.code)) return;
 
+		e.preventDefault();
+
 		if (this.#activeSubmenuIndex > -1) {
-			e.preventDefault();
 			e.stopPropagation();
 
 			const parentIndex = this.#activeSubmenuIndex;
@@ -1050,7 +1051,6 @@ class SelectMenu {
 		}
 
 		if (this.subEscMethod?.()) {
-			e.preventDefault();
 			e.stopPropagation();
 			return;
 		}
@@ -1064,12 +1064,9 @@ class SelectMenu {
 	#CloseListener_mousedown(e) {
 		const eventTarget = dom.query.getEventTarget(e);
 		if (this.form.contains(eventTarget)) return;
-		if (
-			this.#$.ui.opendControllers?.some(
-				({ form }) => form?.contains?.(eventTarget) && !form.contains(this.#refer),
-			)
-		)
-			return;
+
+		const owner = this.#$.ui.getControllerAt(eventTarget);
+		if (owner && !owner.inWrapper && !owner.form.contains(this.#refer)) return;
 		if (!this.#refer.contains(eventTarget)) {
 			this.close();
 		} else if (!dom.check.isInputElement(eventTarget)) {

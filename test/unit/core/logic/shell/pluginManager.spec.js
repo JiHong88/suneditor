@@ -721,6 +721,30 @@ describe('PluginManager', () => {
 			warn.mockRestore();
 		});
 
+		it.each([new Error('failure'), null, 'failure'])('handles a thrown retainFormat error (%s) and continues other elements', (reason) => {
+			const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+			try {
+				const method = jest.fn().mockImplementationOnce(() => { throw reason; }).mockReturnValue(undefined);
+				const plugin = {
+					constructor: { options: {}, key: 'retainPlugin' },
+					retainFormat: () => ({ query: 'img', method }),
+				};
+				const { kernel, product } = createKernelAndProduct({
+					plugins: { retainPlugin: plugin },
+					__pluginRetainFilter: true,
+				});
+				const pm = new PluginManager(kernel, product);
+				pm.init({ retainPlugin: {} });
+				const container = document.createElement('div');
+				container.innerHTML = '<img><img>';
+				pm.applyRetainFormat(container);
+				expect(method).toHaveBeenCalledTimes(2);
+				expect(warn).toHaveBeenCalledWith(expect.stringContaining('retainPlugin'), reason?.message ?? reason);
+			} finally {
+				warn.mockRestore();
+			}
+		});
+
 		it('should not abort other retainFormat plugins when one plugin throws', () => {
 			const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
 			const badMethod = jest.fn(() => {
@@ -1112,6 +1136,15 @@ describe('PluginManager', () => {
 			expect(pm.findComponentInfo(document.createElement('div'))).toBeNull();
 		});
 
+		it('should return null after destroy instead of iterating a released list', () => {
+			const { kernel, product } = createKernelAndProduct();
+			const pm = new PluginManager(kernel, product);
+			pm._destroy();
+
+			expect(() => pm.findComponentInfo(document.createElement('div'))).not.toThrow();
+			expect(pm.findComponentInfo(document.createElement('div'))).toBeNull();
+		});
+
 		it('should return first truthy result from checkers', () => {
 			const componentFn1 = jest.fn(() => null);
 			const componentFn2 = jest.fn((node) => node);
@@ -1281,6 +1314,16 @@ describe('PluginManager', () => {
 	// emitEvent
 	// ---------------------------------------------------------------
 	describe('emitEvent', () => {
+		it('should ignore plugin events after destroy', async () => {
+			const { kernel, product } = createKernelAndProduct();
+			const pm = new PluginManager(kernel, product);
+			pm._destroy();
+
+			expect(() => pm.emitEvent('onFocus', {})).not.toThrow();
+			expect(pm.emitEvent('onFocus', {})).toBeUndefined();
+			await expect(pm.emitEventAsync('onFocus', {})).resolves.toBeUndefined();
+		});
+
 		it('should return false when a handler returns false', () => {
 			const pluginInstance = {
 				constructor: { options: {} },

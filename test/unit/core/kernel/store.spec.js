@@ -350,6 +350,20 @@ describe('Store', () => {
 		});
 	});
 
+	describe('_destroy', () => {
+		it('should ignore set and get after the state bag is released', () => {
+			const listener = jest.fn();
+			store.subscribe('controlActive', listener);
+
+			store._destroy();
+
+			expect(() => store.set('controlActive', true)).not.toThrow();
+			expect(() => store.set('_preventBlur', false)).not.toThrow();
+			expect(store.get('controlActive')).toBeUndefined();
+			expect(listener).not.toHaveBeenCalled();
+		});
+	});
+
 	describe('private cache fields', () => {
 		it('should track _lastSelectionNode', () => {
 			expect(store.get('_lastSelectionNode')).toBeNull();

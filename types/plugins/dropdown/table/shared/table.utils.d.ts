@@ -1,6 +1,25 @@
 import type {} from '../../../../typedef';
 /** ================================================================================================================================ */
 /**
+ * @description Expands a two-cell selection into the smallest logical rectangle that cuts no merged cell.
+ * - Shared by cell multi-selection and row/column reordering, so both treat a merged region as one block.
+ * @param {HTMLCollectionOf<HTMLTableRowElement>} rows
+ * @param {Node} startCell
+ * @param {Node} endCell
+ * @returns {{_i: number, cs: number|null, ce: number|null, rs: number|null, re: number|null}}
+ */
+export function CalculateCellRef(
+	rows: HTMLCollectionOf<HTMLTableRowElement>,
+	startCell: Node,
+	endCell: Node,
+): {
+	_i: number;
+	cs: number | null;
+	ce: number | null;
+	rs: number | null;
+	re: number | null;
+};
+/**
  * @description Checks if the given node is a resizable table element.
  * @param {Node} node The DOM node to check.
  * @returns {boolean} True if the node is a table-related resizable element.
@@ -65,6 +84,31 @@ export function CloneTable(
 ): {
 	clonedTable: HTMLTableElement;
 	clonedSelectedCells: HTMLTableCellElement[];
+};
+/**
+ * @description The row (or column) boundaries a reorder is allowed to cut at.
+ * @param {HTMLTableElement} table The table element.
+ * @param {boolean} isRow `true` for row boundaries, `false` for logical column boundaries.
+ * @returns {number[]} Ascending legal cut indices.
+ */
+export function GetCutLines(table: HTMLTableElement, isRow: boolean): number[];
+/**
+ * @description The band containing `index` — the smallest range between two legal cut lines.
+ * - For a table with no merges every band is a single row/column, so the handle covers one row.
+ * - Inside a merged region the band widens to the whole merged block,
+ * - which is what the drag handle sizes itself to and what a move carries as a unit.
+ * @param {HTMLTableElement} table The table element.
+ * @param {number} index Row index, or logical column index.
+ * @param {boolean} isRow `true` for a row band, `false` for a column band.
+ * @returns {{start: number, end: number}} Inclusive index range.
+ */
+export function GetBand(
+	table: HTMLTableElement,
+	index: number,
+	isRow: boolean,
+): {
+	start: number;
+	end: number;
 };
 /**
  * @description Clear table cache

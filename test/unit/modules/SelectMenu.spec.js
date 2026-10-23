@@ -1057,6 +1057,43 @@ describe('Modules - SelectMenu', () => {
 			}
 		});
 
+		it('opens and closes a popover submenu when the open state cannot be read (`:popover-open` unsupported)', () => {
+			const { dom, keyCodeMap } = require('../../../src/helper');
+			keyCodeMap.isEsc.mockImplementation((code) => code === 'Escape');
+			dom.utils.hasClass.mockImplementation((el, cls) => !!el?.classList?.contains(cls));
+			dom.utils.addClass.mockImplementation((el, cls) => el?.classList?.add(cls));
+			dom.utils.removeClass.mockImplementation((els, cls) => {
+				const list = !els ? [] : els.nodeType ? [els] : Array.from(els);
+				list.forEach((e) => e.classList?.remove(cls));
+			});
+
+			try {
+				selectMenu.create([{ children: ['ul', 'ol'], childMenus: ['<i>Bulleted</i>', '<i>Numbered</i>'] }, 'plain']);
+				const sub = selectMenu.form.querySelector('.se-select-submenu');
+				sub.showPopover = jest.fn();
+				sub.hidePopover = jest.fn();
+				selectMenu.open();
+
+				const kdCall = mockEditor.$.eventManager.addEvent.mock.calls.find((c) => c[1] === 'keydown');
+				const key = (code) => kdCall[2]({ code, preventDefault: jest.fn(), stopPropagation: jest.fn() });
+				key('ArrowDown');
+				key('Enter');
+				expect(sub.showPopover).toHaveBeenCalled();
+
+				expect(() => key('Enter')).not.toThrow();
+				expect(sub.showPopover).toHaveBeenCalledTimes(1);
+
+				const escCall = mockEditor.$.eventManager.addGlobalEvent.mock.calls.find((c) => c[0] === 'keydown');
+				expect(() => escCall[1]({ code: 'Escape', preventDefault: jest.fn(), stopPropagation: jest.fn() })).not.toThrow();
+				expect(sub.hidePopover).toHaveBeenCalled();
+			} finally {
+				dom.utils.hasClass.mockReset();
+				dom.utils.hasClass.mockReturnValue(false);
+				dom.utils.addClass.mockReset();
+				dom.utils.removeClass.mockReset();
+			}
+		});
+
 		it.each(['ArrowLeft', 'ArrowRight'])('%s closes an open submenu and keeps the menu up', (code) => {
 			const { dom } = require('../../../src/helper');
 			dom.utils.hasClass.mockImplementation((el, cls) => !!el?.classList?.contains(cls));

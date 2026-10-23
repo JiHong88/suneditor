@@ -338,7 +338,7 @@ class Embed extends PluginModal {
 		return {
 			query: 'iframe',
 			/** @param {HTMLIFrameElement} element */
-			method: async (element) => {
+			method: (element) => {
 				if (!Embed.#checkContentType(element.src)) return;
 
 				const figureInfo = Figure.GetContainer(element);
@@ -368,7 +368,7 @@ class Embed extends PluginModal {
 			this.#linkValue =
 				this.previewSrc.textContent =
 				this.embedInput.value =
-					this.#cover.getAttribute('data-se-origin') || '';
+					decodeURIComponent(this.#cover.getAttribute('data-se-origin') || '');
 		}
 	}
 
@@ -572,6 +572,7 @@ class Embed extends PluginModal {
 			nonBorder: false,
 			figureTarget: false,
 			infoOnly,
+			nonDragHandle: false,
 		});
 
 		this.#element = target;
@@ -580,10 +581,10 @@ class Embed extends PluginModal {
 		this._caption = figureInfo.caption;
 		this.#align = figureInfo.align;
 
-		if (!this.#cover?.getAttribute?.('data-se-origin')) {
+		if (this.#cover && !this.#cover.getAttribute('data-se-origin')) {
 			const src = target?.getAttribute?.('src') || target?.querySelector?.('a')?.href;
 			if (src && Embed.#checkContentType(src)) {
-				this.#cover.setAttribute('data-se-origin', src);
+				this.#cover.setAttribute('data-se-origin', encodeURIComponent(src));
 			}
 		}
 
@@ -685,22 +686,25 @@ class Embed extends PluginModal {
 				cover = figure.cover;
 				container = figure.container;
 			} else {
-				oFrame = children[0];
-				const figure = Figure.CreateContainer(oFrame, 'se-embed-container');
-				cover = figure.cover;
-				container = figure.container;
-
-				const childNodes = Array.from(children);
+				const embedTarget = children[0];
 				const scriptWhitelist = this.pluginOptions.scriptSrcWhitelist;
-				for (const chd of childNodes) {
-					if (/^script$/i.test(chd.nodeName)) {
-						const scriptSrc = /** @type {Element} */ (chd).getAttribute('src') || '';
-						if (!Embed.#isAllowedScriptSrc(scriptSrc, scriptWhitelist)) continue;
-						scriptTag = dom.utils.createElement('script', { src: scriptSrc, async: 'true' }, null);
-						continue;
-					}
-					cover.appendChild(chd);
+				for (const chd of Array.from(children)) {
+					if (!/^script$/i.test(chd.nodeName)) continue;
+					const scriptSrc = /** @type {Element} */ (chd).getAttribute('src') || '';
+					if (!Embed.#isAllowedScriptSrc(scriptSrc, scriptWhitelist)) continue;
+					scriptTag = dom.utils.createElement('script', { src: scriptSrc, async: 'true' }, null);
 				}
+
+				if (!/^(?:iframe|blockquote)$/i.test(embedTarget?.nodeName)) return;
+
+				const raw = Figure.CreateContainer(embedTarget, 'se-embed-container');
+				container = /** @type {HTMLElement} */ (
+					new DOMParser().parseFromString(this.$.html.clean(raw.container.outerHTML), 'text/html').body
+						.firstElementChild
+				);
+				cover = container?.querySelector('figure');
+				oFrame = cover?.firstElementChild;
+				if (!/^(?:iframe|blockquote)$/i.test(oFrame?.nodeName)) return;
 			}
 		}
 
@@ -714,6 +718,7 @@ class Embed extends PluginModal {
 			nonBorder: false,
 			figureTarget: false,
 			infoOnly: true,
+			nonDragHandle: false,
 		});
 
 		width ||= this.#defaultSizeX;
@@ -731,8 +736,8 @@ class Embed extends PluginModal {
 		// align
 		this.figure.setAlign(oFrame, align);
 
-		// origin src
-		cover.setAttribute('data-se-origin', originSrc);
+		// Keep raw markup out of serialized attribute values during HTML cleaning.
+		cover.setAttribute('data-se-origin', encodeURIComponent(originSrc));
 
 		if (!isUpdate) {
 			this.$.component.insert(container, {
@@ -807,6 +812,7 @@ class Embed extends PluginModal {
 			nonBorder: false,
 			figureTarget: false,
 			infoOnly: true,
+			nonDragHandle: false,
 		});
 		const size = (oFrame.getAttribute('data-se-size') || ',').split(',');
 

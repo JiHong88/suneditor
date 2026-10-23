@@ -112,6 +112,8 @@ class Store {
 	 * @returns {StoreState[K]}
 	 */
 	get(key) {
+		// Destroyed: deferred readers (blur/focus) must not throw on a null state bag.
+		if (!this.#state) return undefined;
 		return this.#state[key];
 	}
 
@@ -122,6 +124,9 @@ class Store {
 	 * @param {StoreState[K]} value - Value to set
 	 */
 	set(key, value) {
+		// Destroyed: a 0ms `controlActive` reset can fire after `CoreKernel._destroy`.
+		if (!this.#state) return;
+
 		const oldValue = this.#state[key];
 		this.#state[key] = value;
 

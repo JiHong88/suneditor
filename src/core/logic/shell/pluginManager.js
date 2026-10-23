@@ -136,6 +136,9 @@ class PluginManager {
 	 * @returns {SunEditor.ComponentInfo|null}
 	 */
 	findComponentInfo(element) {
+		// Destroyed: a deferred hover frame can still ask which component is under the pointer.
+		if (!this.#componentCheckers) return null;
+
 		for (const checker of this.#componentCheckers) {
 			const result = checker(element);
 			if (result) return result;
@@ -165,7 +168,7 @@ class PluginManager {
 					try {
 						plugin.method(infoLst[i]);
 					} catch (error) {
-						console.warn(`[SUNEDITOR.retainFormat.fail]-[${plugin.key}]`, error.message);
+						console.warn(`[SUNEDITOR.retainFormat.fail]-[${plugin.key}]`, error?.message ?? error);
 					}
 				}
 			});
@@ -180,6 +183,9 @@ class PluginManager {
 	 */
 	emitEvent(name, e) {
 		const eventPlugins = this.#onPluginEvents.get(name);
+		// Destroyed: `_destroy` clears the map, so a deferred focus/blur has no handler list.
+		if (!eventPlugins) return;
+
 		for (let i = 0, r; i < eventPlugins.length; i++) {
 			r = eventPlugins[i](e);
 			if (typeof r === 'boolean') return r;
@@ -194,6 +200,8 @@ class PluginManager {
 	 */
 	async emitEventAsync(name, e) {
 		const eventPlugins = this.#onPluginEvents.get(name);
+		if (!eventPlugins) return;
+
 		for (let i = 0, r; i < eventPlugins.length; i++) {
 			r = await eventPlugins[i](e);
 			if (typeof r === 'boolean') return r;

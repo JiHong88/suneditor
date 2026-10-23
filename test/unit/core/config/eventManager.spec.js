@@ -1,246 +1,150 @@
-/**
- * @fileoverview Unit tests for core/config/eventManager.js
- */
-
 import EventManager from '../../../../src/core/config/eventManager';
+import { NO_EVENT } from '../../../../src/helper/env';
 
-describe('EventManager', () => {
-	let eventManager;
-	let mockContextProvider;
-	let mockOptionProvider;
-	let mockDeps;
-	let mockFrameContext;
-	let mockFrameOptions;
+describe('EventManager listener lifecycle', () => {
+	let manager;
+	let frame;
+	let frameOptions;
+	let iframe;
+	let deps;
 
 	beforeEach(() => {
-		jest.clearAllMocks();
+		frame = new Map([['wysiwyg', document.createElement('div')]]);
+		frameOptions = new Map();
+		deps = {};
+		manager = new EventManager(
+			{ frameContext: frame },
+			{
+				frameOptions,
+				options: new Map([['events', {}]]),
+			},
+			deps,
+		);
+	});
 
-		// Create mock frameContext
-		mockFrameContext = new Map([['wysiwyg', document.createElement('div')]]);
+	afterEach(() => {
+		manager?._init();
+		iframe?.remove();
+		iframe = null;
+		jest.restoreAllMocks();
+	});
 
-		// Create mock frameOptions
-		mockFrameOptions = new Map();
+	function enableIframe() {
+		iframe = document.createElement('iframe');
+		document.body.appendChild(iframe);
+		frameOptions.set('iframe', true);
+		frame.set('_ww', iframe.contentWindow);
+		return iframe.contentWindow;
+	}
 
-		// Create mock contextProvider
-		mockContextProvider = {
-			frameContext: mockFrameContext,
-			carrierWrapper: document.createElement('div'),
+	it.each([false, true, { capture: true, passive: false }])(
+		'removes the exact listener using its handle (%j)',
+		(options) => {
+			const element = document.createElement('button');
+			const removed = jest.fn();
+			const retained = jest.fn();
+			const handle = manager.addEvent(element, 'click', removed, options);
+			manager.addEvent(element, 'click', retained);
+			element.click();
+			expect(removed).toHaveBeenCalledTimes(1);
+			expect(retained).toHaveBeenCalledTimes(1);
+
+			expect(manager.removeEvent(handle)).toBeNull();
+			element.click();
+			expect(removed).toHaveBeenCalledTimes(1);
+			expect(retained).toHaveBeenCalledTimes(2);
+		},
+	);
+
+	it('registers and removes every target in a collection', () => {
+		const elements = [document.createElement('button'), document.createElement('button')];
+		const listener = jest.fn();
+		const handle = manager.addEvent(elements, 'click', listener);
+		elements.forEach((element) => element.click());
+		expect(listener).toHaveBeenCalledTimes(2);
+		manager.removeEvent(handle);
+		elements.forEach((element) => element.click());
+		expect(listener).toHaveBeenCalledTimes(2);
+	});
+
+	it.each([null, []])('does not register an empty target (%j)', (target) => {
+		expect(manager.addEvent(target, 'click', jest.fn())).toBeNull();
+	});
+
+	it.each(['handle', 'arguments'])('removes global listeners from host and iframe by %s', (form) => {
+		const ww = enableIframe();
+		const listener = jest.fn();
+		const handle = manager.addGlobalEvent('probe', listener, true);
+		window.dispatchEvent(new Event('probe'));
+		ww.dispatchEvent(new ww.Event('probe'));
+		expect(listener).toHaveBeenCalledTimes(2);
+
+		if (form === 'handle') manager.removeGlobalEvent(handle);
+		else manager.removeGlobalEvent('probe', listener, true);
+		window.dispatchEvent(new Event('probe'));
+		ww.dispatchEvent(new ww.Event('probe'));
+		expect(listener).toHaveBeenCalledTimes(2);
+	});
+
+	it('teardown detaches element, document, host and iframe listeners', () => {
+		const ww = enableIframe();
+		const element = document.createElement('button');
+		const local = jest.fn();
+		const global = jest.fn();
+		manager.addEvent([element, document, window], 'probe', local);
+		manager.addGlobalEvent('probe', global);
+		const dispatch = () => {
+			element.dispatchEvent(new Event('probe'));
+			document.dispatchEvent(new Event('probe'));
+			window.dispatchEvent(new Event('probe'));
+			ww.dispatchEvent(new ww.Event('probe'));
 		};
-
-		// Add focus temp input to carrier wrapper
-		const focusTempInput = document.createElement('input');
-		focusTempInput.className = '__se__focus__temp__';
-		mockContextProvider.carrierWrapper.appendChild(focusTempInput);
-
-		// Create mock options map
-		const mockOptionsMap = new Map([['events', {}]]);
-
-		// Create mock optionProvider
-		mockOptionProvider = {
-			frameOptions: mockFrameOptions,
-			options: mockOptionsMap,
-		};
-
-		// Create mock deps
-		mockDeps = {
-			// Add any necessary deps
-		};
-
-		// Create EventManager instance
-		eventManager = new EventManager(mockContextProvider, mockOptionProvider, mockDeps);
+		dispatch();
+		expect(local).toHaveBeenCalledTimes(3);
+		expect(global).toHaveBeenCalledTimes(2);
+		manager._init();
+		manager = null;
+		dispatch();
+		expect(local).toHaveBeenCalledTimes(3);
+		expect(global).toHaveBeenCalledTimes(2);
 	});
 
-	describe('constructor', () => {
-		it('should create an EventManager instance', () => {
-			expect(eventManager).toBeInstanceOf(EventManager);
-		});
-
-		it('should initialize events from options', () => {
-			expect(eventManager.events).toBeDefined();
-		});
-
-		it('should have triggerEvent method', () => {
-			expect(typeof eventManager.triggerEvent).toBe('function');
-		});
+	it('repeated global open/close cycles leave no active handlers', () => {
+		const listener = jest.fn();
+		for (let i = 0; i < 20; i++) {
+			const handle = manager.addGlobalEvent('probe', listener);
+			window.dispatchEvent(new Event('probe'));
+			manager.removeGlobalEvent(handle);
+			window.dispatchEvent(new Event('probe'));
+		}
+		expect(listener).toHaveBeenCalledTimes(20);
 	});
 
-	describe('addEvent method', () => {
-		it('should add event listener to single element', () => {
-			const element = document.createElement('div');
-			const mockListener = jest.fn();
-
-			const result = eventManager.addEvent(element, 'click', mockListener);
-
-			expect(result).toBeDefined();
-		});
-
-		it('should add event listener to multiple elements', () => {
-			const element1 = document.createElement('div');
-			const element2 = document.createElement('div');
-			const mockListener = jest.fn();
-
-			const result = eventManager.addEvent([element1, element2], 'click', mockListener);
-
-			expect(result).toBeDefined();
-		});
-
-		it('should handle useCapture option', () => {
-			const element = document.createElement('div');
-			const mockListener = jest.fn();
-
-			const result = eventManager.addEvent(element, 'click', mockListener, true);
-			expect(result).toBeDefined();
-		});
-
-		it('should return null for null target', () => {
-			const mockListener = jest.fn();
-
-			const result = eventManager.addEvent(null, 'click', mockListener);
-
-			expect(result).toBeNull();
-		});
-
-		it('should return null for empty array', () => {
-			const mockListener = jest.fn();
-
-			const result = eventManager.addEvent([], 'click', mockListener);
-
-			expect(result).toBeNull();
-		});
-
-		it('should accept AddEventListenerOptions object', () => {
-			const element = document.createElement('div');
-			const mockListener = jest.fn();
-
-			const result = eventManager.addEvent(element, 'click', mockListener, {
-				capture: true,
-				passive: false,
-			});
-
-			expect(result).toBeDefined();
-		});
+	it('awaits a user cancellation and passes the originating frame and dependencies', async () => {
+		let finish;
+		const handler = jest.fn(
+			() =>
+				new Promise((resolve) => {
+					finish = resolve;
+				}),
+		);
+		manager.events.onPaste = handler;
+		const event = new Event('paste');
+		const result = manager.triggerEvent('onPaste', { frameContext: frame, event, data: 'text' });
+		expect(handler).toHaveBeenCalledWith({ $: deps, frameContext: frame, event, data: 'text' });
+		finish(false);
+		await expect(result).resolves.toBe(false);
 	});
 
-	describe('removeEvent method', () => {
-		it('should remove event listener from element', () => {
-			const element = document.createElement('div');
-			const mockListener = jest.fn();
-
-			eventManager.addEvent(element, 'click', mockListener);
-
-			if (typeof eventManager.removeEvent === 'function') {
-				const result = eventManager.removeEvent(element, 'click', mockListener);
-				// Just verify the method exists and was callable
-				expect(result === undefined || result === null || result === true || result === false).toBe(true);
-			}
-		});
+	it('distinguishes no handler from cancellation', async () => {
+		await expect(manager.triggerEvent('onPaste', {})).resolves.toBe(NO_EVENT);
 	});
 
-	describe('triggerEvent method', () => {
-		it('should be a function', () => {
-			expect(typeof eventManager.triggerEvent).toBe('function');
-		});
-
-		it('should trigger registered event handlers', async () => {
-			const mockHandler = jest.fn();
-			eventManager.events = { testEvent: mockHandler };
-
-			await eventManager.triggerEvent('testEvent', {});
-
-			expect(mockHandler).toHaveBeenCalled();
-		});
-
-		it('should pass event data to handler', async () => {
-			const mockHandler = jest.fn();
-			eventManager.events = { testEvent: mockHandler };
-
-			const eventData = { key: 'value' };
-			await eventManager.triggerEvent('testEvent', eventData);
-
-			expect(mockHandler).toHaveBeenCalledWith(expect.objectContaining({ $: mockDeps }));
-		});
-
-		it('should handle missing event handler', async () => {
-			const result = await eventManager.triggerEvent('nonexistentEvent', {});
-
-			// Should not throw and should return a result
-			expect(result).toBeDefined();
-		});
-	});
-
-	describe('event registration tracking', () => {
-		it('should track registered events', () => {
-			const element = document.createElement('div');
-			const mockListener = jest.fn();
-
-			const result1 = eventManager.addEvent(element, 'click', mockListener);
-			const result2 = eventManager.addEvent(element, 'mouseover', mockListener);
-
-			// Events should be registered for later cleanup
-			expect(result1).toBeDefined();
-			expect(result2).toBeDefined();
-		});
-	});
-
-	describe('global event handling', () => {
-		it('should have addGlobalEvent method if implemented', () => {
-			if (typeof eventManager.addGlobalEvent === 'function') {
-				const mockListener = jest.fn();
-				expect(() => eventManager.addGlobalEvent('testEvent', mockListener)).not.toThrow();
-			}
-		});
-
-		it('should have removeGlobalEvent method if implemented', () => {
-			if (typeof eventManager.removeGlobalEvent === 'function') {
-				const mockListener = jest.fn();
-				expect(() => eventManager.removeGlobalEvent('testEvent', mockListener)).not.toThrow();
-			}
-		});
-	});
-
-	describe('event cleanup', () => {
-		it('should support event removal', () => {
-			const element = document.createElement('div');
-			const mockListener = jest.fn();
-
-			eventManager.addEvent(element, 'click', mockListener);
-
-			if (typeof eventManager.removeEvent === 'function') {
-				eventManager.removeEvent(element, 'click', mockListener);
-			}
-		});
-	});
-
-	describe('multiple event types', () => {
-		it('should handle different event types', () => {
-			const element = document.createElement('div');
-			const mockListener = jest.fn();
-
-			const result1 = eventManager.addEvent(element, 'click', mockListener);
-			const result2 = eventManager.addEvent(element, 'keydown', mockListener);
-			const result3 = eventManager.addEvent(element, 'input', mockListener);
-
-			expect(result1).toBeDefined();
-			expect(result2).toBeDefined();
-			expect(result3).toBeDefined();
-		});
-	});
-
-	describe('event handler edge cases', () => {
-		it('should handle window as target', () => {
-			const mockListener = jest.fn();
-
-			const result = eventManager.addEvent(window, 'resize', mockListener);
-
-			expect(result).toBeDefined();
-		});
-
-		it('should handle document as target', () => {
-			const mockListener = jest.fn();
-
-			const result = eventManager.addEvent(document, 'DOMContentLoaded', mockListener);
-
-			expect(result).toBeDefined();
-		});
+	it('reports a rejected public callback as cancellation', async () => {
+		const error = new Error('callback failed');
+		const report = jest.spyOn(console, 'error').mockImplementation(() => {});
+		manager.events.onPaste = jest.fn().mockRejectedValue(error);
+		await expect(manager.triggerEvent('onPaste', {})).resolves.toBe(false);
+		expect(report).toHaveBeenCalledWith('[SUNEDITOR.triggerEvent.onPaste]', error);
 	});
 });

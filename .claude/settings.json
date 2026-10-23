@@ -30,6 +30,12 @@
 						"command": "f=$(jq -r \"(.tool_input.file_path) // empty\"); case \"$f\" in */src/core/schema/options.js) printf \"Option schema changed — if you added/renamed/changed an option, verify all three (see .agents/rules/options-changes.md):\\n  1) OptionProvider.reset() handling (src/core/config/optionProvider.js)\\n  2) OPTION_FIXED_FLAG (global) | OPTION_FRAME_FIXED_FLAG (per-frame)\\n  3) typedef @property, then: npm run ts-build\\n\" >&2; exit 2;; esac",
 						"timeout": 10,
 						"statusMessage": "Options checklist"
+					},
+					{
+						"type": "command",
+						"command": "f=$(jq -r \"(.tool_input.file_path) // empty\"); case \"$f\" in */src/core/event/rules/keydown.rule.backspace.js|*/src/core/event/rules/keydown.rule.delete.js) printf \"Backspace/Delete rule changed — follow .agents/rules/keydown-edge-decisions.md (one decision model). Read it now if you have not:\\n  - edge decisions via format.isEdgeLine / getAdjacentLine, never local siblings\\n  - fail open: never preventDefault on a path with no DOM/caret/selection effect\\n  - the two rules are mirrors (front/end): keep them in sync and sweep all four directions\\n\" >&2; exit 2;; esac",
+						"timeout": 10,
+						"statusMessage": "Keydown edge-decision checklist"
 					}
 				]
 			}

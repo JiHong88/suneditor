@@ -15,7 +15,10 @@ import { CreateHTML, CreateHTML_controller_table, CreateHTML_controller_cell } f
 
 import TableCellService from './services/table.cell';
 import TableClipboardService from './services/table.clipboard';
+import TableDotService from './services/table.dot';
 import TableGridService from './services/table.grid';
+import TableHandleService from './services/table.handle';
+import TableReorderService from './services/table.reorder';
 import TableResizeService from './services/table.resize';
 import TableSelectionService from './services/table.selection';
 import TableStyleService from './services/table.style';
@@ -26,7 +29,13 @@ const { _w, ON_OVER_COMPONENT } = env;
  * @typedef {Object} TablePluginOptions
  * @property {"x"|"y"|"xy"} [scrollType='x'] - Scroll type (`x`, `y`, `xy`)
  * @property {"top"|"bottom"} [captionPosition='bottom'] - Caption position (`top`, `bottom`)
- * @property {"cell"|"table"} [cellControllerPosition='cell'] - Cell controller position (`cell`, `table`)
+ * @property {"cell"|"table"|"dot"} [cellControllerPosition='dot'] - Cell controller position (`cell`, `table`, `dot`)
+ * - `dot`: Selecting a cell shows a dot on the cell's right edge (left in RTL) instead of the controller; clicking the dot opens the cell controller, clicking it again hides it.
+ * - `cell`: The controller opens on selection, below the selected cell.
+ * - `table`: The controller opens on selection, stacked on the table figure with the table controller.
+ * @property {"table"|"dot"} [tableControllerPosition='dot'] - Table controller position (`table`, `dot`)
+ * - `dot`: Selecting the table shows a dot on the table's top-left corner (top-right in RTL) instead of the controller; clicking the dot opens the table controller, clicking it again hides it.
+ * - `table`: The controller opens on selection, on top of the table figure.
  * @property {Array<string>} [colorList] - HEX color list for the cell background color picker.
  * ```js
  * { colorList: ['#bbf7d0', '#fde68a', '#fecaca', '#e9d5ff'] }
@@ -86,39 +95,52 @@ class Table extends PluginDropdownFree {
 		this.figureScrollList = ['se-scroll-figure-xy', 'se-scroll-figure-x', 'se-scroll-figure-y'];
 		this.figureScroll = typeof pluginOptions.scrollType === 'string' ? pluginOptions.scrollType.toLowerCase() : 'x';
 		this.captionPosition = pluginOptions.captionPosition !== 'bottom' ? 'top' : 'bottom';
-		this.cellControllerTop = (pluginOptions.cellControllerPosition !== 'cell' ? 'table' : 'cell') === 'table';
+
+		const cellControllerPosition = pluginOptions.cellControllerPosition;
+		/** @type {"cell"|"table"|"dot"} */
+		this.cellControllerPosition =
+			cellControllerPosition === 'cell' || cellControllerPosition === 'table' ? cellControllerPosition : 'dot';
+		/** @type {"table"|"dot"} */
+		this.tableControllerPosition = pluginOptions.tableControllerPosition === 'table' ? 'table' : 'dot';
+		this.cellControllerTop = this.cellControllerPosition === 'table';
 
 		// create HTML
 		const menu = CreateHTML();
 		const commandArea = menu.querySelector('.se-controller-table-picker');
 		const controller_table = CreateHTML_controller_table(this.$);
-		const controller_cell = CreateHTML_controller_cell(this.$, this.cellControllerTop);
+		const controller_cell = CreateHTML_controller_cell(this.$, this.cellControllerPosition);
 
-		this.$.contextProvider.applyToRoots((e) => {
-			e.get('wrapper').appendChild(
-				dom.utils.createElement('DIV', { class: Constants.RESIZE_CELL_CLASS.replace(/^\./, '') }),
-			);
-			e.get('wrapper').appendChild(
-				dom.utils.createElement('DIV', { class: Constants.RESIZE_CELL_PREV_CLASS.replace(/^\./, '') }),
-			);
-			e.get('wrapper').appendChild(
-				dom.utils.createElement('DIV', { class: Constants.RESIZE_ROW_CLASS.replace(/^\./, '') }),
-			);
-			e.get('wrapper').appendChild(
-				dom.utils.createElement('DIV', { class: Constants.RESIZE_ROW_PREV_CLASS.replace(/^\./, '') }),
-			);
-		});
+		this.dotService = new TableDotService(this);
+		const tableParents = this.dotService.tableDot ? [this.dotService.tableDot] : [];
+		const cellParents = this.dotService.cellDot ? [this.dotService.cellDot] : [];
 
 		// members - Controller
 		if (this.cellControllerTop) {
-			this.controller_cell = new Controller(this, this.$, controller_cell.html, { position: 'top' });
-			this.controller_table = new Controller(this, this.$, controller_table, { position: 'top' });
-			this.controller_cell.sibling = this.controller_table.form;
-			this.controller_table.sibling = this.controller_cell.form;
-			this.controller_table.siblingMain = true;
+			this.controller_cell = new Controller(this, this.$, controller_cell.html, {
+				position: 'top',
+				selection: true,
+			});
+			this.controller_table = new Controller(this, this.$, controller_table, {
+				position: 'top',
+				parents: tableParents,
+				selection: true,
+			});
+			if (this.tableControllerPosition === 'table') {
+				this.controller_cell.sibling = this.controller_table.form;
+				this.controller_table.sibling = this.controller_cell.form;
+				this.controller_table.siblingMain = true;
+			}
 		} else {
-			this.controller_table = new Controller(this, this.$, controller_table, { position: 'top' });
-			this.controller_cell = new Controller(this, this.$, controller_cell.html, { position: 'bottom' });
+			this.controller_table = new Controller(this, this.$, controller_table, {
+				position: 'top',
+				parents: tableParents,
+				selection: true,
+			});
+			this.controller_cell = new Controller(this, this.$, controller_cell.html, {
+				position: 'bottom',
+				parents: cellParents,
+				selection: true,
+			});
 		}
 
 		this.figure = new Figure(this, this.$, null, {});
@@ -147,7 +169,9 @@ class Table extends PluginDropdownFree {
 
 		this.cellService = new TableCellService(this, serviceOptions);
 		this.clipboardService = new TableClipboardService(this);
+		this.handleService = new TableHandleService(this);
 		this.gridService = new TableGridService(this, serviceOptions);
+		this.reorderService = new TableReorderService(this);
 		this.resizeService = new TableResizeService(this);
 		this.selectionService = new TableSelectionService(this);
 		this.styleService = new TableStyleService(this, { pluginOptions, controller_table });
@@ -204,22 +228,30 @@ class Table extends PluginDropdownFree {
 		// controller open
 		const btnDisabled = this.state.selectedCells?.length > 1;
 		const figureEl = dom.query.getParentElement(target, dom.check.isFigure);
-		this.controller_table.open(figureEl, null, {
-			isWWTarget: false,
-			initMethod: null,
-			addOffset: null,
-			disabled: btnDisabled,
-		});
+		if (this.tableControllerPosition === 'dot') {
+			this.dotService.showTableDot();
+		} else {
+			this.controller_table.open(figureEl, null, {
+				isWWTarget: false,
+				initMethod: null,
+				addOffset: null,
+				disabled: btnDisabled,
+			});
+		}
 
 		if (!this.state.fixedCell) return;
 
 		this.cellService.setUnMergeButton();
-		this.controller_cell.open(this.state.tdElement, this.cellControllerTop ? figureEl : null, {
-			isWWTarget: false,
-			initMethod: null,
-			addOffset: null,
-			disabled: btnDisabled,
-		});
+		if (this.cellControllerPosition === 'dot') {
+			this.dotService.showCellDot();
+		} else {
+			this.controller_cell.open(this.state.tdElement, this.cellControllerTop ? figureEl : null, {
+				isWWTarget: false,
+				initMethod: null,
+				addOffset: null,
+				disabled: btnDisabled,
+			});
+		}
 	}
 
 	/**
@@ -261,7 +293,10 @@ class Table extends PluginDropdownFree {
 	componentCopy({ event, cloneContainer }) {
 		/** @type {NodeListOf<HTMLTableCellElement>} */
 		const selectedCells = cloneContainer.querySelectorAll('.se-selected-table-cell');
-		dom.utils.removeClass(selectedCells, 'se-selected-table-cell|se-selected-cell-focus');
+		dom.utils.removeClass(
+			selectedCells,
+			`se-selected-table-cell|se-selected-cell-focus|${Constants.SELECTED_EDGE_CLASSES}`,
+		);
 
 		if (selectedCells.length > 0) {
 			this.clipboardService.copySelectedTableCells(event, cloneContainer, selectedCells);
@@ -427,15 +462,18 @@ class Table extends PluginDropdownFree {
 	 * @type {SunEditor.Hook.Event.OnMouseMove}
 	 */
 	onMouseMove({ event }) {
-		if (this.resizeService.isResizing()) return;
+		if (this.resizeService.isResizing() || this.handleService.isMoving()) return;
 
 		const eventTarget = dom.query.getEventTarget(event);
 		const target = dom.query.getParentElement(eventTarget, IsResizeEls);
 		if (!target || event.buttons === 1) {
 			this.resizeService.offResizeGuide();
+			if (event.buttons === 1) this.handleService.hide();
+			else this.handleService.hideOutside(eventTarget, event);
 			return;
 		}
 
+		this.handleService.refresh(dom.query.getParentElement(eventTarget, dom.check.isTableCell));
 		if (this.resizeService.onResizeGuide(event, target) === false) return;
 
 		if (this._element) this._element.style.cursor = '';
@@ -449,6 +487,10 @@ class Table extends PluginDropdownFree {
 	onMouseDown({ event }) {
 		this.setState('ref', null);
 		this.setState('selectedCell', null);
+		this.handleService.hide();
+
+		this.dotService.closeControllers();
+		this.dotService.closeCellDot();
 
 		const eventTarget = dom.query.getEventTarget(event);
 
@@ -487,8 +529,9 @@ class Table extends PluginDropdownFree {
 	 * @hook Editor.EventManager
 	 * @type {SunEditor.Hook.Event.OnMouseLeave}
 	 */
-	onMouseLeave() {
+	onMouseLeave({ event }) {
 		this.resizeService.offResizeGuide();
+		this.handleService.hideOnLeave(event);
 	}
 
 	/**
@@ -590,6 +633,8 @@ class Table extends PluginDropdownFree {
 	 */
 	onKeyUp({ line }) {
 		this.#_s = false;
+		this.dotService.reposition();
+
 		if (
 			this.state.isShiftPressed &&
 			dom.query.getParentElement(line, dom.check.isTableCell) === this.state.fixedCell
@@ -598,6 +643,7 @@ class Table extends PluginDropdownFree {
 			this._editorEnable(true);
 			this.#initService();
 		}
+
 		this.setState('isShiftPressed', false);
 	}
 
@@ -607,6 +653,7 @@ class Table extends PluginDropdownFree {
 	 */
 	onScroll() {
 		this.resizeService.offResizeGuide();
+		if (!this.handleService.isPinned()) this.handleService.hide();
 	}
 
 	/**
@@ -785,9 +832,10 @@ class Table extends PluginDropdownFree {
 	 * @description Adds a new entry to the history stack.
 	 */
 	historyPush() {
-		this.selectionService.deleteStyleSelectedCells();
+		this.selectionService.deleteStyleSelectedCells(true);
 		this.$.history.push(false);
 		this.selectionService.recallStyleSelectedCells();
+		this.dotService.reposition();
 	}
 
 	/**
@@ -819,7 +867,26 @@ class Table extends PluginDropdownFree {
 	 */
 	_setCellControllerPosition(tdElement, reset) {
 		this.setCellInfo(tdElement, reset);
-		if (!this.cellControllerTop) this.controller_cell.resetPosition(tdElement);
+		if (!this.cellControllerTop) this._resetCellControllerPosition(tdElement);
+	}
+
+	/**
+	 * @internal
+	 * @description Resets the cell controller's position - in `dot` mode, re-anchors the dot
+	 * (and the controller on it, when open) instead.
+	 * @param {HTMLTableCellElement} tdElement - The target table cell.
+	 */
+	_resetCellControllerPosition(tdElement) {
+		if (this.cellControllerPosition === 'dot') {
+			this.dotService.showCellDot();
+			this.dotService.showTableDot();
+			if (this.controller_cell.isOpen && this.controller_cell.form.style.display === 'block') {
+				this.controller_cell.resetPosition();
+			}
+			return;
+		}
+
+		this.controller_cell.resetPosition(tdElement);
 	}
 
 	/**
@@ -839,6 +906,8 @@ class Table extends PluginDropdownFree {
 	_closeController() {
 		this.controller_table.close(true);
 		this.controller_cell.close(true);
+		this.dotService.hide();
+		this.$.component.deselect();
 	}
 
 	/**
@@ -860,6 +929,7 @@ class Table extends PluginDropdownFree {
 			nonBorder: true,
 			figureTarget: true,
 			infoOnly: false,
+			nonDragHandle: _DragHandle.get('__overInfo') === ON_OVER_COMPONENT,
 		});
 	}
 
@@ -974,6 +1044,8 @@ class Table extends PluginDropdownFree {
 	 * @description Initializes services by calling their init methods.
 	 */
 	#initService() {
+		this.dotService.init();
+		this.handleService.init();
 		this.resizeService.init();
 		this.selectionService.init();
 		this.styleService.init();

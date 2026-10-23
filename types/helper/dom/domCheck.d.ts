@@ -176,6 +176,13 @@ export function isUneditable(node: Node): boolean;
  * @returns {boolean}
  */
 export function isImportantDisabled(node: Node): boolean;
+/**
+ * @description Checks if the element is currently shown as a popover.
+ * - Returns `false` where the `:popover-open` selector is not implemented (`matches` throws a `SyntaxError` there).
+ * @param {?Element} element The element to check
+ * @returns {boolean}
+ */
+export function isPopoverOpen(element: Element | null): boolean;
 export default check;
 declare namespace check {
 	export { isZeroWidth };
@@ -205,4 +212,5 @@ declare namespace check {
 	export { isExcludeFormat };
 	export { isUneditable };
 	export { isImportantDisabled };
+	export { isPopoverOpen };
 }

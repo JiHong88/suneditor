@@ -10,6 +10,7 @@ import {
 	OnClick_wysiwyg,
 	OnMouseMove_wysiwyg,
 	OnMouseLeave_wysiwyg,
+	cancelWysiwygMouseMoveFrames,
 } from '../event/handlers/handler_ww_mouse';
 import { OnBeforeInput_wysiwyg, OnInput_wysiwyg } from '../event/handlers/handler_ww_input';
 import { OnKeyDown_wysiwyg, OnKeyUp_wysiwyg } from '../event/handlers/handler_ww_key';
@@ -37,6 +38,8 @@ class EventOrchestrator extends KernelInjector {
 
 	/** @type {number} */
 	#balloonDelay = null;
+	/** @type {Set<number>} Deferred event work owned by this orchestrator. */
+	#pendingTimers = new Set();
 	/** @type {?SunEditor.Event.GlobalInfo} */
 	#close_move = null;
 	/** @type {?SunEditor.Event.GlobalInfo} */
@@ -432,20 +435,20 @@ class EventOrchestrator extends KernelInjector {
 		if (env.isResizeObserverSupported) {
 			this._toolbarObserver = new ResizeObserver(() => {
 				// Defer to avoid ResizeObserver loop limit — layout must settle before recalculating responsive buttons
-				_w.setTimeout(() => {
+				this.#defer(() => {
 					this.#toolbar.resetResponsiveToolbar();
-				}, 0);
+				});
 			});
 			this._wwFrameObserver = new ResizeObserver((entries) => {
 				// Defer to avoid ResizeObserver loop limit — measure final height after reflow completes
-				_w.setTimeout(() => {
+				this.#defer(() => {
 					entries.forEach((e) => {
 						this.#ui._emitResizeEvent(this.$.frameRoots.get(e.target.getAttribute('data-root-key')), -1, e);
 					});
 					if (this.#store.mode.isInline && this.#store.mode.isBottom) {
 						this.#toolbar._resetSticky();
 					}
-				}, 0);
+				});
 			});
 		}
 
@@ -669,6 +672,8 @@ class EventOrchestrator extends KernelInjector {
 	 */
 	_removeAllEvents() {
 		this.#eventManager._init();
+		for (const timer of this.#pendingTimers) _w.clearTimeout(timer);
+		this.#pendingTimers.clear();
 
 		if (this._wwFrameObserver) {
 			this._wwFrameObserver.disconnect();
@@ -679,6 +684,8 @@ class EventOrchestrator extends KernelInjector {
 			this._toolbarObserver.disconnect();
 			this._toolbarObserver = null;
 		}
+
+		cancelWysiwygMouseMoveFrames(this.$.frameRoots);
 
 		// clear timers
 		if (this.#balloonDelay) {
@@ -708,6 +715,17 @@ class EventOrchestrator extends KernelInjector {
 		this.__secopy = null;
 		this._lineBreakComp = null;
 		this.scrollparents = null;
+	}
+
+	/**
+	 * @param {() => void} callback Event work to run after the current event completes.
+	 */
+	#defer(callback) {
+		const timer = _w.setTimeout(() => {
+			this.#pendingTimers.delete(timer);
+			callback();
+		}, 0);
+		this.#pendingTimers.add(timer);
 	}
 
 	/**
@@ -825,11 +843,11 @@ class EventOrchestrator extends KernelInjector {
 	__postBlurEvent(frameContext, event) {
 		if (this.#store.mode.isInline) {
 			// Defer hide — prevents race with deferred focus show (setTimeout in #OnFocus_wysiwyg)
-			_w.setTimeout(() => {
+			this.#defer(() => {
 				if (!this.#store.get('hasFocus')) {
 					this._hideToolbar();
 				}
-			}, 0);
+			});
 		} else if (this.#store.mode.isBalloon) {
 			this._hideToolbar();
 		}
@@ -944,9 +962,9 @@ class EventOrchestrator extends KernelInjector {
 		if (this._inputFocus) {
 			if (this.#store.mode.isInline) {
 				// Defer inline toolbar show — browser focus event fires before selection is finalized
-				_w.setTimeout(() => {
+				this.#defer(() => {
 					this.#toolbar._showInline();
-				}, 0);
+				});
 			}
 			return;
 		}
@@ -965,9 +983,9 @@ class EventOrchestrator extends KernelInjector {
 		this.$.history.resetButtons(rootKey, null);
 
 		// Defer focus event emission — allow blur handler on the previous frame to complete first
-		_w.setTimeout(() => {
+		this.#defer(() => {
 			this.__postFocusEvent(frameContext, e);
-		}, 0);
+		});
 	}
 
 	/**

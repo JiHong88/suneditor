@@ -127,6 +127,7 @@ describe('Modules - Controller', () => {
 			component: {
 				...kernel.$.component,
 				__removeGlobalEvent: jest.fn(),
+				__restoreGlobalEvent: jest.fn(),
 				deselect: jest.fn(),
 				isInline: jest.fn().mockReturnValue(false),
 			},
@@ -138,6 +139,12 @@ describe('Modules - Controller', () => {
 			subToolbar: { ...kernel.$.subToolbar, hide: jest.fn() },
 		};
 		mockEditor.$ = $;
+
+		// registry queries answer from the real list (Controller mutates $.ui.opendControllers)
+		$.ui.isInsideController = jest.fn((t) => !!t && $.ui.opendControllers.some(({ form }) => !!form?.contains?.(t)));
+		$.ui.getControllerAt = jest.fn((t) => (t && $.ui.opendControllers.find(({ form }) => !!form?.contains?.(t))) || null);
+		$.ui.hasFloatingController = jest.fn(() => $.ui.opendControllers.some((c) => !c.notInCarrier));
+		$.ui.closeAllControllers = jest.fn();
 
 		mockInst = {
 			editor: mockEditor,
@@ -1159,13 +1166,15 @@ describe('Modules - Controller', () => {
 			expect($.store.set).toHaveBeenCalledWith('controlActive', true);
 		});
 
-		it('should call onControllerContext', async () => {
+		it('records its root and passive flag on its registry entry', async () => {
 			const el = createMockElement();
 			const ctrl = new Controller(mockInst, $, el, {});
 			const target = createTarget();
 			await ctrl.open(target, target, {});
 			await new Promise((r) => setTimeout(r, 0));
-			expect($.ui.onControllerContext).toHaveBeenCalled();
+			expect($.ui.opendControllers[0]).toEqual(
+				expect.objectContaining({ inst: ctrl, passive: false, topArea: $.frameContext.get('topArea') }),
+			);
 		});
 
 		it('should trigger onShowController event', async () => {
@@ -1228,8 +1237,8 @@ describe('Modules - Controller', () => {
 			$.ui.currentControllerName = 'testController';
 			ctrl.isOpen = true;
 			ctrl.close();
-			expect($.ui.offControllerContext).toHaveBeenCalled();
 			expect($.ui.setControllerOnDisabledButtons).toHaveBeenCalledWith(false);
+			expect($.ui.currentControllerName).toBe('');
 		});
 
 		it('should proceed with cleanup when no controllers remain', () => {
@@ -1239,7 +1248,8 @@ describe('Modules - Controller', () => {
 			$.ui.currentControllerName = 'differentName';
 			ctrl.isOpen = true;
 			ctrl.close();
-			expect($.ui.offControllerContext).toHaveBeenCalled();
+			expect($.ui.setControllerOnDisabledButtons).toHaveBeenCalledWith(false);
+			expect($.ui.currentControllerName).toBe('');
 		});
 
 		it('should set lineBreaker display none', () => {
@@ -1657,7 +1667,7 @@ describe('Modules - Controller', () => {
 		it('should return when selectMenuOn is true', () => {
 			$.ui.selectMenuOn = true;
 			const handlers = getGlobalEventHandlers($);
-			const e = { target: el, code: 'Escape' };
+			const e = { target: el, code: 'Escape', preventDefault: jest.fn(), stopPropagation: jest.fn() };
 			mockKeyCodeMap.isNonResponseKey.mockReturnValue(true);
 			mockKeyCodeMap.isEsc.mockReturnValue(true);
 
@@ -1669,7 +1679,7 @@ describe('Modules - Controller', () => {
 		it('should return when opendControllers has fixed=true for this controller', () => {
 			$.ui.opendControllers = [{ inst: ctrl, fixed: true, form: el }];
 			const handlers = getGlobalEventHandlers($);
-			const e = { target: el, code: 'Escape' };
+			const e = { target: el, code: 'Escape', preventDefault: jest.fn(), stopPropagation: jest.fn() };
 			mockKeyCodeMap.isNonResponseKey.mockReturnValue(true);
 			mockKeyCodeMap.isEsc.mockReturnValue(true);
 
@@ -1686,7 +1696,7 @@ describe('Modules - Controller', () => {
 			mockKeyCodeMap.isCtrl.mockReturnValue(false);
 			mockKeyCodeMap.isEsc.mockReturnValue(true);
 
-			const e = { target: document.createElement('div'), code: 'Escape' };
+			const e = { target: document.createElement('div'), code: 'Escape', preventDefault: jest.fn(), stopPropagation: jest.fn() };
 			handlers.keydown(e);
 			expect(ctrl.isOpen).toBe(false);
 		});
@@ -1702,7 +1712,7 @@ describe('Modules - Controller', () => {
 			mockKeyCodeMap.isCtrl.mockReturnValue(false);
 			mockKeyCodeMap.isEsc.mockReturnValue(true);
 
-			handlers.keydown({ target: document.createElement('div'), code: 'Escape' });
+			handlers.keydown({ target: document.createElement('div'), code: 'Escape', preventDefault: jest.fn(), stopPropagation: jest.fn() });
 			// ctrl is not in opendControllers as fixed, so checkFixed returns false
 			expect(ctrl.isOpen).toBe(false);
 		});
@@ -1724,7 +1734,7 @@ describe('Modules - Controller', () => {
 			mockKeyCodeMap.isEsc.mockReturnValue(true);
 		});
 
-		const fireEsc = () => getGlobalEventHandlers($).keydown({ target: document.createElement('div'), code: 'Escape' });
+		const fireEsc = () => getGlobalEventHandlers($).keydown({ target: document.createElement('div'), code: 'Escape', preventDefault: jest.fn(), stopPropagation: jest.fn() });
 
 		it('returning true keeps the controller open on ESC (inner sub-panel absorbs it)', () => {
 			expect(ctrl.isOpen).toBe(true);
@@ -1825,7 +1835,7 @@ describe('Modules - Controller', () => {
 			mockKeyCodeMap.isEsc.mockReturnValue(true);
 			const handlers = getGlobalEventHandlers($);
 
-			handlers.keydown({ target: document.createElement('div'), code: 'Escape' });
+			handlers.keydown({ target: document.createElement('div'), code: 'Escape', preventDefault: jest.fn(), stopPropagation: jest.fn() });
 			expect(parentCtrl2.isOpen).toBe(true);
 		});
 
@@ -1834,7 +1844,7 @@ describe('Modules - Controller', () => {
 			mockKeyCodeMap.isEsc.mockReturnValue(true);
 			const handlers = getGlobalEventHandlers($);
 
-			handlers.keydown({ target: document.createElement('div'), code: 'Escape' });
+			handlers.keydown({ target: document.createElement('div'), code: 'Escape', preventDefault: jest.fn(), stopPropagation: jest.fn() });
 			expect(ctrl.isOpen).toBe(false);
 		});
 
@@ -1852,7 +1862,7 @@ describe('Modules - Controller', () => {
 			$.ui.opendControllers = [{ inst: ctrl, fixed: false, form: el }];
 			const handlers = getGlobalEventHandlers($);
 
-			handlers.keydown({ target: document.createElement('div'), code: 'Escape' });
+			handlers.keydown({ target: document.createElement('div'), code: 'Escape', preventDefault: jest.fn(), stopPropagation: jest.fn() });
 			expect(ctrl.isOpen).toBe(false);
 		});
 
@@ -2037,7 +2047,7 @@ describe('Modules - Controller', () => {
 		});
 
 		it('should return true for drag handle class', () => {
-			mockDom.utils.hasClass.mockImplementation((target, cls) => cls === 'se-drag-handle');
+			mockDom.utils.hasClass.mockImplementation((target, cls) => cls.split('|').includes('se-drag-handle'));
 			mockKeyCodeMap.isNonResponseKey.mockReturnValue(true);
 			mockKeyCodeMap.isEsc.mockReturnValue(false);
 			const handlers = getGlobalEventHandlers($);
@@ -2182,7 +2192,7 @@ describe('Modules - Controller', () => {
 
 			const outsideTarget = document.createElement('div');
 			const handlers = getGlobalEventHandlers($);
-			handlers.keydown({ target: outsideTarget, code: 'Escape' });
+			handlers.keydown({ target: outsideTarget, code: 'Escape', preventDefault: jest.fn(), stopPropagation: jest.fn() });
 
 			expect($.component.__prevent).toBe(false);
 		});
@@ -2203,7 +2213,7 @@ describe('Modules - Controller', () => {
 			wysiwyg.appendChild(insideTarget);
 
 			const handlers = getGlobalEventHandlers($);
-			handlers.keydown({ target: insideTarget, code: 'Escape' });
+			handlers.keydown({ target: insideTarget, code: 'Escape', preventDefault: jest.fn(), stopPropagation: jest.fn() });
 
 			expect($.component.__prevent).toBe(true);
 		});
@@ -2347,6 +2357,232 @@ describe('Modules - Controller', () => {
 			// This should be a no-op
 			ctrl.close(false);
 			expect(mockInst.controllerClose).not.toHaveBeenCalled();
+		});
+	});
+
+	// ==================== selection UI & Esc levels ====================
+
+	describe('selection UI controllers and Esc levels', () => {
+		beforeEach(() => {
+			mockKeyCodeMap.isEsc.mockReturnValue(true);
+			mockKeyCodeMap.isNonResponseKey.mockReturnValue(true);
+		});
+
+		const esc = (target = document.createElement('div')) => ({
+			target,
+			code: 'Escape',
+			preventDefault: jest.fn(),
+			stopPropagation: jest.fn(),
+		});
+		const keydownOf = (ctrl) => {
+			const calls = $.eventManager.addGlobalEvent.mock.calls.filter(([type]) => type === 'keydown');
+			return calls[calls.length - 1][1];
+		};
+
+		it('a selection UI controller leaves the component its listeners; a standalone one takes them', async () => {
+			const base = new Controller(mockInst, $, createMockElement('base'), { selection: true });
+			base.open(createTarget());
+			const child = new Controller(mockInst, $, createMockElement('child'), { parents: [base] });
+			child.open(createTarget());
+			expect(child.isSelectionUI).toBe(true); // inherited
+			expect($.component.__removeGlobalEvent).not.toHaveBeenCalled();
+
+			const standalone = new Controller(mockInst, $, createMockElement('standalone'), {});
+			standalone.open(createTarget());
+			expect($.component.__removeGlobalEvent).toHaveBeenCalled();
+		});
+
+		it('inherits the selection role from a parent element that is an open selection controller form', async () => {
+			const base = new Controller(mockInst, $, createMockElement('base'), { selection: true });
+			base.open(createTarget());
+			await Promise.resolve();
+			const viaForm = new Controller(mockInst, $, createMockElement('viaForm'), { parents: [base.form] });
+			expect(viaForm.isSelectionUI).toBe(true);
+
+			const loose = new Controller(mockInst, $, createMockElement('loose'), { parents: [document.createElement('div')] });
+			expect(loose.isSelectionUI).toBe(false);
+		});
+
+		it('Esc closes a child level only, and consumes the key', async () => {
+			const base = new Controller(mockInst, $, createMockElement('base'), { selection: true });
+			base.open(createTarget());
+			await Promise.resolve();
+			const child = new Controller(mockInst, $, createMockElement('child'), { parents: [base] });
+			child.open(createTarget());
+			await Promise.resolve();
+
+			const e = esc();
+			keydownOf(child)(e);
+
+			expect(child.isOpen).toBe(false);
+			expect(base.isOpen).toBe(true);
+			expect(e.stopPropagation).toHaveBeenCalled();
+			expect($.component.deselect).not.toHaveBeenCalled();
+		});
+
+		it("a base selection controller leaves the Esc to the component (which ends the selection)", async () => {
+			const base = new Controller(mockInst, $, createMockElement('base'), { selection: true });
+			base.open(createTarget());
+			await Promise.resolve();
+
+			const e = esc();
+			keydownOf(base)(e);
+
+			expect(base.isOpen).toBe(true);
+			expect(e.stopPropagation).not.toHaveBeenCalled();
+		});
+
+		it("escape: 'all' closes everything at once through the ui", async () => {
+			const ctrl = new Controller(mockInst, $, createMockElement('all'), { escape: 'all' });
+			ctrl.open(createTarget());
+			await Promise.resolve();
+
+			const e = esc();
+			keydownOf(ctrl)(e);
+
+			expect($.ui.closeAllControllers).toHaveBeenCalled();
+			expect(e.stopPropagation).toHaveBeenCalled();
+		});
+	});
+
+	// ==================== container: 'wrapper' ====================
+
+	describe("container: 'wrapper' (in-editor controller)", () => {
+		let wrapper;
+		let eventWysiwyg;
+
+		beforeEach(() => {
+			wrapper = document.createElement('div');
+			eventWysiwyg = { scrollTop: 30, scrollLeft: 5 };
+			const parts = {
+				wrapper,
+				eventWysiwyg,
+				lineBreaker_t: document.createElement('div'),
+				lineBreaker_b: document.createElement('div'),
+			};
+			$.frameContext = { get: (key) => parts[key] ?? null };
+			$.store.set = jest.fn();
+		});
+
+		const create = (place, params = {}) =>
+			new Controller(mockInst, $, createMockElement('wrapperCtrl'), { container: 'wrapper', place, ...params });
+
+		it('is not put in the carrier and gets no popover / hover z-index handling', () => {
+			const ctrl = create(() => ({ left: 0, top: 0 }));
+			expect(ctrl.container).toBe('wrapper');
+			expect(ctrl.form.hasAttribute('popover')).toBe(false);
+			expect($.contextProvider.carrierWrapper.contains(ctrl.form)).toBe(false);
+			const types = $.eventManager.addEvent.mock.calls.filter(([el]) => el === ctrl.form).map(([, type]) => type);
+			expect(types).toEqual(['click']);
+		});
+
+		it('open moves the form into the current wrapper, registers it once and places it with a scroll baseline', () => {
+			const target = document.createElement('td');
+			const place = jest.fn(() => ({ left: 12, top: 40 }));
+			const ctrl = create(place);
+
+			ctrl.open(target);
+			ctrl.open(target); // re-place, not re-register
+
+			expect(ctrl.form.parentNode).toBe(wrapper);
+			expect(place).toHaveBeenCalledWith(ctrl.form, target);
+			expect(ctrl.form.style.left).toBe('12px');
+			expect(ctrl.form.style.top).toBe('40px');
+			expect(ctrl.form.style.display).toBe('block');
+			expect(ctrl.__offset).toEqual({ left: 17, top: 70 });
+			expect($.ui.opendControllers).toEqual([
+				expect.objectContaining({
+					inst: ctrl,
+					form: ctrl.form,
+					notInCarrier: true,
+					inWrapper: true,
+					fixed: true,
+				}),
+			]);
+			expect(ctrl.isOpen).toBe(true);
+		});
+
+		it('open touches no editor state: no listeners, no context, no positioning by target, no hover-info reset', () => {
+			const ctrl = create(() => ({ left: 0, top: 0 }));
+			ctrl.open(document.createElement('td'));
+
+			expect($.eventManager.addGlobalEvent).not.toHaveBeenCalled();
+			expect($.offset.setAbsPosition).not.toHaveBeenCalled();
+			expect($.store.set).not.toHaveBeenCalled();
+			expect($.ui.currentControllerName).toBe('');
+			expect(mockDragHandle.set).not.toHaveBeenCalled();
+		});
+
+		it('a null place hides it (and its children); a later place shows them again', () => {
+			let pos = null;
+			const parent = create(() => pos);
+			const child = new Controller(mockInst, $, createMockElement('child'), { parents: [parent] });
+
+			pos = { left: 1, top: 2 };
+			parent.open(document.createElement('td'));
+			child.open(parent.form);
+			expect(child.form.style.display).toBe('block');
+
+			pos = null;
+			parent.resetPosition();
+			expect(parent.form.style.display).toBe('none');
+			expect(child.form.style.display).toBe('none');
+			expect(parent.isOpen).toBe(true);
+
+			pos = { left: 3, top: 4 };
+			parent.resetPosition();
+			expect(parent.form.style.display).toBe('block');
+			expect(child.form.hasAttribute('data-se-hidden-by-parent')).toBe(false);
+		});
+
+		it('close neither deselects nor strips the component listeners nor resets the editor state', () => {
+			const ctrl = create(() => ({ left: 0, top: 0 }));
+			ctrl.open(document.createElement('td'));
+			$.ui.currentControllerName = 'other';
+
+			ctrl.close();
+
+			expect($.component.deselect).not.toHaveBeenCalled();
+			expect($.component.__removeGlobalEvent).not.toHaveBeenCalled();
+			expect($.store.set).not.toHaveBeenCalled();
+			expect($.ui.currentControllerName).toBe('other');
+			expect($.ui.opendControllers).toEqual([]);
+			expect(ctrl.form.style.display).toBe('none');
+			expect(ctrl.isOpen).toBe(false);
+		});
+
+		it('resetPosition re-anchors the floating controllers positioned inside it', async () => {
+			const anchor = document.createElement('span');
+			anchor.getClientRects = () => [{}];
+			const ctrl = create((form) => {
+				if (!form.contains(anchor)) form.appendChild(anchor);
+				return { left: 0, top: 0 };
+			});
+			ctrl.open(document.createElement('td'));
+
+			const floating = new Controller(mockInst, $, createMockElement('floating'), {});
+			floating.open(document.createElement('div'), anchor);
+			await Promise.resolve(); // a carrier controller registers after its async show event
+			$.offset.setAbsPosition.mockClear();
+
+			ctrl.resetPosition();
+			expect($.offset.setAbsPosition).toHaveBeenCalledWith(floating.form, anchor, expect.any(Object));
+		});
+
+		it('is skipped by the floating-controller bookkeeping of carrier controllers', async () => {
+			const inEditor = create(() => ({ left: 0, top: 0 }));
+			inEditor.open(document.createElement('td'));
+			inEditor.form.style.zIndex = '';
+
+			const floating = new Controller(mockInst, $, createMockElement('floating'), {});
+			floating.open(document.createElement('div'));
+			await Promise.resolve(); // a carrier controller registers after its async show event
+			expect(inEditor.form.style.zIndex).toBe(''); // no z-index stacking
+
+			// closing the floating one still resets the editor state although an in-editor one stays listed
+			$.ui.currentControllerName = 'other';
+			floating.close();
+			expect($.ui.currentControllerName).toBe('');
 		});
 	});
 });

@@ -796,7 +796,11 @@ class Selection_ {
 	 * @description Saving the range object and the currently selected node of editor
 	 */
 	init() {
-		const activeEl = this.#frameContext.get('_wd').activeElement;
+		const doc = this.#frameContext.get('_wd');
+		// A deferred mousedown init can run after the frame document has been cleared.
+		if (!doc) return null;
+
+		const activeEl = doc.activeElement;
 		if (dom.check.isInputElement(activeEl)) {
 			this.selectionNode = activeEl;
 			return activeEl;

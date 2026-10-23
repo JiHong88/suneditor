@@ -372,9 +372,10 @@ function Constructor(editorTargets, options) {
 	} else {
 		const rootContainer = frameRoots.get(rootId).get('container');
 		if (o.get('_toolbar_bottom')) {
-			const statusbar = rootContainer.querySelector('.se-statusbar');
+			const statusbar = rootContainer.querySelector('.se-status-bar');
 			rootContainer.insertBefore(toolbar, statusbar);
 			if (subbar) rootContainer.insertBefore(subbar, toolbar);
+			rootContainer.insertBefore(rootContainer.querySelector('.se-toolbar-sticky-dummy'), toolbar.nextSibling);
 		} else {
 			rootContainer.insertBefore(toolbar, rootContainer.firstElementChild);
 			if (subbar) rootContainer.insertBefore(subbar, rootContainer.firstElementChild);
@@ -764,6 +765,17 @@ export function InitOptions(options, editorTargets, plugins) {
 		o.get('defaultLine'),
 	);
 	o.set('elementBlacklist', elb + (elb ? '|' : '') + o.get('_disallowedExtraTag'));
+	o.set(
+		'allowedURLProtocols',
+		Array.isArray(options.allowedURLProtocols)
+			? options.allowedURLProtocols
+					.map((protocol) => protocol.trim().toLowerCase())
+					.filter(
+						(protocol) =>
+							/^[a-z][a-z0-9+.-]*$/.test(protocol) && !/^(javascript|vbscript|data)$/.test(protocol),
+					)
+			: [],
+	);
 	// attribute
 	o.set(
 		'attributeWhitelist',

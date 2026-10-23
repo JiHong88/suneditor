@@ -30,6 +30,8 @@ class Component {
 	#bindClose_keydown = null;
 	/** @type {?SunEditor.Event.GlobalInfo} */
 	#bindClose_mousedown = null;
+	/** @type {?number} Pending selection listener setup. */
+	#selectionTimer = null;
 
 	/**
 	 * @constructor
@@ -115,6 +117,17 @@ class Component {
 			this.#eventManager.addEvent(dragHandle, 'dragend', this.#OnDragEnd.bind(this));
 			this.#eventManager.addEvent(dragHandle, 'click', this.#OnDragClick.bind(this));
 		});
+	}
+
+	/**
+	 * @description Whether the current selection is only a hover selection (made on mouse-over, cleared on mouse-out)
+	 * — not yet upgraded by a click or an opened controller.
+	 * @returns {boolean}
+	 */
+	get isHoverSelected() {
+		if (!this.isSelected) return false;
+		const overInfo = _DragHandle.get('__overInfo');
+		return overInfo === ON_OVER_COMPONENT || overInfo === undefined;
 	}
 
 	/**
@@ -371,7 +384,9 @@ class Component {
 
 		const __overInfo = _DragHandle.get('__overInfo');
 		// Defer drag handle setup — let the current click/mousedown event complete before attaching global listeners
-		_w.setTimeout(() => {
+		if (this.#selectionTimer !== null) _w.clearTimeout(this.#selectionTimer);
+		this.#selectionTimer = _w.setTimeout(() => {
+			this.#selectionTimer = null;
 			_DragHandle.set('__overInfo', __overInfo === ON_OVER_COMPONENT ? undefined : false);
 			if (__overInfo !== ON_OVER_COMPONENT) this.#addGlobalEvent();
 			if (!info.isFile) this.#addNotFileGlobalEvent();
@@ -530,9 +545,14 @@ class Component {
 		if (info || figure) {
 			info ||= this.get(figure);
 			if (info && !dom.utils.hasClass(info.container, 'se-component-selected')) {
-				this.#$.ui.offCurrentController();
-				_DragHandle.set('__overInfo', ON_OVER_COMPONENT);
-				this.select(info.target, info.pluginName);
+				if (this.isSelected && this.currentInfo?.container === info.container) {
+					dom.utils.addClass(info.container, 'se-component-selected');
+				} else {
+					this.#$.ui.offCurrentController();
+					_DragHandle.set('__overInfo', ON_OVER_COMPONENT);
+					this.select(info.target, info.pluginName);
+					if (_DragHandle.get('__overInfo') === ON_OVER_COMPONENT) _DragHandle.set('__overInfo', undefined);
+				}
 			}
 		} else if (_DragHandle.get('__overInfo') !== null && !dom.utils.hasClass(target, 'se-drag-handle')) {
 			this.__deselect();
@@ -546,6 +566,9 @@ class Component {
 	 * - This method resets the selection state and hides UI elements related to the component selection.
 	 */
 	__deselect() {
+		if (this.#selectionTimer !== null) _w.clearTimeout(this.#selectionTimer);
+		this.#selectionTimer = null;
+
 		this.#store.set('_preventBlur', false);
 		_DragHandle.set('__overInfo', null);
 		this.__removeDragEvent();
@@ -831,10 +854,10 @@ class Component {
 		const target = dom.query.getEventTarget(e);
 		if (
 			this.currentTarget?.contains(target) ||
-			dom.query.getParentElement(target, '.se-controller') ||
 			dom.utils.hasClass(target, 'se-drag-handle') ||
-			(this.currentPluginName === this.#$.ui.currentControllerName &&
-				this.#$.ui.opendControllers.some(({ form }) => form.contains(target)))
+			this.#$.ui.isInsideController(target) ||
+			dom.query.getParentElement(target, '.se-controller') ||
+			dom.query.getParentElement(target, '.se-select-menu')
 		) {
 			return;
 		}
@@ -847,6 +870,7 @@ class Component {
 	#OnCopy_component(e) {
 		const target = dom.query.getEventTarget(e);
 		if (dom.check.isInputElement(target) && dom.query.getParentElement(target, '.se-modal')) return;
+		if (this.#$.ui.isInsideController(target)) return;
 
 		const info = this.info;
 		if (!info) return;
@@ -867,6 +891,8 @@ class Component {
 	 * @param {ClipboardEvent} e - Event object
 	 */
 	#OnCut_component(e) {
+		if (this.#$.ui.isInsideController(dom.query.getEventTarget(e))) return;
+
 		const info = this.info;
 		if (!info) return;
 
@@ -885,6 +911,8 @@ class Component {
 		if (this.#$.ui.selectMenuOn) return;
 
 		const keyCode = e.code;
+		if (!keyCodeMap.isEsc(keyCode) && this.#$.ui.isInsideController(dom.query.getEventTarget(e))) return;
+
 		const ctrl = keyCodeMap.isCtrl(e);
 
 		// redo, undo
@@ -907,6 +935,7 @@ class Component {
 
 			if (
 				typeof this.currentPlugin?.componentDestroy === 'function' &&
+				this.info?.container &&
 				(!this.info.isInputType || !this.#store.get('hasFocus'))
 			) {
 				const focusNode = this.info.container.previousSibling;
@@ -926,7 +955,8 @@ class Component {
 		if (keyCodeMap.isEnter(keyCode)) {
 			e.preventDefault();
 			const compContext = this.currentInfo || this.get(this.currentTarget);
-			const container = compContext.container || compContext.target;
+			const container = compContext?.container || compContext?.target;
+			if (!container?.parentNode) return;
 			const sibling = container.previousElementSibling || container.nextElementSibling;
 			let newEl = null;
 			if (dom.check.isListCell(container.parentNode)) {
@@ -951,7 +981,9 @@ class Component {
 		// up down, left right
 		DIR_KEYCODE.lastIndex = 0;
 		if (DIR_KEYCODE.test(keyCode)) {
-			const { container } = this.get(this.currentTarget);
+			const comp = this.get(this.currentTarget);
+			if (!comp) return;
+			const { container } = comp;
 			const isInline = this.isInline(container || this.currentTarget);
 
 			let el = null;
@@ -1015,6 +1047,7 @@ class Component {
 
 		// ESC
 		if (keyCodeMap.isEsc(keyCode)) {
+			if (e.defaultPrevented) return;
 			this.deselect();
 			return;
 		}
@@ -1025,6 +1058,8 @@ class Component {
 	 * @description Destroy the Component instance and release memory
 	 */
 	_destroy() {
+		if (this.#selectionTimer !== null) _w.clearTimeout(this.#selectionTimer);
+		this.#selectionTimer = null;
 		this.__removeGlobalEvent();
 		this.__removeDragEvent();
 	}
@@ -1040,7 +1075,10 @@ function SetClipboardComponent(e, container, clipboardData) {
 function RemoveSelectedClass(container) {
 	dom.utils.removeClass(container, 'se-component-selected');
 	dom.utils.removeClass(container.querySelectorAll('.se-figure-selected'), 'se-figure-selected');
-	dom.utils.removeClass(container.querySelectorAll('.se-selected-table-cell'), 'se-selected-table-cell');
+	dom.utils.removeClass(
+		container.querySelectorAll('.se-selected-table-cell'),
+		'se-selected-table-cell|se-selected-cell-focus-t|se-selected-cell-focus-b|se-selected-cell-focus-l|se-selected-cell-focus-r',
+	);
 	dom.utils.removeClass(container.querySelector('.se-selected-cell-focus'), 'se-selected-cell-focus');
 }
 

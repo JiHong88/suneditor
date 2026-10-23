@@ -86,6 +86,21 @@
  */
 
 // --------------------------------------------------------- [Module Types - Cross-module Public API] ---------------------------------------------------------------------------------------------------
+// Module instance types - for passing module instances between functions/services.
+/**
+ * @typedef {import('./modules/contract/Browser').default} SunEditor.Module.Browser.Instance
+ * @typedef {import('./modules/contract/ColorPicker').default} SunEditor.Module.ColorPicker.Instance
+ * @typedef {import('./modules/contract/Controller').default} SunEditor.Module.Controller.Instance
+ * @typedef {import('./modules/contract/Figure').default} SunEditor.Module.Figure.Instance
+ * @typedef {import('./modules/contract/HueSlider').default} SunEditor.Module.HueSlider.Instance
+ * @typedef {import('./modules/contract/Modal').default} SunEditor.Module.Modal.Instance
+ * @typedef {import('./modules/ui/CommandMenu').default} SunEditor.Module.CommandMenu.Instance
+ * @typedef {import('./modules/ui/ModalAnchorEditor').default} SunEditor.Module.ModalAnchorEditor.Instance
+ * @typedef {import('./modules/ui/SelectMenu').default} SunEditor.Module.SelectMenu.Instance
+ * @typedef {import('./modules/manager/ApiManager').default} SunEditor.Module.ApiManager.Instance
+ * @typedef {import('./modules/manager/FileManager').default} SunEditor.Module.FileManager.Instance
+ */
+
 /**
  * @typedef {import('./modules/contract/Controller').ControllerInfo} SunEditor.Module.Controller.Info
  *

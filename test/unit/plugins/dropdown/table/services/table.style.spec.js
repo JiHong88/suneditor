@@ -141,6 +141,7 @@ describe('TableStyleService', () => {
 			_setCellControllerPosition: jest.fn(),
 			_closeController: jest.fn(),
 			historyPush: jest.fn(),
+			frameContext: { get: jest.fn(() => document.createElement('div')) },
 		};
 
 		// Make main act as its own kernel for dependency injection
@@ -229,6 +230,76 @@ describe('TableStyleService', () => {
 
 			expect(styleService.propTargets.back_color.value).toBe('rgb(255, 0, 0)');
 			expect(styleService.propTargets.border_style.textContent).toBe('solid');
+		});
+	});
+
+	describe('border defaults', () => {
+		const computed = (border) => ({
+			border,
+			backgroundColor: '',
+			color: '#111111',
+			textAlign: '',
+			verticalAlign: '',
+			fontWeight: '',
+			textDecoration: '',
+			fontStyle: '',
+		});
+
+		it('should prefill width 2 and the editing text color for a cell without its own border', () => {
+			const cell = document.createElement('td');
+			mainState.selectedCells = [cell];
+			const { env } = require('../../../../../../src/helper');
+			env._w.getComputedStyle.mockReturnValue(computed('1px solid rgb(225, 225, 225)'));
+
+			styleService.openCellProps(document.createElement('button'));
+
+			expect(styleService.propTargets.border_style.textContent).toBe('none');
+			expect(styleService.propTargets.border_width.value).toBe('2');
+			expect(styleService.propTargets.border_color.value).toBe('#111111');
+		});
+
+		it('should prefill width 2 for a table without its own border', () => {
+			main._element = document.createElement('table');
+			const { env } = require('../../../../../../src/helper');
+			env._w.getComputedStyle.mockReturnValue(computed('1px solid rgb(225, 225, 225)'));
+
+			styleService.openTableProps(document.createElement('button'));
+
+			expect(styleService.propTargets.border_width.value).toBe('2');
+			expect(styleService.propTargets.border_color.value).toBe('#111111');
+		});
+
+		it('should keep the border a cell already has', () => {
+			const cell = document.createElement('td');
+			cell.style.border = '3px dashed rgb(255, 0, 0)';
+			mainState.selectedCells = [cell];
+			const { env } = require('../../../../../../src/helper');
+			env._w.getComputedStyle.mockReturnValue(computed('3px dashed rgb(255, 0, 0)'));
+
+			styleService.openCellProps(document.createElement('button'));
+
+			expect(styleService.propTargets.border_width.value).toBe('3px');
+			expect(styleService.propTargets.border_color.value).toBe('rgb(255, 0, 0)');
+		});
+
+		it('should fall back to the defaults when the inputs are cleared on submit', () => {
+			const cell = document.createElement('td');
+			const table = document.createElement('table');
+			table
+				.appendChild(document.createElement('tbody'))
+				.appendChild(document.createElement('tr'))
+				.appendChild(cell);
+			mainState.selectedCells = [cell];
+			styleService.controller_props.currentTarget = document.createElement('button');
+			const { env } = require('../../../../../../src/helper');
+			env._w.getComputedStyle.mockReturnValue(computed('1px solid rgb(225, 225, 225)'));
+
+			styleService.propTargets.border_style.textContent = 'solid';
+			styleService.propTargets.border_width.value = '';
+			styleService.propTargets.border_color.value = '';
+			styleService.submitProps(document.createElement('button'));
+
+			expect(cell.style.border).toBe('2px solid rgb(17, 17, 17)');
 		});
 	});
 

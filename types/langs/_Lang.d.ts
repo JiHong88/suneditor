@@ -36,6 +36,7 @@ export type _Lang = {
 	bulletedList: string;
 	cancel: string;
 	caption: string;
+	cellMenu: string;
 	cellProperties: string;
 	center: string;
 	close: string;
@@ -51,7 +52,13 @@ export type _Lang = {
 	cut: string;
 	default: string;
 	deleteColumn: string;
+	moveColumn: string;
+	moveColumnLeft: string;
+	moveColumnRight: string;
 	deleteRow: string;
+	moveRow: string;
+	moveRowUp: string;
+	moveRowDown: string;
 	dir_ltr: string;
 	dir_rtl: string;
 	download: string;
@@ -168,6 +175,7 @@ export type _Lang = {
 	superscript: string;
 	table: string;
 	tableHeader: string;
+	tableMenu: string;
 	tableProperties: string;
 	tags: string;
 	tag_blockquote: string;

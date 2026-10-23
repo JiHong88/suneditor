@@ -11,7 +11,8 @@ jest.mock('../../../../../../src/helper', () => ({
         },
         utils: {
             removeClass: jest.fn(),
-            hasClass: jest.fn()
+            hasClass: jest.fn(),
+            createElement: jest.fn((tag) => globalThis.document.createElement(tag || 'div'))
         }
     },
     numbers: {
@@ -44,6 +45,7 @@ jest.mock('../../../../../../src/plugins/dropdown/table/shared/table.utils', () 
 describe('TableResizeService', () => {
     let resizeService;
     let main;
+    let mockWrapper;
     let mainState;
     let mockTable;
 
@@ -60,15 +62,15 @@ describe('TableResizeService', () => {
             logical_cellCnt: 2
         };
 
+        mockWrapper = document.createElement('div');
+
         main = {
             state: mainState,
             selectionService: {
                 deleteStyleSelectedCells: jest.fn()
             },
             frameContext: {
-                get: jest.fn().mockReturnValue({
-                    querySelector: jest.fn().mockReturnValue(document.createElement('div'))
-                })
+                get: jest.fn(() => mockWrapper)
             },
             uiManager: {
                 enableBackWrapper: jest.fn(),
@@ -94,6 +96,8 @@ describe('TableResizeService', () => {
             _editorEnable: jest.fn(),
             controller_table: { hide: jest.fn() },
             controller_cell: { hide: jest.fn() },
+            dotService: { hide: jest.fn(), reposition: jest.fn() },
+            contextProvider: { applyToRoots: jest.fn((cb) => cb({ get: () => mockWrapper })) },
             history: { push: jest.fn() },
             component: {
                 hoverSelect: jest.fn(),
@@ -133,6 +137,14 @@ describe('TableResizeService', () => {
              resizeService.onResizeGuide({}, document.createElement('tr'));
 
              expect(dom.query.getParentElement).toHaveBeenCalled();
+        });
+
+        it('should not throw when the current root has no resize line', () => {
+            const { CheckCellEdge } = require('../../../../../../src/plugins/dropdown/table/shared/table.utils');
+            CheckCellEdge.mockReturnValue({ is: true, isLeft: false });
+            main.frameContext.get.mockReturnValue(null);
+
+            expect(() => resizeService.onResizeGuide({}, document.createElement('td'))).not.toThrow();
         });
     });
 
@@ -520,13 +532,6 @@ describe('TableResizeService', () => {
     describe('onResizeGuide edge cases', () => {
         it('should hide existing resize line before showing new one', () => {
             const { CheckCellEdge } = require('../../../../../../src/plugins/dropdown/table/shared/table.utils');
-
-            const mockResizeLine = document.createElement('div');
-            mockResizeLine.style.display = 'block';
-
-            main.frameContext.get.mockReturnValue({
-                querySelector: jest.fn().mockReturnValue(mockResizeLine)
-            });
 
             CheckCellEdge.mockReturnValue({ is: true, isLeft: false });
 

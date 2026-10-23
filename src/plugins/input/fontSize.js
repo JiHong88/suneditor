@@ -216,7 +216,8 @@ class FontSize extends PluginInput {
 	 * @type {SunEditor.Hook.Event.Active}
 	 */
 	active(element, target) {
-		if (!dom.utils.hasClass(target, '__se__font_size')) return false;
+		// The size label may be a sibling of the target (e.g. `disableInput` replaces the button)
+		if (!target.parentElement?.querySelector('.__se__font_size')) return false;
 
 		let fontSize = '';
 		if (!element) {

@@ -430,6 +430,14 @@ class BlockHandle {
 			return;
 		}
 
+		if (
+			dom.utils.hasClass(block.element, 'se-input-component') &&
+			dom.utils.hasClass(block.element, 'se-component-selected')
+		) {
+			this.#scheduleHide();
+			return;
+		}
+
 		// Same block and handle already visible — skip
 		if (block.element === this.#currentBlock && this.#handle.style.display === 'flex') return;
 

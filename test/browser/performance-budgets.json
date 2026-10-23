@@ -1,0 +1,9 @@
+{
+	"version": 1,
+	"paragraphCounts": [50, 2000],
+	"samples": 20,
+	"operationsPerSample": 50,
+	"selection": { "maxActiveCallsPerOperation": 2, "maxRectReadsPerOperation": 0 },
+	"offset": { "maxRectReadsPerOperation": { "div": 1, "iframe": 2 } },
+	"maxLargeDocumentCountGrowth": 1
+}

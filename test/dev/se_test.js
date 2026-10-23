@@ -776,6 +776,9 @@ const options1 = {
 	toolbar_sticky: 0,
 	lineAttrReset: 'id',
 	wordCounter: true,
+	toolbar: {
+		mode: 'bottom',
+	},
 	wordCounter_label: 'Words :',
 	charCounter: true,
 	charCounter_label: 'Characters :',
@@ -1097,7 +1100,8 @@ const options1 = {
 	},
 	table: {
 		scrollType: 'x',
-		// cellControllerPosition: 'cell',
+		cellControllerPosition: 'dot',
+		tableControllerPosition: 'dot',
 	},
 	fontColor: {
 		// disableHEXInput: true,
@@ -1113,9 +1117,9 @@ const options1 = {
 	},
 	fontSize: {
 		// showIncDecControls: true
-		// disableInput: true,
+		disableInput: true,
 		// sizeUnit: 'text',
-		// showDefaultSizeLabel:true
+		showDefaultSizeLabel:true
 	},
 
 	autocomplete: {
@@ -1651,7 +1655,7 @@ const options1 = {
 	toolbar_sticky: { top: 50, position: 'fixed' },
 	iframe_attributes: { frameborder: '1' },
 	lineBreakClearStyle: true,
-	mode: 'classic',
+	mode: 'classic:bottom',
 	// textDirection: 'rtl',
 	// iframe: true,
 	height: '500px',
@@ -2187,7 +2191,10 @@ const options1 = {
 		pre: '// code', // tag override wins over @brLine
 		h1: 'Heading 1',
 	},
-	height: '300px',
+	height: '500px',
+	// textDirection: 'rtl',
+	// iframe: true,
+	// height: '300px',
 	// textDirection: 'rtl',
 	// value: `<a href="https://example.com"><img alt="Logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==" /></a>`,
 };
@@ -2651,7 +2658,7 @@ const options_test = {
 	},
 	image: {
 		multiple: true,
-		
+
 		width: '100%',
 		height: 'auto',
 		sizeOnlyPercentage: false,

@@ -1,0 +1,37 @@
+name: Feature request
+description: Suggest an improvement or a new capability
+labels: ['feature']
+body:
+    - type: markdown
+      attributes:
+          value: |
+              Open-ended ideas can start in [Discussions → Ideas](https://github.com/JiHong88/SunEditor/discussions/categories/ideas).
+              Many features can be built as a [plugin](https://suneditor.com/plugin-guide) — mention it if you have tried.
+    - type: textarea
+      id: problem
+      attributes:
+          label: Problem
+          description: What are you trying to do, and what gets in the way?
+          placeholder: I'm always frustrated when ...
+      validations:
+          required: true
+    - type: textarea
+      id: solution
+      attributes:
+          label: Proposed solution
+          description: What should happen? Include an API sketch (option, method, plugin) if you have one.
+      validations:
+          required: true
+    - type: textarea
+      id: alternatives
+      attributes:
+          label: Alternatives considered
+          description: Workarounds, custom plugins, or how other editors handle it.
+    - type: dropdown
+      id: contribute
+      attributes:
+          label: Would you like to contribute this?
+          options:
+              - 'No'
+              - Yes, with guidance
+              - Yes, I can open a PR

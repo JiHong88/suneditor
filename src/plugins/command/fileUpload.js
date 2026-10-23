@@ -130,7 +130,7 @@ class FileUpload extends PluginCommand {
 				this,
 				this.$,
 				controllerEl,
-				{ position: 'bottom', disabled: true },
+				{ position: 'bottom', disabled: true, selection: true },
 				FileUpload.key,
 			);
 			this.editInput = controllerEl.querySelector('input');
@@ -204,6 +204,7 @@ class FileUpload extends PluginCommand {
 				nonBorder: true,
 				figureTarget: true,
 				infoOnly: false,
+				nonDragHandle: false,
 			});
 		} else {
 			asBtn.innerHTML = this.$.icons.expansion + dom.utils.createTooltipInner(this.$.lang.asBlock);
@@ -389,8 +390,11 @@ class FileUpload extends PluginCommand {
 				'data-se-non-focus': 'true',
 				'data-se-non-link': 'true',
 			},
-			name,
+			null,
 		);
+
+		// `name` comes from the server response or a browser item — set as text, never as HTML
+		a.textContent = name;
 
 		this.fileManager.setFileData(a, file);
 

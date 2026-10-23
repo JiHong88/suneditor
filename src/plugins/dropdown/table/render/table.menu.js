@@ -1,6 +1,28 @@
 import { dom } from '../../../../helper';
 import { _DragHandle } from '../../../../modules/ui';
-import { BORDER_LIST, BORDER_FORMATS } from '../shared/table.constants';
+import { BORDER_LIST, BORDER_FORMATS, CELL_CONTEXT_KEYS } from '../shared/table.constants';
+
+/**
+ * @description Creates the cell-context menu rows (shown only when opened from a move handle).
+ * @param {Object} lang - Language object.
+ * @param {Object} icons - Icons object.
+ * @returns {string} HTML string
+ */
+function CreateCellContextHTML(lang, icons) {
+	return /*html*/ `
+		<div title="${lang.cellProperties}" aria-label="${lang.cellProperties}">
+			<span class="se-list-icon">${icons.cell_properties}</span><span class="se-txt">${lang.cellProperties}</span>
+		</div>
+		<div title="${lang.mergeCells}" aria-label="${lang.mergeCells}">
+			<span class="se-list-icon">${icons.merge_cell}</span><span class="se-txt">${lang.mergeCells}</span>
+		</div>
+		<div title="${lang.verticalSplit}" aria-label="${lang.verticalSplit}">
+			<span class="se-list-icon">${icons.split_cell}</span><span class="se-txt">${lang.verticalSplit}</span>
+		</div>
+		<div title="${lang.horizontalSplit}" aria-label="${lang.horizontalSplit}">
+			<span class="se-list-icon">${icons.split_cell}</span><span class="se-txt">${lang.horizontalSplit}</span>
+		</div>`;
+}
 
 /**
  * @description Creates the split menu items.
@@ -27,50 +49,86 @@ export function CreateSplitMenu(lang) {
  * @description Creates the column menu items.
  * @param {Object} lang - Language object.
  * @param {Object} icons - Icons object.
+ * @param {boolean} [withCellContext] - Include the cell-context items (handle menu only).
  * @returns {{items: string[], menus: NodeListOf<Element>}}
  */
-export function CreateColumnMenu(lang, icons) {
+export function CreateColumnMenu(lang, icons, withCellContext) {
 	const menus = dom.utils.createElement(
 		'DIV',
 		null,
-		/*html*/ `
+		(withCellContext ? CreateCellContextHTML(lang, icons) : '') +
+			/*html*/ `
 		<div title="${lang.insertColumnBefore}" aria-label="${lang.insertColumnBefore}">
 			<span class="se-list-icon">${icons.insert_column_left}</span><span class="se-txt">${lang.insertColumnBefore}</span>
 		</div>
 		<div title="${lang.insertColumnAfter}" aria-label="${lang.insertColumnAfter}">
 			<span class="se-list-icon">${icons.insert_column_right}</span><span class="se-txt">${lang.insertColumnAfter}</span>
 		</div>
+		<div title="${lang.moveColumnLeft}" aria-label="${lang.moveColumnLeft}">
+			<span class="se-list-icon">${icons.menu_arrow_left}</span><span class="se-txt">${lang.moveColumnLeft}</span>
+		</div>
+		<div title="${lang.moveColumnRight}" aria-label="${lang.moveColumnRight}">
+			<span class="se-list-icon">${icons.menu_arrow_right}</span><span class="se-txt">${lang.moveColumnRight}</span>
+		</div>
 		<div title="${lang.deleteColumn}" aria-label="${lang.deleteColumn}">
 			<span class="se-list-icon">${icons.delete_column}</span><span class="se-txt">${lang.deleteColumn}</span>
 		</div>`,
 	);
 
-	return { items: ['insert-left', 'insert-right', 'delete'], menus: menus.querySelectorAll('div') };
+	return {
+		items: [
+			...(withCellContext ? CELL_CONTEXT_KEYS : []),
+			'insert-left',
+			'insert-right',
+			'move-left',
+			'move-right',
+			'delete',
+		],
+		menus: menus.querySelectorAll('div'),
+	};
 }
 
 /**
  * @description Creates the row menu items.
  * @param {Object} lang - Language object.
  * @param {Object} icons - Icons object.
+ * @param {boolean} [withCellContext] - Include the cell-context items (handle menu only).
  * @returns {{items: string[], menus: NodeListOf<Element>}}
  */
-export function CreateRowMenu(lang, icons) {
+export function CreateRowMenu(lang, icons, withCellContext) {
 	const menus = dom.utils.createElement(
 		'DIV',
 		null,
-		/*html*/ `
+		(withCellContext ? CreateCellContextHTML(lang, icons) : '') +
+			/*html*/ `
 		<div title="${lang.insertRowAbove}" aria-label="${lang.insertRowAbove}">
 			<span class="se-list-icon">${icons.insert_row_above}</span><span class="se-txt">${lang.insertRowAbove}</span>
 		</div>
 		<div title="${lang.insertRowBelow}" aria-label="${lang.insertRowBelow}">
 			<span class="se-list-icon">${icons.insert_row_below}</span><span class="se-txt">${lang.insertRowBelow}</span>
 		</div>
+		<div title="${lang.moveRowUp}" aria-label="${lang.moveRowUp}">
+			<span class="se-list-icon">${icons.menu_arrow_up}</span><span class="se-txt">${lang.moveRowUp}</span>
+		</div>
+		<div title="${lang.moveRowDown}" aria-label="${lang.moveRowDown}">
+			<span class="se-list-icon">${icons.menu_arrow_down}</span><span class="se-txt">${lang.moveRowDown}</span>
+		</div>
 		<div title="${lang.deleteRow}" aria-label="${lang.deleteRow}">
 			<span class="se-list-icon">${icons.delete_row}</span><span class="se-txt">${lang.deleteRow}</span>
 		</div>`,
 	);
 
-	return { items: ['insert-above', 'insert-below', 'delete'], menus: menus.querySelectorAll('div') };
+	return {
+		items: [
+			...(withCellContext ? CELL_CONTEXT_KEYS : []),
+			'insert-above',
+			'insert-below',
+			'move-up',
+			'move-down',
+			'delete',
+		],
+		menus: menus.querySelectorAll('div'),
+	};
 }
 
 /**

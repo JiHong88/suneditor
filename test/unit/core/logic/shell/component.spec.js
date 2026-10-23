@@ -338,6 +338,7 @@ describe('Component', () => {
 
 			expect(mockEditor.store.set).toHaveBeenCalledWith('_preventBlur', false);
 		});
+
 	});
 
 	describe('insert method', () => {
@@ -397,6 +398,47 @@ describe('Component', () => {
 		});
 	});
 
+	describe('deferred selection lifecycle', () => {
+		let target;
+		let info;
+
+		beforeEach(() => {
+			jest.useFakeTimers();
+			const { _DragHandle } = require('../../../../../src/modules/ui');
+			_DragHandle.get.mockReturnValue(null);
+			const line = document.createElement('p');
+			line.innerHTML = 'before<span class="se-component se-inline-component">item</span>';
+			target = line.lastChild;
+			info = { target, container: target, pluginName: 'test', isFile: false };
+			jest.spyOn(component, 'get').mockReturnValue(info);
+			mockEditor.$.plugins.test = { componentSelect: () => true };
+			mockEditor.store.set('hasFocus', true);
+		});
+
+		afterEach(() => {
+			component._destroy();
+			jest.clearAllTimers();
+			jest.useRealTimers();
+			jest.restoreAllMocks();
+		});
+
+		it.each(['__deselect', '_destroy'])('cancels pending listener setup on %s', (method) => {
+			component.select(target, 'test', { isInput: true });
+			component[method]();
+			jest.runAllTimers();
+			expect(mockEditor.$.eventManager.addGlobalEvent).not.toHaveBeenCalled();
+			expect(target.classList.contains('se-component-selected')).toBe(false);
+		});
+
+		it('keeps only one pending listener setup across repeated selections', () => {
+			for (let i = 0; i < 20; i++) component.select(target, 'test', { isInput: true });
+			jest.runAllTimers();
+			expect(mockEditor.$.eventManager.addGlobalEvent).toHaveBeenCalledTimes(4);
+			expect(target.classList.contains('se-component-selected')).toBe(true);
+		});
+
+	});
+
 	describe('_destroy method', () => {
 		it('is defined and accessible', () => {
 			expect(typeof component._destroy).toBe('function');
@@ -417,6 +459,25 @@ describe('Component', () => {
 
 		it('should not throw when called without active events', () => {
 			expect(() => component.__removeGlobalEvent()).not.toThrow();
+		});
+	});
+
+	describe('isHoverSelected', () => {
+		const { _DragHandle } = require('../../../../../src/modules/ui');
+
+		it('is false without a selection', () => {
+			component.isSelected = false;
+			_DragHandle.get.mockReturnValue(undefined);
+			expect(component.isHoverSelected).toBe(false);
+		});
+
+		it('is true for a hover selection, false for a real (clicked) one', () => {
+			component.isSelected = true;
+			_DragHandle.get.mockReturnValue(undefined);
+			expect(component.isHoverSelected).toBe(true);
+			_DragHandle.get.mockReturnValue(false);
+			expect(component.isHoverSelected).toBe(false);
+			component.isSelected = false;
 		});
 	});
 

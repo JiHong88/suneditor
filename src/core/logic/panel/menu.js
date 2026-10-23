@@ -143,13 +143,13 @@ class Menu {
 		const menu = (this.currentDropdown = this.targetMap[dropdownName]);
 		this.currentDropdownActiveButton = btnEl;
 
+		this.#context.get('menuTray').showPopover?.();
 		if (isMobile) {
 			this.#deferMenuShow(btnEl, menu);
 		} else {
 			this.#setMenuPosition(btnEl, menu);
 		}
 
-		this.#context.get('menuTray').showPopover?.();
 		this.#bindClose_dropdown_mouse = this.#eventManager.addGlobalEvent(
 			'mousedown',
 			this.#globalEventHandler.mousedown,
@@ -268,13 +268,13 @@ class Menu {
 			this.currentContainerActiveButton.getAttribute('data-command'));
 		this.currentContainer = this.targetMap[containerName];
 
+		this.#context.get('menuTray').showPopover?.();
 		if (isMobile) {
 			this.#deferMenuShow(button, this.currentContainer);
 		} else {
 			this.#setMenuPosition(button, this.currentContainer);
 		}
 
-		this.#context.get('menuTray').showPopover?.();
 		this.#bindClose_cons_mouse = this.#eventManager.addGlobalEvent(
 			'mousedown',
 			this.#globalEventHandler.containerDown,
