@@ -266,6 +266,62 @@ describe('HTML Security - XSS Prevention', () => {
 		});
 	});
 
+	describe('Namespaced tag sanitization (GHSA-6rf4-v2fh-m6p4)', () => {
+		const NS_PAYLOADS = [
+			['advisory PoC: nested iframe', '<a:b src="/x"><iframe src=javascript:alert(1)></iframe></a:b>'],
+			['advisory PoC: onclick', '<p><a:b src="/x" onclick="document.body.style.background=\'red\'">click</a:b></p>'],
+			['advisory PoC: onmouseover', '<p><a:b src="/x" onmouseover="alert(1)">hover</a:b></p>'],
+			['digit in prefix', '<a1:b src="/x" onclick="alert(1)">x</a1:b>'],
+			['digit in local name', '<p><a:b1 src="/x" onclick="alert(1)">x</a:b1></p>'],
+			['upper case', '<P><A:B ONCLICK="alert(1)">x</A:B></P>'],
+			['word namespace', '<p><o:p onclick="alert(1)">x</o:p></p>'],
+		];
+
+		it.each(NS_PAYLOADS)('clean() drops the namespaced element and its handlers (%s)', (_name, payload) => {
+			const cleaned = editor.$.html.clean(payload);
+			expect(cleaned).not.toMatch(/\son[a-z]+\s*=/i);
+			expect(cleaned).not.toMatch(/javascript\s*:/i);
+			expect(cleaned).not.toMatch(/<[a-z0-9]+:[a-z0-9]+/i);
+		});
+
+		it.each(NS_PAYLOADS)('set()/get() keeps no handlers (%s)', (_name, payload) => {
+			editor.$.html.set(payload);
+			const content = editor.$.html.get();
+			expect(content).not.toMatch(/\son[a-z]+\s*=/i);
+			expect(content).not.toMatch(/javascript\s*:/i);
+		});
+
+		describe('with strictMode.tagFilter disabled (attrFilter still on)', () => {
+			let relaxedEditor;
+
+			beforeAll(async () => {
+				relaxedEditor = createTestEditor({
+					buttonList: [['bold', 'italic']],
+					defaultLine: 'p',
+					strictMode: { tagFilter: false },
+				});
+				await waitForEditorReady(relaxedEditor);
+			});
+
+			afterAll(() => {
+				destroyTestEditor(relaxedEditor);
+			});
+
+			it.each(NS_PAYLOADS)('clean() strips event handlers from namespaced tags (%s)', (_name, payload) => {
+				const cleaned = relaxedEditor.$.html.clean(payload);
+				expect(cleaned).not.toMatch(/\son[a-z]+\s*=/i);
+				expect(cleaned).not.toMatch(/javascript\s*:/i);
+			});
+
+			it.each(NS_PAYLOADS)('set()/get() strips event handlers from namespaced tags (%s)', (_name, payload) => {
+				relaxedEditor.$.html.set(payload);
+				const content = relaxedEditor.$.html.get();
+				expect(content).not.toMatch(/\son[a-z]+\s*=/i);
+				expect(content).not.toMatch(/javascript\s*:/i);
+			});
+		});
+	});
+
 	describe('Attribute value encoding (domUtils.getAttributesToString)', () => {
 		it('should encode double quotes in attribute values', () => {
 			const el = document.createElement('div');
