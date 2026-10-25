@@ -241,6 +241,7 @@ class EventManager {
 		}
 
 		this.#globalEvents = null;
+		this.events = {};
 	}
 }
 

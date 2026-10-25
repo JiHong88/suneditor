@@ -21,6 +21,13 @@ declare class Editor {
 	/** @type {SunEditor.Deps} */
 	$: SunEditor.Deps;
 	/**
+	 * @description Event handlers (the `events` option). Assign a handler to add or replace it at runtime.
+	 * @example
+	 * editor.events.onChange = ({ data }) => console.log(data);
+	 * @returns {SunEditor.Event.Handlers}
+	 */
+	get events(): SunEditor.Event.Handlers;
+	/**
 	 * @description Checks if the content of the editor is empty.
 	 * - Display criteria for "placeholder".
 	 * @param {?SunEditor.FrameContext} [fc] Frame context, if not present, currently selected frame context.
@@ -53,6 +60,5 @@ declare class Editor {
 	 * @description Destroy the suneditor
 	 */
 	destroy(): any;
-	events: any;
 	#private;
 }
