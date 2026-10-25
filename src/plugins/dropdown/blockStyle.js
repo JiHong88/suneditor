@@ -140,6 +140,7 @@ class BlockStyle extends PluginDropdown {
  */
 function CreateItems({ lang }, items) {
 	const defaultFormats = ['p', 'blockquote', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+	const stringFormats = [...defaultFormats, 'div', 'pre'];
 	const formatList = !items || items.length === 0 ? defaultFormats : items;
 	const result = [];
 
@@ -147,7 +148,7 @@ function CreateItems({ lang }, items) {
 		format = formatList[i];
 
 		if (typeof format === 'string') {
-			if (!defaultFormats.includes(format)) continue;
+			if (!stringFormats.includes(format)) continue;
 			tagName = format.toLowerCase();
 			command = tagName === 'blockquote' ? 'block' : tagName === 'pre' ? 'br-line' : 'line';
 			h = /^h/.test(tagName) ? tagName.match(/\d+/)[0] : '';

@@ -5,6 +5,8 @@ import CommandMenu from '../../../modules/ui/CommandMenu.js';
 
 const { _w, _d } = env;
 
+const DEFAULT_MENU = ['p', 'heading', 'list', 'blockquote', 'pre'];
+
 /**
  * @description Resolve a CSS length value (`px`, `em`, `rem`, or unitless) to pixels.
  * Falls back to `0` when the value is empty or unparseable.
@@ -93,7 +95,8 @@ class BlockHandle {
 		this.#dragBtn = blockHandleDrag;
 
 		const opts = Array.isArray(blockHandleOptions) ? { menu: blockHandleOptions } : blockHandleOptions || {};
-		this.#menuConfig = opts.menu || null;
+		const menu = opts.menu === undefined ? DEFAULT_MENU : opts.menu;
+		this.#menuConfig = Array.isArray(menu) && menu.length > 0 ? menu : null;
 		this.#menuMaxHeight = typeof opts.maxHeight === 'string' ? opts.maxHeight : '';
 		this.#menuMinWidth = typeof opts.minWidth === 'string' ? opts.minWidth : '200px';
 		this.#onPlusClickHook = typeof opts.onPlusClick === 'function' ? opts.onPlusClick : null;
