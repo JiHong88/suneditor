@@ -29,7 +29,7 @@ export const DEFAULTS = {
 	SCOPE_SELECTION_TAGS: ['td', 'table', 'li', 'ol', 'ul', 'pre', 'figcaption', 'blockquote', 'dl', 'dt', 'dd'],
 
 	ATTRIBUTE_WHITELIST:
-		'contenteditable|target|href|title|download|rel|src|alt|class|type|colspan|rowspan' +
+		'contenteditable|target|href|title|download|rel|src|alt|class|type|colspan|rowspan|start' +
 		'|width|height|controls|autoplay|loop|muted|poster|preload|playsinline|volume|crossorigin|disableRemotePlayback|controlsList' +
 		'|allowfullscreen|sandbox|loading|allow|referrerpolicy|frameborder|scrolling',
 

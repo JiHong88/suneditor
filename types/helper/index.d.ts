@@ -98,6 +98,7 @@ export const dom: {
 		isBreak: typeof import('./dom/domCheck').isBreak;
 		isAnchor: typeof import('./dom/domCheck').isAnchor;
 		isMedia: typeof import('./dom/domCheck').isMedia;
+		hasMediaOrTable: typeof import('./dom/domCheck').hasMediaOrTable;
 		isIFrame: typeof import('./dom/domCheck').isIFrame;
 		isFigure: typeof import('./dom/domCheck').isFigure;
 		isContentLess: typeof import('./dom/domCheck').isContentLess;

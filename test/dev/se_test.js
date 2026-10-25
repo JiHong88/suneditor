@@ -1655,7 +1655,7 @@ const options1 = {
 	toolbar_sticky: { top: 50, position: 'fixed' },
 	iframe_attributes: { frameborder: '1' },
 	lineBreakClearStyle: true,
-	mode: 'classic:bottom',
+	mode: 'classic',
 	// textDirection: 'rtl',
 	// iframe: true,
 	height: '500px',

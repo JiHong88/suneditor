@@ -1,6 +1,9 @@
 import { onlyZeroWidthRegExp } from '../unicode';
 
 const _RE_EXCLUDE_FORMAT = /(\s|^)(katex|MathJax|se-exclude-format)(\s|$)/;
+const _MEDIA_TAGS = ['IMG', 'IFRAME', 'AUDIO', 'VIDEO', 'CANVAS'];
+const _RE_MEDIA = new RegExp(`^(${_MEDIA_TAGS.join('|')})$`, 'i');
+const _MEDIA_OR_TABLE_SELECTOR = [..._MEDIA_TAGS, 'TABLE'].join(', ');
 
 /**
  * @description A method that checks If the text is blank or to see if it contains `ZERO WIDTH SPACE` or empty (`unicode.zeroWidthSpace`)
@@ -152,7 +155,17 @@ export function isAnchor(node) {
  * @returns {node is HTMLImageElement|HTMLIFrameElement|HTMLAudioElement|HTMLVideoElement|HTMLCanvasElement}
  */
 export function isMedia(node) {
-	return /^(IMG|IFRAME|AUDIO|VIDEO|CANVAS)$/i.test(typeof node === 'string' ? node : node?.nodeName);
+	return _RE_MEDIA.test(typeof node === 'string' ? node : node?.nodeName);
+}
+
+/**
+ * @description Check the element contains a media (img, iframe, audio, video, canvas) or table element.
+ * - Such content has no text, but the element is not empty.
+ * @param {Node} node The element to check
+ * @returns {boolean}
+ */
+export function hasMediaOrTable(node) {
+	return !!(/** @type {HTMLElement} */ (node)?.querySelector?.(_MEDIA_OR_TABLE_SELECTOR));
 }
 
 /**
@@ -193,7 +206,7 @@ export function isEmptyLine(node) {
 	if (!node?.parentNode) return true;
 	const el = /** @type {HTMLElement} */ (node);
 	return (
-		!el.querySelector('IMG, IFRAME, AUDIO, VIDEO, CANVAS, TABLE') &&
+		!hasMediaOrTable(el) &&
 		(el.children.length <= 1 || isBreak(el.firstElementChild)) &&
 		isZeroWidth(el.textContent)
 	);
@@ -348,6 +361,7 @@ const check = {
 	isBreak,
 	isAnchor,
 	isMedia,
+	hasMediaOrTable,
 	isIFrame,
 	isFigure,
 	isContentLess,

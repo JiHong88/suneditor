@@ -134,7 +134,7 @@ export function makePorts(inst, { _styleNodes }) {
 		},
 
 		listFormat: {
-			applyNested: (cells, shift) => listFormat.applyNested(cells, shift),
+			applyNested: (cells, nested) => listFormat.applyNested(cells, nested),
 		},
 
 		component: {

@@ -119,7 +119,7 @@ export function makePorts(
 	listFormat: {
 		applyNested: (
 			cells: any,
-			shift: any,
+			nested: any,
 		) => {
 			sc: Node;
 			so: number;

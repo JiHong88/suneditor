@@ -318,6 +318,7 @@ describe('ListFormat & Format Extended Tests', () => {
 
 			// applyNested should return a range and content should be preserved
 			expect(result).toBeDefined();
+			expect(wysiwyg.innerHTML).toBe('<ul><li>Item 1<ul><li>Item 2</li></ul></li><li>Item 3</li></ul>');
 			expect(wysiwyg.textContent).toContain('Item 2');
 			// The list structure should still have all items
 			const allContent = wysiwyg.textContent;
@@ -333,8 +334,7 @@ describe('ListFormat & Format Extended Tests', () => {
 			editor.$.listFormat.applyNested([nestedLi], false);
 
 			// Nested item should be promoted
-			const content = wysiwyg.textContent;
-			expect(content).toContain('Nested');
+			expect(wysiwyg.innerHTML).toBe('<ul><li>Item 1</li><li>Nested</li><li>Item 2</li></ul>');
 		});
 
 		it('should return range info from applyNested', () => {
@@ -355,8 +355,8 @@ describe('ListFormat & Format Extended Tests', () => {
 			const li = wysiwyg.querySelector('li');
 			editor.$.selection.setRange(li.firstChild, 0, li.firstChild, 4);
 
-			// First item with no previous sibling - should return range
-			const result = editor.$.listFormat.applyNested([li], false);
+			// First item with no previous sibling cannot be indented - should return range
+			const result = editor.$.listFormat.applyNested([li], true);
 
 			expect(result).toBeDefined();
 			expect(result).toHaveProperty('sc');
@@ -572,6 +572,21 @@ describe('ListFormat & Format Extended Tests', () => {
 		});
 	});
 
+	describe('format.indent / outdent on list items', () => {
+		it('indent nests the item and outdent moves it back', () => {
+			wysiwyg.innerHTML = '<ul><li>Item 1</li><li>Item 2</li></ul>';
+			const li = wysiwyg.querySelectorAll('li')[1];
+
+			editor.$.selection.setRange(li.firstChild, 0, li.firstChild, 1);
+			editor.$.format.indent();
+			expect(wysiwyg.innerHTML).toBe('<ul><li>Item 1<ul><li>Item 2</li></ul></li></ul>');
+
+			editor.$.selection.setRange(li.firstChild, 0, li.firstChild, 1);
+			editor.$.format.outdent();
+			expect(wysiwyg.innerHTML).toBe('<ul><li>Item 1</li><li>Item 2</li></ul>');
+		});
+	});
+
 	describe('listFormat.applyNested - additional branch coverage', () => {
 		it('should handle outdenting multiple items at once', () => {
 			wysiwyg.innerHTML = '<ul><li>Item 1<ul><li>Sub 1</li><li>Sub 2</li></ul></li></ul>';
@@ -582,8 +597,7 @@ describe('ListFormat & Format Extended Tests', () => {
 				const result = editor.$.listFormat.applyNested(nestedItems, false);
 
 				expect(result).toBeDefined();
-				expect(wysiwyg.textContent).toContain('Sub 1');
-				expect(wysiwyg.textContent).toContain('Sub 2');
+				expect(wysiwyg.innerHTML).toBe('<ul><li>Item 1</li><li>Sub 1</li><li>Sub 2</li></ul>');
 			}
 		});
 
@@ -596,6 +610,7 @@ describe('ListFormat & Format Extended Tests', () => {
 			const result = editor.$.listFormat.applyNested(null, true);
 
 			expect(result).toBeDefined();
+			expect(wysiwyg.innerHTML).toBe('<ul><li>Item 1<ul><li>Item 2</li></ul></li></ul>');
 		});
 	});
 

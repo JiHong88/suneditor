@@ -22,7 +22,7 @@ const FONT_VALUES_MAP = {
 function NodeToJson(node) {
 	// text
 	if (node.nodeType === 3) {
-		const text = node.nodeValue.trim();
+		const text = node.nodeValue;
 		if (text) return { type: 'text', content: text };
 		return null;
 	}

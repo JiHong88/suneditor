@@ -669,7 +669,7 @@ describe('keydown.registry effects', () => {
 
 			effects['tab.format.indent']({ ports: mockPorts, ctx: mockCtx }, { range, formatEl: li1, shift: false });
 
-			expect(mockPorts.listFormat.applyNested).toHaveBeenCalledWith([li2], false);
+			expect(mockPorts.listFormat.applyNested).toHaveBeenCalledWith([li2], true);
 		});
 
 		it('should handle shift+tab on single line (outdent removes leading spaces)', () => {

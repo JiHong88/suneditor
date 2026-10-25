@@ -407,6 +407,24 @@ describe('dom.check helper', () => {
 		});
 	});
 
+	describe('hasMediaOrTable', () => {
+		it('should detect nested media or table elements', () => {
+			['img', 'iframe', 'audio', 'video', 'canvas', 'table'].forEach(tag => {
+				const li = document.createElement('li');
+				li.appendChild(document.createElement('span')).appendChild(document.createElement(tag));
+				expect(dom.check.hasMediaOrTable(li)).toBe(true);
+			});
+		});
+
+		it('should return false without media, or for a non-element', () => {
+			const li = document.createElement('li');
+			li.innerHTML = 'text<br><strong>b</strong>';
+			expect(dom.check.hasMediaOrTable(li)).toBe(false);
+			expect(dom.check.hasMediaOrTable(document.createTextNode('a'))).toBe(false);
+			expect(dom.check.hasMediaOrTable(null)).toBe(false);
+		});
+	});
+
 	describe('isIFrame', () => {
 		it('should detect iframe elements', () => {
 			expect(dom.check.isIFrame(document.createElement('iframe'))).toBe(true);

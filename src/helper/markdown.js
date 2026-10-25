@@ -19,7 +19,21 @@
  */
 
 const VOID_ELEMENTS = /^(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)$/i;
+const BLOCK_ELEMENTS =
+	/^(address|article|aside|blockquote|div|dl|fieldset|figure|footer|form|h[1-6]|header|hr|main|nav|ol|p|pre|section|table|ul)$/i;
+// A line starting with one of these tags is an HTML block; other tags are inline HTML in a paragraph.
+const HTML_BLOCK_RE =
+	/^\s*<\/?(address|article|aside|audio|blockquote|canvas|details|dialog|div|dl|fieldset|figcaption|figure|footer|form|h[1-6]|header|hr|iframe|main|nav|ol|p|pre|script|section|style|summary|table|textarea|ul|video)(?=[\s/>]|$)/i;
 const ZERO_WIDTH_RE = /^[\u200B\uFEFF]+$/;
+// Same word characters the parser checks around '_' emphasis.
+const WORD_CHAR_RE = /[a-zA-Z0-9]/;
+// A line matching this ends a paragraph and starts a block (heading, fence, quote, table, list, hr).
+const PARAGRAPH_BREAK_RE = /^(#{1,6}\s|`{3,}|~{3,}|>|\||(\s*)([-*+]|\d+\.)\s|(\*{3,}|-{3,}|_{3,})\s*$)/;
+// An empty list item ('-', '1.') starts a list, but cannot interrupt a paragraph.
+const EMPTY_LIST_ITEM_RE = /^\s*([-*+]|\d+\.)\s*$/;
+// Placeholder for an inline <br>; the block that holds it decides how to write it.
+const BR_MARK = '\uE000';
+const BR_MARK_RE = /\uE000/g;
 
 /**
  * @description Check if a string is empty or contains only zero-width characters
@@ -45,35 +59,155 @@ const INLINE_WRAP_MAP = {
 };
 
 /**
+ * @description Escape the Markdown syntax in a text, only where it could be parsed as syntax.
+ * - `*`, `` ` ``, `]`: always (`]` also blocks links, images and task boxes).
+ * - `\`: before punctuation, a line break or at the end (next to other syntax).
+ * - `_`: unless inside a word (`file_name`).
+ * - `~`, `^`: when the text has a pair.
+ * - `=`: before another `=`.
+ * - `~`, `=`: also at the edges, where they touch the `~~` / `==` of a sibling.
+ * - `<`, `&`: before a tag or an entity.
+ * @param {string} str
+ * @param {boolean} [isHtml=true] `false` when the result is HTML-escaped afterwards (`<`, `&` are then safe).
+ * @returns {string}
+ */
+function escapeText(str, isHtml = true) {
+	const hasTildePair = str.indexOf('~') !== str.lastIndexOf('~');
+	const hasCaretPair = str.indexOf('^') !== str.lastIndexOf('^');
+	const last = str.length - 1;
+	let result = '';
+
+	for (let i = 0; i <= last; i++) {
+		const ch = str[i];
+		const prev = str[i - 1] || '';
+		const next = str[i + 1] || '';
+		let escape = false;
+
+		switch (ch) {
+			case '\\':
+				escape = !next || /[!-/:-@[-`{-~\r\n]/.test(next);
+				break;
+			case '*':
+			case '`':
+			case ']':
+				escape = true;
+				break;
+			case '_':
+				escape = !(WORD_CHAR_RE.test(prev) && WORD_CHAR_RE.test(next));
+				break;
+			case '~':
+				escape = hasTildePair || i === 0 || i === last;
+				break;
+			case '^':
+				escape = hasCaretPair;
+				break;
+			case '=':
+				escape = next === '=' || i === 0 || i === last;
+				break;
+			case '<':
+				escape = isHtml && /[a-zA-Z/!?]/.test(next);
+				break;
+			case '&':
+				escape = isHtml && /^&(#\d+|#x[\da-f]+|\w+);/i.test(str.slice(i));
+				break;
+		}
+
+		result += escape ? '\\' + ch : ch;
+	}
+
+	return result;
+}
+
+/**
  * @description Process children of a JSON node into inline markdown
+ * @param {Array<Object>} children
+ * @param {boolean} [isBlock=false]
+ * @param {string} [indent='']
+ * @returns {string}
+ */
+function childrenToInline(children, isBlock = false, indent = '') {
+	if (!children || children.length === 0) return '';
+
+	const parts = children.map((child, index) => {
+		// HTML indentation next to blocks is not an inline word separator.
+		if (
+			child.type === 'text' &&
+			/^[\t\n\r ]*$/.test(child.content) &&
+			(BLOCK_ELEMENTS.test(children[index - 1]?.tag) || BLOCK_ELEMENTS.test(children[index + 1]?.tag))
+		) {
+			return '';
+		}
+		return nodeToMarkdown(child, indent, isBlock);
+	});
+
+	// Touching '*' markers are ambiguous (e.g. '*A***B**'), so keep the right one as HTML.
+	for (let i = 1; i < parts.length; i++) {
+		if (INLINE_WRAP_MAP[children[i].tag] && parts[i - 1].endsWith('*') && parts[i].startsWith('*')) {
+			parts[i] = escapeLineBreaks(nodeToHtmlFallback(children[i], true));
+		}
+	}
+
+	return parts.join('');
+}
+
+/**
+ * @description Encode line breaks so inline content is not split into Markdown blocks.
+ * @param {string} str
+ * @returns {string}
+ */
+function escapeLineBreaks(str) {
+	return str.replace(/\r/g, '&#13;').replace(/\n/g, '&#10;').replace(BR_MARK_RE, '<br>');
+}
+
+/**
+ * @description Remove whitespace and `<br>` (empty line placeholder) from both ends of inline content.
+ * @param {string} str
+ * @returns {string}
+ */
+function trimLine(str) {
+	return str.replace(/^[\s\uE000]+|[\s\uE000]+$/g, '');
+}
+
+/**
+ * @description Escape a line that would start a Markdown block (list, heading, quote...).
+ * @param {string} line
+ * @returns {string}
+ */
+function escapeLineStart(line) {
+	if (!PARAGRAPH_BREAK_RE.test(line) && !EMPTY_LIST_ITEM_RE.test(line)) return line;
+	// '1.' -> '1\.' ('\1' is not an escape)
+	if (/^\s*\d/.test(line)) return line.replace('.', '\\.');
+	return line.replace(/\S/, '\\$&');
+}
+
+/**
+ * @description Write inline content as the lines of a Markdown paragraph.
+ * - `<br>` becomes a hard line break (`\` + newline); other line breaks stay as soft breaks.
+ * - A line that would start a Markdown block stays in the paragraph.
+ * @param {string} str
+ * @returns {string}
+ */
+function toParagraph(str) {
+	return (
+		trimLine(str)
+			// Whitespace around a line break is not rendered, and a blank line would end the paragraph.
+			.replace(/[ \t\r]*\n(?:[ \t\r]*\n)*/g, '\n')
+			.replace(/\n?\uE000\n?/g, BR_MARK)
+			.replace(BR_MARK_RE, '\\\n')
+			.split('\n')
+			.map(escapeLineStart)
+			.join('\n')
+	);
+}
+
+/**
+ * @description Process inline children into a single Markdown line (heading, list item, table cell).
+ * - `<br>` between contents is kept as HTML; edge `<br>` (empty line placeholder) is dropped.
  * @param {Array<Object>} children
  * @returns {string}
  */
-function childrenToInline(children) {
-	if (!children || children.length === 0) return '';
-
-	const parts = [];
-	for (let i = 0; i < children.length; i++) {
-		const part = nodeToMarkdown(children[i], '', false);
-		if (part) {
-			// Add space between adjacent parts when both are non-empty and
-			// the previous part doesn't end with space and current doesn't start with space
-			if (parts.length > 0) {
-				const prev = parts[parts.length - 1];
-				if (
-					prev &&
-					!prev.endsWith(' ') &&
-					!prev.endsWith('\n') &&
-					!part.startsWith(' ') &&
-					!part.startsWith('\n')
-				) {
-					parts.push(' ');
-				}
-			}
-			parts.push(part);
-		}
-	}
-	return parts.join('');
+function childrenToLine(children) {
+	return escapeLineBreaks(trimLine(childrenToInline(children)));
 }
 
 /**
@@ -91,22 +225,38 @@ function getTextContent(node) {
 /**
  * @description Convert a JSON element node to its HTML string (for fallback)
  * @param {Object} node
+ * @param {boolean} [isInline=false] Inline HTML is parsed with its line, so its text is Markdown-escaped too.
  * @returns {string}
  */
-function nodeToHtmlFallback(node) {
+function nodeToHtmlFallback(node, isInline = false) {
 	if (!node) return '';
-	if (node.type === 'text') return node.content || '';
+	if (node.type === 'text') {
+		const text = node.content || '';
+		return escapeHtml(isInline ? escapeText(text, false) : text);
+	}
 
 	const { tag, attributes = {}, children = [] } = node;
 	const attrStr = Object.entries(attributes)
-		.map(([k, v]) => `${k}="${v}"`)
+		.map(([k, v]) => `${k}="${escapeHtml(String(v))}"`)
 		.join(' ');
 	const openTag = attrStr ? `<${tag} ${attrStr}>` : `<${tag}>`;
 
 	if (VOID_ELEMENTS.test(tag)) return openTag;
 
-	const inner = children.map(nodeToHtmlFallback).join('');
+	const inner = children.map((child) => nodeToHtmlFallback(child, isInline)).join('');
 	return `${openTag}${inner}</${tag}>`;
+}
+
+/**
+ * @description Whether a list subtree needs HTML to preserve a negative start number.
+ * @param {Object} node
+ * @returns {boolean}
+ */
+function hasNegativeListStart(node) {
+	return (
+		(node.tag === 'ol' && parseInt(node.attributes?.start, 10) < 0) ||
+		(node.children || []).some(hasNegativeListStart)
+	);
 }
 
 /**
@@ -135,14 +285,15 @@ function indentBlock(str, indent) {
 function listToMarkdown(node, indent, isOrdered) {
 	const children = node.children || [];
 	let result = '';
-	let index = 1;
+	const start = parseInt(node.attributes?.start, 10);
+	let index = isOrdered && !Number.isNaN(start) ? start : 1;
 
 	for (const child of children) {
 		if (child.type !== 'element' || child.tag !== 'li') continue;
 
 		const prefix = isOrdered ? `${index}. ` : '- ';
 		const liChildren = child.children || [];
-		let inlineContent = '';
+		const inlineChildren = [];
 		let subBlocks = '';
 		const blockIndent = indent + ' '.repeat(prefix.length);
 
@@ -164,7 +315,7 @@ function listToMarkdown(node, indent, isOrdered) {
 			if (ci === 0 && taskPrefix) continue;
 
 			if (liChild.type !== 'element') {
-				inlineContent += nodeToMarkdown(liChild, '', false);
+				inlineChildren.push(liChild);
 				continue;
 			}
 
@@ -184,11 +335,12 @@ function listToMarkdown(node, indent, isOrdered) {
 			} else if (tag === 'blockquote' || tag === 'pre') {
 				subBlocks += indentBlock(nodeToMarkdown(liChild, '', true), blockIndent);
 			} else {
-				inlineContent += nodeToMarkdown(liChild, '', false);
+				inlineChildren.push(liChild);
 			}
 		}
 
-		result += `${indent}${prefix}${taskPrefix}${inlineContent.trim()}\n`;
+		// An empty item is written as a bare marker ('-'), without trailing spaces.
+		result += `${indent}${prefix}${taskPrefix}${childrenToLine(inlineChildren)}`.trimEnd() + '\n';
 		if (subBlocks) result += subBlocks;
 		index++;
 	}
@@ -216,7 +368,8 @@ function tableToMarkdown(node) {
 				const cells = [];
 				for (const cell of child.children || []) {
 					if (cell.tag === 'td' || cell.tag === 'th') {
-						const content = childrenToInline(cell.children).trim();
+						// '|' splits cells even inside code or HTML, so it is always escaped in a cell.
+						const content = childrenToLine(cell.children || []).replace(/\|/g, '\\|');
 						const colspan = parseInt(cell.attributes?.colspan, 10) || 1;
 						const rowspan = parseInt(cell.attributes?.rowspan, 10) || 1;
 						cells.push({ content, colspan, rowspan });
@@ -307,7 +460,7 @@ function nodeToMarkdown(node, indent, isBlock) {
 
 	// Text node - strip zero-width characters (editor artifacts)
 	if (node.type === 'text') {
-		return (node.content || '').replace(/[\u200B\uFEFF]/g, '');
+		return escapeText((node.content || '').replace(/[\u200B\uFEFF]/g, ''));
 	}
 
 	if (node.type !== 'element') return '';
@@ -316,13 +469,13 @@ function nodeToMarkdown(node, indent, isBlock) {
 
 	// Body (root node from htmlToJson)
 	if (tag === 'body') {
-		return children.map((c) => nodeToMarkdown(c, '', true)).join('');
+		return childrenToInline(children, true);
 	}
 
 	// Headings
 	const headingMatch = /^h([1-6])$/.exec(tag);
 	if (headingMatch) {
-		const content = childrenToInline(children).trim();
+		const content = childrenToLine(children);
 		if (!content) return '\n';
 		const level = parseInt(headingMatch[1], 10);
 		const prefix = '#'.repeat(level);
@@ -330,14 +483,14 @@ function nodeToMarkdown(node, indent, isBlock) {
 	}
 
 	if (tag === 'p') {
-		const content = childrenToInline(children);
+		const content = toParagraph(childrenToInline(children));
 		// Empty paragraph
-		if (!content.trim()) return '\n';
-		return `${content.trim()}\n\n`;
+		if (!content) return '\n';
+		return `${content}\n\n`;
 	}
 
 	if (tag === 'br') {
-		return '\n';
+		return isBlock ? '\n' : BR_MARK;
 	}
 
 	if (tag === 'hr') {
@@ -348,12 +501,16 @@ function nodeToMarkdown(node, indent, isBlock) {
 	const wrapSyntax = INLINE_WRAP_MAP[tag];
 	if (wrapSyntax) {
 		const content = childrenToInline(children);
-		return `${wrapSyntax}${content}${wrapSyntax}`;
+		// Spaces next to a marker break emphasis (e.g. '* word*' starts a list item), so keep them outside.
+		const [, lead, body, trail] = /^((?:[^\S\r\n]|\uE000)*)([\s\S]*?)((?:[^\S\r\n]|\uE000)*)$/.exec(content);
+		if (!body) return content;
+		return `${lead}${wrapSyntax}${escapeLineBreaks(body)}${wrapSyntax}${trail}`;
 	}
 
 	// Inline code
 	if (tag === 'code') {
-		const content = getTextContent({ children });
+		// A line break in inline code renders as a space, and must not start a new Markdown line.
+		const content = getTextContent({ children }).replace(/\r?\n|\r/g, ' ');
 		// Use double backticks if content contains backtick
 		if (content.includes('`')) {
 			return '`` ' + content + ' ``';
@@ -392,7 +549,7 @@ function nodeToMarkdown(node, indent, isBlock) {
 	}
 
 	if (tag === 'blockquote') {
-		const inner = children.map((c) => nodeToMarkdown(c, '', true)).join('');
+		const inner = childrenToInline(children, true);
 		// Prefix each line with >
 		const lines = inner.replace(/\n$/, '').split('\n');
 		return lines.map((line) => `> ${line}`).join('\n') + '\n\n';
@@ -427,11 +584,10 @@ function nodeToMarkdown(node, indent, isBlock) {
 	}
 
 	// Lists
-	if (tag === 'ul') {
-		return listToMarkdown(node, indent, false) + '\n';
-	}
-	if (tag === 'ol') {
-		return listToMarkdown(node, indent, true) + '\n';
+	if (tag === 'ul' || tag === 'ol') {
+		// Preserve the entire outer list when a nested list cannot use Markdown markers.
+		if (hasNegativeListStart(node)) return nodeToHtmlFallback(node) + '\n\n';
+		return listToMarkdown(node, indent, tag === 'ol') + '\n';
 	}
 
 	if (tag === 'table') {
@@ -458,24 +614,27 @@ function nodeToMarkdown(node, indent, isBlock) {
 	if (tag === 'div') {
 		// Component containers - process inner content
 		if (attributes.class && /se-component/.test(attributes.class)) {
-			return children.map((c) => nodeToMarkdown(c, indent, true)).join('');
+			return childrenToInline(children, true, indent);
 		}
 		const content = childrenToInline(children);
-		if (isBlock) return content + '\n\n';
-		return content;
+		if (!isBlock) return content;
+		// A div used as a line (defaultLine: 'div') is a paragraph.
+		if (children.some((c) => BLOCK_ELEMENTS.test(c.tag))) return content + '\n\n';
+		const line = toParagraph(content);
+		return line ? line + '\n\n' : '\n';
 	}
 
 	// Span - pass through as inline (may contain styles)
 	if (tag === 'span') {
 		if (attributes.style || attributes.class) {
-			return nodeToHtmlFallback(node);
+			return nodeToHtmlFallback(node, true);
 		}
 		return childrenToInline(children);
 	}
 
 	// Figure - process children (table, media)
 	if (tag === 'figure') {
-		const inner = children.map((c) => nodeToMarkdown(c, indent, true)).join('');
+		const inner = childrenToInline(children, true, indent);
 		return /\n$/.test(inner) ? inner : inner + '\n\n';
 	}
 	if (tag === 'figcaption') {
@@ -490,11 +649,11 @@ function nodeToMarkdown(node, indent, isBlock) {
 
 	// Abbreviation
 	if (tag === 'abbr') {
-		return nodeToHtmlFallback(node);
+		return nodeToHtmlFallback(node, true);
 	}
 
-	// HTML fallback
-	return nodeToHtmlFallback(node);
+	// HTML fallback (a tag the parser does not read as an HTML block is parsed inline)
+	return nodeToHtmlFallback(node, !HTML_BLOCK_RE.test('<' + tag));
 }
 
 /**
@@ -508,7 +667,7 @@ function nodeToMarkdown(node, indent, isBlock) {
  */
 export function jsonToMarkdown(jsonNode) {
 	if (!jsonNode) return '';
-	const result = nodeToMarkdown(jsonNode, '', true);
+	const result = nodeToMarkdown(jsonNode, '', true).replace(BR_MARK_RE, '<br>');
 	// Trim trailing whitespace but keep final newline
 	return result.replace(/\n{3,}/g, '\n\n').trim() + '\n';
 }
@@ -531,30 +690,36 @@ function parseInline(text) {
 		return '\uFFFC' + (placeholders.length - 1) + '\uFFFC';
 	}
 
-	// 1. Escape sequences: \* \_ \~ \` \[ \] \( \) \# \! \\ \| \{ \} \< \> \+ \-
-	text = text.replace(/\\([\\*_~`[\]()#!|{}<>+-])/g, (_, ch) => hold(ch));
+	// 1. Inline code — extract to placeholder so inner syntax (and escapes) is not parsed
+	text = text.replace(/(?<!\\)``\s(.+?)\s``/g, (_, c) => hold('<code>' + escapeHtml(c) + '</code>'));
+	text = text.replace(/(?<!\\)`([^`]+)`/g, (_, c) => hold('<code>' + escapeHtml(c) + '</code>'));
 
-	// 2. Inline code — extract to placeholder so inner syntax is not parsed
-	text = text.replace(/``\s(.+?)\s``/g, (_, c) => hold('<code>' + c + '</code>'));
-	text = text.replace(/`([^`]+)`/g, (_, c) => hold('<code>' + c + '</code>'));
+	// 2. Autolinks: <https://url> or <email@example.com>
+	text = text.replace(/(?<!\\)<(https?:\/\/[^>]+)>/g, (_, url) => hold(`<a href="${url}">${url}</a>`));
+	text = text.replace(/(?<!\\)<([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})>/g, (_, email) =>
+		hold(`<a href="mailto:${email}">${email}</a>`),
+	);
 
-	// 3. Images: ![alt](src "title") or ![alt](src)
+	// 3. Inline HTML tags — kept as-is, so attributes (e.g. class="__se__") are not parsed
+	text = text.replace(/(?<!\\)<\/?[a-zA-Z][^<>]*>/g, (tag) => hold(tag));
+
+	// 4. Escape sequences: '\' + any ASCII punctuation
+	text = text.replace(/\\([!-/:-@[-`{-~])/g, (_, ch) => hold(escapeHtml(ch)));
+
+	// 4-1. Hard line breaks: '\' or two or more spaces before a newline
+	text = text.replace(/(?:\\| {2,})\n/g, () => hold('<br>'));
+
+	// 5. Images: ![alt](src "title") or ![alt](src)
 	text = text.replace(/!\[([^\]]*)\]\(([^)\s]+)(?:\s+"([^"]*)")?\)/g, (_, alt, src, title) => {
 		return hold(title ? `<img src="${src}" alt="${alt}" title="${title}">` : `<img src="${src}" alt="${alt}">`);
 	});
 
-	// 4. Links: [text](url "title") or [text](url)
+	// 5-1. Links: [text](url "title") or [text](url)
 	text = text.replace(/\[([^\]]+)\]\(([^)\s]+)(?:\s+"([^"]*)")?\)/g, (_, t, url, title) => {
 		return hold(title ? `<a href="${url}" title="${title}">${t}</a>` : `<a href="${url}">${t}</a>`);
 	});
 
-	// 5. Autolinks: <https://url> or <email@example.com>
-	text = text.replace(/<(https?:\/\/[^>]+)>/g, (_, url) => hold(`<a href="${url}">${url}</a>`));
-	text = text.replace(/<([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})>/g, (_, email) =>
-		hold(`<a href="mailto:${email}">${email}</a>`),
-	);
-
-	// 6. GFM autolink: bare URLs (only when not already inside a tag attribute)
+	// 6. GFM autolink: bare URLs (tag attributes are already held)
 	text = text.replace(/(?<![="'\w/])(https?:\/\/[^\s<>\])"]+)/g, (_, url) => hold(`<a href="${url}">${url}</a>`));
 
 	// 7. Strikethrough first (before single tilde subscript)
@@ -581,8 +746,9 @@ function parseInline(text) {
 	// 13. Subscript: ~text~ (single tilde only, after strikethrough is already consumed)
 	text = text.replace(/(?<!~)~([^\s~]+)~(?!~)/g, '<sub>$1</sub>');
 
-	// Restore all placeholders
-	text = text.replace(/\uFFFC(\d+)\uFFFC/g, (_, idx) => placeholders[parseInt(idx, 10)]);
+	// Restore all placeholders (a held link text can hold others)
+	const restore = (str) => str.replace(/\uFFFC(\d+)\uFFFC/g, (_, idx) => restore(placeholders[parseInt(idx, 10)]));
+	text = restore(text);
 
 	return text;
 }
@@ -674,7 +840,7 @@ export function markdownToHtml(md, defaultLine) {
 		}
 
 		// Unordered list: - item, * item, + item
-		if (/^(\s*)([-*+])\s+/.test(line)) {
+		if (/^(\s*)([-*+])(\s+|$)/.test(line)) {
 			const result = parseList(lines, i, false);
 			output.push(result.html);
 			i = result.index;
@@ -682,15 +848,15 @@ export function markdownToHtml(md, defaultLine) {
 		}
 
 		// Ordered list: 1. item
-		if (/^(\s*)\d+\.\s+/.test(line)) {
+		if (/^(\s*)\d+\.(\s+|$)/.test(line)) {
 			const result = parseList(lines, i, true);
 			output.push(result.html);
 			i = result.index;
 			continue;
 		}
 
-		// HTML tag pass-through (starts with <)
-		if (/^\s*<[a-zA-Z]/.test(line)) {
+		// HTML block pass-through (starts with a block tag)
+		if (HTML_BLOCK_RE.test(line)) {
 			// Collect all lines until we find the closing or a blank line
 			let htmlBlock = line;
 			i++;
@@ -710,11 +876,7 @@ export function markdownToHtml(md, defaultLine) {
 
 		// Paragraph (default)
 		const paraLines = [];
-		while (
-			i < lines.length &&
-			!isBlankLine(lines[i]) &&
-			!/^(#{1,6}\s|`{3,}|~{3,}|>|\||(\s*)([-*+]|\d+\.)\s|(\*{3,}|-{3,}|_{3,})\s*$)/.test(lines[i])
-		) {
+		while (i < lines.length && !isBlankLine(lines[i]) && !PARAGRAPH_BREAK_RE.test(lines[i])) {
 			paraLines.push(lines[i]);
 			i++;
 		}
@@ -743,8 +905,8 @@ function parseTable(tableLines) {
 		line
 			.replace(/^\|/, '')
 			.replace(/\|$/, '')
-			.split('|')
-			.map((c) => c.trim());
+			.split(/(?<!\\)\|/)
+			.map((c) => c.trim().replace(/\\\|/g, '|'));
 
 	const headers = parseRow(tableLines[0]);
 	// Parse separator line for alignment
@@ -803,8 +965,9 @@ function parseTable(tableLines) {
  */
 function parseList(lines, startIndex, ordered) {
 	const tag = ordered ? 'ol' : 'ul';
-	const itemPattern = ordered ? /^(\s*)\d+\.\s+(.*)/ : /^(\s*)([-*+])\s+(.*)/;
-	let html = `<${tag}>`;
+	const itemPattern = ordered ? /^(\s*)\d+\.(?:\s+|$)(.*)/ : /^(\s*)([-*+])(?:\s+|$)(.*)/;
+	const start = ordered ? parseInt(lines[startIndex].trimStart(), 10) : 1;
+	let html = ordered && start !== 1 ? `<ol start="${start}">` : `<${tag}>`;
 	let i = startIndex;
 	const baseIndent = (lines[i].match(/^(\s*)/)[1] || '').length;
 
@@ -825,7 +988,7 @@ function parseList(lines, startIndex, ordered) {
 			const match = itemPattern.exec(line);
 			if (!match) break;
 
-			const content = ordered ? line.replace(/^\s*\d+\.\s+/, '') : line.replace(/^\s*[-*+]\s+/, '');
+			const content = ordered ? line.replace(/^\s*\d+\.(\s+|$)/, '') : line.replace(/^\s*[-*+](\s+|$)/, '');
 			i++;
 
 			// GFM task list checkbox
@@ -851,8 +1014,8 @@ function parseList(lines, startIndex, ordered) {
 				if (nextIndent <= baseIndent) break;
 
 				// Nested list
-				if (/^\s*[-*+]\s+/.test(nextLine) || /^\s*\d+\.\s+/.test(nextLine)) {
-					const nested = parseList(lines, i, /^\s*\d+\.\s+/.test(nextLine));
+				if (/^\s*([-*+]|\d+\.)(\s+|$)/.test(nextLine)) {
+					const nested = parseList(lines, i, /^\s*\d+\./.test(nextLine));
 					nestedHtml += nested.html;
 					i = nested.index;
 					continue;

@@ -167,7 +167,7 @@ describe('markdown helper', () => {
 		it('should handle line breaks', () => {
 			const html = '<p>line1<br>line2</p>';
 			const result = htmlToMd(html);
-			expect(result).toContain('line1\nline2');
+			expect(result).toContain('line1\\\nline2');
 		});
 	});
 
@@ -262,6 +262,172 @@ describe('markdown helper', () => {
 			expect(result).toContain('<strong>bold</strong>');
 			expect(result).toContain('<ul>');
 			expect(result).toContain('<li>item1</li>');
+		});
+	});
+
+	describe('text and numbering preservation', () => {
+		it.each([
+			'Read the **Rules**. Then set `title` (max 100).\n\n- Set `title` (max 100).\n- Use **bold** here.\n\n5. Fifth step.\n6. Sixth step.\n',
+			'(`x`), **bold**! **a** **b**; [link](https://example.com).\n',
+			'- [x] Set `title` here.\n- Use **bold** here.\n',
+			'1. One\n2. Two\n\nParagraph.\n\n3. Three\n4. Four\n',
+			'0. Zero\n1. One\n',
+			'5. Parent\n   8. Nested\n   9. Next\n6. Last\n',
+		])('preserves Markdown over repeated conversions: %s', (input) => {
+			let result = input;
+			for (let i = 0; i < 3; i++) {
+				result = jsonToMarkdown(converter.htmlToJson(markdownToHtml(result)));
+				expect(result).toBe(input);
+			}
+		});
+
+		it.each([0, 5, 10])('preserves ordered start %i in both directions', (start) => {
+			const html = `<ol start="${start}"><li>First</li><li>Next</li></ol>`;
+			const md = `${start}. First\n${start + 1}. Next\n`;
+			expect(markdownToHtml(md)).toBe(html);
+			expect(jsonToMarkdown(converter.htmlToJson(html))).toBe(md);
+		});
+
+		it.each(['body', 'div', 'blockquote'])('preserves bare inline separators in %s', (tag) => {
+			const html = `<${tag}><strong>A</strong> <code>B</code></${tag}>`;
+			expect(jsonToMarkdown(converter.htmlToJson(html))).toContain('**A** `B`');
+		});
+
+		it('ignores whitespace between blocks without losing inline separators', () => {
+			const html = '<p><strong>A</strong> <code>B</code>.</p>\n  <p>C</p>';
+			expect(jsonToMarkdown(converter.htmlToJson(html))).toBe('**A** `B`.\n\nC\n');
+		});
+	});
+
+	describe('review regressions', () => {
+		it.each(['strong', 'em', 'del', 'mark'])('preserves multiline %s content', (tag) => {
+			let html = `<p><${tag}>\n  first\n\nsecond\n</${tag}> text</p>`;
+			const expected = html;
+			for (let i = 0; i < 3; i++) {
+				html = markdownToHtml(jsonToMarkdown(converter.htmlToJson(html)));
+				expect(new DOMParser().parseFromString(html, 'text/html').body.innerHTML).toBe(expected);
+			}
+		});
+
+		it.each([
+			'<ol start="-2"><li>First</li><li>Next</li></ol>',
+			'<ul><li>Parent<ol start="-2"><li>Nested</li></ol></li></ul>',
+			'<ol start="-2"><li>&lt;tag&gt; &amp; text</li></ol>',
+		])('preserves unsupported list starts as HTML: %s', (input) => {
+			let html = input;
+			for (let i = 0; i < 3; i++) {
+				html = markdownToHtml(jsonToMarkdown(converter.htmlToJson(html)));
+				expect(html).toBe(input);
+			}
+		});
+
+		it.each([
+			['<p><em>A</em><strong>B</strong></p>', '<p><em>A</em><strong>B</strong></p>'],
+			[
+				'<p><em>A</em><em>B</em> <strong>C</strong><em>D</em></p>',
+				'<p><em>A</em><em>B</em> <strong>C</strong><em>D</em></p>',
+			],
+			['<p><em> word</em> rest</p>', '<p><em>word</em> rest</p>'],
+			['<p>x <em> y </em>z</p>', '<p>x  <em>y</em> z</p>'],
+			['<p>x<br><em> y</em></p>', '<p>x<br> <em>y</em></p>'],
+		])('keeps adjacent or space-padded emphasis inline: %s', (input, expected) => {
+			let html = input;
+			for (let i = 0; i < 3; i++) {
+				html = markdownToHtml(jsonToMarkdown(converter.htmlToJson(html)));
+				expect(html).toBe(expected);
+			}
+		});
+
+		it.each([
+			// paragraph: a line that would start a block is escaped
+			['<p><strong>A</strong>\n- b</p>', '<p><strong>A</strong>\n- b</p>'],
+			['<p>a\n# b</p>', '<p>a\n# b</p>'],
+			['<p>a\n| b |</p>', '<p>a\n| b |</p>'],
+			['<p><code>a\n- b</code></p>', '<p><code>a - b</code></p>'],
+			['<ul><li><code>a\nb</code></li></ul>', '<ul><li><code>a b</code></li></ul>'],
+			['<p>- a</p>', '<p>- a</p>'],
+			['<p>1. a</p>', '<p>1. a</p>'],
+			['<p>line1\nline2</p>', '<p>line1\nline2</p>'],
+			['<p>a\n  \nb</p>', '<p>a\nb</p>'],
+			['<div>a\n- b</div>', '<p>a\n- b</p>'],
+			['<blockquote><p>a\n- b</p></blockquote>', '<blockquote><p>a\n- b</p></blockquote>'],
+			// paragraph: <br> is a hard line break; edge <br> is the empty line placeholder
+			['<p>a<br>b</p>', '<p>a<br>b</p>'],
+			['<p>a<br><br>b</p>', '<p>a<br><br>b</p>'],
+			['<p>a<br>\nb</p>', '<p>a<br>b</p>'],
+			['<p>a<br>- b</p>', '<p>a<br>- b</p>'],
+			['<p>a\\<br>b</p>', '<p>a\\<br>b</p>'],
+			['<p>a\\\nb</p>', '<p>a\\\nb</p>'],
+			['<p>a<br></p>', '<p>a</p>'],
+			['<p><strong>a<br>b</strong></p>', '<p><strong>a<br>b</strong></p>'],
+			['<p><a href="x">a<br>b</a></p>', '<p><a href="x">a<br>b</a></p>'],
+			['<div>a<br>b</div>', '<p>a<br>b</p>'],
+			['<blockquote><p>a<br>b</p></blockquote>', '<blockquote><p>a<br>b</p></blockquote>'],
+			// single-line blocks: breaks never leave the line
+			['<ul><li><strong>A</strong>\nb</li></ul>', '<ul><li><strong>A</strong>&#10;b</li></ul>'],
+			['<ul><li>a<br>b</li></ul>', '<ul><li>a<br>b</li></ul>'],
+			['<ul><li>a</li><li><br></li><li>b</li></ul>', '<ul><li>a</li><li></li><li>b</li></ul>'],
+			['<ol start="3"><li><br></li></ol>', '<ol start="3"><li></li></ol>'],
+			[
+				'<table><tbody><tr><td>a<br>b</td><td><br></td></tr></tbody></table>',
+				'<table><tbody><tr><td>a<br>b</td><td></td></tr></tbody></table>',
+			],
+			['<h2>A<br>B</h2>', '<h2>A<br>B</h2>'],
+		])('keeps line breaks inside their block: %s', (input, expected) => {
+			let html = input;
+			for (let i = 0; i < 3; i++) {
+				html = markdownToHtml(jsonToMarkdown(converter.htmlToJson(html)));
+				expect(html).toBe(expected);
+			}
+		});
+
+		it.each([
+			['<p><span style="color: red;">a</span> <strong>b</strong></p>'],
+			['<p><u>a</u> <em>b</em></p>'],
+			['<p>a</p><video src="x"></video><p>b</p>'],
+		])('parses only block tags as HTML blocks: %s', (input) => {
+			let html = input;
+			for (let i = 0; i < 3; i++) {
+				html = markdownToHtml(jsonToMarkdown(converter.htmlToJson(html)));
+				expect(html).toBe(input);
+			}
+		});
+
+		it.each([
+			['<p>2*3*4 = 24, **kwargs</p>', '2\\*3\\*4 = 24, \\*\\*kwargs'],
+			['<p>file_name and _draft_ 가_나</p>', 'file_name and \\_draft\\_ 가\\_나'],
+			['<p>10시~12시 ~x~ 안녕~</p>', '10시\\~12시 \\~x\\~ 안녕\\~'],
+			['<p>x^2 a ==b== c</p>', 'x^2 a \\==b\\== c'],
+			['<p>see [1](note) `npm i`</p>', 'see [1\\](note) \\`npm i\\`'],
+			['<p>&lt;b&gt;x&lt;/b&gt; &amp;lt; a &lt; b &amp; c</p>', '\\<b>x\\</b> \\&lt; a < b & c'],
+			['<p>C:\\temp\\*</p>', 'C:\\temp\\\\\\*'],
+			['<p>a~<del>b</del> a=<mark>b</mark></p>', 'a\\~~~b~~ a\\===b=='],
+			['<p><span class="__se__a">x*y*</span></p>', '<span class="__se__a">x\\*y\\*</span>'],
+			['<p><code>&lt;b&gt; a*b*</code></p>', '`<b> a*b*`'],
+			['<ul><li>[ ] text</li></ul>', '- [ \\] text'],
+			['<table><tbody><tr><td><code>a|b</code> c|d</td></tr></tbody></table>', '|   |\n| --- |\n| `a\\|b` c\\|d |'],
+		])('escapes text only where it would be parsed as syntax: %s', (input, md) => {
+			const result = jsonToMarkdown(converter.htmlToJson(input));
+			expect(result).toBe(md + '\n');
+			let html = input;
+			for (let i = 0; i < 3; i++) {
+				html = markdownToHtml(jsonToMarkdown(converter.htmlToJson(html)));
+				expect(new DOMParser().parseFromString(html, 'text/html').body.innerHTML).toBe(input);
+			}
+		});
+
+		it.each([
+			['a  \nb', '<p>a<br>b</p>'],
+			['a\\\nb', '<p>a<br>b</p>'],
+			['a\\\\\nb', '<p>a\\\nb</p>'],
+			['[a\\*b](x)', '<p><a href="x">a*b</a></p>'],
+			['- a\n-\n- b', '<ul><li>a</li><li></li><li>b</li></ul>'],
+			['1.', '<ol><li></li></ol>'],
+			['a\n-', '<p>a\n-</p>'],
+			['`a\\*b` \\=\\. <span class="__se__">x</span>', '<p><code>a\\*b</code> =. <span class="__se__">x</span></p>'],
+			['\\<b>x\\</b>', '<p>&lt;b>x&lt;/b></p>'],
+		])('parses hard breaks, nested escapes and empty list items: %s', (md, expected) => {
+			expect(markdownToHtml(md)).toBe(expected);
 		});
 	});
 

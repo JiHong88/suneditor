@@ -227,6 +227,7 @@ declare class HTML {
 	): void;
 	/**
 	 * @description Gets the current content to JSON data
+	 * - Text content keeps its whitespace as-is (see @link converter.htmlToJson).
 	 * @param {Object} [options] Options
 	 * @param {boolean} [options.withFrame=false] Gets the current content with containing parent `div.sun-editor-editable` (`<div class="sun-editor-editable">{content}</div>`).
 	 * @param {number|Array<number>} [options.rootKey=null] Root index
