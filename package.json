@@ -1,6 +1,6 @@
 {
 	"name": "suneditor",
-	"version": "3.4.0",
+	"version": "3.4.1",
 	"description": "A modular WYSIWYG HTML editor with zero runtime dependencies. Everything included, enable only what you need.",
 	"author": "Yi JiHong",
 	"license": "MIT",
