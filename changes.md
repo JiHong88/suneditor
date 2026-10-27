@@ -4,6 +4,8 @@
 - `CommandMenuItem.children`: a custom block handle / slash command menu item can hold child items, shown as a submenu (`modules/ui/CommandMenu`)
 - Slash command `items` accept the built-in custom items (`p`, `h1`-`h6`, `heading`, `ul`, `ol`, `list`, `blockquote`, `pre`), as the block handle menu does (`modules/ui/CommandMenu`, `plugins/field/slashCommand`)
 - Icons `paragraph`, `heading`, `heading_1`-`heading_6` (Lucide); the built-in `p`, `heading`, `h1`-`h6` menu items show them (`assets/icons/defaultIcons`, `modules/ui/CommandMenu`)
+- The "plugin not found" (`create.toolbar.fail`) and "target not found" (`create.fail`) errors end with a link to the matching Troubleshooting entry on suneditor.com (`suneditor`, `core/section/constructor`)
+- `env.TROUBLESHOOTING_URLS` (Troubleshooting entries by anchor id) and `env.GUIDE_EXTERNAL_LIBRARIES_URL`: the documentation links used by engine messages (`helper/env`)
 
 ### fix
 

@@ -43,8 +43,8 @@ describe('SunEditor Main Entry', () => {
 	describe('create method', () => {
 		describe('Target validation', () => {
 			it('should throw error when target is null or undefined', () => {
-				expect(() => suneditor.create(null)).toThrow('[SUNEDITOR.create.fail] The first parameter "target" is missing.');
-				expect(() => suneditor.create(undefined)).toThrow('[SUNEDITOR.create.fail] The first parameter "target" is missing.');
+				expect(() => suneditor.create(null)).toThrow('[SUNEDITOR.create.fail] The first parameter "target" is missing. → https://suneditor.com/troubleshooting#target');
+				expect(() => suneditor.create(undefined)).toThrow('[SUNEDITOR.create.fail] The first parameter "target" is missing. → https://suneditor.com/troubleshooting#target');
 			});
 
 			it('should handle DOM element target', () => {
@@ -73,7 +73,7 @@ describe('SunEditor Main Entry', () => {
 				const selector = '#nonexistent';
 				mockQuerySelector.mockReturnValue(null);
 
-				expect(() => suneditor.create(selector)).toThrow('[SUNEDITOR.create.fail]-[document.querySelector(#nonexistent)] Cannot find target element. Make sure "#nonexistent" is a valid selector and exists in the document.');
+				expect(() => suneditor.create(selector)).toThrow('[SUNEDITOR.create.fail]-[document.querySelector(#nonexistent)] Cannot find target element. Make sure "#nonexistent" is a valid selector and exists in the document. → https://suneditor.com/troubleshooting#target');
 			});
 
 			it('should handle multi-root object target', () => {

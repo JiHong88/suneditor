@@ -95,14 +95,17 @@ export default {
 			);
 		}
 
-		if (!target) throw Error('[SUNEDITOR.create.fail] The first parameter "target" is missing.');
+		if (!target)
+			throw Error(
+				`[SUNEDITOR.create.fail] The first parameter "target" is missing. → ${helper.env.TROUBLESHOOTING_URLS.target}`,
+			);
 
 		const multiTargets = [];
 		if (typeof target === 'string') {
 			const t = document.querySelector(target);
 			if (!t)
 				throw Error(
-					`[SUNEDITOR.create.fail]-[document.querySelector(${target})] Cannot find target element. Make sure "${target}" is a valid selector and exists in the document.`,
+					`[SUNEDITOR.create.fail]-[document.querySelector(${target})] Cannot find target element. Make sure "${target}" is a valid selector and exists in the document. → ${helper.env.TROUBLESHOOTING_URLS.target}`,
 				);
 			multiTargets.push({ key: null, target: t });
 		} else if (target.nodeType === 1) {

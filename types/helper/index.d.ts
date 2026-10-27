@@ -24,6 +24,11 @@ export const env: {
 	DPI: number;
 	KATEX_WEBSITE: string;
 	MATHJAX_WEBSITE: string;
+	TROUBLESHOOTING_URLS: {
+		plugin: string;
+		target: string;
+	};
+	GUIDE_EXTERNAL_LIBRARIES_URL: string;
 };
 export const unicode: {
 	zeroWidthSpace: string;

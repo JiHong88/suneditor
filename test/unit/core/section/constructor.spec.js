@@ -821,7 +821,7 @@ describe('Core Section - Constructor', () => {
         it('should throw error for non-existent plugin', () => {
             expect(() => {
                 CreateToolBar([['nonExistentPlugin']], {}, mockOptions, mockIcons, mockLang, false);
-            }).toThrow(/does not exist/);
+            }).toThrow('does not exist. [nonExistentPlugin] → https://suneditor.com/troubleshooting#plugin');
         });
 
         it('should handle toolbar_hide option', () => {
