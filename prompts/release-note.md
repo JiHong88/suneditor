@@ -23,13 +23,17 @@ Always classify each item into exactly one of the following categories:
 | ---------------- | ------------------------------------------------------------------------- |
 | Design           | Changes the visual design of the editor UI (icons, spacing, theme)        |
 | New Feature      | Introduces a new capability, option, or plugin that did not exist before  |
-| Enhancement      | Improves existing behavior, performance, or UX without adding a new API   |
+| Enhancement      | Improves existing behavior, performance, or UX; adds no new capability    |
 | Changes          | Alters existing behavior without breaking it - working code keeps working |
 | Bugfix           | Corrects incorrect or unexpected behavior                                 |
 | Security         | Fixes a vulnerability or hardens sanitizing (XSS, injection, bypass)      |
 | Breaking Changes | Removes, renames, or changes API compatibility from a prior version       |
 | Hotfix           | Critical fix released immediately; always bold the message                |
 | Translation      | Adds or updates i18n locale files                                         |
+
+New Feature vs Enhancement is decided by capability, not by whether an API was added: a small public
+API that only exposes what users could already do (a `dom.check.*` helper, a constant) is an
+**Enhancement**.
 
 ---
 
@@ -101,6 +105,7 @@ Use one of these sentence patterns:
 - Focus on the behavior that changed, not why.
     > `Improved mobile check logic. [#1477]`
     > `Improved to prevent certain structures from being broken when pasting HTML formats. [#1541]`
+    > `Added the \`dom.check.hasMediaOrTable()\` helper.`
 
 ### Bugfix Patterns
 
@@ -121,8 +126,7 @@ reader has to _do_, never by whether the change felt like an improvement:
 | **Breaking Changes** | stops working as written                | migrate                                       |
 
 - State the old value or behavior, so the reader can tell at a glance whether it affects them.
-- Say how to get the previous behavior back when an option can restore it.
-    > `The default value of the \`slashCommand.limitSize\` option has been changed to no limit; set it explicitly to restore a cap.`
+- Say how to get the previous behavior back when an option can restore it. > `The default value of the \`slashCommand.limitSize\` option has been changed to no limit; set it explicitly to restore a cap.`
 `The command menu now commits on Enter instead of Space.`
 
 A changed default is **not** automatically breaking - it is breaking only when the old code stops
@@ -134,8 +138,7 @@ a Breaking Change.
 
 - Start with "Fixed a vulnerability where..." or "Hardened ..." and name the affected surface, not the payload.
 - Never include a proof-of-concept payload, bypass string or exploit steps.
-- Link the published GitHub Security Advisory when one exists.
-    > `Fixed a vulnerability where a \`javascript:\` URL in a \`<video>\` \`poster\` attribute was not removed by the HTML sanitizer.`
+- Link the published GitHub Security Advisory when one exists. > `Fixed a vulnerability where a \`javascript:\` URL in a \`<video>\` \`poster\` attribute was not removed by the HTML sanitizer.`
 `Hardened URL sanitizing for \`poster\`, \`cite\` and \`formaction\` attributes. ([GHSA-xxxx-xxxx-xxxx](https://github.com/JiHong88/SunEditor/security/advisories/GHSA-xxxx-xxxx-xxxx))`
 
 ### Breaking Changes Patterns
@@ -199,6 +202,7 @@ Map its section headings onto categories:
 | `changes.md` | Release note                                                                    |
 | ------------ | ------------------------------------------------------------------------------- |
 | `feat`       | **New Feature** - or **Design** if it is purely visual                          |
+| `enhance`    | **Enhancement**                                                                 |
 | `fix`        | **Bugfix** - or **Security** if it closes a vulnerability or hardens sanitizing |
 | `change`     | **Changes** - or **Breaking Changes** if existing code stops working as written |
 | `breaking`   | **Breaking Changes**                                                            |
