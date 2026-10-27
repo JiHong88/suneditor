@@ -21,7 +21,7 @@ class ListFormat {
 	 * @description Append all selected `line` element to the list and insert.
 	 * @param {string} type List type. (ol | ul):[listStyleType]
 	 * @param {Array<Node>} selectedCells `line` elements or list cells.
-	 * @param {boolean} nested If `true`, indenting existing list cells.
+	 * @param {boolean} nested If `true`, when the list is cancelled, cells of a nested list are moved out one level instead of becoming lines.
 	 * @example
 	 * // Create ordered list from selected lines
 	 * const lines = editor.format.getLines();
@@ -30,7 +30,7 @@ class ListFormat {
 	 * // Create unordered list with custom style
 	 * editor.listFormat.apply('ul:circle', selectedElements, false);
 	 *
-	 * // Indent existing list items
+	 * // Outdent nested list items
 	 * const listItems = [li1, li2, li3];
 	 * editor.listFormat.apply('ul', listItems, true);
 	 */
@@ -375,7 +375,7 @@ class ListFormat {
 	/**
 	 * @description Nest list cells or cancel nested cells.
 	 * @param {Array<HTMLElement>} selectedCells List cells.
-	 * @param {boolean} nested Nested or cancel nested.
+	 * @param {boolean} nested If `true`, nests the cells (indent); if `false`, cancels the nesting (outdent).
 	 * @example
 	 * // Indent list items (increase nesting)
 	 * const selectedItems = [liElement1, liElement2];
@@ -397,7 +397,7 @@ class ListFormat {
 		const cellsLen = selectedCells.length;
 		if (
 			cellsLen === 0 ||
-			(!nested &&
+			(nested &&
 				!dom.check.isListCell(selectedCells[0].previousElementSibling) &&
 				!dom.check.isListCell(selectedCells.at(-1).nextElementSibling))
 		) {
@@ -413,7 +413,7 @@ class ListFormat {
 		let lastCell = selectedCells.at(-1);
 		let range = null;
 
-		if (nested) {
+		if (!nested) {
 			if (
 				originList !== lastCell.parentElement &&
 				dom.check.isList(lastCell.parentElement?.parentElement) &&
@@ -539,6 +539,8 @@ class ListFormat {
 		if (rNode) {
 			rNode.parentNode.insertBefore(rangeElement, rNode.nextSibling);
 			if (cNodes?.length === 0) dom.utils.removeItem(rNode);
+			// The part after a list split is a new list, so its numbering restarts.
+			else /** @type {HTMLElement} */ (rangeElement).removeAttribute('start');
 		}
 
 		return rangeElement === baseNode ? rangeElement.parentNode : rangeElement;
@@ -629,9 +631,10 @@ class ListFormat {
 		}
 
 		if (next && originList.children.length > 0) {
-			const newList = originList.cloneNode(false);
+			const newList = /** @type {HTMLElement} */ (originList.cloneNode(false));
 			const children = originList.childNodes;
 			const index = dom.query.getPositionIndex(next);
+			if (index > 0) newList.removeAttribute('start');
 			while (children[index]) {
 				newList.appendChild(children[index]);
 			}

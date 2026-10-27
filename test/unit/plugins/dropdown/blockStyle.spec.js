@@ -118,6 +118,18 @@ describe('Plugins - Dropdown - blockStyle', () => {
             const emptyFormatBlock = new BlockStyle(kernel, { items: [] });
             expect(emptyFormatBlock.formatList).toBeDefined();
         });
+
+        it('should accept the "pre" and "div" string items', () => {
+            kernel.$.lang.tag_div = 'Normal (DIV)';
+            kernel.$.menu.initDropdownTarget.mockClear();
+            new BlockStyle(kernel, { items: ['pre', 'div', 'unknown'] });
+
+            const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
+            expect(items.map((it) => [it.value, it.command, it.title])).toEqual([
+                ['pre', 'br-line', 'Code'],
+                ['div', 'line', 'Normal (DIV)'],
+            ]);
+        });
     });
 
     describe('active method', () => {
@@ -509,17 +521,19 @@ describe('Plugins - Dropdown - blockStyle', () => {
             const items = kernel.$.menu.initDropdownTarget.mock.calls[0][1];
 
             expect(items).toBeInstanceOf(Array);
-            expect(items.length).toBe(4); // 'pre' is not in defaultFormats, filtered out
+            expect(items.length).toBe(5);
 
             const commands = items.map(item => item.command);
             expect(commands).toContain('line');
             expect(commands).toContain('block');
+            expect(commands).toContain('br-line');
 
             const values = items.map(item => item.value);
             expect(values).toContain('p');
             expect(values).toContain('h1');
             expect(values).toContain('h2');
             expect(values).toContain('blockquote');
+            expect(values).toContain('pre');
         });
 
         it('should include default formats when no items provided', () => {

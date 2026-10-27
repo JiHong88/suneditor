@@ -17,6 +17,16 @@ class Editor {
 	$;
 
 	/**
+	 * @description Event handlers (the `events` option). Assign a handler to add or replace it at runtime.
+	 * @example
+	 * editor.events.onChange = ({ data }) => console.log(data);
+	 * @returns {SunEditor.Event.Handlers}
+	 */
+	get events() {
+		return this.$.eventManager.events;
+	}
+
+	/**
 	 * @constructor
 	 * @description SunEditor constructor function.
 	 * @param {Array<{target: Element, key: *, options: SunEditor.InitFrameOptions}>} multiTargets Target element
@@ -108,12 +118,6 @@ class Editor {
 		dom.utils.removeItem(this.$.context.get('toolbar_wrapper'));
 		dom.utils.removeItem(this.$.context.get('toolbar_sub_wrapper'));
 		dom.utils.removeItem(this.$.context.get('statusbar_wrapper'));
-
-		/** clear events */
-		for (const k in this.events) {
-			this.events[k] = null;
-		}
-		this.events = null;
 
 		/** destroy kernel (handles all internal cleanup) */
 		this.#kernel._destroy();

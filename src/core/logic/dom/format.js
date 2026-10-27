@@ -424,6 +424,9 @@ class Format {
 						nextList = null;
 					} else {
 						listParent = originParent.cloneNode(false);
+						if (line.previousElementSibling) {
+							/** @type {HTMLElement} */ (listParent).removeAttribute('start');
+						}
 					}
 				}
 
@@ -500,7 +503,8 @@ class Format {
 		if (
 			beforeTag &&
 			dom.query.getNodeDepth(beforeTag) > 0 &&
-			(dom.check.isList(beforeTag.parentNode) || dom.check.isList(beforeTag.parentNode.parentNode))
+			(dom.check.isList(beforeTag.parentNode) ||
+				(dom.check.isList(beforeTag.parentNode.parentNode) && !dom.check.isList(beforeTag)))
 		) {
 			const depthFormat = dom.query.getParentElement(
 				beforeTag,
@@ -655,7 +659,10 @@ class Format {
 
 			if (selectedFormats) lineIndex = selectedFormats.indexOf(insNode);
 			if (selectedFormats && lineIndex === -1) {
-				rangeEl ||= /** @type {HTMLElement} */ (blockElement.cloneNode(false));
+				if (!rangeEl) {
+					rangeEl = /** @type {HTMLElement} */ (blockElement.cloneNode(false));
+					rangeEl.removeAttribute('start');
+				}
 				rangeEl.appendChild(insNode);
 			} else {
 				if (selectedFormats) next = selectedFormats[lineIndex + 1];
@@ -747,8 +754,7 @@ class Format {
 
 		if (newBlockElement) firstNode = newBlockElement.previousSibling;
 		else firstNode ||= blockElement.previousSibling;
-		rangeRight =
-			blockElement.nextSibling !== rangeEl ? blockElement.nextSibling : rangeEl ? rangeEl.nextSibling : null;
+		rangeRight = blockElement.nextSibling;
 
 		if (/** @type {HTMLElement} */ (blockElement).children.length === 0 || blockElement.textContent.length === 0) {
 			dom.utils.removeItem(blockElement);
@@ -819,7 +825,7 @@ class Format {
 
 		// list cells
 		if (cells.length > 0) {
-			this.#$.listFormat.applyNested(cells, false);
+			this.#$.listFormat.applyNested(cells, true);
 		}
 
 		this.#store.set('_lastSelectionNode', null);
@@ -847,7 +853,7 @@ class Format {
 
 		// list cells
 		if (cells.length > 0) {
-			this.#$.listFormat.applyNested(cells, true);
+			this.#$.listFormat.applyNested(cells, false);
 		}
 
 		this.#store.set('_lastSelectionNode', null);

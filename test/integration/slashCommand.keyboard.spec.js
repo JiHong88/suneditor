@@ -129,3 +129,39 @@ describe('SlashCommand - keyboard selection of a dropdown-free plugin', () => {
 		expect(tableDropdown.parentNode).toBe(menuTray);
 	});
 });
+
+describe('SlashCommand - built-in custom items', () => {
+	let editor;
+
+	beforeEach(async () => {
+		const rect = { top: 0, left: 0, bottom: 0, right: 0, width: 0, height: 0 };
+		Range.prototype.getClientRects = () => [rect];
+		Range.prototype.getBoundingClientRect = () => rect;
+
+		editor = createTestEditor({
+			plugins: { slashCommand: SlashCommand },
+			slashCommand: { items: ['h2', 'pre'], delayTime: 0 },
+		});
+		await waitForEditorReady(editor);
+	});
+
+	afterEach(() => {
+		if (editor) destroyTestEditor(editor);
+	});
+
+	it('turns the line into the picked format and removes the typed trigger', () => {
+		const wysiwyg = editor.$.frameContext.get('wysiwyg');
+		wysiwyg.innerHTML = '<p>text /</p>';
+		const textNode = wysiwyg.querySelector('p').firstChild;
+		editor.$.selection.setRange(textNode, 6, textNode, 6);
+		SlashCommand.prototype.onInput.call(editor.$.plugins.slashCommand);
+		expect(editor.$.ui.selectMenuOn).toBe(true);
+
+		editor.$.frameContext
+			.get('_ww')
+			.dispatchEvent(new KeyboardEvent('keydown', { code: 'Enter', key: 'Enter', bubbles: true, cancelable: true }));
+
+		expect(wysiwyg.querySelector('h2')?.textContent).toBe('text ');
+		expect(wysiwyg.querySelector('p')).toBeNull();
+	});
+});

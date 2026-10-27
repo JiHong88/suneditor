@@ -45,15 +45,16 @@ describe('converter helper', () => {
 			expect(div.children).toEqual([]);
 		});
 
-		it('should skip empty text nodes (converage line 19)', () => {
-			const html = '<div>   </div>';
-			const result = converter.htmlToJson(html);
-			// text content is empty after trim, so it returns null/empty
-			// htmlToJson parses '<div>   </div>'. Doc body has div.
-			// div has one text node "   ". NodeToJson -> trim -> empty -> null.
-			// children array in element json only pushes if childJson is valid.
-			const div = result.children[0]; // <div>
-			expect(div.children.length).toBe(0);
+		it.each([
+			'<div>   </div>',
+			'<p>Set <code>title</code> (max 100).</p>',
+			'<p><strong>A</strong> <em>B</em></p>',
+			'<pre><code>  indented\n  code  </code></pre>',
+			'<p>A&nbsp;<strong>B</strong></p>',
+		])('preserves text whitespace in JSON: %s', (html) => {
+			const expected = new DOMParser().parseFromString(html, 'text/html').body.textContent;
+			const restored = converter.jsonToHtml(converter.htmlToJson(html));
+			expect(new DOMParser().parseFromString(restored, 'text/html').body.textContent).toBe(expected);
 		});
 
 		it('should return null for non-element non-text nodes (coverage line 45)', () => {

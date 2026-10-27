@@ -3,6 +3,8 @@ import SelectMenu from './SelectMenu.js';
 
 const { _w } = env;
 
+const HEADINGS = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+
 /**
  * @description Resolve an icon spec to an HTML string. Accepts a key from `$.icons`,
  * a raw HTML snippet (anything starting with `<`), or empty.
@@ -31,13 +33,109 @@ export function buildRowHTML(label, iconHTML) {
 }
 
 /**
+ * @description Build a submenu child row's content (icon + label), as the dropdown submenus show it.
+ * @param {string} label
+ * @param {string} iconHTML
+ * @returns {string}
+ */
+function buildSubmenuRowHTML(label, iconHTML) {
+	return `<span class="se-block-submenu-item">${iconHTML ? `${iconHTML}<span>${label}</span>` : label}</span>`;
+}
+
+/**
+ * @description Built-in custom item for a string key that no plugin or command resolves.
+ * - A preset `CommandMenuItem` whose `action` calls the format APIs (`$.format`, `$.listFormat`); it is not an editor command.
+ * - `p`, `h1`-`h6`, `heading` (H1-H6 submenu), `ul`, `ol`, `list` (UL/OL submenu), `blockquote`, `pre`.
+ * @param {string} key Menu key
+ * @param {Object<string, string>} lang Language object
+ * @returns {?CommandMenuItem} `null` when `key` is not a built-in item
+ */
+function createBuiltinItem(key, lang) {
+	switch (key) {
+		case 'p':
+			return {
+				key,
+				title: lang.tag_p,
+				icon: 'paragraph',
+				action: ($) => $.format.setLine(dom.utils.createElement('P')),
+			};
+		case 'heading':
+			return {
+				key,
+				title: lang.tag_h,
+				icon: 'heading',
+				children: HEADINGS.map((h) => createBuiltinItem(h, lang)),
+			};
+		case 'list':
+			return {
+				key,
+				title: lang.list,
+				icon: 'list_numbered',
+				children: [createBuiltinItem('ul', lang), createBuiltinItem('ol', lang)],
+			};
+		case 'ul':
+		case 'ol':
+			return {
+				key,
+				title: key === 'ul' ? lang.bulletedList : lang.numberedList,
+				icon: key === 'ul' ? 'list_bulleted' : 'list_numbered',
+				action: ($) => {
+					const range = $.listFormat.apply(key, null, false);
+					if (range) $.selection.setRange(range.sc, range.so, range.ec, range.eo);
+					$.focusManager.focus();
+					$.history.push(false);
+				},
+			};
+		case 'blockquote':
+			return {
+				key,
+				title: lang.tag_blockquote,
+				icon: 'blockquote',
+				action: ($) => {
+					const quote = dom.query.getParentElement($.selection.getNode(), 'blockquote');
+					if (quote) {
+						$.format.removeBlock(quote, {
+							selectedFormats: null,
+							newBlockElement: null,
+							shouldDelete: false,
+							skipHistory: false,
+						});
+					} else {
+						$.format.applyBlock(dom.utils.createElement('BLOCKQUOTE'));
+					}
+				},
+			};
+		case 'pre':
+			return {
+				key,
+				title: lang.tag_pre,
+				icon: 'code_block',
+				action: ($) => $.format.setBrLine(dom.utils.createElement('PRE')),
+			};
+	}
+
+	if (HEADINGS.includes(key)) {
+		return {
+			key,
+			title: lang.tag_h + key[1],
+			icon: 'heading_' + key[1],
+			action: ($) => $.format.setLine(dom.utils.createElement(key.toUpperCase())),
+		};
+	}
+
+	return null;
+}
+
+/**
  * @typedef {Object} CommandMenuItem
  * @property {string} [key] - Optional identifier.
  * @property {string} title - Display label.
  * @property {string} [icon] - `$.icons` key or raw HTML snippet.
  * @property {string[]} [keywords] - Extra search terms (used by the filter).
- * @property {function(SunEditor.Deps, *): void | Promise<void>} action - Custom callback. The second
+ * @property {function(SunEditor.Deps, *): void | Promise<void>} [action] - Custom callback. The second
  *   argument is the host-supplied context (e.g. `{block}` for BlockHandle, `{triggerChar, query}` for SlashCommand).
+ *   Required unless `children` is given.
+ * @property {CommandMenuItem[]} [children] - Child items shown as a submenu of this row (children with no `action` are skipped).
  */
 
 /**
@@ -53,10 +151,11 @@ export function buildRowHTML(label, iconHTML) {
  * @property {string} iconHTML
  * @property {string} search   - Lower-cased haystack for substring filtering.
  * @property {CommandMenuItem} [raw]
- * @property {string} [name]   - Plugin key.
+ * @property {string} [name]   - Plugin key, or the string key of a built-in custom item.
  * @property {string} [type]   - Plugin type (`'modal'`, `'command'`, etc.).
  * @property {string} [command]
- * @property {SubmenuChild[]} [children]   - For `kind: 'submenu'` — clickable child rows (one per dropdown item).
+ * @property {Array<SubmenuChild|ResolvedItem>} [children] - For `kind: 'submenu'` — clickable child rows
+ *   (one per dropdown item, or the resolved custom children of a `CommandMenuItem`).
  * @property {string[]} [childMenus]       - For `kind: 'submenu'` — HTML for each child row.
  */
 
@@ -80,9 +179,11 @@ export function buildRowHTML(label, iconHTML) {
  * @description Shared command-menu module used by BlockHandle and SlashCommand.
  * - Owns the underlying `SelectMenu`, renders rows with the canonical BlockHandle row HTML.
  * - Supports four item kinds:
- *   - `'custom'` — user-defined `{title, icon?, action}` invoked with `($, hostContext)`.
+ *   - `'custom'` — user-defined `{title, icon?, action}` invoked with `($, hostContext)`, or a built-in
+ *     custom item key (`p`, `h1`-`h6`, `heading`, `ul`, `ol`, `list`, `blockquote`, `pre`) that no plugin resolves.
  *   - `'plugin'` — plain plugin (modal/browser/command/popup) dispatched via `plugin.open/show/action`.
- *   - `'submenu'` — dropdown plugin auto-expanded inline (children come from `$.menu.itemsMap`).
+ *   - `'submenu'` — dropdown plugin auto-expanded inline (children come from `$.menu.itemsMap`),
+ *     or a custom item with `children`.
  *   - `'dropdownFree'` — dropdown-free plugin (e.g. `fontColor`, `table`) shown with a submenu arrow
  *     and an attached hover flyout that reuses the plugin's toolbar dropdown DOM.
  * - Handles blur prevention on mousedown, hover flyout lifecycle, and click-to-toggle for dropdown-free.
@@ -195,7 +296,12 @@ class CommandMenu {
 		for (const entry of this.#rawItems) {
 			if (typeof entry === 'string') {
 				const r = this.#resolveButton(entry, this.#$.plugins, this.#$.options, this.#$.icons, this.#$.lang);
-				if (!r) continue;
+				if (!r) {
+					const builtin = createBuiltinItem(entry, this.#$.lang);
+					const item = builtin && this.#resolveObject(builtin);
+					if (item) out.push({ ...item, name: entry, search: (item.title + ' ' + entry).toLowerCase() });
+					continue;
+				}
 
 				const type = r.type || '';
 
@@ -226,9 +332,7 @@ class CommandMenu {
 							childMenus: menuItems.map((mi) => {
 								const iconEl =
 									mi._element?.querySelector('.se-list-icon') || mi._element?.querySelector('svg');
-								const icon = iconEl ? iconEl.outerHTML : '';
-								const label = icon ? `${icon}<span>${mi.title}</span>` : mi.title;
-								return `<span class="se-block-submenu-item">${label}</span>`;
+								return buildSubmenuRowHTML(mi.title, iconEl ? iconEl.outerHTML : '');
 							}),
 						});
 						continue;
@@ -244,20 +348,51 @@ class CommandMenu {
 					type,
 					command: r.command,
 				});
-			} else if (entry && typeof entry === 'object' && typeof entry.action === 'function') {
-				const title = entry.title || entry.key || '';
-				const keywords = Array.isArray(entry.keywords) ? entry.keywords.join(' ') : '';
-				out.push({
-					kind: 'custom',
-					title,
-					iconHTML: resolveIconHTML(entry.icon, this.#$.icons),
-					search: (title + ' ' + keywords).toLowerCase(),
-					raw: entry,
-				});
+			} else if (entry && typeof entry === 'object') {
+				const item = this.#resolveObject(entry);
+				if (item) out.push(item);
 			}
 		}
 		this.#resolved = out;
 		return out;
+	}
+
+	/**
+	 * @description Resolve an object item: a submenu when it has `children`, otherwise a custom item.
+	 * @param {CommandMenuItem} entry
+	 * @returns {?ResolvedItem} `null` when there is nothing to run (no `action`, or no child with one)
+	 */
+	#resolveObject(entry) {
+		if (Array.isArray(entry.children)) {
+			const children = entry.children
+				.filter((c) => typeof c?.action === 'function')
+				.map((c) => this.#resolveCustom(c));
+			if (children.length === 0) return null;
+			return {
+				...this.#resolveCustom(entry),
+				kind: 'submenu',
+				children,
+				childMenus: children.map((c) => buildSubmenuRowHTML(c.title, c.iconHTML)),
+			};
+		}
+		return typeof entry.action === 'function' ? this.#resolveCustom(entry) : null;
+	}
+
+	/**
+	 * @description Resolve a custom (object) item.
+	 * @param {CommandMenuItem} entry
+	 * @returns {ResolvedItem}
+	 */
+	#resolveCustom(entry) {
+		const title = entry.title || entry.key || '';
+		const keywords = Array.isArray(entry.keywords) ? entry.keywords.join(' ') : '';
+		return {
+			kind: 'custom',
+			title,
+			iconHTML: resolveIconHTML(entry.icon, this.#$.icons),
+			search: (title + ' ' + keywords).toLowerCase(),
+			raw: entry,
+		};
 	}
 
 	/**
@@ -287,7 +422,7 @@ class CommandMenu {
 		const ctx = { icons: this.#$.icons };
 		const arrow = `<span class="se-submenu-arrow">${this.#$.icons.menu_arrow_right}</span>`;
 		return items.map((it) => {
-			if (it.kind === 'custom' && this.#renderCustomItem) return this.#renderCustomItem(it.raw, ctx);
+			if (it.kind === 'custom' && !it.name && this.#renderCustomItem) return this.#renderCustomItem(it.raw, ctx);
 			const row = buildRowHTML(it.title, it.iconHTML);
 			return it.kind === 'dropdownFree' ? row + arrow : row;
 		});

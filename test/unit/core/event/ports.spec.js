@@ -283,7 +283,7 @@ describe('makePorts', () => {
 	// listFormat ports
 	// ============================================================
 	describe('listFormat port', () => {
-		it('applyNested delegates with cells and shift arguments', () => {
+		it('applyNested delegates with cells and nested arguments', () => {
 			const cells = ['cell1', 'cell2'];
 			ports.listFormat.applyNested(cells, true);
 			expect(inst.$.listFormat.applyNested).toHaveBeenCalledWith(cells, true);

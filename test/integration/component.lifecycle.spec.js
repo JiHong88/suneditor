@@ -105,6 +105,29 @@ describe('Component Lifecycle', () => {
 			expect(result).toBeNull();
 			editor.$.char.check.mockRestore();
 		});
+
+		it.each([
+			['line', '<ol><li>a</li><li>bc</li></ol>', 'bc', 1],
+			['line', '<ol><li>a</li><li>bc</li></ol>', 'bc', 2],
+			['line', '<ol><li>bc<ol><li>x</li></ol></li></ol>', 'bc', 2],
+			['line', '<ol><li>b<strong>c</strong></li></ol>', 'b', 1],
+			['auto', '<ol><li>a</li><li>bc</li></ol>', 'bc', 1],
+		])('keeps a component inserted in a list cell in that cell (%s): %s', (behavior, html, text, offset) => {
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
+			editor.$.html.set(html);
+			const walker = document.createTreeWalker(wysiwyg, NodeFilter.SHOW_TEXT);
+			let node;
+			while ((node = walker.nextNode()) && node.nodeValue !== text);
+			const cell = node.parentNode.closest('li');
+			editor.$.selection.setRange(node, offset, node, offset);
+
+			const hr = document.createElement('hr');
+			editor.$.component.insert(hr, { insertBehavior: behavior });
+
+			expect(hr.parentNode).toBe(cell);
+			expect(wysiwyg.querySelector('li > li')).toBeNull();
+			expect(cell.contains(editor.$.selection.getRange().startContainer)).toBe(true);
+		});
 	});
 
 	describe('deselect()', () => {

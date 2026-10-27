@@ -3,6 +3,8 @@
  * Tests src/core/logic/panel/viewer.js through real editor instance
  */
 
+import { markdown } from '../../src/helper';
+
 import { createTestEditor, waitForEditorReady, destroyTestEditor } from '../__mocks__/editorIntegration';
 
 describe('Viewer Integration Tests', () => {
@@ -10,13 +12,51 @@ describe('Viewer Integration Tests', () => {
 
 	beforeEach(async () => {
 		editor = createTestEditor({
-			buttonList: [['codeView', 'fullScreen', 'showBlocks']],
+			buttonList: [['codeView', 'markdownView', 'fullScreen', 'showBlocks']],
 		});
 		await waitForEditorReady(editor);
 	});
 
 	afterEach(() => {
 		destroyTestEditor(editor);
+	});
+
+	describe('markdownView', () => {
+		it.each([
+			'Read the **Rules**. Then set `title` (max 100).\n\n- Set `title` (max 100).\n- Use **bold** here.\n\n5. Fifth step.\n6. Sixth step.\n',
+			'0. Zero\n1. One\n\nParagraph.\n\n3. Three\n4. Four\n',
+		])('preserves text and list starts across three view toggles: %s', (md) => {
+			editor.$.html.set(markdown.markdownToHtml(md));
+			for (let i = 0; i < 3; i++) {
+				editor.$.viewer.markdownView(true);
+				expect(editor.$.frameContext.get('markdown').value).toBe(md);
+				editor.$.viewer.markdownView(false);
+			}
+		});
+
+		it.each([
+			'<ol start="-2"><li>First</li><li>Next</li></ol>',
+			'<ul><li>Parent<ol start="-2"><li>Nested</li></ol></li></ul>',
+		])('preserves negative list starts across view toggles: %s', (html) => {
+			editor.$.html.set(html);
+			const expected = editor.$.frameContext.get('wysiwyg').innerHTML;
+			for (let i = 0; i < 3; i++) {
+				editor.$.viewer.markdownView(true);
+				editor.$.viewer.markdownView(false);
+				expect(editor.$.frameContext.get('wysiwyg').innerHTML).toBe(expected);
+			}
+		});
+
+		it('still honors an explicit start attribute blacklist', async () => {
+			const filteredEditor = createTestEditor({ attributeBlacklist: { ol: 'start' } });
+			try {
+				await waitForEditorReady(filteredEditor);
+				filteredEditor.$.html.set('<ol start="5"><li>Item</li></ol>');
+				expect(filteredEditor.$.frameContext.get('wysiwyg').querySelector('ol').hasAttribute('start')).toBe(false);
+			} finally {
+				destroyTestEditor(filteredEditor);
+			}
+		});
 	});
 
 	describe('codeView', () => {

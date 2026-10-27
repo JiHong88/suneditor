@@ -118,9 +118,18 @@ class NodeTransform {
 			while (children[index]) {
 				newEl.appendChild(children[index]);
 			}
+
+			if (dom.check.isList(newEl) && !dom.check.isEmptyLine(depthEl)) {
+				newEl.removeAttribute('start');
+			}
 		}
 
-		if (depthEl.nodeType === 1 && depthEl.childNodes.length <= 1 && !depthEl.firstChild?.textContent?.length)
+		if (
+			depthEl.nodeType === 1 &&
+			depthEl.childNodes.length <= 1 &&
+			!depthEl.firstChild?.textContent?.length &&
+			!dom.check.hasMediaOrTable(depthEl)
+		)
 			/** @type {HTMLElement} */ (depthEl).innerHTML = '<br>';
 
 		const pElement = depthEl.parentNode;

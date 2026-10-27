@@ -347,7 +347,7 @@ export default {
 
 		// Nested list
 		if (cells.length > 0) {
-			r = ports.listFormat.applyNested(cells, shift);
+			r = ports.listFormat.applyNested(cells, !shift);
 		}
 
 		// Lines tab

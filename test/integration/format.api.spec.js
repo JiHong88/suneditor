@@ -115,6 +115,62 @@ describe('Format API integration tests', () => {
 	});
 
 	describe('format.applyBlock() - Apply block formatting', () => {
+		it.each([
+			// [html, start text, end text, expected]
+			[
+				'<ol start="5"><li>a</li><li>b</li><li>c</li></ol>',
+				'b',
+				'b',
+				'<ol start="5"><li>a</li></ol><blockquote><ol><li>b</li></ol></blockquote><ol><li>c</li></ol>',
+			],
+			[
+				'<ol start="5"><li>a</li><li>b</li><li>c</li></ol>',
+				'a',
+				'a',
+				'<blockquote><ol start="5"><li>a</li></ol></blockquote><ol start="5"><li>b</li><li>c</li></ol>',
+			],
+			[
+				'<ol start="5"><li>a</li><li>b</li><li>c</li></ol>',
+				'b',
+				'c',
+				'<ol start="5"><li>a</li></ol><blockquote><ol><li>b</li><li>c</li></ol></blockquote>',
+			],
+			[
+				'<ol start="5"><li>a<ol start="3"><li>x</li><li>y</li><li>z</li></ol></li><li>b</li></ol>',
+				'y',
+				'y',
+				'<ol start="5"><li>a<ol start="3"><li>x</li></ol><blockquote><ol><li>y</li></ol></blockquote><ol><li>z</li></ol></li><li>b</li></ol>',
+			],
+			[
+				'<ol start="5"><li>a<ol start="3"><li>x</li><li>y</li><li>z</li></ol></li><li>b</li></ol>',
+				'x',
+				'x',
+				'<ol start="5"><li>a<blockquote><ol start="3"><li>x</li></ol></blockquote><ol start="3"><li>y</li><li>z</li></ol></li><li>b</li></ol>',
+			],
+			[
+				'<p>p</p><ol><li>a</li><li>b</li></ol><p>q</p>',
+				'p',
+				'a',
+				'<blockquote><p>p</p><ol><li>a</li></ol></blockquote><ol><li>b</li></ol><p>q</p>',
+			],
+		])('keeps the quoted list items in place: %s [%s..%s]', (html, start, end, expected) => {
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
+			editor.$.html.set(html);
+			const find = (t) => {
+				const walker = document.createTreeWalker(wysiwyg, NodeFilter.SHOW_TEXT);
+				let node;
+				while ((node = walker.nextNode()) && node.nodeValue !== t);
+				return node;
+			};
+			const sc = find(start);
+			const ec = find(end);
+			editor.$.selection.setRange(sc, 0, ec, ec.length);
+
+			editor.$.format.applyBlock(document.createElement('BLOCKQUOTE'));
+
+			expect(wysiwyg.innerHTML).toBe(expected);
+		});
+
 		it('should wrap paragraph in blockquote', () => {
 			const wysiwyg = editor.$.frameContext.get('wysiwyg');
 			wysiwyg.innerHTML = '<p>Quote this text</p>';

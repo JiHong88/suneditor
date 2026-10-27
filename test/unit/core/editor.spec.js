@@ -577,6 +577,21 @@ describe('Core - Editor', () => {
 			});
 		});
 
+		describe('events', () => {
+			it('should expose the event manager handlers', () => {
+				expect(editor.events).toBe(editor.$.eventManager.events);
+			});
+
+			it('should call a handler assigned at runtime', async () => {
+				const onChange = jest.fn();
+				editor.events.onChange = onChange;
+
+				await editor.$.eventManager.triggerEvent('onChange', { data: '<p>a</p>' });
+
+				expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ data: '<p>a</p>' }));
+			});
+		});
+
 		describe('destroy', () => {
 
 

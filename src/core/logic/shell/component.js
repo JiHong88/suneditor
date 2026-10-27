@@ -255,11 +255,18 @@ class Component {
 				break;
 			}
 			case 'line': {
-				if (!this.#moveToNextLineOrAdd(container)) {
-					const line = this.#$.format.addLine(container, null);
-					if (line) this.#$.selection.setRange(line, 0, line, 0);
+				if (this.#moveToNextLineOrAdd(container)) break;
+
+				const cell = container.parentNode;
+				if (dom.check.isListCell(cell)) {
+					let br = container.nextSibling;
+					if (!dom.check.isBreak(br)) br = cell.insertBefore(dom.utils.createElement('BR'), br);
+					this.#$.selection.setRange(br, 0, br, 0);
+					break;
 				}
 
+				const line = this.#$.format.addLine(container, null);
+				if (line) this.#$.selection.setRange(line, 0, line, 0);
 				break;
 			}
 			case 'none': {
@@ -760,10 +767,19 @@ class Component {
 	 * - If a valid next sibling line exists, moves the selection there.
 	 * - If no next sibling exists, creates a new line after the container and moves the selection there.
 	 * - If the next sibling exists but is not a valid line element and cannot create a new line, returns `false`.
+	 * - In a list cell, moves to the content after the component in that cell; returns `false` when there is none.
 	 * @param {Node} container The component container element.
 	 * @returns {boolean} Returns `true` if the selection moved to a line (existing or newly created), otherwise `false`.
 	 */
 	#moveToNextLineOrAdd(container) {
+		if (dom.check.isListCell(container.parentNode)) {
+			const next = container.nextSibling;
+			if (!next || dom.check.isBreak(next) || dom.check.isList(next)) return false;
+			const edge = next.nodeType === 3 ? next : dom.query.getEdgeChildNodes(next, null).sc || next;
+			this.#$.selection.setRange(edge, 0, edge, 0);
+			return true;
+		}
+
 		const nextSibling = /** @type {Element} */ (container).nextElementSibling;
 		if (!nextSibling) {
 			const line = this.#$.format.addLine(container, null);

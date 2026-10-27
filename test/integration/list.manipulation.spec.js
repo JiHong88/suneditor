@@ -268,8 +268,7 @@ describe('List Manipulation integration tests', () => {
             listFormat.applyNested([listItems[1]], true);
 
             // Verify nested structure
-            const allLists = wysiwyg.querySelectorAll('ul');
-            expect(allLists.length).toBeGreaterThanOrEqual(1);
+            expect(wysiwyg.querySelector('ul ul li')).toBe(listItems[1]);
         });
 
         it('should handle applyNested for outdenting list items', () => {
@@ -293,8 +292,8 @@ describe('List Manipulation integration tests', () => {
             listFormat.applyNested([nestedLi], false);
 
             // Verify structure is flattened
-            const content = wysiwyg.textContent;
-            expect(content).toContain('Nested Item');
+            expect(wysiwyg.querySelector('ul ul')).toBeNull();
+            expect(nestedLi.parentElement).toBe(wysiwyg.querySelector('ul'));
         });
 
         it('should remove nested lists with removeNested', () => {

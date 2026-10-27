@@ -14,7 +14,7 @@ declare class ListFormat {
 	 * @description Append all selected `line` element to the list and insert.
 	 * @param {string} type List type. (ol | ul):[listStyleType]
 	 * @param {Array<Node>} selectedCells `line` elements or list cells.
-	 * @param {boolean} nested If `true`, indenting existing list cells.
+	 * @param {boolean} nested If `true`, when the list is cancelled, cells of a nested list are moved out one level instead of becoming lines.
 	 * @example
 	 * // Create ordered list from selected lines
 	 * const lines = editor.format.getLines();
@@ -23,7 +23,7 @@ declare class ListFormat {
 	 * // Create unordered list with custom style
 	 * editor.listFormat.apply('ul:circle', selectedElements, false);
 	 *
-	 * // Indent existing list items
+	 * // Outdent nested list items
 	 * const listItems = [li1, li2, li3];
 	 * editor.listFormat.apply('ul', listItems, true);
 	 */
@@ -56,7 +56,7 @@ declare class ListFormat {
 	/**
 	 * @description Nest list cells or cancel nested cells.
 	 * @param {Array<HTMLElement>} selectedCells List cells.
-	 * @param {boolean} nested Nested or cancel nested.
+	 * @param {boolean} nested If `true`, nests the cells (indent); if `false`, cancels the nesting (outdent).
 	 * @example
 	 * // Indent list items (increase nesting)
 	 * const selectedItems = [liElement1, liElement2];

@@ -1021,7 +1021,7 @@ export function InitOptions(options, editorTargets, plugins) {
 			o.set('codeMirrorEditor', true);
 		} else {
 			console.warn(
-				'[SUNEDITOR.options.externalLibs.codeMirror.fail] The codeMirror option is set incorrectly. See: https://github.com/ARA-developer/suneditor/blob/develop/guide/external-libraries.md',
+				`[SUNEDITOR.options.externalLibs.codeMirror.fail] The codeMirror option is set incorrectly. See: ${env.GUIDE_EXTERNAL_LIBRARIES_URL}`,
 			);
 			o.set('codeMirror', null);
 		}
@@ -1828,7 +1828,7 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang, isUpdat
 					if (!modules) {
 						if (!plugin)
 							throw Error(
-								`[SUNEDITOR.create.toolbar.fail] The button name of a plugin that does not exist. [${button}]`,
+								`[SUNEDITOR.create.toolbar.fail] The button name of a plugin that does not exist. [${button}] → ${env.TROUBLESHOOTING_URLS.plugin}`,
 							);
 						plugin = typeof plugin === 'object' ? plugin.constructor : plugin;
 						modules = [

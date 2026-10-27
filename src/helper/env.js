@@ -270,6 +270,18 @@ export function canUseBeforeInput() {
 export const KATEX_WEBSITE = 'https://katex.org/docs/supported.html';
 export const MATHJAX_WEBSITE = 'https://www.mathjax.org/';
 
+/**
+ * @description suneditor.com Troubleshooting entries linked from engine error messages.
+ * - Keys are the anchor ids of the page (the demo's `TROUBLESHOOTING_ITEMS[].id`); keep them fixed.
+ */
+export const TROUBLESHOOTING_URLS = {
+	plugin: 'https://suneditor.com/troubleshooting#plugin',
+	target: 'https://suneditor.com/troubleshooting#target',
+};
+
+export const GUIDE_EXTERNAL_LIBRARIES_URL =
+	'https://github.com/JiHong88/suneditor/blob/master/guide/external-libraries.md';
+
 const env = {
 	_w,
 	_d,
@@ -295,6 +307,8 @@ const env = {
 	DPI,
 	KATEX_WEBSITE,
 	MATHJAX_WEBSITE,
+	TROUBLESHOOTING_URLS,
+	GUIDE_EXTERNAL_LIBRARIES_URL,
 };
 
 export default env;

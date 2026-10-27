@@ -103,6 +103,13 @@ export function isMedia(
 	node: (Node | string) | null,
 ): node is HTMLImageElement | HTMLIFrameElement | HTMLAudioElement | HTMLVideoElement | HTMLCanvasElement;
 /**
+ * @description Check the element contains a media (img, iframe, audio, video, canvas) or table element.
+ * - Such content has no text, but the element is not empty.
+ * @param {Node} node The element to check
+ * @returns {boolean}
+ */
+export function hasMediaOrTable(node: Node): boolean;
+/**
  * @description Check the node is a iframe tag
  * @param {?Node|string} node The element or element name to check
  * @returns {node is HTMLIFrameElement}
@@ -200,6 +207,7 @@ declare namespace check {
 	export { isBreak };
 	export { isAnchor };
 	export { isMedia };
+	export { hasMediaOrTable };
 	export { isIFrame };
 	export { isFigure };
 	export { isContentLess };

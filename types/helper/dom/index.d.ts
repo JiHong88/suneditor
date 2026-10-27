@@ -39,6 +39,7 @@ export const domCheck: {
 	isBreak: typeof import('./domCheck').isBreak;
 	isAnchor: typeof import('./domCheck').isAnchor;
 	isMedia: typeof import('./domCheck').isMedia;
+	hasMediaOrTable: typeof import('./domCheck').hasMediaOrTable;
 	isIFrame: typeof import('./domCheck').isIFrame;
 	isFigure: typeof import('./domCheck').isFigure;
 	isContentLess: typeof import('./domCheck').isContentLess;

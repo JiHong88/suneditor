@@ -97,6 +97,69 @@ describe('Format - removeBlock integration tests', () => {
     });
 
     describe('Removing list elements', () => {
+        it.each([
+            [1, '<ol start="5"><li>a</li></ol><p>b</p><ol><li>c</li></ol>'],
+            [0, '<p>a</p><ol start="5"><li>b</li><li>c</li></ol>'],
+        ])('restarts only the list split after removed item %i', (index, expected) => {
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
+            editor.$.html.set('<ol start="5"><li>a</li><li>b</li><li>c</li></ol>');
+
+            const li = wysiwyg.querySelectorAll('li')[index];
+            editor.$.selection.setRange(li.firstChild, 0, li.firstChild, 1);
+            editor.$.listFormat.remove([li], false);
+
+            expect(wysiwyg.innerHTML).toBe(expected);
+        });
+
+        it.each([
+            ['a', 1, '<ol start="5"><li>a</li><li>b</li></ol><ol><li></li><li>c</li></ol>'],
+            ['a', 0, '<ol start="5"><br></ol><ol start="5"><li>a</li><li>b</li><li>c</li></ol>'],
+        ])('nodeTransform.split restarts only a list split after content: %s/%i', (_, offset, expected) => {
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
+            editor.$.html.set('<ol start="5"><li>a</li><li>b</li><li>c</li></ol>');
+
+            const text = wysiwyg.querySelectorAll('li')[offset ? 1 : 0].firstChild;
+            editor.$.nodeTransform.split(text, offset, 0);
+
+            expect(wysiwyg.innerHTML).toBe(expected);
+        });
+
+        it('nodeTransform.split keeps an image-only part before the split', () => {
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
+            editor.$.html.set('<ol start="5"><li><img src="x.png">bc</li></ol>');
+
+            editor.$.nodeTransform.split(wysiwyg.querySelector('li').lastChild, 0, 0);
+
+            expect(wysiwyg.innerHTML).toBe('<ol start="5"><li><img src="x.png"></li></ol><ol><li>bc</li></ol>');
+        });
+
+        it.each([
+            ['y', '<ol start="5"><li>a<ol start="3"><li>x</li></ol></li><li>y<ol><li>z</li></ol></li></ol>'],
+            ['x', '<ol start="5"><li>a</li><li>x<ol start="3"><li>y</li><li>z</li></ol></li></ol>'],
+        ])('outdenting nested item %s restarts only a split nested list', (target, expected) => {
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
+            editor.$.html.set('<ol start="5"><li>a<ol start="3"><li>x</li><li>y</li><li>z</li></ol></li></ol>');
+
+            const li = Array.from(wysiwyg.querySelectorAll('li')).find((el) => el.firstChild.nodeValue === target);
+            editor.$.selection.setRange(li.firstChild, 0, li.firstChild, 1);
+            editor.$.listFormat.applyNested([li], false);
+
+            expect(wysiwyg.innerHTML).toBe(expected);
+        });
+
+        it('removing a nested item restarts the outer list split after it', () => {
+            const wysiwyg = editor.$.frameContext.get('wysiwyg');
+            editor.$.html.set('<ol start="5"><li>a<ol start="3"><li>x</li><li>y</li><li>z</li></ol></li><li>b</li></ol>');
+
+            const y = Array.from(wysiwyg.querySelectorAll('li')).find((el) => el.firstChild.nodeValue === 'y');
+            editor.$.selection.setRange(y.firstChild, 0, y.firstChild, 1);
+            editor.$.listFormat.remove([y], false);
+
+            expect(wysiwyg.innerHTML).toBe(
+                '<ol start="5"><li>a<ol start="3"><li>x</li></ol></li></ol><p>y</p><ol><li>z</li><li>b</li></ol>',
+            );
+        });
+
         it('should convert list items to paragraphs when removing list', () => {
             const wysiwyg = editor.$.frameContext.get('wysiwyg');
 

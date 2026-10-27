@@ -29,7 +29,7 @@ export const DEFAULTS = {
 	SCOPE_SELECTION_TAGS: ['td', 'table', 'li', 'ol', 'ul', 'pre', 'figcaption', 'blockquote', 'dl', 'dt', 'dd'],
 
 	ATTRIBUTE_WHITELIST:
-		'contenteditable|target|href|title|download|rel|src|alt|class|type|colspan|rowspan' +
+		'contenteditable|target|href|title|download|rel|src|alt|class|type|colspan|rowspan|start' +
 		'|width|height|controls|autoplay|loop|muted|poster|preload|playsinline|volume|crossorigin|disableRemotePlayback|controlsList' +
 		'|allowfullscreen|sandbox|loading|allow|referrerpolicy|frameborder|scrolling',
 
@@ -317,12 +317,13 @@ export const DEFAULTS = {
  * @property {"classic"|"inline"|"balloon"|"balloon-always"|"classic:bottom"|"inline:bottom"} [mode="classic"] - Toolbar mode: `classic`, `inline`, `balloon`, `balloon-always`. Append `:bottom` to place toolbar at the bottom (e.g. `classic:bottom`, `inline:bottom`).
  * @property {Object} [blockHandle] - Block handle configuration. When provided, a per-line block handle UI is shown. Works independently of `mode`.
  * @property {Array<string | { title: string, icon?: string, action: (deps: SunEditor.Deps, ctx: { block: HTMLElement }) => void }>} [blockHandle.menu] - Menu entries.
- * - **String entries** — resolved via `ResolveButton`. Accepts the same values as toolbar `buttonList`:
- *   - **Block format keys**: `p`, `h1`-`h6`, `heading` (H1-H6 submenu), `ul`, `ol`, `list` (UL/OL submenu), `blockquote`, `pre`.
+ * - **String entries**:
+ *   - **Built-in custom items**: `p`, `h1`-`h6`, `heading` (H1-H6 submenu), `ul`, `ol`, `list` (UL/OL submenu), `blockquote`, `pre`.
+ *     Preset items that apply the block format; they work without a plugin. A registered plugin of the same name (`list`, `blockquote`) is used instead.
  *   - **Plugin names**: Any registered plugin name (e.g. `blockStyle`, `align`, `image`, `link`). Dropdown plugins display their items as a submenu. Modal plugins open the modal on click.
  *   - **Built-in commands**: `bold`, `italic`, `underline`, `strike`, `undo`, `redo`, etc.
  * - **Custom item objects** — `{ title, icon?, action }`. `icon` is an icon key from `$.icons` or a raw `<svg>` HTML string; `action` is invoked with `($, { block })`.
- * - Defaults to `['p', 'heading', 'list', 'blockquote', 'pre']`.
+ * - Defaults to `['p', 'heading', 'list', 'blockquote', 'pre']`. An empty array shows no menu.
  * ```js
  * blockHandle: {
  *   menu: [
@@ -639,7 +640,7 @@ export const DEFAULTS = {
  *
  * === Dynamic Options ===
  * @property {Object<string, *>} [externalLibs] - External libraries like CodeMirror, KaTeX, or MathJax.
- * - See {@link https://github.com/ARA-developer/suneditor/blob/develop/guide/external-libraries.md External Libraries Guide}
+ * - See {@link https://github.com/JiHong88/suneditor/blob/master/guide/external-libraries.md External Libraries Guide}
  * ```js
  * {
  *   externalLibs: {

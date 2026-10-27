@@ -116,6 +116,11 @@ export const DPI: number;
 /** --- editor env --- */
 export const KATEX_WEBSITE: 'https://katex.org/docs/supported.html';
 export const MATHJAX_WEBSITE: 'https://www.mathjax.org/';
+export namespace TROUBLESHOOTING_URLS {
+	let plugin: string;
+	let target: string;
+}
+export const GUIDE_EXTERNAL_LIBRARIES_URL: 'https://github.com/JiHong88/suneditor/blob/master/guide/external-libraries.md';
 export default env;
 declare namespace env {
 	export { _w };
@@ -142,4 +147,6 @@ declare namespace env {
 	export { DPI };
 	export { KATEX_WEBSITE };
 	export { MATHJAX_WEBSITE };
+	export { TROUBLESHOOTING_URLS };
+	export { GUIDE_EXTERNAL_LIBRARIES_URL };
 }
