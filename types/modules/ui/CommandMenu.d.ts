@@ -36,8 +36,13 @@ export type CommandMenuItem = {
 	/**
 	 * - Custom callback. The second
 	 * argument is the host-supplied context (e.g. `{block}` for BlockHandle, `{triggerChar, query}` for SlashCommand).
+	 * Required unless `children` is given.
 	 */
-	action: (arg0: SunEditor.Deps, arg1: any) => void | Promise<void>;
+	action?: (arg0: SunEditor.Deps, arg1: any) => void | Promise<void>;
+	/**
+	 * - Child items shown as a submenu of this row (children with no `action` are skipped).
+	 */
+	children?: CommandMenuItem[];
 };
 export type SubmenuChild = {
 	/**
@@ -59,7 +64,7 @@ export type ResolvedItem = {
 	search: string;
 	raw?: CommandMenuItem;
 	/**
-	 * - Plugin key.
+	 * - Plugin key, or the string key of a built-in custom item.
 	 */
 	name?: string;
 	/**
@@ -68,9 +73,10 @@ export type ResolvedItem = {
 	type?: string;
 	command?: string;
 	/**
-	 * - For `kind: 'submenu'` — clickable child rows (one per dropdown item).
+	 * - For `kind: 'submenu'` — clickable child rows
+	 * (one per dropdown item, or the resolved custom children of a `CommandMenuItem`).
 	 */
-	children?: SubmenuChild[];
+	children?: Array<SubmenuChild | ResolvedItem>;
 	/**
 	 * - For `kind: 'submenu'` — HTML for each child row.
 	 */
@@ -125,8 +131,10 @@ export type CommandMenuParams = {
  * @property {string} title - Display label.
  * @property {string} [icon] - `$.icons` key or raw HTML snippet.
  * @property {string[]} [keywords] - Extra search terms (used by the filter).
- * @property {function(SunEditor.Deps, *): void | Promise<void>} action - Custom callback. The second
+ * @property {function(SunEditor.Deps, *): void | Promise<void>} [action] - Custom callback. The second
  *   argument is the host-supplied context (e.g. `{block}` for BlockHandle, `{triggerChar, query}` for SlashCommand).
+ *   Required unless `children` is given.
+ * @property {CommandMenuItem[]} [children] - Child items shown as a submenu of this row (children with no `action` are skipped).
  */
 /**
  * @typedef {Object} SubmenuChild
@@ -140,10 +148,11 @@ export type CommandMenuParams = {
  * @property {string} iconHTML
  * @property {string} search   - Lower-cased haystack for substring filtering.
  * @property {CommandMenuItem} [raw]
- * @property {string} [name]   - Plugin key.
+ * @property {string} [name]   - Plugin key, or the string key of a built-in custom item.
  * @property {string} [type]   - Plugin type (`'modal'`, `'command'`, etc.).
  * @property {string} [command]
- * @property {SubmenuChild[]} [children]   - For `kind: 'submenu'` — clickable child rows (one per dropdown item).
+ * @property {Array<SubmenuChild|ResolvedItem>} [children] - For `kind: 'submenu'` — clickable child rows
+ *   (one per dropdown item, or the resolved custom children of a `CommandMenuItem`).
  * @property {string[]} [childMenus]       - For `kind: 'submenu'` — HTML for each child row.
  */
 /**
@@ -165,9 +174,11 @@ export type CommandMenuParams = {
  * @description Shared command-menu module used by BlockHandle and SlashCommand.
  * - Owns the underlying `SelectMenu`, renders rows with the canonical BlockHandle row HTML.
  * - Supports four item kinds:
- *   - `'custom'` — user-defined `{title, icon?, action}` invoked with `($, hostContext)`.
+ *   - `'custom'` — user-defined `{title, icon?, action}` invoked with `($, hostContext)`, or a built-in
+ *     custom item key (`p`, `h1`-`h6`, `heading`, `ul`, `ol`, `list`, `blockquote`, `pre`) that no plugin resolves.
  *   - `'plugin'` — plain plugin (modal/browser/command/popup) dispatched via `plugin.open/show/action`.
- *   - `'submenu'` — dropdown plugin auto-expanded inline (children come from `$.menu.itemsMap`).
+ *   - `'submenu'` — dropdown plugin auto-expanded inline (children come from `$.menu.itemsMap`),
+ *     or a custom item with `children`.
  *   - `'dropdownFree'` — dropdown-free plugin (e.g. `fontColor`, `table`) shown with a submenu arrow
  *     and an attached hover flyout that reuses the plugin's toolbar dropdown DOM.
  * - Handles blur prevention on mousedown, hover flyout lifecycle, and click-to-toggle for dropdown-free.

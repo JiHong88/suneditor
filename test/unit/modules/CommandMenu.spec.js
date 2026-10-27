@@ -93,9 +93,63 @@ describe('CommandMenu', () => {
 				expect(items[0].command).toBe('bold');
 			});
 
+			it('resolves a built-in custom item key that no plugin or command takes', () => {
+				const menu = makeMenu(['h2', 'heading']);
+				const [h2, heading] = menu.getItems();
+				expect(h2).toEqual(expect.objectContaining({ kind: 'custom', name: 'h2', title: $.lang.tag_h + '2' }));
+				expect(h2.search).toContain('h2');
+				expect(heading.kind).toBe('submenu');
+				expect(heading.children.map((c) => c.raw.key)).toEqual(['h1', 'h2', 'h3', 'h4', 'h5', 'h6']);
+			});
+
+			it('shows the paragraph and heading icons', () => {
+				const [p, heading] = makeMenu(['p', 'heading']).getItems();
+				expect(p.iconHTML).toBe($.icons.paragraph);
+				expect(heading.iconHTML).toBe($.icons.heading);
+				heading.children.forEach((c, i) => expect(c.iconHTML).toBe($.icons['heading_' + (i + 1)]));
+				expect(heading.childMenus[2]).toContain('<svg');
+			});
+
+			it('keeps the canonical row for a built-in custom item when a custom renderer is given', () => {
+				const renderCustomItem = jest.fn(() => '<b>custom</b>');
+				const menu = new CommandMenu(null, $, {
+					items: ['p', { title: 'Mine', action() {} }],
+					resolveButton: ResolveButton,
+					renderCustomItem,
+					selectMenuParams: { position: 'bottom-left' },
+				});
+				const rows = menu.renderRows(menu.getItems());
+				expect(rows[0]).toContain('se-cmd-row');
+				expect(rows[1]).toBe('<b>custom</b>');
+				expect(renderCustomItem).toHaveBeenCalledTimes(1);
+			});
+
 			it('drops unresolvable string entries', () => {
 				const menu = makeMenu(['definitely-not-a-command', { title: 'Custom', action() {} }]);
 				expect(menu.getItems()).toHaveLength(1);
+			});
+
+			it('resolves a custom item with children to a "submenu" of custom children', () => {
+				const h1 = jest.fn();
+				const menu = makeMenu([
+					{
+						title: 'Heading',
+						children: [{ title: 'H1', icon: '<i>1</i>', action: h1 }, { title: 'No action' }],
+					},
+				]);
+				const [item] = menu.getItems();
+				expect(item.kind).toBe('submenu');
+				expect(item.children).toHaveLength(1); // the child with no action is skipped
+				expect(item.children[0].kind).toBe('custom');
+				expect(item.childMenus[0]).toBe('<span class="se-block-submenu-item"><i>1</i><span>H1</span></span>');
+
+				menu.dispatch(item.children[0], { block: null });
+				expect(h1).toHaveBeenCalledWith($, { block: null });
+			});
+
+			it('drops a custom item whose children have no action', () => {
+				const menu = makeMenu([{ title: 'Empty', children: [{ title: 'x' }] }]);
+				expect(menu.getItems()).toHaveLength(0);
 			});
 
 			it('caches the resolved list until setItems invalidates it', () => {

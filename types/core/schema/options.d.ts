@@ -261,8 +261,8 @@ export namespace DEFAULTS {
  * @property {Object} [blockHandle] - Block handle configuration. When provided, a per-line block handle UI is shown. Works independently of `mode`.
  * @property {Array<string | { title: string, icon?: string, action: (deps: SunEditor.Deps, ctx: { block: HTMLElement }) => void }>} [blockHandle.menu] - Menu entries.
  * - **String entries**:
- *   - **Block format keys**: `p`, `h1`-`h6`, `heading` (H1-H6 submenu), `ul`, `ol`, `list` (UL/OL submenu), `blockquote`, `pre`.
- *     A registered plugin of the same name (`list`, `blockquote`) is used instead.
+ *   - **Built-in custom items**: `p`, `h1`-`h6`, `heading` (H1-H6 submenu), `ul`, `ol`, `list` (UL/OL submenu), `blockquote`, `pre`.
+ *     Preset items that apply the block format; they work without a plugin. A registered plugin of the same name (`list`, `blockquote`) is used instead.
  *   - **Plugin names**: Any registered plugin name (e.g. `blockStyle`, `align`, `image`, `link`). Dropdown plugins display their items as a submenu. Modal plugins open the modal on click.
  *   - **Built-in commands**: `bold`, `italic`, `underline`, `strike`, `undo`, `redo`, etc.
  * - **Custom item objects** — `{ title, icon?, action }`. `icon` is an icon key from `$.icons` or a raw `<svg>` HTML string; `action` is invoked with `($, { block })`.

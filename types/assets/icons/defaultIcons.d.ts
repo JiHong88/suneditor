@@ -42,6 +42,14 @@ declare namespace _default {
 	export let format_float_center: string;
 	export let font_color: string;
 	export let background_color: string;
+	export let paragraph: string;
+	export let heading: string;
+	export let heading_1: string;
+	export let heading_2: string;
+	export let heading_3: string;
+	export let heading_4: string;
+	export let heading_5: string;
+	export let heading_6: string;
 	export let list_bulleted: string;
 	export let list_numbered: string;
 	export let list_checked: string;

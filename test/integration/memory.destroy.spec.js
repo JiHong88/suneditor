@@ -75,7 +75,7 @@ describe('Editor resource lifecycle', () => {
 		expect(options.size()).toBe(0);
 		expect(roots.size).toBe(0);
 		expect(topArea.isConnected).toBe(false);
-		expect(entry.editor.events).toBeNull();
+		expect(entry.editor.events).toEqual({});
 	});
 
 	it('cancels a pending history save before it can notify or access destroyed state', async () => {

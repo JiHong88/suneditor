@@ -1664,6 +1664,33 @@ const options1 = {
 	toolbar_innerWidth: 'auto',
 	blockHandle: {
 		menu: [
+			// Built-in custom items ('list', 'blockquote' below resolve to the registered plugins instead)
+			'p',
+			'heading',
+			'h1',
+			'h2',
+			'ul',
+			'ol',
+			'pre',
+			// Custom item with children (submenu)
+			{
+				title: 'Custom submenu',
+				icon: 'heading',
+				keywords: ['children'],
+				children: [
+					{
+						title: 'Heading 4',
+						icon: 'heading_4',
+						action: ($) => $.format.setLine(document.createElement('H4')),
+					},
+					{
+						title: 'Paragraph',
+						icon: 'paragraph',
+						action: ($) => $.format.setLine(document.createElement('P')),
+					},
+					{ title: 'No action (skipped)' },
+				],
+			},
 			'bold',
 			'blockStyle',
 			'blockquote',
@@ -1686,8 +1713,35 @@ const options1 = {
 	},
 	slashCommand: {
 		// triggerChar: '/',
-		limitSize: 17,
+		// limitSize: 17,
 		items: [
+			// Built-in custom items ('list', 'blockquote' below resolve to the registered plugins instead)
+			'p',
+			'heading',
+			'h1',
+			'h2',
+			'ul',
+			'ol',
+			'pre',
+			// Custom item with children (submenu)
+			{
+				title: 'Custom submenu',
+				icon: 'heading',
+				keywords: ['children'],
+				children: [
+					{
+						title: 'Heading 4',
+						icon: 'heading_4',
+						action: ($) => $.format.setLine(document.createElement('H4')),
+					},
+					{
+						title: 'Paragraph',
+						icon: 'paragraph',
+						action: ($) => $.format.setLine(document.createElement('P')),
+					},
+					{ title: 'No action (skipped)' },
+				],
+			},
 			{
 				key: 'h1',
 				title: 'Heading 1',

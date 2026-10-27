@@ -1,6 +1,9 @@
 ### feat
 
 - `dom.check.hasMediaOrTable(node)`: check the element contains a media or table element (`helper/dom/domCheck`)
+- `CommandMenuItem.children`: a custom block handle / slash command menu item can hold child items, shown as a submenu (`modules/ui/CommandMenu`)
+- Slash command `items` accept the built-in custom items (`p`, `h1`-`h6`, `heading`, `ul`, `ol`, `list`, `blockquote`, `pre`), as the block handle menu does (`modules/ui/CommandMenu`, `plugins/field/slashCommand`)
+- Icons `paragraph`, `heading`, `heading_1`-`heading_6` (Lucide); the built-in `p`, `heading`, `h1`-`h6` menu items show them (`assets/icons/defaultIcons`, `modules/ui/CommandMenu`)
 
 ### fix
 
@@ -15,6 +18,10 @@
 - Applying a block (e.g. blockquote) to list items keeps it where the items were, instead of after the rest of the list (`core/logic/dom/format`)
 - Inserting a component (e.g. hr) in a list item keeps it in that item, without creating a list item inside it (`core/logic/shell/component`)
 - Splitting a list keeps a line before the split that holds only an image or other media, instead of clearing it (`core/logic/dom/nodeTransform`)
+- `editor.events` was `undefined` since 3.3.3, so `editor.events.onChange = fn` threw; it returns the event handlers again (`core/editor`, `core/config/eventManager`)
+- Block handle menu: the documented built-in items (`p`, `h1`-`h6`, `heading`, `ul`, `ol`, `list`, `blockquote`, `pre`) were left out of the menu; they now work without a plugin, and the documented default menu opens when `menu` is not given (`core/logic/panel/blockHandle`, `modules/ui/CommandMenu`)
+- blockStyle `items` accepts the `'pre'` and `'div'` strings, which were dropped (`plugins/dropdown/blockStyle`)
+- The External Libraries guide link in the math and codeMirror warnings pointed to the wrong repository (`plugins/modal/math`, `core/section/constructor`)
 
 ### breaking
 

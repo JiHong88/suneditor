@@ -45,7 +45,9 @@ export type SlashCommandPluginOptions = {
 	triggerChar?: string;
 	/**
 	 * - Menu entries. Strings resolve via `ResolveButton`
-	 * (plugin names, built-in commands like `'bold'`); objects are custom items with their own `action`.
+	 * (plugin names, built-in commands like `'bold'`) or are built-in custom items (`p`, `h1`-`h6`, `heading`, `ul`, `ol`,
+	 * `list`, `blockquote`, `pre`; a registered plugin of the same name is used instead); objects are custom items
+	 * with their own `action`, or with `children` for a submenu.
 	 * Required.
 	 */
 	items: Array<SlashCommandItem | string>;
@@ -146,7 +148,9 @@ export type SlashCommandPluginOptions = {
  * @typedef {Object} SlashCommandPluginOptions
  * @property {string} [triggerChar='/'] - Character that opens the command menu. Single character recommended.
  * @property {Array<SlashCommandItem | string>} items - Menu entries. Strings resolve via `ResolveButton`
- *   (plugin names, built-in commands like `'bold'`); objects are custom items with their own `action`.
+ *   (plugin names, built-in commands like `'bold'`) or are built-in custom items (`p`, `h1`-`h6`, `heading`, `ul`, `ol`,
+ *   `list`, `blockquote`, `pre`; a registered plugin of the same name is used instead); objects are custom items
+ *   with their own `action`, or with `children` for a submenu.
  *   Required.
  * @property {number} [delayTime=120] - Debounce delay (ms) before the input is inspected for the trigger.
  * @property {number} [limitSize=0] - Maximum number of items kept after filtering. `0` (default) keeps every match
