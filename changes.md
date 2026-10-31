@@ -2,6 +2,10 @@
 
 - Typing `>` then Space at the start of a line turns it into a blockquote, like `1.` / `*.` + Space make a list (inside a blockquote it nests one); turn it off with `shortcuts: { blockquote: undefined }` (`plugins/command/blockquote`)
 
+### enhance
+
+- `msOffice`: detect Word Online/Office 365, strip EOP/Selected cursor markers, unwrap OutlineElement wrappers, and sanitize legacy font tags (`helper/msOffice`, `core/event/eventOrchestrator`)
+
 ### fix
 
 - Editing a link's display text keeps the inline formatting that wraps the whole link text (e.g. `<a><b><i>text</i></b></a>`, a font applied to the link text) instead of replacing it with plain text, and the link text is selected again afterwards whatever wrappers it holds (`modules/ui/ModalAnchorEditor`, `plugins/modal/link`)
