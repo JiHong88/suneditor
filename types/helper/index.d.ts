@@ -183,6 +183,7 @@ export const markdown: {
 	markdownToHtml: typeof import('./markdown').markdownToHtml;
 };
 export const msOffice: {
+	isMSOffice: typeof import('./msOffice').isMSOffice;
 	cleanHTML: typeof import('./msOffice').cleanHTML;
 };
 export const googleDocs: {
