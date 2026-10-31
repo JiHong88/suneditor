@@ -52,6 +52,43 @@ const _FONT_SIZE_MAP = {
 	7: '48px',
 };
 
+/** Matches Word Online cloud font artifact suffixes */
+const _RE_MS_CLOUD_FONT = /(?:_EmbeddedFont|_MSFontService)/i;
+
+/** Known MS Office cursive / script / handwriting fonts that Word exports with wrong or missing generic fallbacks */
+const _MS_CURSIVE_FONTS = new Set([
+	'monotype corsiva',
+	'segoe script',
+	'segoe print',
+	'brush script mt',
+	'lucida calligraphy',
+	'lucida handwriting',
+	'comic sans ms',
+	'gabriola',
+	'ink free',
+	'bradley hand',
+	'bradley hand itc',
+	'edwardian script itc',
+	'freestyle script',
+	'french script mt',
+	'kunstler script',
+	'mistral',
+	'palace script mt',
+	'pristina',
+	'rage italic',
+	'script mt bold',
+	'vladimir script',
+	'vivaldi',
+	'kristen itc',
+	'chiller',
+	'mv boli',
+	'papyrus',
+]);
+
+/** Cross-platform cursive fallback stack (macOS Apple Chancery, Linux URW Chancery L / Z003, generic cursive) */
+const _CURSIVE_FALLBACK_STACK = "'Apple Chancery', 'URW Chancery L', 'Z003', cursive";
+const _CURSIVE_STRIP_TOKENS = new Set(['sans-serif', 'serif', 'cursive', 'apple chancery', 'urw chancery l', 'z003']);
+
 /** Matches tab-stops CSS declarations */
 const _RE_TAB_STOPS = /\s*tab-stops:[^;"]+;?/gi;
 
@@ -220,6 +257,45 @@ function _removeListMarkers(el) {
 }
 
 /**
+ * @description Cleans Word Online cloud font artifacts (_EmbeddedFont, _MSFontService) from font stacks.
+ * @param {string} val - Font family value
+ * @returns {string} Cleaned font family value
+ */
+function _cleanFontFamily(val) {
+	if (!val) return '';
+	const hasCloudFont = _RE_MS_CLOUD_FONT.test(val);
+	const parts = val.split(',');
+	const kept = [];
+	for (let i = 0, len = parts.length; i < len; i++) {
+		const part = parts[i].trim();
+		if (part && !_RE_MS_CLOUD_FONT.test(part)) {
+			kept.push(part);
+		}
+	}
+	if (kept.length === 0) return '';
+
+	const primaryName = kept[0]
+		.replace(/^["']+|["']+$/g, '')
+		.trim()
+		.toLowerCase();
+	if (_MS_CURSIVE_FONTS.has(primaryName)) {
+		const filtered = kept.filter(
+			(t) =>
+				!_CURSIVE_STRIP_TOKENS.has(
+					t
+						.replace(/^["']+|["']+$/g, '')
+						.trim()
+						.toLowerCase(),
+				),
+		);
+		filtered.push(_CURSIVE_FALLBACK_STACK);
+		return filtered.join(', ');
+	}
+
+	return hasCloudFont ? kept.join(', ') : val.trim();
+}
+
+/**
  * @description Cleans inline style attributes: strips mso-*, tab-stops, converts mso-highlight to background-color.
  * @param {Element} el
  */
@@ -237,6 +313,14 @@ function _cleanStyles(el) {
 
 	// Strip default "color: windowtext" so text inherits editor theme color; map remaining windowtext (e.g. borders) to #000000
 	cleaned = cleaned.replace(/(?:^|;)\s*color\s*:\s*windowtext\b\s*;?/gi, ';').replace(/\bwindowtext\b/gi, '#000000');
+
+	// Clean Word Online cloud font artifacts from font-family
+	if (/font-family/i.test(cleaned)) {
+		cleaned = cleaned.replace(/(?:^|;)\s*font-family\s*:\s*([^;]+)/gi, (match, val) => {
+			const cleanedFont = _cleanFontFamily(val);
+			return cleanedFont ? `;font-family: ${cleanedFont}` : '';
+		});
+	}
 
 	cleaned = cleaned
 		.replace(_RE_MSO_STYLE, '')
@@ -847,8 +931,11 @@ function _convertFontTags(doc) {
 
 		const face = font.getAttribute('face');
 		if (face) {
-			styles.push(`font-family: ${face}`);
-			existingStyle = existingStyle.replace(/\bfont-family\s*:[^;]+;?/gi, '').trim();
+			const cleanedFace = _cleanFontFamily(face);
+			if (cleanedFace) {
+				styles.push(`font-family: ${cleanedFace}`);
+				existingStyle = existingStyle.replace(/\bfont-family\s*:[^;]+;?/gi, '').trim();
+			}
 		}
 
 		const color = font.getAttribute('color');

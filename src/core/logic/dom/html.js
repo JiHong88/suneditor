@@ -2155,7 +2155,12 @@ class HTML {
 			}
 			if (!mv) return v;
 
-			const style = sv.replace(_RE_AMP_QUOT, '').match(mv);
+			const styleBody = sv
+				.slice(0, -1)
+				.replace(_RE_STYLE_PREFIX, '')
+				.replace(_RE_AMP_QUOT, "'")
+				.replace(_RE_DQUOTE, "'");
+			const style = ('"' + styleBody).match(mv);
 			if (!style) return v;
 
 			const allowedStyle = [];
@@ -2166,9 +2171,29 @@ class HTML {
 					const cs = this.#frameContext.get('wwComputedStyle')[k]?.replace(_RE_DQUOTE, '');
 					const c = r[3].trim();
 					switch (k) {
-						case 'fontFamily':
-							if (!this.#$.plugins.font || !this.#$.plugins.font.fontArray.includes(c)) continue;
+						case 'fontFamily': {
+							if (!this.#$.plugins.font || !_RE_SAFE_FONT_FAMILY.test(c)) continue;
+							const fontArray = this.#$.plugins.font.fontArray || [];
+							const fontTokens = c.split(',');
+							let hasValidFont = false;
+							for (let j = 0, jlen = fontTokens.length; j < jlen; j++) {
+								const token = fontTokens[j].replace(_RE_FONT_QUOTES, '').trim().toLowerCase();
+								if (!token) continue;
+								if (
+									_GENERIC_FONT_FAMILIES.has(token) ||
+									fontArray.some(
+										(f) =>
+											f.toLowerCase() === token ||
+											f.split(',')[0].replace(_RE_FONT_QUOTES, '').trim().toLowerCase() === token,
+									)
+								) {
+									hasValidFont = true;
+									break;
+								}
+							}
+							if (!hasValidFont) continue;
 							break;
+						}
 						case 'fontSize':
 							if (!this.#$.plugins.fontSize) continue;
 							if (!this.#fontSizeUnitRegExp.test(r[0])) {
@@ -2186,7 +2211,13 @@ class HTML {
 							break;
 					}
 
-					if (cs !== c) {
+					const isDefaultFont =
+						k === 'fontFamily' &&
+						cs &&
+						c.replace(_RE_FONT_QUOTES, '').trim().toLowerCase() ===
+							cs.replace(_RE_FONT_QUOTES, '').trim().toLowerCase();
+
+					if (cs !== c && !isDefaultFont) {
 						allowedStyle.push(r[0]);
 					}
 				}
@@ -2493,7 +2524,7 @@ const _RE_ON_HANDLER = /\s(?:on[a-z]+)\s*=\s*(?:(["'])[^"']*\1|\S+)/gi;
 // #rebuildIframePlaceholder
 const _RE_ATTR_NAME = /^[a-z_][a-z0-9_.:-]*$/i;
 const _RE_PLACEHOLDER_BLOCKED_ATTR = /^(?:on|srcdoc$)/i;
-const _RE_STYLE_ATTR = /style\s*=\s*(?:"|')[^"']*(?:"|')/;
+const _RE_STYLE_ATTR = /style\s*=\s*(?:"[^"]*"|'[^']*')/i;
 const _RE_STYLE_NAME = /^\s*style\s*=/i;
 const _RE_STYLE_ATTR_RAW = /\sstyle\s*=\s*(?:"[^"]*"|'[^']*')/i;
 const _RE_ANY_ATTR = /\s[^\s"'>/=]+\s*=\s*(?:"[^"]*"|'[^']*')/g;
@@ -2507,10 +2538,28 @@ const _RE_INSIGNIFICANT_WS = /^[ \t\n\r\f\v]+$/;
 const _RE_SIZE_ATTR = /\ssize="([^"]+)"/i;
 const _RE_FACE_ATTR = /\sface="([^"]+)"/i;
 const _RE_COLOR_ATTR = /\scolor="([^"]+)"/i;
+const _RE_STYLE_PREFIX = /^style\s*=\s*["']/i;
 const _RE_AMP_QUOT = /&quot;/g;
-const _RE_CSS_PROP = /([a-zA-Z0-9-]+)(:)([^"']+)/;
+const _RE_CSS_PROP = /([a-zA-Z0-9-]+)(:)([^"]+)/;
 const _RE_CSS_GLOBAL = /inherit|initial|revert|unset/i;
 const _RE_DQUOTE = /"/g;
+const _RE_FONT_QUOTES = /["']/g;
+const _RE_SAFE_FONT_FAMILY = /^[\p{L}\p{N}\s,'_-]+$/u;
+const _GENERIC_FONT_FAMILIES = new Set([
+	'serif',
+	'sans-serif',
+	'monospace',
+	'cursive',
+	'fantasy',
+	'system-ui',
+	'ui-serif',
+	'ui-sans-serif',
+	'ui-monospace',
+	'ui-rounded',
+	'emoji',
+	'math',
+	'fangsong',
+]);
 const _RE_CSS_VALUE = /:\s*([^;]+)/;
 const _RE_TRANSPARENT_COLOR = /rgba\(([0-9]+\s*,\s*){3}0\)|windowtext/i;
 

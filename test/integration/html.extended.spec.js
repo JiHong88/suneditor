@@ -3,6 +3,7 @@
  */
 
 import { createTestEditor, waitForEditorReady, destroyTestEditor } from '../__mocks__/editorIntegration';
+import { font } from '../../src/plugins';
 
 describe('HTML Extended Tests', () => {
 	let editor;
@@ -73,6 +74,83 @@ describe('HTML Extended Tests', () => {
 			const cleaned = editor.$.html.clean('');
 
 			expect(typeof cleaned).toBe('string');
+		});
+
+	});
+
+	describe('html.clean() font preservation', () => {
+		let fontEditor;
+
+		beforeEach(async () => {
+			fontEditor = createTestEditor({
+				plugins: { font },
+			});
+			await waitForEditorReady(fontEditor);
+		});
+
+		afterEach(() => {
+			destroyTestEditor(fontEditor);
+		});
+
+		it('should preserve single-quoted font names without truncation', () => {
+			const cleaned = fontEditor.$.html.clean(
+				'<p><span style="font-family: \'Comic Sans MS\';">Comic text</span></p>',
+			);
+
+			expect(cleaned).toContain('font-family: \'Comic Sans MS\'');
+		});
+
+		it('should preserve cursive signature fonts with generic fallbacks', () => {
+			const cleaned = fontEditor.$.html.clean(
+				'<p><span style="font-family: \'Segoe Script\', cursive;">Much obliged</span></p>',
+			);
+
+			expect(cleaned).toContain('font-family: \'Segoe Script\', cursive');
+		});
+
+		it('should preserve body fonts with generic sans-serif fallbacks', () => {
+			const cleaned = fontEditor.$.html.clean(
+				'<p><span style="font-family: Calibri, sans-serif;">Body paragraph</span></p>',
+			);
+
+			expect(cleaned).toContain('font-family: Calibri, sans-serif');
+		});
+
+		it('should preserve toolbar fonts case-insensitively', () => {
+			const cleaned = fontEditor.$.html.clean('<p><span style="font-family: Tahoma;">Tahoma text</span></p>');
+
+			expect(cleaned).toContain('font-family: Tahoma');
+		});
+
+		it('should strip standalone unsupported font names without generic fallbacks', () => {
+			const cleaned = fontEditor.$.html.clean(
+				'<p><span style="font-family: UnknownBogusFont;">Bogus font text</span></p>',
+			);
+
+			expect(cleaned).not.toContain('font-family');
+		});
+
+		it('should normalize double-quoted font names inside single-quoted style attributes safely', () => {
+			const cleaned = fontEditor.$.html.clean(
+				'<p><span style=\'font-family: "Segoe Script", cursive;\'>Much obliged</span></p>',
+			);
+
+			expect(cleaned).toContain("font-family: 'Segoe Script', cursive");
+		});
+
+		it('should prevent attribute breakout via double quotes inside single-quoted style attributes', () => {
+			const cleaned = fontEditor.$.html.clean('<p style=\'margin: 0" on&#102;ocus="alert(1)\'>Safe text</p>');
+
+			expect(cleaned).not.toContain('onfocus');
+			expect(cleaned).not.toContain('alert(1)');
+		});
+
+		it('should preserve Unicode / CJK font names when paired with a generic fallback or registered in font list', () => {
+			const cleaned = fontEditor.$.html.clean(
+				'<p><span style="font-family: \'맑은 고딕\', sans-serif;">Korean font text</span></p>',
+			);
+
+			expect(cleaned).toContain("font-family: '맑은 고딕', sans-serif");
 		});
 	});
 

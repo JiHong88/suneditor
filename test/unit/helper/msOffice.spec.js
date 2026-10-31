@@ -167,5 +167,53 @@ describe('Helper - msOffice', () => {
 				expect(output).toBe('<table><tbody><tr><td style="vertical-align:top">Cell</td></tr></tbody></table>');
 			});
 		});
+
+		describe('Word Online cloud font cleanup', () => {
+			it('strips _EmbeddedFont and _MSFontService suffixes from font-family styles', () => {
+				const input =
+					'<span style="font-family: &quot;Segoe Script&quot;, &quot;Segoe Script_EmbeddedFont&quot;, &quot;Segoe Script_MSFontService&quot;, cursive;">Much obliged</span>';
+				expect(cleanHTML(input)).toBe(
+					'<span style="font-family: &quot;Segoe Script&quot;, \'Apple Chancery\', \'URW Chancery L\', \'Z003\', cursive">Much obliged</span>',
+				);
+
+				const inputCalibri =
+					'<span style="font-family: Calibri, Calibri_EmbeddedFont, Calibri_MSFontService, sans-serif;">Body text</span>';
+				expect(cleanHTML(inputCalibri)).toBe(
+					'<span style="font-family: Calibri, sans-serif">Body text</span>',
+				);
+			});
+
+			it('strips cloud font suffixes in <font face="..."> attributes during conversion', () => {
+				const input =
+					'<font face="Calibri, Calibri_EmbeddedFont, Calibri_MSFontService, sans-serif" size="3">Text</font>';
+				expect(cleanHTML(input)).toBe(
+					'<span style="font-family: Calibri, sans-serif; font-size: 16px">Text</span>',
+				);
+			});
+
+			it('removes font-family style if only cloud fonts were present', () => {
+				const input = '<p style="font-family: Calibri_EmbeddedFont, Calibri_MSFontService;">Cloud only</p>';
+				expect(cleanHTML(input)).toBe('<p>Cloud only</p>');
+			});
+
+			it('preserves existing style font-family when <font face> contains only cloud fonts', () => {
+				const input =
+					'<font face="Calibri_EmbeddedFont" style="font-family: Arial, sans-serif;">Fallback font</font>';
+				expect(cleanHTML(input)).toBe('<span style="font-family: Arial, sans-serif">Fallback font</span>');
+			});
+
+			it('normalizes fallback to cross-platform cursive stack for MS Office script/cursive fonts like Monotype Corsiva', () => {
+				const wordOnlineInput =
+					'<span style="font-family: &quot;Monotype Corsiva&quot;, &quot;Monotype Corsiva_EmbeddedFont&quot;, &quot;Monotype Corsiva_MSFontService&quot;, sans-serif;">Much obliged,</span>';
+				expect(cleanHTML(wordOnlineInput)).toBe(
+					'<span style="font-family: &quot;Monotype Corsiva&quot;, \'Apple Chancery\', \'URW Chancery L\', \'Z003\', cursive">Much obliged,</span>',
+				);
+
+				const desktopWordInput = '<font face="Monotype Corsiva" size="4">Dr./ John Doe</font>';
+				expect(cleanHTML(desktopWordInput)).toBe(
+					'<span style="font-family: Monotype Corsiva, \'Apple Chancery\', \'URW Chancery L\', \'Z003\', cursive; font-size: 19px">Dr./ John Doe</span>',
+				);
+			});
+		});
 	});
 });

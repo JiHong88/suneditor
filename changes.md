@@ -6,7 +6,8 @@
 
 ### enhance
 
-- `msOffice`: detect Word Online/Office 365, strip EOP/Selected cursor markers, unwrap OutlineElement wrappers, and sanitize legacy font tags (`helper/msOffice`, `core/event/eventOrchestrator`)
+- `msOffice`: detect Word Online/Office 365, strip EOP/Selected cursor markers and cloud font suffixes (`_EmbeddedFont`, `_MSFontService`), unwrap OutlineElement wrappers, and sanitize legacy font tags (`helper/msOffice`, `core/event/eventOrchestrator`)
+- Preserve quoted `font-family` names and generic CSS fallback stacks during `html.clean`, and match case-insensitive or fallback font stacks in the `font` dropdown (`core/logic/dom/html`, `plugins/dropdown/font`)
 - `dom.check.hasMediaOrTable(node)`: check the element contains a media or table element (`helper/dom/domCheck`)
 - The "plugin not found" (`create.toolbar.fail`) and "target not found" (`create.fail`) errors end with a link to the matching Troubleshooting entry on suneditor.com; the links are exported as `env.TROUBLESHOOTING_URLS` (by anchor id) and `env.GUIDE_EXTERNAL_LIBRARIES_URL` (`suneditor`, `core/section/constructor`, `helper/env`)
 
