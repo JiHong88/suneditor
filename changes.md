@@ -6,6 +6,7 @@
 
 ### enhance
 
+- `msOffice`: detect Word Online/Office 365, strip EOP/Selected cursor markers, unwrap OutlineElement wrappers, and sanitize legacy font tags (`helper/msOffice`, `core/event/eventOrchestrator`)
 - `dom.check.hasMediaOrTable(node)`: check the element contains a media or table element (`helper/dom/domCheck`)
 - The "plugin not found" (`create.toolbar.fail`) and "target not found" (`create.fail`) errors end with a link to the matching Troubleshooting entry on suneditor.com; the links are exported as `env.TROUBLESHOOTING_URLS` (by anchor id) and `env.GUIDE_EXTERNAL_LIBRARIES_URL` (`suneditor`, `core/section/constructor`, `helper/env`)
 

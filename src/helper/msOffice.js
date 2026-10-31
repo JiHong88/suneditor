@@ -29,6 +29,29 @@ const _RE_MSO_CLASS = /\bMso\w+/g;
 /** Matches Excel xl* class names */
 const _RE_XL_CLASS = /\bxl\d+/g;
 
+/** Matches Office Online class names */
+const _RE_OFFICE_ONLINE_CLASS =
+	/\b(?:SCXW|BCX)\d+\b|\b(?:NormalTextRun|TextRun|OutlineElement|Paragraph|EOP|Selected)\b/gi;
+
+/** Matches Office Online & desktop markers for isMSOffice */
+const _RE_IS_MS_OFFICE =
+	/class=["'][^"']*(?:\b(?:Mso\w*|NormalTextRun|TextRun|OutlineElement|(?:SCXW|BCX)\d+)\b|(?:\s|^|["'])EOP(?:\s|$|["']))/i;
+const _RE_IS_MS_CONTENT = /content=["']*(?:Word\.Document|OneNote\.File|Excel\.Sheet)/i;
+const _RE_IS_MS_XMLNS = /xmlns:(?:o|w|v)=/i;
+const _RE_IS_MS_MSO_STYLE = /\bmso-[\w-]+\s*:/i;
+const _RE_IS_MS_DATA_ATTR = /data-ccp-(?:props|parastyle)/i;
+
+/** Legacy HTML <font size="1..7"> → CSS px font-size */
+const _FONT_SIZE_MAP = {
+	1: '10px',
+	2: '13px',
+	3: '16px',
+	4: '19px',
+	5: '24px',
+	6: '32px',
+	7: '48px',
+};
+
 /** Matches tab-stops CSS declarations */
 const _RE_TAB_STOPS = /\s*tab-stops:[^;"]+;?/gi;
 
@@ -212,6 +235,9 @@ function _cleanStyles(el) {
 		cleaned += ';background-color:' + highlightMatch[1].trim();
 	}
 
+	// Strip default "color: windowtext" so text inherits editor theme color; map remaining windowtext (e.g. borders) to #000000
+	cleaned = cleaned.replace(/(?:^|;)\s*color\s*:\s*windowtext\b\s*;?/gi, ';').replace(/\bwindowtext\b/gi, '#000000');
+
 	cleaned = cleaned
 		.replace(_RE_MSO_STYLE, '')
 		.replace(_RE_TAB_STOPS, '')
@@ -234,14 +260,19 @@ function _cleanStyles(el) {
 }
 
 /**
- * @description Removes Mso- and xl- class names from an element. Removes class attr if empty.
+ * @description Removes Mso-, xl-, and Office Online class names from an element. Removes class attr if empty.
  * @param {Element} el
  */
 function _cleanClasses(el) {
 	const cls = el.getAttribute('class');
 	if (!cls) return;
 
-	const cleaned = cls.replace(_RE_MSO_CLASS, '').replace(_RE_XL_CLASS, '').trim();
+	const cleaned = cls
+		.replace(_RE_MSO_CLASS, '')
+		.replace(_RE_XL_CLASS, '')
+		.replace(_RE_OFFICE_ONLINE_CLASS, '')
+		.replace(/\s{2,}/g, ' ')
+		.trim();
 	if (cleaned) {
 		el.setAttribute('class', cleaned);
 	} else {
@@ -749,7 +780,124 @@ function _cleanBreaks(doc) {
 	}
 }
 
+// ---------- Word Online & Office 365 cleanup ----------
+
+/**
+ * @description Removes Word Online End-Of-Paragraph and selection artifacts while preserving valid user text.
+ * @param {Document} doc
+ */
+function _cleanWordOnlineArtifacts(doc) {
+	const eopElements = doc.body.querySelectorAll('span[class*="EOP"], span[class*="Selected"]');
+	for (let i = 0, len = eopElements.length; i < len; i++) {
+		const el = eopElements[i];
+		const style = el.getAttribute('style') || '';
+		const isDarkBg =
+			/background(?:-color)?\s*:[^;]*(?:rgb\(\s*96|#60|gray)/i.test(style) || el.classList.contains('EOP');
+
+		if (isDarkBg) {
+			const text = (el.textContent || '').replace(/[\s\u00a0\u200b]/g, '');
+			if (!text && !el.querySelector('img, video, iframe, br, table')) {
+				el.remove();
+			} else {
+				// Prevent text loss: strip dark background styling and artifact classes
+				const cleanStyle = style.replace(/\bbackground(?:-color)?\s*:[^;]+;?/gi, '').trim();
+				if (cleanStyle) {
+					el.setAttribute('style', cleanStyle);
+				} else {
+					el.removeAttribute('style');
+				}
+				el.classList.remove('EOP', 'Selected');
+				if (!el.getAttribute('class')) {
+					el.removeAttribute('class');
+				}
+			}
+		}
+	}
+}
+
+/**
+ * @description Unwraps redundant Word Online OutlineElement and Paragraph container divs.
+ * @param {Document} doc
+ */
+function _unwrapOutlineDivs(doc) {
+	const outlineDivs = doc.body.querySelectorAll('div.OutlineElement, div.Paragraph');
+	for (let i = outlineDivs.length - 1; i >= 0; i--) {
+		const div = outlineDivs[i];
+		const parent = div.parentNode;
+		if (parent && div.children.length > 0) {
+			while (div.firstChild) {
+				parent.insertBefore(div.firstChild, div);
+			}
+			div.remove();
+		}
+	}
+}
+
+/**
+ * @description Converts legacy <font> tags to semantic <span> elements with CSS styling.
+ * @param {Document} doc
+ */
+function _convertFontTags(doc) {
+	const fonts = doc.body.querySelectorAll('font');
+	for (let i = fonts.length - 1; i >= 0; i--) {
+		const font = fonts[i];
+		const span = doc.createElement('span');
+		const styles = [];
+		let existingStyle = font.getAttribute('style') || '';
+
+		const face = font.getAttribute('face');
+		if (face) {
+			styles.push(`font-family: ${face}`);
+			existingStyle = existingStyle.replace(/\bfont-family\s*:[^;]+;?/gi, '').trim();
+		}
+
+		const color = font.getAttribute('color');
+		if (color) {
+			existingStyle = existingStyle.replace(/(?:^|;)\s*color\s*:[^;]+;?/gi, ';').trim();
+			if (color.toLowerCase() !== 'windowtext') {
+				styles.push(`color: ${color}`);
+			}
+		}
+
+		const size = font.getAttribute('size');
+		const mappedSize = (size && _FONT_SIZE_MAP[size]) || (/14pt/i.test(existingStyle) ? '19px' : '');
+		if (mappedSize) {
+			styles.push(`font-size: ${mappedSize}`);
+			existingStyle = existingStyle.replace(/\bfont-size\s*:[^;]+;?/gi, '').trim();
+		}
+
+		if (existingStyle) {
+			styles.push(existingStyle);
+		}
+
+		if (styles.length) {
+			span.setAttribute('style', styles.join('; '));
+		}
+
+		while (font.firstChild) {
+			span.appendChild(font.firstChild);
+		}
+		font.replaceWith(span);
+	}
+}
+
 // ---------- public API ----------
+
+/**
+ * @description Checks whether the HTML content originated from Microsoft Office (Desktop, Online, Word, Excel, OneNote).
+ * @param {string} html HTML string
+ * @returns {boolean}
+ */
+export function isMSOffice(html) {
+	if (!html || typeof html !== 'string') return false;
+	return (
+		_RE_IS_MS_OFFICE.test(html) ||
+		_RE_IS_MS_CONTENT.test(html) ||
+		_RE_IS_MS_XMLNS.test(html) ||
+		_RE_IS_MS_MSO_STYLE.test(html) ||
+		_RE_IS_MS_DATA_ATTR.test(html)
+	);
+}
 
 /**
  * @description Converts MS Word/Excel/OneNote HTML clipboard data to clean, standards-compliant HTML.
@@ -801,25 +949,30 @@ export function cleanHTML(html) {
 	// 3a. Remove track changes & comments first (before structural changes)
 	_cleanTrackChanges(doc);
 
-	// 3b. Convert Word fake lists to proper <ol>/<ul>/<li>
+	// 3b. Clean Word Online markers, outline wrappers, and legacy font tags
+	_cleanWordOnlineArtifacts(doc);
+	_unwrapOutlineDivs(doc);
+	_convertFontTags(doc);
+
+	// 3c. Convert Word fake lists to proper <ol>/<ul>/<li>
 	_convertLists(doc, listStyles);
 
-	// 3c. Convert outline-level paragraphs to semantic headings
+	// 3d. Convert outline-level paragraphs to semantic headings
 	_convertHeadings(doc);
 
-	// 3d. Clean tables
+	// 3e. Clean tables
 	_cleanTables(doc);
 
-	// 3e. Clean links
+	// 3f. Clean links
 	_cleanLinks(doc);
 
-	// 3f. Clean images
+	// 3g. Clean images
 	_cleanImages(doc);
 
-	// 3g. Clean page/section/column breaks
+	// 3h. Clean page/section/column breaks
 	_cleanBreaks(doc);
 
-	// 3h. Clean all elements (styles, classes, attributes)
+	// 3i. Clean all elements (styles, classes, attributes)
 	const allElements = doc.body.querySelectorAll('*');
 	for (const el of allElements) {
 		_cleanStyles(el);
@@ -828,6 +981,9 @@ export function cleanHTML(html) {
 		// Remove Word-specific attributes
 		if (el.getAttribute('lang')) el.removeAttribute('lang');
 		el.removeAttribute('v:shapes');
+		el.removeAttribute('data-ccp-props');
+		el.removeAttribute('data-ccp-parastyle');
+		el.removeAttribute('data-contrast');
 
 		// Remove width/height from non-media, non-table elements
 		const tag = el.tagName.toLowerCase();
@@ -837,10 +993,10 @@ export function cleanHTML(html) {
 		}
 	}
 
-	// 3i. Unwrap empty spans
+	// 3j. Unwrap empty spans
 	_unwrapEmptySpans(doc.body);
 
-	// 3j. Remove completely empty paragraphs
+	// 3k. Remove completely empty paragraphs
 	const paragraphs = doc.body.querySelectorAll('p');
 	for (const p of paragraphs) {
 		if (!p.textContent.trim() && !p.querySelector('img, video, iframe, br, table')) {
@@ -852,5 +1008,6 @@ export function cleanHTML(html) {
 }
 
 export default {
+	isMSOffice,
 	cleanHTML,
 };
