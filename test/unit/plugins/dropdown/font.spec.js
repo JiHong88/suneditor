@@ -287,6 +287,26 @@ describe('Plugins - Dropdown - Font', () => {
 
             expect(dom.utils.addClass).toHaveBeenCalledWith(font.fontList[2], 'active');
         });
+
+        it('should match font buttons case-insensitively', () => {
+            mockTargetText.textContent = 'Tahoma';
+            font.fontList[2].getAttribute.mockReturnValue('tahoma');
+            const { dom } = require('../../../../src/helper');
+
+            font.on(mockTarget);
+
+            expect(dom.utils.addClass).toHaveBeenCalledWith(font.fontList[2], 'active');
+        });
+
+        it('should match primary font name when font has fallback stack', () => {
+            mockTargetText.textContent = 'Arial, sans-serif';
+            font.fontList[1].getAttribute.mockReturnValue('Arial');
+            const { dom } = require('../../../../src/helper');
+
+            font.on(mockTarget);
+
+            expect(dom.utils.addClass).toHaveBeenCalledWith(font.fontList[1], 'active');
+        });
     });
 
     describe('action method', () => {

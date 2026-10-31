@@ -92,8 +92,17 @@ class Font extends PluginDropdown {
 
 		if (currentFont !== this.currentFont) {
 			let found = false;
+			const currentPrimary = currentFont.split(',')[0].replace(/'|"/g, '').trim().toLowerCase();
 			for (let i = 0, len = fontList.length; i < len; i++) {
-				if (currentFont === (fontList[i].getAttribute('data-command') || '').replace(/'|"/g, '')) {
+				const cmd = (fontList[i].getAttribute('data-command') || '').replace(/'|"/g, '').trim();
+				const cmdPrimary = cmd.split(',')[0].trim().toLowerCase();
+				if (
+					(currentFont &&
+						cmd &&
+						(currentFont.toLowerCase() === cmd.toLowerCase() ||
+							(Boolean(currentPrimary) && currentPrimary === cmdPrimary))) ||
+					(!currentFont && !cmd)
+				) {
 					dom.utils.addClass(fontList[i], 'active');
 					found = true;
 				} else {
