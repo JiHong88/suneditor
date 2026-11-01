@@ -9,6 +9,8 @@ describe('Helper - msOffice', () => {
 		it('detects desktop Word Mso classes', () => {
 			expect(isMSOffice('<p class="MsoNormal">Text</p>')).toBe(true);
 			expect(isMSOffice('<p class="MsoListParagraph">1. Item</p>')).toBe(true);
+			expect(isMSOffice('<p class=MsoNormal>Unquoted text</p>')).toBe(true);
+			expect(isMSOffice('<p class=MsoListParagraph>Unquoted list</p>')).toBe(true);
 		});
 
 		it('detects Word/Excel/OneNote content meta tags', () => {
@@ -32,15 +34,38 @@ describe('Helper - msOffice', () => {
 			expect(isMSOffice('<html xmlns:w="urn:schemas-microsoft-com:office:word"></html>')).toBe(true);
 		});
 
-		it('detects mso-* CSS styles', () => {
+		it('detects mso-* CSS styles and conditional comments', () => {
 			expect(isMSOffice('<p style="mso-margin-top-alt: auto;">Text</p>')).toBe(true);
 			expect(isMSOffice('<span style="mso-list: Ignore;">·</span>')).toBe(true);
+			expect(
+				isMSOffice('<span style=\'font-size:11.0pt;font-family:"Calibri",sans-serif;mso-fareast-font-family:Calibri\'>Text</span>'),
+			).toBe(true);
+			expect(
+				isMSOffice('<span style="font-family: \'Segoe UI\', sans-serif; mso-ascii-font-family: Calibri;">Text</span>'),
+			).toBe(true);
+			expect(isMSOffice('<span style=mso-spacerun:yes>&nbsp;</span>')).toBe(true);
+			expect(isMSOffice('<style><!-- @list l0 {mso-list-id:1;} --></style><p>Item</p>')).toBe(true);
+			expect(isMSOffice('<!--[if !mso]><style>v\\:* {behavior:url(#default#VML);}</style><![endif]-->')).toBe(
+				true,
+			);
 		});
 
 		it('returns false for non-MS Office content', () => {
 			expect(isMSOffice('<p>Plain HTML paragraph</p>')).toBe(false);
 			expect(isMSOffice('<p class="eop-footer developer-eop">Footer</p>')).toBe(false);
+			expect(isMSOffice('<div class="is-selected">Custom element</div>')).toBe(false);
+			expect(isMSOffice('<div class="tab selected">Selected tab</div>')).toBe(false);
+			expect(isMSOffice('<p class="my-paragraph">Custom text</p>')).toBe(false);
+			expect(isMSOffice('<p class="paragraph">Generic paragraph class</p>')).toBe(false);
+			expect(isMSOffice('<p class=MsoNormal-custom>Unquoted hyphenated class</p>')).toBe(false);
+			expect(isMSOffice('<img alt="Use class=MsoNormal in Word" src="https://example.com/a.png">')).toBe(false);
+			expect(isMSOffice('<meta data-content="Word.Document">')).toBe(false);
+			expect(isMSOffice('<div style="--mso-custom-var: 10px;">CSS custom property</div>')).toBe(false);
 			expect(isMSOffice('<p>The mso-format in prose is: valid</p>')).toBe(false);
+			expect(isMSOffice('<p>In CSS, mso-style: is a prefix</p>')).toBe(false);
+			expect(isMSOffice('<p>The data-ccp-props attribute is used by Word</p>')).toBe(false);
+			expect(isMSOffice('<p>xmlns:o=urn:schemas-microsoft-com in prose</p>')).toBe(false);
+			expect(isMSOffice('<p>class="MsoNormal" in tutorial text</p>')).toBe(false);
 			expect(isMSOffice('<b id="docs-internal-guid-123"><p>Google Doc</p></b>')).toBe(false);
 			expect(isMSOffice('')).toBe(false);
 			expect(isMSOffice(null)).toBe(false);
@@ -62,18 +87,27 @@ describe('Helper - msOffice', () => {
 				expect(output).toBe('<p>Selected text</p>');
 			});
 
-			it('preserves user text in selection markers while stripping dark background and classes', () => {
-				const input =
+			it('preserves user text and normal highlights in selection markers', () => {
+				const inputYellow =
+					'<p>Highlighted <span class="Selected" style="background-color: yellow;">user text</span></p>';
+				expect(cleanHTML(inputYellow)).toBe(
+					'<p>Highlighted <span style="background-color: yellow">user text</span></p>',
+				);
+
+				const inputDark =
 					'<p>Highlighted <span class="Selected" style="background-color: rgb(96, 96, 96);">user text</span></p>';
-				const output = cleanHTML(input);
-				expect(output).toBe('<p>Highlighted user text</p>');
+				expect(cleanHTML(inputDark)).toBe(
+					'<p>Highlighted <span style="background-color: rgb(96, 96, 96)">user text</span></p>',
+				);
 			});
 
 			it('preserves media and line breaks inside selection markers', () => {
 				const input =
 					'<p>Before<span class="Selected" style="background-color: rgb(96, 96, 96);"><img src="https://example.com/pic.png"></span>After</p>';
 				const output = cleanHTML(input);
-				expect(output).toBe('<p>Before<img src="https://example.com/pic.png">After</p>');
+				expect(output).toBe(
+					'<p>Before<span style="background-color: rgb(96, 96, 96)"><img src="https://example.com/pic.png"></span>After</p>',
+				);
 			});
 
 			it('unwraps redundant OutlineElement and Paragraph container divs without losing sibling nodes', () => {
@@ -90,11 +124,11 @@ describe('Helper - msOffice', () => {
 				expect(output).toBe('<p>Clean text</p>');
 			});
 
-			it('removes Office Online classes (SCXW, BCX, NormalTextRun, TextRun, OutlineElement, Paragraph)', () => {
+			it('removes Office Online classes while preserving hyphenated class names', () => {
 				const input =
-					'<p class="custom Paragraph SCXW12345 keep"><span class="TextRun NormalTextRun BCX9876">Text</span></p>';
+					'<p class="custom Paragraph SCXW12345 keep is-selected my-paragraph"><span class="TextRun NormalTextRun BCX9876">Text</span></p>';
 				const output = cleanHTML(input);
-				expect(output).toBe('<p class="custom keep">Text</p>');
+				expect(output).toBe('<p class="custom keep is-selected my-paragraph">Text</p>');
 			});
 		});
 
@@ -105,9 +139,10 @@ describe('Helper - msOffice', () => {
 					'<span style="font-family: Candara; font-size: 19px">Important text</span>',
 				);
 
-				const inputExplicitColor = '<font face="Candara" color="#d9534f" size="4">Colored text</font>';
+				const inputExplicitColor =
+					'<font face="Candara" color="#d9534f" size="4" style="color: windowtext; font-weight: bold;">Colored text</font>';
 				expect(cleanHTML(inputExplicitColor)).toBe(
-					'<span style="font-family: Candara; color: #d9534f; font-size: 19px">Colored text</span>',
+					'<span style="font-family: Candara; color: #d9534f; font-size: 19px; font-weight: bold">Colored text</span>',
 				);
 			});
 
@@ -123,6 +158,18 @@ describe('Helper - msOffice', () => {
 				expect(output).toBe(
 					'<span style="font-family: Candara; font-size: 19px; font-weight: bold">Styled text</span>',
 				);
+
+				const msoFontInput =
+					'<font face="Candara" size="4" style="mso-fareast-font-family: SimSun; mso-bidi-font-size: 14pt; font-weight: bold;">MSO styled text</font>';
+				expect(cleanHTML(msoFontInput)).toBe(
+					'<span style="font-family: Candara; font-size: 19px; font-weight: bold">MSO styled text</span>',
+				);
+			});
+
+			it('does not rewrite 14pt to 19px when <font> tag lacks size attribute', () => {
+				const input = '<font style="font-size: 14pt;">Kept size</font>';
+				const output = cleanHTML(input);
+				expect(output).toBe('<span style="font-size: 14pt">Kept size</span>');
 			});
 
 			it('strips color: windowtext on text while mapping windowtext to #000000 on borders', () => {

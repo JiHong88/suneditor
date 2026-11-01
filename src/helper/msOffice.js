@@ -23,23 +23,28 @@ const _RE_MSO_LIST = /l(\d+)\s+level(\d+)\s+lfo(\d+)/i;
 /** Matches mso-list:Ignore markers */
 const _RE_MSO_LIST_IGNORE = /mso-list:\s*Ignore/i;
 
-/** Matches Mso* class names */
-const _RE_MSO_CLASS = /\bMso\w+/g;
+/** Matches Office class name tokens */
+const _RE_OFFICE_CLASS_TOKEN =
+	/^(?:Mso\w+|xl\d+|(?:SCXW|BCX)\d+|NormalTextRun|TextRun|OutlineElement|Paragraph|EOP|Selected)$/i;
 
-/** Matches Excel xl* class names */
-const _RE_XL_CLASS = /\bxl\d+/g;
+/** Matches Office class attribute on HTML tags (quoted or unquoted) */
+const _RE_IS_MS_CLASS =
+	/<[a-z0-9]+(?:[^>"']|"[^"]*"|'[^']*')*\sclass\s*=\s*(?:["'](?:[^"']*\s)?(?:Mso\w+|xl\d+|(?:SCXW|BCX)\d+|NormalTextRun|TextRun|OutlineElement)(?:\s[^"']*)?["']|(?:Mso\w+|xl\d+|(?:SCXW|BCX)\d+|NormalTextRun|TextRun|OutlineElement)(?=[\s/>]|$))/i;
 
-/** Matches Office Online class names */
-const _RE_OFFICE_ONLINE_CLASS =
-	/\b(?:SCXW|BCX)\d+\b|\b(?:NormalTextRun|TextRun|OutlineElement|Paragraph|EOP|Selected)\b/gi;
+/** Matches Word/Excel/OneNote Generator or ProgId meta tags */
+const _RE_IS_MS_CONTENT =
+	/<meta(?:[^>"']|"[^"]*"|'[^']*')*\scontent\s*=\s*["']?(?:Word\.Document|OneNote\.File|Excel\.Sheet)\b/i;
 
-/** Matches Office Online & desktop markers for isMSOffice */
-const _RE_IS_MS_OFFICE =
-	/class=["'][^"']*(?:\b(?:Mso\w*|NormalTextRun|TextRun|OutlineElement|(?:SCXW|BCX)\d+)\b|(?:\s|^|["'])EOP(?:\s|$|["']))/i;
-const _RE_IS_MS_CONTENT = /content=["']*(?:Word\.Document|OneNote\.File|Excel\.Sheet)/i;
-const _RE_IS_MS_XMLNS = /xmlns:(?:o|w|v)=/i;
-const _RE_IS_MS_MSO_STYLE = /\bmso-[\w-]+\s*:/i;
-const _RE_IS_MS_DATA_ATTR = /data-ccp-(?:props|parastyle)/i;
+/** Matches Office XML namespaces on html or root elements */
+const _RE_IS_MS_XMLNS =
+	/<(?:html|[a-z0-9]+:[a-z0-9]+)(?:[^>"']|"[^"]*"|'[^']*')*\sxmlns:(?:o|w|v|x)\s*=\s*["']?(?:urn:schemas-microsoft-com|#)/i;
+
+/** Matches mso-* styles inside style attributes, <style> tags, or conditional comments */
+const _RE_IS_MS_MSO_STYLE =
+	/<[a-z0-9]+(?:[^>"']|"[^"]*"|'[^']*')*\sstyle\s*=\s*(?:"(?:[^"]*?[\s;])?mso-[a-z-]+\s*:|'(?:[^']*?[\s;])?mso-[a-z-]+\s*:|mso-[a-z-]+\s*:)|<style[^>]*>(?:[^<]|<!--)*(?:[\s;{]mso-[a-z-]+\s*:|@list\s+l\d+)|<!--\[if\s+(?:!|(?:gt|lt)e?\s+)?mso\b/i;
+
+/** Matches Office 365 data attributes on HTML tags */
+const _RE_IS_MS_DATA_ATTR = /<[a-z0-9]+(?:[^>"']|"[^"]*"|'[^']*')*\sdata-ccp-(?:props|parastyle)\s*=/i;
 
 /** Legacy HTML <font size="1..7"> → CSS px font-size */
 const _FONT_SIZE_MAP = {
@@ -248,8 +253,8 @@ function _cleanStyles(el) {
 
 	// Remove trailing/leading semicolons
 	cleaned = cleaned
-		.replace(/^;+|;+$/g, '')
-		.replace(/;{2,}/g, ';')
+		.replace(/^(?:\s*;)+|(?:\s*;)+$/g, '')
+		.replace(/;(?:\s*;)+/g, ';')
 		.trim();
 
 	if (cleaned) {
@@ -267,14 +272,16 @@ function _cleanClasses(el) {
 	const cls = el.getAttribute('class');
 	if (!cls) return;
 
-	const cleaned = cls
-		.replace(_RE_MSO_CLASS, '')
-		.replace(_RE_XL_CLASS, '')
-		.replace(_RE_OFFICE_ONLINE_CLASS, '')
-		.replace(/\s{2,}/g, ' ')
-		.trim();
-	if (cleaned) {
-		el.setAttribute('class', cleaned);
+	const tokens = cls.trim().split(/\s+/);
+	const kept = [];
+	for (let i = 0, len = tokens.length; i < len; i++) {
+		const token = tokens[i];
+		if (token && !_RE_OFFICE_CLASS_TOKEN.test(token)) {
+			kept.push(token);
+		}
+	}
+	if (kept.length) {
+		el.setAttribute('class', kept.join(' '));
 	} else {
 		el.removeAttribute('class');
 	}
@@ -783,33 +790,18 @@ function _cleanBreaks(doc) {
 // ---------- Word Online & Office 365 cleanup ----------
 
 /**
- * @description Removes Word Online End-Of-Paragraph and selection artifacts while preserving valid user text.
+ * @description Removes Word Online End-Of-Paragraph and cursor selection artifacts.
+ * - Only empty markers are removed; elements containing user text retain their styling and highlights.
  * @param {Document} doc
  */
 function _cleanWordOnlineArtifacts(doc) {
-	const eopElements = doc.body.querySelectorAll('span[class*="EOP"], span[class*="Selected"]');
-	for (let i = 0, len = eopElements.length; i < len; i++) {
-		const el = eopElements[i];
-		const style = el.getAttribute('style') || '';
-		const isDarkBg =
-			/background(?:-color)?\s*:[^;]*(?:rgb\(\s*96|#60|gray)/i.test(style) || el.classList.contains('EOP');
-
-		if (isDarkBg) {
+	const markers = doc.body.querySelectorAll('span');
+	for (let i = markers.length - 1; i >= 0; i--) {
+		const el = markers[i];
+		if (el.classList.contains('EOP') || el.classList.contains('Selected')) {
 			const text = (el.textContent || '').replace(/[\s\u00a0\u200b]/g, '');
 			if (!text && !el.querySelector('img, video, iframe, br, table')) {
 				el.remove();
-			} else {
-				// Prevent text loss: strip dark background styling and artifact classes
-				const cleanStyle = style.replace(/\bbackground(?:-color)?\s*:[^;]+;?/gi, '').trim();
-				if (cleanStyle) {
-					el.setAttribute('style', cleanStyle);
-				} else {
-					el.removeAttribute('style');
-				}
-				el.classList.remove('EOP', 'Selected');
-				if (!el.getAttribute('class')) {
-					el.removeAttribute('class');
-				}
 			}
 		}
 	}
@@ -848,23 +840,28 @@ function _convertFontTags(doc) {
 		const face = font.getAttribute('face');
 		if (face) {
 			styles.push(`font-family: ${face}`);
-			existingStyle = existingStyle.replace(/\bfont-family\s*:[^;]+;?/gi, '').trim();
+			existingStyle = existingStyle.replace(/(?:^|;)\s*font-family\s*:[^;]+;?/gi, ';');
 		}
 
 		const color = font.getAttribute('color');
 		if (color) {
-			existingStyle = existingStyle.replace(/(?:^|;)\s*color\s*:[^;]+;?/gi, ';').trim();
+			existingStyle = existingStyle.replace(/(?:^|;)\s*color\s*:[^;]+;?/gi, ';');
 			if (color.toLowerCase() !== 'windowtext') {
 				styles.push(`color: ${color}`);
 			}
 		}
 
 		const size = font.getAttribute('size');
-		const mappedSize = (size && _FONT_SIZE_MAP[size]) || (/14pt/i.test(existingStyle) ? '19px' : '');
+		const mappedSize = size && _FONT_SIZE_MAP[size];
 		if (mappedSize) {
 			styles.push(`font-size: ${mappedSize}`);
-			existingStyle = existingStyle.replace(/\bfont-size\s*:[^;]+;?/gi, '').trim();
+			existingStyle = existingStyle.replace(/(?:^|;)\s*font-size\s*:[^;]+;?/gi, ';');
 		}
+
+		existingStyle = existingStyle
+			.replace(/^(?:\s*;)+|(?:\s*;)+$/g, '')
+			.replace(/;(?:\s*;)+/g, ';')
+			.trim();
 
 		if (existingStyle) {
 			styles.push(existingStyle);
@@ -891,7 +888,7 @@ function _convertFontTags(doc) {
 export function isMSOffice(html) {
 	if (!html || typeof html !== 'string') return false;
 	return (
-		_RE_IS_MS_OFFICE.test(html) ||
+		_RE_IS_MS_CLASS.test(html) ||
 		_RE_IS_MS_CONTENT.test(html) ||
 		_RE_IS_MS_XMLNS.test(html) ||
 		_RE_IS_MS_MSO_STYLE.test(html) ||
