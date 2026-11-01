@@ -38,6 +38,24 @@ class Blockquote extends PluginCommand {
 	}
 
 	/**
+	 * @hook Editor.Core
+	 * @type {SunEditor.Hook.Core.Shortcut}
+	 */
+	shortcut({ range, line, info }) {
+		const { startContainer } = range;
+		if (dom.check.isText(startContainer)) {
+			startContainer.textContent = startContainer.substringData(info.key.length, startContainer.length);
+		}
+
+		if (line && dom.check.isEmptyLine(line)) {
+			line.replaceChildren(dom.utils.createElement('BR'));
+			this.$.selection.setRange(line, 0, line, 0);
+		}
+
+		this.$.format.applyBlock(this.quoteTag.cloneNode(false));
+	}
+
+	/**
 	 * @override
 	 * @type {PluginCommand['action']}
 	 */

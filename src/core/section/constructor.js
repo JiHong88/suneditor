@@ -975,6 +975,7 @@ export function InitOptions(options, editorTargets, plugins) {
 					hr: ['!+---+=+~shortcut', ''],
 					list_numbered: ['!+1.+_+~shortcut', ''],
 					list_bulleted: ['!+*.+_+~shortcut', ''],
+					blockquote: ['!+>+_+~shortcut', ''],
 					// custom
 					_h1: ['c+s+Digit1|Numpad1+$~blockStyle.applyHeaderByShortcut', ''],
 					_h2: ['c+s+Digit2|Numpad2+$~blockStyle.applyHeaderByShortcut', ''],
