@@ -103,8 +103,10 @@ export namespace DEFAULTS {
  * @property {boolean} [iframe=false] - Content will be placed in an iframe and isolated from the rest of the page.
  * @property {boolean} [iframe_fullPage=false] - Allows the usage of HTML, HEAD, BODY tags and DOCTYPE declaration on the `iframe`.
  * @property {Object<string, string>} [iframe_attributes={}] - Attributes of the `iframe`.
+ * - `sandbox`: defaults to `"allow-same-origin allow-scripts"`. A custom value is kept as given, with `allow-same-origin` added if missing.
+ * - Omitting `allow-scripts` blocks scripts in the content, but the editor does not work in Safari or iOS browsers.
  * ```js
- * { iframe_attributes: { 'allow-scripts': 'true', sandbox: 'allow-same-origin' } }
+ * { iframe_attributes: { sandbox: 'allow-same-origin allow-scripts allow-downloads' } }
  * ```
  * @property {Array<string>} [iframe_cssFileName=["suneditor"]] - CSS files to apply inside the iframe.
  * - String: Filename pattern to search in document `<link>` tags.
@@ -812,8 +814,10 @@ export type EditorFrameOptions = {
 	iframe_fullPage?: boolean;
 	/**
 	 * - Attributes of the `iframe`.
+	 * - `sandbox`: defaults to `"allow-same-origin allow-scripts"`. A custom value is kept as given, with `allow-same-origin` added if missing.
+	 * - Omitting `allow-scripts` blocks scripts in the content, but the editor does not work in Safari or iOS browsers.
 	 * ```js
-	 * { iframe_attributes: { 'allow-scripts': 'true', sandbox: 'allow-same-origin' } }
+	 * { iframe_attributes: { sandbox: 'allow-same-origin allow-scripts allow-downloads' } }
 	 * ```
 	 */
 	iframe_attributes?: {

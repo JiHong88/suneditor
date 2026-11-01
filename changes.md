@@ -9,3 +9,7 @@
 - Dropping onto a component (an image, a video, an inline component, a math formula) puts the content beside it, on the side the pointer is over, and the drag cursor shows that spot, instead of inside the component, which broke it or removed it with the rest of the content; below the last block component it goes into a new line (`core/event/handlers/handler_ww_dragDrop`)
 - Pasting or dropping over a selection that leaves only whitespace in its text (e.g. `a&nbsp;` with `a` selected) keeps that whitespace, its inline formatting and its line, instead of removing them and inserting on the next line or at the line end (`core/logic/dom/html`)
 - `$.eventManager.addEvent()`/`removeEvent()` given an iframe window that holds frames (e.g. an `iframe`-mode editor with a video embed) uses that window instead of throwing a `SecurityError` or listening on the embedded frame, and an empty `NodeList` returns `null` instead of throwing (`core/config/eventManager`)
+
+### change
+
+- An `iframe_attributes.sandbox` value is kept as given, with only `allow-same-origin` added, instead of also getting `allow-scripts`; leave out `allow-scripts` only if the editor need not work in Safari or iOS browsers (an error is logged there) (#1716) (`core/section/constructor`)

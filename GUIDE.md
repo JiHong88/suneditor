@@ -310,12 +310,12 @@ Shared across agents; `.claude/skills` is a symlink. Read the relevant `SKILL.md
 
 Invoke these project skills using the current host’s supported skill mechanism.
 
-| Command         | Description                                                                              |
-| --------------- | ---------------------------------------------------------------------------------------- |
+| Command         | Description                                                                                        |
+| --------------- | -------------------------------------------------------------------------------------------------- |
 | `/post-edit`    | Scope-specific validation; authoritative order in the [skill](./.agents/skills/post-edit/SKILL.md) |
-| `/code-review` | Review behavior, resource/performance regressions and project contracts (report only)                |
-| `/changes`      | Analyze git diff and update `changes.md` (for manual edits only)                         |
-| `/release-note` | Convert `changes.md` to release note format                                              |
+| `/code-review`  | Review behavior, resource/performance regressions and project contracts (report only)              |
+| `/changes`      | Analyze git diff and update `changes.md` (for manual edits only)                                   |
+| `/release-note` | Convert `changes.md` to release note format                                                        |
 
 ---
 
@@ -367,13 +367,13 @@ runtime activation is in [Toolbar button → plugin activation](./ARCHITECTURE.m
 
 Trace the closest existing implementation and its callers before extending a feature:
 
-| Responsibility | Starting point |
-| --- | --- |
-| Command / dropdown | `src/plugins/command/blockquote.js`, `src/plugins/dropdown/align.js` |
-| Modal and component | `src/plugins/modal/link.js`, `src/plugins/modal/image/index.js` |
-| Selection and formatting | `src/core/logic/dom/selection.js`, `src/core/logic/dom/format.js` |
-| Shared UI contract | `src/modules/contract/Modal.js`, `src/modules/contract/Controller.js` |
-| Keyboard editing | `src/core/event/handlers/handler_ww_key.js`, `reducers/keydown.reducer.js`, `rules/keydown.rule.enter.js` |
+| Responsibility           | Starting point                                                                                            |
+| ------------------------ | --------------------------------------------------------------------------------------------------------- |
+| Command / dropdown       | `src/plugins/command/blockquote.js`, `src/plugins/dropdown/align.js`                                      |
+| Modal and component      | `src/plugins/modal/link.js`, `src/plugins/modal/image/index.js`                                           |
+| Selection and formatting | `src/core/logic/dom/selection.js`, `src/core/logic/dom/format.js`                                         |
+| Shared UI contract       | `src/modules/contract/Modal.js`, `src/modules/contract/Controller.js`                                     |
+| Keyboard editing         | `src/core/event/handlers/handler_ww_key.js`, `reducers/keydown.reducer.js`, `rules/keydown.rule.enter.js` |
 
 The [reuse map](./prompts/performance-guide.md#reuse-map) lists shared owners by behavior.
 The [event pipeline](./ARCHITECTURE.md#event-pipeline-internal) explains handlers, decisions and effects.
@@ -420,10 +420,12 @@ SunEditor supports **DIV mode** (default) and **iframe mode** (`iframe: true`).
 SUNEDITOR.create('#editor', {
 	iframe: true,
 	iframe_attributes: {
-		sandbox: 'allow-downloads', // allow-same-origin is auto-added
+		sandbox: 'allow-scripts allow-downloads', // allow-same-origin is auto-added
 	},
 });
 ```
+
+**`sandbox`:** Defaults to `allow-same-origin allow-scripts`. A custom value is used as given, with only `allow-same-origin` added. Omitting `allow-scripts` keeps scripts in the content from running, but the editor does not work in Safari or iOS browsers (WebKit blocks the editor's event listeners in the iframe).
 
 **SSR frameworks (Next.js/Nuxt):** Use dynamic import with `ssr: false` to avoid `contentDocument is null` errors.
 

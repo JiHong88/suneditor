@@ -74,6 +74,47 @@ describe('Core Section - Constructor', () => {
             expect(focusTemp).not.toBeNull();
             expect(focusTemp.tabIndex).toBe(-1);
         });
+
+        describe('iframe sandbox (#1716)', () => {
+            let error;
+            beforeEach(() => {
+                error = jest.spyOn(console, 'error').mockImplementation(() => {});
+            });
+            afterEach(() => {
+                error.mockRestore();
+            });
+
+            const sandboxOf = (iframe_attributes) => {
+                const target = document.createElement('textarea');
+                const result = Constructor([{ target, key: null, options: {} }], {
+                    buttonList: [['bold']],
+                    iframe: true,
+                    ...(iframe_attributes ? { iframe_attributes } : {})
+                });
+                return result.frameRoots.get(null).get('wysiwygFrame').getAttribute('sandbox');
+            };
+
+            it('defaults to allow-same-origin allow-scripts', () => {
+                expect(sandboxOf()).toBe('allow-same-origin allow-scripts');
+            });
+
+            it('keeps an explicit sandbox without allow-scripts as given', () => {
+                expect(sandboxOf({ sandbox: 'allow-same-origin' })).toBe('allow-same-origin');
+            });
+
+            it('logs an error on WebKit when an explicit sandbox omits allow-scripts', () => {
+                // jsdom's user agent ("AppleWebKit/... jsdom") is detected as Safari
+                sandboxOf({ sandbox: 'allow-scripts' });
+                expect(error.mock.calls.some(([m]) => m.includes('iframe.error'))).toBe(false);
+                sandboxOf({ sandbox: 'allow-same-origin' });
+                expect(error.mock.calls.some(([m]) => m.includes('iframe.error'))).toBe(true);
+            });
+
+            it('adds only allow-same-origin to an explicit sandbox', () => {
+                expect(sandboxOf({ sandbox: ' allow-downloads ' })).toBe('allow-downloads allow-same-origin');
+                expect(sandboxOf({ sandbox: 'allow-scripts allow-downloads' })).toBe('allow-scripts allow-downloads allow-same-origin');
+            });
+        });
     });
 
     describe('Constructor plugin registration', () => {
