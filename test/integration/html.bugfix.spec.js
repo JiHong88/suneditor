@@ -5,6 +5,7 @@
  * 2. html.add() Live HTMLCollection - every other child skipped during DOM mutation
  * 3. clean() classList filtering - new Array(classList) produced wrong result
  * 4. clean() wrongList insertBefore - argument order was reversed
+ * 5. remove() whitespace remainder - a whitespace-only text left by the removal was deleted with its wrappers and line
  */
 
 import { createTestEditor, destroyTestEditor, waitForEditorReady } from '../__mocks__/editorIntegration';
@@ -325,6 +326,54 @@ describe('html.js bug fix regression tests', () => {
 			expect(cleaned).toContain('Good item');
 			expect(cleaned).toContain('Bad');
 			expect(cleaned).toContain('nested');
+		});
+	});
+
+	// ──────────────────────────────────────────────────
+	// Bug 5: remove() whitespace remainder
+	// Before fix: the empty-element cleanup also ran on the text left by the removal (a text node has no
+	// child nodes), and its trim test treats `&nbsp;` as empty, so a whitespace-only remainder was deleted
+	// together with its wrappers and line, and the caret moved to another line.
+	// After fix: the cleanup takes an element, or a text that is empty or zero-width only.
+	// ──────────────────────────────────────────────────
+	describe('Bug 5: remove() whitespace remainder', () => {
+		/** Sets the content and selects `[start, end)` of the text node `pick` returns. */
+		function select(html, pick, start, end) {
+			const wysiwyg = editor.$.frameContext.get('wysiwyg');
+			wysiwyg.innerHTML = html;
+			const text = pick(wysiwyg);
+			editor.$.selection.setRange(text, start, text, end);
+			return wysiwyg;
+		}
+
+		it('should keep a line left with only a non-breaking space', () => {
+			const wysiwyg = select('<p>a&nbsp;</p><p>next</p>', (w) => w.querySelector('p').firstChild, 0, 1);
+
+			const r = editor.$.html.remove();
+
+			expect(wysiwyg.innerHTML).toBe('<p>&nbsp;</p><p>next</p>');
+			expect(r.container).toBe(wysiwyg.querySelector('p').firstChild);
+			expect(r.offset).toBe(0);
+		});
+
+		it('should keep the whitespace left inside an inline wrapper', () => {
+			const wysiwyg = select('<p>x<strong>ab </strong>y</p>', (w) => w.querySelector('strong').firstChild, 0, 2);
+
+			const r = editor.$.html.remove();
+
+			expect(wysiwyg.innerHTML).toBe('<p>x<strong> </strong>y</p>');
+			expect(r.container).toBe(wysiwyg.querySelector('strong').firstChild);
+		});
+
+		it.each([
+			['a line left with only a non-breaking space', '<p>a&nbsp;</p><p>next</p>', 'p', 0, 1, '<p>Z&nbsp;</p><p>next</p>'],
+			['the whitespace inside an inline wrapper', '<p>x<strong>ab </strong>y</p>', 'strong', 0, 2, '<p>x<strong>Z </strong>y</p>'],
+		])('should insert over the selection in place when it leaves %s', (_, html, tag, start, end, expected) => {
+			const wysiwyg = select(html, (w) => w.querySelector(tag).firstChild, start, end);
+
+			editor.$.html.insert('Z', { skipCharCount: true });
+
+			expect(wysiwyg.innerHTML).toBe(expected);
 		});
 	});
 });

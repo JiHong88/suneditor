@@ -67,8 +67,39 @@ describe('EventManager listener lifecycle', () => {
 		expect(listener).toHaveBeenCalledTimes(2);
 	});
 
-	it.each([null, []])('does not register an empty target (%j)', (target) => {
-		expect(manager.addEvent(target, 'click', jest.fn())).toBeNull();
+	it.each([
+		['null', () => null],
+		['an empty array', () => []],
+		['an empty NodeList', () => document.querySelectorAll('.none')],
+	])('does not register an empty target (%s)', (_, target) => {
+		expect(manager.addEvent(target(), 'click', jest.fn())).toBeNull();
+	});
+
+	it('registers on an iframe window that holds frames, not on its child frame', () => {
+		const ww = enableIframe();
+		ww.document.body.appendChild(ww.document.createElement('iframe'));
+		expect(ww.length).toBe(1);
+
+		const listener = jest.fn();
+		const childAdd = jest.spyOn(ww[0], 'addEventListener');
+		const handle = manager.addEvent(ww, 'probe', listener);
+		ww.dispatchEvent(new ww.Event('probe'));
+		expect(childAdd).not.toHaveBeenCalled();
+		expect(listener).toHaveBeenCalledTimes(1);
+
+		manager.removeEvent({ ...handle, target: ww });
+		ww.dispatchEvent(new ww.Event('probe'));
+		expect(listener).toHaveBeenCalledTimes(1);
+	});
+
+	it('registers on a form that holds controls as one target', () => {
+		const form = document.createElement('form');
+		form.append(document.createElement('input'), document.createElement('input'));
+		const listener = jest.fn();
+		manager.addEvent(form, 'probe', listener);
+		form.dispatchEvent(new Event('probe'));
+		form.elements[0].dispatchEvent(new Event('probe'));
+		expect(listener).toHaveBeenCalledTimes(1);
 	});
 
 	it.each(['handle', 'arguments'])('removes global listeners from host and iframe by %s', (form) => {

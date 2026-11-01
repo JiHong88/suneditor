@@ -31,6 +31,8 @@ declare class EventOrchestrator extends KernelInjector {
 	_toolbarObserver: ResizeObserver;
 	/** @internal @type {?Element} */
 	_lineBreakComp: Element | null;
+	/** @internal @type {boolean} `true` while a drag that started inside the editor is in progress */
+	_dragFromWysiwyg: boolean;
 	/** @internal @type {?Object<string, *>} */
 	_formatAttrsTemp: {
 		[x: string]: any;

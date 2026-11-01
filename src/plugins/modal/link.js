@@ -147,15 +147,24 @@ class Link extends PluginModal {
 				if (!this.$.html.insertNode(oA, { afterNode: null, skipCharCount: false })) return true;
 			}
 
-			this.$.selection.setRange(oA.childNodes[0], 0, oA.childNodes[0], oA.textContent.length);
+			this.#selectContents(oA);
 		} else {
-			// set range
-			const textNode = this.controller.currentTarget.childNodes[0];
-			this.$.selection.setRange(textNode, 0, textNode, textNode.textContent.length);
+			this.#selectContents(this.controller.currentTarget);
 		}
 
 		this.$.history.push(false);
 		return true;
+	}
+
+	/**
+	 * @description Selects the whole text of an anchor, whatever inline wrappers it holds (`<a><b><i>text</i></b></a>`).
+	 * @param {Node} anchor Anchor element
+	 */
+	#selectContents(anchor) {
+		const isLeaf = (current) => current.childNodes.length === 0 || current.nodeType === 3;
+		const sc = dom.query.getEdgeChild(anchor, isLeaf, false) || anchor;
+		const ec = dom.query.getEdgeChild(anchor, isLeaf, true) || anchor;
+		this.$.selection.setRange(sc, 0, ec, ec.textContent.length);
 	}
 
 	/**
@@ -179,21 +188,7 @@ class Link extends PluginModal {
 		} else if (/copy/.test(command)) {
 			this.$.html.copy(this.target);
 		} else if (/unlink/.test(command)) {
-			const sc = dom.query.getEdgeChild(
-				this.controller.currentTarget,
-				function (current) {
-					return current.childNodes.length === 0 || current.nodeType === 3;
-				},
-				false,
-			);
-			const ec = dom.query.getEdgeChild(
-				this.controller.currentTarget,
-				function (current) {
-					return current.childNodes.length === 0 || current.nodeType === 3;
-				},
-				true,
-			);
-			this.$.selection.setRange(sc, 0, ec, ec.textContent.length);
+			this.#selectContents(this.controller.currentTarget);
 			this.$.inline.apply(null, { stylesToModify: null, nodesToRemove: ['A'], strictRemove: false });
 		} else {
 			/** delete */

@@ -276,6 +276,21 @@ describe('Link Plugin', () => {
 			expect(kernel.$.history.push).toHaveBeenCalledWith(false);
 		});
 
+		it('should select the edge text nodes of an updated link that holds inline wrappers', async () => {
+			const { dom } = require('../../../../src/helper');
+			link.isUpdateState = true;
+			const first = { textContent: 'linked', nodeType: 3 };
+			const last = { textContent: 'text', nodeType: 3 };
+			link.controller.currentTarget = { childNodes: [{ nodeType: 1 }] };
+			dom.query.getEdgeChild.mockImplementation((node, query, lastEdge) => (lastEdge ? last : first));
+			link.anchor.create = jest.fn().mockReturnValue({ tagName: 'A' });
+
+			await link.modalAction();
+
+			expect(dom.query.getEdgeChild).toHaveBeenCalledWith(link.controller.currentTarget, expect.any(Function), false);
+			expect(kernel.$.selection.setRange).toHaveBeenCalledWith(first, 0, last, 4);
+		});
+
 		it('should return true if insertNode fails', async () => {
 			link.isUpdateState = false;
 			kernel.$.html.insertNode.mockReturnValue(false);

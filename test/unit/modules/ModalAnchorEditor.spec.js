@@ -46,6 +46,10 @@ function createDeps(overrides = {}) {
 	const editor = createMockEditor();
 	const $ = editor.$;
 
+	// the default text style tags (options `textStyleTags`)
+	const textStyleTags = /^(strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary)$/i;
+	$.format.isTextStyleNode = jest.fn((el) => el?.nodeType === 1 && textStyleTags.test(el.nodeName));
+
 	// selection.get must return an object with toString
 	$.selection.get = jest.fn().mockReturnValue({
 		toString: () => 'selected text',
@@ -404,6 +408,63 @@ describe('ModalAnchorEditor', () => {
 			const result = ae.create(false);
 			expect(result).toBe(anchor);
 			expect(result.href).toContain('test.com');
+		});
+
+		it('should keep inline wrappers of an existing anchor and replace only the innermost text', () => {
+			const $ = createDeps();
+			const ae = new ModalAnchorEditor($, createModalForm(), { relList: [], defaultRel: {} });
+			const anchor = document.createElement('a');
+			anchor.innerHTML = '<b><i>old</i></b>';
+			ae.set(anchor);
+			ae.linkValue = 'https://test.com';
+			ae.displayInput.value = 'new';
+			const result = ae.create(false);
+			expect(result.innerHTML).toBe('<b><i>new</i></b>');
+		});
+
+		it('should replace the whole content when an existing anchor holds more than one child', () => {
+			const $ = createDeps();
+			const ae = new ModalAnchorEditor($, createModalForm(), { relList: [], defaultRel: {} });
+			const anchor = document.createElement('a');
+			anchor.innerHTML = '<b>old</b> text';
+			ae.set(anchor);
+			ae.linkValue = 'https://test.com';
+			ae.displayInput.value = 'new';
+			const result = ae.create(false);
+			expect(result.innerHTML).toBe('new');
+		});
+
+		it.each([
+			['a br', '<br>', 'new'],
+			['an image', '<img src="x.png">', 'new'],
+			['a wrapped image', '<b><img src="x.png"></b>', '<b>new</b>'],
+			['a wrapped br', '<b><i><br></i></b>', '<b><i>new</i></b>'],
+			['a non-editable element', '<span contenteditable="false">X</span>', 'new'],
+			['an svg icon', '<svg><path></path></svg>', 'new'],
+			['a wrapped svg icon', '<strong><svg><path></path></svg></strong>', '<strong>new</strong>'],
+		])('should not write the text into %s inside the anchor', (_, html, expected) => {
+			const $ = createDeps();
+			const ae = new ModalAnchorEditor($, createModalForm(), { relList: [], defaultRel: {} });
+			const anchor = document.createElement('a');
+			anchor.innerHTML = html;
+			ae.set(anchor);
+			ae.linkValue = 'https://test.com';
+			ae.displayInput.value = 'new';
+			const result = ae.create(false);
+			expect(result.innerHTML).toBe(expected);
+		});
+
+		it('should not write the text into a component inside the anchor', () => {
+			const $ = createDeps();
+			$.component.is = jest.fn((el) => el.classList?.contains('se-component'));
+			const ae = new ModalAnchorEditor($, createModalForm(), { relList: [], defaultRel: {} });
+			const anchor = document.createElement('a');
+			anchor.innerHTML = '<span class="se-component"><span>INNER</span></span>';
+			ae.set(anchor);
+			ae.linkValue = 'https://test.com';
+			ae.displayInput.value = 'new';
+			const result = ae.create(false);
+			expect(result.innerHTML).toBe('new');
 		});
 
 		it('should set target=_blank when newWindowCheck is checked', () => {

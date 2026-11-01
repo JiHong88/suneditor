@@ -288,7 +288,21 @@ class ModalAnchorEditor {
 		if (notText) {
 			if (anchor.children.length === 0) anchor.textContent = '';
 		} else {
-			anchor.textContent = displayText;
+			let target = /** @type {Element} */ (anchor);
+
+			while (target.childNodes.length === 1 && target.firstChild.nodeType === 1) {
+				const child = target.firstElementChild;
+				if (
+					!this.#$.format.isTextStyleNode(child) ||
+					dom.check.isNonEditable(child) ||
+					this.#$.component.is(child)
+				) {
+					break;
+				}
+				target = child;
+			}
+
+			target.textContent = displayText;
 		}
 	}
 

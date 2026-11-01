@@ -1230,7 +1230,11 @@ class HTML {
 			}
 		}
 
-		if (!dom.check.isWysiwygFrame(container) && container.childNodes.length === 0) {
+		if (
+			!dom.check.isWysiwygFrame(container) &&
+			container.childNodes.length === 0 &&
+			(container.nodeType === 1 || dom.check.isZeroWidth(container))
+		) {
 			const rc = this.#$.nodeTransform.removeAllParents(container, null, null);
 			if (rc) container = rc.sc || rc.ec || this.#frameContext.get('wysiwyg');
 		}
