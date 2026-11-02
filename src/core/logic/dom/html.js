@@ -35,6 +35,7 @@ class HTML {
 	#disallowedTagNameRegExp;
 	#allowedTagNameRegExp;
 	#emptyLineRegExp;
+	#brLineBlockRegExp;
 
 	/** @type {Set<string>} */
 	#allowedURLProtocols;
@@ -101,6 +102,11 @@ class HTML {
 		}
 		this.#cleanStyleTagKeyRegExp = new RegExp(`^(${Object.keys(splitTagStyles).join('|')})$`, 'i');
 		this.#cleanStyleRegExpMap = stylesMap;
+
+		this.#brLineBlockRegExp = new RegExp(
+			`<(${options.get('formatBrLine').str})(\\s[^>]*)?>([\\s\\S]*?)<\\/\\1\\s*>`,
+			'gi',
+		);
 
 		// font size unit
 		this.#fontSizeUnitRegExp = new RegExp('\\d+(' + options.get('fontSizeUnits').join('|') + ')$', 'i');
@@ -1507,7 +1513,15 @@ class HTML {
 	 * @returns {string} HTML string
 	 */
 	compress(html) {
-		return html.replace(/>\s+</g, '> <').replace(/\n/g, '').trim();
+		let result = '';
+		let last = 0;
+		for (const m of html.matchAll(this.#brLineBlockRegExp)) {
+			const [block, tag, attrs = '', body] = m;
+			result += this.#compressText(html.slice(last, m.index));
+			result += `<${tag}${attrs}>${body.replace(/^\r?\n/, '').replace(/(<br\s*\/?>)?\r?\n/gi, '<br>')}</${tag}>`;
+			last = m.index + block.length;
+		}
+		return (result + this.#compressText(html.slice(last))).trim();
 	}
 
 	/**
@@ -1529,22 +1543,30 @@ class HTML {
 			return this.#$.format.isLine(current) || this.#$.component.is(current);
 		};
 		const brChar = comp ? '' : '\n';
+		const brLineReg = this.#options.get('formatBrLine').reg;
 
 		const codeSize = comp ? 0 : this.#store.get('codeIndentSize') * 1;
 		const indentSize = codeSize > 0 ? new Array(codeSize + 1).join(' ') : '';
 
-		(function recursionFunc(element, indent) {
+		(function recursionFunc(element, indent, inBrLine) {
 			const children = element?.childNodes;
 			if (!children) return;
 
 			const elementRegTest = brReg.test(element.nodeName);
-			const elementIndent = elementRegTest ? indent : '';
+			const elementIndent = elementRegTest && !inBrLine ? indent : '';
 
-			for (let i = 0, len = children.length, node, br, lineBR, nodeRegTest, tag, tagIndent; i < len; i++) {
+			for (
+				let i = 0, len = children.length, node, br, lineBR, nodeRegTest, nodeBrLine, tag, tagIndent;
+				i < len;
+				i++
+			) {
 				node = children[i];
 				nodeRegTest = brReg.test(node.nodeName);
-				br = nodeRegTest ? brChar : '';
-				lineBR = isFormat(node) && !elementRegTest && !/^(TH|TD)$/i.test(element.nodeName) ? brChar : '';
+				br = (inBrLine ? /^BR$/i.test(node.nodeName) : nodeRegTest) ? brChar : '';
+				lineBR =
+					!inBrLine && isFormat(node) && !elementRegTest && !/^(TH|TD)$/i.test(element.nodeName)
+						? brChar
+						: '';
 
 				if (node.nodeType === 8) {
 					returnHTML += '\n<!-- ' + node.textContent.trim() + ' -->' + br;
@@ -1559,10 +1581,8 @@ class HTML {
 				}
 				if (node.childNodes.length === 0) {
 					returnHTML +=
-						(/^HR$/i.test(node.nodeName) ? brChar : '') +
-						(/^PRE$/i.test(node.parentElement.nodeName) && /^BR$/i.test(node.nodeName)
-							? ''
-							: elementIndent) +
+						(!inBrLine && /^HR$/i.test(node.nodeName) ? brChar : '') +
+						elementIndent +
 						/** @type {HTMLElement} */ (node).outerHTML +
 						br;
 					continue;
@@ -1572,22 +1592,25 @@ class HTML {
 					returnHTML += new XMLSerializer().serializeToString(node);
 				} else {
 					tag = node.nodeName.toLowerCase();
-					tagIndent = elementIndent || nodeRegTest ? indent : '';
+					nodeBrLine = inBrLine || brLineReg.test(node.nodeName);
+					tagIndent = !inBrLine && (elementIndent || nodeRegTest) ? indent : '';
 					returnHTML +=
 						(lineBR || (elementRegTest ? '' : br)) +
 						tagIndent +
 						/** @type {HTMLElement} */ (node).outerHTML.match(wRegExp('<' + tag + '[^>]*>', 'i'))[0] +
 						br;
-					recursionFunc(node, indent + indentSize + '');
+					recursionFunc(node, indent + indentSize + '', nodeBrLine);
 					returnHTML +=
-						(/\n$/.test(returnHTML) ? tagIndent : '') +
+						(!nodeBrLine && /\n$/.test(returnHTML) ? tagIndent : '') +
 						'</' +
 						tag +
 						'>' +
-						(lineBR || br || elementRegTest ? brChar : /^(TH|TD)$/i.test(node.nodeName) ? brChar : '');
+						(!inBrLine && (lineBR || br || elementRegTest || /^(TH|TD)$/i.test(node.nodeName))
+							? brChar
+							: '');
 				}
 			}
-		})(wDoc, '');
+		})(wDoc, '', false);
 
 		return returnHTML.trim() + brChar;
 	}
@@ -1716,6 +1739,19 @@ class HTML {
 		}
 
 		return '';
+	}
+
+	/**
+	 * @description Compresses HTML outside brLine blocks: collapses whitespace between tags and turns a line break into a space.
+	 * - A line break after `<br>` (code view output) is dropped; it would only start the next line with a space.
+	 * @param {string} html HTML string
+	 * @returns {string} Compressed HTML string
+	 */
+	#compressText(html) {
+		return html
+			.replace(/(<br\s*\/?>)\s*\n\s*/gi, '$1')
+			.replace(/>\s+</g, '> <')
+			.replace(/\s*\n\s*/g, ' ');
 	}
 
 	/**

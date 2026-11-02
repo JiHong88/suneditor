@@ -239,6 +239,18 @@ describe('HTML API integration tests', () => {
 			expect(compressed).toContain('Line 1');
 			expect(compressed).toContain('Line 2');
 		});
+
+		it('turns a line break in text into a space', () => {
+			expect(editor.$.html.compress('<p>foo\nbar</p>\r\n<p>a\r\n  b</p>')).toBe('<p>foo bar</p> <p>a b</p>');
+			// the line break after a <br> (code view output) is formatting only
+			expect(editor.$.html.compress('<p>a<br>\n  b</p>')).toBe('<p>a<br>b</p>');
+		});
+
+		it('turns a line break in a brLine (PRE) into <br>', () => {
+			// the line break after the open tag and after a <br> (code view output) is formatting only
+			expect(editor.$.html.compress('<pre class="x">\n{\n  "a": 1\n}</pre>')).toBe('<pre class="x">{<br>  "a": 1<br>}</pre>');
+			expect(editor.$.html.compress('<pre>\na<br>\n  b</pre>')).toBe('<pre>a<br>  b</pre>');
+		});
 	});
 
 	describe('html.getJson() and setJson() - JSON conversion', () => {

@@ -68,11 +68,9 @@ export function OnDragOver_wysiwyg(fc, dragCursor, _iframeTopArea, _innerToolbar
 
 /**
  * @description Keeps a caret position valid while the dragged selection is removed (`html.remove()`).
- * - In a text node the removal keeps, the text on the far side of the point from the selection stays: the point
- *   keeps its distance from the node end after the selection, or its offset before it, even when the node is rewritten.
- * - In an element, or in a text node the removal takes out (e.g. a whitespace-only remainder), a live `Range`
- *   follows the DOM: removed children before the point shift its offset, and a removed container moves it to where
- *   that container was.
+ * - In a text node the removal keeps, the point keeps its distance from the text on the far side of the selection.
+ * - Otherwise a live `Range` follows the DOM: removed children before the point shift its offset,
+ *   and a removed container moves it to where that container was.
  * @param {Document} wd Document that owns the point
  * @param {Node} root The editable root (`wysiwyg`) the point must stay in
  * @param {Node} container The point container
@@ -98,11 +96,9 @@ function _trackPoint(wd, root, container, offset, after) {
 }
 
 /**
- * @description Turns an element caret position into the text position it stands for: the end of the deepest text
- * before it, or else the start of the deepest text after it. After a line or block (between two blocks), the point
- * stands for the start of the next one, as `selection.resetRangeToTextNode` reads it, so the text after it comes first.
- * The walk does not enter a component or a non-editable element; when no such text is next to the point, the
- * point is returned as is. The insertion that follows a drop places text reliably only at a text position.
+ * @description Turns an element caret position into the text position it stands for; a drop places text reliably only there.
+ * - The end of the deepest text before it, or else the start of the deepest text after it (between two blocks, the text after it comes first).
+ * - The walk does not enter a component or a non-editable element; with no such text, the point is returned as is.
  * @param {Node} container The point container
  * @param {number} offset The point offset
  * @param {(el: Node) => boolean} isOpaque Returns `true` for an element whose inside must not be entered
@@ -133,9 +129,7 @@ function _toTextPoint(container, offset, isOpaque, isBlockLevel) {
 }
 
 /**
- * @description Finds the component a drop point falls inside: text dropped there lands in the component container,
- * which corrupts or removes the component. An editable line or block inside a component (a table cell, a caption)
- * holds the point itself.
+ * @description Finds the component a drop point falls inside; an editable line or block in it (a table cell, a caption) holds the point itself.
  * @param {Node} container The point container
  * @param {(el: Node) => boolean} isBlockLevel Returns `true` for a line or block element
  * @returns {?Element} The component container, or `null` when the point is not inside one
@@ -150,9 +144,9 @@ function _getEnclosingComponent(container, isBlockLevel) {
 
 /**
  * @this {EventManagerThis_handler_ww_dragDrop}
- * @description Resolves the drop point of a drag event. A point inside a component (block or inline) moves to just
- * before or after it, by the half the pointer is over: the top or bottom half of a block one, the start or end half
- * of an inline one. It then takes the text position it stands for, so the drag cursor shows where the drop lands.
+ * @description Resolves the drop point of a drag event.
+ * - A point inside a component (block or inline) moves to just before or after it,
+ * - by the half the pointer is over: the top or bottom half of a block one, the start or end half of an inline one.
  * @param {DragEvent} e The drag event
  * @returns {{sc: Node, so: number, ec: Node, eo: number}} The drop point
  */

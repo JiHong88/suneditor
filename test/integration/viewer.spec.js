@@ -25,6 +25,8 @@ describe('Viewer Integration Tests', () => {
 		it.each([
 			'Read the **Rules**. Then set `title` (max 100).\n\n- Set `title` (max 100).\n- Use **bold** here.\n\n5. Fifth step.\n6. Sixth step.\n',
 			'0. Zero\n1. One\n\nParagraph.\n\n3. Three\n4. Four\n',
+			'```\n{\n  "a": 1\n}\n```\n',
+			'```js\nconst a = 1;\n\nif (a) {\n  b();\n}\n```\n',
 		])('preserves text and list starts across three view toggles: %s', (md) => {
 			editor.$.html.set(markdown.markdownToHtml(md));
 			for (let i = 0; i < 3; i++) {
@@ -47,6 +49,11 @@ describe('Viewer Integration Tests', () => {
 			}
 		});
 
+		it('turns a soft line break into a space instead of joining the words', () => {
+			editor.$.html.set(markdown.markdownToHtml('LINE ONE\nLine two'));
+			expect(editor.$.html.get()).toBe('<p>LINE ONE Line two</p>');
+		});
+
 		it('still honors an explicit start attribute blacklist', async () => {
 			const filteredEditor = createTestEditor({ attributeBlacklist: { ol: 'start' } });
 			try {
@@ -60,6 +67,20 @@ describe('Viewer Integration Tests', () => {
 	});
 
 	describe('codeView', () => {
+		it.each([
+			'<pre>a<br>b<br>  c</pre>',
+			'<pre><strong>a</strong><br>b <em>c<br></em>d<br><br></pre>',
+			'<blockquote><pre>a<br><br></pre></blockquote><p>a<br>b</p>',
+		])('keeps the rows of a PRE across code view toggles: %s', (html) => {
+			editor.$.html.set(html);
+			const expected = editor.$.html.get();
+			for (let i = 0; i < 3; i++) {
+				editor.$.viewer.codeView(true);
+				editor.$.viewer.codeView(false);
+				expect(editor.$.html.get()).toBe(expected);
+			}
+		});
+
 		it('should toggle code view on', () => {
 			editor.$.viewer.codeView(true);
 			expect(editor.$.frameContext.get('isCodeView')).toBe(true);

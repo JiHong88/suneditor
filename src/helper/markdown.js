@@ -223,6 +223,19 @@ function getTextContent(node) {
 }
 
 /**
+ * @description Get the text of a code block; `<br>` (the editor's line break in `PRE`) becomes a newline.
+ * @param {Object} node
+ * @returns {string}
+ */
+function getCodeText(node) {
+	if (!node) return '';
+	if (node.type === 'text') return node.content || '';
+	if (node.tag === 'br') return '\n';
+	if (node.children) return node.children.map(getCodeText).join('');
+	return '';
+}
+
+/**
  * @description Convert a JSON element node to its HTML string (for fallback)
  * @param {Object} node
  * @param {boolean} [isInline=false] Inline HTML is parsed with its line, so its text is Markdown-escaped too.
@@ -564,14 +577,15 @@ function nodeToMarkdown(node, indent, isBlock) {
 		const codeChild = children.find((c) => c.type === 'element' && c.tag === 'code');
 		if (codeChild) {
 			lang = (codeChild.attributes?.class || '').replace(/^language-/, '');
-			codeContent = getTextContent(codeChild);
+			codeContent = getCodeText(codeChild);
 		} else {
 			// Also check pre's own class for language- (editor internal format)
 			lang = (node.attributes?.class || '').match(/language-(\S+)/)?.[1] || '';
-			codeContent = getTextContent({ children });
+			codeContent = getCodeText({ children });
 		}
 
-		// Replace <br> represented as newlines
+		// the editor ends a brLine with a placeholder <br>
+		codeContent = codeContent.replace(/\n$/, '');
 		return '```' + lang + '\n' + codeContent + '\n```\n\n';
 	}
 

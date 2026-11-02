@@ -111,6 +111,10 @@ describe('markdown helper', () => {
 			expect(result).toContain('const x = 1;');
 		});
 
+		it('should convert <br> in a code block to a newline', () => {
+			expect(htmlToMd('<pre>a<br>  b<br>c<br></pre>')).toBe('```\na\n  b\nc\n```\n');
+		});
+
 		it('should convert table', () => {
 			const html = '<table><thead><tr><th>A</th><th>B</th></tr></thead><tbody><tr><td>1</td><td>2</td></tr></tbody></table>';
 			const result = htmlToMd(html);
