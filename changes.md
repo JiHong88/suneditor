@@ -9,7 +9,10 @@
 - Dropping onto a component (an image, a video, an inline component, a math formula) puts the content beside it, on the side the pointer is over, and the drag cursor shows that spot, instead of inside the component, which broke it or removed it with the rest of the content; below the last block component it goes into a new line (`core/event/handlers/handler_ww_dragDrop`)
 - Pasting or dropping over a selection that leaves only whitespace in its text (e.g. `a&nbsp;` with `a` selected) keeps that whitespace, its inline formatting and its line, instead of removing them and inserting on the next line or at the line end (`core/logic/dom/html`)
 - `$.eventManager.addEvent()`/`removeEvent()` given an iframe window that holds frames (e.g. an `iframe`-mode editor with a video embed) uses that window instead of throwing a `SecurityError` or listening on the embedded frame, and an empty `NodeList` returns `null` instead of throwing (`core/config/eventManager`)
+- `html.clean()` / `html.compress()` (used by `html.set`, paste, code view and markdown view) turn a line break inside text into a space instead of deleting it, which joined the words, and a line break inside a `PRE` (brLine) into `<br>` instead of removing it, so Markdown code blocks keep their lines; code view no longer adds layout line breaks or indentation inside a `PRE`, so its rows survive a toggle (`core/logic/dom/html`)
+- Markdown view and `jsonToMarkdown()` keep the lines of a code block written in the editor (`<br>` in `PRE`) instead of joining them (`helper/markdown`)
 
 ### change
 
+- Dark-family themes (`dark`, `midnight`, `cobalt`): toolbar/menu buttons in the `.on` / `.active` state now get a visibly tinted fill with a bright accent icon instead of a near-background fill with a darker-than-fill icon.
 - An `iframe_attributes.sandbox` value is kept as given, with only `allow-same-origin` added, instead of also getting `allow-scripts`; leave out `allow-scripts` only if the editor need not work in Safari or iOS browsers (an error is logged there) (#1716) (`core/section/constructor`)

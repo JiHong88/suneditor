@@ -64,30 +64,34 @@
 	--se-find-no-match-color: rgba(255, 80, 80, 0.2);
 
 	/* hover states */
-	--se-hover-color: #162040;
-	--se-hover-dark-color: #304878;
-	--se-hover-dark2-color: #3a5688;
-	--se-hover-dark3-color: #446498;
-	--se-hover-light-color: #5078b0;
-	--se-hover-light2-color: #6088c0;
-	--se-hover-light3-color: #7098d0;
+	--se-hover-color: #ffffff;
+	--se-hover-dark-color: #405484;
+	--se-hover-dark2-color: #4c6294;
+	--se-hover-dark3-color: #5870a4;
+	--se-hover-light-color: #273a5c;
+	--se-hover-light2-color: #2f446a;
+	--se-hover-light3-color: #374e78;
 
 	/* active foreground states */
 	--se-active-color: #4488ff;
-	--se-active-hover-color: #5599ff;
+	--se-active-hover-color: #a0c6ff;
 	--se-active-dark-color: #3366dd;
 	--se-active-dark2-color: #2855cc;
-	--se-active-dark3-color: #4488ff;
-	--se-active-dark4-color: #3366dd;
-	--se-active-dark5-color: #1e44bb;
+	--se-active-dark3-color: #5a97ff;
+	--se-active-dark4-color: #5a97ff;
+	--se-active-dark5-color: #78aeff;
+
+	/* text on accent fills */
+	--se-active-font-color: #0f1828;
+	--se-btn-primary-color: #0f1828;
 
 	/* active background states */
-	--se-active-light-color: #141e3a;
-	--se-active-light2-color: #1a284a;
-	--se-active-light3-color: #22345c;
-	--se-active-light4-color: #2a4070;
-	--se-active-light5-color: #324c84;
-	--se-active-light6-color: #3a5898;
+	--se-active-light-color: #172a4e;
+	--se-active-light2-color: #1b325c;
+	--se-active-light3-color: #244d94;
+	--se-active-light4-color: #1e4280;
+	--se-active-light5-color: #2a58a8;
+	--se-active-light6-color: #3264b8;
 
 	/* floating layer shadow */
 	--se-shadow-layer-color: rgba(0, 64, 128, 0.25);
@@ -121,7 +125,7 @@
 	/* table picker */
 	--se-table-picker-color: #2a3040;
 	--se-table-picker-border-color: #4a5568;
-	--se-table-picker-highlight-color: #1a2848;
+	--se-table-picker-highlight-color: #2a5aa8;
 	--se-table-picker-highlight-border-color: #4488ff;
 
 	/* success status palette */

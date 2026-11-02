@@ -400,7 +400,7 @@
 .sun-editor .se-btn-primary {
 	background-color: var(--se-active-dark5-color);
 	border: 1px solid var(--se-active-dark5-color);
-	color: #fff;
+	color: var(--se-btn-primary-color);
 	font-weight: 500;
 	border-radius: var(--se-border-radius);
 	outline: 0 none;
@@ -414,7 +414,7 @@
 .sun-editor .se-btn-primary:focus {
 	background-color: var(--se-active-hover-color);
 	border-color: var(--se-active-hover-color);
-	color: #fff;
+	color: var(--se-btn-primary-color);
 }
 
 .sun-editor .se-btn-primary:active,
@@ -2580,7 +2580,7 @@
 	margin: 0 0 10px 0 !important;
 	font-size: var(--se-modal-input-font-size);
 	font-weight: 500;
-	color: #fff;
+	color: var(--se-btn-primary-color);
 	line-height: 1.4;
 	text-align: center;
 	white-space: nowrap;
