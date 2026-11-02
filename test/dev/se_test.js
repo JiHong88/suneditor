@@ -1782,11 +1782,11 @@ const options1 = {
 	},
 	// mode: 'classic:bottom',
 	// maxHeight: 400,
-	// subToolbar: {
-	// 	buttonList: [['bold', 'italic', 'underline']],
-	// 	mode: 'balloon-always',
-	// 	width: 'auto',
-	// },
+	subToolbar: {
+		buttonList: [['bold', 'italic', 'underline']],
+		mode: 'balloon-always',
+		width: 'auto',
+	},
 	layout: {
 		items: [
 			{

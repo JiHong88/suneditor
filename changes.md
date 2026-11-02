@@ -14,5 +14,15 @@
 
 ### change
 
+- The balloon toolbar and the controllers (link, image, table, math, audio, file) no longer draw a pointer arrow toward their target; they float on their shadow; the balloon toolbar and the anchor popup sit 10px from the selection (was 12px) and element-anchored controllers keep their 8px gap. The `.se-arrow` element stays in the markup, hidden, and still sets that gap, so custom controllers keep requiring it (`assets/suneditor.css`). To keep drawing the pointer, add after the editor CSS:
+    ```css
+    .sun-editor .se-arrow:not(.se-arrow-visible-hidden),
+    .sun-editor .se-arrow:not(.se-arrow-visible-hidden)::after {
+    	visibility: visible;
+    	border-left-width: 12px;
+    	border-right-width: 12px;
+    	margin-left: -12px;
+    }
+    ```
 - Dark-family themes (`dark`, `midnight`, `cobalt`): toolbar/menu buttons in the `.on` / `.active` state now get a visibly tinted fill with a bright accent icon instead of a near-background fill with a darker-than-fill icon.
 - An `iframe_attributes.sandbox` value is kept as given, with only `allow-same-origin` added, instead of also getting `allow-scripts`; leave out `allow-scripts` only if the editor need not work in Safari or iOS browsers (an error is logged there) (#1716) (`core/section/constructor`)

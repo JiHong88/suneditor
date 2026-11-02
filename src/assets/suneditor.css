@@ -810,6 +810,15 @@
 	border-top-color: var(--se-controller-background-color);
 }
 
+/* pointer hidden: remove this rule to show the arrow pointer again. */
+.sun-editor .se-arrow,
+.sun-editor .se-arrow::after {
+	visibility: hidden;
+	border-left-width: 10px;
+	border-right-width: 10px;
+	margin-left: -10px;
+}
+
 /* arrow hidden (invisible but still occupies space - 6px) */
 .sun-editor .se-arrow-visible-hidden {
 	visibility: hidden;
