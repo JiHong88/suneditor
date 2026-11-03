@@ -11,6 +11,7 @@
 - `$.eventManager.addEvent()`/`removeEvent()` given an iframe window that holds frames (e.g. an `iframe`-mode editor with a video embed) uses that window instead of throwing a `SecurityError` or listening on the embedded frame, and an empty `NodeList` returns `null` instead of throwing (`core/config/eventManager`)
 - `html.clean()` / `html.compress()` (used by `html.set`, paste, code view and markdown view) turn a line break inside text into a space instead of deleting it, which joined the words, and a line break inside a `PRE` (brLine) into `<br>` instead of removing it, so Markdown code blocks keep their lines; code view no longer adds layout line breaks or indentation inside a `PRE`, so its rows survive a toggle (`core/logic/dom/html`)
 - Markdown view and `jsonToMarkdown()` keep the lines of a code block written in the editor (`<br>` in `PRE`) instead of joining them (`helper/markdown`)
+- Markdown view and `jsonToMarkdown()` escape `]` in text only where it would form syntax (before `(` or `:`, closing a task box `[ ]` / `[x]`) instead of everywhere, so `The [Name] Collection` stays as written; inside link text and an image `alt` both `[` and `]` are escaped (an `alt` was not escaped at all), so `<a>a [b] c</a>` and `alt="a]b"` survive a Markdown round trip and read the same in GFM; `markdownToHtml()` reads a link or image text with balanced `[...]` pairs as CommonMark does and no longer joins `[a [b](u)` into one link (`helper/markdown`)
 
 ### change
 

@@ -213,10 +213,15 @@ describe('markdown helper', () => {
 
 		it('should convert links', () => {
 			expect(markdownToHtml('[text](url)')).toBe('<p><a href="url">text</a></p>');
+			// Balanced brackets stay in the text; an unbalanced '[' starts the link (CommonMark).
+			expect(markdownToHtml('[a [b] c](u)')).toBe('<p><a href="u">a [b] c</a></p>');
+			expect(markdownToHtml('[a [b](u)')).toBe('<p>[a <a href="u">b</a></p>');
 		});
 
 		it('should convert images', () => {
 			expect(markdownToHtml('![alt](src.png)')).toBe('<p><img src="src.png" alt="alt"></p>');
+			expect(markdownToHtml('![a [b] c](s)')).toBe('<p><img src="s" alt="a [b] c"></p>');
+			expect(markdownToHtml('![a ![b](s)')).toBe('<p>![a <img src="s" alt="b"></p>');
 		});
 
 		it('should convert horizontal rule', () => {
@@ -409,6 +414,12 @@ describe('markdown helper', () => {
 			['<p><span class="__se__a">x*y*</span></p>', '<span class="__se__a">x\\*y\\*</span>'],
 			['<p><code>&lt;b&gt; a*b*</code></p>', '`<b> a*b*`'],
 			['<ul><li>[ ] text</li></ul>', '- [ \\] text'],
+			['<p>The [Name] Collection, see [1]</p>', 'The [Name] Collection, see [1]'],
+			['<p>[a]: b, [x] [ ] c</p>', '[a\\]: b, [x\\] [ \\] c'],
+			['<p><a href="u">The [Name] x</a></p>', '[The \\[Name\\] x](u)'],
+			['<p><a href="u">a [b</a> [c <a href="u">d</a></p>', '[a \\[b](u) [c [d](u)'],
+			['<p><a href="u"><img src="s" alt="a]b"></a></p>', '[![a\\]b](s)](u)'],
+			['<p><img src="s" alt="[a] b*c* `d`"></p>', '![\\[a\\] b\\*c\\* \\`d\\`](s)'],
 			['<table><tbody><tr><td><code>a|b</code> c|d</td></tr></tbody></table>', '|   |\n| --- |\n| `a\\|b` c\\|d |'],
 		])('escapes text only where it would be parsed as syntax: %s', (input, md) => {
 			const result = jsonToMarkdown(converter.htmlToJson(input));
@@ -419,6 +430,17 @@ describe('markdown helper', () => {
 				expect(new DOMParser().parseFromString(html, 'text/html').body.innerHTML).toBe(input);
 			}
 		});
+
+		it.each(['<p>[a]<span>(b)</span></p>', '<p>[a<span>]</span>(b)</p>', '<ul><li>[<span>x</span>] c</li></ul>'])(
+			'escapes a ] that forms syntax with a sibling: %s',
+			(input) => {
+				const html = markdownToHtml(jsonToMarkdown(converter.htmlToJson(input)));
+				expect(html).not.toMatch(/<a |<input/);
+				expect(new DOMParser().parseFromString(html, 'text/html').body.textContent).toBe(
+					new DOMParser().parseFromString(input, 'text/html').body.textContent,
+				);
+			},
+		);
 
 		it.each([
 			['a  \nb', '<p>a<br>b</p>'],
