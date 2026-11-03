@@ -1043,6 +1043,10 @@
 	z-index: 2;
 }
 
+.sun-editor .se-wrapper.se-source-view-status .se-block-handle-area {
+	display: none;
+}
+
 .sun-editor .se-wrapper.se-mode-block .se-wrapper-inner {
 	flex: 1;
 	min-width: 0;

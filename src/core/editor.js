@@ -105,16 +105,8 @@ class Editor {
 	 * @description Destroy the suneditor
 	 */
 	destroy() {
-		/** destroy external library */
-		if (this.$.options.get('hasCodeMirror')) {
-			this.$.contextProvider.applyToRoots((e) => {
-				const opts = e.get('options');
-				const cm = opts.get('codeMirrorEditor');
-				if (cm) cm.toTextArea();
-			});
-		}
-
 		/** remove DOM elements */
+		// CodeMirror needs no `toTextArea()`: its wrapper goes with `topArea`, and its textarea is detached at construction.
 		dom.utils.removeItem(this.$.context.get('toolbar_wrapper'));
 		dom.utils.removeItem(this.$.context.get('toolbar_sub_wrapper'));
 		dom.utils.removeItem(this.$.context.get('statusbar_wrapper'));

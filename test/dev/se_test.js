@@ -21,8 +21,8 @@ import { RegisterHTMLHandler } from 'mathjax-full/js/handlers/html.js';
 
 // codemirror
 import CodeMirror from 'codemirror';
-require('codemirror/lib/codemirror.css');
-require('codemirror/mode/htmlmixed/htmlmixed');
+import 'codemirror/lib/codemirror.css';
+import 'codemirror/mode/htmlmixed/htmlmixed';
 
 // perfect-freehand
 // import PerfectFreehand from 'perfect-freehand';
@@ -978,7 +978,7 @@ const options1 = {
 	type: 'document:header,page',
 	// codeLangs: [],
 	externalLibs: {
-		// codeMirror: { src: CodeMirror },
+		codeMirror: { src: CodeMirror },
 		// katex: {
 		// 	src: Katex
 		// },
@@ -1119,7 +1119,7 @@ const options1 = {
 		// showIncDecControls: true
 		disableInput: true,
 		// sizeUnit: 'text',
-		showDefaultSizeLabel:true
+		showDefaultSizeLabel: true,
 	},
 
 	autocomplete: {

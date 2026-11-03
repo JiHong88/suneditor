@@ -59,9 +59,10 @@ test('ISSUE 3: slash H1 converts the line and placeholder is H1-sized', async ({
 	await page.waitForTimeout(150);
 	await page.locator('.se-wrapper-wysiwyg').click();
 	await page.waitForTimeout(100);
-	await page.keyboard.type('/head');
+	// `/head` also matches the built-in `heading` row, a submenu that Enter only opens; `/h1` matches the H1 row alone
+	await page.keyboard.type('/h1');
 	await page.waitForTimeout(350);
-	await page.keyboard.press('Enter'); // select the "Heading 1" item
+	await page.keyboard.press('Enter'); // select the H1 item
 	await page.waitForTimeout(250);
 	// place caret in the (now empty) h1 line and let the placeholder mark it
 	await page.evaluate(() => {
