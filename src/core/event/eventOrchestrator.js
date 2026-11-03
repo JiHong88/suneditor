@@ -195,6 +195,20 @@ class EventOrchestrator extends KernelInjector {
 
 	/**
 	 * @internal
+	 * @description Hide the balloon toolbar on Esc and cancel a pending `_showToolbarBalloonDelay`.
+	 */
+	_dismissToolbarBalloon() {
+		if (this.#balloonDelay) {
+			_w.clearTimeout(this.#balloonDelay);
+			this.#balloonDelay = null;
+		}
+
+		if (this.#store.mode.isBalloon) this._hideToolbar();
+		else if (this.#store.mode.isSubBalloon) this._hideToolbar_sub();
+	}
+
+	/**
+	 * @internal
 	 * @description Hide the toolbar.
 	 */
 	_hideToolbar() {

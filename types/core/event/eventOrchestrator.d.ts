@@ -79,6 +79,11 @@ declare class EventOrchestrator extends KernelInjector {
 	_toggleToolbarBalloon(): void;
 	/**
 	 * @internal
+	 * @description Hide the balloon toolbar on Esc and cancel a pending `_showToolbarBalloonDelay`.
+	 */
+	_dismissToolbarBalloon(): void;
+	/**
+	 * @internal
 	 * @description Hide the toolbar.
 	 */
 	_hideToolbar(): void;
