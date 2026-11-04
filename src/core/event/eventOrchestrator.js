@@ -316,7 +316,7 @@ class EventOrchestrator extends KernelInjector {
 		// SE copy data
 		const SEData = this.__secopy === plainText;
 		// MS word, OneNote, Excel, Office Online
-		const MSData = !SEData && msOffice.isMSOffice(cleanData);
+		const MSData = msOffice.isMSOffice(cleanData);
 		// Google Docs
 		const GDData = !SEData && !MSData && googleDocs.isGoogleDocs(cleanData);
 		// from

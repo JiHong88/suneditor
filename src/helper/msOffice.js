@@ -27,9 +27,9 @@ const _RE_MSO_LIST_IGNORE = /mso-list:\s*Ignore/i;
 const _RE_OFFICE_CLASS_TOKEN =
 	/^(?:Mso\w+|xl\d+|(?:SCXW|BCX)\d+|NormalTextRun|TextRun|OutlineElement|Paragraph|EOP|Selected)$/i;
 
-/** Matches Office class attribute on HTML tags (quoted or unquoted) */
+/** Matches Office class attribute on HTML tags (quoted or unquoted, case-sensitive class token) */
 const _RE_IS_MS_CLASS =
-	/<[a-z0-9]+(?:[^>"']|"[^"]*"|'[^']*')*\sclass\s*=\s*(?:["'](?:[^"']*\s)?(?:Mso\w+|xl\d+|(?:SCXW|BCX)\d+|NormalTextRun|TextRun|OutlineElement)(?:\s[^"']*)?["']|(?:Mso\w+|xl\d+|(?:SCXW|BCX)\d+|NormalTextRun|TextRun|OutlineElement)(?=[\s/>]|$))/i;
+	/<[a-zA-Z0-9]+(?:[^>"']|"[^"]*"|'[^']*')*\s[cC][lL][aA][sS][sS]\s*=\s*(?:["'](?:[^"']*\s)?(?:Mso\w+|(?:SCXW|BCX)\d+|NormalTextRun|TextRun|OutlineElement)(?:\s[^"']*)?["']|(?:Mso\w+|(?:SCXW|BCX)\d+|NormalTextRun|TextRun|OutlineElement)(?=[\s/>]|$))/;
 
 /** Matches Word/Excel/OneNote Generator or ProgId meta tags */
 const _RE_IS_MS_CONTENT =
@@ -37,11 +37,7 @@ const _RE_IS_MS_CONTENT =
 
 /** Matches Office XML namespaces on html or root elements */
 const _RE_IS_MS_XMLNS =
-	/<(?:html|[a-z0-9]+:[a-z0-9]+)(?:[^>"']|"[^"]*"|'[^']*')*\sxmlns:(?:o|w|v|x)\s*=\s*["']?(?:urn:schemas-microsoft-com|#)/i;
-
-/** Matches mso-* styles inside style attributes, <style> tags, or conditional comments */
-const _RE_IS_MS_MSO_STYLE =
-	/<[a-z0-9]+(?:[^>"']|"[^"]*"|'[^']*')*\sstyle\s*=\s*(?:"(?:[^"]*?[\s;])?mso-[a-z-]+\s*:|'(?:[^']*?[\s;])?mso-[a-z-]+\s*:|mso-[a-z-]+\s*:)|<style[^>]*>(?:[^<]|<!--)*(?:[\s;{]mso-[a-z-]+\s*:|@list\s+l\d+)|<!--\[if\s+(?:!|(?:gt|lt)e?\s+)?mso\b/i;
+	/<(?:html|[a-z0-9]+:[a-z0-9]+)(?:[^>"']|"[^"]*"|'[^']*')*\sxmlns:(?:o|w|v|x)\s*=\s*["']?urn:schemas-microsoft-com/i;
 
 /** Matches Office 365 data attributes on HTML tags */
 const _RE_IS_MS_DATA_ATTR = /<[a-z0-9]+(?:[^>"']|"[^"]*"|'[^']*')*\sdata-ccp-(?:props|parastyle)\s*=/i;
@@ -240,8 +236,14 @@ function _cleanStyles(el) {
 		cleaned += ';background-color:' + highlightMatch[1].trim();
 	}
 
-	// Strip default "color: windowtext" so text inherits editor theme color; map remaining windowtext (e.g. borders) to #000000
-	cleaned = cleaned.replace(/(?:^|;)\s*color\s*:\s*windowtext\b\s*;?/gi, ';').replace(/\bwindowtext\b/gi, '#000000');
+	// Strip default "color: windowtext" on non-link text so text inherits editor theme color;
+	// Inside <a>, preserve it so Word's black link text does not turn into browser/theme link blue.
+	// Map all remaining windowtext (e.g. borders, links) to #000000.
+	const isLink = el.tagName === 'A' || !!el.closest('a');
+	if (!isLink) {
+		cleaned = cleaned.replace(/(?:^|;)\s*color\s*:\s*windowtext(?:\s*!\s*important)?\b\s*;?/gi, ';');
+	}
+	cleaned = cleaned.replace(/\bwindowtext\b/gi, '#000000');
 
 	cleaned = cleaned
 		.replace(_RE_MSO_STYLE, '')
@@ -792,27 +794,63 @@ function _cleanBreaks(doc) {
 /**
  * @description Removes Word Online End-Of-Paragraph and cursor selection artifacts.
  * - Only empty markers are removed; elements containing user text retain their styling and highlights.
+ * - When an EOP marker is the only content of a paragraph, keeps the line as a blank paragraph (<p><br></p>).
  * @param {Document} doc
  */
 function _cleanWordOnlineArtifacts(doc) {
 	const markers = doc.body.querySelectorAll('span');
 	for (let i = markers.length - 1; i >= 0; i--) {
 		const el = markers[i];
-		if (el.classList.contains('EOP') || el.classList.contains('Selected')) {
-			const text = (el.textContent || '').replace(/[\s\u00a0\u200b]/g, '');
-			if (!text && !el.querySelector('img, video, iframe, br, table')) {
+		const isEOP = el.classList.contains('EOP');
+		const isSelected = el.classList.contains('Selected');
+		if (!isEOP && !isSelected) continue;
+
+		if (isEOP) {
+			const hasMediaOrTable = el.querySelector('img, video, iframe, br, table, a');
+			const nonMarkerText = (el.textContent || '').replace(/[\s\u00a0\u200b]/g, '');
+			if (!nonMarkerText && !hasMediaOrTable) {
+				const parent = el.closest('p, h1, h2, h3, h4, h5, h6');
+				if (parent && !parent.querySelector('br')) {
+					const parentText = (parent.textContent || '').replace(/[\s\u00a0\u200b]/g, '');
+					const hasMedia = parent.querySelector('img, video, iframe, table, a');
+					if (!parentText && !hasMedia) {
+						const br = doc.createElement('br');
+						while (parent.firstChild) {
+							parent.removeChild(parent.firstChild);
+						}
+						parent.appendChild(br);
+						continue;
+					}
+				}
 				el.remove();
+			}
+		} else if (isSelected) {
+			const hasMediaOrTable = el.querySelector('img, video, iframe, br, table, a');
+			const text = el.textContent || '';
+			const nonWsText = text.replace(/[\s\u00a0\u200b]/g, '');
+
+			if (!nonWsText && !hasMediaOrTable) {
+				const isGrayCursor = /gray|rgb\(96\s*,\s*96\s*,\s*96\)|#606060/i.test(el.style.backgroundColor || '');
+				const visibleWs = text.replace(/[\u200b]/g, '');
+				if (visibleWs && !isGrayCursor) {
+					// Preserve whitespace text node (spaces or &nbsp;) so adjacent words don't merge
+					const textNode = doc.createTextNode(text);
+					el.replaceWith(textNode);
+				} else {
+					// Purely empty, zero-width, or gray cursor selection artifact
+					el.remove();
+				}
 			}
 		}
 	}
 }
 
 /**
- * @description Unwraps redundant Word Online OutlineElement and Paragraph container divs.
+ * @description Unwraps redundant Word Online OutlineElement container divs.
  * @param {Document} doc
  */
 function _unwrapOutlineDivs(doc) {
-	const outlineDivs = doc.body.querySelectorAll('div.OutlineElement, div.Paragraph');
+	const outlineDivs = doc.body.querySelectorAll('div.OutlineElement');
 	for (let i = outlineDivs.length - 1; i >= 0; i--) {
 		const div = outlineDivs[i];
 		const parent = div.parentNode;
@@ -827,6 +865,7 @@ function _unwrapOutlineDivs(doc) {
 
 /**
  * @description Converts legacy <font> tags to semantic <span> elements with CSS styling.
+ * - Inline style attributes take precedence over font tag attributes (matching browser CSS rendering).
  * @param {Document} doc
  */
 function _convertFontTags(doc) {
@@ -835,36 +874,40 @@ function _convertFontTags(doc) {
 		const font = fonts[i];
 		const span = doc.createElement('span');
 		const styles = [];
-		let existingStyle = font.getAttribute('style') || '';
+		const existingStyle = font.getAttribute('style') || '';
 
+		const hasInlineFamily = /(?:^|;)\s*font-family\s*:/i.test(existingStyle);
 		const face = font.getAttribute('face');
-		if (face) {
+		if (face && !hasInlineFamily) {
 			styles.push(`font-family: ${face}`);
-			existingStyle = existingStyle.replace(/(?:^|;)\s*font-family\s*:[^;]+;?/gi, ';');
 		}
 
+		const hasInlineColor = /(?:^|;)\s*color\s*:/i.test(existingStyle);
 		const color = font.getAttribute('color');
-		if (color) {
-			existingStyle = existingStyle.replace(/(?:^|;)\s*color\s*:[^;]+;?/gi, ';');
-			if (color.toLowerCase() !== 'windowtext') {
+		if (color && !hasInlineColor) {
+			if (color.toLowerCase() === 'windowtext') {
+				const isLink = font.tagName === 'A' || !!font.closest('a');
+				if (isLink) {
+					styles.push('color: #000000');
+				}
+			} else {
 				styles.push(`color: ${color}`);
 			}
 		}
 
+		const hasInlineSize = /(?:^|;)\s*font-size\s*:/i.test(existingStyle);
 		const size = font.getAttribute('size');
 		const mappedSize = size && _FONT_SIZE_MAP[size];
-		if (mappedSize) {
+		if (mappedSize && !hasInlineSize) {
 			styles.push(`font-size: ${mappedSize}`);
-			existingStyle = existingStyle.replace(/(?:^|;)\s*font-size\s*:[^;]+;?/gi, ';');
 		}
 
-		existingStyle = existingStyle
+		const cleanExisting = existingStyle
 			.replace(/^(?:\s*;)+|(?:\s*;)+$/g, '')
 			.replace(/;(?:\s*;)+/g, ';')
 			.trim();
-
-		if (existingStyle) {
-			styles.push(existingStyle);
+		if (cleanExisting) {
+			styles.push(cleanExisting);
 		}
 
 		if (styles.length) {
@@ -891,7 +934,6 @@ export function isMSOffice(html) {
 		_RE_IS_MS_CLASS.test(html) ||
 		_RE_IS_MS_CONTENT.test(html) ||
 		_RE_IS_MS_XMLNS.test(html) ||
-		_RE_IS_MS_MSO_STYLE.test(html) ||
 		_RE_IS_MS_DATA_ATTR.test(html)
 	);
 }
