@@ -2,7 +2,7 @@
 
 > `changes.md`는 현재 릴리즈 버전의 변경사항만 기록하는 파일입니다.
 > **suneditor-demo** 데모 업데이트, **릴리즈 노트** 작성 시 참고 자료로 활용됩니다.
-> 릴리즈 완료 후 내용을 비우고 다음 버전을 위해 새로 작성합니다.
+> `release-note.md` 작성 직후 내용을 비우고 다음 버전을 위해 새로 작성합니다.
 
 ---
 
@@ -65,10 +65,9 @@
 
 ## 릴리즈 시 처리
 
-1. `changes.md` 내용을 GitHub Release 본문 / npm 릴리즈 노트에 복사
-2. suneditor-demo 업데이트 목록으로 활용
-3. **릴리즈 완료 후 `changes.md` 내용을 모두 비움** (파일은 유지, 내용만 삭제)
-4. 다음 버전 개발 시 새로 기록 시작
+1. `/release-note`로 `changes.md`를 `release-note.md`로 변환 (GitHub Release 본문, npm 패키지, suneditor-demo 업데이트가 이 파일을 사용)
+2. **`release-note.md` 작성 직후 `changes.md` 내용을 모두 비움** (파일은 유지, 내용만 삭제)
+3. 다음 버전 개발 시 새로 기록 시작
 
 ---
 

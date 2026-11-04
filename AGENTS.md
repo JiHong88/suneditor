@@ -68,4 +68,4 @@ Refer to [prompts/changes-guide.md](./prompts/changes-guide.md) for formatting r
 ## Release Note
 
 When asked to write a release note, read [changes.md](./changes.md) and write a release note to [release-note.md](./release-note.md) following the style and rules in [prompts/release-note.md](./prompts/release-note.md).
-Replace the entire contents of `release-note.md` with the generated release note.
+Replace the entire contents of `release-note.md` with the generated release note, then clear `changes.md` (keep the file, empty its contents).

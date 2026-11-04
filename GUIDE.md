@@ -476,8 +476,7 @@ For user-facing changes, update `changes.md` using
 [prompts/changes-guide.md](./prompts/changes-guide.md), the sole formatting authority.
 Use `### feat`, `### fix`, `### change`, `### breaking` groups and concise bullets with
 source/plugin references. Do not use dated category headings. Skip documentation/harness,
-tests and internal-only changes. Clear the log only after release completion or an explicit
-request, not while drafting release notes.
+tests and internal-only changes. Clear the log right after `release-note.md` is written.
 
 ---
 
