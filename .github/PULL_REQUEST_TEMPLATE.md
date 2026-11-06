@@ -13,6 +13,7 @@ Closes #
 
 ## Checklist
 
+- [ ] This PR covers **one** bug fix or feature (unrelated changes are in separate PRs)
 - [ ] Tests added or updated (unit: `test/unit`, integration: `test/integration`, browser: `test/e2e`)
 - [ ] `npm run lint` and `npm test` pass
 - [ ] `changes.md` updated for user-facing changes (`feat` / `enhance` / `fix` / `change` / `breaking`)
