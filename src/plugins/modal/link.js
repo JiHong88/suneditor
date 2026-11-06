@@ -5,6 +5,8 @@ import { dom, numbers } from '../../helper';
 
 /**
  * @typedef {Object} LinkOptions
+ * @property {boolean} [title=true] - Show the "Title" input in the link modal.
+ * @property {boolean} [textToDisplay=true] - Show the "Text to display" input in the link modal.
  * @property {string} [uploadUrl] - The URL endpoint for file uploads.
  * - The server must return:
  * ```js
@@ -25,7 +27,7 @@ import { dom, numbers } from '../../helper';
  */
 
 /**
- * @typedef {Omit<LinkOptions & import('../../modules/ui/ModalAnchorEditor').ModalAnchorEditorParams, ''>} LinkPluginOptions
+ * @typedef {Omit<LinkOptions & Omit<import('../../modules/ui/ModalAnchorEditor').ModalAnchorEditorParams, 'title' | 'textToDisplay'>, ''>} LinkPluginOptions
  */
 
 /**
@@ -52,8 +54,8 @@ class Link extends PluginModal {
 		this.icon = 'link';
 
 		// define plugin options
-		pluginOptions.textToDisplay = true;
-		pluginOptions.title = true;
+		pluginOptions.textToDisplay = pluginOptions.textToDisplay ?? true;
+		pluginOptions.title = pluginOptions.title ?? true;
 
 		// create HTML
 		const modalEl = CreateHTML_modal(this.$);
