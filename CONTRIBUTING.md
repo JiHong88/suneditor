@@ -27,6 +27,9 @@ Node.js **v22 recommended**, minimum **v14+** is required to build and test.
 
 - Check that no one is working on the same thing in [open issues](https://github.com/jihong88/suneditor/issues).
 - For new features or major changes, please open an issue first to gather feedback.
+- **Keep each PR to one bug fix or one feature.** Put unrelated changes, refactors or extra improvements in separate PRs.
+- Large PRs (roughly **300+ changed lines in `src/`**, tests excluded) are hard to review. Agree on the scope in an issue first, or split the work into smaller PRs.
+- PRs that bundle several features or unrelated changes may be closed with a request to split them.
 - Use a **feature branch** (not `master`) for your pull request.
 - Make sure your code passes tests and doesn't break existing functionality.
 - Follow the [Commit Message Convention](#-commit-message-convention) below.

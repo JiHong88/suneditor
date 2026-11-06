@@ -1012,6 +1012,8 @@ const options1 = {
 			'tag',
 		],
 		defaultRel: 'tag',
+		// title: false,
+        // textToDisplay: false
 	},
 	video: {
 		allowMultiple: true,

@@ -1300,6 +1300,7 @@ class HTML {
 
 			const isTableCell = dom.check.isTableCell;
 			const isEmptyLine = dom.check.isEmptyLine;
+			const isComponent = (el) => this.#$.component.is(el);
 			const editableEls = [];
 			const emptyCells = [];
 			dom.query.getListChildren(
@@ -1310,7 +1311,13 @@ class HTML {
 					}
 
 					const parent = current.parentElement;
-					if (isTableCell(parent) && parent.children.length <= 1 && isEmptyLine(current)) {
+					if (
+						isTableCell(parent) &&
+						parent.children.length <= 1 &&
+						isEmptyLine(current) &&
+						!isComponent(current) &&
+						!dom.utils.arrayFind(current.querySelectorAll('*'), isComponent)
+					) {
 						emptyCells.push(parent);
 					}
 					return false;

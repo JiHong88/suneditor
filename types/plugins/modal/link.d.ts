@@ -2,6 +2,14 @@ import type {} from '../../typedef';
 export default Link;
 export type LinkOptions = {
 	/**
+	 * - Show the "Title" input in the link modal.
+	 */
+	title?: boolean;
+	/**
+	 * - Show the "Text to display" input in the link modal.
+	 */
+	textToDisplay?: boolean;
+	/**
 	 * - The URL endpoint for file uploads.
 	 * - The server must return:
 	 * ```js
@@ -37,11 +45,13 @@ export type LinkOptions = {
 	acceptedFormats?: string;
 };
 export type LinkPluginOptions = Omit<
-	LinkOptions & import('../../modules/ui/ModalAnchorEditor').ModalAnchorEditorParams,
+	LinkOptions & Omit<import('../../modules/ui/ModalAnchorEditor').ModalAnchorEditorParams, 'title' | 'textToDisplay'>,
 	''
 >;
 /**
  * @typedef {Object} LinkOptions
+ * @property {boolean} [title=true] - Show the "Title" input in the link modal.
+ * @property {boolean} [textToDisplay=true] - Show the "Text to display" input in the link modal.
  * @property {string} [uploadUrl] - The URL endpoint for file uploads.
  * - The server must return:
  * ```js
@@ -61,7 +71,7 @@ export type LinkPluginOptions = Omit<
  * @property {string} [acceptedFormats] - Accepted file formats for link uploads.
  */
 /**
- * @typedef {Omit<LinkOptions & import('../../modules/ui/ModalAnchorEditor').ModalAnchorEditorParams, ''>} LinkPluginOptions
+ * @typedef {Omit<LinkOptions & Omit<import('../../modules/ui/ModalAnchorEditor').ModalAnchorEditorParams, 'title' | 'textToDisplay'>, ''>} LinkPluginOptions
  */
 /**
  * @class
@@ -91,11 +101,11 @@ declare class Link extends PluginModal {
 		acceptedFormats: string;
 		enableFileUpload: boolean;
 		/**
-		 * - Modal title display.
+		 * - Show the "Title" input in the link modal.
 		 */
 		title?: boolean;
 		/**
-		 * - Create Text to display input.
+		 * - Show the "Text to display" input in the link modal.
 		 */
 		textToDisplay?: boolean;
 		/**

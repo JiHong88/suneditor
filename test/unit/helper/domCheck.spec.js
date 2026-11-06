@@ -119,6 +119,28 @@ describe('dom.check helper', () => {
             document.body.removeChild(div);
 		});
         
+		it('should return false for a component, an hr or a line holding one (#1721)', () => {
+			const td = document.createElement('td');
+			document.body.appendChild(td);
+
+			td.innerHTML = '<my-widget class="se-component"></my-widget>';
+			expect(dom.check.isEmptyLine(td.firstElementChild)).toBe(false);
+
+			td.innerHTML = '<div><my-widget class="se-component se-inline-component"></my-widget></div>';
+			expect(dom.check.isEmptyLine(td.firstElementChild)).toBe(false);
+
+			td.innerHTML = '<div><span class="se-flex-component"></span></div>';
+			expect(dom.check.isEmptyLine(td.firstElementChild)).toBe(false);
+
+			td.innerHTML = '<hr>';
+			expect(dom.check.isEmptyLine(td.firstElementChild)).toBe(false);
+
+			td.innerHTML = '<div><hr></div>';
+			expect(dom.check.isEmptyLine(td.firstElementChild)).toBe(false);
+
+			document.body.removeChild(td);
+		});
+
         it('should return true if children are only BR or zero-width text', () => {
             const div = document.createElement('div');
             document.body.appendChild(div);
