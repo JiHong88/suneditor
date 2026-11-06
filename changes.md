@@ -1,6 +1,6 @@
 ### change
 
-- Pasting from Word Online / Office 365 is detected by strong Office markers in `msOffice.isMSOffice(html)` and cleaned with `msOffice.cleanHTML(html)`: empty `EOP`/`Selected` cursor spans, `OutlineElement` wrapper divs, `data-ccp-*` / `data-contrast` attributes, and non-anchor `color: windowtext` are stripped, blank paragraphs are preserved, and `<font>` tags are converted to styled `<span>` elements with inline style precedence (#1717) (`helper/msOffice`, `core/event/eventOrchestrator`)
+- Word Online pastes are now cleaned like desktop Word: cursor markers (dark blocks) and `OutlineElement` wrappers are removed, blank lines are kept, and non-link `color: windowtext` is dropped so text follows the editor theme. Added `msOffice.isMSOffice()` (#1717, `helper/msOffice`, `core/event/eventOrchestrator`)
 
 ### fix
 

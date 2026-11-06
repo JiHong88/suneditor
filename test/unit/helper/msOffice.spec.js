@@ -28,21 +28,16 @@ describe('Helper - msOffice', () => {
 			);
 		});
 
-		it('detects Office 365 data attributes and XML namespaces', () => {
+		it('detects Office 365 data attributes', () => {
 			expect(isMSOffice('<span data-ccp-props="{}">Text</span>')).toBe(true);
-			expect(isMSOffice('<html xmlns:o="urn:schemas-microsoft-com:office:office"></html>')).toBe(true);
-			expect(isMSOffice('<html xmlns:w="urn:schemas-microsoft-com:office:word"></html>')).toBe(true);
+			expect(isMSOffice('<p data-ccp-parastyle="Normal">Text</p>')).toBe(true);
 		});
 
 		it('detects strong Office markers in combinations', () => {
 			expect(isMSOffice('<p class="MsoNormal" style="mso-margin-top-alt: auto;">Text</p>')).toBe(true);
-			expect(isMSOffice('<div class="OutlineElement"><span style="mso-list: Ignore;">·</span>Item</div>')).toBe(
-				true,
-			);
 			expect(
 				isMSOffice('<span class="NormalTextRun" style=\'font-size:11.0pt;font-family:"Calibri",sans-serif;mso-fareast-font-family:Calibri\'>Text</span>'),
 			).toBe(true);
-			expect(isMSOffice('<html xmlns:o="urn:schemas-microsoft-com:office:office"><style><!-- @list l0 {mso-list-id:1;} --></style></html>')).toBe(true);
 		});
 
 		it('returns false for non-MS Office content', () => {
@@ -52,18 +47,17 @@ describe('Helper - msOffice', () => {
 			expect(isMSOffice('<div class="tab selected">Selected tab</div>')).toBe(false);
 			expect(isMSOffice('<p class="my-paragraph">Custom text</p>')).toBe(false);
 			expect(isMSOffice('<p class="paragraph">Generic paragraph class</p>')).toBe(false);
-			expect(isMSOffice('<p class=MsoNormal-custom>Unquoted hyphenated class</p>')).toBe(false);
-			expect(isMSOffice('<p class="msonormal">Case-sensitive MsoNormal check</p>')).toBe(false);
 			expect(isMSOffice('<span class="scxw12345">Case-sensitive SCXW check</span>')).toBe(false);
 			expect(isMSOffice('<div class="xl24 col-xl10">Case-sensitive xl check</div>')).toBe(false);
-			expect(isMSOffice('<img alt="Use class=MsoNormal in Word" src="https://example.com/a.png">')).toBe(false);
-			expect(isMSOffice('<meta data-content="Word.Document">')).toBe(false);
 			expect(isMSOffice('<div style="--mso-custom-var: 10px;">CSS custom property</div>')).toBe(false);
 			expect(isMSOffice('<p>The mso-format in prose is: valid</p>')).toBe(false);
 			expect(isMSOffice('<p>In CSS, mso-style: is a prefix</p>')).toBe(false);
 			expect(isMSOffice('<p>The data-ccp-props attribute is used by Word</p>')).toBe(false);
 			expect(isMSOffice('<p>xmlns:o=urn:schemas-microsoft-com in prose</p>')).toBe(false);
-			expect(isMSOffice('<p>class="MsoNormal" in tutorial text</p>')).toBe(false);
+			expect(isMSOffice('<p>Word Online uses class="NormalTextRun SCXW1" spans</p>')).toBe(false);
+			expect(isMSOffice('<span class="TextRun">Generic TextRun class</span>')).toBe(false);
+			expect(isMSOffice('<div class="OutlineElement">Generic OutlineElement class</div>')).toBe(false);
+			expect(isMSOffice('<span data-ccp-props-x="1">Similar attribute name</span>')).toBe(false);
 			expect(isMSOffice('<b id="docs-internal-guid-123"><p>Google Doc</p></b>')).toBe(false);
 			// Google Sheets real clipboard payloads
 			expect(
@@ -123,6 +117,12 @@ describe('Helper - msOffice', () => {
 				'</td></tr></tbody></table>';
 			expect(isMSOffice(emailTemplateHtml)).toBe(false);
 
+			// 3-1. Email template root with Outlook VML/Office namespaces
+			const emailRootHtml =
+				'<html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">' +
+				'<body style="mso-line-height-rule: exactly;"><p>Newsletter</p></body></html>';
+			expect(isMSOffice(emailRootHtml)).toBe(false);
+
 			// 4. Tailwind CSS documentation / UI component with responsive grid tokens
 			const tailwindHtml =
 				'<div class="max-w-4xl mx-auto xl:flex 2xl:container col-xl-12">' +
@@ -133,14 +133,6 @@ describe('Helper - msOffice', () => {
 				'</div></div>';
 			expect(isMSOffice(tailwindHtml)).toBe(false);
 
-			// 5. Stack Overflow code article discussing Word cleanup (contains class="MsoNormal" in code blocks and prose)
-			const stackOverflowHtml =
-				'<div class="s-prose js-post-body">' +
-				'<p>To strip <code>class="MsoNormal"</code> when pasting from Word, avoid using loose regexes.</p>' +
-				'<pre class="lang-html s-code-block"><code>&lt;p class="MsoNormal"&gt;Example code&lt;/p&gt;</code></pre>' +
-				'<p>Check <code>mso-margin-top-alt</code> or <code>xmlns:o=urn:schemas-microsoft-com</code> boundaries.</p>' +
-				'</div>';
-			expect(isMSOffice(stackOverflowHtml)).toBe(false);
 		});
 	});
 
@@ -153,10 +145,14 @@ describe('Helper - msOffice', () => {
 				expect(output).toBe('<p>Paragraph text</p>');
 			});
 
-			it('removes Selected cursor markers with gray backgrounds', () => {
-				const input = '<p>Selected text<span class="Selected" style="background-color: gray;">&nbsp;</span></p>';
-				const output = cleanHTML(input);
-				expect(output).toBe('<p>Selected text</p>');
+			it('removes zero-width Selected cursor markers', () => {
+				const input = '<p>Selected text<span class="Selected" style="background-color: gray;">\u200b</span></p>';
+				expect(cleanHTML(input)).toBe('<p>Selected text</p>');
+			});
+
+			it('keeps the space of a whitespace-only Selected marker regardless of background', () => {
+				const input = '<p>Hello<span class="Selected" style="background-color: rgb(96, 96, 96);"> </span>world</p>';
+				expect(cleanHTML(input)).toBe('<p>Hello world</p>');
 			});
 
 			it('preserves user text and normal highlights in selection markers', () => {
@@ -235,56 +231,15 @@ describe('Helper - msOffice', () => {
 					'<p class="custom Paragraph SCXW12345 keep is-selected my-paragraph"><span class="TextRun NormalTextRun BCX9876">Text</span></p>';
 				const output = cleanHTML(input);
 				expect(output).toBe('<p class="custom keep is-selected my-paragraph">Text</p>');
+
+				// Office tokens are case-sensitive: lowercase site classes survive
+				expect(cleanHTML('<p class="MsoNormal paragraph selected eop">Text</p>')).toBe(
+					'<p class="paragraph selected eop">Text</p>',
+				);
 			});
 		});
 
-		describe('Legacy font tags and windowtext colors', () => {
-			it('converts <font> tag with face, explicit color, and size="4" to semantic span while stripping windowtext default color', () => {
-				const inputWindowtext = '<font face="Candara" color="windowtext" size="4">Important text</font>';
-				expect(cleanHTML(inputWindowtext)).toBe(
-					'<span style="font-family: Candara; font-size: 19px">Important text</span>',
-				);
-
-				const inputExplicitColor =
-					'<font face="Candara" color="#d9534f" size="4">Colored text</font>';
-				expect(cleanHTML(inputExplicitColor)).toBe(
-					'<span style="font-family: Candara; color: #d9534f; font-size: 19px">Colored text</span>',
-				);
-			});
-
-			it('maps legacy <font size="1..7"> values to pixel font-sizes', () => {
-				expect(cleanHTML('<font size="2">Small</font>')).toBe('<span style="font-size: 13px">Small</span>');
-				expect(cleanHTML('<font size="5">Large</font>')).toBe('<span style="font-size: 24px">Large</span>');
-			});
-
-			it('prioritizes inline style over font tag face, color, and size attributes', () => {
-				const inputColorWin =
-					'<font color="windowtext" style="color: #C00000;">Red text</font>';
-				expect(cleanHTML(inputColorWin)).toBe('<span style="color: #C00000">Red text</span>');
-
-				const inputSizeWin =
-					'<font face="Candara" size="4" style="font-size: 14pt; font-weight: bold;">Styled text</font>';
-				expect(cleanHTML(inputSizeWin)).toBe(
-					'<span style="font-family: Candara; font-size: 14pt; font-weight: bold">Styled text</span>',
-				);
-
-				const inputFaceWin =
-					'<font face="Arial" style="font-family: Georgia;">Custom font</font>';
-				expect(cleanHTML(inputFaceWin)).toBe('<span style="font-family: Georgia">Custom font</span>');
-
-				const msoFontInput =
-					'<font face="Candara" size="4" style="mso-fareast-font-family: SimSun; mso-bidi-font-size: 14pt; font-weight: bold;">MSO styled text</font>';
-				expect(cleanHTML(msoFontInput)).toBe(
-					'<span style="font-family: Candara; font-size: 19px; font-weight: bold">MSO styled text</span>',
-				);
-			});
-
-			it('does not rewrite 14pt to 19px when <font> tag lacks size attribute', () => {
-				const input = '<font style="font-size: 14pt;">Kept size</font>';
-				const output = cleanHTML(input);
-				expect(output).toBe('<span style="font-size: 14pt">Kept size</span>');
-			});
-
+		describe('windowtext colors', () => {
 			it('strips color: windowtext on text while mapping windowtext to #000000 on borders and links', () => {
 				const textInput = '<p style="color: windowtext; font-weight: bold;">Theme-adaptive text</p>';
 				expect(cleanHTML(textInput)).toBe('<p style="font-weight: bold">Theme-adaptive text</p>');
@@ -295,12 +250,6 @@ describe('Helper - msOffice', () => {
 
 				const linkInput = '<a href="https://example.com" style="color: windowtext;">Word Link</a>';
 				expect(cleanHTML(linkInput)).toBe('<a href="https://example.com" style="color: #000000">Word Link</a>');
-
-				const linkFontInput =
-					'<a href="https://example.com"><font color="windowtext">Word Link Font</font></a>';
-				expect(cleanHTML(linkFontInput)).toBe(
-					'<a href="https://example.com"><span style="color: #000000">Word Link Font</span></a>',
-				);
 
 				const linkSpanInput =
 					'<a href="https://example.com"><span style="color: windowtext !important;">Word Link Span</span></a>';

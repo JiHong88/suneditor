@@ -1,6 +1,6 @@
 import type {} from '../typedef';
 /**
- * @description Checks whether the HTML content originated from Microsoft Office (Desktop, Online, Word, Excel, OneNote).
+ * @description Checks whether the HTML content originated from Microsoft Office (Word, Excel, OneNote, Word Online).
  * @param {string} html HTML string
  * @returns {boolean}
  */

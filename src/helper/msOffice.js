@@ -23,35 +23,23 @@ const _RE_MSO_LIST = /l(\d+)\s+level(\d+)\s+lfo(\d+)/i;
 /** Matches mso-list:Ignore markers */
 const _RE_MSO_LIST_IGNORE = /mso-list:\s*Ignore/i;
 
-/** Matches Office class name tokens */
+/** Matches Office class name tokens (case-sensitive) */
 const _RE_OFFICE_CLASS_TOKEN =
-	/^(?:Mso\w+|xl\d+|(?:SCXW|BCX)\d+|NormalTextRun|TextRun|OutlineElement|Paragraph|EOP|Selected)$/i;
+	/^(?:Mso\w+|xl\d+|(?:SCXW|BCX)\d+|NormalTextRun|TextRun|OutlineElement|Paragraph|EOP|Selected)$/;
 
-/** Matches Office class attribute on HTML tags (quoted or unquoted, case-sensitive class token) */
-const _RE_IS_MS_CLASS =
-	/<[a-zA-Z0-9]+(?:[^>"']|"[^"]*"|'[^']*')*\s[cC][lL][aA][sS][sS]\s*=\s*(?:["'](?:[^"']*\s)?(?:Mso\w+|(?:SCXW|BCX)\d+|NormalTextRun|TextRun|OutlineElement)(?:\s[^"']*)?["']|(?:Mso\w+|(?:SCXW|BCX)\d+|NormalTextRun|TextRun|OutlineElement)(?=[\s/>]|$))/;
+/** Desktop Word / OneNote / Excel markers */
+const _RE_IS_MS_DESKTOP = [
+	/class=["']*Mso(Normal|List)/i,
+	/content=["']*Word.Document/i,
+	/content=["']*OneNote.File/i,
+	/content=["']*Excel.Sheet/i,
+];
 
-/** Matches Word/Excel/OneNote Generator or ProgId meta tags */
-const _RE_IS_MS_CONTENT =
-	/<meta(?:[^>"']|"[^"]*"|'[^']*')*\scontent\s*=\s*["']?(?:Word\.Document|OneNote\.File|Excel\.Sheet)\b/i;
+/** Word Online class tokens inside a tag (`<` in text is always escaped, so `[^<>]` stays within one tag) */
+const _RE_IS_MS_ONLINE_CLASS = /<[a-z][^<>]*\sclass=["']?(?:[^"'<>]*\s)?(?:(?:SCXW|BCX)\d+|NormalTextRun)(?=[\s"'>])/;
 
-/** Matches Office XML namespaces on html or root elements */
-const _RE_IS_MS_XMLNS =
-	/<(?:html|[a-z0-9]+:[a-z0-9]+)(?:[^>"']|"[^"]*"|'[^']*')*\sxmlns:(?:o|w|v|x)\s*=\s*["']?urn:schemas-microsoft-com/i;
-
-/** Matches Office 365 data attributes on HTML tags */
-const _RE_IS_MS_DATA_ATTR = /<[a-z0-9]+(?:[^>"']|"[^"]*"|'[^']*')*\sdata-ccp-(?:props|parastyle)\s*=/i;
-
-/** Legacy HTML <font size="1..7"> → CSS px font-size */
-const _FONT_SIZE_MAP = {
-	1: '10px',
-	2: '13px',
-	3: '16px',
-	4: '19px',
-	5: '24px',
-	6: '32px',
-	7: '48px',
-};
+/** Word Online data attributes inside a tag */
+const _RE_IS_MS_ONLINE_ATTR = /<[a-z][^<>]*\sdata-ccp-(?:props|parastyle)=/;
 
 /** Matches tab-stops CSS declarations */
 const _RE_TAB_STOPS = /\s*tab-stops:[^;"]+;?/gi;
@@ -830,14 +818,11 @@ function _cleanWordOnlineArtifacts(doc) {
 			const nonWsText = text.replace(/[\s\u00a0\u200b]/g, '');
 
 			if (!nonWsText && !hasMediaOrTable) {
-				const isGrayCursor = /gray|rgb\(96\s*,\s*96\s*,\s*96\)|#606060/i.test(el.style.backgroundColor || '');
-				const visibleWs = text.replace(/[\u200b]/g, '');
-				if (visibleWs && !isGrayCursor) {
-					// Preserve whitespace text node (spaces or &nbsp;) so adjacent words don't merge
-					const textNode = doc.createTextNode(text);
-					el.replaceWith(textNode);
+				// Keep spaces / &nbsp; so adjacent words don't merge; drop zero-width-only markers
+				const visibleWs = text.replace(/\u200b/g, '');
+				if (visibleWs) {
+					el.replaceWith(doc.createTextNode(visibleWs));
 				} else {
-					// Purely empty, zero-width, or gray cursor selection artifact
 					el.remove();
 				}
 			}
@@ -863,78 +848,19 @@ function _unwrapOutlineDivs(doc) {
 	}
 }
 
-/**
- * @description Converts legacy <font> tags to semantic <span> elements with CSS styling.
- * - Inline style attributes take precedence over font tag attributes (matching browser CSS rendering).
- * @param {Document} doc
- */
-function _convertFontTags(doc) {
-	const fonts = doc.body.querySelectorAll('font');
-	for (let i = fonts.length - 1; i >= 0; i--) {
-		const font = fonts[i];
-		const span = doc.createElement('span');
-		const styles = [];
-		const existingStyle = font.getAttribute('style') || '';
-
-		const hasInlineFamily = /(?:^|;)\s*font-family\s*:/i.test(existingStyle);
-		const face = font.getAttribute('face');
-		if (face && !hasInlineFamily) {
-			styles.push(`font-family: ${face}`);
-		}
-
-		const hasInlineColor = /(?:^|;)\s*color\s*:/i.test(existingStyle);
-		const color = font.getAttribute('color');
-		if (color && !hasInlineColor) {
-			if (color.toLowerCase() === 'windowtext') {
-				const isLink = font.tagName === 'A' || !!font.closest('a');
-				if (isLink) {
-					styles.push('color: #000000');
-				}
-			} else {
-				styles.push(`color: ${color}`);
-			}
-		}
-
-		const hasInlineSize = /(?:^|;)\s*font-size\s*:/i.test(existingStyle);
-		const size = font.getAttribute('size');
-		const mappedSize = size && _FONT_SIZE_MAP[size];
-		if (mappedSize && !hasInlineSize) {
-			styles.push(`font-size: ${mappedSize}`);
-		}
-
-		const cleanExisting = existingStyle
-			.replace(/^(?:\s*;)+|(?:\s*;)+$/g, '')
-			.replace(/;(?:\s*;)+/g, ';')
-			.trim();
-		if (cleanExisting) {
-			styles.push(cleanExisting);
-		}
-
-		if (styles.length) {
-			span.setAttribute('style', styles.join('; '));
-		}
-
-		while (font.firstChild) {
-			span.appendChild(font.firstChild);
-		}
-		font.replaceWith(span);
-	}
-}
-
 // ---------- public API ----------
 
 /**
- * @description Checks whether the HTML content originated from Microsoft Office (Desktop, Online, Word, Excel, OneNote).
+ * @description Checks whether the HTML content originated from Microsoft Office (Word, Excel, OneNote, Word Online).
  * @param {string} html HTML string
  * @returns {boolean}
  */
 export function isMSOffice(html) {
 	if (!html || typeof html !== 'string') return false;
 	return (
-		_RE_IS_MS_CLASS.test(html) ||
-		_RE_IS_MS_CONTENT.test(html) ||
-		_RE_IS_MS_XMLNS.test(html) ||
-		_RE_IS_MS_DATA_ATTR.test(html)
+		_RE_IS_MS_DESKTOP.some((re) => re.test(html)) ||
+		_RE_IS_MS_ONLINE_CLASS.test(html) ||
+		_RE_IS_MS_ONLINE_ATTR.test(html)
 	);
 }
 
@@ -988,10 +914,9 @@ export function cleanHTML(html) {
 	// 3a. Remove track changes & comments first (before structural changes)
 	_cleanTrackChanges(doc);
 
-	// 3b. Clean Word Online markers, outline wrappers, and legacy font tags
+	// 3b. Clean Word Online markers and outline wrappers
 	_cleanWordOnlineArtifacts(doc);
 	_unwrapOutlineDivs(doc);
-	_convertFontTags(doc);
 
 	// 3c. Convert Word fake lists to proper <ol>/<ul>/<li>
 	_convertLists(doc, listStyles);
