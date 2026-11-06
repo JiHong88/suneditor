@@ -1,7 +1,16 @@
 import { dom, env } from '../../helper';
 import { _DragHandle } from '../../modules/ui';
 
-const { _w, _d, NO_EVENT } = env;
+const { _w, NO_EVENT } = env;
+
+/**
+ * @description Check if it is for a single event
+ * @param {*} target Event target or a list of them
+ * @returns {boolean}
+ */
+function _isEventTarget(target) {
+	return typeof target.addEventListener === 'function';
+}
 
 /**
  * @description Event manager, editor's all event management class
@@ -95,15 +104,8 @@ class EventManager {
 	 */
 	addEvent(target, type, listener, useCapture) {
 		if (!target) return null;
-		if (
-			target === _w ||
-			target === _d ||
-			typeof target.length !== 'number' ||
-			target.nodeType ||
-			(!Array.isArray(target) && target.length < 1)
-		)
-			target = [target];
-		if (target.length === 0) return null;
+		if (_isEventTarget(target)) target = [target];
+		if (!target.length) return null;
 
 		const len = target.length;
 		for (let i = 0; i < len; i++) {
@@ -138,15 +140,8 @@ class EventManager {
 		const useCapture = params.useCapture;
 
 		if (!target) return;
-		if (
-			target === _w ||
-			target === _d ||
-			typeof target.length !== 'number' ||
-			target.nodeType ||
-			(!Array.isArray(target) && target.length < 1)
-		)
-			target = [target];
-		if (target.length === 0) return;
+		if (_isEventTarget(target)) target = [target];
+		if (!target.length) return;
 
 		for (let i = 0, len = target.length; i < len; i++) {
 			target[i].removeEventListener(type, listener, useCapture);

@@ -31,6 +31,8 @@ declare class EventOrchestrator extends KernelInjector {
 	_toolbarObserver: ResizeObserver;
 	/** @internal @type {?Element} */
 	_lineBreakComp: Element | null;
+	/** @internal @type {boolean} `true` while a drag that started inside the editor is in progress */
+	_dragFromWysiwyg: boolean;
 	/** @internal @type {?Object<string, *>} */
 	_formatAttrsTemp: {
 		[x: string]: any;
@@ -75,6 +77,11 @@ declare class EventOrchestrator extends KernelInjector {
 	 * @description Show or hide the toolbar-balloon.
 	 */
 	_toggleToolbarBalloon(): void;
+	/**
+	 * @internal
+	 * @description Hide the balloon toolbar on Esc and cancel a pending `_showToolbarBalloonDelay`.
+	 */
+	_dismissToolbarBalloon(): void;
 	/**
 	 * @internal
 	 * @description Hide the toolbar.

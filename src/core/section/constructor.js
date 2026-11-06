@@ -975,6 +975,7 @@ export function InitOptions(options, editorTargets, plugins) {
 					hr: ['!+---+=+~shortcut', ''],
 					list_numbered: ['!+1.+_+~shortcut', ''],
 					list_bulleted: ['!+*.+_+~shortcut', ''],
+					blockquote: ['!+>+_+~shortcut', ''],
 					// custom
 					_h1: ['c+s+Digit1|Numpad1+$~blockStyle.applyHeaderByShortcut', ''],
 					_h2: ['c+s+Digit2|Numpad2+$~blockStyle.applyHeaderByShortcut', ''],
@@ -1305,13 +1306,14 @@ function _initTargetElements(key, options, topDiv, targetOptions, formFieldPrefi
 		// [sandbox] prop
 		let sandboxValue = frameAttrs.sandbox;
 		if (sandboxValue) {
-			const requiredSandbox = ['allow-same-origin', 'allow-scripts'];
-			const userSandbox = sandboxValue.split(/\s+/);
-			const missingSandbox = requiredSandbox.filter((req) => !userSandbox.includes(req));
+			const userSandbox = sandboxValue.trim().split(/\s+/);
+			if (!userSandbox.includes('allow-same-origin')) userSandbox.push('allow-same-origin');
+			sandboxValue = userSandbox.join(' ');
 
-			if (missingSandbox.length > 0) {
-				// Add missing required value
-				sandboxValue = userSandbox.concat(missingSandbox).join(' ');
+			if (env.isSafari && !userSandbox.includes('allow-scripts')) {
+				console.error(
+					'[SUNEDITOR.create.iframe.error] The "iframe_attributes.sandbox" option omits "allow-scripts". The editor does not work in Safari or iOS browsers without it.',
+				);
 			}
 		} else {
 			sandboxValue = 'allow-same-origin allow-scripts';

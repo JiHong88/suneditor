@@ -45,7 +45,9 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 
 	this.$.menu.dropdownOff();
 
-	if (this.$.store.mode.isBalloon) {
+	if (keyCodeMap.isEsc(keyCode)) {
+		if (!e.defaultPrevented && !this.$.component.isSelected) this._dismissToolbarBalloon();
+	} else if (this.$.store.mode.isBalloon) {
 		if (!this.$.store.mode.isBalloonAlways) this._hideToolbar();
 	} else if (this.$.store.mode.isSubBalloon) {
 		if (!this.$.store.mode.isSubBalloonAlways) this._hideToolbar_sub();
@@ -150,11 +152,13 @@ export async function OnKeyUp_wysiwyg(fc, e) {
 
 	if (
 		(this.$.store.mode.isBalloon || this.$.store.mode.isSubBalloon) &&
-		(((this.$.store.mode.isBalloonAlways || this.$.store.mode.isSubBalloonAlways) && !keyCodeMap.isEsc(keyCode)) ||
-			!range.collapsed)
+		(this.$.store.mode.isBalloonAlways || this.$.store.mode.isSubBalloonAlways || !range.collapsed)
 	) {
-		if (this.$.store.mode.isBalloonAlways || this.$.store.mode.isSubBalloonAlways) {
-			if (!keyCodeMap.isEsc(keyCode)) this._showToolbarBalloonDelay();
+		if (keyCodeMap.isEsc(keyCode)) {
+			// dismissed on keydown; showing it again here would undo that
+			if (!this.$.store.mode.isBalloonAlways && !this.$.store.mode.isSubBalloonAlways) return;
+		} else if (this.$.store.mode.isBalloonAlways || this.$.store.mode.isSubBalloonAlways) {
+			this._showToolbarBalloonDelay();
 		} else {
 			if (this.$.store.mode.isSubBalloon) this.$.subToolbar._showBalloon();
 			else this.$.toolbar._showBalloon();

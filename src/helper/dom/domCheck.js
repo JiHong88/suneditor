@@ -4,6 +4,7 @@ const _RE_EXCLUDE_FORMAT = /(\s|^)(katex|MathJax|se-exclude-format)(\s|$)/;
 const _MEDIA_TAGS = ['IMG', 'IFRAME', 'AUDIO', 'VIDEO', 'CANVAS'];
 const _RE_MEDIA = new RegExp(`^(${_MEDIA_TAGS.join('|')})$`, 'i');
 const _MEDIA_OR_TABLE_SELECTOR = [..._MEDIA_TAGS, 'TABLE'].join(', ');
+const _NON_EMPTY_LINE_SELECTOR = `${[..._MEDIA_TAGS, 'TABLE', 'HR'].join(', ').toLowerCase()}, .se-component, .se-flex-component`;
 
 /**
  * @description A method that checks If the text is blank or to see if it contains `ZERO WIDTH SPACE` or empty (`unicode.zeroWidthSpace`)
@@ -206,9 +207,10 @@ export function isEmptyLine(node) {
 	if (!node?.parentNode) return true;
 	const el = /** @type {HTMLElement} */ (node);
 	return (
-		!hasMediaOrTable(el) &&
 		(el.children.length <= 1 || isBreak(el.firstElementChild)) &&
-		isZeroWidth(el.textContent)
+		isZeroWidth(el.textContent) &&
+		!el.matches(_NON_EMPTY_LINE_SELECTOR) &&
+		!el.querySelector(_NON_EMPTY_LINE_SELECTOR)
 	);
 }
 

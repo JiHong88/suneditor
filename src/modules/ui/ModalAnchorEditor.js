@@ -5,8 +5,8 @@ const { _w, NO_EVENT } = env;
 
 /**
  * @typedef {Object} ModalAnchorEditorParams
- * @property {boolean} [title=false] - Modal title display.
- * @property {boolean} [textToDisplay=''] - Create Text to display input.
+ * @property {boolean} [title=false] - Show the "Title" input.
+ * @property {boolean} [textToDisplay=false] - Show the "Text to display" input.
  * @property {boolean} [openNewWindow=false] - Default checked value of the "Open in new window" checkbox.
  * @property {boolean} [noAutoPrefix=false] - If `true`, disables the automatic prefixing of the host URL to the value of the link.
  * @property {Array<string>} [relList=[]] - Available `rel` attribute values shown as checkboxes in the link modal.
@@ -288,7 +288,21 @@ class ModalAnchorEditor {
 		if (notText) {
 			if (anchor.children.length === 0) anchor.textContent = '';
 		} else {
-			anchor.textContent = displayText;
+			let target = /** @type {Element} */ (anchor);
+
+			while (target.childNodes.length === 1 && target.firstChild.nodeType === 1) {
+				const child = target.firstElementChild;
+				if (
+					!this.#$.format.isTextStyleNode(child) ||
+					dom.check.isNonEditable(child) ||
+					this.#$.component.is(child)
+				) {
+					break;
+				}
+				target = child;
+			}
+
+			target.textContent = displayText;
 		}
 	}
 

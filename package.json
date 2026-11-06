@@ -1,6 +1,6 @@
 {
 	"name": "suneditor",
-	"version": "3.4.1",
+	"version": "3.4.2",
 	"description": "A modular WYSIWYG HTML editor with zero runtime dependencies. Everything included, enable only what you need.",
 	"author": "Yi JiHong",
 	"license": "MIT",
@@ -51,7 +51,7 @@
 	},
 	"overrides": {
 		"uuid": ">=14.0.0",
-		"qs": "^6.16.0"
+		"qs": "^6.17.1"
 	},
 	"scripts": {
 		"dev": "webpack-dev-server --config webpack/dev.js",

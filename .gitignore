@@ -37,3 +37,5 @@ playwright/.cache/
 # npx repomix
 repomix-output.xml
 .gstack/
+
+graphify-out/

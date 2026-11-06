@@ -8,5 +8,6 @@ declare class Blockquote extends PluginCommand {
 	title: any;
 	quoteTag: HTMLElement;
 	active(element: HTMLElement | null, target: HTMLElement | null): boolean | void;
+	shortcut(params: SunEditor.HookParams.Shortcut): void;
 }
 import { PluginCommand } from '../../interfaces';

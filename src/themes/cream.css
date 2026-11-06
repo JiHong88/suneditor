@@ -81,6 +81,10 @@
 	--se-active-dark4-color: #006ab5;
 	--se-active-dark5-color: #004d87;
 
+	/* text on accent fills */
+	--se-active-font-color: #ffffff;
+	--se-btn-primary-color: #ffffff;
+
 	/* active background states */
 	--se-active-light-color: #c8dfef;
 	--se-active-light2-color: #b0d0e8;

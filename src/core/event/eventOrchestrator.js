@@ -15,7 +15,12 @@ import {
 import { OnBeforeInput_wysiwyg, OnInput_wysiwyg } from '../event/handlers/handler_ww_input';
 import { OnKeyDown_wysiwyg, OnKeyUp_wysiwyg } from '../event/handlers/handler_ww_key';
 import { OnPaste_wysiwyg, OnCopy_wysiwyg, OnCut_wysiwyg } from '../event/handlers/handler_ww_clipboard';
-import { OnDragOver_wysiwyg, OnDragEnd_wysiwyg, OnDrop_wysiwyg } from '../event/handlers/handler_ww_dragDrop';
+import {
+	OnDragStart_wysiwyg,
+	OnDragOver_wysiwyg,
+	OnDragEnd_wysiwyg,
+	OnDrop_wysiwyg,
+} from '../event/handlers/handler_ww_dragDrop';
 
 // logic
 import DefaultLineManager from '../event/support/defaultLineManager';
@@ -96,6 +101,8 @@ class EventOrchestrator extends KernelInjector {
 		this._toolbarObserver = null;
 		/** @internal @type {?Element} */
 		this._lineBreakComp = null;
+		/** @internal @type {boolean} `true` while a drag that started inside the editor is in progress */
+		this._dragFromWysiwyg = false;
 		/** @internal @type {?Object<string, *>} */
 		this._formatAttrsTemp = null;
 		/** @internal @type {number} */
@@ -184,6 +191,20 @@ class EventOrchestrator extends KernelInjector {
 			if (hasSubMode) this.$.subToolbar._showBalloon(range);
 			else this.#toolbar._showBalloon(range);
 		}
+	}
+
+	/**
+	 * @internal
+	 * @description Hide the balloon toolbar on Esc and cancel a pending `_showToolbarBalloonDelay`.
+	 */
+	_dismissToolbarBalloon() {
+		if (this.#balloonDelay) {
+			_w.clearTimeout(this.#balloonDelay);
+			this.#balloonDelay = null;
+		}
+
+		if (this.#store.mode.isBalloon) this._hideToolbar();
+		else if (this.#store.mode.isSubBalloon) this._hideToolbar_sub();
 	}
 
 	/**
@@ -294,12 +315,8 @@ class EventOrchestrator extends KernelInjector {
 
 		// SE copy data
 		const SEData = this.__secopy === plainText;
-		// MS word, OneNode, Excel
-		const MSData =
-			/class=["']*Mso(Normal|List)/i.test(cleanData) ||
-			/content=["']*Word.Document/i.test(cleanData) ||
-			/content=["']*OneNote.File/i.test(cleanData) ||
-			/content=["']*Excel.Sheet/i.test(cleanData);
+		// MS word, OneNote, Excel, Office Online
+		const MSData = msOffice.isMSOffice(cleanData);
 		// Google Docs
 		const GDData = !SEData && !MSData && googleDocs.isGoogleDocs(cleanData);
 		// from
@@ -514,6 +531,7 @@ class EventOrchestrator extends KernelInjector {
 			),
 			false,
 		);
+		this.#eventManager.addEvent(eventWysiwyg, 'dragstart', OnDragStart_wysiwyg.bind(this), false);
 		this.#eventManager.addEvent(eventWysiwyg, 'dragend', OnDragEnd_wysiwyg.bind(this, dragCursor), false);
 		this.#eventManager.addEvent(eventWysiwyg, 'drop', OnDrop_wysiwyg.bind(this, fc, dragCursor), false);
 		this.#eventManager.addEvent(eventWysiwyg, 'scroll', this.#OnScroll_wysiwyg.bind(this, fc, eventWysiwyg), {
@@ -714,6 +732,7 @@ class EventOrchestrator extends KernelInjector {
 		this.__eventDoc = null;
 		this.__secopy = null;
 		this._lineBreakComp = null;
+		this._dragFromWysiwyg = false;
 		this.scrollparents = null;
 	}
 

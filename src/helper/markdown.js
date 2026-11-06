@@ -34,6 +34,28 @@ const EMPTY_LIST_ITEM_RE = /^\s*([-*+]|\d+\.)\s*$/;
 // Placeholder for an inline <br>; the block that holds it decides how to write it.
 const BR_MARK = '\uE000';
 const BR_MARK_RE = /\uE000/g;
+// The text before a ']' that could close a task box ('[ ]', '[x]'), or a node start where a sibling may hold the '['.
+const TASK_BOX_HEAD_RE = /^[ xX]?$|\[[ xX]$/;
+// A string ending with a ']' that is not escaped.
+const BRACKET_END_RE = /(?:^|[^\\])(?:\\\\)*\]$/;
+
+// Inside link text ('[text](url)') or an image description ('![alt](src)') a ']' ends the text and a '[' opens
+// a nested pair (CommonMark), so both are always escaped there.
+let bracketTextDepth = 0;
+
+/**
+ * @description Run `fn` as link text / image description (see `bracketTextDepth`).
+ * @param {() => string} fn
+ * @returns {string}
+ */
+function asBracketText(fn) {
+	bracketTextDepth++;
+	try {
+		return fn();
+	} finally {
+		bracketTextDepth--;
+	}
+}
 
 /**
  * @description Check if a string is empty or contains only zero-width characters
@@ -60,7 +82,9 @@ const INLINE_WRAP_MAP = {
 
 /**
  * @description Escape the Markdown syntax in a text, only where it could be parsed as syntax.
- * - `*`, `` ` ``, `]`: always (`]` also blocks links, images and task boxes).
+ * - `*`, `` ` ``: always.
+ * - `]`: before `(` or `:` (link, image, reference definition), closing a task box (`[ ]`, `[x]`).
+ * - `[`, `]`: always in link text and an image description.
  * - `\`: before punctuation, a line break or at the end (next to other syntax).
  * - `_`: unless inside a word (`file_name`).
  * - `~`, `^`: when the text has a pair.
@@ -89,8 +113,13 @@ function escapeText(str, isHtml = true) {
 				break;
 			case '*':
 			case '`':
-			case ']':
 				escape = true;
+				break;
+			case '[':
+				escape = bracketTextDepth > 0;
+				break;
+			case ']':
+				escape = bracketTextDepth > 0 || next === '(' || next === ':' || TASK_BOX_HEAD_RE.test(str.slice(0, i));
 				break;
 			case '_':
 				escape = !(WORD_CHAR_RE.test(prev) && WORD_CHAR_RE.test(next));
@@ -145,6 +174,15 @@ function childrenToInline(children, isBlock = false, indent = '') {
 		if (INLINE_WRAP_MAP[children[i].tag] && parts[i - 1].endsWith('*') && parts[i].startsWith('*')) {
 			parts[i] = escapeLineBreaks(nodeToHtmlFallback(children[i], true));
 		}
+	}
+
+	// A ']' ending one part and a '(' or ':' starting the next would form a link, so escape the ']'.
+	for (let i = 1, prev = 0; i < parts.length; i++) {
+		if (!parts[i]) continue;
+		if (/^[(:]/.test(parts[i]) && BRACKET_END_RE.test(parts[prev])) {
+			parts[prev] = parts[prev].slice(0, -1) + '\\]';
+		}
+		prev = i;
 	}
 
 	return parts.join('');
@@ -219,6 +257,19 @@ function getTextContent(node) {
 	if (!node) return '';
 	if (node.type === 'text') return node.content || '';
 	if (node.children) return node.children.map(getTextContent).join('');
+	return '';
+}
+
+/**
+ * @description Get the text of a code block; `<br>` (the editor's line break in `PRE`) becomes a newline.
+ * @param {Object} node
+ * @returns {string}
+ */
+function getCodeText(node) {
+	if (!node) return '';
+	if (node.type === 'text') return node.content || '';
+	if (node.tag === 'br') return '\n';
+	if (node.children) return node.children.map(getCodeText).join('');
 	return '';
 }
 
@@ -536,7 +587,7 @@ function nodeToMarkdown(node, indent, isBlock) {
 
 	if (tag === 'a') {
 		const href = attributes.href || '';
-		const text = childrenToInline(children);
+		const text = asBracketText(() => childrenToInline(children));
 		const title = attributes.title;
 		if (title) return `[${text}](${href} "${title}")`;
 		return `[${text}](${href})`;
@@ -544,7 +595,7 @@ function nodeToMarkdown(node, indent, isBlock) {
 
 	if (tag === 'img') {
 		const src = attributes.src || '';
-		const alt = attributes.alt || '';
+		const alt = asBracketText(() => escapeText(attributes.alt || ''));
 		return `![${alt}](${src})`;
 	}
 
@@ -564,14 +615,15 @@ function nodeToMarkdown(node, indent, isBlock) {
 		const codeChild = children.find((c) => c.type === 'element' && c.tag === 'code');
 		if (codeChild) {
 			lang = (codeChild.attributes?.class || '').replace(/^language-/, '');
-			codeContent = getTextContent(codeChild);
+			codeContent = getCodeText(codeChild);
 		} else {
 			// Also check pre's own class for language- (editor internal format)
 			lang = (node.attributes?.class || '').match(/language-(\S+)/)?.[1] || '';
-			codeContent = getTextContent({ children });
+			codeContent = getCodeText({ children });
 		}
 
-		// Replace <br> represented as newlines
+		// the editor ends a brLine with a placeholder <br>
+		codeContent = codeContent.replace(/\n$/, '');
 		return '```' + lang + '\n' + codeContent + '\n```\n\n';
 	}
 
@@ -710,12 +762,16 @@ function parseInline(text) {
 	text = text.replace(/(?:\\| {2,})\n/g, () => hold('<br>'));
 
 	// 5. Images: ![alt](src "title") or ![alt](src)
-	text = text.replace(/!\[([^\]]*)\]\(([^)\s]+)(?:\s+"([^"]*)")?\)/g, (_, alt, src, title) => {
-		return hold(title ? `<img src="${src}" alt="${alt}" title="${title}">` : `<img src="${src}" alt="${alt}">`);
-	});
+	// The text may hold balanced '[...]' pairs; an unbalanced '[' starts a later link instead ('[a [b](u)').
+	text = text.replace(
+		/!\[([^[\]]*(?:\[[^[\]]*\][^[\]]*)*)\]\(([^)\s]+)(?:\s+"([^"]*)")?\)/g,
+		(_, alt, src, title) => {
+			return hold(title ? `<img src="${src}" alt="${alt}" title="${title}">` : `<img src="${src}" alt="${alt}">`);
+		},
+	);
 
 	// 5-1. Links: [text](url "title") or [text](url)
-	text = text.replace(/\[([^\]]+)\]\(([^)\s]+)(?:\s+"([^"]*)")?\)/g, (_, t, url, title) => {
+	text = text.replace(/\[((?:[^[\]]|\[[^[\]]*\])+)\]\(([^)\s]+)(?:\s+"([^"]*)")?\)/g, (_, t, url, title) => {
 		return hold(title ? `<a href="${url}" title="${title}">${t}</a>` : `<a href="${url}">${t}</a>`);
 	});
 

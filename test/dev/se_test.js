@@ -21,8 +21,8 @@ import { RegisterHTMLHandler } from 'mathjax-full/js/handlers/html.js';
 
 // codemirror
 import CodeMirror from 'codemirror';
-require('codemirror/lib/codemirror.css');
-require('codemirror/mode/htmlmixed/htmlmixed');
+import 'codemirror/lib/codemirror.css';
+import 'codemirror/mode/htmlmixed/htmlmixed';
 
 // perfect-freehand
 // import PerfectFreehand from 'perfect-freehand';
@@ -978,7 +978,7 @@ const options1 = {
 	type: 'document:header,page',
 	// codeLangs: [],
 	externalLibs: {
-		// codeMirror: { src: CodeMirror },
+		codeMirror: { src: CodeMirror },
 		// katex: {
 		// 	src: Katex
 		// },
@@ -1012,6 +1012,8 @@ const options1 = {
 			'tag',
 		],
 		defaultRel: 'tag',
+		// title: false,
+        // textToDisplay: false
 	},
 	video: {
 		allowMultiple: true,
@@ -1119,7 +1121,7 @@ const options1 = {
 		// showIncDecControls: true
 		disableInput: true,
 		// sizeUnit: 'text',
-		showDefaultSizeLabel:true
+		showDefaultSizeLabel: true,
 	},
 
 	autocomplete: {
@@ -1653,7 +1655,8 @@ const options1 = {
 	// iframe: true,
 	// maxHeight: 600,
 	toolbar_sticky: { top: 50, position: 'fixed' },
-	iframe_attributes: { frameborder: '1' },
+	// iframe: true,
+	iframe_attributes: { frameborder: '1', sandbox: 'allow-same-origin' },
 	lineBreakClearStyle: true,
 	mode: 'classic',
 	// textDirection: 'rtl',
@@ -1781,11 +1784,11 @@ const options1 = {
 	},
 	// mode: 'classic:bottom',
 	// maxHeight: 400,
-	// subToolbar: {
-	// 	buttonList: [['bold', 'italic', 'underline']],
-	// 	mode: 'balloon-always',
-	// 	width: 'auto',
-	// },
+	subToolbar: {
+		buttonList: [['bold', 'italic', 'underline']],
+		mode: 'balloon-always',
+		width: 'auto',
+	},
 	layout: {
 		items: [
 			{

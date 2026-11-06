@@ -18,8 +18,10 @@
 	<a href="https://suneditor.com/playground"><strong>Live Playground</strong></a> ·
 	<a href="https://suneditor.com"><strong>Documentation</strong></a> ·
 	<a href="#-install--quick-start"><strong>Get Started</strong></a> ·
-	<a href="#-framework-integration"><strong>Frameworks</strong></a>
+	<a href="#react"><strong>React</strong></a>
 </p>
+
+<p align="center"><a href="https://github.com/suneditor/suneditor-react"><img align="absmiddle" height="24" src="https://img.shields.io/badge/React-%40suneditor%2Fsuneditor--react-555?style=flat-square&logo=react&logoColor=61DAFB&labelColor=20232a" alt="@suneditor/suneditor-react" /></a> Official component, Next.js ready</p>
 
 #
 
@@ -133,6 +135,22 @@ suneditor.create(document.querySelector('#editor'), {
 });
 ```
 
+### React
+
+```bash
+npm install suneditor @suneditor/suneditor-react
+```
+
+```tsx
+import SunEditor from '@suneditor/suneditor-react';
+import 'suneditor/css/editor';
+import 'suneditor/css/contents';
+
+<SunEditor options={(se) => ({ plugins: [se.plugins.image], height: '400px' })} />;
+```
+
+Props, controlled value and Next.js usage: [suneditor-react README](https://github.com/suneditor/suneditor-react)
+
 ### CDN ([jsDelivr](https://www.jsdelivr.com/package/npm/suneditor))
 
 ```html
@@ -150,15 +168,6 @@ suneditor.create(document.querySelector('#editor'), {
 	});
 </script>
 ```
-
----
-
-## 🔧 Framework Integration
-
-You can use the official wrappers for easier integration:
-
-React – [suneditor-react](https://github.com/JiHong88/suneditor-react)\
-Vue – [suneditor-vue](https://github.com/JiHong88/suneditor-vue)
 
 ---
 

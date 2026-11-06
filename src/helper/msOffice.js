@@ -23,11 +23,23 @@ const _RE_MSO_LIST = /l(\d+)\s+level(\d+)\s+lfo(\d+)/i;
 /** Matches mso-list:Ignore markers */
 const _RE_MSO_LIST_IGNORE = /mso-list:\s*Ignore/i;
 
-/** Matches Mso* class names */
-const _RE_MSO_CLASS = /\bMso\w+/g;
+/** Matches Office class name tokens (case-sensitive) */
+const _RE_OFFICE_CLASS_TOKEN =
+	/^(?:Mso\w+|xl\d+|(?:SCXW|BCX)\d+|NormalTextRun|TextRun|OutlineElement|Paragraph|EOP|Selected)$/;
 
-/** Matches Excel xl* class names */
-const _RE_XL_CLASS = /\bxl\d+/g;
+/** Desktop Word / OneNote / Excel markers */
+const _RE_IS_MS_DESKTOP = [
+	/class=["']*Mso(Normal|List)/i,
+	/content=["']*Word.Document/i,
+	/content=["']*OneNote.File/i,
+	/content=["']*Excel.Sheet/i,
+];
+
+/** Word Online class tokens inside a tag (`<` in text is always escaped, so `[^<>]` stays within one tag) */
+const _RE_IS_MS_ONLINE_CLASS = /<[a-z][^<>]*\sclass=["']?(?:[^"'<>]*\s)?(?:(?:SCXW|BCX)\d+|NormalTextRun)(?=[\s"'>])/;
+
+/** Word Online data attributes inside a tag */
+const _RE_IS_MS_ONLINE_ATTR = /<[a-z][^<>]*\sdata-ccp-(?:props|parastyle)=/;
 
 /** Matches tab-stops CSS declarations */
 const _RE_TAB_STOPS = /\s*tab-stops:[^;"]+;?/gi;
@@ -212,6 +224,15 @@ function _cleanStyles(el) {
 		cleaned += ';background-color:' + highlightMatch[1].trim();
 	}
 
+	// Strip default "color: windowtext" on non-link text so text inherits editor theme color;
+	// Inside <a>, preserve it so Word's black link text does not turn into browser/theme link blue.
+	// Map all remaining windowtext (e.g. borders, links) to #000000.
+	const isLink = el.tagName === 'A' || !!el.closest('a');
+	if (!isLink) {
+		cleaned = cleaned.replace(/(?:^|;)\s*color\s*:\s*windowtext(?:\s*!\s*important)?\b\s*;?/gi, ';');
+	}
+	cleaned = cleaned.replace(/\bwindowtext\b/gi, '#000000');
+
 	cleaned = cleaned
 		.replace(_RE_MSO_STYLE, '')
 		.replace(_RE_TAB_STOPS, '')
@@ -222,8 +243,8 @@ function _cleanStyles(el) {
 
 	// Remove trailing/leading semicolons
 	cleaned = cleaned
-		.replace(/^;+|;+$/g, '')
-		.replace(/;{2,}/g, ';')
+		.replace(/^(?:\s*;)+|(?:\s*;)+$/g, '')
+		.replace(/;(?:\s*;)+/g, ';')
 		.trim();
 
 	if (cleaned) {
@@ -234,16 +255,23 @@ function _cleanStyles(el) {
 }
 
 /**
- * @description Removes Mso- and xl- class names from an element. Removes class attr if empty.
+ * @description Removes Mso-, xl-, and Office Online class names from an element. Removes class attr if empty.
  * @param {Element} el
  */
 function _cleanClasses(el) {
 	const cls = el.getAttribute('class');
 	if (!cls) return;
 
-	const cleaned = cls.replace(_RE_MSO_CLASS, '').replace(_RE_XL_CLASS, '').trim();
-	if (cleaned) {
-		el.setAttribute('class', cleaned);
+	const tokens = cls.trim().split(/\s+/);
+	const kept = [];
+	for (let i = 0, len = tokens.length; i < len; i++) {
+		const token = tokens[i];
+		if (token && !_RE_OFFICE_CLASS_TOKEN.test(token)) {
+			kept.push(token);
+		}
+	}
+	if (kept.length) {
+		el.setAttribute('class', kept.join(' '));
 	} else {
 		el.removeAttribute('class');
 	}
@@ -749,7 +777,92 @@ function _cleanBreaks(doc) {
 	}
 }
 
+// ---------- Word Online & Office 365 cleanup ----------
+
+/**
+ * @description Removes Word Online End-Of-Paragraph and cursor selection artifacts.
+ * - Only empty markers are removed; elements containing user text retain their styling and highlights.
+ * - When an EOP marker is the only content of a paragraph, keeps the line as a blank paragraph (<p><br></p>).
+ * @param {Document} doc
+ */
+function _cleanWordOnlineArtifacts(doc) {
+	const markers = doc.body.querySelectorAll('span');
+	for (let i = markers.length - 1; i >= 0; i--) {
+		const el = markers[i];
+		const isEOP = el.classList.contains('EOP');
+		const isSelected = el.classList.contains('Selected');
+		if (!isEOP && !isSelected) continue;
+
+		if (isEOP) {
+			const hasMediaOrTable = el.querySelector('img, video, iframe, br, table, a');
+			const nonMarkerText = (el.textContent || '').replace(/[\s\u00a0\u200b]/g, '');
+			if (!nonMarkerText && !hasMediaOrTable) {
+				const parent = el.closest('p, h1, h2, h3, h4, h5, h6');
+				if (parent && !parent.querySelector('br')) {
+					const parentText = (parent.textContent || '').replace(/[\s\u00a0\u200b]/g, '');
+					const hasMedia = parent.querySelector('img, video, iframe, table, a');
+					if (!parentText && !hasMedia) {
+						const br = doc.createElement('br');
+						while (parent.firstChild) {
+							parent.removeChild(parent.firstChild);
+						}
+						parent.appendChild(br);
+						continue;
+					}
+				}
+				el.remove();
+			}
+		} else if (isSelected) {
+			const hasMediaOrTable = el.querySelector('img, video, iframe, br, table, a');
+			const text = el.textContent || '';
+			const nonWsText = text.replace(/[\s\u00a0\u200b]/g, '');
+
+			if (!nonWsText && !hasMediaOrTable) {
+				// Keep spaces / &nbsp; so adjacent words don't merge; drop zero-width-only markers
+				const visibleWs = text.replace(/\u200b/g, '');
+				if (visibleWs) {
+					el.replaceWith(doc.createTextNode(visibleWs));
+				} else {
+					el.remove();
+				}
+			}
+		}
+	}
+}
+
+/**
+ * @description Unwraps redundant Word Online OutlineElement container divs.
+ * @param {Document} doc
+ */
+function _unwrapOutlineDivs(doc) {
+	const outlineDivs = doc.body.querySelectorAll('div.OutlineElement');
+	for (let i = outlineDivs.length - 1; i >= 0; i--) {
+		const div = outlineDivs[i];
+		const parent = div.parentNode;
+		if (parent && div.children.length > 0) {
+			while (div.firstChild) {
+				parent.insertBefore(div.firstChild, div);
+			}
+			div.remove();
+		}
+	}
+}
+
 // ---------- public API ----------
+
+/**
+ * @description Checks whether the HTML content originated from Microsoft Office (Word, Excel, OneNote, Word Online).
+ * @param {string} html HTML string
+ * @returns {boolean}
+ */
+export function isMSOffice(html) {
+	if (!html || typeof html !== 'string') return false;
+	return (
+		_RE_IS_MS_DESKTOP.some((re) => re.test(html)) ||
+		_RE_IS_MS_ONLINE_CLASS.test(html) ||
+		_RE_IS_MS_ONLINE_ATTR.test(html)
+	);
+}
 
 /**
  * @description Converts MS Word/Excel/OneNote HTML clipboard data to clean, standards-compliant HTML.
@@ -801,25 +914,29 @@ export function cleanHTML(html) {
 	// 3a. Remove track changes & comments first (before structural changes)
 	_cleanTrackChanges(doc);
 
-	// 3b. Convert Word fake lists to proper <ol>/<ul>/<li>
+	// 3b. Clean Word Online markers and outline wrappers
+	_cleanWordOnlineArtifacts(doc);
+	_unwrapOutlineDivs(doc);
+
+	// 3c. Convert Word fake lists to proper <ol>/<ul>/<li>
 	_convertLists(doc, listStyles);
 
-	// 3c. Convert outline-level paragraphs to semantic headings
+	// 3d. Convert outline-level paragraphs to semantic headings
 	_convertHeadings(doc);
 
-	// 3d. Clean tables
+	// 3e. Clean tables
 	_cleanTables(doc);
 
-	// 3e. Clean links
+	// 3f. Clean links
 	_cleanLinks(doc);
 
-	// 3f. Clean images
+	// 3g. Clean images
 	_cleanImages(doc);
 
-	// 3g. Clean page/section/column breaks
+	// 3h. Clean page/section/column breaks
 	_cleanBreaks(doc);
 
-	// 3h. Clean all elements (styles, classes, attributes)
+	// 3i. Clean all elements (styles, classes, attributes)
 	const allElements = doc.body.querySelectorAll('*');
 	for (const el of allElements) {
 		_cleanStyles(el);
@@ -828,6 +945,9 @@ export function cleanHTML(html) {
 		// Remove Word-specific attributes
 		if (el.getAttribute('lang')) el.removeAttribute('lang');
 		el.removeAttribute('v:shapes');
+		el.removeAttribute('data-ccp-props');
+		el.removeAttribute('data-ccp-parastyle');
+		el.removeAttribute('data-contrast');
 
 		// Remove width/height from non-media, non-table elements
 		const tag = el.tagName.toLowerCase();
@@ -837,10 +957,10 @@ export function cleanHTML(html) {
 		}
 	}
 
-	// 3i. Unwrap empty spans
+	// 3j. Unwrap empty spans
 	_unwrapEmptySpans(doc.body);
 
-	// 3j. Remove completely empty paragraphs
+	// 3k. Remove completely empty paragraphs
 	const paragraphs = doc.body.querySelectorAll('p');
 	for (const p of paragraphs) {
 		if (!p.textContent.trim() && !p.querySelector('img, video, iframe, br, table')) {
@@ -852,5 +972,6 @@ export function cleanHTML(html) {
 }
 
 export default {
+	isMSOffice,
 	cleanHTML,
 };
