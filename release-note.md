@@ -7,12 +7,15 @@
 ### Enhancement
 
 * Esc now hides the balloon toolbar (`mode: 'balloon'`, `'balloon-always'`, and `subToolbar` in those modes) while keeping the selection, and an open dropdown or controller is closed first.
+* Improved pasting from Word Online so dark cursor-marker blocks and extra wrappers are removed and blank lines are kept. [#1717](https://github.com/JiHong88/suneditor/issues/1717) ([@HamzaA598](https://github.com/HamzaA598))
+* Added the `msOffice.isMSOffice()` helper.
 
 ### Changes
 
 * The balloon toolbar and the controllers no longer draw a pointer arrow toward their target, and the balloon toolbar sits 10px from the selection instead of 12px; custom CSS can show the arrow again.
 * Active toolbar and menu buttons in the `dark`, `midnight` and `cobalt` themes now use a tinted fill with a bright accent icon.
 * An `iframe_attributes.sandbox` value is now kept as given with only `allow-same-origin` added, instead of also gaining `allow-scripts`; include `allow-scripts` to keep the editor working in Safari and iOS browsers. [#1716](https://github.com/JiHong88/suneditor/issues/1716)
+* Text pasted from Word no longer keeps `color: windowtext` outside links, so it follows the editor theme color. [#1717](https://github.com/JiHong88/suneditor/issues/1717)
 
 ### Bugfix
 
@@ -28,3 +31,5 @@
 * Fixed a bug where `markdownToHtml()` misread link and image text containing brackets.
 * Fixed a bug where `editor.destroy()` threw an error and left the editor partly torn down when CodeMirror was enabled.
 * Fixed an issue where the block handle area stayed visible in code view and Markdown view, narrowing the source frame.
+* Fixed a bug where `html.get()` and `getContents()` replaced a table cell with `<br>` when its only content was a component or an `hr`. [#1721](https://github.com/JiHong88/suneditor/issues/1721)
+* Fixed an issue where the link modal always showed the title and display text inputs, ignoring `link: { title: false, textToDisplay: false }`. [#1722](https://github.com/JiHong88/suneditor/issues/1722)
