@@ -573,6 +573,8 @@ class MyImagePlugin extends PluginModal {
 }
 ```
 
+`static component()` only identifies the element. Content checks recognize a component by its class, so mark the root — see [Component Hooks](#component-hooks-editorcomponent-interface) requirement 3.
+
 ---
 
 ## Constructor Pattern
@@ -977,6 +979,7 @@ For plugins that create **static components** in the editor (e.g., images, video
 
 1. Define `static component(node)` — Returns the component element if the node belongs to this plugin, or `null`.
 2. Define a public `_element` property — References the currently controlled DOM element. Used to detect clicks and prevent accidental controller closure.
+3. Mark the component root with the `se-component` class (`se-component se-inline-component` for an inline component), or wrap it with `Figure.CreateContainer()` / `Figure.CreateInlineContainer()`, which add them. Empty-content checks (`editor.isEmpty()`, empty lines, `allowedEmptyTags`) find components by this class, not by `static component()`. A component with no text, no media tag (`img`, `iframe`, `video`, `audio`, `canvas`) and no class is treated as empty — e.g. a Backspace merge can remove its line.
 
 | Hook                        | Required | When Called                   | Return                                                              |
 | --------------------------- | -------- | ----------------------------- | ------------------------------------------------------------------- |
