@@ -113,7 +113,7 @@ describe('Core Config - Options', () => {
         });
 
         it('should have class name regex patterns', () => {
-            expect(DEFAULTS.CLASS_NAME).toBe('^__se__|^se-|^katex|^MathJax|^language-');
+            expect(DEFAULTS.CLASS_NAME).toBe('^__se__|^se-|^katex|^MathJax|^language-[\\w+#.-]+$');
             expect(DEFAULTS.CLASS_MJX).toContain('mjx-container|mjx-math');
         });
 
