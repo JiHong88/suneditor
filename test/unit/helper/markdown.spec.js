@@ -485,6 +485,27 @@ describe('markdown helper', () => {
 			expect(result).toContain('<li>two</li>');
 		});
 
+		it.each([
+			['1. a\n\n2. b', '<ol><li><p>a</p></li><li><p>b</p></li></ol>', '1. a\n\n2. b\n'],
+			['- a\n\n- b', '<ul><li><p>a</p></li><li><p>b</p></li></ul>', '- a\n\n- b\n'],
+			['- a\n- b', '<ul><li>a</li><li>b</li></ul>', '- a\n- b\n'],
+			['- a\n\n  - b', '<ul><li><p>a</p><ul><li>b</li></ul></li></ul>', '- a\n\n  - b\n'],
+			['- a\n  - b\n\n  - c\n- d', '<ul><li>a<ul><li><p>b</p></li><li><p>c</p></li></ul></li><li>d</li></ul>', '- a\n  - b\n\n  - c\n- d\n'],
+			['- a\n  - b\n\n- c', '<ul><li><p>a</p><ul><li>b</li></ul></li><li><p>c</p></li></ul>', '- a\n\n  - b\n\n- c\n'],
+			['- [x] a\n\n- [ ] b', '<ul><li class="task-list-item"><p><input type="checkbox" checked disabled> a</p></li><li class="task-list-item"><p><input type="checkbox" disabled> b</p></li></ul>', '- [x] a\n\n- [ ] b\n'],
+			[
+				'The number of windows in my house is\n14.  The number of doors is 6.',
+				'<p>The number of windows in my house is\n14.  The number of doors is 6.</p>',
+				'The number of windows in my house is\n14\\.  The number of doors is 6.\n',
+			],
+			['a\n1. b', '<p>a</p><ol><li>b</li></ol>', 'a\n\n1. b\n'],
+		])('should keep loose lists and paragraph continuation through roundtrip: %s', (md, html, expectedMd) => {
+			expect(markdownToHtml(md)).toBe(html);
+			const result = jsonToMarkdown(converter.htmlToJson(html));
+			expect(result).toBe(expectedMd);
+			expect(markdownToHtml(result)).toBe(html);
+		});
+
 		it('should preserve table inside list through roundtrip', () => {
 			const html = '<ul><li>item<table><thead><tr><th>A</th><th>B</th></tr></thead><tbody><tr><td>1</td><td>2</td></tr></tbody></table></li></ul>';
 			const result = roundtrip(html);
