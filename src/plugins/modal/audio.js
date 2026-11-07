@@ -217,10 +217,11 @@ class Audio_ extends PluginModal {
 	async modalAction() {
 		if (this.audioInputFile && this.audioInputFile?.files.length > 0) {
 			return await this.submitFile(this.audioInputFile.files);
-		} else if (this.audioUrlFile && this.#urlValue.length > 0) {
+		} else if (this.#urlValue.length > 0 && !(this.modal.isUpdate && this.#urlValue === this.#element.src)) {
 			return await this.submitURL(this.#urlValue);
 		}
-		return false;
+
+		return this.modal.isUpdate;
 	}
 
 	/**

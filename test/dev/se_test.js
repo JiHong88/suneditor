@@ -1019,7 +1019,7 @@ const options1 = {
 		allowMultiple: true,
 		uploadUrl: 'http://localhost:3000/editor/upload',
 		createFileInput: true,
-		createUrlInput: false,
+		createUrlInput: true,
 		controls: [
 			[
 				'resize_auto,75,50',
@@ -1090,13 +1090,13 @@ const options1 = {
 	image: {
 		uploadUrl: 'http://localhost:3000/editor/upload',
 		allowMultiple: true,
-		createUrlInput: false,
+		createUrlInput: true,
 	},
 	audio: {
 		allowMultiple: true,
 		uploadUrl: 'http://localhost:3000/editor/upload',
 		createFileInput: true,
-		createUrlInput: false,
+		createUrlInput: true,
 	},
 	audioGallery: {
 		url: 'http://localhost:3000/editor/gallery/audio',

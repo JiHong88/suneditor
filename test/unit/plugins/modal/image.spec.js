@@ -725,7 +725,37 @@ describe('Image Plugin', () => {
 			const result = await image.modalAction();
 
 			expect(image.$.history.push).toHaveBeenCalledWith(false);
-			expect(result).toBe(true); 
+			expect(result).toBe(true);
+		});
+
+		it.each([
+			['there is no URL input', true],
+			['the URL is unchanged', false],
+		])('should close without re-submitting on edit when %s', async (_, removeUrlInput) => {
+			image.modal.isUpdate = true;
+			if (removeUrlInput) image.imgUrlFile = null;
+			const submitSpy = jest.spyOn(image, 'submitURL');
+			image.componentSelect({
+				nodeName: 'IMG',
+				src: 'https://old.com/image.jpg',
+				style: { width: '50px', height: '50px' },
+				alt: 'old',
+				cloneNode: jest.fn().mockImplementation(() => ({
+					nodeName: 'IMG',
+					style: { width: '50px', height: '50px' },
+					setAttribute: jest.fn(),
+					removeAttribute: jest.fn(),
+				})),
+				getAttribute: jest.fn(),
+				removeAttribute: jest.fn(),
+			});
+			image.modal.form.querySelector.mockReturnValue({ value: 'center' });
+
+			const result = await image.modalAction();
+
+			expect(image.$.history.push).toHaveBeenCalledWith(false);
+			expect(submitSpy).not.toHaveBeenCalled();
+			expect(result).toBe(true);
 		});
 	});
 

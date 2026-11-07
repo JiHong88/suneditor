@@ -311,11 +311,11 @@ class Image_ extends PluginModal {
 
 		if (this.imgInputFile && this.imgInputFile.files.length > 0) {
 			return await this.submitFile(this.imgInputFile.files);
-		} else if (this.imgUrlFile && this.#linkValue.length > 0) {
+		} else if (this.#linkValue.length > 0 && !(this.modal.isUpdate && this.#linkValue === this.#element.src)) {
 			return await this.submitURL(this.#linkValue);
 		}
 
-		return false;
+		return this.modal.isUpdate;
 	}
 
 	/**

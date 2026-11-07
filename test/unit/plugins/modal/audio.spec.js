@@ -379,6 +379,36 @@ describe('Audio Plugin', () => {
 			const result = await audio.modalAction();
 			expect(result).toBe(false);
 		});
+
+		describe('on edit', () => {
+			const openEdit = (options, removeUrlInput) => {
+				const a = new Audio_(kernel, { createFileInput: true, ...options });
+				if (removeUrlInput) a.audioUrlFile = null;
+				const el = document.createElement('audio');
+				el.src = 'https://example.com/audio.mp3';
+				a.componentSelect(el);
+				jest.spyOn(a, 'open').mockImplementation(() => {});
+				a.controllerAction({ getAttribute: jest.fn().mockReturnValue('update') });
+				a.modal.isUpdate = true;
+				return a;
+			};
+
+			it('should close without re-submitting when there is no URL input', async () => {
+				const a = openEdit({ createUrlInput: false }, true);
+				const submitSpy = jest.spyOn(a, 'submitURL');
+
+				expect(await a.modalAction()).toBe(true);
+				expect(submitSpy).not.toHaveBeenCalled();
+			});
+
+			it('should close without re-submitting when the URL is unchanged', async () => {
+				const a = openEdit({ createUrlInput: true });
+				const submitSpy = jest.spyOn(a, 'submitURL');
+
+				expect(await a.modalAction()).toBe(true);
+				expect(submitSpy).not.toHaveBeenCalled();
+			});
+		});
 	});
 
 	describe('modalInit()', () => {

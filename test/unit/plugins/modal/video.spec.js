@@ -377,6 +377,57 @@ describe('Video Plugin', () => {
             expect(result).toBe(true);
         });
 
+        describe('modalAction on edit without a new source', () => {
+            const openEdit = (removeUrlInput) => {
+                const v = new Video(kernel, { createFileInput: true, createUrlInput: !removeUrlInput });
+                if (removeUrlInput) v.videoUrlFile = null; // mocked DOM always returns an input
+                const el = {
+                    nodeName: 'VIDEO',
+                    src: 'https://example.com/same.mp4',
+                    style: { float: '' },
+                    setAttribute: jest.fn(),
+                    getAttribute: jest.fn(),
+                    querySelector: jest.fn().mockReturnValue(null)
+                };
+                v.componentSelect(el);
+                v.videoInputFile.files = [];
+                v.modal.isUpdate = true;
+                return { v, el };
+            };
+
+            it.each([
+                ['there is no URL input', true],
+                ['the URL is unchanged', false],
+            ])('should apply size and align without re-submitting when %s', async (_, removeUrlInput) => {
+                const { v, el } = openEdit(removeUrlInput);
+                const submitSpy = jest.spyOn(v, 'submitURL');
+                const createSpy = jest.spyOn(v, 'create').mockImplementation(() => {});
+
+                expect(await v.modalAction()).toBe(true);
+                expect(submitSpy).not.toHaveBeenCalled();
+                // update in place, keeping the current source and file data
+                expect(createSpy).toHaveBeenCalledWith(el, el.src, expect.anything(), expect.anything(), expect.anything(), true, null, true);
+            });
+        });
+
+        it('create should keep the current file data when file is null', () => {
+            const el = {
+                nodeName: 'VIDEO',
+                src: 'https://example.com/same.mp4',
+                style: { float: '' },
+                setAttribute: jest.fn(),
+                getAttribute: jest.fn(),
+                querySelector: jest.fn().mockReturnValue(null)
+            };
+            video.componentSelect(el);
+            const setFileData = jest.spyOn(video.fileManager, 'setFileData');
+
+            video.create(el, el.src, '100%', '56.25%', 'center', true, null, true);
+
+            expect(setFileData).not.toHaveBeenCalled();
+            expect(kernel.$.history.push).toHaveBeenCalledWith(false);
+        });
+
         it('modalAction should call component.select on successful submit via setTimeout', async () => {
             // Setup: submitFile returns truthy
             video.videoInputFile.files = [{ name: 'video.mp4', type: 'video/mp4', size: 1000 }];
