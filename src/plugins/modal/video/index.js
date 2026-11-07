@@ -277,7 +277,7 @@ class Video extends PluginModal {
 		if (this.videoInputFile)
 			this.$.eventManager.addEvent(modalEl.fileRemoveBtn, 'click', this.#RemoveSelectedFiles.bind(this));
 		if (this.videoUrlFile) this.$.eventManager.addEvent(this.videoUrlFile, 'input', this.#OnLinkPreview.bind(this));
-		if (this.videoInputFile && this.videoUrlFile)
+		if (this.videoInputFile)
 			this.$.eventManager.addEvent(this.videoInputFile, 'change', this.#OnfileInputChange.bind(this));
 	}
 
@@ -961,12 +961,10 @@ class Video extends PluginModal {
 	 * @param {InputEvent} e - Event object
 	 */
 	#OnfileInputChange(e) {
-		if (!this.videoInputFile.value) {
-			this.videoUrlFile.disabled = false;
-			this.previewSrc.style.textDecoration = '';
-		} else {
-			this.videoUrlFile.disabled = true;
-			this.previewSrc.style.textDecoration = 'line-through';
+		if (this.videoUrlFile) {
+			const hasFile = !!this.videoInputFile.value;
+			this.videoUrlFile.disabled = hasFile;
+			this.previewSrc.style.textDecoration = hasFile ? 'line-through' : '';
 		}
 
 		// inputFile check

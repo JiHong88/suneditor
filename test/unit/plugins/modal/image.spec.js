@@ -1102,6 +1102,13 @@ describe('Image Plugin', () => {
 			expect(image.pluginOptions.createUrlInput).toBe(true);
 		});
 
+		it('should respect createUrlInput false when createFileInput is left at its default', () => {
+			const image = new Image(kernel, { createUrlInput: false });
+			// createFileInput defaults to true, so the URL input may be turned off
+			expect(image.pluginOptions.createFileInput).toBe(true);
+			expect(image.pluginOptions.createUrlInput).toBe(false);
+		});
+
 		it('should handle keepFormatType option', () => {
 			const image = new Image(kernel, { keepFormatType: true });
 			expect(image.pluginOptions.keepFormatType).toBe(true);
