@@ -147,9 +147,7 @@ class Audio_ extends PluginModal {
 				'click',
 				this.#RemoveSelectedFiles.bind(this, this.audioUrlFile, this.preview),
 			);
-			if (this.audioUrlFile) {
-				this.$.eventManager.addEvent(this.audioInputFile, 'change', this.#FileInputChange.bind(this));
-			}
+			this.$.eventManager.addEvent(this.audioInputFile, 'change', this.#FileInputChange.bind(this));
 		}
 		if (this.audioUrlFile) {
 			this.$.eventManager.addEvent(this.audioUrlFile, 'input', this.#OnLinkPreview.bind(this));
@@ -202,7 +200,8 @@ class Audio_ extends PluginModal {
 			if (this.audioInputFile && this.pluginOptions.allowMultiple)
 				this.audioInputFile.setAttribute('multiple', 'multiple');
 		} else if (this.#element) {
-			this.#urlValue = this.preview.textContent = this.audioUrlFile.value = this.#element.src;
+			if (this.audioUrlFile)
+				this.#urlValue = this.preview.textContent = this.audioUrlFile.value = this.#element.src;
 			if (this.audioInputFile && this.pluginOptions.allowMultiple)
 				this.audioInputFile.removeAttribute('multiple');
 		} else {
@@ -218,10 +217,11 @@ class Audio_ extends PluginModal {
 	async modalAction() {
 		if (this.audioInputFile && this.audioInputFile?.files.length > 0) {
 			return await this.submitFile(this.audioInputFile.files);
-		} else if (this.audioUrlFile && this.#urlValue.length > 0) {
+		} else if (this.#urlValue.length > 0 && !(this.modal.isUpdate && this.#urlValue === this.#element.src)) {
 			return await this.submitURL(this.#urlValue);
 		}
-		return false;
+
+		return this.modal.isUpdate;
 	}
 
 	/**
@@ -641,12 +641,10 @@ class Audio_ extends PluginModal {
 	#FileInputChange(e) {
 		/** @type {HTMLInputElement} */
 		const target = dom.query.getEventTarget(e);
-		if (!this.audioInputFile.value) {
-			this.audioUrlFile.disabled = false;
-			this.preview.style.textDecoration = '';
-		} else {
-			this.audioUrlFile.disabled = true;
-			this.preview.style.textDecoration = 'line-through';
+		if (this.audioUrlFile) {
+			const hasFile = !!this.audioInputFile.value;
+			this.audioUrlFile.disabled = hasFile;
+			this.preview.style.textDecoration = hasFile ? 'line-through' : '';
 		}
 
 		// inputFile check

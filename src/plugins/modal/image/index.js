@@ -112,6 +112,7 @@ class Image_ extends PluginModal {
 		this.title = this.$.lang.image;
 		this.icon = 'image';
 
+		const createFileInput = pluginOptions.createFileInput === undefined ? true : pluginOptions.createFileInput;
 		this.pluginOptions = {
 			canResize: pluginOptions.canResize === undefined ? true : pluginOptions.canResize,
 			showHeightInput: pluginOptions.showHeightInput === undefined ? true : !!pluginOptions.showHeightInput,
@@ -126,11 +127,9 @@ class Image_ extends PluginModal {
 					? pluginOptions.defaultHeight + SIZE_UNIT.PIXEL
 					: pluginOptions.defaultHeight,
 			percentageOnlySize: !!pluginOptions.percentageOnlySize,
-			createFileInput: pluginOptions.createFileInput === undefined ? true : pluginOptions.createFileInput,
+			createFileInput,
 			createUrlInput:
-				pluginOptions.createUrlInput === undefined || !pluginOptions.createFileInput
-					? true
-					: pluginOptions.createUrlInput,
+				pluginOptions.createUrlInput === undefined || !createFileInput ? true : pluginOptions.createUrlInput,
 			uploadUrl: typeof pluginOptions.uploadUrl === 'string' ? pluginOptions.uploadUrl : null,
 			uploadHeaders: pluginOptions.uploadHeaders || null,
 			uploadSizeLimit: numbers.get(pluginOptions.uploadSizeLimit, 0),
@@ -212,11 +211,15 @@ class Image_ extends PluginModal {
 
 		// init
 		this.$.eventManager.addEvent(modalEl.tabs, 'click', this.#OpenTab.bind(this));
-		if (this.imgInputFile)
+		if (this.imgInputFile) {
 			this.$.eventManager.addEvent(modalEl.fileRemoveBtn, 'click', this.#RemoveSelectedFiles.bind(this));
-		if (this.imgUrlFile) this.$.eventManager.addEvent(this.imgUrlFile, 'input', this.#OnLinkPreview.bind(this));
-		if (this.imgInputFile && this.imgUrlFile)
+		}
+		if (this.imgUrlFile) {
+			this.$.eventManager.addEvent(this.imgUrlFile, 'input', this.#OnLinkPreview.bind(this));
+		}
+		if (this.imgInputFile) {
 			this.$.eventManager.addEvent(this.imgInputFile, 'change', this.#OnfileInputChange.bind(this));
+		}
 
 		const galleryButton = modalEl.galleryButton;
 		if (galleryButton) this.$.eventManager.addEvent(galleryButton, 'click', this.#OpenGallery.bind(this));
@@ -308,11 +311,11 @@ class Image_ extends PluginModal {
 
 		if (this.imgInputFile && this.imgInputFile.files.length > 0) {
 			return await this.submitFile(this.imgInputFile.files);
-		} else if (this.imgUrlFile && this.#linkValue.length > 0) {
+		} else if (this.#linkValue.length > 0 && !(this.modal.isUpdate && this.#linkValue === this.#element.src)) {
 			return await this.submitURL(this.#linkValue);
 		}
 
-		return false;
+		return this.modal.isUpdate;
 	}
 
 	/**
@@ -1002,12 +1005,10 @@ class Image_ extends PluginModal {
 	}
 
 	#OnfileInputChange({ target }) {
-		if (!this.imgInputFile.value) {
-			this.imgUrlFile.disabled = false;
-			this.previewSrc.style.textDecoration = '';
-		} else {
-			this.imgUrlFile.disabled = true;
-			this.previewSrc.style.textDecoration = 'line-through';
+		if (this.imgUrlFile) {
+			const hasFile = !!this.imgInputFile.value;
+			this.imgUrlFile.disabled = hasFile;
+			this.previewSrc.style.textDecoration = hasFile ? 'line-through' : '';
 		}
 
 		// inputFile check

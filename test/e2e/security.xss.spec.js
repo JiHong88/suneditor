@@ -154,6 +154,55 @@ test.describe('Security advisories: Embed raw HTML PoCs (submitSRC)', () => {
 	}
 });
 
+const CODE_LANG_CASES = [
+	['GHSA-j4jp-7r3h-rf28 pre class', `<pre class="language-&lt;img/src='x'/onerror='window.__xss++'&gt;">code</pre>`],
+	['GHSA-j4jp-7r3h-rf28 pre>code class', `<pre><code class="language-&lt;img/src='x'/onerror='window.__xss++'&gt;">code</code></pre>`],
+];
+
+test.describe('Security advisories: code block language hover UI', () => {
+	for (const [label, payload] of CODE_LANG_CASES) {
+		for (const [mode, options] of [
+			['default', {}],
+			['classFilter off', { strictMode: { classFilter: false } }],
+			['allowedClassName any', { allowedClassName: '.*' }],
+		]) {
+			test(`${label} — ${mode}`, async ({ page }) => {
+				await page.goto('/');
+				await page.waitForFunction(() => window.editor_root !== undefined && window.suneditor, { timeout: 15000 });
+				await page.evaluate(
+					async ({ payload, options }) => {
+						const codeBlock = window.editor_root.$.plugins.codeBlock.constructor;
+						window.editor_root.destroy();
+						document.body.innerHTML = '<div id="e"></div>';
+						window.__xss = 0;
+						window.__sEditor = window.suneditor.create('#e', { plugins: [codeBlock], buttonList: [['codeBlock']], ...options });
+						await new Promise((r) => setTimeout(r, 300));
+						window.__sEditor.$.html.set(payload);
+					},
+					{ payload, options },
+				);
+
+				// hover the code block (language button), then open the language menu
+				const box = await page.evaluate(() => {
+					const r = window.__sEditor.$.frameContext.get('wysiwyg').querySelector('pre').getBoundingClientRect();
+					return { x: r.left + 10, y: r.top + 5 };
+				});
+				await page.mouse.move(box.x, box.y);
+				await page.mouse.move(box.x + 5, box.y + 2);
+				const button = page.locator('.se-code-lang-button');
+				await expect(button).toBeVisible();
+				await button.click();
+				await page.waitForTimeout(300);
+
+				const result = await page.evaluate(() => ({
+					xss: window.__xss,
+					img: document.querySelectorAll('.se-code-lang img, .se-select-item img').length,
+				}));
+				expect(result).toEqual({ xss: 0, img: 0 });
+			});
+		}
+	}
+});
 
 test('additional URL protocols preserve app links without admitting unsafe URLs', async ({ page }) => {
 	await make(page, { allowedURLProtocols: ['zoommtg', 'slack', 'javascript', 'data'] });

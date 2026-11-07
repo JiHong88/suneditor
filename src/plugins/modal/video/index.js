@@ -272,13 +272,19 @@ class Video extends PluginModal {
 
 		// init
 		const galleryButton = modalEl.galleryButton;
-		if (galleryButton) this.$.eventManager.addEvent(galleryButton, 'click', this.#OpenGallery.bind(this));
+		if (galleryButton) {
+			this.$.eventManager.addEvent(galleryButton, 'click', this.#OpenGallery.bind(this));
+		}
 
-		if (this.videoInputFile)
+		if (this.videoInputFile) {
 			this.$.eventManager.addEvent(modalEl.fileRemoveBtn, 'click', this.#RemoveSelectedFiles.bind(this));
-		if (this.videoUrlFile) this.$.eventManager.addEvent(this.videoUrlFile, 'input', this.#OnLinkPreview.bind(this));
-		if (this.videoInputFile && this.videoUrlFile)
+		}
+		if (this.videoUrlFile) {
+			this.$.eventManager.addEvent(this.videoUrlFile, 'input', this.#OnLinkPreview.bind(this));
+		}
+		if (this.videoInputFile) {
 			this.$.eventManager.addEvent(this.videoInputFile, 'change', this.#OnfileInputChange.bind(this));
+		}
 	}
 
 	/**
@@ -362,8 +368,12 @@ class Video extends PluginModal {
 		let result = false;
 		if (this.videoInputFile && this.videoInputFile.files.length > 0) {
 			result = await this.submitFile(this.videoInputFile.files);
-		} else if (this.videoUrlFile && this.#linkValue.length > 0) {
+		} else if (this.#linkValue.length > 0 && !(this.modal.isUpdate && this.#linkValue === this.#getSrc())) {
 			result = await this.submitURL(this.#linkValue);
+		} else if (this.modal.isUpdate) {
+			const { inputWidth, inputHeight, align } = this.#getInfo();
+			this.create(this.#element, this.#element.src, inputWidth, inputHeight, align, true, null, true);
+			result = true;
 		}
 
 		if (result) _w.setTimeout(this.$.component.select.bind(this.$.component, this.#element, Video.key), 0);
@@ -527,7 +537,7 @@ class Video extends PluginModal {
 	 * @param {string} height - The desired height for the video element.
 	 * @param {string} align - The alignment to apply to the video element (e.g., 'left', 'center', 'right').
 	 * @param {boolean} isUpdate - Indicates whether this is an update to an existing component (`true`) or a new creation (`false`).
-	 * @param {{name: string, size: number}} file - File metadata associated with the video
+	 * @param {?{name: string, size: number}} file - File metadata associated with the video (`null` keeps the current file data on update)
 	 * @param {boolean} isLast - Indicates whether this is the last file in the batch (used for scroll and insert actions).
 	 */
 	create(oFrame, src, width, height, align, isUpdate, file, isLast) {
@@ -583,7 +593,7 @@ class Video extends PluginModal {
 
 		// select figure
 		// oFrame.onload = OnloadVideo.bind(this, oFrame);
-		this.fileManager.setFileData(oFrame, file);
+		if (file) this.fileManager.setFileData(oFrame, file);
 
 		if (!isUpdate) {
 			this.$.component.insert(container, {
@@ -786,11 +796,7 @@ class Video extends PluginModal {
 		const originHeight = String(figureInfo.height || figureInfo.originHeight || figureInfo.h || '');
 		this.sizeService.setOriginSize(originWidth, originHeight);
 
-		if (this.videoUrlFile)
-			this.#linkValue =
-				this.previewSrc.textContent =
-				this.videoUrlFile.value =
-					this.#element.src || this.#element.querySelector('source')?.src || '';
+		if (this.videoUrlFile) this.#linkValue = this.previewSrc.textContent = this.videoUrlFile.value = this.#getSrc();
 
 		/** @type {HTMLInputElement} */
 		const activeAlign =
@@ -801,6 +807,14 @@ class Video extends PluginModal {
 		if (!this.#resizing) return;
 
 		this.sizeService.ready(figureInfo, target);
+	}
+
+	/**
+	 * @description Returns the source of the current video (`src`, or the first `<source>`).
+	 * @returns {string}
+	 */
+	#getSrc() {
+		return this.#element.src || this.#element.querySelector('source')?.src || '';
 	}
 
 	/**
@@ -961,12 +975,10 @@ class Video extends PluginModal {
 	 * @param {InputEvent} e - Event object
 	 */
 	#OnfileInputChange(e) {
-		if (!this.videoInputFile.value) {
-			this.videoUrlFile.disabled = false;
-			this.previewSrc.style.textDecoration = '';
-		} else {
-			this.videoUrlFile.disabled = true;
-			this.previewSrc.style.textDecoration = 'line-through';
+		if (this.videoUrlFile) {
+			const hasFile = !!this.videoInputFile.value;
+			this.videoUrlFile.disabled = hasFile;
+			this.previewSrc.style.textDecoration = hasFile ? 'line-through' : '';
 		}
 
 		// inputFile check

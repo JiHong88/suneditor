@@ -44,7 +44,7 @@ export const DEFAULTS = {
 
 	SIZE_UNITS: ['px', 'pt', 'em', 'rem'],
 
-	CLASS_NAME: '^__se__|^se-|^katex|^MathJax|^language-',
+	CLASS_NAME: '^__se__|^se-|^katex|^MathJax|^language-[\\w+#.-]+$',
 	CLASS_MJX: 'mjx-container|mjx-math|mjx-mrow|mjx-mi|mjx-mo|mjx-mn|mjx-msup|mjx-mfrac|mjx-munderover',
 	EXTRA_TAG_MAP: { script: false, style: false, meta: false, link: false, '[a-z]+:[a-z]+': false },
 

@@ -29,6 +29,9 @@ const DEFAULT_LANGS = [
 	'yaml',
 ];
 
+// A language name is an identifier (`c++`, `c#`, `vb.net`); anything else is ignored.
+const LANG_NAME_RE = /^[\w+#.-]+$/;
+
 /**
  * @typedef {Object} CodeBlockPluginOptions
  * @property {Array<string>} [langs] - List of selectable programming languages for code blocks.
@@ -58,6 +61,7 @@ class CodeBlock extends PluginCommand {
 
 	// hover UI
 	#hoverButton;
+	#hoverLangText;
 	#hoverSelectMenu;
 	#hoverController;
 	#hoverCurrentPre;
@@ -104,7 +108,14 @@ class CodeBlock extends PluginCommand {
 		// ───────────────── [hover UI] ─────────────────
 		// controller
 		const containerEl = dom.utils.createElement('DIV', { class: 'se-controller se-code-lang' });
-		this.#hoverButton = dom.utils.createElement('DIV', { class: 'se-code-lang-button' });
+		this.#hoverButton = dom.utils.createElement(
+			'DIV',
+			{ class: 'se-code-lang-button' },
+			'<span class="se-code-lang-icon">&lt;/&gt;</span>',
+		);
+		// The language comes from the content: write it as text, never as HTML.
+		this.#hoverLangText = dom.utils.createElement('SPAN', { class: 'se-code-lang-text' });
+		this.#hoverButton.appendChild(this.#hoverLangText);
 		this.#updateHoverButtonText('');
 		containerEl.appendChild(this.#hoverButton);
 
@@ -301,7 +312,7 @@ class CodeBlock extends PluginCommand {
 	}
 
 	#updateHoverButtonText(lang) {
-		this.#hoverButton.innerHTML = /* html */ `<span class="se-code-lang-icon">&lt;/&gt;</span><span class="se-code-lang-text">${lang || this.$.lang.codeLanguage || 'Language'}</span>`;
+		this.#hoverLangText.textContent = lang || this.$.lang.codeLanguage || 'Language';
 	}
 
 	#isHoverOpen() {
@@ -319,7 +330,8 @@ class CodeBlock extends PluginCommand {
 				? preOrChild
 				: dom.query.getParentElement(preOrChild, (el) => /^PRE$/i.test(el.nodeName));
 		if (!pre) return '';
-		return /** @type {HTMLElement} */ (pre).className.match(/language-(\S+)/)?.[1] || '';
+		const lang = /** @type {HTMLElement} */ (pre).className.match(/language-(\S+)/)?.[1];
+		return lang && LANG_NAME_RE.test(lang) ? lang : '';
 	}
 
 	/**

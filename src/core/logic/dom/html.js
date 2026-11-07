@@ -2495,7 +2495,7 @@ class HTML {
 		const codeEl = pre.firstElementChild;
 		const langMatch = (codeEl.className || '').match(/language-(\S+)/);
 
-		if (langMatch) {
+		if (langMatch && _RE_LANG_NAME.test(langMatch[1])) {
 			dom.utils.addClass(pre, 'language-' + langMatch[1]);
 			pre.setAttribute('data-se-lang', langMatch[1]);
 		}
@@ -2532,6 +2532,9 @@ class HTML {
 }
 
 /** Module-level regex constants */
+// #unwrapPreCode: a code language is an identifier (`c++`, `c#`, `vb.net`)
+const _RE_LANG_NAME = /^[\w+#.-]+$/;
+
 // #CleanElements
 const _RE_XML_NS_TAG = /^<[^\s/>:]+:[^\s/>]*/;
 const _RE_TAG_NAME = /(?!<)[a-zA-Z0-9-]+/;

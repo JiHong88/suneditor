@@ -1,35 +1,19 @@
-## 3.4.2
-
-### New Feature
-
-* Typing `>` followed by Space at the start of a line now turns it into a blockquote; set `shortcuts: { blockquote: undefined }` to turn it off.
-
-### Enhancement
-
-* Esc now hides the balloon toolbar (`mode: 'balloon'`, `'balloon-always'`, and `subToolbar` in those modes) while keeping the selection, and an open dropdown or controller is closed first.
-* Improved pasting from Word Online so dark cursor-marker blocks and extra wrappers are removed and blank lines are kept. [#1717](https://github.com/JiHong88/suneditor/issues/1717) ([@HamzaA598](https://github.com/HamzaA598))
-* Added the `msOffice.isMSOffice()` helper.
+## 3.4.3
 
 ### Changes
 
-* The balloon toolbar and the controllers no longer draw a pointer arrow toward their target, and the balloon toolbar sits 10px from the selection instead of 12px; custom CSS can show the arrow again.
-* Active toolbar and menu buttons in the `dark`, `midnight` and `cobalt` themes now use a tinted fill with a bright accent icon.
-* An `iframe_attributes.sandbox` value is now kept as given with only `allow-same-origin` added, instead of also gaining `allow-scripts`; include `allow-scripts` to keep the editor working in Safari and iOS browsers. [#1716](https://github.com/JiHong88/suneditor/issues/1716)
-* Text pasted from Word no longer keeps `color: windowtext` outside links, so it follows the editor theme color. [#1717](https://github.com/JiHong88/suneditor/issues/1717)
+* Editing an image, video or audio without a new file or URL no longer re-submits the current source, so `onImageUploadBefore`, `onVideoUploadBefore` and `onAudioUploadBefore` fire only when the source is replaced and the stored file name and size are kept.
 
 ### Bugfix
 
-* Fixed an issue where editing a link's display text removed the inline formatting wrapping the link text.
-* Fixed a bug where dropping a dragged selection onto itself moved the text to the start of the line or emptied a link.
-* Fixed a bug where moved content could land away from the point where it was dropped.
-* Fixed an issue where content dropped onto an image, video, inline component or math formula was inserted inside it and broke the component.
-* Fixed a bug where pasting or dropping over a selection that left only whitespace removed that whitespace and its formatting and inserted the content on the next line.
-* Fixed a bug where `$.eventManager.addEvent()` and `removeEvent()` threw a `SecurityError` on an `iframe`-mode editor that contained embedded frames, such as a video.
-* Fixed an issue where a line break inside text was deleted instead of becoming a space, joining words, in `html.set()`, paste, code view and Markdown view. [#1714](https://github.com/JiHong88/suneditor/issues/1714)
-* Fixed an issue where code blocks lost their line breaks in code view, Markdown view and `jsonToMarkdown()`. [#1714](https://github.com/JiHong88/suneditor/issues/1714)
-* Fixed an issue where Markdown view and `jsonToMarkdown()` escaped every `]` in text but left brackets in link text and image `alt` unescaped, breaking Markdown round trips. [#1714](https://github.com/JiHong88/suneditor/issues/1714)
-* Fixed a bug where `markdownToHtml()` misread link and image text containing brackets.
-* Fixed a bug where `editor.destroy()` threw an error and left the editor partly torn down when CodeMirror was enabled.
-* Fixed an issue where the block handle area stayed visible in code view and Markdown view, narrowing the source frame.
-* Fixed a bug where `html.get()` and `getContents()` replaced a table cell with `<br>` when its only content was a component or an `hr`. [#1721](https://github.com/JiHong88/suneditor/issues/1721)
-* Fixed an issue where the link modal always showed the title and display text inputs, ignoring `link: { title: false, textToDisplay: false }`. [#1722](https://github.com/JiHong88/suneditor/issues/1722)
+* Fixed an issue where the image, video and audio file inputs did not show the selected file name when `createUrlInput` was `false`. [#1726](https://github.com/JiHong88/suneditor/issues/1726) ([@RClaudiuM](https://github.com/RClaudiuM))
+* Fixed a bug where `image: { createUrlInput: false }` was ignored unless `createFileInput` was also set. [#1726](https://github.com/JiHong88/suneditor/issues/1726) ([@RClaudiuM](https://github.com/RClaudiuM))
+* Fixed a bug where opening the audio edit modal threw an error when `createUrlInput` was `false`.
+* Fixed a bug where the image, video and audio edit modals did not close on submit without a new file when `createUrlInput` was `false`, and video size and alignment changes were not applied.
+* Fixed an issue where `markdownToHtml()` and `jsonToMarkdown()` lost the blank lines between the items of a loose list. [#1724](https://github.com/JiHong88/suneditor/issues/1724) ([@orshih6](https://github.com/orshih6))
+* Fixed an issue where a numbered line other than `1.` inside a Markdown paragraph was split off into an ordered list. [#1724](https://github.com/JiHong88/suneditor/issues/1724) ([@orshih6](https://github.com/orshih6))
+
+### Security
+
+* Fixed a vulnerability where the language of a code block could inject HTML into the code block language button and menu. ([GHSA-j4jp-7r3h-rf28](https://github.com/JiHong88/suneditor/security/advisories/GHSA-j4jp-7r3h-rf28))
+* Hardened class sanitizing so a `language-` class is kept only when the language name consists of letters, digits, `_`, `+`, `#`, `.` and `-`.

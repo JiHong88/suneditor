@@ -31,6 +31,8 @@ const WORD_CHAR_RE = /[a-zA-Z0-9]/;
 const PARAGRAPH_BREAK_RE = /^(#{1,6}\s|`{3,}|~{3,}|>|\||(\s*)([-*+]|\d+\.)\s|(\*{3,}|-{3,}|_{3,})\s*$)/;
 // An empty list item ('-', '1.') starts a list, but cannot interrupt a paragraph.
 const EMPTY_LIST_ITEM_RE = /^\s*([-*+]|\d+\.)\s*$/;
+// An ordered list can interrupt a paragraph only when it starts with 1.
+const ORDERED_ITEM_RE = /^\s*(\d+)\.\s/;
 // Placeholder for an inline <br>; the block that holds it decides how to write it.
 const BR_MARK = '\uE000';
 const BR_MARK_RE = /\uE000/g;
@@ -338,12 +340,21 @@ function listToMarkdown(node, indent, isOrdered) {
 	let result = '';
 	const start = parseInt(node.attributes?.start, 10);
 	let index = isOrdered && !Number.isNaN(start) ? start : 1;
+	// A loose list (<li><p>...</p></li>) keeps blank lines between its items.
+	const isLoose = children.some(
+		(li) => li.tag === 'li' && (li.children || []).some((c) => c.type === 'element' && c.tag === 'p'),
+	);
 
 	for (const child of children) {
 		if (child.type !== 'element' || child.tag !== 'li') continue;
 
 		const prefix = isOrdered ? `${index}. ` : '- ';
-		const liChildren = child.children || [];
+		let liChildren = child.children || [];
+		// GFM puts the checkbox of a loose task item in its first paragraph.
+		const firstP = liChildren[0];
+		if (firstP?.tag === 'p' && firstP.children?.[0]?.tag === 'input') {
+			liChildren = [...firstP.children, ...liChildren.slice(1)];
+		}
 		const inlineChildren = [];
 		let subBlocks = '';
 		const blockIndent = indent + ' '.repeat(prefix.length);
@@ -390,9 +401,11 @@ function listToMarkdown(node, indent, isOrdered) {
 			}
 		}
 
+		if (isLoose && result) result += '\n';
 		// An empty item is written as a bare marker ('-'), without trailing spaces.
-		result += `${indent}${prefix}${taskPrefix}${childrenToLine(inlineChildren)}`.trimEnd() + '\n';
-		if (subBlocks) result += subBlocks;
+		const itemLine = `${indent}${prefix}${taskPrefix}${childrenToLine(inlineChildren)}`.trimEnd();
+		result += itemLine + '\n';
+		if (subBlocks) result += (isLoose && itemLine !== indent + prefix.trimEnd() ? '\n' : '') + subBlocks;
 		index++;
 	}
 
@@ -932,7 +945,9 @@ export function markdownToHtml(md, defaultLine) {
 
 		// Paragraph (default)
 		const paraLines = [];
-		while (i < lines.length && !isBlankLine(lines[i]) && !PARAGRAPH_BREAK_RE.test(lines[i])) {
+		while (i < lines.length && !isBlankLine(lines[i])) {
+			const orderedMatch = paraLines.length > 0 && ORDERED_ITEM_RE.exec(lines[i]);
+			if (PARAGRAPH_BREAK_RE.test(lines[i]) && !(orderedMatch && parseInt(orderedMatch[1], 10) !== 1)) break;
 			paraLines.push(lines[i]);
 			i++;
 		}
@@ -1023,7 +1038,9 @@ function parseList(lines, startIndex, ordered) {
 	const tag = ordered ? 'ol' : 'ul';
 	const itemPattern = ordered ? /^(\s*)\d+\.(?:\s+|$)(.*)/ : /^(\s*)([-*+])(?:\s+|$)(.*)/;
 	const start = ordered ? parseInt(lines[startIndex].trimStart(), 10) : 1;
-	let html = ordered && start !== 1 ? `<ol start="${start}">` : `<${tag}>`;
+	const items = [];
+	// A list is loose when blank lines separate its items or the blocks inside an item.
+	let isLoose = false;
 	let i = startIndex;
 	const baseIndent = (lines[i].match(/^(\s*)/)[1] || '').length;
 
@@ -1043,6 +1060,7 @@ function parseList(lines, startIndex, ordered) {
 		if (currentIndent === baseIndent) {
 			const match = itemPattern.exec(line);
 			if (!match) break;
+			if (i > startIndex && isBlankLine(lines[i - 1])) isLoose = true;
 
 			const content = ordered ? line.replace(/^\s*\d+\.(\s+|$)/, '') : line.replace(/^\s*[-*+](\s+|$)/, '');
 			i++;
@@ -1068,10 +1086,12 @@ function parseList(lines, startIndex, ordered) {
 				}
 				const nextIndent = (nextLine.match(/^(\s*)/)[1] || '').length;
 				if (nextIndent <= baseIndent) break;
+				const afterBlank = isBlankLine(lines[i - 1]);
 
 				// Nested list
 				if (/^\s*([-*+]|\d+\.)(\s+|$)/.test(nextLine)) {
 					const nested = parseList(lines, i, /^\s*\d+\./.test(nextLine));
+					if (afterBlank) isLoose = true;
 					nestedHtml += nested.html;
 					i = nested.index;
 					continue;
@@ -1088,6 +1108,7 @@ function parseList(lines, startIndex, ordered) {
 						tableLines.push(tl.trimStart());
 						i++;
 					}
+					if (afterBlank) isLoose = true;
 					nestedHtml += parseTable(tableLines);
 					continue;
 				}
@@ -1100,9 +1121,13 @@ function parseList(lines, startIndex, ordered) {
 				const checkbox = taskChecked
 					? '<input type="checkbox" checked disabled> '
 					: '<input type="checkbox" disabled> ';
-				html += `<li class="task-list-item">${checkbox}${parseInline(displayContent)}${nestedHtml}</li>`;
+				items.push({
+					cls: ' class="task-list-item"',
+					text: `${checkbox}${parseInline(displayContent)}`,
+					nestedHtml,
+				});
 			} else {
-				html += `<li>${parseInline(content)}${nestedHtml}</li>`;
+				items.push({ cls: '', text: parseInline(content), nestedHtml });
 			}
 		} else {
 			// More indented - this shouldn't happen if nested blocks are handled above
@@ -1110,6 +1135,11 @@ function parseList(lines, startIndex, ordered) {
 		}
 	}
 
+	let html = ordered && start !== 1 ? `<ol start="${start}">` : `<${tag}>`;
+	for (const { cls, text, nestedHtml } of items) {
+		// A loose item wraps its text in <p>; an empty item has no paragraph.
+		html += `<li${cls}>${isLoose && text ? `<p>${text}</p>` : text}${nestedHtml}</li>`;
+	}
 	html += `</${tag}>`;
 	return { html, index: i };
 }
