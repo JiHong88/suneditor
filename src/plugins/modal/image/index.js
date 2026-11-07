@@ -211,11 +211,15 @@ class Image_ extends PluginModal {
 
 		// init
 		this.$.eventManager.addEvent(modalEl.tabs, 'click', this.#OpenTab.bind(this));
-		if (this.imgInputFile)
+		if (this.imgInputFile) {
 			this.$.eventManager.addEvent(modalEl.fileRemoveBtn, 'click', this.#RemoveSelectedFiles.bind(this));
-		if (this.imgUrlFile) this.$.eventManager.addEvent(this.imgUrlFile, 'input', this.#OnLinkPreview.bind(this));
-		if (this.imgInputFile)
+		}
+		if (this.imgUrlFile) {
+			this.$.eventManager.addEvent(this.imgUrlFile, 'input', this.#OnLinkPreview.bind(this));
+		}
+		if (this.imgInputFile) {
 			this.$.eventManager.addEvent(this.imgInputFile, 'change', this.#OnfileInputChange.bind(this));
+		}
 
 		const galleryButton = modalEl.galleryButton;
 		if (galleryButton) this.$.eventManager.addEvent(galleryButton, 'click', this.#OpenGallery.bind(this));

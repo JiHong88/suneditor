@@ -200,7 +200,8 @@ class Audio_ extends PluginModal {
 			if (this.audioInputFile && this.pluginOptions.allowMultiple)
 				this.audioInputFile.setAttribute('multiple', 'multiple');
 		} else if (this.#element) {
-			this.#urlValue = this.preview.textContent = this.audioUrlFile.value = this.#element.src;
+			if (this.audioUrlFile)
+				this.#urlValue = this.preview.textContent = this.audioUrlFile.value = this.#element.src;
 			if (this.audioInputFile && this.pluginOptions.allowMultiple)
 				this.audioInputFile.removeAttribute('multiple');
 		} else {

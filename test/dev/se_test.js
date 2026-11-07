@@ -1019,6 +1019,7 @@ const options1 = {
 		allowMultiple: true,
 		uploadUrl: 'http://localhost:3000/editor/upload',
 		createFileInput: true,
+		createUrlInput: false,
 		controls: [
 			[
 				'resize_auto,75,50',
@@ -1086,10 +1087,16 @@ const options1 = {
 	// 	defaultFormatType: 'block',
 	// 	// percentageOnlySize: true
 	// },
+	image: {
+		uploadUrl: 'http://localhost:3000/editor/upload',
+		allowMultiple: true,
+		createUrlInput: false,
+	},
 	audio: {
 		allowMultiple: true,
 		uploadUrl: 'http://localhost:3000/editor/upload',
 		createFileInput: true,
+		createUrlInput: false,
 	},
 	audioGallery: {
 		url: 'http://localhost:3000/editor/gallery/audio',
@@ -2805,7 +2812,7 @@ const options_test = {
 		width: '100%',
 		height: 'auto',
 		videoFileInput: true,
-		videoUrlInput: true,
+		videoUrlInput: false,
 		videoRatio: 0.5625,
 	},
 	videoGallery: {

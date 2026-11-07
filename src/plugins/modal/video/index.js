@@ -272,13 +272,19 @@ class Video extends PluginModal {
 
 		// init
 		const galleryButton = modalEl.galleryButton;
-		if (galleryButton) this.$.eventManager.addEvent(galleryButton, 'click', this.#OpenGallery.bind(this));
+		if (galleryButton) {
+			this.$.eventManager.addEvent(galleryButton, 'click', this.#OpenGallery.bind(this));
+		}
 
-		if (this.videoInputFile)
+		if (this.videoInputFile) {
 			this.$.eventManager.addEvent(modalEl.fileRemoveBtn, 'click', this.#RemoveSelectedFiles.bind(this));
-		if (this.videoUrlFile) this.$.eventManager.addEvent(this.videoUrlFile, 'input', this.#OnLinkPreview.bind(this));
-		if (this.videoInputFile)
+		}
+		if (this.videoUrlFile) {
+			this.$.eventManager.addEvent(this.videoUrlFile, 'input', this.#OnLinkPreview.bind(this));
+		}
+		if (this.videoInputFile) {
 			this.$.eventManager.addEvent(this.videoInputFile, 'change', this.#OnfileInputChange.bind(this));
+		}
 	}
 
 	/**

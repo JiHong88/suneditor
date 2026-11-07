@@ -15,12 +15,12 @@ function selectFile(input, name) {
 }
 
 const cases = [
-	{ key: 'image', plugin: image, fileInput: 'imgInputFile', urlInput: 'imgUrlFile', fileName: 'picture.png' },
-	{ key: 'video', plugin: video, fileInput: 'videoInputFile', urlInput: 'videoUrlFile', fileName: 'clip.mp4' },
-	{ key: 'audio', plugin: audio, fileInput: 'audioInputFile', urlInput: 'audioUrlFile', fileName: 'sound.mp3' },
+	{ key: 'image', plugin: image, fileInput: 'imgInputFile', urlInput: 'imgUrlFile', fileName: 'picture.png', media: '<img src="https://example.com/a.png">' },
+	{ key: 'video', plugin: video, fileInput: 'videoInputFile', urlInput: 'videoUrlFile', fileName: 'clip.mp4', media: '<video src="https://example.com/a.mp4"></video>' },
+	{ key: 'audio', plugin: audio, fileInput: 'audioInputFile', urlInput: 'audioUrlFile', fileName: 'sound.mp3', media: '<audio src="https://example.com/a.mp3" controls></audio>' },
 ];
 
-describe.each(cases)('$key modal file input', ({ key, plugin, fileInput, urlInput, fileName }) => {
+describe.each(cases)('$key modal file input', ({ key, plugin, fileInput, urlInput, fileName, media }) => {
 	let editor;
 
 	const createEditor = async (pluginOptions) => {
@@ -58,5 +58,17 @@ describe.each(cases)('$key modal file input', ({ key, plugin, fileInput, urlInpu
 
 		expect(inst.fileModalWrapper.querySelector('.se-input-file-cnt').textContent).toBe(fileName);
 		expect(inst[urlInput].disabled).toBe(true);
+	});
+
+	it('opens the update modal of a selected component when the URL input is disabled', async () => {
+		const inst = await createEditor({ createFileInput: true, createUrlInput: false });
+		editor.$.html.set(`<p>a</p>${media}<p>b</p>`);
+		const target = editor.$.frameContext.get('wysiwyg').querySelector(key === 'image' ? 'img' : key);
+
+		editor.$.component.select(target, key);
+		expect(editor.$.ui.currentControllerName).toBe(key);
+
+		expect(() => inst.open()).not.toThrow();
+		expect(inst.modal.isUpdate).toBe(true);
 	});
 });
