@@ -626,6 +626,30 @@ export function createTooltipInner(text) {
 	return `<span class="se-tooltip-inner"><span class="se-tooltip-text">${text}</span></span>`;
 }
 
+/** @type {WeakMap<Document|ShadowRoot, Map<string, HTMLStyleElement>>} */
+const injectedStyles = new WeakMap();
+
+/**
+ * @description Inserts a `<style>` once per document or shadow root, and again if it was removed (shadow root re-render, head cleanup).
+ * - For rules that must stay out of the CSS files, e.g. `::highlight()`: downstream CSS tools such as lightningcss
+ *   (Tailwind v4, Vite, Next) report it as an unknown pseudo-element when the user imports `suneditor.css`.
+ * @param {string} id Unique key of the style
+ * @param {string} cssText CSS text
+ * @param {Document|ShadowRoot} [root=_d] Target document or shadow root
+ */
+export function injectStyle(id, cssText, root = _d) {
+	let styles = injectedStyles.get(root);
+	if (!styles) injectedStyles.set(root, (styles = new Map()));
+
+	const prev = styles.get(id);
+	if (prev && root.contains(prev)) return;
+
+	const style = _d.createElement('style');
+	style.textContent = cssText;
+	(root.nodeType === 9 ? /** @type {Document} */ (root).head : root).appendChild(style);
+	styles.set(id, style);
+}
+
 const utils = {
 	clone,
 	createElement,
@@ -657,6 +681,7 @@ const utils = {
 	getRootCssVar,
 	setRootCssVar,
 	createTooltipInner,
+	injectStyle,
 };
 
 export default utils;

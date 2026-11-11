@@ -967,6 +967,8 @@ class EventOrchestrator extends KernelInjector {
 	 * @param {FocusEvent} e - Focus event object
 	 */
 	#OnFocus_wysiwyg(frameContext, e) {
+		this.$.selection.__clearBlurHighlight();
+
 		if (this.$.selection.__iframeFocus || frameContext.get('isReadOnly') || frameContext.get('isDisabled')) {
 			e.preventDefault();
 			return false;
@@ -1020,6 +1022,9 @@ class EventOrchestrator extends KernelInjector {
 
 		// Drop the per-line placeholder on blur; the empty-editor placeholder takes over if applicable.
 		this.#ui._updatePlaceholder(frameContext);
+
+		// Keep the selection visible while focus is in a modal, dropdown, controller or toolbar input
+		this.$.selection.__showBlurHighlight(frameContext);
 
 		if (this._inputFocus || this.#store.get('_preventBlur')) return;
 		this.#store.set('_preventFocus', false);

@@ -339,6 +339,7 @@ class UIManager {
 		this._toggleControllerButtons(!!value);
 
 		if (value) {
+			this.#$.selection.__clearBlurHighlight();
 			this.offCurrentController();
 			this.offCurrentModal();
 
@@ -367,6 +368,7 @@ class UIManager {
 		const fc = rootKey ? this.#frameRoots.get(rootKey) : this.#frameContext;
 
 		this.#$.toolbar.disable();
+		this.#$.selection.__clearBlurHighlight();
 		this.offCurrentController();
 		this.offCurrentModal();
 

@@ -7,6 +7,7 @@
 	/* caret and placeholder */
 	--se-caret-color: #ccc;
 	--se-drag-caret-color: #18aa7a;
+	--se-selection-blur-color: rgba(90, 151, 255, 0.35);
 	--se-placeholder-color: #64718c;
 
 	/* editable text tones */

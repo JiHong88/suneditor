@@ -1,9 +1,10 @@
 .sun-editor,
 .sun-editor-editable {
 	/** --------------------------- content - [colors] ----------- */
-	/* caret and placeholder */
+	/* caret, selection and placeholder */
 	--se-caret-color: #333;
 	--se-drag-caret-color: #4592ff;
+	--se-selection-blur-color: rgba(69, 146, 255, 0.3);
 	--se-placeholder-color: #bbb;
 
 	/* editable text tones */

@@ -149,6 +149,7 @@ export const dom: {
 		getRootCssVar: typeof import('./dom/domUtils').getRootCssVar;
 		setRootCssVar: typeof import('./dom/domUtils').setRootCssVar;
 		createTooltipInner: typeof import('./dom/domUtils').createTooltipInner;
+		injectStyle: typeof import('./dom/domUtils').injectStyle;
 	};
 };
 export const numbers: {

@@ -246,6 +246,15 @@ export function setRootCssVar(name: string, value: string): void;
  * @returns {string} Tooltip HTML
  */
 export function createTooltipInner(text: string): string;
+/**
+ * @description Inserts a `<style>` once per document or shadow root, and again if it was removed (shadow root re-render, head cleanup).
+ * - For rules that must stay out of the CSS files, e.g. `::highlight()`: downstream CSS tools such as lightningcss
+ *   (Tailwind v4, Vite, Next) report it as an unknown pseudo-element when the user imports `suneditor.css`.
+ * @param {string} id Unique key of the style
+ * @param {string} cssText CSS text
+ * @param {Document|ShadowRoot} [root=_d] Target document or shadow root
+ */
+export function injectStyle(id: string, cssText: string, root?: Document | ShadowRoot): void;
 export default utils;
 declare namespace utils {
 	export { clone };
@@ -278,4 +287,5 @@ declare namespace utils {
 	export { getRootCssVar };
 	export { setRootCssVar };
 	export { createTooltipInner };
+	export { injectStyle };
 }

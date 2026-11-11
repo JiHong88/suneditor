@@ -4538,8 +4538,8 @@
 	fill: currentColor;
 }
 
-/* Finder - CSS Custom Highlight API: injected at runtime via JS (PostCSS cannot parse ::highlight) */
-/* Finter - Mark element fallback highlights */
+/* Finder - CSS Custom Highlight API: injected at runtime via JS (dom.utils.injectStyle); lightningcss rejects ::highlight */
+/* Finder - Mark element fallback highlights */
 .sun-editor mark.se-find-mark,
 .sun-editor-editable mark.se-find-mark {
 	background-color: var(--se-find-match-color, rgba(255, 213, 0, 0.4));

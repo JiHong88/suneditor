@@ -2,6 +2,10 @@ import { dom, env } from '../../../helper';
 
 const { _d, _w } = env;
 
+const FIND_HIGHLIGHT_STYLE =
+	'::highlight(se-find-match){background-color:var(--se-find-match-color,rgba(255,213,0,.4));color:inherit}' +
+	'::highlight(se-find-current){background-color:var(--se-find-current-color,rgba(255,150,50,.7));color:inherit}';
+
 /**
  * @description Find/Replace feature
  */
@@ -46,18 +50,6 @@ class Finder {
 	#bindCloseKey = null;
 	#contentObserver = null;
 	#internalUpdate = false;
-
-	/** @description Inject ::highlight() styles at runtime (avoids PostCSS parse errors). */
-	static #highlightStyleInjected = false;
-	static #injectHighlightStyles() {
-		if (Finder.#highlightStyleInjected) return;
-		Finder.#highlightStyleInjected = true;
-		const style = _d.createElement('style');
-		style.textContent =
-			'::highlight(se-find-match){background-color:var(--se-find-match-color,rgba(255,213,0,.4));color:inherit}' +
-			'::highlight(se-find-current){background-color:var(--se-find-current-color,rgba(255,150,50,.7));color:inherit}';
-		_d.head.appendChild(style);
-	}
 
 	/**
 	 * @constructor
@@ -576,9 +568,9 @@ class Finder {
 
 	/** @description Apply CSS Custom Highlight API highlights. */
 	#applyNativeHighlight() {
-		Finder.#injectHighlightStyles();
-		// eslint-disable-next-line
-		const allRanges = new Highlight(...this.#matches);
+		dom.utils.injectStyle('se-find', FIND_HIGHLIGHT_STYLE, this.#$.contextProvider.shadowRoot || _d);
+
+		const allRanges = new _w.Highlight(...this.#matches);
 		CSS.highlights.set('se-find-match', allRanges);
 		this.#updateCurrentNativeHighlight();
 	}
@@ -586,7 +578,7 @@ class Finder {
 	/** @description Update the "current match" native highlight. */
 	#updateCurrentNativeHighlight() {
 		if (this.#currentIndex >= 0 && this.#currentIndex < this.#matches.length) {
-			const current = new Highlight(this.#matches[this.#currentIndex]);
+			const current = new _w.Highlight(this.#matches[this.#currentIndex]);
 			CSS.highlights.set('se-find-current', current);
 		} else {
 			CSS.highlights.delete('se-find-current');

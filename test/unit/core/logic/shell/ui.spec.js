@@ -288,6 +288,11 @@ function createUIKernel(overrides = {}) {
 		isLine: jest.fn().mockReturnValue(false),
 	};
 
+	// --- Selection ---
+	const selection = {
+		__clearBlurHighlight: jest.fn(),
+	};
+
 	// --- Facade ---
 	const facade = {
 		isEmpty: jest.fn().mockReturnValue(false),
@@ -333,6 +338,7 @@ function createUIKernel(overrides = {}) {
 		viewer,
 		component,
 		format,
+		selection,
 		facade,
 		store,
 		...overrides,
@@ -923,6 +929,13 @@ describe('UIManager (real instance)', () => {
 			expect(ctx.$.component.__deselect).toHaveBeenCalled();
 		});
 
+		it('should clear the blur selection highlight only when enabling readOnly', () => {
+			ui.readOnly(false);
+			expect(ctx.$.selection.__clearBlurHighlight).not.toHaveBeenCalled();
+			ui.readOnly(true);
+			expect(ctx.$.selection.__clearBlurHighlight).toHaveBeenCalled();
+		});
+
 		it('should use rootKey-based frameContext when rootKey is provided', () => {
 			ui.readOnly(true, 'second');
 			expect(ctx.frameRoots.get('second').get('isReadOnly')).toBe(true);
@@ -1014,6 +1027,7 @@ describe('UIManager (real instance)', () => {
 			expect(ctx.$.toolbar.disable).toHaveBeenCalled();
 			expect(ctx.elements.wysiwyg.getAttribute('contenteditable')).toBe('false');
 			expect(ctx.frameContext.get('isDisabled')).toBe(true);
+			expect(ctx.$.selection.__clearBlurHighlight).toHaveBeenCalled();
 		});
 
 		it('should disable code textarea when not using codeMirror', () => {

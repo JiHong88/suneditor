@@ -85,6 +85,7 @@ export const domUtils: {
 	getRootCssVar: typeof import('./domUtils').getRootCssVar;
 	setRootCssVar: typeof import('./domUtils').setRootCssVar;
 	createTooltipInner: typeof import('./domUtils').createTooltipInner;
+	injectStyle: typeof import('./domUtils').injectStyle;
 };
 export default dom;
 declare namespace dom {

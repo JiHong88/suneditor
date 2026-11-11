@@ -164,8 +164,25 @@ declare class Selection_ {
 	__focus(): void;
 	/**
 	 * @internal
+	 * @description Keeps the remembered selection painted while focus is outside the editor (modal, dropdown, toolbar input, page).
+	 * - Skipped in iframe mode: the browser already paints the iframe selection as inactive.
+	 * @param {SunEditor.FrameContext} fc Frame context that lost focus
+	 */
+	__showBlurHighlight(fc: SunEditor.FrameContext): void;
+	/**
+	 * @internal
+	 * @description Removes the highlight painted by `__showBlurHighlight`. Safe to call repeatedly.
+	 */
+	__clearBlurHighlight(): void;
+	/**
+	 * @internal
 	 * @description Initialize the scroll information when the editor first loads
 	 */
 	__init(): void;
+	/**
+	 * @internal
+	 * @description Releases the blur highlight (the registry is page-global, so a detached Range would leak).
+	 */
+	_destroy(): void;
 	#private;
 }

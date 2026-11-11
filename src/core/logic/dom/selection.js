@@ -1,5 +1,8 @@
 import { dom, unicode, env, numbers } from '../../../helper';
-const { _w } = env;
+const { _w, _d } = env;
+
+const BLUR_HIGHLIGHT = 'se-selection-blur';
+const BLUR_HIGHLIGHT_STYLE = `::highlight(${BLUR_HIGHLIGHT}){background-color:var(--se-selection-blur-color,rgba(69,146,255,.3));color:inherit}`;
 
 /**
  * @description Selection, Range related class
@@ -18,6 +21,11 @@ class Selection_ {
 
 	#scrollMargin = 0;
 	#hasScrollParents = false;
+
+	/** @type {?{ hl: Highlight, range: Range, fc: SunEditor.FrameContext }} */
+	#blurHL = null;
+	/** @type {?() => void} */
+	#blurUnsub = null;
 
 	/**
 	 * @constructor
@@ -907,6 +915,77 @@ class Selection_ {
 
 	/**
 	 * @internal
+	 * @description Keeps the remembered selection painted while focus is outside the editor (modal, dropdown, toolbar input, page).
+	 * - Skipped in iframe mode: the browser already paints the iframe selection as inactive.
+	 * @param {SunEditor.FrameContext} fc Frame context that lost focus
+	 */
+	__showBlurHighlight(fc) {
+		this.__clearBlurHighlight();
+
+		const registry = _w.CSS?.highlights;
+		if (!registry || !_w.Highlight || fc.get('options').get('iframe') || !_d.hasFocus()) return;
+		if (this.#$.component.__selectionSelected || this.#$.component.isSelected) return;
+		if (!this.#paintBlurRange(fc, this.#store.get('_range'))) return;
+
+		// setRange usually moves focus first, so OnFocus clears before this runs
+		this.#blurUnsub = this.#store.subscribe('_range', (range) => {
+			const active = (this.#$.contextProvider.shadowRoot || _d).activeElement;
+			if (fc.get('wysiwyg').contains(active) || !this.#paintBlurRange(fc, range)) this.__clearBlurHighlight();
+		});
+	}
+
+	/**
+	 * @internal
+	 * @description Removes the highlight painted by `__showBlurHighlight`. Safe to call repeatedly.
+	 */
+	__clearBlurHighlight() {
+		this.#unpaintBlurRange();
+		this.#blurUnsub?.();
+		this.#blurUnsub = null;
+	}
+
+	/**
+	 * @description Paints a clone of `range` (a live Range would follow later selection changes).
+	 * @param {SunEditor.FrameContext} fc Frame context
+	 * @param {?Range} range Range to paint
+	 * @returns {boolean} Whether a range was painted
+	 */
+	#paintBlurRange(fc, range) {
+		this.#unpaintBlurRange();
+
+		const wysiwyg = fc.get('wysiwyg');
+		if (!range || range.collapsed || !wysiwyg.contains(range.commonAncestorContainer)) return false;
+		if (wysiwyg.querySelector('.se-selected-table-cell')) return false;
+
+		dom.utils.injectStyle(BLUR_HIGHLIGHT, BLUR_HIGHLIGHT_STYLE, this.#$.contextProvider.shadowRoot || _d);
+
+		const registry = _w.CSS.highlights;
+		let hl = registry.get(BLUR_HIGHLIGHT);
+		if (!hl) {
+			hl = new _w.Highlight();
+			hl.priority = -1; // below the "finder" highlights
+			registry.set(BLUR_HIGHLIGHT, hl);
+		}
+
+		const clone = range.cloneRange();
+		hl.add(clone);
+		this.#blurHL = { hl, range: clone, fc };
+		return true;
+	}
+
+	/**
+	 * @description Removes only this editor's range; the shared highlight is dropped when no editor uses it.
+	 */
+	#unpaintBlurRange() {
+		if (!this.#blurHL) return;
+		const { hl, range } = this.#blurHL;
+		this.#blurHL = null;
+		hl.delete(range);
+		if (hl.size === 0 && _w.CSS.highlights.get(BLUR_HIGHLIGHT) === hl) _w.CSS.highlights.delete(BLUR_HIGHLIGHT);
+	}
+
+	/**
+	 * @internal
 	 * @description Initialize the scroll information when the editor first loads
 	 */
 	__init() {
@@ -915,6 +994,14 @@ class Selection_ {
 			? 40
 			: (numbers.get(_w.getComputedStyle(this.#frameContext.get('wysiwyg')).scrollMargin, 0) || 40) +
 				numbers.get(_w.getComputedStyle(this.#frameContext.get('wrapper')).paddingBottom, 0);
+	}
+
+	/**
+	 * @internal
+	 * @description Releases the blur highlight (the registry is page-global, so a detached Range would leak).
+	 */
+	_destroy() {
+		this.__clearBlurHighlight();
 	}
 }
 

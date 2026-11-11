@@ -584,4 +584,53 @@ describe('dom.utils helper', () => {
         });
         
     });
+	describe('injectStyle', () => {
+		const find = (root, text) => [...root.querySelectorAll('style')].filter((s) => s.textContent === text);
+
+		it('should insert the style into the document head only once per id', () => {
+			dom.utils.injectStyle('t-once', '.t-once{color:red}');
+			dom.utils.injectStyle('t-once', '.t-once{color:red}');
+			const styles = find(document.head, '.t-once{color:red}');
+			expect(styles).toHaveLength(1);
+			styles[0].remove();
+		});
+
+		it('should insert different ids separately', () => {
+			dom.utils.injectStyle('t-a', '.t-a{}');
+			dom.utils.injectStyle('t-b', '.t-b{}');
+			expect(find(document.head, '.t-a{}')).toHaveLength(1);
+			expect(find(document.head, '.t-b{}')).toHaveLength(1);
+			[...find(document.head, '.t-a{}'), ...find(document.head, '.t-b{}')].forEach((s) => s.remove());
+		});
+
+		it('should insert again when the style was removed', () => {
+			dom.utils.injectStyle('t-re', '.t-re{}');
+			find(document.head, '.t-re{}').forEach((s) => s.remove());
+			dom.utils.injectStyle('t-re', '.t-re{}');
+			const styles = find(document.head, '.t-re{}');
+			expect(styles).toHaveLength(1);
+			styles[0].remove();
+		});
+
+		it('should insert into the head of another document', () => {
+			const other = document.implementation.createHTMLDocument('other');
+			dom.utils.injectStyle('t-doc', '.t-doc{}', other);
+			expect(find(other.head, '.t-doc{}')).toHaveLength(1);
+			expect(find(document.head, '.t-doc{}')).toHaveLength(0);
+		});
+
+		it('should insert into a shadow root, separately from the document', () => {
+			const host = document.createElement('div');
+			document.body.appendChild(host);
+			const shadow = host.attachShadow({ mode: 'open' });
+			try {
+				dom.utils.injectStyle('t-shadow', '.t-shadow{}', shadow);
+				dom.utils.injectStyle('t-shadow', '.t-shadow{}', shadow);
+				expect(find(shadow, '.t-shadow{}')).toHaveLength(1);
+				expect(find(document.head, '.t-shadow{}')).toHaveLength(0);
+			} finally {
+				host.remove();
+			}
+		});
+	});
 });
