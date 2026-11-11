@@ -552,12 +552,17 @@ class Viewer {
 		const rtlClass = this.#options.get('_rtl') ? ' se-rtl' : '';
 		const themeClass = (this.#options.get('_themeClass') || '').trim();
 		const stripTheme = (cls) => (themeClass ? cls.replace(themeClass, '').trim() : cls);
-		// @page margin already applies the inner padding; the A4 document body must not also force 21cm
+
+		// @page margin already applies the inner padding; the body must not add padding or force the A4 width (21cm)
+		// padding reset is !important because a copied body style attribute (iframe_fullPage) drops the inline one
 		const pageCSS = /*html*/ `
 			<style>
 				@page {
 					size: A4;
 					margin: ${innerPadding};
+				}
+				body {
+					padding: 0 !important;
 				}
 				body.sun-editor-editable.se-type-document-editable-a4 {
 					width: auto !important;

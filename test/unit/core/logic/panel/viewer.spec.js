@@ -1375,22 +1375,82 @@ describe('Viewer', () => {
 			// No error expected
 		});
 
-		it('should not force the A4 width on the print body in document type (#1728)', () => {
-			const style = document.createElement('style');
-			style.textContent = '.sun-editor-editable.se-type-document-editable-a4 { width: 21cm !important; }';
-			document.head.appendChild(style);
-			env.frameOptions.set('iframe', false);
-			env.options.set('_editableClass', 'sun-editor-editable se-type-document-editable-a4');
-			try {
+		describe('document type page box (#1728)', () => {
+			const A4_CLASS = 'sun-editor-editable se-type-document-editable-a4';
+			let style;
+
+			beforeEach(() => {
+				style = document.createElement('style');
+				style.textContent =
+					'.sun-editor-editable.se-type-document-editable-a4 { width: 21cm !important; padding: 40px; }';
+				document.head.appendChild(style);
+				env.options.set('_editableClass', A4_CLASS);
+			});
+			afterEach(() => {
+				style.remove();
+			});
+
+			const printAndGetBody = () => {
 				viewer.print();
 				const iframes = document.body.querySelectorAll('iframe');
 				const printWindow = iframes[iframes.length - 1].contentWindow;
-				const printBody = printWindow.document.body;
-				expect(printBody.classList.contains('se-type-document-editable-a4')).toBe(true);
-				expect(printWindow.getComputedStyle(printBody).width).not.toBe('21cm');
-			} finally {
-				style.remove();
-			}
+				const body = printWindow.document.body;
+				const rules = [...printWindow.document.styleSheets].flatMap((s) => [...s.cssRules]);
+				return { body, rules, computed: printWindow.getComputedStyle(body) };
+			};
+
+			const expectPageBox = ({ body, rules, computed }) => {
+				expect(body.classList.contains('se-type-document-editable-a4')).toBe(true);
+				expect(computed.width).toBe('auto');
+				expect(computed.paddingLeft).toBe('0px');
+				expect(computed.paddingRight).toBe('0px');
+				// jsdom cascades by source order only; in browsers these must be !important to beat the A4 class rule
+				const ruleOf = (selector) => rules.find((r) => r.selectorText === selector);
+				expect(ruleOf('body').style.getPropertyPriority('padding')).toBe('important');
+				expect(
+					ruleOf('body.sun-editor-editable.se-type-document-editable-a4').style.getPropertyPriority('width'),
+				).toBe('important');
+			};
+
+			it('should not force the A4 width on the print body (non-iframe mode)', () => {
+				env.frameOptions.set('iframe', false);
+				expectPageBox(printAndGetBody());
+			});
+
+			it('should not force the A4 width on the print body (iframe mode)', () => {
+				env.frameOptions.set('iframe', true);
+				env.frameOptions.set('iframe_fullPage', false);
+				expectPageBox(printAndGetBody());
+			});
+
+			it('should not force the A4 width on the print body with printClass', () => {
+				env.frameOptions.set('iframe', false);
+				// constructor composes printClass as `${printClass} ${_editableClass}`
+				env.options.set('printClass', `my-print-class ${A4_CLASS}`);
+				const result = printAndGetBody();
+				expect(result.body.classList.contains('my-print-class')).toBe(true);
+				expectPageBox(result);
+			});
+
+			it('should reset the body padding even when the copied fullPage body has a style attribute', () => {
+				env.frameOptions.set('iframe', true);
+				env.frameOptions.set('iframe_fullPage', true);
+				// _wd is the test document, so its body attributes are copied into the print body
+				const prevClass = document.body.getAttribute('class');
+				const prevStyle = document.body.getAttribute('style');
+				document.body.setAttribute('class', A4_CLASS);
+				document.body.setAttribute('style', 'font-size: 14px;');
+				try {
+					const result = printAndGetBody();
+					expect(result.computed.fontSize).toBe('14px');
+					expectPageBox(result);
+				} finally {
+					if (prevClass === null) document.body.removeAttribute('class');
+					else document.body.setAttribute('class', prevClass);
+					if (prevStyle === null) document.body.removeAttribute('style');
+					else document.body.setAttribute('style', prevStyle);
+				}
+			});
 		});
 
 		it('should call hideLoading and remove iframe after timeout', () => {
