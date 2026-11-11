@@ -1375,6 +1375,24 @@ describe('Viewer', () => {
 			// No error expected
 		});
 
+		it('should not force the A4 width on the print body in document type (#1728)', () => {
+			const style = document.createElement('style');
+			style.textContent = '.sun-editor-editable.se-type-document-editable-a4 { width: 21cm !important; }';
+			document.head.appendChild(style);
+			env.frameOptions.set('iframe', false);
+			env.options.set('_editableClass', 'sun-editor-editable se-type-document-editable-a4');
+			try {
+				viewer.print();
+				const iframes = document.body.querySelectorAll('iframe');
+				const printWindow = iframes[iframes.length - 1].contentWindow;
+				const printBody = printWindow.document.body;
+				expect(printBody.classList.contains('se-type-document-editable-a4')).toBe(true);
+				expect(printWindow.getComputedStyle(printBody).width).not.toBe('21cm');
+			} finally {
+				style.remove();
+			}
+		});
+
 		it('should call hideLoading and remove iframe after timeout', () => {
 			viewer.print();
 			const iframesBefore = document.body.querySelectorAll('iframe');
