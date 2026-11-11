@@ -552,11 +552,15 @@ class Viewer {
 		const rtlClass = this.#options.get('_rtl') ? ' se-rtl' : '';
 		const themeClass = (this.#options.get('_themeClass') || '').trim();
 		const stripTheme = (cls) => (themeClass ? cls.replace(themeClass, '').trim() : cls);
+		// @page margin already applies the inner padding; the A4 document body must not also force 21cm
 		const pageCSS = /*html*/ `
 			<style>
 				@page {
 					size: A4;
 					margin: ${innerPadding};
+				}
+				body.sun-editor-editable.se-type-document-editable-a4 {
+					width: auto !important;
 				}
 			</style>`;
 
