@@ -12,7 +12,6 @@ class Selection_ {
 	#$;
 	#store;
 
-	#shadowRoot;
 	#instanceCheck;
 	#context;
 	#frameContext;
@@ -36,7 +35,6 @@ class Selection_ {
 		this.#$ = kernel.$;
 		this.#store = kernel.store;
 
-		this.#shadowRoot = this.#$.contextProvider.shadowRoot;
 		this.#instanceCheck = this.#$.instanceCheck;
 		this.#context = this.#$.context;
 		this.#frameContext = this.#$.frameContext;
@@ -59,9 +57,13 @@ class Selection_ {
 	 */
 	get() {
 		let selection = null;
+		const shadowRoot = this.#$.contextProvider.shadowRoot;
 
-		if (typeof this.#shadowRoot?.getSelection === 'function') {
-			selection = this.#shadowRoot.getSelection();
+		if (
+			typeof shadowRoot?.getSelection === 'function' &&
+			shadowRoot.ownerDocument === this.#frameContext.get('_wd')
+		) {
+			selection = shadowRoot.getSelection();
 		} else {
 			selection = this.#frameContext.get('_ww').getSelection();
 		}

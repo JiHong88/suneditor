@@ -1168,7 +1168,12 @@ class EventOrchestrator extends KernelInjector {
 	 * @param {Document} _wd - Wysiwyg document
 	 */
 	#OnSelectionchange_document(_wd) {
-		const selection = _wd.getSelection();
+		const shadowRoot = this.#contextProvider.shadowRoot;
+		const selection =
+			typeof shadowRoot?.getSelection === 'function' && shadowRoot.ownerDocument === _wd
+				? shadowRoot.getSelection()
+				: _wd.getSelection();
+
 		let anchorNode = selection.anchorNode;
 
 		this.#contextProvider.applyToRoots((root) => {

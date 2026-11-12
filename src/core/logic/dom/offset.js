@@ -76,7 +76,6 @@ class Offset {
 	#$;
 	#store;
 
-	#shadowRoot;
 	#carrierWrapper;
 	#context;
 	#frameContext;
@@ -91,7 +90,6 @@ class Offset {
 		this.#$ = kernel.$;
 		this.#store = kernel.store;
 
-		this.#shadowRoot = this.#$.contextProvider.shadowRoot;
 		this.#carrierWrapper = this.#$.contextProvider.carrierWrapper;
 		this.#context = this.#$.context;
 		this.#frameContext = this.#$.frameContext;
@@ -290,7 +288,7 @@ class Offset {
 			}
 		}
 
-		el = /** @type {HTMLElement} */ (this.#shadowRoot?.host);
+		el = /** @type {HTMLElement} */ (this.#$.contextProvider.shadowRoot?.host);
 		if (el) ohOffsetEl = owOffsetEl = topArea;
 		while (el) {
 			t += el.scrollTop;
