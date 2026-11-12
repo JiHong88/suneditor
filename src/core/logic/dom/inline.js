@@ -13,6 +13,7 @@ import { dom, unicode, converter } from '../../../helper';
  */
 class Inline {
 	#$;
+	#store;
 	#options;
 
 	#listCamel;
@@ -24,6 +25,7 @@ class Inline {
 	 */
 	constructor(kernel) {
 		this.#$ = kernel.$;
+		this.#store = kernel.store;
 
 		this.#options = this.#$.options;
 
@@ -479,6 +481,8 @@ class Inline {
 
 		// set range
 		this.#$.ui.offCurrentController();
+		// refresh the toolbar state for the same selection node
+		this.#store.set('_lastSelectionNode', null);
 		this.#$.selection.setRange(start.container, start.offset, end.container, end.offset);
 		this.#$.history.push(false);
 
