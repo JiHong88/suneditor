@@ -30,4 +30,19 @@ describe('Core Logic - Offset', () => {
 			expect(typeof offset).toBe('object');
 		});
 	});
+
+	describe('getGlobalScroll', () => {
+		it('should include the shadow host scroll resolved after construction', () => {
+			const before = offset.getGlobalScroll().top;
+			// contextProvider.init() resolves shadowRoot after the offset module is constructed
+			const host = document.createElement('div');
+			Object.defineProperty(host, 'scrollTop', { value: 30 });
+			kernel.$.contextProvider.shadowRoot = { host };
+			try {
+				expect(offset.getGlobalScroll().top).toBe(before + 30);
+			} finally {
+				kernel.$.contextProvider.shadowRoot = null;
+			}
+		});
+	});
 });

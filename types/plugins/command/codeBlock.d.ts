@@ -6,6 +6,7 @@ export type CodeBlockPluginOptions = {
 	 * - Defaults to 21 common languages
 	 * - [javascript, typescript, html, css, json, python, java, c, cpp, csharp, go, rust, ruby, php, swift, kotlin, sql, bash, markdown, xml, yaml].
 	 * - Set to empty array `[]` to disable language selection UI entirely.
+	 * - Entries that are not a valid language name (letters, digits, `_`, `+`, `#`, `.`, `-`, without spaces) are ignored.
 	 * ```js
 	 * { codeBlock: { langs: ['javascript', 'python', 'html', 'css'] } }
 	 * ```
@@ -18,6 +19,7 @@ export type CodeBlockPluginOptions = {
  * - Defaults to 21 common languages
  * - [javascript, typescript, html, css, json, python, java, c, cpp, csharp, go, rust, ruby, php, swift, kotlin, sql, bash, markdown, xml, yaml].
  * - Set to empty array `[]` to disable language selection UI entirely.
+ * - Entries that are not a valid language name (letters, digits, `_`, `+`, `#`, `.`, `-`, without spaces) are ignored.
  * ```js
  * { codeBlock: { langs: ['javascript', 'python', 'html', 'css'] } }
  * ```

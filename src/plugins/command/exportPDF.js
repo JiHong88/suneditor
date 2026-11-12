@@ -140,7 +140,7 @@ class ExportPDF extends PluginCommand {
 		const blob = new Blob([xhr.response], { type: 'application/pdf' });
 		const contentDisposition = xhr.getResponseHeader('Content-Disposition');
 		const downloadUrl = URL.createObjectURL(blob);
-		const filename = (contentDisposition.match(/filename="([^"]+)/) || [])[1] || this.fileName + '.pdf';
+		const filename = (contentDisposition?.match(/filename="([^"]+)/) || [])[1] || this.fileName + '.pdf';
 		const a = dom.utils.createElement(
 			'A',
 			{ href: downloadUrl, download: filename, style: 'display: none;' },

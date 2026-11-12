@@ -17,7 +17,7 @@ const { _w, _d } = env;
  * @property {Object} [formSize={}] - An object specifying the dimensions for the math modal.
  * @property {string} [formSize.width="460px"] - The default width of the math modal.
  * @property {string} [formSize.height] - The default height of the math modal.
- * - Defaults to `"14em"`. When `autoHeight` is `true`, defaults to `formSize.minHeight`.
+ * - Defaults to `"14em"`. When `autoHeight` is `true`, it is ignored and the textarea starts at `formSize.minHeight` (then grows with its content).
  * @property {string} [formSize.maxWidth] - The maximum width of the math modal.
  * @property {string} [formSize.maxHeight] - The maximum height of the math modal.
  * @property {string} [formSize.minWidth="400px"] - The minimum width of the math modal.
@@ -194,7 +194,7 @@ class Math_ extends PluginModal {
 		} else if (this.controller.currentTarget) {
 			const currentTarget = this.controller.currentTarget;
 			const exp = converter.entityToHTML(this.#escapeBackslashes(getValue(currentTarget), true));
-			const fontSize = getType(currentTarget) || '1em';
+			const fontSize = getType(currentTarget) || this.defaultFontSize;
 			this.textArea.value = exp;
 			this.fontSizeElement.value = fontSize;
 			this.previewElement.innerHTML = this.#renderer(exp);
@@ -269,6 +269,8 @@ class Math_ extends PluginModal {
 	modalInit() {
 		this.textArea.value = '';
 		this.previewElement.innerHTML = '';
+		this.fontSizeElement.value = this.defaultFontSize;
+		this.previewElement.style.fontSize = this.defaultFontSize;
 		dom.utils.removeClass(this.textArea, 'se-error');
 	}
 
@@ -332,7 +334,11 @@ class Math_ extends PluginModal {
 		try {
 			dom.utils.removeClass(this.textArea, 'se-error');
 			if (this.katex) {
-				result = this.katex.src.renderToString(exp, { throwOnError: true, displayMode: true });
+				result = this.katex.src.renderToString(exp, {
+					displayMode: true,
+					...this.katex.options,
+					throwOnError: true,
+				});
 			} else if (this.mathjax) {
 				result = this.mathjax.convert(exp).outerHTML;
 				if (/<mjx-merror/.test(result)) {

@@ -48,6 +48,33 @@ describe('Core Logic - Selection', () => {
 			const sel = selection.get();
 			expect(typeof sel).toBe('object');
 		});
+
+		it('should use the shadowRoot selection resolved after construction', () => {
+			// contextProvider.init() resolves shadowRoot after the selection module is constructed
+			const native = window.getSelection();
+			const shadowRoot = { ownerDocument: document, getSelection: jest.fn(() => native) };
+			kernel.$.contextProvider.shadowRoot = shadowRoot;
+			try {
+				expect(selection.get()).toBe(native);
+				expect(shadowRoot.getSelection).toHaveBeenCalled();
+			} finally {
+				kernel.$.contextProvider.shadowRoot = null;
+			}
+		});
+
+		it('should use the frame window selection for a frame outside the shadow root document (iframe)', () => {
+			const shadowRoot = {
+				ownerDocument: document.implementation.createHTMLDocument(''),
+				getSelection: jest.fn(),
+			};
+			kernel.$.contextProvider.shadowRoot = shadowRoot;
+			try {
+				expect(selection.get()).toBe(window.getSelection());
+				expect(shadowRoot.getSelection).not.toHaveBeenCalled();
+			} finally {
+				kernel.$.contextProvider.shadowRoot = null;
+			}
+		});
 	});
 
 	describe('isRange', () => {

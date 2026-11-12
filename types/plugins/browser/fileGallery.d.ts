@@ -42,7 +42,8 @@ export type FileGalleryPluginOptions = {
 		[x: string]: string;
 	};
 	/**
-	 * - Default thumbnail
+	 * - Default thumbnail HTML (e.g. an SVG icon or `<img>` markup),
+	 * or a function that returns it per item. Used for items without their own `thumbnail` URL.
 	 */
 	thumbnail?: string | ((item: SunEditor.Module.Browser.File) => string);
 };
@@ -69,7 +70,8 @@ export type FileGalleryPluginOptions = {
  * as `?keyword=<value>` and the server response replaces the list. When not set, search filters the
  * already-loaded items locally.
  * @property {Object<string, string>} [searchHeaders] - Server-side search request headers
- * @property {string|((item: SunEditor.Module.Browser.File) => string)} [thumbnail] - Default thumbnail
+ * @property {string|((item: SunEditor.Module.Browser.File) => string)} [thumbnail] - Default thumbnail HTML (e.g. an SVG icon or `<img>` markup),
+ * or a function that returns it per item. Used for items without their own `thumbnail` URL.
  */
 /**
  * @class

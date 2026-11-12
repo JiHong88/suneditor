@@ -168,6 +168,10 @@ export type AudioInfo = {
 	 * - new create or update
 	 */
 	isUpdate: boolean;
+	/**
+	 * - audio url (URL input only)
+	 */
+	url?: string;
 };
 export type FileInfo = {
 	/**
@@ -335,6 +339,7 @@ export type EventHandlers = {
  * @property {HTMLAudioElement} element - target element
  * @property {FileList} files - FileList object
  * @property {boolean} isUpdate - new create or update
+ * @property {string} [url] - audio url (URL input only)
  */
 /**
  * @typedef {Object} FileInfo

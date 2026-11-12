@@ -2654,6 +2654,50 @@ describe('EventOrchestrator #OnSelectionchange_document with readOnly', () => {
 	});
 });
 
+describe('EventOrchestrator #OnSelectionchange_document in a shadow root', () => {
+	let editor;
+	let wysiwyg;
+	let text;
+
+	beforeEach(async () => {
+		editor = createTestEditor({ buttonList: [['bold']] });
+		await waitForEditorReady(editor);
+		wysiwyg = editor.$.frameContext.get('wysiwyg');
+		wysiwyg.innerHTML = '<p>Shadow selection</p>';
+		text = wysiwyg.querySelector('p').firstChild;
+		// Chromium retargets the document selection to the shadow host
+		jest.spyOn(document, 'getSelection').mockReturnValue(/** @type {*} */ ({ anchorNode: document.body }));
+	});
+
+	afterEach(() => {
+		editor.$.contextProvider.shadowRoot = null;
+		jest.restoreAllMocks();
+		destroyTestEditor(editor);
+	});
+
+	it("should read the shadow root's own selection", () => {
+		editor.$.contextProvider.shadowRoot = /** @type {*} */ ({
+			ownerDocument: document,
+			getSelection: () => ({ anchorNode: text }),
+		});
+		const init = jest.spyOn(editor.$.selection, 'init').mockReturnValue(null);
+		document.dispatchEvent(new Event('selectionchange'));
+		expect(init).toHaveBeenCalled();
+	});
+
+	it('should keep the document selection for a document other than the shadow root owner', () => {
+		const shadowSelection = jest.fn(() => ({ anchorNode: text }));
+		editor.$.contextProvider.shadowRoot = /** @type {*} */ ({
+			ownerDocument: document.implementation.createHTMLDocument(''),
+			getSelection: shadowSelection,
+		});
+		const init = jest.spyOn(editor.$.selection, 'init').mockReturnValue(null);
+		document.dispatchEvent(new Event('selectionchange'));
+		expect(shadowSelection).not.toHaveBeenCalled();
+		expect(init).not.toHaveBeenCalled();
+	});
+});
+
 describe('EventOrchestrator #OnScroll_window with visible balloon', () => {
 	let editor;
 	let wysiwyg;

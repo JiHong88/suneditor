@@ -924,7 +924,7 @@ class Component {
 	 * @param {KeyboardEvent} e - Event object
 	 */
 	async #OnKeyDown_component(e) {
-		if (this.#$.ui.selectMenuOn) return;
+		if (this.#$.ui.selectMenuOn || this.#$.ui.opendModal) return;
 
 		const keyCode = e.code;
 		if (!keyCodeMap.isEsc(keyCode) && this.#$.ui.isInsideController(dom.query.getEventTarget(e))) return;

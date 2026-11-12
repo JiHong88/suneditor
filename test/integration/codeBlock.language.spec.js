@@ -55,4 +55,19 @@ describe('codeBlock language', () => {
 		expect(clean('<pre><code class="language-a/b=c">x</code></pre>')).toBe('<pre>x</pre>');
 		expect(clean('<pre class="language-a/b=c">x</pre>')).toBe('<pre>x</pre>');
 	});
+
+	it('drops configured langs that cannot be a language class', () => {
+		destroyTestEditor(editor);
+		editor = createTestEditor({
+			plugins: { codeBlock },
+			buttonList: [['codeBlock']],
+			codeBlock: { langs: ['javascript', 'Visual Basic', 'c++'] },
+		});
+
+		const { menu } = hover('<pre>code</pre>');
+
+		expect(menu).toContain('javascript');
+		expect(menu).toContain('c++');
+		expect(menu).not.toContain('Visual Basic');
+	});
 });

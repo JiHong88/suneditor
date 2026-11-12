@@ -201,11 +201,29 @@ describe('Drawing Plugin', () => {
 			k.$.lang.remove = 'Remove';
 			k.$.plugins.image = { pluginOptions: { uploadUrl: null } };
 
-			new Drawing(k, { outputFormat: 'svg' });
+			const d = new Drawing(k, { outputFormat: 'svg' });
+			expect(consoleSpy).not.toHaveBeenCalled();
 
+			d.open();
 			expect(consoleSpy).toHaveBeenCalledWith(
 				expect.stringContaining('uploadUrl')
 			);
+
+			// checked only once
+			consoleSpy.mockClear();
+			d.modalOff();
+			d.open();
+			expect(consoleSpy).not.toHaveBeenCalled();
+			consoleSpy.mockRestore();
+		});
+
+		it('should not throw when the "image" plugin is registered after drawing (outputFormat=svg)', () => {
+			const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+			// before registration, $.plugins.image is still the class reference (no pluginOptions)
+			kernel.$.plugins.image = class Image {};
+
+			expect(() => new Drawing(kernel, { outputFormat: 'svg' })).not.toThrow();
+			expect(consoleSpy).not.toHaveBeenCalled();
 			consoleSpy.mockRestore();
 		});
 	});
@@ -645,10 +663,77 @@ describe('Drawing Plugin', () => {
 				mouseleaveCall[2]();
 				mouseenterCall[2]({ buttons: 1, offsetX: 50, offsetY: 60 });
 
-				// With lineReconnect, points from mousedown remain + 2 reconnection points
+				// With lineReconnect, the new stroke starts from the exit point
 				expect(d.isDrawing).toBe(true);
-				expect(d.points.length).toBe(3); // original point + last point reconnect + new point
+				expect(d.paths).toEqual([[[10, 20]]]);
+				expect(d.points).toEqual([[10, 20], [50, 60]]);
 			}
+		});
+
+		function getHandlers(d) {
+			const calls = kernel.$.eventManager.addEvent.mock.calls;
+			const get = (type) => calls.find((call) => call[0] === d.canvas && call[1] === type)[2];
+			return {
+				down: get('mousedown'),
+				move: get('mousemove'),
+				up: get('mouseup'),
+				leave: get('mouseleave'),
+				enter: get('mouseenter')
+			};
+		}
+
+		it('lineReconnect: entering with the button held and no previous stroke should not throw', () => {
+			const d = new Drawing(kernel, { lineReconnect: true });
+			d.open();
+			const h = getHandlers(d);
+
+			expect(() => h.enter({ buttons: 1, offsetX: 5, offsetY: 6 })).not.toThrow();
+			expect(d.isDrawing).toBe(true);
+			expect(d.points).toEqual([[5, 6]]);
+		});
+
+		it('lineReconnect: should not reconnect to a finished stroke', () => {
+			const d = new Drawing(kernel, { lineReconnect: true });
+			d.open();
+			const h = getHandlers(d);
+
+			h.down({ preventDefault: jest.fn(), offsetX: 10, offsetY: 20 });
+			h.up();
+			// a new press that started outside the canvas
+			h.enter({ buttons: 1, offsetX: 50, offsetY: 60 });
+			expect(d.points).toEqual([[50, 60]]);
+		});
+
+		it('lineReconnect: releasing outside the canvas should stop drawing', () => {
+			const d = new Drawing(kernel, { lineReconnect: true });
+			d.open();
+			const h = getHandlers(d);
+
+			h.down({ preventDefault: jest.fn(), offsetX: 10, offsetY: 20 });
+			h.leave();
+			h.enter({ buttons: 0, offsetX: 50, offsetY: 60 });
+			h.move({ preventDefault: jest.fn(), offsetX: 70, offsetY: 80 });
+
+			expect(d.isDrawing).toBe(false);
+			expect(d.points).toEqual([]);
+			expect(d.paths).toEqual([[[10, 20]]]);
+		});
+
+		it('lineReconnect: should not store the segment before leaving twice', () => {
+			const d = new Drawing(kernel, { lineReconnect: true });
+			d.open();
+			const h = getHandlers(d);
+
+			h.down({ preventDefault: jest.fn(), offsetX: 10, offsetY: 20 });
+			h.move({ preventDefault: jest.fn(), offsetX: 15, offsetY: 25 });
+			h.leave();
+			h.enter({ buttons: 1, offsetX: 50, offsetY: 60 });
+			h.up();
+
+			expect(d.paths).toEqual([
+				[[10, 20], [15, 25]],
+				[[15, 25], [50, 60]]
+			]);
 		});
 	});
 
@@ -928,6 +1013,35 @@ describe('Drawing Plugin', () => {
 			}
 
 			globalThis.DataTransfer = origDataTransfer;
+		});
+
+		it('should apply lineCap to the SVG paths', async () => {
+			const origDataTransfer = globalThis.DataTransfer;
+			globalThis.DataTransfer = class MockDataTransfer {
+				constructor() {
+					this._files = [];
+					this.items = { add: (file) => this._files.push(file) };
+				}
+				get files() {
+					return this._files;
+				}
+			};
+			const serializeSpy = jest.spyOn(XMLSerializer.prototype, 'serializeToString');
+
+			try {
+				const d = new Drawing(kernel, { outputFormat: 'svg', lineCap: 'square' });
+				d.open();
+				d.ctx.lineCap = 'square';
+				d.paths = [[[10, 20], [50, 60]]];
+
+				await d.modalAction();
+
+				const svg = serializeSpy.mock.calls.at(-1)[0];
+				expect(svg.querySelector('path').getAttribute('stroke-linecap')).toBe('square');
+			} finally {
+				serializeSpy.mockRestore();
+				globalThis.DataTransfer = origDataTransfer;
+			}
 		});
 	});
 

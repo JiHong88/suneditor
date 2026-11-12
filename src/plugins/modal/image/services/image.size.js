@@ -1,4 +1,4 @@
-import { keyCodeMap } from '../../../../helper';
+import { keyCodeMap, numbers } from '../../../../helper';
 import { Figure } from '../../../../modules/contract';
 import { SIZE_UNIT } from '../shared/image.constants';
 
@@ -58,9 +58,13 @@ export class ImageSizeService {
 	 * @param {string} h - Height value
 	 */
 	setInputSize(w, h) {
-		this.#inputX.value = w === 'auto' ? '' : w;
+		if (this.#state.onlyPercentage) {
+			this.#inputX.value = /%$/.test(w) ? String(numbers.get(w, 2)) : '';
+			this.#inputY.value = '';
+			return;
+		}
 
-		if (this.#state.onlyPercentage) return;
+		this.#inputX.value = w === 'auto' ? '' : w;
 		this.#inputY.value = h === 'auto' ? '' : h;
 	}
 
@@ -71,7 +75,7 @@ export class ImageSizeService {
 	getInputSize() {
 		return {
 			w: this.#inputX?.value || '',
-			h: this.#inputY?.value || '',
+			h: this.#state.onlyPercentage ? '' : this.#inputY?.value || '',
 		};
 	}
 
@@ -97,6 +101,7 @@ export class ImageSizeService {
 		if (this.#state.onlyPercentage) {
 			if (!w) w = '100%';
 			else if (!/%$/.test(w)) w += SIZE_UNIT.PERCENTAGE;
+			h = 'auto';
 		}
 		this.#main.figure.setSize(w, h);
 	}
@@ -194,7 +199,8 @@ export class ImageSizeService {
 	 */
 	#OnClickRevert() {
 		if (this.#state.onlyPercentage) {
-			this.#inputX.value = Number(this.#origin_w) > 100 ? '100' : this.#origin_w;
+			const w = numbers.get(this.#origin_w, 2);
+			this.#inputX.value = !/%$/.test(this.#origin_w) || !w || w > 100 ? '100' : String(w);
 		} else {
 			this.#inputX.value = this.#origin_w;
 			this.#inputY.value = this.#origin_h;

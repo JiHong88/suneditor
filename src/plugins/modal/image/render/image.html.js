@@ -53,6 +53,8 @@ export function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 			<pre class="se-link-preview"></pre>
 		</div>`;
 
+	const onlyPercentage = pluginOptions.percentageOnlySize;
+	const heightDisplay = !pluginOptions.showHeightInput || onlyPercentage ? 'style="display: none !important;"' : '';
 	const canResizeHtml = !pluginOptions.canResize
 		? ''
 		: /*html*/ `
@@ -60,12 +62,12 @@ export function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 			<div class="se-modal-size-text">
 				<label class="size-w">${lang.width}</label>
 				<label class="se-modal-size-x">&nbsp;</label>
-				<label class="size-h">${lang.height}</label>
+				<label class="size-h" ${heightDisplay}>${lang.height}</label>
 			</div>
-			<input class="se-input-control _se_size_x" placeholder="auto" type="text" />
-			<label class="se-modal-size-x">x</label>
-			<input type="text" class="se-input-control _se_size_y" placeholder="auto" />
-			<label><input type="checkbox" class="se-modal-btn-check _se_check_proportion" checked/>&nbsp;${lang.proportion}</label>
+			<input class="se-input-control _se_size_x"${onlyPercentage ? ' placeholder="100" type="number" min="1" max="100"' : ' placeholder="auto" type="text"'} />
+			<label class="se-modal-size-x" ${onlyPercentage ? '' : heightDisplay}>${onlyPercentage ? '%' : 'x'}</label>
+			<input type="text" class="se-input-control _se_size_y" placeholder="auto" ${heightDisplay} />
+			<label ${heightDisplay}><input type="checkbox" class="se-modal-btn-check _se_check_proportion" checked/>&nbsp;${lang.proportion}</label>
 			<button type="button" aria-label="${lang.revert}" class="se-btn se-tooltip se-modal-btn-revert">
 				${icons.revert}
 				${dom.utils.createTooltipInner(lang.revert)}

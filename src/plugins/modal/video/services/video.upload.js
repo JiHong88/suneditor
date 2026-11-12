@@ -28,15 +28,18 @@ export class VideoUploadService {
 		if (!files) return;
 
 		const videoUploadUrl = this.#pluginOptions.uploadUrl;
-		if (typeof videoUploadUrl === 'string' && videoUploadUrl.length > 0) {
-			this.#main.fileManager.upload(
-				videoUploadUrl,
-				this.#pluginOptions.uploadHeaders,
-				files,
-				this.#UploadCallBack.bind(this, info),
-				this.#error.bind(this),
-			);
+		if (!videoUploadUrl?.length) {
+			this.#error({ errorMessage: '[SUNEDITOR.videoUpload.fail] The "uploadUrl" option is not set.' });
+			return;
 		}
+
+		this.#main.fileManager.upload(
+			videoUploadUrl,
+			this.#pluginOptions.uploadHeaders,
+			files,
+			this.#UploadCallBack.bind(this, info),
+			this.#error.bind(this),
+		);
 	}
 
 	/**
@@ -77,7 +80,7 @@ export class VideoUploadService {
 		const message = await this.#$.eventManager.triggerEvent('onVideoUploadError', { error: response });
 		const err = message === NO_EVENT ? response.errorMessage : message || response.errorMessage;
 		this.#$.ui.alertOpen(err, 'error');
-		console.error('[SUNEDITOR.plugin.video.error]', message);
+		console.error('[SUNEDITOR.plugin.video.error]', err);
 	}
 
 	/**

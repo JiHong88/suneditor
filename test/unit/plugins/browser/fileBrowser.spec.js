@@ -84,6 +84,16 @@ describe('Plugins - Browser - FileBrowser', () => {
             expect(browserOptions.thumbnail({ type: 'unknown' })).toBe('📁');
         });
 
+        it('should use a string thumbnail for every item (like the sibling galleries)', () => {
+            new FileBrowser(kernel, { thumbnail: '<img src="/thumb.png">' });
+
+            const { Browser } = require('../../../../src/modules/contract');
+            const browserOptions = Browser.mock.calls[Browser.mock.calls.length - 1][2];
+
+            expect(browserOptions.thumbnail({ type: 'video' })).toBe('<img src="/thumb.png">');
+            expect(browserOptions.thumbnail({ type: 'file' })).toBe('<img src="/thumb.png">');
+        });
+
         it('should merge props with frame prop', () => {
             const pluginOptions = {
                 props: ['custom1', 'custom2']

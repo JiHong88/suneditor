@@ -53,10 +53,6 @@ class Link extends PluginModal {
 		this.title = this.$.lang.link;
 		this.icon = 'link';
 
-		// define plugin options
-		pluginOptions.textToDisplay = pluginOptions.textToDisplay ?? true;
-		pluginOptions.title = pluginOptions.title ?? true;
-
 		// create HTML
 		const modalEl = CreateHTML_modal(this.$);
 		const controllerEl = CreateHTML_controller(this.$);
@@ -67,6 +63,8 @@ class Link extends PluginModal {
 		this.isUpdateState = false;
 		this.pluginOptions = {
 			...pluginOptions,
+			textToDisplay: pluginOptions.textToDisplay === undefined ? true : !!pluginOptions.textToDisplay,
+			title: pluginOptions.title === undefined ? true : !!pluginOptions.title,
 			uploadUrl,
 			uploadHeaders: pluginOptions.uploadHeaders || null,
 			uploadSizeLimit: numbers.get(pluginOptions.uploadSizeLimit, 0),

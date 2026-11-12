@@ -14,7 +14,8 @@ jest.mock('../../../../../../src/modules/contract', () => ({
 jest.mock('../../../../../../src/helper', () => ({
     keyCodeMap: {
         isSpace: jest.fn()
-    }
+    },
+    numbers: jest.requireActual('../../../../../../src/helper').numbers
 }));
 
 import { keyCodeMap } from '../../../../../../src/helper';
@@ -99,11 +100,20 @@ describe('ImageSizeService', () => {
             expect(mockInputY.value).toBe('');
         });
 
-        it('should not set Y value if onlyPercentage is true', () => {
+        it('should show only the number of a percentage width and clear Y if onlyPercentage is true', () => {
             mockMain.state.onlyPercentage = true;
-            service.setInputSize('50%', 'auto');
-            expect(mockInputX.value).toBe('50%');
-            // Y should remain whatever it was or ignored
+            mockInputY.value = '200px';
+            service.setInputSize('50%', '120px');
+            expect(mockInputX.value).toBe('50');
+            expect(mockInputY.value).toBe('');
+        });
+
+        it('should leave X empty for a non-percentage width if onlyPercentage is true', () => {
+            mockMain.state.onlyPercentage = true;
+            service.setInputSize('300px', '150px');
+            expect(mockInputX.value).toBe('');
+            service.setInputSize('auto', 'auto');
+            expect(mockInputX.value).toBe('');
         });
     });
 
@@ -130,14 +140,23 @@ describe('ImageSizeService', () => {
             mockMain.state.onlyPercentage = true;
             mockInputX.value = '50';
             service.applySize();
-            expect(mockMain.figure.setSize).toHaveBeenCalledWith('50%', '150px');
+            expect(mockMain.figure.setSize).toHaveBeenCalledWith('50%', 'auto');
         });
 
         it('should not append percentage unit if present when onlyPercentage is true', () => {
             mockMain.state.onlyPercentage = true;
             mockInputX.value = '50%';
             service.applySize();
-            expect(mockMain.figure.setSize).toHaveBeenCalledWith('50%', '150px');
+            expect(mockMain.figure.setSize).toHaveBeenCalledWith('50%', 'auto');
+        });
+
+        it('should ignore any height (typed or default) and use 100% for an empty width when onlyPercentage is true', () => {
+            mockMain.state.onlyPercentage = true;
+            mockMain.pluginOptions.defaultWidth = '';
+            mockInputX.value = '';
+            mockInputY.value = '300px';
+            service.applySize();
+            expect(mockMain.figure.setSize).toHaveBeenCalledWith('100%', 'auto');
         });
     });
 
@@ -207,6 +226,23 @@ describe('ImageSizeService', () => {
             
             expect(mockInputX.value).toBe('300px');
             expect(mockInputY.value).toBe('150px');
+        });
+
+        it.each([
+            ['40%', '40'],
+            ['150%', '100'],
+            ['300px', '100'],
+            ['', '100'],
+        ])('should revert to a 1-100 number when onlyPercentage is true (origin %s -> %s)', (origin, expected) => {
+            mockMain.state.onlyPercentage = true;
+            service = new ImageSizeService(mockMain, mockModalEl);
+            const revertCallback = mockMain.eventManager.addEvent.mock.calls.filter((c) => c[1] === 'click').pop()[2];
+
+            service.setOriginSize(origin, '150px');
+            mockInputX.value = '10';
+            revertCallback();
+
+            expect(mockInputX.value).toBe(expected);
         });
     });
 });

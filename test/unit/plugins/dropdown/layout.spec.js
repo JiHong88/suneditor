@@ -116,7 +116,7 @@ describe('Plugins - Dropdown - Layout', () => {
 
             expect(() => {
                 layout.action(mockTarget);
-            }).toThrow('[SUNEDITOR.layout.fail] cause : "layouts[i].html not found"');
+            }).toThrow('[SUNEDITOR.layout.fail] cause : "layout.items[i].html not found"');
 
             expect(kernel.$.menu.dropdownOff).toHaveBeenCalled();
         });
@@ -145,7 +145,7 @@ describe('Plugins - Dropdown - Layout', () => {
 
             new Layout(kernel, { items: [] });
 
-            expect(consoleSpy).toHaveBeenCalledWith('[SUNEDITOR.plugins.layout.warn] To use the "layout" plugin, please define the "layouts" option.');
+            expect(consoleSpy).toHaveBeenCalledWith('[SUNEDITOR.plugins.layout.warn] To use the "layout" plugin, please define the "layout.items" option.');
 
             consoleSpy.mockRestore();
         });

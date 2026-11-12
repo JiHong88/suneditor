@@ -50,6 +50,18 @@ jest.mock('../../../../src/helper', () => ({
 	},
 }));
 
+/**
+ * Creates the preview `<hr>` rendered inside a dropdown item button.
+ * @param {string} className
+ * @param {string} [style]
+ */
+function createPreviewHr(className, style) {
+	const el = document.createElement('hr');
+	el.className = className;
+	if (style) el.setAttribute('style', style);
+	return el;
+}
+
 describe('Plugins - Dropdown - HR', () => {
 	let kernel;
 	let hr;
@@ -233,7 +245,7 @@ describe('Plugins - Dropdown - HR', () => {
 
 		beforeEach(() => {
 			mockTarget = {
-				firstElementChild: { className: '__se__solid' },
+				firstElementChild: createPreviewHr('__se__solid'),
 			};
 		});
 
@@ -264,6 +276,18 @@ describe('Plugins - Dropdown - HR', () => {
 			hr.action(mockTarget);
 
 			expect(kernel.component.insert).toHaveBeenCalled();
+		});
+
+		it('should apply the item style of the preview HR to the inserted HR', () => {
+			const { dom } = require('../../../../src/helper');
+			mockTarget.firstElementChild = createPreviewHr('__se__solid', 'border-top: 3px solid red;');
+
+			hr.action(mockTarget);
+
+			expect(dom.utils.createElement).toHaveBeenCalledWith('hr', {
+				class: '__se__solid',
+				style: 'border-top: 3px solid red;',
+			});
 		});
 
 		it('should handle missing firstElementChild', () => {
@@ -324,7 +348,7 @@ describe('Plugins - Dropdown - HR', () => {
 
 			const result = hr.submit(className);
 
-			expect(dom.utils.createElement).toHaveBeenCalledWith('hr', { class: className });
+			expect(dom.utils.createElement).toHaveBeenCalledWith('hr', { class: className, style: null });
 			expect(kernel.$.focusManager.focus).toHaveBeenCalled();
 			expect(kernel.component.insert).toHaveBeenCalledWith(expect.any(Object), { insertBehavior: 'line' });
 			expect(result).toBeDefined();
@@ -438,7 +462,7 @@ describe('Plugins - Dropdown - HR', () => {
 	describe('Integration', () => {
 		it('should work with editor component module', () => {
 			const mockTarget = {
-				firstElementChild: { className: '__se__solid' },
+				firstElementChild: createPreviewHr('__se__solid'),
 			};
 
 			expect(() => {
@@ -450,7 +474,7 @@ describe('Plugins - Dropdown - HR', () => {
 
 		it('should work with editor format module', () => {
 			const mockTarget = {
-				firstElementChild: { className: '__se__solid' },
+				firstElementChild: createPreviewHr('__se__solid'),
 			};
 
 			hr.action(mockTarget);
@@ -460,7 +484,7 @@ describe('Plugins - Dropdown - HR', () => {
 
 		it('should work with editor selection module', () => {
 			const mockTarget = {
-				firstElementChild: { className: '__se__solid' },
+				firstElementChild: createPreviewHr('__se__solid'),
 			};
 
 			hr.action(mockTarget);

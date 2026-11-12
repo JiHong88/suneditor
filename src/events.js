@@ -72,6 +72,7 @@
  * @property {HTMLAudioElement} element - target element
  * @property {FileList} files - FileList object
  * @property {boolean} isUpdate - new create or update
+ * @property {string} [url] - audio url (URL input only)
  */
 
 // --- file

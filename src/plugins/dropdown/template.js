@@ -47,7 +47,7 @@ class Template extends PluginDropdown {
 			this.$.html.insert(temp.html, { selectInserted: false, skipCharCount: false, skipCleaning: false });
 		} else {
 			this.$.menu.dropdownOff();
-			throw Error('[SUNEDITOR.template.fail] cause : "templates[i].html not found"');
+			throw Error('[SUNEDITOR.template.fail] cause : "template.items[i].html not found"');
 		}
 
 		this.$.menu.dropdownOff();
@@ -61,7 +61,7 @@ class Template extends PluginDropdown {
 function CreateItems(templateList) {
 	if (!templateList || templateList.length === 0) {
 		console.warn(
-			'[SUNEDITOR.plugins.template.warn] To use the "template" plugin, please define the "templates" option.',
+			'[SUNEDITOR.plugins.template.warn] To use the "template" plugin, please define the "template.items" option.',
 		);
 	}
 

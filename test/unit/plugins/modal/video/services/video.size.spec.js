@@ -468,11 +468,20 @@ describe('VideoSizeService', () => {
             expect(mockInputX.value).toBe('100');
         });
 
-        it('should skip setting inputY in setInputSize', () => {
-            service.setInputSize('500px', '300px');
+        it('should show only the number of a percentage width in setInputSize and skip inputY', () => {
+            mockInputY.value = 'keep';
+            service.setInputSize('50%', '300px');
 
-            expect(mockInputX.value).toBe('500px');
-            // inputY should not be modified when onlyPercentage is true
+            expect(mockInputX.value).toBe('50');
+            expect(mockInputY.value).toBe('keep');
+        });
+
+        it('should leave inputX empty for the default (100%) or a non-percentage width', () => {
+            service.setInputSize('100%', '');
+            expect(mockInputX.value).toBe('');
+
+            service.setInputSize('500px', '300px');
+            expect(mockInputX.value).toBe('');
         });
 
         it('should handle ratio select with percentage value', () => {

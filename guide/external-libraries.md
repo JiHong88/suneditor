@@ -127,9 +127,8 @@ const editor = SUNEDITOR.create('editor', {
 		katex: {
 			src: katex,
 			options: {
-				// Optional: KaTeX render options
-				throwOnError: false,
-				displayMode: true,
+				// Optional: KaTeX render options (passed to katex.renderToString)
+				macros: { '\\RR': '\\mathbb{R}' },
 			},
 		},
 	},
@@ -147,9 +146,11 @@ const editor = SUNEDITOR.create('editor', {
 
 ```javascript
 {
-	throwOnError: false;
+	displayMode: true,
 }
 ```
+
+`throwOnError` is always `true`: the math modal shows the parse error under the input instead of rendering it.
 
 **CDN Usage (HTML):**
 

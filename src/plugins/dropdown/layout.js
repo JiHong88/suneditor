@@ -47,7 +47,7 @@ class Layout extends PluginDropdown {
 			this.$.html.set(temp.html);
 		} else {
 			this.$.menu.dropdownOff();
-			throw Error('[SUNEDITOR.layout.fail] cause : "layouts[i].html not found"');
+			throw Error('[SUNEDITOR.layout.fail] cause : "layout.items[i].html not found"');
 		}
 
 		this.$.menu.dropdownOff();
@@ -60,7 +60,9 @@ class Layout extends PluginDropdown {
  */
 function CreateItems(layoutList) {
 	if (!layoutList || layoutList.length === 0) {
-		console.warn('[SUNEDITOR.plugins.layout.warn] To use the "layout" plugin, please define the "layouts" option.');
+		console.warn(
+			'[SUNEDITOR.plugins.layout.warn] To use the "layout" plugin, please define the "layout.items" option.',
+		);
 	}
 
 	return (layoutList || []).map((t, i) => ({

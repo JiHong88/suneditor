@@ -38,6 +38,7 @@ const LANG_NAME_RE = /^[\w+#.-]+$/;
  * - Defaults to 21 common languages
  * - [javascript, typescript, html, css, json, python, java, c, cpp, csharp, go, rust, ruby, php, swift, kotlin, sql, bash, markdown, xml, yaml].
  * - Set to empty array `[]` to disable language selection UI entirely.
+ * - Entries that are not a valid language name (letters, digits, `_`, `+`, `#`, `.`, `-`, without spaces) are ignored.
  * ```js
  * { codeBlock: { langs: ['javascript', 'python', 'html', 'css'] } }
  * ```
@@ -79,7 +80,9 @@ class CodeBlock extends PluginCommand {
 		this.icon = 'code_block';
 
 		this.#preTag = dom.utils.createElement('PRE');
-		this.#langs = pluginOptions?.langs ?? DEFAULT_LANGS;
+		this.#langs = (Array.isArray(pluginOptions?.langs) ? pluginOptions.langs : DEFAULT_LANGS).filter(
+			(lang) => typeof lang === 'string' && LANG_NAME_RE.test(lang),
+		);
 
 		if (!this.#langs.length) return;
 

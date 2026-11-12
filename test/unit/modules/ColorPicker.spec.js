@@ -518,6 +518,12 @@ describe('Modules - ColorPicker', () => {
 			cp.hueSliderClose();
 			expect(cp.hueSlider.close).toHaveBeenCalledTimes(1);
 		});
+
+		it('should not throw when disableHEXInput is true (no hue slider)', () => {
+			const cp = new ColorPicker(mockHost, mockDeps, 'color', { ...defaultParams, disableHEXInput: true });
+			expect(cp.hueSlider).toBeNull();
+			expect(() => cp.hueSliderClose()).not.toThrow();
+		});
 	});
 
 	// ---------------------------------------------------------------

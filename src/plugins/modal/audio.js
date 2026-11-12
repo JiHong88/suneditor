@@ -7,8 +7,10 @@ const { NO_EVENT, ON_OVER_COMPONENT } = env;
 
 /**
  * @typedef {Object} AudioPluginOptions
- * @property {string} [defaultWidth="300px"] - The default width of the `AUDIO` tag.
- * @property {string} [defaultHeight="150px"] - The default height of the `AUDIO` tag.
+ * @property {string} [defaultWidth] - The default width of the `AUDIO` tag. If a number is provided, `"px"` will be appended.
+ * - If not set, no inline width is written (the contents CSS sizes it).
+ * @property {string} [defaultHeight] - The default height of the `AUDIO` tag. If a number is provided, `"px"` will be appended.
+ * - If not set, no inline height is written (the contents CSS sizes it).
  * @property {boolean} [createFileInput] - Whether to create a file input element.
  * @property {boolean} [createUrlInput] - Whether to create a URL input element.
  * - Defaults to `true`. Always `true` when `createFileInput` is `false`.
@@ -369,7 +371,7 @@ class Audio_ extends PluginModal {
 			element: this.#element,
 		};
 
-		const handler = function (uploadCallback, newInfos, infos) {
+		const handler = function (uploadCallback, infos, newInfos) {
 			infos = newInfos || infos;
 			uploadCallback(infos, infos.files);
 		}.bind(this, this.#serverUpload.bind(this), audioInfo);
@@ -404,7 +406,7 @@ class Audio_ extends PluginModal {
 			element: this.#createAudioTag(),
 		};
 
-		const handler = function (uploadCallback, newInfos, infos) {
+		const handler = function (uploadCallback, infos, newInfos) {
 			infos = newInfos || infos;
 			uploadCallback(infos.element, infos.url, infos.files, infos.isUpdate, true);
 		}.bind(this, this.create.bind(this), audioInfo);
@@ -538,9 +540,15 @@ class Audio_ extends PluginModal {
 	#serverUpload(info, files) {
 		if (!files) return;
 
+		const uploadUrl = this.pluginOptions.uploadUrl;
+		if (!uploadUrl?.length) {
+			this.#error({ errorMessage: '[SUNEDITOR.audioUpload.fail] The "uploadUrl" option is not set.' });
+			return;
+		}
+
 		const uploadFiles = this.modal.isUpdate ? [files[0]] : files;
 		this.fileManager.upload(
-			this.pluginOptions.uploadUrl,
+			uploadUrl,
 			this.pluginOptions.uploadHeaders,
 			uploadFiles,
 			this.#UploadCallBack.bind(this, info),

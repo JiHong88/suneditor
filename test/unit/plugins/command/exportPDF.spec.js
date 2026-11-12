@@ -288,11 +288,12 @@ describe('Plugins - Command - ExportPDF', () => {
             expect(mockAnchor.click).toHaveBeenCalled();
         });
 
-        it('should use fallback filename when Content-Disposition is missing', async () => {
+        // XHR returns `null` for a missing / non-exposed (cross-origin) header, '' for an empty one
+        it.each([null, ''])('should use fallback filename when Content-Disposition is %p', async (header) => {
             mockApiManager.asyncCall.mockResolvedValue({
                 status: 200,
                 response: new ArrayBuffer(8),
-                getResponseHeader: jest.fn().mockReturnValue('')
+                getResponseHeader: jest.fn().mockReturnValue(header)
             });
 
             const { dom } = require('../../../../src/helper');

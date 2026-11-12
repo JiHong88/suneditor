@@ -3,7 +3,9 @@ import { dom } from '../../helper';
 
 /**
  * @typedef {Object} HRPluginOptions
- * @property {Array<{name: string, class: string, style?: string}>} [items] - HR list
+ * @property {Array<{name: string, class: string, style?: string}>} [items] - HR list.
+ * `style` is applied to the inserted `hr`. Allow its properties with the `tagStyles` option
+ * (e.g. `tagStyles: { hr: 'border-top' }`) so they survive content cleaning.
  * ```js
  * [
  *   { name: 'Solid', class: '__se__solid', style: 'border-top: 1px solid #000;' },
@@ -95,7 +97,8 @@ class HR extends PluginDropdown {
 	 * @type {PluginDropdown['action']}
 	 */
 	action(target) {
-		const hr = this.submit(target.firstElementChild.className);
+		const preview = target.firstElementChild;
+		const hr = this.submit(preview.className, preview.getAttribute('style'));
 		const line = this.$.format.addLine(hr);
 		this.$.selection.setRange(line, 1, line, 1);
 		this.$.menu.dropdownOff();
@@ -104,9 +107,10 @@ class HR extends PluginDropdown {
 	/**
 	 * @description Add a `hr` element
 	 * @param {string} className HR class name
+	 * @param {?string} [style] HR inline style
 	 */
-	submit(className) {
-		const hr = dom.utils.createElement('hr', { class: className });
+	submit(className, style) {
+		const hr = dom.utils.createElement('hr', { class: className, style: style || null });
 		this.$.focusManager.focus();
 		this.$.component.insert(hr, { insertBehavior: 'line' });
 		return hr;

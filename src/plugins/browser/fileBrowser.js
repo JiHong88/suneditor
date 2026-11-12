@@ -30,11 +30,14 @@ import { Browser } from '../../modules/contract';
  * as `?keyword=<value>` and the server response replaces the list. When not set, search filters the
  * already-loaded items locally.
  * @property {Object<string, string>} [searchHeaders] - Server-side search request headers
- * @property {string|((item: SunEditor.Module.Browser.File) => string)} [thumbnail] - Default thumbnail URL or a function that returns a thumbnail URL per item.
+ * @property {string|((item: SunEditor.Module.Browser.File) => string)} [thumbnail] - Default thumbnail HTML (e.g. an SVG icon or `<img>` markup),
+ * or a function that returns it per item. Used for non-image items without their own `thumbnail` URL.
+ * - The markup is inserted as HTML: do not interpolate unescaped server data into it.
+ * Default: a built-in icon per item `type`.
  * @property {number} [expand=1] - Initial folder expand depth. `1` expands the first level, `Infinity` expands all. Default: `1`.
  * @property {Array<string>} [props] - Additional tag names
  * ```js
- * { url: '/api/files', headers: { Authorization: 'Bearer token' }, thumbnail: (item) => item.thumbUrl }
+ * { url: '/api/files', headers: { Authorization: 'Bearer token' }, thumbnail: (item) => (item.type === 'pdf' ? pdfIconSvg : fileIconSvg) }
  * ```
  */
 
@@ -80,7 +83,9 @@ class FileBrowser extends PluginBrowser {
 			thumbnail:
 				typeof pluginOptions.thumbnail === 'function'
 					? pluginOptions.thumbnail
-					: (item) => thumbnail[item.type] || defaultThumbnail,
+					: typeof pluginOptions.thumbnail === 'string'
+						? () => /** @type {string} */ (pluginOptions.thumbnail)
+						: (item) => thumbnail[item.type] || defaultThumbnail,
 			props: [...new Set((pluginOptions.props ?? []).concat(['frame']))],
 			expand: pluginOptions.expand,
 		});

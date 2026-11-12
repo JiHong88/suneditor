@@ -90,6 +90,8 @@ declare class Link extends PluginModal {
 	target: HTMLAnchorElement;
 	isUpdateState: boolean;
 	pluginOptions: {
+		textToDisplay: boolean;
+		title: boolean;
 		uploadUrl: string;
 		uploadHeaders: {
 			[x: string]: string;
@@ -100,14 +102,6 @@ declare class Link extends PluginModal {
 		uploadSingleSizeLimit: number;
 		acceptedFormats: string;
 		enableFileUpload: boolean;
-		/**
-		 * - Show the "Title" input in the link modal.
-		 */
-		title?: boolean;
-		/**
-		 * - Show the "Text to display" input in the link modal.
-		 */
-		textToDisplay?: boolean;
 		/**
 		 * - Default checked value of the "Open in new window" checkbox.
 		 */

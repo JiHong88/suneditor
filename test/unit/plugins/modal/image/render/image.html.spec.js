@@ -66,6 +66,7 @@ describe('CreateHTML_modal', () => {
             createFileInput: true,
             createUrlInput: true,
             canResize: true,
+            showHeightInput: true,
             useFormatType: true
         };
         
@@ -109,6 +110,51 @@ describe('CreateHTML_modal', () => {
         
         expect(result.inputX).toBeNull();
         expect(result.inputY).toBeNull();
+    });
+
+    it('should show the height controls by default', () => {
+        const result = CreateHTML_modal({ lang: mockLang, icons: mockIcons, plugins: mockPlugins }, mockOptions);
+        const hidden = [...result.html.querySelectorAll('._se_tab_content_image [style]')];
+
+        expect(result.inputY.style.display).toBe('');
+        expect(hidden).toHaveLength(0);
+    });
+
+    it('should hide the height input, its label, the "x" separator and the proportion check if showHeightInput is false (#1729)', () => {
+        mockOptions.showHeightInput = false;
+        const result = CreateHTML_modal({ lang: mockLang, icons: mockIcons, plugins: mockPlugins }, mockOptions);
+        const isHidden = (el) => el.style.display === 'none' && el.style.getPropertyPriority('display') === 'important';
+
+        expect(isHidden(result.inputY)).toBe(true);
+        expect(isHidden(result.html.querySelector('.se-modal-size-text .size-h'))).toBe(true);
+        expect(isHidden(result.html.querySelector('label.se-modal-size-x:not(.se-modal-size-text *)'))).toBe(true);
+        expect(isHidden(result.proportion.parentElement)).toBe(true);
+        // width stays
+        expect(result.inputX.style.display).toBe('');
+        expect(result.html.querySelector('.size-w').style.display).toBe('');
+    });
+
+    it('should render a 1-100 width number input with "%" and hide the height controls if percentageOnlySize is true', () => {
+        mockOptions.percentageOnlySize = true;
+        const result = CreateHTML_modal({ lang: mockLang, icons: mockIcons, plugins: mockPlugins }, mockOptions);
+        const isHidden = (el) => el.style.display === 'none' && el.style.getPropertyPriority('display') === 'important';
+        const separator = result.html.querySelector('label.se-modal-size-x:not(.se-modal-size-text *)');
+
+        expect(result.inputX.type).toBe('number');
+        expect(result.inputX.min).toBe('1');
+        expect(result.inputX.max).toBe('100');
+        expect(separator.textContent).toBe('%');
+        expect(isHidden(separator)).toBe(false);
+        expect(isHidden(result.inputY)).toBe(true);
+        expect(isHidden(result.html.querySelector('.se-modal-size-text .size-h'))).toBe(true);
+        expect(isHidden(result.proportion.parentElement)).toBe(true);
+    });
+
+    it('should render a text width input with "x" if percentageOnlySize is false', () => {
+        const result = CreateHTML_modal({ lang: mockLang, icons: mockIcons, plugins: mockPlugins }, mockOptions);
+
+        expect(result.inputX.type).toBe('text');
+        expect(result.html.querySelector('label.se-modal-size-x:not(.se-modal-size-text *)').textContent).toBe('x');
     });
 
     it('should not render format type controls if useFormatType is false', () => {

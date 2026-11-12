@@ -67,9 +67,12 @@ export class VideoSizeService {
 	 * @param {string} h - Height value
 	 */
 	setInputSize(w, h) {
-		this.#inputX.value = w === this.#defaultSizeX ? '' : w;
+		if (this.#state.onlyPercentage) {
+			this.#inputX.value = w !== this.#defaultSizeX && /%$/.test(w) ? String(numbers.get(w, 2)) : '';
+			return;
+		}
 
-		if (this.#state.onlyPercentage) return;
+		this.#inputX.value = w === this.#defaultSizeX ? '' : w;
 		this.#inputY.value = h === this.#defaultSizeY ? '' : h;
 	}
 

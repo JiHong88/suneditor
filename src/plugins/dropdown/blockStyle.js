@@ -10,9 +10,11 @@ import { dom } from '../../helper';
  * @property {Array<"p"|"div"|"blockquote"|"pre"|"h1"|"h2"|"h3"|"h4"|"h5"|"h6"|string|BlockStyleItem>} [items] - Format list.
  * Use string shortcuts for built-in tags, or `BlockStyleItem` objects for custom block styles.
  * - `command` — `"line"`: single line block, `"br-line"`: br-separated block, `"block"`: container block.
+ * - `class` — must use the format prefix that matches `command`: `__se__format__line_xxx`, `__se__format__br_line_xxx`
+ *   or `__se__format__block_xxx`. Only that class is used to identify the style (other classes are not recognized).
  * ```js
  * // string shortcuts + custom item
- * ['p', 'h1', 'h2', 'blockquote', { tag: 'div', command: 'block', name: 'Custom Block', class: 'my-block' }]
+ * ['p', 'h1', 'h2', 'blockquote', { tag: 'div', command: 'block', name: 'Custom Block', class: '__se__format__block_custom' }]
  * ```
  */
 

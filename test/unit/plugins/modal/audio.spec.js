@@ -645,6 +645,54 @@ describe('Audio Plugin', () => {
 			const result = await audio.submitFile(files);
 			expect(result).toBe(true);
 		});
+
+		it('should upload the files of the info object returned by onAudioUploadBefore', async () => {
+			const a = new Audio_(kernel, { uploadUrl: '/api/upload' });
+			const files = [{ name: 'song.mp3', type: 'audio/mp3', size: 1000 }];
+			const replaced = [{ name: 'other.mp3', type: 'audio/mp3', size: 500 }];
+			kernel.$.eventManager.triggerEvent.mockResolvedValueOnce({ files: replaced, isUpdate: false });
+
+			await a.submitFile(files);
+			expect(a.fileManager.upload).toHaveBeenCalledWith(
+				'/api/upload',
+				null,
+				replaced,
+				expect.any(Function),
+				expect.any(Function)
+			);
+		});
+
+		it('should report an error instead of uploading when uploadUrl is not set', async () => {
+			const a = new Audio_(kernel, {});
+			const files = [{ name: 'song.mp3', type: 'audio/mp3', size: 1000 }];
+			kernel.$.eventManager.triggerEvent.mockResolvedValue(env.NO_EVENT);
+			const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+			const result = await a.submitFile(files);
+			await Promise.resolve();
+			expect(result).toBe(true);
+			expect(a.fileManager.upload).not.toHaveBeenCalled();
+			expect(kernel.$.eventManager.triggerEvent).toHaveBeenCalledWith('onAudioUploadError', {
+				error: { errorMessage: expect.stringContaining('"uploadUrl" option is not set') },
+			});
+			expect(kernel.$.ui.alertOpen).toHaveBeenCalledWith(expect.stringContaining('"uploadUrl" option is not set'), 'error');
+			consoleError.mockRestore();
+		});
+
+		it('should upload when uploadUrl is set', async () => {
+			const a = new Audio_(kernel, { uploadUrl: '/api/upload' });
+			const files = [{ name: 'song.mp3', type: 'audio/mp3', size: 1000 }];
+			kernel.$.eventManager.triggerEvent.mockResolvedValueOnce(env.NO_EVENT);
+
+			await a.submitFile(files);
+			expect(a.fileManager.upload).toHaveBeenCalledWith(
+				'/api/upload',
+				null,
+				files,
+				expect.any(Function),
+				expect.any(Function)
+			);
+		});
 	});
 
 	describe('submitURL()', () => {
@@ -678,10 +726,45 @@ describe('Audio Plugin', () => {
 		});
 
 		it('should call handler with object when event returns object', async () => {
-			const customResult = { url: 'custom-url', files: { name: 'test', size: 0 } };
-			kernel.$.eventManager.triggerEvent.mockResolvedValueOnce(customResult);
+			kernel.$.eventManager.triggerEvent.mockImplementationOnce(async (name, { info }) => ({
+				...info,
+				url: 'custom-url',
+				files: { name: 'test', size: 0 }
+			}));
 			const result = await audio.submitURL('https://example.com/audio.mp3');
 			expect(result).toBe(true);
+		});
+
+		it('should insert with the info object returned by onAudioUploadBefore', async () => {
+			const createSpy = jest.spyOn(audio, 'create').mockImplementation(() => {});
+			const element = document.createElement('audio');
+			const files = { name: 'x.mp3', size: 0 };
+			kernel.$.eventManager.triggerEvent.mockResolvedValueOnce({
+				url: 'https://cdn.example.com/x.mp3',
+				files,
+				isUpdate: false,
+				element
+			});
+
+			await audio.submitURL('https://example.com/audio.mp3');
+			expect(createSpy).toHaveBeenCalledWith(element, 'https://cdn.example.com/x.mp3', files, false, true);
+		});
+
+		it('should insert with the info passed to the handler parameter', async () => {
+			const createSpy = jest.spyOn(audio, 'create').mockImplementation(() => {});
+			kernel.$.eventManager.triggerEvent.mockImplementationOnce(async (name, { info, handler }) => {
+				handler({ ...info, url: 'https://cdn.example.com/y.mp3' });
+				return undefined;
+			});
+
+			await audio.submitURL('https://example.com/audio.mp3');
+			expect(createSpy).toHaveBeenCalledWith(
+				expect.anything(),
+				'https://cdn.example.com/y.mp3',
+				expect.anything(),
+				false,
+				true
+			);
 		});
 	});
 

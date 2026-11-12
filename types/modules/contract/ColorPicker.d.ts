@@ -16,7 +16,8 @@ export type ColorPickerParams = {
 		  }
 	>;
 	/**
-	 * Number of colors to be displayed in one line
+	 * Number of colors to be displayed in one line.
+	 * - Applies only with a custom `colorList`. The default palette is fixed at 9 per line.
 	 */
 	splitNum?: number;
 	/**
@@ -40,7 +41,8 @@ export type ColorPickerParams = {
  * @typedef {Object} ColorPickerParams
  * @property {HTMLElement} form The form element to attach the color picker.
  * @property {Array<string|{value: string, name: string}>} [colorList=[]] color list
- * @property {number} [splitNum=0] Number of colors to be displayed in one line
+ * @property {number} [splitNum=0] Number of colors to be displayed in one line.
+ * - Applies only with a custom `colorList`. The default palette is fixed at 9 per line.
  * @property {string} [defaultColor] Default color
  * @property {boolean} [disableHEXInput=false] Disable HEX input
  * @property {boolean} [disableRemove=false] Disable remove button

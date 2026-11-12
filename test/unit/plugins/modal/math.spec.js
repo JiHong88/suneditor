@@ -398,6 +398,41 @@ describe('Math Plugin', () => {
 
 			expect(math.fontSizeElement.value).toBe('1em');
 		});
+
+		it('should fall back to the configured default font size (not a hard-coded 1em) when no type attribute', async () => {
+			math = new Math(kernel, {
+				fontSizeList: [
+					{ text: 'S', value: '12px' },
+					{ text: 'L', value: '20px', default: true }
+				]
+			});
+			math.controller.currentTarget = {
+				getAttribute: jest.fn((attr) => (attr === 'data-se-value' ? 'y=mx+b' : null))
+			};
+
+			math.modalOn(true);
+
+			expect(math.fontSizeElement.value).toBe('20px');
+			expect(math.previewElement.style.fontSize).toBe('20px');
+		});
+
+		it('should reset the font size to the configured default for a new insert', async () => {
+			math = new Math(kernel, {
+				fontSizeList: [
+					{ text: '1', value: '1em' },
+					{ text: '1.5', value: '1.5em', default: true },
+					{ text: '2', value: '2em' }
+				]
+			});
+			// left over from a previous insert / update
+			math.fontSizeElement.value = '2em';
+			math.previewElement.style.fontSize = '2em';
+
+			math.modalOn(false);
+
+			expect(math.fontSizeElement.value).toBe('1.5em');
+			expect(math.previewElement.style.fontSize).toBe('1.5em');
+		});
 	});
 
 	describe('modalAction method', () => {
@@ -981,6 +1016,25 @@ describe('Math Plugin', () => {
 
 			// The renderer should have been called via modalOn update path
 			expect(renderToString).toHaveBeenCalledWith('x^2', { throwOnError: true, displayMode: true });
+		});
+
+		it('should pass user katex.options to renderToString, keeping throwOnError true', () => {
+			const renderToString = jest.fn().mockReturnValue('<span class="katex">x</span>');
+			const macros = { '\\RR': '\\mathbb{R}' };
+			kernel.$.options.get = jest.fn((key) => {
+				if (key === 'externalLibs') {
+					return { katex: { src: { renderToString }, options: { macros, displayMode: false, throwOnError: false } } };
+				}
+				return null;
+			});
+			math = new Math(kernel, {});
+			math.controller.currentTarget = {
+				getAttribute: jest.fn((attr) => (attr === 'data-se-value' ? '\\RR' : attr === 'data-se-type' ? '1em' : null))
+			};
+
+			math.modalOn(true);
+
+			expect(renderToString).toHaveBeenCalledWith('\\RR', { macros, displayMode: false, throwOnError: true });
 		});
 
 		it('should handle KaTeX error and set error class', () => {

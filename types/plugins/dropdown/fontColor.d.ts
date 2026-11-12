@@ -13,7 +13,8 @@ export type FontColorPluginOptions = {
 		  }
 	>;
 	/**
-	 * - Number of colors per line
+	 * - Number of colors per line.
+	 * Applies only with custom `items`. The default palette is fixed at 9 per line.
 	 */
 	splitNum?: number;
 	/**
@@ -28,7 +29,8 @@ export type FontColorPluginOptions = {
  * @typedef {Object} FontColorPluginOptions
  * @property {Array<string|{value: string, name: string}>} [items] - Color list.
  * Use HEX strings or objects with `value`/`name` for labeled colors.
- * @property {number} [splitNum] - Number of colors per line
+ * @property {number} [splitNum] - Number of colors per line.
+ * Applies only with custom `items`. The default palette is fixed at 9 per line.
  * @property {boolean} [disableHEXInput] - Disable HEX input
  * ```js
  * { items: ['#ff0000', '#00ff00', { value: '#0000ff', name: 'Blue' }], splitNum: 6 }

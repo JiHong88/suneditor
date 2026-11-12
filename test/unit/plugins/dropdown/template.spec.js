@@ -125,7 +125,7 @@ describe('Plugins - Dropdown - Template', () => {
 
             expect(() => {
                 template.action(mockTarget);
-            }).toThrow('[SUNEDITOR.template.fail] cause : "templates[i].html not found"');
+            }).toThrow('[SUNEDITOR.template.fail] cause : "template.items[i].html not found"');
 
             expect(kernel.$.menu.dropdownOff).toHaveBeenCalled();
         });
@@ -154,7 +154,7 @@ describe('Plugins - Dropdown - Template', () => {
 
             new Template(kernel, { items: [] });
 
-            expect(consoleSpy).toHaveBeenCalledWith('[SUNEDITOR.plugins.template.warn] To use the "template" plugin, please define the "templates" option.');
+            expect(consoleSpy).toHaveBeenCalledWith('[SUNEDITOR.plugins.template.warn] To use the "template" plugin, please define the "template.items" option.');
 
             consoleSpy.mockRestore();
         });

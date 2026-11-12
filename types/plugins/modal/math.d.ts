@@ -50,7 +50,7 @@ export type MathPluginOptions = {
  * @property {Object} [formSize={}] - An object specifying the dimensions for the math modal.
  * @property {string} [formSize.width="460px"] - The default width of the math modal.
  * @property {string} [formSize.height] - The default height of the math modal.
- * - Defaults to `"14em"`. When `autoHeight` is `true`, defaults to `formSize.minHeight`.
+ * - Defaults to `"14em"`. When `autoHeight` is `true`, it is ignored and the textarea starts at `formSize.minHeight` (then grows with its content).
  * @property {string} [formSize.maxWidth] - The maximum width of the math modal.
  * @property {string} [formSize.maxHeight] - The maximum height of the math modal.
  * @property {string} [formSize.minWidth="400px"] - The minimum width of the math modal.
@@ -85,7 +85,7 @@ declare class Math_ extends PluginModal {
 			width: string;
 			/**
 			 * - The default height of the math modal.
-			 * - Defaults to `"14em"`. When `autoHeight` is `true`, defaults to `formSize.minHeight`.
+			 * - Defaults to `"14em"`. When `autoHeight` is `true`, it is ignored and the textarea starts at `formSize.minHeight` (then grows with its content).
 			 */
 			height: string;
 			/**

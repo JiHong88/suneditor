@@ -35,6 +35,7 @@ class Drawing extends PluginModal {
 
 	#events;
 	#eventsRegister;
+	#uploadUrlChecked = false;
 
 	/**
 	 * @constructor
@@ -74,10 +75,6 @@ class Drawing extends PluginModal {
 		if (!this.$.plugins.image) {
 			console.warn(
 				'[SUNEDITOR.plugins.drawing.warn] The drawing plugin must need either "image" plugin. Please add the "image" plugin.',
-			);
-		} else if (this.pluginOptions.outputFormat === 'svg' && !this.$.plugins.image.pluginOptions.uploadUrl) {
-			console.warn(
-				'[SUNEDITOR.plugins.drawing.warn] The drawing plugin must need the "image" plugin with the "uploadUrl" option. Please add the "image" plugin with the "uploadUrl" option.',
 			);
 		}
 
@@ -137,6 +134,16 @@ class Drawing extends PluginModal {
 	 * @type {PluginModal['open']}
 	 */
 	open() {
+		// checked on the first open: "image" may be registered after this plugin, so its options are not available in the constructor
+		if (!this.#uploadUrlChecked) {
+			this.#uploadUrlChecked = true;
+			if (this.pluginOptions.outputFormat === 'svg' && !this.$.plugins.image?.pluginOptions?.uploadUrl) {
+				console.warn(
+					'[SUNEDITOR.plugins.drawing.warn] The drawing plugin must need the "image" plugin with the "uploadUrl" option. Please add the "image" plugin with the "uploadUrl" option.',
+				);
+			}
+		}
+
 		if (this.pluginOptions.useFormatType) {
 			this.#activeAsInline(
 				(this.pluginOptions.keepFormatType ? this.as : this.pluginOptions.defaultFormatType) === 'inline',
@@ -347,6 +354,7 @@ class Drawing extends PluginModal {
 			svgPath.setAttribute('fill', 'none');
 			svgPath.setAttribute('stroke', String(this.ctx.strokeStyle));
 			svgPath.setAttribute('stroke-width', this.ctx.lineWidth + '');
+			svgPath.setAttribute('stroke-linecap', this.ctx.lineCap);
 			svg.appendChild(svgPath);
 		});
 
@@ -451,31 +459,26 @@ class Drawing extends PluginModal {
 	}
 
 	#OnCanvasMouseLeave() {
-		if (this.isDrawing) {
-			this.paths.push([...this.points]);
-			if (!this.pluginOptions.lineReconnect) {
-				this.points = [];
-				this.isDrawing = false;
-			}
-		}
+		if (!this.isDrawing) return;
+		if (this.points.length > 0) this.paths.push([...this.points]);
+		this.points = [];
+		if (!this.pluginOptions.lineReconnect) this.isDrawing = false;
 	}
 
 	/**
 	 * @param {MouseEvent} e - Event object
 	 */
 	#OnCanvasMouseEnter(e) {
-		if (e.buttons === 1) {
-			this.isDrawing = true;
-			if (!this.pluginOptions.lineReconnect) {
-				this.points.push([e.offsetX, e.offsetY]);
-			} else {
-				const lastPath = this.paths.at(-1);
-				const lastPoint = lastPath.at(-1);
-				this.points.push([lastPoint[0], lastPoint[1]]);
-				this.points.push([e.offsetX, e.offsetY]);
-			}
-			this.#draw();
+		if (e.buttons !== 1) {
+			this.isDrawing = false;
+			return;
 		}
+
+		const lastPoint = this.isDrawing && this.pluginOptions.lineReconnect ? this.paths.at(-1)?.at(-1) : null;
+		this.isDrawing = true;
+		if (lastPoint) this.points.push([lastPoint[0], lastPoint[1]]);
+		this.points.push([e.offsetX, e.offsetY]);
+		this.#draw();
 	}
 
 	#OnRemove() {

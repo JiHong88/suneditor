@@ -28,7 +28,7 @@ const { _w, ON_OVER_COMPONENT } = env;
 /**
  * @typedef {Object} TablePluginOptions
  * @property {"x"|"y"|"xy"} [scrollType='x'] - Scroll type (`x`, `y`, `xy`)
- * @property {"top"|"bottom"} [captionPosition='bottom'] - Caption position (`top`, `bottom`)
+ * @property {"top"|"bottom"} [captionPosition='top'] - Caption position (`top`, `bottom`). Any value other than `'bottom'` is treated as `'top'`.
  * @property {"cell"|"table"|"dot"} [cellControllerPosition='dot'] - Cell controller position (`cell`, `table`, `dot`)
  * - `dot`: Selecting a cell shows a dot on the cell's right edge (left in RTL) instead of the controller; clicking the dot opens the cell controller, clicking it again hides it.
  * - `cell`: The controller opens on selection, below the selected cell.

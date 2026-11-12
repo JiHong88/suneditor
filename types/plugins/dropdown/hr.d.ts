@@ -2,7 +2,9 @@ import type {} from '../../typedef';
 export default HR;
 export type HRPluginOptions = {
 	/**
-	 * - HR list
+	 * - HR list.
+	 * `style` is applied to the inserted `hr`. Allow its properties with the `tagStyles` option
+	 * (e.g. `tagStyles: { hr: 'border-top' }`) so they survive content cleaning.
 	 * ```js
 	 * [
 	 * { name: 'Solid', class: '__se__solid', style: 'border-top: 1px solid #000;' },
@@ -18,7 +20,9 @@ export type HRPluginOptions = {
 };
 /**
  * @typedef {Object} HRPluginOptions
- * @property {Array<{name: string, class: string, style?: string}>} [items] - HR list
+ * @property {Array<{name: string, class: string, style?: string}>} [items] - HR list.
+ * `style` is applied to the inserted `hr`. Allow its properties with the `tagStyles` option
+ * (e.g. `tagStyles: { hr: 'border-top' }`) so they survive content cleaning.
  * ```js
  * [
  *   { name: 'Solid', class: '__se__solid', style: 'border-top: 1px solid #000;' },
@@ -51,7 +55,8 @@ declare class HR extends PluginDropdown {
 	/**
 	 * @description Add a `hr` element
 	 * @param {string} className HR class name
+	 * @param {?string} [style] HR inline style
 	 */
-	submit(className: string): HTMLElement;
+	submit(className: string, style?: string | null): HTMLElement;
 }
 import { PluginDropdown } from '../../interfaces';
