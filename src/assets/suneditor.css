@@ -2430,8 +2430,10 @@
 	height: 100%;
 	top: 0;
 	left: 0;
-	background-color: var(--se-overlay-background-color);
-	opacity: 0.5;
+	/* backdrop blur */
+	background-color: color-mix(in srgb, var(--se-overlay-background-color) 50%, transparent);
+	-webkit-backdrop-filter: var(--se-overlay-backdrop-filter);
+	backdrop-filter: var(--se-overlay-backdrop-filter);
 }
 
 /* modal - modal */
@@ -3668,8 +3670,10 @@
 	height: 100%;
 	top: 0;
 	left: 0;
-	background-color: var(--se-overlay-background-color);
-	opacity: 0.5;
+	/* backdrop blur */
+	background-color: color-mix(in srgb, var(--se-overlay-background-color) 50%, transparent);
+	-webkit-backdrop-filter: var(--se-overlay-backdrop-filter);
+	backdrop-filter: var(--se-overlay-backdrop-filter);
 }
 
 .sun-editor .se-browser .se-browser-inner {
