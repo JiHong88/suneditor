@@ -14,7 +14,8 @@ Steps:
 4. Read `release-note.md` for existing release notes
 5. Rewrite every `changes.md` entry into the release note format — one sentence each, with the
    source-file references (`` (`core/logic/shell/ui`) ``), root cause, and internal identifiers
-   removed. Never copy an entry through unchanged; see "Condense First" in the rules.
+   removed. Never copy an entry through unchanged (see "Condense First" in the rules). Merge minor
+   entries of the same plugin into one bullet (see "Merge Per Plugin").
 6. Replace `release-note.md` with the current `## <version>` section only, following `AGENTS.md`.
 7. Check the draft before writing: no `` (`path/to/file`) `` references, no internal method or CSS
    selector names, no item longer than one sentence.

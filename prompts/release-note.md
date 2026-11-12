@@ -62,6 +62,17 @@ Drop everything else:
 independent user-visible effects. If an item still needs a second sentence, it is carrying
 root cause - cut it.
 
+### Merge Per Plugin
+
+`changes.md` keeps one entry per fix, so one plugin often has many. Merge the minor ones into one
+bullet per plugin (or module) and category: name the plugin, then list the symptoms briefly.
+
+> `Fixed several \`embed\` issues: broken Instagram/Pinterest/LinkedIn URLs, protocol-less Twitter/Facebook links, and CodePen/Spotify/Pinterest embeds not being selectable.`
+
+- Keep a separate bullet for an item with an issue/PR reference, a contributor credit, or a
+  notable symptom (load failure, data loss, security).
+- Never merge across categories (a Bugfix and a Change stay apart).
+
 ### General Rules
 
 - One item per line, starting with a bullet (`*`).
