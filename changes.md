@@ -5,6 +5,7 @@
 
 ### fix
 
+- Fixed the style buttons (bold, underline, italic, strike, subscript, superscript) losing their `active` state after the styled text at the caret is deleted, while typing still produced styled text (#1731, `selectionState`)
 - Fixed find/replace highlights not painted when the editor is inside a shadow root in Firefox and Safari (`finder`)
 - Fixed printed lines in `document` type being wider than the editor page (#1728, `viewer`)
 - Fixed the editor padding being added on top of the page margin when printing in `iframe_fullPage` mode with `editorStyle` (`viewer`)

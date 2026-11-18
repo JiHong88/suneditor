@@ -1,6 +1,20 @@
 import { dom, numbers } from '../../../helper';
 
 /**
+ * @constant {Object.<string, string>} Native `queryCommandState` command names for the basic style commands.
+ * - The toolbar tracks styles by walking the selection's DOM ancestors, but when the last styled character at the
+ *   caret is deleted, that walk finds nothing while the browser still applies the pending style to newly typed text.
+ */
+const PENDING_STYLE_COMMANDS = {
+	bold: 'bold',
+	underline: 'underline',
+	italic: 'italic',
+	strike: 'strikeThrough',
+	subscript: 'subscript',
+	superscript: 'superscript',
+};
+
+/**
  * @description Service class managing the selection state and toolbar updates.
  * - Handles activating toolbar buttons based on the current selection.
  * - Manages the `active` state of plugins and commands.
@@ -142,6 +156,27 @@ export default class SelectionState {
 				nodeName = styleCommand[nodeName] || nodeName;
 				commandMapNodes.push(nodeName);
 				dom.utils.addClass(commandTargets.get(nodeName), 'active');
+			}
+		}
+
+		/**
+		 * Pending typing style: when the last styled character at the caret has been deleted,
+		 * the DOM walk above finds no styled ancestor, but the browser still applies the pending
+		 * style to newly typed text. Keep the button `active` so it matches what typing will do.
+		 */
+		if (notReadonly) {
+			const wd = fc.get('_wd');
+			if (wd && typeof wd.queryCommandState === 'function' && fc.get('wysiwyg').contains(selectionNode)) {
+				for (const command in PENDING_STYLE_COMMANDS) {
+					if (
+						!commandMapNodes.includes(command) &&
+						commandTargets.has(command) &&
+						wd.queryCommandState(PENDING_STYLE_COMMANDS[command])
+					) {
+						commandMapNodes.push(command);
+						dom.utils.addClass(commandTargets.get(command), 'active');
+					}
+				}
 			}
 		}
 
